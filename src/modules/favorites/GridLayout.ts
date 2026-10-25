@@ -1,6 +1,6 @@
 export interface GridSettings {
-  /** Columns of a narrow tab bar. */
-  minColumns: number;
+  /** Most columns in a row, whatever the tab bar width. */
+  maxColumns: number;
   /** Narrowest tile before a column is dropped, in pixels. */
   tileMinWidth: number;
   /** Tile height, in pixels. */
@@ -14,9 +14,11 @@ export class GridLayout {
   #ResizeObserver: typeof ResizeObserver;
   #observer: ResizeObserver | null = null;
   #strip: HTMLElement | null = null;
+  #tiles = 0;
+  #width = 0;
 
   /**
-   * Sizes the Favorites grid: picks the column count from the tab bar width,
+   * Sizes the Favorites grid: picks the column count from the tile count and the tab bar width,
    * and exposes the sizes to the stylesheet as CSS variables on the tab strip.
    *
    * @param settings Grid sizes.
@@ -28,31 +30,34 @@ export class GridLayout {
   }
 
   /**
-   * Computes how many tiles fit in a row. A wider tab bar gets more columns,
-   * a narrow one never fewer than `minColumns`, as in Arc.
+   * Computes the columns of a row, as in Arc: up to `maxColumns`, fewer when there are fewer
+   * tiles so they stretch to fill the row, and fewer when the tab bar is too narrow for them.
    *
-   * @param width Inner width of the tab strip, in pixels.
+   * @param width Inner width of the tab strip, in pixels; 0 when not measured yet.
+   * @param tiles How many tiles the grid holds.
    * @param settings Grid sizes.
-   * @returns The column count.
+   * @returns The column count, at least 1.
    */
   public static columnsFor(
     width: number,
-    { minColumns, tileMinWidth, gap }: Pick<GridSettings, 'minColumns' | 'tileMinWidth' | 'gap'>,
+    tiles: number,
+    { maxColumns, tileMinWidth, gap }: Pick<GridSettings, 'maxColumns' | 'tileMinWidth' | 'gap'>,
   ): number {
-    if (!(width > 0)) {
-      return minColumns;
-    }
-    return Math.max(minColumns, Math.floor((width + gap) / (tileMinWidth + gap)));
+    const fitting = width > 0 ? Math.floor((width + gap) / (tileMinWidth + gap)) : maxColumns;
+    return Math.max(1, Math.min(maxColumns, tiles, fitting));
   }
 
   /**
-   * Follows a tab strip: sets its variables and keeps the column count in step with its width.
-   * Passing another strip, or null, releases the previous one.
+   * Follows a tab strip: sets its variables and keeps the column count in step with its width
+   * and its tile count. Passing another strip, or null, releases the previous one.
    *
    * @param strip The tab strip laid out as a grid.
+   * @param tiles How many tiles the strip holds.
    */
-  public follow(strip: HTMLElement | null): void {
+  public follow(strip: HTMLElement | null, tiles = 0): void {
+    this.#tiles = tiles;
     if (strip === this.#strip) {
+      this.#setColumns();
       return;
     }
     this.release();
@@ -60,13 +65,15 @@ export class GridLayout {
       return;
     }
     this.#strip = strip;
+    this.#width = strip.clientWidth;
     const { tileHeight, gap } = this.#settings;
     strip.style.setProperty('--vivarcdi-favorites-tile-height', `${tileHeight}px`);
     strip.style.setProperty('--vivarcdi-favorites-gap', `${gap}px`);
-    this.#setColumns(strip.clientWidth);
+    this.#setColumns();
     this.#observer = new this.#ResizeObserver(([entry]) => {
       if (entry !== undefined) {
-        this.#setColumns(entry.contentRect.width);
+        this.#width = entry.contentRect.width;
+        this.#setColumns();
       }
     });
     this.#observer.observe(strip);
@@ -87,8 +94,8 @@ export class GridLayout {
     this.#strip = null;
   }
 
-  #setColumns(width: number): void {
-    const columns = GridLayout.columnsFor(width, this.#settings);
+  #setColumns(): void {
+    const columns = GridLayout.columnsFor(this.#width, this.#tiles, this.#settings);
     this.#strip?.style.setProperty('--vivarcdi-favorites-columns', String(columns));
   }
 }

@@ -13,6 +13,7 @@ export class FavoriteTagger {
   #maxTiles: number;
   #unloadedTabs: UnloadedLookup;
   #strip: HTMLElement | null = null;
+  #tileCount = 0;
 
   /**
    * Marks the first pinned tabs of a vertical tab bar as Favorites tiles.
@@ -43,6 +44,13 @@ export class FavoriteTagger {
   }
 
   /**
+   * @returns How many tiles the last `apply` marked.
+   */
+  public get tileCount(): number {
+    return this.#tileCount;
+  }
+
+  /**
    * Marks the tiles of a tab bar, or removes every mark when the tab bar is not vertical.
    * Only touches what changed, so it can run after every mutation of the tab bar.
    *
@@ -67,6 +75,7 @@ export class FavoriteTagger {
       }
       this.#mark(slot, isTile);
     }
+    this.#tileCount = tiles;
     return strip;
   }
 
@@ -83,6 +92,7 @@ export class FavoriteTagger {
       slot.removeAttribute(UNLOADED_ATTRIBUTE);
     }
     this.#strip = null;
+    this.#tileCount = 0;
   }
 
   #gridStripOf(tabBar: Element | null): HTMLElement | null {
