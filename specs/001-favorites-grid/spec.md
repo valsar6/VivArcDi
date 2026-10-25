@@ -34,12 +34,13 @@ fill the row. Every other tab stays a full-width row, one below the other, with 
 without VivArcDi.
 
 Rows of tiles are separated by the same gap as the tiles in a row, and the list of other tabs starts
-one gap below the grid. Inside a tile the favicon is centered both ways; Vivaldi's loading bar and
-selection outline are hidden, and a notification badge sits small in the top right corner.
+one gap below the grid. Inside a tile the favicon, 24 px as in Arc, is centered both ways; Vivaldi's
+loading bar and selection outline are hidden, and a notification badge sits small in the top right
+corner of the tile, clear of the icon.
 
 The active tile has a lighter background and a small shadow. Tiles of unloaded (discarded or
 hibernated) tabs show a faded, desaturated icon. A tile playing audio shows a small audio icon in
-its top right corner.
+its bottom right corner.
 
 A middle click on a tile, which Vivaldi treats as close, unloads the tab instead. The tile stays; a
 normal click loads it again. If the tile was the active tab, the most recently used other tab
@@ -99,9 +100,9 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 | AC-13 | THE active tile SHALL be lighter than the others, and unloaded tiles SHALL look faded. | manual |
 | AC-14 | WHEN a tile is reordered by dragging, THE grid SHALL follow the new order. | manual |
 | AC-15 | WHEN the workspace changes, THE grid SHALL show the pinned tabs of the new workspace. | manual |
-| AC-16 | WHILE a tile plays audio, THE audio icon SHALL appear small in its top right corner. | manual |
+| AC-16 | WHILE a tile plays audio, THE audio icon SHALL appear small in its bottom right corner. | manual |
 | AC-17 | WHILE the grid is shown, every tab that is not a tile SHALL keep a full-width row with its title, one row below the other. | manual |
-| AC-18 | THE rows of tiles SHALL be separated by `gap`, the other tabs SHALL start one `gap` below the grid, and each tile SHALL show its favicon centered with no loading bar. | manual |
+| AC-18 | THE rows of tiles SHALL be separated by `gap`, the other tabs SHALL start one `gap` below the grid, and each tile SHALL show its 24 px favicon centered both ways, with no loading bar and the notification badge in the tile's top right corner, clear of the icon. | manual |
 
 ## Out of scope
 
