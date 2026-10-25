@@ -8,23 +8,24 @@ export class ActivationMarker extends Module {
   #element: HTMLElement | null = null;
 
   /**
-   * Marks Vivaldi's root element with the `vivarcdi-active` class and the
+   * Marks Vivaldi's root element with the `data-vivarcdi-active` attribute and the
    * VivArcDi version, so stylesheets only apply when VivArcDi is running.
+   * The mark is a data attribute because Vivaldi rewrites the root's classes on every re-render.
    *
    * @param context What the module may use.
    */
   public override start({ document, selectors, build }: ModuleContext): void {
     const element = DomQuery.require(document, selectors.get('browser'));
-    element.classList.add('vivarcdi-active');
+    element.dataset['vivarcdiActive'] = '';
     element.dataset['vivarcdiVersion'] = build.vivarcdiVersion;
     this.#element = element;
   }
 
   /**
-   * Removes the class and the version attribute.
+   * Removes the activation and version attributes.
    */
   public override stop(): void {
-    this.#element?.classList.remove('vivarcdi-active');
+    delete this.#element?.dataset['vivarcdiActive'];
     delete this.#element?.dataset['vivarcdiVersion'];
     this.#element = null;
   }

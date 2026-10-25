@@ -1,4 +1,4 @@
-$root: '#browser.vivarcdi-active';
+$root: '#browser[data-vivarcdi-active]';
 $grid: '[data-vivarcdi-favorites]';
 $tile: '[data-vivarcdi-favorite]';
 $unloaded: '[data-vivarcdi-unloaded]';
