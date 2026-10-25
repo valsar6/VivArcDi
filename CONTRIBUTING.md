@@ -1,5 +1,27 @@
 # Contributing
 
+## Spec-driven workflow
+
+VivArcDi is built spec first: a versioned specification in [`specs/`](specs/README.md) says what a
+feature does, and code follows it. No code is written for a behavior that no approved spec describes.
+
+| Step | Output | Gate |
+|---|---|---|
+| 1. Specify | `specs/NNN-name/spec.md`, from [the template](specs/_template/spec.md): user stories, expected behavior, requirements, acceptance criteria, out of scope | Tore approves the spec |
+| 2. Design | `design.md` and `tasks.md` in the same folder | Tore approves the design |
+| 3. Implement | Code and tests, one task at a time | Review of the pull request |
+| 4. Verify | Manual checklist from the `manual` acceptance criteria | Tore checks it on macOS and Debian |
+
+- **Approval is explicit.** A spec or design becomes `Approved` only when Tore says so on its pull
+  request; the author then sets the status and the date in its header. Steps 1 and 2 may share a pull
+  request for small features, but the spec is approved before the design is written.
+- **Open questions block approval.** A spec with unchecked open questions stays `Draft`.
+- **Implementation pull requests** link the spec, tick the tasks they complete, and set the spec to
+  `Implemented` when the last task is merged.
+- **Behavior changes start in the spec.** A bug that the spec did not foresee gets an acceptance
+  criterion first, then the fix. A change of intent updates the spec and goes through approval again.
+- **Each acceptance criterion has a check**: an automated test with the same name, or a manual step.
+
 ## Principles
 
 - **Design patterns.** Reach for the catalog at [refactoring.guru](https://refactoring.guru/design-patterns)
@@ -36,8 +58,27 @@ the installer deploys. Users never need Node.
 | `npm run build` | Build `dist/` |
 | `make test-py` | Installer tests (Python 3.9+, standard library only) |
 | `make check` | Lint, typecheck, all tests and build in one go |
+| `npm run release -- check --base origin/main --branch <branch>` | The branch and version check that CI runs on pull requests |
 
 `any` is not allowed. Add tests with every behavior change.
+
+## Branches, versions and releases
+
+VivArcDi follows [semantic versioning](https://semver.org) and stays at `0.x.y` until the base of the
+project is complete. The rules are in [spec 006](specs/006-versioning-and-releases/spec.md); in short:
+
+| Branch | Use | Version change in the pull request |
+|---|---|---|
+| `features/<name>` | A new feature or module, from an approved spec | Minor: `0.2.3` to `0.3.0` |
+| `fix/<name>` | A bug fix | Patch: `0.3.0` to `0.3.1` |
+| anything else, e.g. `docs/<name>` | Specs, documentation, tooling | None |
+
+- `<name>` is short, lowercase and hyphenated, e.g. `features/peek`, `fix/tile-drag`.
+- The version lives in `package.json` and `installer/vivarcdi/__init__.py`; change both.
+- The `branch-policy` CI job fails a pull request whose version change does not match its branch.
+- Every merge into `main` that carries a new version is tagged `v<version>` and published as a GitHub
+  release by CI, with notes generated from the merged pull requests. Nobody tags by hand.
+- Moving to `1.0.0` is Tore's decision and changes the policy in spec 006 first.
 
 ## Commits and pull requests
 
