@@ -53,10 +53,17 @@ test('start injects styles and starts enabled modules', async () => {
   const { app, browser, document } = createApp();
   await app.start();
   assert.deepEqual(app.startedModules, ['activation-marker']);
-  assert.ok(browser.classList.contains('vivarcdi-active'));
+  assert.equal(browser.dataset['vivarcdiActive'], '');
   assert.equal(browser.dataset['vivarcdiVersion'], '0.1.0');
   assert.equal(document.head.children.length, 1);
   assert.equal(document.head.children[0]?.dataset['vivarcdi'], 'styles/base.css');
+});
+
+test('the activation mark survives a rewrite of the browser classes', async () => {
+  const { app, browser } = createApp();
+  await app.start();
+  browser.classes.clear();
+  assert.equal(browser.dataset['vivarcdiActive'], '');
 });
 
 test('start stays inactive on a Vivaldi older than every catalog', async () => {
@@ -80,7 +87,8 @@ test('stop undoes modules and styles', async () => {
   const { app, browser, document } = createApp();
   await app.start();
   await app.stop();
-  assert.equal(browser.classList.contains('vivarcdi-active'), false);
+  assert.equal('vivarcdiActive' in browser.dataset, false);
+  assert.equal('vivarcdiVersion' in browser.dataset, false);
   assert.equal(document.head.children.length, 0);
   assert.deepEqual(app.startedModules, []);
 });
