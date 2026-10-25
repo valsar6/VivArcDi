@@ -89,7 +89,7 @@ jobs:
         run: |
           mkdir release
           cp -r installer dist docs release/
-          cp README.md LICENSE release/
+          cp README.md LICENSE .gitignore release/
           find release -name __pycache__ -type d -prune -exec rm -rf {} +
       - name: Force-push the release tree to the dist branch
         working-directory: release
