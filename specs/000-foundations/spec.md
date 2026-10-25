@@ -114,6 +114,7 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 | AC-18 | WHEN Vivaldi updates itself, THE hook SHALL reapply VivArcDi without user action, on Debian and on macOS. | manual |
 | AC-19 | WHEN `uninstall` runs and Vivaldi restarts, THE browser SHALL look and behave as before the install. | manual |
 | AC-20 | WHEN Vivaldi rewrites the classes of the browser root, THE activation mark SHALL stay. | auto: `the activation mark survives a rewrite of the browser classes` |
+| AC-21 | WHEN the installer runs from a `dist` checkout, THE checkout SHALL stay clean in `git status`, because the `dist` branch carries the `.gitignore` that ignores Python bytecode. | manual: install from `git clone -b dist`, then `git status` shows nothing to commit |
 
 ## Out of scope
 

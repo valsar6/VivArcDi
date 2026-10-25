@@ -21,3 +21,5 @@ Reconstructed from PR #1 and PR #5.
 - [ ] **T11.** Manual checks AC-17 to AC-19 on Debian 13.
 - [x] **T12.** Activation mark as a data attribute, found on Vivaldi 8.2 where the class was lost
   and no stylesheet applied. AC-20.
+- [x] **T13.** Publish `.gitignore` on the `dist` branch, so `__pycache__` folders written by the
+  installer do not dirty the user's checkout. AC-21.
