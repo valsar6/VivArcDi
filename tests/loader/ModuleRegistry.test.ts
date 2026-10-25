@@ -1,11 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Module } from '../../src/core/Module.js';
+import type { ModuleContext } from '../../src/core/Module.js';
 import { ModuleRegistry } from '../../src/core/ModuleRegistry.js';
 
 class Alpha extends Module {
-  static id = 'alpha';
-  start() {}
+  public static override id = 'alpha';
+
+  public override start(): void {}
 }
 
 class Nameless extends Module {}
@@ -27,11 +29,11 @@ test('createEnabled instantiates only enabled modules', () => {
     gamma: { enabled: false },
   });
   assert.equal(modules.length, 1);
-  assert.ok(modules[0].module instanceof Alpha);
-  assert.deepEqual(modules[0].options, { enabled: true, size: 3 });
+  assert.ok(modules[0]?.module instanceof Alpha);
+  assert.deepEqual(modules[0]?.options, { enabled: true, size: 3 });
   assert.deepEqual(unknown, ['beta']);
 });
 
 test('the base module refuses to start', () => {
-  assert.throws(() => new Nameless().start({}), /must implement start/);
+  assert.throws(() => new Nameless().start({} as ModuleContext), /must implement start/);
 });
