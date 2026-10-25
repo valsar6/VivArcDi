@@ -1,4 +1,4 @@
-export type TabsMethod = 'get' | 'query' | 'update' | 'discard';
+export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard';
 
 export type TabUpdateListener = (
   tabId: number,
@@ -11,11 +11,29 @@ export interface TabsEvent {
   removeListener(listener: TabUpdateListener): void;
 }
 
-export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & { onUpdated: TabsEvent };
+export type TabActivatedListener = (info: chrome.tabs.OnActivatedInfo) => void;
+
+export interface ChromeEvent<Listener> {
+  addListener(listener: Listener): void;
+  removeListener(listener: Listener): void;
+}
+
+export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & {
+  onUpdated: TabsEvent;
+  onActivated?: ChromeEvent<TabActivatedListener> | undefined;
+};
+
+export type RuntimeMessageListener = (message: unknown) => void;
 
 export interface ChromeApi {
   tabs?: TabsApi | undefined;
-  runtime?: { lastError?: { message?: string } | undefined } | undefined;
+  runtime?:
+    | {
+        lastError?: { message?: string } | undefined;
+        onMessage?: ChromeEvent<RuntimeMessageListener> | undefined;
+      }
+    | undefined;
+  windows?: { create: (...args: unknown[]) => void } | undefined;
 }
 
 export class BrowserTabs {
@@ -65,6 +83,27 @@ export class BrowserTabs {
   }
 
   /**
+   * Creates a tab.
+   *
+   * @param properties As accepted by `chrome.tabs.create`.
+   * @returns The new tab.
+   */
+  public create(properties: chrome.tabs.CreateProperties): Promise<chrome.tabs.Tab> {
+    return this.#call('create', properties);
+  }
+
+  /**
+   * Changes a tab, including Vivaldi's own properties such as `vivExtData`.
+   *
+   * @param tabId Tab id.
+   * @param properties Properties to change.
+   * @returns The updated tab.
+   */
+  public update(tabId: number, properties: Record<string, unknown>): Promise<chrome.tabs.Tab> {
+    return this.#call('update', tabId, properties);
+  }
+
+  /**
    * Unloads a tab from memory while keeping it in the tab bar.
    *
    * @param tabId Tab id. Chromium refuses to unload the active tab.
@@ -84,6 +123,21 @@ export class BrowserTabs {
     const { onUpdated } = this.#requireTabs();
     onUpdated.addListener(listener);
     return () => onUpdated.removeListener(listener);
+  }
+
+  /**
+   * Listens to `chrome.tabs.onActivated`.
+   *
+   * @param listener Called when the active tab of a window changes.
+   * @returns A function that removes the listener.
+   */
+  public onActivated(listener: TabActivatedListener): () => void {
+    const { onActivated } = this.#requireTabs();
+    if (onActivated === undefined) {
+      throw new Error('chrome.tabs.onActivated is not available');
+    }
+    onActivated.addListener(listener);
+    return () => onActivated.removeListener(listener);
   }
 
   #call<T>(method: TabsMethod, ...args: unknown[]): Promise<T> {
