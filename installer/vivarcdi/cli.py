@@ -23,6 +23,7 @@ def build_context(platform: Platform, reporter: Reporter, repo_root: Path = REPO
         WindowHtmlPatcher(),
         PayloadDeployer(repo_root / "src", __version__),
         BackupStore(platform.data_dir / "backups"),
+        platform.permission_advisor(),
     )
     return InstallerContext(
         platform=platform,
@@ -54,6 +55,9 @@ def main(argv: list[str]) -> int:
         platform = PlatformFactory().create()
         if command.needs_root and platform.requires_root and not is_root():
             reporter.error(f"On {platform.name} run it with sudo: sudo python3 installer {command.name}")
+            return 1
+        if not platform.allows_root and is_root():
+            reporter.error(f"On {platform.name} run it without sudo: python3 installer {command.name}")
             return 1
         return command.execute(build_context(platform, reporter))
     except VivArcDiError as error:
