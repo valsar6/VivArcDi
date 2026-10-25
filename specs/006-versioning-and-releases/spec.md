@@ -47,6 +47,8 @@ itself a feature (`features/sdd`) and raises the version to `0.3.0`, the first t
   match.
 - **FR-5.** A push to `main` whose version has no tag creates the tag `v<version>` and a GitHub
   release. A version that is already tagged is not released again.
+- **FR-6.** The first `dist` commit of a version is tagged `dist-v<version>`, so users can check out
+  the build of any release. A version whose `dist` tag exists is not tagged again.
 
 ### Non-functional
 
@@ -66,6 +68,7 @@ itself a feature (`features/sdd`) and raises the version to `0.3.0`, the first t
 | AC-7 | WHEN a pull request is opened, THE `branch-policy` CI job SHALL report whether it follows the policy. | manual: open a `fix/` pull request without a version change and see the job fail |
 | AC-8 | WHEN a new version is merged into `main`, THE CI SHALL create the tag `v<version>` and a GitHub release. | manual: after merging this spec, `v0.3.0` exists in the releases |
 | AC-9 | WHEN `main` gets a commit without a version change, THE CI SHALL create no release. | manual |
+| AC-10 | WHEN CI publishes a version on `dist` for the first time, THE CI SHALL tag that `dist` commit `dist-v<version>`. | manual: after merging 0.4.4, `git ls-remote --tags origin dist-v0.4.4` points at the head of `dist` |
 
 ## Out of scope
 

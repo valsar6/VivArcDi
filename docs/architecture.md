@@ -20,7 +20,7 @@ The scripts are not bundled because the loader resolves its files by URL at runt
 Page scripts are the exception: they run inside web pages, injected with `webview.executeScript`,
 where payload URLs cannot be imported. `peek-links.ts` becomes `dist/page/peek-links.js`, which
 defines the global `VivArcDiPeekLinks` with the file's exports.
-The installer never runs Node. CI publishes `dist/` and `installer/` to the `dist` branch, see the
+The installer never runs Node. CI commits `dist/` and `installer/` on top of the `dist` branch, see the
 README.
 
 ## Payload
