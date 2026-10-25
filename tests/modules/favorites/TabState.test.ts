@@ -62,7 +62,12 @@ test('the only tab of a window is not unloaded', async () => {
 });
 
 test('without access times the nearest tab is chosen', () => {
-  const leaving = { id: 5, index: 4 };
-  const windowTabs = [leaving, { id: 1, index: 0 }, { id: 6, index: 5 }, { id: 7, index: 6 }];
-  assert.equal(TileUnloader.successorOf(windowTabs, leaving).id, 6);
+  const leaving = { id: 5, index: 4 } as chrome.tabs.Tab;
+  const windowTabs = [
+    leaving,
+    { id: 1, index: 0 },
+    { id: 6, index: 5 },
+    { id: 7, index: 6 },
+  ] as chrome.tabs.Tab[];
+  assert.equal(TileUnloader.successorOf(windowTabs, leaving)?.id, 6);
 });

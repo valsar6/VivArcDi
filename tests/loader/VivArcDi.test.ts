@@ -3,18 +3,30 @@ import assert from 'node:assert/strict';
 import { Logger } from '../../src/core/Logger.js';
 import { Module } from '../../src/core/Module.js';
 import { ModuleRegistry } from '../../src/core/ModuleRegistry.js';
+import type { ModuleOptions } from '../../src/core/types.js';
 import { VivArcDi } from '../../src/core/VivArcDi.js';
 import { ActivationMarker } from '../../src/modules/ActivationMarker.js';
 import { FakeDocument, FakeElement, FakeLoader, SilentSink } from './fakes.js';
 
 class Broken extends Module {
-  static id = 'broken';
-  start() {
+  public static override id = 'broken';
+
+  public override start(): void {
     throw new Error('boom');
   }
 }
 
-function createApp({ vivaldiVersion = '8.1.3740.12', modules } = {}) {
+interface AppOptions {
+  vivaldiVersion?: string;
+  modules?: Record<string, ModuleOptions>;
+}
+
+function createApp({ vivaldiVersion = '8.1.3740.12', modules }: AppOptions = {}): {
+  app: VivArcDi;
+  browser: FakeElement;
+  document: FakeDocument;
+  sink: SilentSink;
+} {
   const browser = new FakeElement();
   const document = new FakeDocument({ '#browser': browser });
   const sink = new SilentSink();
@@ -28,7 +40,12 @@ function createApp({ vivaldiVersion = '8.1.3740.12', modules } = {}) {
     'selectors/8.1.json': { browser: '#browser' },
   });
   const registry = new ModuleRegistry().register(ActivationMarker).register(Broken);
-  const app = new VivArcDi({ loader, registry, logger: new Logger('test', sink), document });
+  const app = new VivArcDi({
+    loader,
+    registry,
+    logger: new Logger('test', sink),
+    document: document as unknown as Document,
+  });
   return { app, browser, document, sink };
 }
 
@@ -37,9 +54,9 @@ test('start injects styles and starts enabled modules', async () => {
   await app.start();
   assert.deepEqual(app.startedModules, ['activation-marker']);
   assert.ok(browser.classList.contains('vivarcdi-active'));
-  assert.equal(browser.dataset.vivarcdiVersion, '0.1.0');
+  assert.equal(browser.dataset['vivarcdiVersion'], '0.1.0');
   assert.equal(document.head.children.length, 1);
-  assert.equal(document.head.children[0].dataset.vivarcdi, 'styles/base.css');
+  assert.equal(document.head.children[0]?.dataset['vivarcdi'], 'styles/base.css');
 });
 
 test('start stays inactive on a Vivaldi older than every catalog', async () => {
@@ -47,7 +64,7 @@ test('start stays inactive on a Vivaldi older than every catalog', async () => {
   await app.start();
   assert.deepEqual(app.startedModules, []);
   assert.equal(document.head.children.length, 0);
-  assert.match(sink.lines[0].join(' '), /staying inactive/);
+  assert.match((sink.lines[0] ?? []).join(' '), /staying inactive/);
 });
 
 test('a failing module does not stop the others', async () => {
