@@ -1,0 +1,6 @@
+{
+  "styles": ["styles/base.css"],
+  "modules": {
+    "activation-marker": { "enabled": true }
+  }
+}
