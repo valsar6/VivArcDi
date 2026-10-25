@@ -1,0 +1,80 @@
+@use 'tokens' as *;
+
+#{$root} #{$peek-open} {
+  position: relative;
+}
+
+#{$root} .vivarcdi-peek-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: $peek-layer;
+  background: $peek-dim;
+  animation: vivarcdi-peek-fade $peek-duration ease-out;
+}
+
+#{$root} .vivarcdi-peek-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: $peek-layer + 1;
+  display: flex;
+  flex-direction: column;
+  width: var(--vivarcdi-peek-width, 80%);
+  height: var(--vivarcdi-peek-height, 90%);
+  overflow: hidden;
+  border-radius: $peek-radius;
+  background: var(--colorBg, #fff);
+  box-shadow: $peek-shadow;
+  transform: translate(-50%, -50%);
+  animation: vivarcdi-peek-rise $peek-duration $peek-easing;
+}
+
+#{$root} .vivarcdi-peek-toolbar {
+  display: flex;
+  flex: 0 0 $peek-toolbar-height;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 6px;
+  background: var(--colorBgDark, #eee);
+}
+
+#{$root} .vivarcdi-peek-toolbar button {
+  width: $peek-button-size;
+  height: $peek-button-size;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--colorFg, #222);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#{$root} .vivarcdi-peek-toolbar button:hover {
+  background: color-mix(in srgb, var(--colorFg, #222) 14%, transparent);
+}
+
+#{$root} .vivarcdi-peek-toolbar .vivarcdi-peek-close:hover {
+  background: #e5484d;
+  color: #fff;
+}
+
+#{$root} .vivarcdi-peek-page {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+@keyframes vivarcdi-peek-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes vivarcdi-peek-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+}
