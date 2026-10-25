@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 2 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-25 |
 
 ## Summary
 
