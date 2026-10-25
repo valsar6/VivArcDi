@@ -15,8 +15,8 @@ It ships three things:
 
 ## Status
 
-Phase 1 of the [roadmap](#roadmap): the [Favorites grid](#favorites), on top of the module loader, the
-installer and the [native settings guide](docs/native-settings.md) of phase 0.
+Phase 2 of the [roadmap](#roadmap): [Peek](#peek), after the [Favorites grid](#favorites) of phase 1
+and the module loader, the installer and the [native settings guide](docs/native-settings.md) of phase 0.
 
 Tested against the Vivaldi 8.1 interface. Other versions stay untouched until they get a
 [selector file](docs/architecture.md#selectors).
@@ -211,6 +211,29 @@ Options of `favorites-grid` in `config.json`:
 | `tileHeight` | `44` | Tile height, in pixels |
 | `gap` | `6` | Space between tiles, in pixels |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
+
+## Peek
+
+Some links open in Peek: a rounded panel over the current page, which stays visible and dimmed
+behind it. The panel shows the real page, so you can scroll, type and follow links inside it.
+
+- **Shift+click** on a link opens it in Peek instead of a new window.
+- In a Favorite or pinned tab, a link to **another site** opens in Peek, so the tab keeps its page.
+  Subdomains count as the same site: from `mail.google.com`, `docs.google.com` opens in the tab.
+- **Expand** (or Cmd/Ctrl+O) opens the page as a tab right after the current one.
+- **Split** opens it as a tab and tiles it side by side with the current one.
+- **Close**, a click on the dimmed area, Esc or Cmd/Ctrl+W closes the Peek, never the tab behind.
+  Switching tab closes it too.
+
+Options of `peek` in `config.json`:
+
+| Option | Default | Meaning |
+|---|---|---|
+| `shiftClick` | `true` | Shift+click opens Peek |
+| `pinnedCrossSite` | `true` | Links to another site in Favorites and pinned tabs open Peek |
+| `anyCrossSite` | `false` | Links to another site in every other tab open Peek too |
+| `widthPercent` | `80` | Panel width, as a percentage of the page area (40 to 100) |
+| `heightPercent` | `90` | Panel height, as a percentage of the page area (40 to 100) |
 
 ## Roadmap
 
