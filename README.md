@@ -29,29 +29,90 @@ Tested against the Vivaldi 8.1 interface. Other versions stay untouched until th
 
 ## Install
 
+VivArcDi is not a Vivaldi extension: there is nothing to add from Vivaldi's settings or from the Chrome
+Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it once from a terminal.
+
+### macOS
+
+1. Install Vivaldi from [vivaldi.com](https://vivaldi.com) and move it to `/Applications`.
+2. Open Terminal and check that Python is there:
+
+   ```sh
+   python3 --version
+   ```
+
+   If macOS offers to install the command line developer tools, accept and wait for it to finish.
+3. Download VivArcDi:
+
+   ```sh
+   git clone https://github.com/valsar6/VivArcDi.git
+   cd VivArcDi
+   ```
+
+4. Quit Vivaldi (Cmd+Q), then install:
+
+   ```sh
+   python3 installer install
+   ```
+
+   If macOS says Terminal is not allowed to modify apps, open System Settings > Privacy & Security >
+   App Management, turn Terminal on, and run the command again.
+5. Open Vivaldi.
+
+### Debian
+
+1. Install Vivaldi from the official `.deb` on [vivaldi.com](https://vivaldi.com). It also adds the
+   Vivaldi apt repository, which keeps Vivaldi updated.
+2. Install git if it is missing:
+
+   ```sh
+   sudo apt install git python3
+   ```
+
+3. Download VivArcDi:
+
+   ```sh
+   git clone https://github.com/valsar6/VivArcDi.git
+   cd VivArcDi
+   ```
+
+4. Close Vivaldi, then install:
+
+   ```sh
+   sudo python3 installer install
+   ```
+
+5. Open Vivaldi.
+
+### Check that it works
+
 ```sh
-git clone https://github.com/valsar6/VivArcDi.git
-cd VivArcDi
+python3 installer status
 ```
 
-**macOS**
+should list your Vivaldi as `patched, up to date` and the update hook as `active`.
+You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for the line
+`[VivArcDi] 0.1.0 active on Vivaldi …` in the console.
+
+### Update VivArcDi
+
+From the `VivArcDi` folder:
 
 ```sh
+git pull
 python3 installer install
 ```
 
-macOS may ask to let your terminal modify other apps (System Settings > Privacy & Security >
-App Management). Allow it, then run the command again.
+(with `sudo` on Debian), then restart Vivaldi. Vivaldi's own updates need nothing from you: see
+[How updates are handled](#how-updates-are-handled).
 
-**Debian**
+### Uninstall
 
 ```sh
-sudo python3 installer install
+python3 installer uninstall
 ```
 
-Restart Vivaldi afterwards. To check that VivArcDi is running, open the interface inspector
-(`vivaldi://inspect/#apps`, then *inspect* under `vivaldi`) and look for the line
-`[VivArcDi] 0.1.0 active on Vivaldi …` in the console.
+(with `sudo` on Debian), then restart Vivaldi.
 
 ## Commands
 
