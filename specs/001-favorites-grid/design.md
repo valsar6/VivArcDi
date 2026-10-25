@@ -61,5 +61,6 @@ See the options in [spec.md](spec.md) FR-7; defaults live in `FavoritesGrid.defa
 |---|---|
 | Vivaldi 8.2 strip children may not be grid items themselves | Stylesheet sets them to `display: contents` and places their `.tab-position`, so placement works whatever Vivaldi's own display is |
 | Vivaldi 8.2 keeps the tab header at its row height inside a tile | Favicon, badge and audio icon are positioned against the tile's `.tab-wrapper`, with the tab and its header set to `position: static` |
+| Vivaldi 8.2 overrides the `transform` of the favicon, so a translate does not center it | The favicon is centered with `inset: 0` and `margin: auto`, and its `transform` is forced to `none` |
 | Vivaldi positions tabs absolutely for drag and drop | Stylesheet resets position inside the grid; reordering is a manual check (AC-14) |
 | Status of hibernated tabs differs from Chromium's `discarded` | `UnloadedTabs.isUnloaded` accepts `discarded` and `status: unloaded` |

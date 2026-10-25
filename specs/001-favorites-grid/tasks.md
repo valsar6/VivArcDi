@@ -18,4 +18,5 @@ Reconstructed from PR #4 and PR #5.
 - [x] **T8.** Grid placement on `.tab-position`, row gap, centered favicon, badge and loading bar.
   AC-17, AC-18.
 - [x] **T9.** Favicon, badge and audio icon positioned against the tile, favicon 24 px. AC-16, AC-18.
+- [x] **T10.** Favicon centered with `inset: 0` and `margin: auto`, since Vivaldi overrides the favicon `transform`. AC-18.
 - [ ] **T7.** Manual checks AC-12 to AC-16 on macOS and Debian.
