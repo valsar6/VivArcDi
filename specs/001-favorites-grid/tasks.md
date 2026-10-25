@@ -15,4 +15,6 @@ Reconstructed from PR #4 and PR #5.
 - [x] **T5.** `FavoritesGrid` module, fallback without `chrome.tabs`, clean stop. AC-10, AC-11.
 - [x] **T6.** README section and manual checklist
   (`phase-1/verifica-favorites.md` in the project files).
+- [x] **T8.** Grid placement on `.tab-position`, row gap, centered favicon, badge and loading bar.
+  AC-17, AC-18.
 - [ ] **T7.** Manual checks AC-12 to AC-16 on macOS and Debian.

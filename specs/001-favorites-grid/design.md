@@ -59,5 +59,6 @@ See the options in [spec.md](spec.md) FR-7; defaults live in `FavoritesGrid.defa
 
 | Risk | Mitigation |
 |---|---|
+| Vivaldi 8.2 strip children may not be grid items themselves | Stylesheet sets them to `display: contents` and places their `.tab-position`, so placement works whatever Vivaldi's own display is |
 | Vivaldi positions tabs absolutely for drag and drop | Stylesheet resets position inside the grid; reordering is a manual check (AC-14) |
 | Status of hibernated tabs differs from Chromium's `discarded` | `UnloadedTabs.isUnloaded` accepts `discarded` and `status: unloaded` |
