@@ -1,5 +1,7 @@
+import type { BrowserRuntime } from './BrowserRuntime.js';
 import type { BrowserTabs } from './BrowserTabs.js';
 import type { Logger } from './Logger.js';
+import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from './SelectorCatalog.js';
 import type { BuildInfo } from './types.js';
 
@@ -14,6 +16,10 @@ export interface ModuleContext {
   options: Record<string, unknown>;
   /** The `chrome.tabs` API; check `tabs.available` first. */
   tabs: BrowserTabs;
+  /** `chrome.runtime` messages and `chrome.windows`; check before use. */
+  runtime: BrowserRuntime;
+  /** Loads files that ship with VivArcDi. */
+  payload: PayloadSource;
   /** Versions written by the installer. */
   build: BuildInfo;
 }
