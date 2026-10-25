@@ -55,18 +55,19 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
    python3 installer install
    ```
 
-   Do not use `sudo` here: the update hook runs as your user and must be able to change Vivaldi too.
-   If the installer stops with a permission error, it prints the fix. The two usual causes are:
+   Do not use `sudo` here: it does not help on macOS, and the update hook must be able to change
+   Vivaldi as your user. If the installer stops with a permission error, it prints the steps:
 
-   - **Vivaldi belongs to another user**, often `root` after an install or update made with an
-     administrator password. Give it back to your user, then install again:
+   - **App Management.** macOS stops any program, even with `sudo`, from changing a signed app.
+     Open System Settings > Privacy & Security > App Management, turn your terminal app on, quit
+     it with Cmd+Q, reopen it and install again.
+   - **Vivaldi belongs to another user**, often `root`. Only after allowing App Management, give it
+     back to your user, then install again:
 
      ```sh
      sudo chown -R "$(whoami)" /Applications/Vivaldi.app
      ```
 
-   - **App Management blocks the terminal.** Open System Settings > Privacy & Security >
-     App Management, turn your terminal app on, reopen it and install again.
 5. Open Vivaldi.
 
 ### Debian
@@ -146,6 +147,9 @@ Vivaldi overwrites `window.html` when it updates, which removes VivArcDi.
 The hook runs a copy of the installer kept in `~/Library/Application Support/VivArcDi` on macOS and
 `/usr/local/share/vivarcdi` on Debian, so you can move or delete the cloned repository.
 After an update, restart Vivaldi once more to load the reapplied modules.
+
+> **macOS limitation.** The launchd agent runs outside your terminal, so App Management may block
+> it too. Until this is solved, run `python3 installer install` again after a Vivaldi update.
 
 ## Configuration
 

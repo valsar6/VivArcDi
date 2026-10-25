@@ -40,11 +40,12 @@ class SudoAdvisor(PermissionAdvisor):
 
 
 class MacOSAdvisor(PermissionAdvisor):
-    """For macOS, where Vivaldi.app should belong to the user who runs it.
+    """For macOS, where two protections can block the installer.
 
-    Two causes are told apart: the bundle belongs to another user (often root,
-    after an install or update made with an administrator password), or macOS
-    App Management blocks the terminal from changing other apps.
+    App Management stops any program, even with sudo, from changing a signed
+    app unless the user allowed it, so it always comes first. If the bundle
+    also belongs to another user (often root), it must be given back to the
+    user who runs Vivaldi, which only works once App Management allows it.
     """
 
     def __init__(self, current_user: str | None = None):
@@ -53,17 +54,15 @@ class MacOSAdvisor(PermissionAdvisor):
     def explain(self, path: Path) -> str:
         bundle = self._app_bundle(path)
         owner = owner_of(path) if path.exists() else self._current_user
+        steps = [
+            "Open System Settings > Privacy & Security > App Management and allow your terminal app.",
+            "Quit the terminal completely (Cmd+Q) and open it again.",
+        ]
         if owner != self._current_user:
-            return (
-                f"Cannot write to {path}: it belongs to {owner}, not to {self._current_user}.\n"
-                f"Give Vivaldi back to your user, then run the installer again:\n"
-                f'  sudo chown -R {self._current_user} "{bundle}"'
-            )
-        return (
-            f"macOS blocked the change to {path}.\n"
-            "Open System Settings > Privacy & Security > App Management, allow your terminal app,\n"
-            "then quit and reopen the terminal and run the installer again."
-        )
+            steps.append(f'Give Vivaldi back to your user: sudo chown -R {self._current_user} "{bundle}"')
+        steps.append("Run the installer again, without sudo.")
+        numbered = "\n".join(f"  {index}. {step}" for index, step in enumerate(steps, start=1))
+        return f"macOS did not let the installer change {path} (owner: {owner}).\n{numbered}"
 
     @staticmethod
     def _app_bundle(path: Path) -> Path:
