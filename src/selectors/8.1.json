@@ -1,5 +1,9 @@
 {
   "browser": "#browser",
   "tabBar": "#tabs-tabbar-container",
+  "verticalTabBar": "#tabs-tabbar-container:is(.left, .right)",
+  "tabStrip": "#tabs-container .tab-strip",
+  "pinnedTab": ".tab-position.is-pinned",
+  "tabWrapper": ".tab-wrapper",
   "webviewContainer": "#webview-container"
 }
