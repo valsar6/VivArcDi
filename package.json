@@ -12,7 +12,8 @@
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && stylelint \"src/**/*.scss\"",
-    "test": "node --import tsx --test \"tests/**/*.test.ts\""
+    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
+    "release": "tsx scripts/release/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
