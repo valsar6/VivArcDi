@@ -1,0 +1,98 @@
+@use 'tokens' as *;
+
+@mixin tint($name, $percent) {
+  --vivarcdi-tile-bg#{$name}: color-mix(in srgb, var(--colorFg, #fff) #{$percent}, transparent);
+}
+
+#{$root} #{$grid} {
+  @include tint('', $tint-rest);
+  @include tint('-hover', $tint-hover);
+  @include tint('-active', $tint-active);
+
+  display: grid !important;
+  grid-template-columns: repeat(var(--vivarcdi-favorites-columns, #{$default-columns}), minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  column-gap: var(--vivarcdi-favorites-gap, #{$gap});
+  align-content: start;
+  height: auto !important;
+}
+
+#{$root} #{$grid} > * {
+  grid-column: 1 / -1;
+  position: relative;
+}
+
+#{$root} #{$grid} > * > .tab-position {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+#{$root} #{$grid} > #{$tile} {
+  grid-column: auto;
+  min-width: 0;
+  margin-bottom: var(--vivarcdi-favorites-gap, #{$gap});
+}
+
+#{$root} #{$tile} {
+  .tab-position,
+  .tab-wrapper,
+  .tab {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: var(--vivarcdi-favorites-tile-height, #{$tile-height}) !important;
+    max-height: none !important;
+    margin: 0 !important;
+  }
+
+  .tab-wrapper {
+    border-radius: var(--vivarcdi-radius);
+    background-color: var(--vivarcdi-tile-bg) !important;
+    overflow: hidden;
+    transition: background-color var(--vivarcdi-transition);
+
+    &:hover {
+      background-color: var(--vivarcdi-tile-bg-hover) !important;
+    }
+
+    &:has(.tab.active) {
+      background-color: var(--vivarcdi-tile-bg-active) !important;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
+    }
+  }
+
+  .tab {
+    background: transparent !important;
+  }
+
+  .tab-header {
+    justify-content: center !important;
+    height: 100% !important;
+    padding: 0 !important;
+  }
+
+  .favicon {
+    width: $favicon-size !important;
+    height: $favicon-size !important;
+    margin: auto !important;
+    transition:
+      opacity var(--vivarcdi-transition),
+      filter var(--vivarcdi-transition);
+  }
+
+  :is(.title, .close, .stack-counter, .svg-tab-selection) {
+    display: none !important;
+  }
+
+  .tab-audio {
+    position: absolute !important;
+    top: $audio-offset;
+    right: $audio-offset;
+    transform: scale($audio-scale);
+  }
+}
+
+#{$root} #{$unloaded} .favicon {
+  opacity: $unloaded-opacity;
+  filter: saturate($unloaded-saturation);
+}

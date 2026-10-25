@@ -3,6 +3,7 @@ import json
 import shutil
 from pathlib import Path
 
+from .distribution import require_dist
 from .installation import VivaldiInstallation
 
 BUILD_FILE = "build.json"
@@ -10,7 +11,7 @@ IGNORED_NAMES = {"__pycache__", ".DS_Store"}
 
 
 class PayloadDeployer:
-    """Copies the VivArcDi payload (the src folder) next to window.html.
+    """Copies the built VivArcDi payload (the dist folder) next to window.html.
 
     It also writes build.json, which tells the loader which VivArcDi and
     Vivaldi versions it runs on, and which payload files were deployed.
@@ -21,7 +22,11 @@ class PayloadDeployer:
         self._vivarcdi_version = vivarcdi_version
 
     def deploy(self, installation: VivaldiInstallation) -> None:
-        """Replace the payload of an installation with a fresh copy."""
+        """Replace the payload of an installation with a fresh copy.
+
+        Raises InstallerError when the payload was not built.
+        """
+        require_dist(self._source_dir)
         self.remove(installation)
         shutil.copytree(
             self._source_dir,
@@ -55,6 +60,7 @@ class PayloadDeployer:
         }
 
     def _fingerprint(self) -> str:
+        require_dist(self._source_dir)
         digest = hashlib.sha256()
         for path in sorted(self._source_dir.rglob("*")):
             if path.is_file() and not IGNORED_NAMES.intersection(path.parts):

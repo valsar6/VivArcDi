@@ -12,3 +12,7 @@ class PatchError(VivArcDiError):
 
 class PermissionDeniedError(VivArcDiError):
     """The installer cannot write where it needs to."""
+
+
+class InstallerError(VivArcDiError):
+    """The installer cannot continue because something it needs is missing."""

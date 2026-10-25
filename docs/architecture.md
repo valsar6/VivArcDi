@@ -1,7 +1,23 @@
 # Architecture
 
-VivArcDi has two halves that never import each other: the **payload** (`src/`), which runs inside
-Vivaldi, and the **installer** (`installer/`), which puts the payload there.
+VivArcDi has two halves that never import each other: the **payload** (`src/`, compiled to `dist/`),
+which runs inside Vivaldi, and the **installer** (`installer/`), which puts the built payload there.
+
+## Build
+
+The payload is TypeScript and SCSS. `npm run build` (`scripts/build.mjs`) writes `dist/`, which is
+git-ignored:
+
+| Step | Tool | Result |
+|---|---|---|
+| Scripts | esbuild, one output file per `.ts`, no bundling | `dist/loader.js`, `dist/core/*.js`, `dist/modules/**/*.js` |
+| Styles | Sass, partials (`_*.scss`) skipped | `dist/styles/*.css` |
+| Static files | copied as they are | `dist/config.json`, `dist/selectors/*.json` |
+
+The scripts are not bundled because the loader resolves its files by URL at runtime
+(`import.meta.url`, `ResourceLoader`, `StyleInjector`), so `dist/` keeps the layout of `src/`.
+The installer never runs Node. CI publishes `dist/` and `installer/` to the `dist` branch, see the
+README.
 
 ## Payload
 
@@ -14,10 +30,10 @@ Vivaldi installation. The installer adds a single line to it, between two marker
 <!-- vivarcdi:end -->
 ```
 
-and copies `src/` next to it as `vivarcdi/`, adding a generated `build.json` with the VivArcDi and
+and copies `dist/` next to it as `vivarcdi/`, adding a generated `build.json` with the VivArcDi and
 Vivaldi versions.
 
-`loader.js` boots `VivArcDi` (`src/core/VivArcDi.js`), which:
+`loader.js` boots `VivArcDi` (`src/core/VivArcDi.ts`), which:
 
 1. loads `config.json` and `build.json`;
 2. picks the selector catalog for the running Vivaldi version;
@@ -30,17 +46,17 @@ never blocked.
 
 ### Modules
 
-A module is a class that extends `Module` (`src/core/Module.js`), declares a static `id`, and
+A module is a class that extends `Module` (`src/core/Module.ts`), declares a static `id`, and
 implements `start(context)` and `stop()`. The context gives it the document, the selector catalog,
 a logger tagged with its id, its options from `config.json`, the build versions, and `tabs`, a
-promise-based wrapper of `chrome.tabs` (`src/core/BrowserTabs.js`; check `tabs.available` first).
+promise-based wrapper of `chrome.tabs` (`src/core/BrowserTabs.ts`; check `tabs.available` first).
 
 Modules mark Vivaldi's elements with `data-vivarcdi-*` attributes and stylesheets style those marks.
 Vivaldi re-renders its interface often and rewrites the `class` attribute when it does, but leaves
 unknown data attributes alone. Modules that follow the interface observe it with a
 `MutationObserver` and redraw through `FrameTask`, at most once per animation frame.
 
-Modules are registered in `src/modules/index.js` and enabled in `config.json` under their id.
+Modules are registered in `src/modules/index.ts` and enabled in `config.json` under their id.
 
 | Module | Role |
 |---|---|
@@ -67,10 +83,10 @@ Plain Python 3.9+, standard library only. The main pieces:
 | `Platform` | Finds Vivaldi installations, knows the data folder and the update hook |
 | `UpdateHook` | `LaunchAgentHook` on macOS, `AptHook` on Debian |
 | `WindowHtmlPatcher` | Adds and removes the loader block in `window.html` |
-| `PayloadDeployer` | Copies `src/` and writes `build.json` with a fingerprint of the payload |
+| `PayloadDeployer` | Copies `dist/` and writes `build.json` with a fingerprint of the payload; fails with `InstallerError` when `dist/` was not built |
 | `BackupStore` | Keeps the original `window.html` of each Vivaldi version |
 | `InstallationPatcher` | Combines the three above for one installation |
-| `SelfStager` | Copies the installer to the data folder for the update hook |
+| `SelfStager` | Copies `dist/` and the installer to the data folder for the update hook |
 | `Command` | `install`, `reapply`, `uninstall`, `status` |
 
 `reapply` compares each installation with what it should be: patched `window.html`, and a
@@ -79,8 +95,11 @@ differ are touched, so running it often is cheap.
 
 ## Conventions
 
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full guidelines. In short:
+
 - English everywhere, readability first.
-- No line comments. Exposed functions and classes get JSDoc (JavaScript) or a docstring (Python)
-  describing inputs, outputs and behavior.
+- No `//` comments (enforced by ESLint). Exposed functions and classes get JSDoc (TypeScript) or a
+  docstring (Python) describing inputs, outputs and behavior.
+- TypeScript is strict and has no `any`.
 - Object-oriented design; dependencies are passed in, so every class can be tested with fakes.
 - Commit messages are a single subject line of 50 to 80 characters.
