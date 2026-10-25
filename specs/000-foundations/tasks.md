@@ -19,3 +19,5 @@ Reconstructed from PR #1 and PR #5.
 - [x] **T9.** Manual checks AC-17 and AC-19 on macOS (Tore, 2026-10-25).
 - [ ] **T10.** Make the macOS update hook work despite App Management. AC-18, open question.
 - [ ] **T11.** Manual checks AC-17 to AC-19 on Debian 13.
+- [x] **T12.** Activation mark as a data attribute, found on Vivaldi 8.2 where the class was lost
+  and no stylesheet applied. AC-20.
