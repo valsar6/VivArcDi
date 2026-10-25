@@ -55,8 +55,18 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
    python3 installer install
    ```
 
-   If macOS says Terminal is not allowed to modify apps, open System Settings > Privacy & Security >
-   App Management, turn Terminal on, and run the command again.
+   Do not use `sudo` here: the update hook runs as your user and must be able to change Vivaldi too.
+   If the installer stops with a permission error, it prints the fix. The two usual causes are:
+
+   - **Vivaldi belongs to another user**, often `root` after an install or update made with an
+     administrator password. Give it back to your user, then install again:
+
+     ```sh
+     sudo chown -R "$(whoami)" /Applications/Vivaldi.app
+     ```
+
+   - **App Management blocks the terminal.** Open System Settings > Privacy & Security >
+     App Management, turn your terminal app on, reopen it and install again.
 5. Open Vivaldi.
 
 ### Debian
