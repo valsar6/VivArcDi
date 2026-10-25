@@ -1,0 +1,55 @@
+# Native settings
+
+Much of Arc already exists in Vivaldi. Configure these settings first: they need no mods and survive
+every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versions.
+
+## Sidebar instead of a tab bar
+
+| Arc | Vivaldi setting |
+|---|---|
+| Vertical sidebar on the left | Settings > Tabs > Tab Bar Position: **Left** (or the **Vertical Left** layout preset) |
+| Sidebar that hides and reappears at the edge | The **Auto Hide** layout preset, or Settings > Appearance > auto-hide the UI |
+| Compact URL at the top of the sidebar | Settings > Address Bar: move the address bar into the tab bar area (Custom Tab Bar, 7.8+) |
+| Page in a rounded frame | Settings > Themes: a theme with a full-window background, transparency and blur (8.0+) |
+
+## Spaces
+
+| Arc | Vivaldi setting |
+|---|---|
+| Spaces | **Workspaces**, with a name and an icon or emoji each |
+| Space switcher | Show workspaces at the top of the tab bar |
+| Links that open in a given Space (Air Traffic Control) | Workspace rules for sites |
+
+## Favorites and pinned tabs
+
+| Arc | Vivaldi setting |
+|---|---|
+| Favorites shared by every Space | Pin the tab, then keep it pinned in all workspaces (7.8+) |
+| Pinned tabs of one Space | Pinned tabs in that workspace |
+| Pinned tab that keeps its site | Lock the pinned tab to its domain (7.8+) |
+| Folders | **Tab stacks**, shown as **accordion** in the vertical tab bar; colors from 7.5, drag-and-drop from 7.8 |
+
+## Today tabs and archive
+
+| Arc | Vivaldi setting |
+|---|---|
+| Inactive tabs unloaded | Settings > Tabs > **Tab Hibernation**: hibernate background tabs after a delay |
+| Auto-archive after 12 hours | Not native; planned for phase 4 |
+
+## Keyboard
+
+| Arc | Vivaldi setting |
+|---|---|
+| Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard |
+| Ctrl+Tab in recent order | Settings > Tabs > Tab Cycling: **recently used order** |
+| Copy URL (Cmd/Ctrl+Shift+C) | Settings > Keyboard: search "copy" and bind the copy page address action |
+| Split View | **Tab Tiling**, and "Open link as split tab" (7.8+) |
+
+## Still missing
+
+These need VivArcDi modules and are on the roadmap: the icon grid for Favorites, closing a pinned tab
+without removing it, resetting a pinned tab to its saved URL, the active tab peeking out of a closed
+folder, Peek, and auto-archive.
+
+Some setting names above come from release notes rather than the 8.1 interface itself. If one does not
+match, open an issue with the label you see.

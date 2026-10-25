@@ -1,0 +1,5 @@
+{
+  "browser": "#browser",
+  "tabBar": "#tabs-tabbar-container",
+  "webviewContainer": "#webview-container"
+}
