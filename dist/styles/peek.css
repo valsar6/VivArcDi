@@ -1,0 +1,77 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-peek] {
+  position: relative;
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.35);
+  animation: vivarcdi-peek-fade 220ms ease-out;
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  width: var(--vivarcdi-peek-width, 80%);
+  height: var(--vivarcdi-peek-height, 90%);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--colorBg, #fff);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, -50%);
+  animation: vivarcdi-peek-rise 220ms cubic-bezier(0.16, 0.88, 0.22, 1);
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-toolbar {
+  display: flex;
+  flex: 0 0 32px;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 6px;
+  background: var(--colorBgDark, #eee);
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-toolbar button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--colorFg, #222);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-toolbar button:hover {
+  background: color-mix(in srgb, var(--colorFg, #222) 14%, transparent);
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-toolbar .vivarcdi-peek-close:hover {
+  background: #e5484d;
+  color: #fff;
+}
+
+#browser[data-vivarcdi-active] .vivarcdi-peek-page {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+@keyframes vivarcdi-peek-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vivarcdi-peek-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+}

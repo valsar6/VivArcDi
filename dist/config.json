@@ -1,0 +1,29 @@
+{
+  "styles": [
+    "styles/base.css",
+    "styles/favorites.css",
+    "styles/peek.css"
+  ],
+  "modules": {
+    "activation-marker": {
+      "enabled": true
+    },
+    "favorites-grid": {
+      "enabled": true,
+      "maxTiles": 12,
+      "maxColumns": 3,
+      "tileMinWidth": 64,
+      "tileHeight": 44,
+      "gap": 6,
+      "unloadOnMiddleClick": true
+    },
+    "peek": {
+      "enabled": true,
+      "shiftClick": true,
+      "pinnedCrossSite": true,
+      "anyCrossSite": false,
+      "widthPercent": 80,
+      "heightPercent": 90
+    }
+  }
+}
