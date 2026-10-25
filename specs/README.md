@@ -10,7 +10,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 |---|---|---|
 | [000 Foundations](000-foundations/spec.md) | 0 | Implemented |
 | [001 Favorites grid](001-favorites-grid/spec.md) | 1 | Implemented |
-| [002 Peek](002-peek/spec.md) | 2 | Draft |
+| [002 Peek](002-peek/spec.md) | 2 | Approved |
 | [003 Pinned tabs and folders](003-pinned-tabs-and-folders/spec.md) | 3 | Draft |
 | [004 Today tabs and keyboard](004-today-tabs-and-keyboard/spec.md) | 4 | Draft |
 | [005 Little Arc and extras](005-little-arc-and-extras/spec.md) | 5 | Draft |
