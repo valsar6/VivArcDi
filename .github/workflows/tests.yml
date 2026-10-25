@@ -27,6 +27,47 @@ jobs:
       - run: make test-py
       - run: npm run build
 
+  branch-policy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: git fetch --depth=1 origin "${{ github.base_ref }}"
+      - name: Check the branch name against the version change
+        run: npm run -s release -- check --base "origin/${{ github.base_ref }}" --branch "${{ github.head_ref }}"
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tag and release a new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$(npm run -s release tag)"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
+            echo "${tag} already exists, nothing to release"
+          else
+            gh release create "${tag}" --target "${GITHUB_SHA}" --title "VivArcDi ${tag}" --generate-notes
+          fi
+
   publish-dist:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: test

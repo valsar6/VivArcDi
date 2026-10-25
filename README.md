@@ -104,7 +104,7 @@ python3 installer status
 
 should list your Vivaldi as `patched, up to date` and the update hook as `active`.
 You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for the line
-`[VivArcDi] 0.2.0 active on Vivaldi …` in the console.
+`[VivArcDi] <version> active on Vivaldi …` in the console.
 
 ### Update VivArcDi
 
@@ -233,7 +233,9 @@ make check
 Needs Node 22 and Python 3.9+. `make check` lints (ESLint, Stylelint), type-checks (`tsc`), runs the
 TypeScript tests (`node --test` through `tsx`) and the installer tests (`unittest`), then builds
 `dist/` with esbuild and Sass. `make build` alone builds, and `python3 installer install` then deploys
-your local `dist/`. See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture.md](docs/architecture.md).
+your local `dist/`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the spec-driven workflow and the branch
+and version rules, [specs/](specs/README.md) for what each feature must do, and
+[docs/architecture.md](docs/architecture.md).
 
 ## Credits
 
