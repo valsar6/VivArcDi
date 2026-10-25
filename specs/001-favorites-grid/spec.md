@@ -5,7 +5,7 @@
 | Status | Implemented |
 | Phase | 1 |
 | Owner | Tore |
-| Approved | 2026-10-25, written after the fact from PR #4 and PR #5 |
+| Approved | 2026-10-25, written after the fact from PR #4 and PR #5; revised 2026-10-25 at Tore's request (at most three columns, other tabs stay rows) |
 
 ## Summary
 
@@ -17,7 +17,9 @@ the first pinned tabs of Vivaldi's vertical tab bar behave the same way.
 
 - **US-1.** As a Vivaldi user with a vertical tab bar, I want my first pinned tabs shown as a grid of
   icon tiles, so that my most used sites take little room and are recognizable at a glance.
-- **US-2.** As a user, I want the grid to use more columns when I widen the tab bar, as Arc does.
+- **US-2.** As a user, I want at most three tiles per row, stretched to fill it, as Arc does.
+- **US-5.** As a user, I want my other tabs to stay a vertical list of full-width rows below the
+  grid, as in Arc.
 - **US-3.** As a user, I want to see which tile is active and which tiles are not loaded.
 - **US-4.** As a user, I want to free a Favorite's memory without losing the tile, so that it works
   like a bookmark that is also a tab.
@@ -26,8 +28,10 @@ the first pinned tabs of Vivaldi's vertical tab bar behave the same way.
 
 With the tab bar on the left or right, the first pinned tabs, up to twelve, become square tiles in a
 grid above the other tabs. A tile shows only the favicon, centered; the title appears in Vivaldi's
-own tooltip on hover. The grid has three columns in a narrow tab bar and gains a column each time the
-tab bar grows wide enough for one more tile. Tiles stretch to fill the row.
+own tooltip on hover. A row holds at most three tiles; with fewer than three tiles the row has as
+many columns as tiles, and a tab bar too narrow for three tiles gets fewer columns. Tiles stretch to
+fill the row. Every other tab stays a full-width row, one below the other, with its title, as
+without VivArcDi.
 
 The active tile has a lighter background and a small shadow. Tiles of unloaded (discarded or
 hibernated) tabs show a faded, desaturated icon. A tile playing audio shows a small audio icon in
@@ -52,8 +56,8 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 
 - **FR-1.** The module `favorites-grid` turns the first `maxTiles` pinned tabs of a vertical tab bar
   into tiles. Other tabs are unchanged.
-- **FR-2.** Columns are `max(minColumns, floor((width + gap) / (tileMinWidth + gap)))`, recomputed
-  when the tab strip is resized.
+- **FR-2.** Columns are `max(1, min(maxColumns, tiles, floor((width + gap) / (tileMinWidth + gap))))`,
+  recomputed when the tab strip is resized or the number of tiles changes.
 - **FR-3.** Tiles show the favicon only, with title, close button, stack counter and selection
   outline hidden.
 - **FR-4.** The active tile and tiles of unloaded tabs are styled differently from the others.
@@ -61,7 +65,7 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
   unloads the tab and never reaches Vivaldi's close action.
 - **FR-6.** The successor of an unloaded active tile is the most recently used other tab, preferring
   loaded tabs, then the nearest by position.
-- **FR-7.** Options in `config.json`: `maxTiles` (12), `minColumns` (3), `tileMinWidth` (64),
+- **FR-7.** Options in `config.json`: `maxTiles` (12), `maxColumns` (3), `tileMinWidth` (64),
   `tileHeight` (44), `gap` (6), `unloadOnMiddleClick` (true).
 
 ### Non-functional
@@ -80,7 +84,7 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 | AC-2 | THE module SHALL leave pinned tabs beyond `maxTiles` as rows. | auto: `pinned tabs beyond the limit stay rows` |
 | AC-3 | WHILE the tab bar is horizontal, THE module SHALL show no grid. | auto: `a horizontal tab bar gets no grid`, `turning the tab bar horizontal removes the marks` |
 | AC-4 | WHEN a tab is unpinned, THE module SHALL turn its tile back into a row. | auto: `unpinning a tab turns its tile back into a row` |
-| AC-5 | THE grid SHALL have at least `minColumns` columns and gain columns as the tab bar widens. | auto: `a narrow tab bar keeps the minimum of three columns`, `a wider tab bar gets more columns`, `follow sets the grid variables and tracks resizes` |
+| AC-5 | THE grid SHALL have at most `maxColumns` columns, as many as the tiles when they are fewer, and fewer when the tab bar is too narrow. | auto: `a full row never has more than three columns`, `fewer tiles than columns stretch to fill the row`, `a tab bar too narrow for three tiles gets fewer columns`, `follow sets the grid variables and tracks resizes and tile counts` |
 | AC-6 | WHILE a tile's tab is unloaded, THE module SHALL mark the tile as unloaded. | auto: `tiles of unloaded tabs are marked`, `UnloadedTabs follows discard and reload updates` |
 | AC-7 | WHEN a non-active tile is middle clicked, THE module SHALL unload the tab and keep the tile. | auto: `an inactive tile is unloaded in place` |
 | AC-8 | WHEN the active tile is middle clicked, THE module SHALL activate the most recently used other tab, then unload the tile's tab. | auto: `an active tile hands focus to the most recently used tab first` |
@@ -92,6 +96,7 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 | AC-14 | WHEN a tile is reordered by dragging, THE grid SHALL follow the new order. | manual |
 | AC-15 | WHEN the workspace changes, THE grid SHALL show the pinned tabs of the new workspace. | manual |
 | AC-16 | WHILE a tile plays audio, THE audio icon SHALL appear small in its top right corner. | manual |
+| AC-17 | WHILE the grid is shown, every tab that is not a tile SHALL keep a full-width row with its title, one row below the other. | manual |
 
 ## Out of scope
 
