@@ -76,7 +76,7 @@ jobs:
       contents: write
     concurrency:
       group: publish-dist
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -89,14 +89,35 @@ jobs:
         run: |
           mkdir release
           cp -r installer dist docs release/
-          cp README.md LICENSE .gitignore release/
+          cp README.md LICENSE release/
+          cp scripts/dist.gitignore release/.gitignore
           find release -name __pycache__ -type d -prune -exec rm -rf {} +
-      - name: Force-push the release tree to the dist branch
-        working-directory: release
+      - name: Check out the dist branch
         run: |
-          git init --initial-branch=dist
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --all
-          git commit --message "Publish the release build of main at ${GITHUB_SHA::7}"
-          git push --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" dist
+          if git fetch --depth=1 origin dist; then
+            git worktree add --detach published FETCH_HEAD
+          else
+            git worktree add --orphan published
+          fi
+      - name: Commit the release tree on top of the dist branch
+        run: |
+          version="$(npm run -s release version)"
+          git -C published rm -rq --ignore-unmatch .
+          cp -r release/. published/
+          git -C published add --all
+          git -C published ls-files --error-unmatch dist/loader.js installer/__main__.py > /dev/null
+          if git -C published diff --cached --quiet; then
+            echo "dist already holds this build, nothing to publish"
+            exit 0
+          fi
+          git config user.name "Salvatore"
+          git config user.email "25297596+valsar6@users.noreply.github.com"
+          git -C published commit --message "Publish the dist build of VivArcDi ${version} from main at ${GITHUB_SHA::7}"
+          git -C published push origin HEAD:refs/heads/dist
+          tag="dist-v${version}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
+            echo "${tag} already exists, the dist commit stays untagged"
+          else
+            git -C published tag "${tag}"
+            git -C published push origin "refs/tags/${tag}"
+          fi

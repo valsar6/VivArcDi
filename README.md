@@ -111,7 +111,7 @@ You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, an
 From the `VivArcDi` folder (cloned from the `dist` branch):
 
 ```sh
-git fetch origin && git reset --hard origin/dist
+git pull
 python3 installer install
 ```
 
@@ -129,8 +129,8 @@ python3 installer uninstall
 ### Release builds
 
 VivArcDi is written in TypeScript and SCSS and compiled to plain JavaScript and CSS. You do not need
-Node to install it: on every push to `main`, the CI workflow builds the project and force-pushes a
-release-ready tree to the `dist` branch, which holds only what users need:
+Node to install it: on every push to `main`, the CI workflow builds the project and commits a
+release-ready tree on top of the `dist` branch, which holds only what users need:
 
 ```text
 installer/   the Python installer
@@ -140,8 +140,11 @@ README.md
 LICENSE
 ```
 
-`git clone -b dist` gives you that tree. The `dist` branch is rewritten by every publish, so a plain
-`git pull` can fail; update with `git fetch origin && git reset --hard origin/dist` instead. If you clone `main` instead, the
+`git clone -b dist` gives you that tree, and `git pull` brings it up to date. Each commit on `dist`
+names the version it holds, and the first build of every version is tagged `dist-v<version>`
+(`git checkout dist-v0.4.4` goes back to that release). Checkouts made before 0.4.4, when `dist`
+was rewritten by every publish, need `git fetch origin && git reset --hard origin/dist` once. If
+you clone `main` instead, the
 installer stops and tells you to download a release build or to run `make build` (it needs Node 24).
 
 ## Commands
