@@ -1,5 +1,6 @@
 import { ModuleRegistry } from '../core/ModuleRegistry.js';
 import { ActivationMarker } from './ActivationMarker.js';
+import { FavoritesGrid } from './favorites/FavoritesGrid.js';
 
 /**
  * Builds the registry of every module that ships with VivArcDi.
@@ -8,5 +9,5 @@ import { ActivationMarker } from './ActivationMarker.js';
  * @returns {ModuleRegistry} A registry with all built-in modules.
  */
 export function createDefaultRegistry() {
-  return new ModuleRegistry().register(ActivationMarker);
+  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid);
 }
