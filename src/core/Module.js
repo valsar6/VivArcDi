@@ -4,6 +4,7 @@
  * @property {import('./SelectorCatalog.js').SelectorCatalog} selectors Selectors for the running Vivaldi.
  * @property {import('./Logger.js').Logger} logger Logger tagged with the module id.
  * @property {Record<string, unknown>} options The module's options from `config.json`.
+ * @property {import('./BrowserTabs.js').BrowserTabs} tabs The `chrome.tabs` API; check `tabs.available` first.
  * @property {{ vivarcdiVersion: string, vivaldiVersion: string }} build Versions written by the installer.
  */
 
