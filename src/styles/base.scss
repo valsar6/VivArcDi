@@ -1,0 +1,7 @@
+@use 'tokens' as *;
+
+#{$root} {
+  --vivarcdi-radius: #{$radius};
+  --vivarcdi-gap: #{$gap};
+  --vivarcdi-transition: #{$transition};
+}

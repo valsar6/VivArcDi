@@ -1,0 +1,17 @@
+$root: '#browser.vivarcdi-active';
+$grid: '[data-vivarcdi-favorites]';
+$tile: '[data-vivarcdi-favorite]';
+$unloaded: '[data-vivarcdi-unloaded]';
+$radius: 10px;
+$gap: 6px;
+$transition: 160ms ease;
+$tile-height: 44px;
+$favicon-size: 20px;
+$unloaded-opacity: 0.55;
+$unloaded-saturation: 0.4;
+$audio-offset: 3px;
+$audio-scale: 0.8;
+$tint-rest: 8%;
+$tint-hover: 14%;
+$tint-active: 26%;
+$default-columns: 3;
