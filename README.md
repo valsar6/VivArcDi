@@ -15,9 +15,8 @@ It ships three things:
 
 ## Status
 
-Phase 0 of the [roadmap](#roadmap): the module loader, the installer and the
-[native settings guide](docs/native-settings.md). No Arc feature is implemented yet; the only module,
-`activation-marker`, proves that VivArcDi is running.
+Phase 1 of the [roadmap](#roadmap): the [Favorites grid](#favorites), on top of the module loader, the
+installer and the [native settings guide](docs/native-settings.md) of phase 0.
 
 Tested against the Vivaldi 8.1 interface. Other versions stay untouched until they get a
 [selector file](docs/architecture.md#selectors).
@@ -103,7 +102,7 @@ python3 installer status
 
 should list your Vivaldi as `patched, up to date` and the update hook as `active`.
 You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for the line
-`[VivArcDi] 0.1.0 active on Vivaldi …` in the console.
+`[VivArcDi] 0.2.0 active on Vivaldi …` in the console.
 
 ### Update VivArcDi
 
@@ -157,14 +156,40 @@ After an update, restart Vivaldi once more to load the reapplied modules.
 
 ```json
 {
-  "styles": ["styles/base.css"],
+  "styles": ["styles/base.css", "styles/favorites.css"],
   "modules": {
-    "activation-marker": { "enabled": true }
+    "activation-marker": { "enabled": true },
+    "favorites-grid": { "enabled": true, "maxTiles": 12 }
   }
 }
 ```
 
 After editing it, run `install` again.
+
+## Favorites
+
+With the tab bar on the left or right, the first pinned tabs become a grid of square icon tiles, as in
+Arc. Pinned tabs past the limit, and every other tab, keep their normal rows below the grid.
+
+- Three columns in a narrow tab bar, more as it gets wider.
+- The active tile is lighter; tiles of unloaded (hibernated) tabs are dimmed.
+- Middle click on a tile unloads the tab instead of closing it. The tile stays, and a click loads it
+  again. If the tile was the active tab, the most recently used tab takes its place.
+- Hovering a tile shows its title in Vivaldi's tooltip.
+
+To have the same Favorites in every workspace, pin the tabs and keep them in all workspaces (see
+[native settings](docs/native-settings.md#favorites-and-pinned-tabs)).
+
+Options of `favorites-grid` in `config.json`:
+
+| Option | Default | Meaning |
+|---|---|---|
+| `maxTiles` | `12` | How many pinned tabs become tiles |
+| `minColumns` | `3` | Columns of a narrow tab bar |
+| `tileMinWidth` | `64` | Narrowest tile, in pixels, before the grid drops a column |
+| `tileHeight` | `44` | Tile height, in pixels |
+| `gap` | `6` | Space between tiles, in pixels |
+| `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
 
 ## Roadmap
 
