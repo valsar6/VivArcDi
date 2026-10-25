@@ -5,6 +5,7 @@ import { build } from 'esbuild';
 import * as sass from 'sass';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PAGE_FOLDER = 'page';
 
 class SourceTree {
   #root;
@@ -52,7 +53,9 @@ class ScriptBuilder {
    * @returns {Promise<void>}
    */
   async run() {
-    const sources = await new SourceTree(this.#sourceDir).files((path) => path.endsWith('.ts'));
+    const sources = await new SourceTree(this.#sourceDir).files(
+      (path) => path.endsWith('.ts') && !path.startsWith(`${PAGE_FOLDER}/`),
+    );
     await build({
       entryPoints: sources.map((path) => join(this.#sourceDir, path)),
       outdir: this.#outputDir,
@@ -63,6 +66,52 @@ class ScriptBuilder {
       platform: 'browser',
       logLevel: 'warning',
     });
+  }
+}
+
+class PageScriptBuilder {
+  #sourceDir;
+  #outputDir;
+
+  /**
+   * Bundles each script injected into web pages into one self-contained file, because
+   * pages cannot import the payload's modules. `peek-links.ts` becomes `peek-links.js`,
+   * which defines the global object `VivArcDiPeekLinks` with the file's exports.
+   *
+   * @param sourceDir Folder with the page entry points; helpers live in its subfolders.
+   * @param outputDir Folder that receives the bundles.
+   */
+  constructor(sourceDir, outputDir) {
+    this.#sourceDir = sourceDir;
+    this.#outputDir = outputDir;
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async run() {
+    const entries = await new SourceTree(this.#sourceDir).files((path) => path.endsWith('.ts') && !path.includes('/'));
+    for (const entry of entries) {
+      await build({
+        entryPoints: [join(this.#sourceDir, entry)],
+        outfile: join(this.#outputDir, entry.replace(/\.ts$/, '.js')),
+        bundle: true,
+        format: 'iife',
+        globalName: PageScriptBuilder.globalNameOf(entry),
+        target: 'es2022',
+        platform: 'browser',
+        logLevel: 'warning',
+      });
+    }
+  }
+
+  /**
+   * @param {string} entry File name such as `peek-links.ts`.
+   * @returns {string} Global name such as `VivArcDiPeekLinks`.
+   */
+  static globalNameOf(entry) {
+    const words = entry.replace(/\.ts$/, '').split('-');
+    return `VivArcDi${words.map((word) => word[0].toUpperCase() + word.slice(1)).join('')}`;
   }
 }
 
@@ -147,6 +196,7 @@ class BuildPipeline {
     await rm(this.#outputDir, { recursive: true, force: true });
     await mkdir(this.#outputDir, { recursive: true });
     await new ScriptBuilder(this.#sourceDir, this.#outputDir).run();
+    await new PageScriptBuilder(join(this.#sourceDir, PAGE_FOLDER), join(this.#outputDir, PAGE_FOLDER)).run();
     await new StyleBuilder(join(this.#sourceDir, 'styles'), join(this.#outputDir, 'styles')).run();
     await new AssetCopier(this.#sourceDir, this.#outputDir).run();
   }

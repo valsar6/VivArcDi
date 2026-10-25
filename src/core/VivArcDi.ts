@@ -1,4 +1,5 @@
 import { createDefaultRegistry } from '../modules/index.js';
+import { BrowserRuntime } from './BrowserRuntime.js';
 import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
 import { Logger } from './Logger.js';
@@ -21,6 +22,8 @@ export interface VivArcDiDependencies {
   document: Document;
   /** The tabs API given to modules. */
   tabs?: BrowserTabs;
+  /** The runtime API given to modules. */
+  runtime?: BrowserRuntime;
 }
 
 export class VivArcDi {
@@ -29,6 +32,7 @@ export class VivArcDi {
   #logger: Logger;
   #document: Document;
   #tabs: BrowserTabs;
+  #runtime: BrowserRuntime;
   #styles: StyleInjector;
   #started: EnabledModule[] = [];
 
@@ -38,12 +42,20 @@ export class VivArcDi {
    *
    * @param dependencies Everything the application collaborates with.
    */
-  constructor({ loader, registry, logger, document, tabs = new BrowserTabs(undefined) }: VivArcDiDependencies) {
+  constructor({
+    loader,
+    registry,
+    logger,
+    document,
+    tabs = new BrowserTabs(undefined),
+    runtime = new BrowserRuntime(undefined),
+  }: VivArcDiDependencies) {
     this.#loader = loader;
     this.#registry = registry;
     this.#logger = logger;
     this.#document = document;
     this.#tabs = tabs;
+    this.#runtime = runtime;
     this.#styles = new StyleInjector(document, loader);
   }
 
@@ -56,12 +68,14 @@ export class VivArcDi {
    * @returns The application, started or failed.
    */
   public static async boot(baseUrl: string | URL, document: Document = globalThis.document): Promise<VivArcDi> {
+    const chromeApi = globalThis.chrome as unknown as ChromeApi | undefined;
     const app = new VivArcDi({
       loader: new ResourceLoader(baseUrl),
       registry: createDefaultRegistry(),
       logger: new Logger(),
       document,
-      tabs: new BrowserTabs(globalThis.chrome as unknown as ChromeApi | undefined),
+      tabs: new BrowserTabs(chromeApi),
+      runtime: new BrowserRuntime(chromeApi),
     });
     try {
       await app.start();
@@ -133,6 +147,8 @@ export class VivArcDi {
         options: entry.options,
         build,
         tabs: this.#tabs,
+        runtime: this.#runtime,
+        payload: this.#loader,
       });
       this.#started.push(entry);
     } catch (error) {

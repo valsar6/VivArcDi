@@ -17,6 +17,10 @@ export class FakeLoader implements PayloadSource {
     }
     return structuredClone(this.#files[path]) as T;
   }
+
+  public async text(path: string): Promise<string> {
+    return String(await this.json<unknown>(path));
+  }
 }
 
 export class FakeElement {
