@@ -47,6 +47,10 @@ export default tseslint.config(
     rules: sourceRules,
   },
   {
+    files: ['scripts/**/*.ts'],
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
     files: ['tests/**/*.ts'],
     languageOptions: { globals: { ...globals.node } },
     rules: {
