@@ -32,7 +32,8 @@ The project stays at `0.x.y` until its base is complete. When a pull request is 
 with a version that has no tag yet, CI tags the merge commit `v<version>` and publishes a GitHub
 release with notes generated from the merged pull requests.
 
-The version starts at `0.2.0`: phase 0 was `0.1.0` and the Favorites grid raised it to `0.2.0`.
+Phase 0 was `0.1.0` and the Favorites grid raised it to `0.2.0`; neither was tagged. This spec is
+itself a feature (`features/sdd`) and raises the version to `0.3.0`, the first tagged release.
 
 ## Requirements
 
@@ -63,7 +64,7 @@ The version starts at `0.2.0`: phase 0 was `0.1.0` and the Favorites grid raised
 | AC-5 | IF `package.json` and the installer disagree on the version, THEN THE check SHALL fail. | auto: `version fails when package.json and the installer disagree`, `the repository versions agree` |
 | AC-6 | THE version comparison SHALL recognize single minor, patch and major steps and call anything else irregular. | auto: `bumpFrom names a single step`, `bumpFrom calls skipped or mixed steps irregular` |
 | AC-7 | WHEN a pull request is opened, THE `branch-policy` CI job SHALL report whether it follows the policy. | manual: open a `fix/` pull request without a version change and see the job fail |
-| AC-8 | WHEN a new version is merged into `main`, THE CI SHALL create the tag `v<version>` and a GitHub release. | manual: after merging this spec, `v0.2.0` exists in the releases |
+| AC-8 | WHEN a new version is merged into `main`, THE CI SHALL create the tag `v<version>` and a GitHub release. | manual: after merging this spec, `v0.3.0` exists in the releases |
 | AC-9 | WHEN `main` gets a commit without a version change, THE CI SHALL create no release. | manual |
 
 ## Out of scope
