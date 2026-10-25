@@ -73,8 +73,9 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
   `config.json`, which also carries their options and the list of stylesheets.
 - **FR-9.** Modules get, through their start context, the document, the selector catalog, a logger
   tagged with their id, their options, the build versions and a promise-based `chrome.tabs` wrapper.
-- **FR-10.** `activation-marker` marks the browser root with the `vivarcdi-active` class and the
-  VivArcDi version, so stylesheets apply only while VivArcDi runs.
+- **FR-10.** `activation-marker` marks the browser root with the `data-vivarcdi-active` attribute
+  and the VivArcDi version, so stylesheets apply only while VivArcDi runs. The mark is a data
+  attribute because Vivaldi rewrites the root's `class` attribute whenever it re-renders.
 
 ### Non-functional
 
@@ -112,6 +113,7 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 | AC-17 | WHEN Vivaldi starts after `install`, THE interface console SHALL show `[VivArcDi] <version> active on Vivaldi <version>`. | manual |
 | AC-18 | WHEN Vivaldi updates itself, THE hook SHALL reapply VivArcDi without user action, on Debian and on macOS. | manual |
 | AC-19 | WHEN `uninstall` runs and Vivaldi restarts, THE browser SHALL look and behave as before the install. | manual |
+| AC-20 | WHEN Vivaldi rewrites the classes of the browser root, THE activation mark SHALL stay. | auto: `the activation mark survives a rewrite of the browser classes` |
 
 ## Out of scope
 
