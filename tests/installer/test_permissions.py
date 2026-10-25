@@ -41,15 +41,21 @@ class MacOSAdvisorTest(unittest.TestCase):
         self.bundle = self.root / "Applications" / "Vivaldi.app"
         self.owner = owner_of(self.resources)
 
-    def test_foreign_owner_gets_a_chown_command_for_the_bundle(self):
-        message = MacOSAdvisor(current_user="tore").explain(self.resources)
-        self.assertIn(f"it belongs to {self.owner}, not to tore", message)
-        self.assertIn(f'sudo chown -R tore "{self.bundle}"', message)
+    def test_app_management_always_comes_first(self):
+        for user in ("tore", self.owner):
+            message = MacOSAdvisor(current_user=user).explain(self.resources)
+            self.assertIn("1. Open System Settings > Privacy & Security > App Management", message)
 
-    def test_own_bundle_points_to_app_management(self):
+    def test_foreign_owner_also_gets_a_chown_after_app_management(self):
+        message = MacOSAdvisor(current_user="tore").explain(self.resources)
+        self.assertIn(f"(owner: {self.owner})", message)
+        self.assertIn(f'3. Give Vivaldi back to your user: sudo chown -R tore "{self.bundle}"', message)
+        self.assertIn("4. Run the installer again, without sudo.", message)
+
+    def test_own_bundle_needs_no_chown(self):
         message = MacOSAdvisor(current_user=self.owner).explain(self.resources)
-        self.assertIn("App Management", message)
         self.assertNotIn("chown", message)
+        self.assertIn("3. Run the installer again", message)
 
 
 class SudoAdvisorTest(unittest.TestCase):
