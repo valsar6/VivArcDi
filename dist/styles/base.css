@@ -1,5 +1,5 @@
 #browser[data-vivarcdi-active] {
   --vivarcdi-radius: 10px;
-  --vivarcdi-gap: 6px;
+  --vivarcdi-gap: 8px;
   --vivarcdi-transition: 160ms ease;
 }
