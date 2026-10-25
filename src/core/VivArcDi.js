@@ -1,3 +1,4 @@
+import { BrowserTabs } from './BrowserTabs.js';
 import { Logger } from './Logger.js';
 import { ResourceLoader } from './ResourceLoader.js';
 import { SelectorCatalog } from './SelectorCatalog.js';
@@ -10,6 +11,7 @@ export class VivArcDi {
   #registry;
   #logger;
   #document;
+  #tabs;
   #styles;
   #started = [];
 
@@ -22,12 +24,14 @@ export class VivArcDi {
    * @param {import('./ModuleRegistry.js').ModuleRegistry} dependencies.registry Available modules.
    * @param {Logger} dependencies.logger Logger for the application.
    * @param {Document} dependencies.document The document of Vivaldi's browser window.
+   * @param {BrowserTabs} [dependencies.tabs] The tabs API given to modules.
    */
-  constructor({ loader, registry, logger, document }) {
+  constructor({ loader, registry, logger, document, tabs = new BrowserTabs(undefined) }) {
     this.#loader = loader;
     this.#registry = registry;
     this.#logger = logger;
     this.#document = document;
+    this.#tabs = tabs;
     this.#styles = new StyleInjector(document, loader);
   }
 
@@ -45,6 +49,7 @@ export class VivArcDi {
       registry: createDefaultRegistry(),
       logger: new Logger(),
       document,
+      tabs: new BrowserTabs(globalThis.chrome),
     });
     try {
       await app.start();
@@ -119,6 +124,7 @@ export class VivArcDi {
         logger,
         options: entry.options,
         build,
+        tabs: this.#tabs,
       });
       this.#started.push(entry);
     } catch (error) {
