@@ -5,7 +5,7 @@
 | Status | Implemented |
 | Phase | 1 |
 | Owner | Tore |
-| Approved | 2026-10-25, written after the fact from PR #4 and PR #5; revised 2026-10-25 at Tore's request (at most three columns, other tabs stay rows) |
+| Approved | 2026-10-25, written after the fact from PR #4 and PR #5; revised 2026-10-25 at Tore's request (at most three columns, other tabs stay rows; refined tiles and row spacing) |
 
 ## Summary
 
@@ -33,6 +33,10 @@ many columns as tiles, and a tab bar too narrow for three tiles gets fewer colum
 fill the row. Every other tab stays a full-width row, one below the other, with its title, as
 without VivArcDi.
 
+Rows of tiles are separated by the same gap as the tiles in a row, and the list of other tabs starts
+one gap below the grid. Inside a tile the favicon is centered both ways; Vivaldi's loading bar and
+selection outline are hidden, and a notification badge sits small in the top right corner.
+
 The active tile has a lighter background and a small shadow. Tiles of unloaded (discarded or
 hibernated) tabs show a faded, desaturated icon. A tile playing audio shows a small audio icon in
 its top right corner.
@@ -58,15 +62,15 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
   into tiles. Other tabs are unchanged.
 - **FR-2.** Columns are `max(1, min(maxColumns, tiles, floor((width + gap) / (tileMinWidth + gap))))`,
   recomputed when the tab strip is resized or the number of tiles changes.
-- **FR-3.** Tiles show the favicon only, with title, close button, stack counter and selection
-  outline hidden.
+- **FR-3.** Tiles show the favicon only, centered, with title, close button, stack counter,
+  selection outline and loading bar hidden; a notification badge moves to the top right corner.
 - **FR-4.** The active tile and tiles of unloaded tabs are styled differently from the others.
 - **FR-5.** WHERE `unloadOnMiddleClick` is on and `chrome.tabs` exists, a middle click on a tile
   unloads the tab and never reaches Vivaldi's close action.
 - **FR-6.** The successor of an unloaded active tile is the most recently used other tab, preferring
   loaded tabs, then the nearest by position.
 - **FR-7.** Options in `config.json`: `maxTiles` (12), `maxColumns` (3), `tileMinWidth` (64),
-  `tileHeight` (44), `gap` (6), `unloadOnMiddleClick` (true).
+  `tileHeight` (44), `gap` (8), `unloadOnMiddleClick` (true).
 
 ### Non-functional
 
@@ -97,6 +101,7 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 | AC-15 | WHEN the workspace changes, THE grid SHALL show the pinned tabs of the new workspace. | manual |
 | AC-16 | WHILE a tile plays audio, THE audio icon SHALL appear small in its top right corner. | manual |
 | AC-17 | WHILE the grid is shown, every tab that is not a tile SHALL keep a full-width row with its title, one row below the other. | manual |
+| AC-18 | THE rows of tiles SHALL be separated by `gap`, the other tabs SHALL start one `gap` below the grid, and each tile SHALL show its favicon centered with no loading bar. | manual |
 
 ## Out of scope
 

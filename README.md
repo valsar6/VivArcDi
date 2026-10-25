@@ -212,7 +212,7 @@ Options of `favorites-grid` in `config.json`:
 | `minColumns` | `3` | Columns of a narrow tab bar |
 | `tileMinWidth` | `64` | Narrowest tile, in pixels, before the grid drops a column |
 | `tileHeight` | `44` | Tile height, in pixels |
-| `gap` | `6` | Space between tiles, in pixels |
+| `gap` | `8` | Space between tiles and between their rows, in pixels |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
 
 ## Peek

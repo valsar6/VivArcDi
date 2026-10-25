@@ -33,7 +33,7 @@ export class FavoritesGrid extends Module {
     maxColumns: 3,
     tileMinWidth: 64,
     tileHeight: 44,
-    gap: 6,
+    gap: 8,
     unloadOnMiddleClick: true,
   });
 
