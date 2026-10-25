@@ -55,6 +55,7 @@
   }
 
   .tab-wrapper {
+    position: relative !important;
     border-radius: var(--vivarcdi-radius);
     background-color: var(--vivarcdi-tile-bg) !important;
     overflow: hidden;
@@ -70,28 +71,28 @@
     }
   }
 
-  .tab {
-    display: flex !important;
-    align-items: center;
+  .tab,
+  .tab-header {
+    position: static !important;
     background: transparent !important;
   }
 
-  .tab-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 0 !important;
-  }
-
   .favicon {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
     width: $favicon-size !important;
     height: $favicon-size !important;
-    margin: auto !important;
+    margin: 0 !important;
+    transform: translate(-50%, -50%);
     transition:
       opacity var(--vivarcdi-transition),
       filter var(--vivarcdi-transition);
+  }
+
+  .favicon img {
+    width: 100% !important;
+    height: 100% !important;
   }
 
   :is(.title, .close, .stack-counter, .svg-tab-selection, .page-progress-indicator) {
@@ -100,8 +101,9 @@
 
   .button-badge {
     position: absolute !important;
-    top: $badge-offset;
-    right: $badge-offset;
+    top: $badge-offset !important;
+    right: $badge-offset !important;
+    left: auto !important;
     margin: 0 !important;
     transform: scale($badge-scale);
     transform-origin: top right;
@@ -109,8 +111,9 @@
 
   .tab-audio {
     position: absolute !important;
-    top: $audio-offset;
-    right: $audio-offset;
+    top: auto !important;
+    right: $audio-offset !important;
+    bottom: $audio-offset !important;
     transform: scale($audio-scale);
   }
 }

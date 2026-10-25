@@ -17,4 +17,5 @@ Reconstructed from PR #4 and PR #5.
   (`phase-1/verifica-favorites.md` in the project files).
 - [x] **T8.** Grid placement on `.tab-position`, row gap, centered favicon, badge and loading bar.
   AC-17, AC-18.
+- [x] **T9.** Favicon, badge and audio icon positioned against the tile, favicon 24 px. AC-16, AC-18.
 - [ ] **T7.** Manual checks AC-12 to AC-16 on macOS and Debian.
