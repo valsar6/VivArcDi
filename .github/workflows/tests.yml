@@ -16,7 +16,46 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: make test
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: make test-py
+      - run: npm run build
+
+  publish-dist:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-dist
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Assemble the release tree
+        run: |
+          mkdir release
+          cp -r installer dist docs release/
+          cp README.md LICENSE release/
+          find release -name __pycache__ -type d -prune -exec rm -rf {} +
+      - name: Force-push the release tree to the dist branch
+        working-directory: release
+        run: |
+          git init --initial-branch=dist
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit --message "Publish the release build of main at ${GITHUB_SHA::7}"
+          git push --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" dist
