@@ -1,11 +1,13 @@
 import io
 import json
 import tempfile
+import shutil
 import unittest
 from pathlib import Path
 
 from support import WINDOW_HTML, FakeRunner, make_debian_vivaldi, make_payload_source
 from vivarcdi.cli import build_context
+from vivarcdi.errors import InstallerError
 from vivarcdi.commands import InstallCommand, ReapplyCommand, StatusCommand, UninstallCommand
 from vivarcdi.platforms import DebianPlatform
 from vivarcdi.reporter import Reporter
@@ -38,6 +40,19 @@ class CommandsTest(unittest.TestCase):
         self.assertEqual(backup.read_text(), WINDOW_HTML)
         self.assertTrue((self.platform.data_dir / "installer" / "__main__.py").exists())
         self.assertTrue(self.context.hook.is_installed())
+
+    def test_install_raises_installer_error_when_dist_is_missing(self):
+        shutil.rmtree(self.repo / "dist")
+        with self.assertRaisesRegex(InstallerError, "make build"):
+            self.run_command(InstallCommand())
+        self.assertNotIn("vivarcdi/loader.js", self.window_html.read_text())
+
+    def test_install_removes_a_staged_copy_of_the_old_src_folder(self):
+        legacy = self.platform.data_dir / "src"
+        legacy.mkdir(parents=True)
+        self.run_command(InstallCommand())
+        self.assertFalse(legacy.exists())
+        self.assertTrue((self.platform.data_dir / "dist" / "loader.js").exists())
 
     def test_install_fails_without_vivaldi(self):
         self.window_html.unlink()
