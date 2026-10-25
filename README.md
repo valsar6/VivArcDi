@@ -41,10 +41,11 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
    ```
 
    If macOS offers to install the command line developer tools, accept and wait for it to finish.
-3. Download VivArcDi:
+3. Download VivArcDi (the `dist` branch holds the ready-to-install build, see
+   [Release builds](#release-builds)):
 
    ```sh
-   git clone https://github.com/valsar6/VivArcDi.git
+   git clone -b dist https://github.com/valsar6/VivArcDi.git
    cd VivArcDi
    ```
 
@@ -79,10 +80,11 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
    sudo apt install git python3
    ```
 
-3. Download VivArcDi:
+3. Download VivArcDi (the `dist` branch holds the ready-to-install build, see
+   [Release builds](#release-builds)):
 
    ```sh
-   git clone https://github.com/valsar6/VivArcDi.git
+   git clone -b dist https://github.com/valsar6/VivArcDi.git
    cd VivArcDi
    ```
 
@@ -106,10 +108,10 @@ You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, an
 
 ### Update VivArcDi
 
-From the `VivArcDi` folder:
+From the `VivArcDi` folder (cloned from the `dist` branch):
 
 ```sh
-git pull
+git fetch origin && git reset --hard origin/dist
 python3 installer install
 ```
 
@@ -123,6 +125,24 @@ python3 installer uninstall
 ```
 
 (with `sudo` on Debian), then restart Vivaldi.
+
+### Release builds
+
+VivArcDi is written in TypeScript and SCSS and compiled to plain JavaScript and CSS. You do not need
+Node to install it: on every push to `main`, the CI workflow builds the project and force-pushes a
+release-ready tree to the `dist` branch, which holds only what users need:
+
+```text
+installer/   the Python installer
+dist/        the compiled payload that is copied into Vivaldi
+docs/
+README.md
+LICENSE
+```
+
+`git clone -b dist` gives you that tree. The `dist` branch is rewritten by every publish, so a plain
+`git pull` can fail; update with `git fetch origin && git reset --hard origin/dist` instead. If you clone `main` instead, the
+installer stops and tells you to download a release build or to run `make build` (it needs Node 22).
 
 ## Commands
 
@@ -152,7 +172,7 @@ After an update, restart Vivaldi once more to load the reapplied modules.
 
 ## Configuration
 
-`src/config.json` lists the stylesheets to load and the modules to enable:
+`src/config.json` (`config.json` in a release build) lists the stylesheets to load and the modules to enable:
 
 ```json
 {
@@ -164,7 +184,8 @@ After an update, restart Vivaldi once more to load the reapplied modules.
 }
 ```
 
-After editing it, run `install` again.
+After editing it in a release build, run `install` again. In a source checkout, run `make build`
+first.
 
 ## Favorites
 
@@ -205,11 +226,14 @@ Options of `favorites-grid` in `config.json`:
 ## Development
 
 ```sh
-make test
+npm ci
+make check
 ```
 
-Runs the JavaScript tests with Node 22 (`node --test`) and the installer tests with Python
-(`unittest`). No dependencies to install. See [docs/architecture.md](docs/architecture.md).
+Needs Node 22 and Python 3.9+. `make check` lints (ESLint, Stylelint), type-checks (`tsc`), runs the
+TypeScript tests (`node --test` through `tsx`) and the installer tests (`unittest`), then builds
+`dist/` with esbuild and Sass. `make build` alone builds, and `python3 installer install` then deploys
+your local `dist/`. See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture.md](docs/architecture.md).
 
 ## Credits
 
