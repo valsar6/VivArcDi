@@ -28,8 +28,10 @@ test('pinned tabs beyond the limit stay rows', () => {
   const { bar, strip } = tabBar({
     slots: [1, 2, 3, 4].map((id) => tabSlot(id, { pinned: true })),
   });
-  new FavoriteTagger(selectors, 3, none).apply(asElement(bar));
+  const tagger = new FavoriteTagger(selectors, 3, none);
+  tagger.apply(asElement(bar));
   assert.deepEqual(tileIds(strip), [1, 2, 3]);
+  assert.equal(tagger.tileCount, 3);
 });
 
 test('a horizontal tab bar gets no grid', () => {

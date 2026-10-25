@@ -30,7 +30,7 @@ export class FavoritesGrid extends Module {
    */
   public static readonly defaults: Readonly<FavoritesGridSettings> = Object.freeze({
     maxTiles: 12,
-    minColumns: 3,
+    maxColumns: 3,
     tileMinWidth: 64,
     tileHeight: 44,
     gap: 6,
@@ -112,6 +112,7 @@ export class FavoritesGrid extends Module {
       return;
     }
     const tabBar = this.#document.querySelector(this.#selectors.get('tabBar'));
-    this.#layout?.follow(this.#tagger?.apply(tabBar) ?? null);
+    const strip = this.#tagger?.apply(tabBar) ?? null;
+    this.#layout?.follow(strip, this.#tagger?.tileCount ?? 0);
   }
 }

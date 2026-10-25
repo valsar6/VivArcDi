@@ -11,7 +11,7 @@
     "favorites-grid": {
       "enabled": true,
       "maxTiles": 12,
-      "minColumns": 3,
+      "maxColumns": 3,
       "tileMinWidth": 64,
       "tileHeight": 44,
       "gap": 6,
