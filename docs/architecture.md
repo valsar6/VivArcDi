@@ -66,7 +66,7 @@ Modules are registered in `src/modules/index.ts` and enabled in `config.json` un
 
 | Module | Role |
 |---|---|
-| `activation-marker` | Marks `#browser` with `vivarcdi-active`, so stylesheets apply only when VivArcDi runs |
+| `activation-marker` | Marks `#browser` with `data-vivarcdi-active`, so stylesheets apply only when VivArcDi runs |
 | `favorites-grid` | Favorites grid: `FavoriteTagger` marks tiles, `GridLayout` picks the columns, `UnloadedTabs` and `TileUnloader` handle unloading |
 | `peek` | Peek: `PageScriptInjector` puts the click script in tab pages, `PeekController` holds the open `PeekPanel`, `LinkOpener` and `TabTiler` turn it into a tab |
 
