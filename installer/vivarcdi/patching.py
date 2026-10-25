@@ -1,10 +1,12 @@
-import os
+from contextlib import contextmanager
 from dataclasses import dataclass
+from pathlib import Path
 
 from .backup import BackupStore
 from .errors import PermissionDeniedError
 from .installation import VivaldiInstallation
 from .payload import PayloadDeployer
+from .permissions import PermissionAdvisor, first_unwritable
 from .window_patch import WindowHtmlPatcher
 
 
@@ -25,13 +27,21 @@ class InstallationPatcher:
     """Applies VivArcDi to one Vivaldi installation, or removes it.
 
     Combines the window.html patch, the payload copy and the backup so that
-    commands never deal with them one by one.
+    commands never deal with them one by one. Permission problems become a
+    PermissionDeniedError whose message says how to fix them.
     """
 
-    def __init__(self, patcher: WindowHtmlPatcher, deployer: PayloadDeployer, backups: BackupStore):
+    def __init__(
+        self,
+        patcher: WindowHtmlPatcher,
+        deployer: PayloadDeployer,
+        backups: BackupStore,
+        advisor: PermissionAdvisor,
+    ):
         self._patcher = patcher
         self._deployer = deployer
         self._backups = backups
+        self._advisor = advisor
 
     def state(self, installation: VivaldiInstallation) -> InstallationState:
         """Inspect an installation without changing it."""
@@ -49,23 +59,33 @@ class InstallationPatcher:
         self._ensure_writable(installation)
         html = installation.window_html.read_text()
         self._backups.save(installation, self._patcher.revert(html))
-        self._deployer.deploy(installation)
-        installation.window_html.write_text(self._patcher.apply(html))
+        with self._explaining_permission_errors(installation):
+            self._deployer.deploy(installation)
+            installation.window_html.write_text(self._patcher.apply(html))
 
     def revert(self, installation: VivaldiInstallation) -> None:
         """Remove the patch and the payload, leaving Vivaldi as it was."""
         self._ensure_writable(installation)
         html = installation.window_html.read_text()
-        if self._patcher.is_patched(html):
-            installation.window_html.write_text(self._patcher.revert(html))
-        self._deployer.remove(installation)
+        with self._explaining_permission_errors(installation):
+            if self._patcher.is_patched(html):
+                installation.window_html.write_text(self._patcher.revert(html))
+            self._deployer.remove(installation)
 
-    def backup_path(self, installation: VivaldiInstallation):
+    def backup_path(self, installation: VivaldiInstallation) -> Path:
         """Where the original window.html of an installation is kept."""
         return self._backups.path_for(installation)
 
-    @staticmethod
-    def _ensure_writable(installation: VivaldiInstallation) -> None:
-        targets = (installation.resources_dir, installation.window_html)
-        if not all(os.access(target, os.W_OK) for target in targets):
-            raise PermissionDeniedError(f"Cannot write to {installation.resources_dir}")
+    def _ensure_writable(self, installation: VivaldiInstallation) -> None:
+        targets = [installation.resources_dir, installation.window_html, installation.payload_dir]
+        blocked = first_unwritable(targets)
+        if blocked is not None:
+            raise PermissionDeniedError(self._advisor.explain(blocked))
+
+    @contextmanager
+    def _explaining_permission_errors(self, installation: VivaldiInstallation):
+        try:
+            yield
+        except PermissionError as error:
+            blocked = Path(error.filename) if error.filename else installation.resources_dir
+            raise PermissionDeniedError(self._advisor.explain(blocked)) from error
