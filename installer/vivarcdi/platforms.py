@@ -8,6 +8,7 @@ from pathlib import Path
 from .errors import UnsupportedPlatformError
 from .hooks import AptHook, LaunchAgentHook, UpdateHook
 from .installation import VivaldiInstallation
+from .permissions import MacOSAdvisor, PermissionAdvisor, SudoAdvisor
 from .system import CommandRunner
 
 
@@ -30,9 +31,18 @@ class Platform(ABC):
     def requires_root(self) -> bool:
         """True when installing needs administrator rights."""
 
+    @property
+    def allows_root(self) -> bool:
+        """False when running as root would leave files the user's hook cannot change."""
+        return True
+
     @abstractmethod
     def update_hook(self) -> UpdateHook:
         """The hook that reapplies VivArcDi after Vivaldi updates."""
+
+    @abstractmethod
+    def permission_advisor(self) -> PermissionAdvisor:
+        """Explains how to fix a path the installer cannot write to."""
 
 
 class MacOSPlatform(Platform):
@@ -70,9 +80,16 @@ class MacOSPlatform(Platform):
     def requires_root(self) -> bool:
         return False
 
+    @property
+    def allows_root(self) -> bool:
+        return False
+
     def update_hook(self) -> UpdateHook:
         watch_paths = [versions_dir for _, versions_dir in self._versions_dirs()]
         return LaunchAgentHook(self._home / "Library" / "LaunchAgents", watch_paths, self._runner)
+
+    def permission_advisor(self) -> PermissionAdvisor:
+        return MacOSAdvisor()
 
     def _versions_dirs(self) -> list[tuple[str, Path]]:
         found = []
@@ -118,6 +135,9 @@ class DebianPlatform(Platform):
 
     def update_hook(self) -> UpdateHook:
         return AptHook(self._root / "etc" / "apt" / "apt.conf.d" / "99vivarcdi")
+
+    def permission_advisor(self) -> PermissionAdvisor:
+        return SudoAdvisor()
 
     def _package_version(self, package: str) -> str:
         result = self._runner.run(["dpkg-query", "--showformat=${Version}", "--show", package])
