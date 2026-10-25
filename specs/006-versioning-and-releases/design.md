@@ -29,6 +29,7 @@ In `.github/workflows/tests.yml`:
 |---|---|---|
 | `branch-policy` | Pull requests | Fetches the base branch and runs `check` with the pull request branch name |
 | `release` | Push to `main`, after `test` | Reads the tag; if it does not exist on the remote, runs `gh release create <tag> --target <sha> --generate-notes` |
+| `publish-dist` | Push to `main`, after `test` | Commits the release tree on top of `dist`; if `dist-v<version>` does not exist on the remote, tags that commit |
 
 The release job needs `contents: write`. Tags created with the workflow token do not trigger other
 workflows, so the release cannot loop.

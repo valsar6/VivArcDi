@@ -76,6 +76,11 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 - **FR-10.** `activation-marker` marks the browser root with the `data-vivarcdi-active` attribute
   and the VivArcDi version, so stylesheets apply only while VivArcDi runs. The mark is a data
   attribute because Vivaldi rewrites the root's `class` attribute whenever it re-renders.
+- **FR-11.** On every push to `main`, CI publishes the release tree (`installer/`, `dist/`, `docs/`,
+  `README.md`, `LICENSE` and a `.gitignore` of its own that ignores only Python bytecode and
+  `.DS_Store`) as one new commit on top of the `dist` branch, never rewriting it, so `git pull`
+  updates a `dist` checkout. The commit names the version and the `main` commit, is authored by
+  Tore, and is skipped when the tree did not change.
 
 ### Non-functional
 
@@ -115,6 +120,9 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 | AC-19 | WHEN `uninstall` runs and Vivaldi restarts, THE browser SHALL look and behave as before the install. | manual |
 | AC-20 | WHEN Vivaldi rewrites the classes of the browser root, THE activation mark SHALL stay. | auto: `the activation mark survives a rewrite of the browser classes` |
 | AC-21 | WHEN the installer runs from a `dist` checkout, THE checkout SHALL stay clean in `git status`, because the `dist` branch carries the `.gitignore` that ignores Python bytecode. | manual: install from `git clone -b dist`, then `git status` shows nothing to commit |
+| AC-22 | WHEN `main` publishes a new build, THE `dist` branch SHALL grow by one commit on top of the previous one, so `git pull` on a `dist` checkout fast-forwards. | manual: after a merge into `main`, `git pull` on the `dist` checkout succeeds without hints about divergent branches |
+| AC-23 | THE `dist` branch SHALL contain the compiled payload `dist/`, so `install` works from a fresh `git clone -b dist`. | manual: `git clone -b dist`, then `python3 installer install` finds the payload |
+| AC-24 | WHEN CI publishes on `dist`, THE commit SHALL be authored by Tore and its message SHALL name the VivArcDi version and the `main` commit. | manual: `git log -1 origin/dist` shows `Salvatore` and `Publish the dist build of VivArcDi <version> from main at <sha>` |
 
 ## Out of scope
 
