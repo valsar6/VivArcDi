@@ -1,12 +1,16 @@
+import type { BrowserTabs } from '../../core/BrowserTabs.js';
+
+export type UnloaderTabs = Pick<BrowserTabs, 'get' | 'query' | 'activate' | 'discard'>;
+
 export class TileUnloader {
-  #tabs;
+  #tabs: UnloaderTabs;
 
   /**
    * Unloads a Favorite instead of closing it: the tile stays, and a click loads it again.
    *
-   * @param {import('../../core/BrowserTabs.js').BrowserTabs} tabs Tabs API.
+   * @param tabs Tabs API.
    */
-  constructor(tabs) {
+  constructor(tabs: UnloaderTabs) {
     this.#tabs = tabs;
   }
 
@@ -14,11 +18,11 @@ export class TileUnloader {
    * Chooses the tab to show when the active tab is unloaded: the most recently used
    * other tab, preferring loaded ones, then the nearest by position.
    *
-   * @param {chrome.tabs.Tab[]} windowTabs Every tab of the window.
-   * @param {chrome.tabs.Tab} leaving The tab being unloaded.
-   * @returns {chrome.tabs.Tab | null} The tab to activate, or null when there is no other tab.
+   * @param windowTabs Every tab of the window.
+   * @param leaving The tab being unloaded.
+   * @returns The tab to activate, or null when there is no other tab.
    */
-  static successorOf(windowTabs, leaving) {
+  public static successorOf(windowTabs: chrome.tabs.Tab[], leaving: chrome.tabs.Tab): chrome.tabs.Tab | null {
     const ranked = windowTabs
       .filter(({ id }) => id !== leaving.id)
       .sort(
@@ -34,14 +38,14 @@ export class TileUnloader {
    * Unloads a tab. An active tab first hands focus to its successor,
    * because Chromium cannot unload the tab on screen.
    *
-   * @param {number} tabId The tab to unload.
-   * @returns {Promise<boolean>} False when the tab is the only one in its window.
+   * @param tabId The tab to unload.
+   * @returns False when the tab is the only one in its window.
    */
-  async unload(tabId) {
+  public async unload(tabId: number): Promise<boolean> {
     const tab = await this.#tabs.get(tabId);
     if (tab.active) {
       const successor = TileUnloader.successorOf(await this.#tabs.query({ windowId: tab.windowId }), tab);
-      if (successor === null) {
+      if (successor?.id === undefined) {
         return false;
       }
       await this.#tabs.activate(successor.id);

@@ -1,14 +1,16 @@
+const DEFAULT_TIMEOUT_MS = 15000;
+
 export class UiReadiness {
-  #document;
-  #timeoutMs;
+  #document: Document;
+  #timeoutMs: number;
 
   /**
    * Waits for parts of Vivaldi's interface, which is built after `window.html` loads.
    *
-   * @param {Document} document The document of Vivaldi's browser window.
-   * @param {number} [timeoutMs=15000] How long to wait before giving up.
+   * @param document The document of Vivaldi's browser window.
+   * @param timeoutMs How long to wait before giving up.
    */
-  constructor(document, timeoutMs = 15000) {
+  constructor(document: Document, timeoutMs = DEFAULT_TIMEOUT_MS) {
     this.#document = document;
     this.#timeoutMs = timeoutMs;
   }
@@ -16,16 +18,16 @@ export class UiReadiness {
   /**
    * Resolves with the first element matching a selector, as soon as it exists.
    *
-   * @param {string} selector CSS selector to wait for.
-   * @returns {Promise<Element>} The matching element.
+   * @param selector CSS selector to wait for.
+   * @returns The matching element.
    * @throws {Error} When nothing matches before the timeout.
    */
-  waitFor(selector) {
+  public waitFor(selector: string): Promise<Element> {
     const existing = this.#document.querySelector(selector);
     if (existing) {
       return Promise.resolve(existing);
     }
-    return new Promise((resolve, reject) => {
+    return new Promise<Element>((resolve, reject) => {
       const observer = new MutationObserver(() => {
         const element = this.#document.querySelector(selector);
         if (element) {
@@ -37,7 +39,7 @@ export class UiReadiness {
         finish();
         reject(new Error(`Timed out waiting for ${selector}`));
       }, this.#timeoutMs);
-      const finish = () => {
+      const finish = (): void => {
         observer.disconnect();
         clearTimeout(timer);
       };

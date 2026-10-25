@@ -1,20 +1,34 @@
+import { DomQuery } from '../../core/DomQuery.js';
 import { FrameTask } from '../../core/FrameTask.js';
+import type { Logger } from '../../core/Logger.js';
 import { Module } from '../../core/Module.js';
+import type { ModuleContext } from '../../core/Module.js';
+import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { FavoriteTagger } from './FavoriteTagger.js';
+import type { UnloadedLookup } from './FavoriteTagger.js';
 import { GridLayout } from './GridLayout.js';
+import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
 import { TileUnloader } from './TileUnloader.js';
 import { UnloadedTabs } from './UnloadedTabs.js';
 
-const NO_UNLOADED_TABS = { has: () => false };
+const NO_UNLOADED_TABS: UnloadedLookup = { has: () => false };
+
+export interface FavoritesGridSettings extends GridSettings {
+  /** How many pinned tabs become tiles. */
+  maxTiles: number;
+  /** Whether a middle click unloads a tile instead of closing it. */
+  unloadOnMiddleClick: boolean;
+}
 
 export class FavoritesGrid extends Module {
-  static id = 'favorites-grid';
+  public static override id = 'favorites-grid';
 
   /**
    * Options accepted in `config.json`, with their defaults.
    */
-  static defaults = Object.freeze({
+  public static readonly defaults: Readonly<FavoritesGridSettings> = Object.freeze({
     maxTiles: 12,
     minColumns: 3,
     tileMinWidth: 64,
@@ -23,53 +37,52 @@ export class FavoritesGrid extends Module {
     unloadOnMiddleClick: true,
   });
 
-  #document;
-  #selectors;
-  #observer = null;
-  #refresh = null;
-  #tagger = null;
-  #layout = null;
-  #unloadedTabs = null;
-  #middleClick = null;
+  #document: Document | null = null;
+  #selectors: SelectorCatalog | null = null;
+  #observer: MutationObserver | null = null;
+  #refresh: FrameTask | null = null;
+  #tagger: FavoriteTagger | null = null;
+  #layout: GridLayout | null = null;
+  #unloadedTabs: UnloadedTabs | null = null;
+  #middleClick: MiddleClickUnload | null = null;
 
   /**
    * Shows the first pinned tabs of a vertical tab bar as an Arc-style grid of icon tiles.
    * The grid follows Vivaldi's tab bar as it changes, dims tiles of unloaded tabs,
    * and, when `chrome.tabs` exists, unloads a tile on middle click instead of closing it.
    *
-   * @param {import('../../core/Module.js').ModuleContext} context
-   * @returns {Promise<void>}
+   * @param context What the module may use.
    */
-  async start({ document, selectors, logger, options, tabs }) {
+  public override async start({ document, selectors, logger, options, tabs }: ModuleContext): Promise<void> {
     const settings = { ...FavoritesGrid.defaults, ...options };
     this.#document = document;
     this.#selectors = selectors;
     this.#refresh = new FrameTask(() => this.#update());
     this.#layout = new GridLayout(settings);
 
-    if (tabs?.available) {
-      this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh.request());
+    if (tabs.available) {
+      this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
       this.#startMiddleClick(settings, tabs, logger);
     } else {
       logger.warn('chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs');
     }
     this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_UNLOADED_TABS);
 
-    this.#observer = new MutationObserver(() => this.#refresh.request());
-    this.#observer.observe(document.querySelector(selectors.get('browser')), {
+    this.#observer = new MutationObserver(() => this.#refresh?.request());
+    this.#observer.observe(DomQuery.require(document, selectors.get('browser')), {
       childList: true,
       subtree: true,
       attributes: true,
       attributeFilter: ['class'],
     });
     this.#update();
-    await this.#unloadedTabs?.start().catch((error) => logger.error('Could not read unloaded tabs', error));
+    await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
   }
 
   /**
    * Removes the grid and every listener, leaving Vivaldi's tab bar as it was.
    */
-  stop() {
+  public override stop(): void {
     this.#observer?.disconnect();
     this.#refresh?.cancel();
     this.#middleClick?.detach();
@@ -81,8 +94,8 @@ export class FavoritesGrid extends Module {
     this.#unloadedTabs = null;
   }
 
-  #startMiddleClick(settings, tabs, logger) {
-    if (!settings.unloadOnMiddleClick) {
+  #startMiddleClick(settings: FavoritesGridSettings, tabs: BrowserTabs, logger: Logger): void {
+    if (!settings.unloadOnMiddleClick || this.#document === null || this.#selectors === null) {
       return;
     }
     this.#middleClick = new MiddleClickUnload({
@@ -94,8 +107,11 @@ export class FavoritesGrid extends Module {
     this.#middleClick.attach();
   }
 
-  #update() {
+  #update(): void {
+    if (this.#document === null || this.#selectors === null) {
+      return;
+    }
     const tabBar = this.#document.querySelector(this.#selectors.get('tabBar'));
-    this.#layout.follow(this.#tagger.apply(tabBar));
+    this.#layout?.follow(this.#tagger?.apply(tabBar) ?? null);
   }
 }

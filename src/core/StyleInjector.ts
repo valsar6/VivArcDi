@@ -1,15 +1,17 @@
+import type { PayloadSource } from './ResourceLoader.js';
+
 export class StyleInjector {
-  #document;
-  #loader;
-  #links = [];
+  #document: Document;
+  #loader: PayloadSource;
+  #links: HTMLLinkElement[] = [];
 
   /**
    * Adds VivArcDi stylesheets to Vivaldi's interface.
    *
-   * @param {Document} document The document of Vivaldi's browser window.
-   * @param {import('./ResourceLoader.js').ResourceLoader} loader Resolves stylesheet paths.
+   * @param document The document of Vivaldi's browser window.
+   * @param loader Resolves stylesheet paths.
    */
-  constructor(document, loader) {
+  constructor(document: Document, loader: PayloadSource) {
     this.#document = document;
     this.#loader = loader;
   }
@@ -17,14 +19,14 @@ export class StyleInjector {
   /**
    * Appends a `<link rel="stylesheet">` for a payload stylesheet.
    *
-   * @param {string} path Stylesheet path relative to the payload folder.
-   * @returns {HTMLLinkElement} The added link element.
+   * @param path Stylesheet path relative to the payload folder.
+   * @returns The added link element.
    */
-  inject(path) {
+  public inject(path: string): HTMLLinkElement {
     const link = this.#document.createElement('link');
     link.rel = 'stylesheet';
     link.href = this.#loader.url(path);
-    link.dataset.vivarcdi = path;
+    link.dataset['vivarcdi'] = path;
     this.#document.head.append(link);
     this.#links.push(link);
     return link;
@@ -33,7 +35,7 @@ export class StyleInjector {
   /**
    * Removes every stylesheet this injector added.
    */
-  removeAll() {
+  public removeAll(): void {
     this.#links.forEach((link) => link.remove());
     this.#links = [];
   }
