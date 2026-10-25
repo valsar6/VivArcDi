@@ -32,9 +32,20 @@ never blocked.
 
 A module is a class that extends `Module` (`src/core/Module.js`), declares a static `id`, and
 implements `start(context)` and `stop()`. The context gives it the document, the selector catalog,
-a logger tagged with its id, its options from `config.json`, and the build versions.
+a logger tagged with its id, its options from `config.json`, the build versions, and `tabs`, a
+promise-based wrapper of `chrome.tabs` (`src/core/BrowserTabs.js`; check `tabs.available` first).
+
+Modules mark Vivaldi's elements with `data-vivarcdi-*` attributes and stylesheets style those marks.
+Vivaldi re-renders its interface often and rewrites the `class` attribute when it does, but leaves
+unknown data attributes alone. Modules that follow the interface observe it with a
+`MutationObserver` and redraw through `FrameTask`, at most once per animation frame.
 
 Modules are registered in `src/modules/index.js` and enabled in `config.json` under their id.
+
+| Module | Role |
+|---|---|
+| `activation-marker` | Marks `#browser` with `vivarcdi-active`, so stylesheets apply only when VivArcDi runs |
+| `favorites-grid` | Favorites grid: `FavoriteTagger` marks tiles, `GridLayout` picks the columns, `UnloadedTabs` and `TileUnloader` handle unloading |
 
 ### Selectors
 
