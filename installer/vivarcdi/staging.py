@@ -1,7 +1,10 @@
 import shutil
 from pathlib import Path
 
-STAGED_FOLDERS = ("src", "installer")
+from .distribution import DIST_FOLDER, require_dist
+
+STAGED_FOLDERS = ("dist", "installer")
+LEGACY_FOLDERS = ("src",)
 
 
 class SelfStager:
@@ -21,9 +24,14 @@ class SelfStager:
         return self._repo_root.resolve() == self._data_dir.resolve()
 
     def stage(self) -> None:
-        """Replace the staged copy with the files of the running installer."""
+        """Replace the staged copy with the files of the running installer.
+
+        Raises InstallerError when the payload was not built.
+        """
         if self.is_running_from_stage:
             return
+        require_dist(self._repo_root / DIST_FOLDER)
+        self._remove_folders(LEGACY_FOLDERS)
         self._data_dir.mkdir(parents=True, exist_ok=True)
         for folder in STAGED_FOLDERS:
             target = self._data_dir / folder
@@ -37,7 +45,10 @@ class SelfStager:
 
     def unstage(self) -> None:
         """Delete the staged copy, keeping anything else in the data folder."""
-        for folder in STAGED_FOLDERS:
+        self._remove_folders(STAGED_FOLDERS + LEGACY_FOLDERS)
+
+    def _remove_folders(self, folders: tuple) -> None:
+        for folder in folders:
             target = self._data_dir / folder
             if target.exists():
                 shutil.rmtree(target)

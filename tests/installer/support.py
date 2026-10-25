@@ -28,7 +28,7 @@ class FakeRunner:
 
 
 def make_payload_source(root: Path) -> Path:
-    source = root / "repo" / "src"
+    source = root / "repo" / "dist"
     (source / "core").mkdir(parents=True)
     (source / "loader.js").write_text("import './core/VivArcDi.js';\n")
     (source / "core" / "VivArcDi.js").write_text("export class VivArcDi {}\n")

@@ -5,6 +5,7 @@ from pathlib import Path
 from . import __version__
 from .backup import BackupStore
 from .commands import COMMANDS, Command, InstallerContext
+from .distribution import DIST_FOLDER
 from .errors import VivArcDiError
 from .patching import InstallationPatcher
 from .payload import PayloadDeployer
@@ -21,7 +22,7 @@ def build_context(platform: Platform, reporter: Reporter, repo_root: Path = REPO
     stager = SelfStager(repo_root, platform.data_dir)
     installations = InstallationPatcher(
         WindowHtmlPatcher(),
-        PayloadDeployer(repo_root / "src", __version__),
+        PayloadDeployer(repo_root / DIST_FOLDER, __version__),
         BackupStore(platform.data_dir / "backups"),
         platform.permission_advisor(),
     )
