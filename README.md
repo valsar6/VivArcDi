@@ -142,7 +142,7 @@ LICENSE
 
 `git clone -b dist` gives you that tree. The `dist` branch is rewritten by every publish, so a plain
 `git pull` can fail; update with `git fetch origin && git reset --hard origin/dist` instead. If you clone `main` instead, the
-installer stops and tells you to download a release build or to run `make build` (it needs Node 22).
+installer stops and tells you to download a release build or to run `make build` (it needs Node 24).
 
 ## Commands
 
@@ -230,7 +230,7 @@ npm ci
 make check
 ```
 
-Needs Node 22 and Python 3.9+. `make check` lints (ESLint, Stylelint), type-checks (`tsc`), runs the
+Needs Node 24 and Python 3.9+. `make check` lints (ESLint, Stylelint), type-checks (`tsc`), runs the
 TypeScript tests (`node --test` through `tsx`) and the installer tests (`unittest`), then builds
 `dist/` with esbuild and Sass. `make build` alone builds, and `python3 installer install` then deploys
 your local `dist/`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the spec-driven workflow and the branch
