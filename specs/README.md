@@ -17,6 +17,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [006 Versioning and releases](006-versioning-and-releases/spec.md) | Tooling | Approved |
 | [007 Reopen pinned tabs](007-reopen-pinned-tabs/spec.md) | 3 | Approved |
 | [008 Folder hover preview](008-folder-hover-preview/spec.md) | 3 | Approved |
+| [009 Bookmark folders in the tab bar](009-bookmark-folders-in-tab-bar/spec.md) | 3 | Draft |
 
 ## Layout
 
