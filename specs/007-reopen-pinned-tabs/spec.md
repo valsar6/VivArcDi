@@ -82,29 +82,31 @@ Each time a Favorite or pinned tab becomes active, by any route, VivArcDi record
 | AC-7 | IF the switch fails, THEN THE new tab SHALL stay open on the typed address. | auto: `keeps the new tab when the switch fails` |
 | AC-8 | WHEN a Favorite or pinned tab becomes active, THE module SHALL store the current date for it. | auto: `records the last opened date on activation` |
 | AC-9 | WHEN Tore opens the address of a Favorite from Cmd/Ctrl+T, THE Favorite SHALL become active and no new tab SHALL remain. | manual |
-| AC-10 | WHEN Tore opens the address of a pinned tab inside a closed folder, THE tab SHALL become active and show below the closed folder. | manual |
+| AC-10 | WHEN Tore opens the address of a pinned tab inside a closed folder, THE tab SHALL become active and show below the closed folder. Checked once 003 is implemented. | manual |
 | AC-11 | WHEN Vivaldi restarts, THE last-opened dates SHALL be kept. | manual |
 
 ## Out of scope
 
 - A "Switch to tab" suggestion inside Vivaldi's address bar before Enter.
 - Doing the same for ordinary, unpinned tabs.
+- Showing the last-opened dates: [008](../008-folder-hover-preview/spec.md).
 - Ordering or archiving tabs by their last-opened date ([004](../004-today-tabs-and-keyboard/spec.md)
   may use the dates later).
 
 ## Open questions
 
-- [ ] Which tabs does it apply to: only Favorites and pinned tabs (proposed), or every open tab like
-  Arc's "Switch to Tab"?
-- [ ] How strict is the match: same host and path (proposed), same site only, or the exact address?
-- [ ] A Favorite or pinned tab in another workspace: switch workspace and open it there, or ignore it
-  and open a new tab (proposed)?
-- [ ] Where should the last-opened date show: nowhere for now, only stored for later (proposed), in
-  the tab's tooltip, or used to order something?
-- [ ] Does Vivaldi 8.2 already show open tabs among the address bar suggestions (Cmd/Ctrl+T, then
-  type part of a pinned site)? If it does, VivArcDi could rely on it instead of acting after Enter.
-- [ ] The peek-out below a closed folder comes from 003, which is still a draft. Ship this spec first
-  for Favorites and pinned tabs outside folders (proposed), or wait for 003?
+- [x] Which tabs does it apply to? Only Favorites and pinned tabs (Tore, 2026-10-26).
+- [x] How strict is the match? Same host and path, as in FR-2 (Tore, 2026-10-26).
+- [x] A Favorite or pinned tab in another workspace? Ignored: a new tab opens as usual
+  (Tore, 2026-10-26).
+- [x] Where does the last-opened date show? In a list shown on hover over a folder, as in Arc. That
+  is its own feature, [008](../008-folder-hover-preview/spec.md); this spec only records the dates
+  (Tore, 2026-10-26).
+- [x] Address bar suggestions: the switch after Enter works whether or not Vivaldi suggests open tabs,
+  so it does not depend on them. If Vivaldi suggests the open tab and the user picks it, Vivaldi
+  switches by itself and this module does nothing.
+- [x] Ship before 003? Yes: Favorites and pinned tabs outside folders first; the peek-out below a
+  closed folder (AC-10) follows 003 (Tore, 2026-10-26).
 
 ## References
 

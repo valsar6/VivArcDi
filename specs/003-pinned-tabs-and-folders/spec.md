@@ -75,7 +75,7 @@ stays collapsed; switching to another tab puts it back inside.
 
 ## Out of scope
 
-- Hover preview of a closed folder with list and search.
+- Hover preview of a closed folder with list and search: [008](../008-folder-hover-preview/spec.md).
 - Sharing folders or workspaces.
 - Nested folders, unless Vivaldi stacks support them natively.
 
