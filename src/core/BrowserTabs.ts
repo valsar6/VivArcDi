@@ -1,4 +1,4 @@
-export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard';
+export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove';
 
 export type TabUpdateListener = (
   tabId: number,
@@ -13,6 +13,8 @@ export interface TabsEvent {
 
 export type TabActivatedListener = (info: chrome.tabs.OnActivatedInfo) => void;
 
+export type TabCreatedListener = (tab: chrome.tabs.Tab) => void;
+
 export interface ChromeEvent<Listener> {
   addListener(listener: Listener): void;
   removeListener(listener: Listener): void;
@@ -21,6 +23,7 @@ export interface ChromeEvent<Listener> {
 export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & {
   onUpdated: TabsEvent;
   onActivated?: ChromeEvent<TabActivatedListener> | undefined;
+  onCreated?: ChromeEvent<TabCreatedListener> | undefined;
 };
 
 export type RuntimeMessageListener = (message: unknown) => void;
@@ -114,6 +117,24 @@ export class BrowserTabs {
   }
 
   /**
+   * Loads a tab's page again, which also brings an unloaded tab back into memory.
+   *
+   * @param tabId Tab id.
+   */
+  public async reload(tabId: number): Promise<void> {
+    await this.#call('reload', tabId);
+  }
+
+  /**
+   * Closes a tab.
+   *
+   * @param tabId Tab id.
+   */
+  public async remove(tabId: number): Promise<void> {
+    await this.#call('remove', tabId);
+  }
+
+  /**
    * Listens to `chrome.tabs.onUpdated`.
    *
    * @param listener Called on every update.
@@ -138,6 +159,21 @@ export class BrowserTabs {
     }
     onActivated.addListener(listener);
     return () => onActivated.removeListener(listener);
+  }
+
+  /**
+   * Listens to `chrome.tabs.onCreated`.
+   *
+   * @param listener Called with every new tab.
+   * @returns A function that removes the listener.
+   */
+  public onCreated(listener: TabCreatedListener): () => void {
+    const { onCreated } = this.#requireTabs();
+    if (onCreated === undefined) {
+      throw new Error('chrome.tabs.onCreated is not available');
+    }
+    onCreated.addListener(listener);
+    return () => onCreated.removeListener(listener);
   }
 
   #call<T>(method: TabsMethod, ...args: unknown[]): Promise<T> {

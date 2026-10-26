@@ -24,6 +24,9 @@
       "anyCrossSite": false,
       "widthPercent": 80,
       "heightPercent": 90
+    },
+    "reopen-pinned": {
+      "enabled": true
     }
   }
 }
