@@ -40,8 +40,8 @@ started recording shows "never opened" and sits at the bottom.
 
 ### Functional
 
-- **FR-1.** Resting the pointer on a folder title for `hoverDelayMs` opens the panel next to the
-  sidebar, aligned with the folder.
+- **FR-1.** Resting the pointer on the title of a closed folder for `hoverDelayMs` opens the panel
+  next to the sidebar, aligned with the folder. Expanded folders never open it.
 - **FR-2.** One row per tab of the folder: favicon, title, and the time since its last opening from
   the 007 records, as relative time in the interface language.
 - **FR-3.** Rows are sorted by last opening, most recent first; tabs without a record come last, in
@@ -68,22 +68,22 @@ started recording shows "never opened" and sits at the bottom.
 | AC-2 | THE rows SHALL be sorted by last opening, most recent first, with unrecorded tabs last in folder order. | auto: `sorts rows by last opening with unrecorded tabs last` |
 | AC-3 | WHEN the user types in the search field, THE panel SHALL show only rows whose title or address contains the text, ignoring case. | auto: `filters rows by title or address ignoring case` |
 | AC-4 | WHEN the user presses Enter, THE module SHALL activate the highlighted tab and close the panel. | auto: `activates the highlighted tab on Enter` |
-| AC-5 | WHEN the pointer rests on a folder title for the delay, THE panel SHALL open next to the sidebar with the folder's tabs. | manual |
+| AC-5 | WHEN the pointer rests on a closed folder title for the delay, THE panel SHALL open next to the sidebar with the folder's tabs. | manual |
+| AC-8 | WHILE a folder is expanded, THE panel SHALL NOT open on hover. | manual |
 | AC-6 | WHEN the pointer leaves the folder and the panel, THE panel SHALL close. | manual |
 | AC-7 | WHEN Tore picks a tab in the panel, THE tab SHALL become active and show below the closed folder. | manual |
 
 ## Out of scope
 
 - Editing the folder from the panel (rename, move, remove tabs).
-- A panel for Favorites or for tabs outside folders.
+- A panel for Favorites or for tabs outside folders, and the last-opened time on single tabs.
 
 ## Open questions
 
-- [ ] "Hovering on the open page": besides the folder panel, should the last-opened time also show
-  when the pointer rests on a single pinned tab, for example in its tooltip?
-- [ ] Should the panel also open on a folder that is already expanded, or only on closed ones
-  (proposed)?
-- [ ] Delay before opening: 400 ms (proposed), or immediate like Arc seems to do?
+- [x] Should the last-opened time also show on a single pinned tab? No, only in the folder panel
+  (Tore, 2026-10-26).
+- [x] Closed folders only? Yes (Tore, 2026-10-26).
+- [x] Delay before opening? 400 ms (Tore, 2026-10-26).
 
 ## References
 
