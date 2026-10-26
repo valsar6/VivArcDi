@@ -42,7 +42,7 @@ Rejected alternatives:
 | `src/modules/reopen/AddressKey.ts` | Turns a URL into its match key: host without `www.`, path without trailing `/`, no query or fragment (FR-2) | Value object |
 | `src/modules/reopen/NewTabWatcher.ts` | Watches tabs created empty and reports their first web navigation once (FR-1, FR-5) | Observer |
 | `src/modules/reopen/Workspace.ts` | Reads a tab's workspace from `vivExtData` | Adapter |
-| `src/modules/reopen/PinnedTabFinder.ts` | Pinned tabs of the window and workspace with the same key, most recently opened first (FR-1, FR-4) | |
+| `src/modules/reopen/PinnedTabFinder.ts` | Pinned tabs of the window and workspace with the same key; ties go to Chromium's `lastAccessed`, since tabs with the same key share one stored date (FR-1, FR-4) | |
 | `src/modules/reopen/TabSwitcher.ts` | Activates, reloads if unloaded, removes the new tab; keeps it on failure (FR-3, NFR-2) | |
 | `src/modules/reopen/LastOpenedStore.ts` | Last-opened dates by address key, saved across restarts (FR-6, NFR-2 of 003) | Repository |
 | `src/modules/reopen/ActivationRecorder.ts` | On `tabs.onActivated`, records the date of pinned tabs in the store (FR-6) | Observer |
