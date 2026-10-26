@@ -23,6 +23,6 @@ Reconstructed from PR #1 and PR #5.
   and no stylesheet applied. AC-20.
 - [x] **T13.** Publish `.gitignore` on the `dist` branch, so `__pycache__` folders written by the
   installer do not dirty the user's checkout. AC-21.
-- [ ] **T14.** Publish `dist` as commits on top of the branch instead of a force-push, with a
+- [x] **T14.** Publish `dist` as commits on top of the branch instead of a force-push, with a
   `.gitignore` of its own so the payload is not ignored, as found after 0.4.3 shipped without
-  `dist/`. AC-22 to AC-24, checks after merge.
+  `dist/`. AC-22 to AC-24, checked by Tore on 2026-10-26.
