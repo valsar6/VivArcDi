@@ -95,3 +95,4 @@ stays collapsed; switching to another tab puts it back inside.
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr), section "Spaces, Pinned tabs e
   cartelle".
 - [docs/native-settings.md](../../docs/native-settings.md#favorites-and-pinned-tabs)
+- [007 Reopen pinned tabs](../007-reopen-pinned-tabs/spec.md) reuses the peek-out of FR-4.
