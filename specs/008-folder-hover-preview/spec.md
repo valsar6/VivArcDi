@@ -33,7 +33,7 @@ highlighted.
 In VivArcDi the panel opens after the pointer rests on a folder for a short delay and closes when the
 pointer leaves both the folder and the panel, or with Esc. Typing filters the rows by title and
 address. Arrow keys move the highlight; Enter or a click activates the tab, which then peeks out
-below the closed folder (003/AC-14) and becomes the most recent. A tab never opened since VivArcDi
+below the closed folder (003/AC-6) and becomes the most recent. A tab never opened since VivArcDi
 started recording shows "never opened" and sits at the bottom.
 
 ## Requirements
