@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from .handoff import ReapplyHandoff
 from .hooks import UpdateHook
 from .patching import InstallationPatcher
 from .platforms import Platform
@@ -18,6 +19,8 @@ class InstallerContext:
     hook: UpdateHook
     reapply_command: list[str]
     reporter: Reporter
+    handoff: ReapplyHandoff
+    background: bool = False
 
 
 class Command(ABC):
@@ -55,16 +58,32 @@ class InstallCommand(Command):
 
 
 class ReapplyCommand(Command):
-    """Patches again any Vivaldi build that lost VivArcDi, e.g. after an update."""
+    """Patches again any Vivaldi build that lost VivArcDi, e.g. after an update.
+
+    Run by the update hook in the background, it hands the work to the
+    platform's handoff when there is one, because on macOS only the apps the
+    user allowed in App Management may change Vivaldi.
+    """
 
     name = "reapply"
     help = "patch again the Vivaldi builds that an update reset"
 
     def execute(self, context: InstallerContext) -> int:
-        for installation in context.platform.find_installations():
-            if context.installations.state(installation).needs_reapply:
-                context.installations.apply(installation)
-                context.reporter.info(f"Reapplied VivArcDi to {installation.label}")
+        outdated = [
+            installation
+            for installation in context.platform.find_installations()
+            if context.installations.state(installation).needs_reapply
+        ]
+        if not outdated:
+            return 0
+        if context.background and context.handoff.available:
+            context.handoff.request()
+            context.reporter.info("Asked the terminal to apply VivArcDi again")
+            return 0
+        for installation in outdated:
+            context.installations.apply(installation)
+            context.reporter.info(f"Reapplied VivArcDi to {installation.label}")
+        context.handoff.clear()
         return 0
 
 
@@ -80,6 +99,7 @@ class UninstallCommand(Command):
             context.installations.revert(installation)
             report.info(f"Removed VivArcDi from {installation.label}")
         context.hook.remove()
+        context.handoff.clear()
         context.stager.unstage()
         report.info(f"Backups of the original window.html stay in {context.platform.data_dir}")
         report.info("Restart Vivaldi to finish.")

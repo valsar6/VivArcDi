@@ -171,8 +171,10 @@ The hook runs a copy of the installer kept in `~/Library/Application Support/Viv
 `/usr/local/share/vivarcdi` on Debian, so you can move or delete the cloned repository.
 After an update, restart Vivaldi once more to load the reapplied modules.
 
-> **macOS limitation.** The launchd agent runs outside your terminal, so App Management may block
-> it too. Until this is solved, run `python3 installer install` again after a Vivaldi update.
+On macOS, App Management lets only the apps you allowed change Vivaldi, and the launchd agent is not
+one of them. So after an update the agent opens a Terminal window that applies VivArcDi again; when
+it says so, restart Vivaldi and close the window. If you installed a version older than 0.5.2, run
+`python3 installer install` once more to update the agent.
 
 ## Configuration
 
