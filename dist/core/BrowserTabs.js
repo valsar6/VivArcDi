@@ -67,6 +67,22 @@ class BrowserTabs {
     return this.#call("discard", tabId);
   }
   /**
+   * Loads a tab's page again, which also brings an unloaded tab back into memory.
+   *
+   * @param tabId Tab id.
+   */
+  async reload(tabId) {
+    await this.#call("reload", tabId);
+  }
+  /**
+   * Closes a tab.
+   *
+   * @param tabId Tab id.
+   */
+  async remove(tabId) {
+    await this.#call("remove", tabId);
+  }
+  /**
    * Listens to `chrome.tabs.onUpdated`.
    *
    * @param listener Called on every update.
@@ -90,6 +106,20 @@ class BrowserTabs {
     }
     onActivated.addListener(listener);
     return () => onActivated.removeListener(listener);
+  }
+  /**
+   * Listens to `chrome.tabs.onCreated`.
+   *
+   * @param listener Called with every new tab.
+   * @returns A function that removes the listener.
+   */
+  onCreated(listener) {
+    const { onCreated } = this.#requireTabs();
+    if (onCreated === void 0) {
+      throw new Error("chrome.tabs.onCreated is not available");
+    }
+    onCreated.addListener(listener);
+    return () => onCreated.removeListener(listener);
   }
   #call(method, ...args) {
     const chromeApi = this.#require();
