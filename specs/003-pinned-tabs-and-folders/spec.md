@@ -18,8 +18,7 @@ keeps Favorites global.
 
 - **US-1.** As a user, I want each workspace to have its own pinned tabs, while Favorites stay the
   same everywhere.
-- **US-2.** As a user, I want closing a pinned tab or Favorite to unload it instead of removing it,
-  whatever the way I close it.
+- **US-2.** As a user, I want closing a pinned tab or Favorite to unload it instead of removing it.
 - **US-3.** As a user, I want to go back to a pinned tab's saved page with one click after browsing
   away.
 - **US-4.** As a user, I want to group pinned tabs in folders that I can collapse.
@@ -28,71 +27,111 @@ keeps Favorites global.
 
 ## Expected behavior
 
-Favorites (the grid of [001](../001-favorites-grid/spec.md)) are shared by every workspace. Below
-them, each workspace shows its own pinned tabs, then a separator, then its other tabs.
+**Favorites and pinned tabs.** A Favorite is a tab that Vivaldi pins in all workspaces (Vivaldi 7.8+).
+Every other pinned tab belongs to its workspace. The Favorites grid of
+[001](../001-favorites-grid/spec.md) shows the Favorites only, so it is the same in every workspace;
+below it, each workspace shows its own pinned tabs as rows, then a separator, then its other tabs.
+This replaces the rule of 001 that made the first pinned tabs of the tab bar into tiles, whatever
+their workspace.
 
-A pinned tab remembers the URL it was pinned with. When the user navigates away, the tab shows a
-reset affordance (Arc shows a "/" in the URL and makes the favicon clickable); clicking it, or the
-"Reset tab" command, returns to the saved URL. Cmd/Ctrl+W on a pinned tab or a Favorite unloads it
-and keeps it in place, dimmed.
+**Saved page.** A pinned tab, Favorite included, remembers the address it had when it was pinned. A
+tab that was already pinned before VivArcDi saw it remembers the address it shows the first time
+VivArcDi sees it. When the tab shows another page (other host or path, compared as in 007/FR-2),
+its favicon turns into a reset button, as Arc does with the favicon and the "/" in the address.
+Clicking it loads the saved address. Unpinning the tab forgets the address; pinning it again saves
+the current one.
 
-Folders are Vivaldi tab stacks shown as an accordion. A collapsed folder shows only its title. When
-one of its tabs is active, that tab is shown right below the folder title, indented, while the folder
-stays collapsed; switching to another tab puts it back inside.
+**Closing.** Cmd/Ctrl+W and the close button on a pinned tab or a Favorite unload it: the tab stays
+in place, dimmed, and the last used tab becomes active, as the middle click of 001 already does. The
+"Close tab" item of Vivaldi's context menu still closes the tab for real, so there is always a way
+to remove one.
+
+**Folders.** Folders are Vivaldi tab stacks shown as accordion. A collapsed folder shows only its
+title. When one of its tabs is active, that tab shows right below the folder title, indented, while
+the folder stays collapsed. When another tab becomes active, it goes back inside. This applies to
+every accordion stack, pinned or not.
 
 ## Requirements
 
 ### Functional
 
-- **FR-1.** Favorites are the same in every workspace without the user pinning them in all
-  workspaces by hand.
-- **FR-2.** Each pinned tab stores its pinned URL; a reset command and a clickable reset affordance
-  restore it.
-- **FR-3.** Cmd/Ctrl+W, the close button and the context menu close action unload pinned tabs and
-  Favorites instead of closing them.
-- **FR-4.** The active tab of a collapsed accordion stack is shown below the stack title.
-- **FR-5.** Pinned tabs and tabs in folders are never auto-archived ([004](../004-today-tabs-and-keyboard/spec.md)).
+- **FR-1.** Favorites are the tabs pinned in all workspaces. The grid shows only them, up to
+  `maxTiles` of 001; the other pinned tabs show as rows of their own workspace.
+- **FR-2.** Each pinned tab stores its saved address: the one it had when pinned, or the one it
+  shows when VivArcDi first sees it pinned. Unpinning removes it.
+- **FR-3.** WHILE a pinned tab shows a page different from its saved address, its favicon is a reset
+  button that loads the saved address.
+- **FR-4.** Cmd/Ctrl+W, with the focus in the interface or in the page, and the close button unload a
+  pinned tab or Favorite instead of closing it, and activate the last used tab.
+- **FR-5.** The active tab of a collapsed accordion stack shows below the stack title, indented.
+- **FR-6.** Pinned tabs and tabs in folders are never auto-archived ([004](../004-today-tabs-and-keyboard/spec.md)).
+- **FR-7.** Options in `config.json`, module `pinned-tabs`: `enabled` (true), `resetButton` (true),
+  `unloadOnClose` (true); module `folders`: `enabled` (true).
 
 ### Non-functional
 
 - **NFR-1.** Vivaldi's own data (sessions, workspaces, stacks) is never rewritten in a way that
-  breaks it when VivArcDi is removed.
-- **NFR-2.** Saved URLs survive a restart of Vivaldi.
+  breaks it when VivArcDi is removed. VivArcDi adds at most its own key to a tab's data, which plain
+  Vivaldi ignores.
+- **NFR-2.** Saved addresses survive a restart of Vivaldi.
+- **NFR-3.** IF Vivaldi's data or markup is not what the module expects, THEN the module does
+  nothing and logs the error, and Vivaldi behaves as without VivArcDi.
+- **NFR-4.** Works on Vivaldi 8.1 and 8.2, on macOS and Debian.
 
 ## Acceptance criteria
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHEN the user switches workspace, THE Favorites grid SHALL stay the same. | manual |
-| AC-2 | WHEN the user switches workspace, THE pinned tabs shown SHALL be those of the new workspace. | manual |
-| AC-3 | WHILE a pinned tab shows a URL different from its saved one, THE tab SHALL show the reset affordance. | manual |
-| AC-4 | WHEN the user activates the reset affordance or command, THE tab SHALL load its saved URL. | manual |
-| AC-5 | WHEN the user presses Cmd/Ctrl+W on a pinned tab or Favorite, THE tab SHALL be unloaded and stay in place. | manual |
-| AC-6 | WHILE a folder is collapsed and one of its tabs is active, THAT tab SHALL appear below the folder title. | manual |
-| AC-7 | WHEN another tab becomes active, THE peeking tab SHALL return inside the collapsed folder. | manual |
-| AC-8 | WHEN Vivaldi restarts, THE saved URLs SHALL be kept. | manual |
-| AC-9 | IF VivArcDi is uninstalled, THEN workspaces, pinned tabs and stacks SHALL remain usable in plain Vivaldi. | manual |
+| AC-1 | THE grid SHALL mark as tiles only the tabs pinned in all workspaces. | auto: `marks only tabs pinned in all workspaces as tiles` |
+| AC-2 | WHEN a tab is pinned, THE module SHALL save its current address. | auto: `saves the address of a newly pinned tab` |
+| AC-3 | WHEN the module first sees a pinned tab without a saved address, THE module SHALL save its current address. | auto: `saves the address of a pinned tab seen for the first time` |
+| AC-4 | WHEN a tab is unpinned, THE module SHALL forget its saved address. | auto: `forgets the address of an unpinned tab` |
+| AC-5 | WHILE a pinned tab shows another host or path than its saved address, THE tab SHALL be marked for the reset button. | auto: `marks pinned tabs that left their saved address` |
+| AC-6 | WHEN the user clicks the reset button, THE tab SHALL load its saved address. | auto: `loads the saved address on reset` |
+| AC-7 | WHEN Cmd/Ctrl+W targets a pinned tab or Favorite, THE module SHALL unload it and activate the last used tab. | auto: `unloads a pinned tab on close shortcut` |
+| AC-8 | WHEN Cmd/Ctrl+W targets an ordinary tab, THE module SHALL leave the shortcut to Vivaldi. | auto: `leaves the close shortcut to Vivaldi for ordinary tabs` |
+| AC-9 | WHILE a stack is collapsed and one of its tabs is active, THE module SHALL mark that tab as peeking. | auto: `marks the active tab of a collapsed stack as peeking` |
+| AC-10 | WHEN another tab becomes active, THE module SHALL remove the peeking mark. | auto: `removes the peeking mark when another tab is active` |
+| AC-11 | WHEN Tore switches workspace, THE Favorites grid SHALL stay the same and the pinned rows SHALL be those of the new workspace. | manual |
+| AC-12 | WHEN Tore browses away from a pinned tab's page and clicks its favicon, THE tab SHALL go back to the saved page. | manual |
+| AC-13 | WHEN Tore presses Cmd/Ctrl+W on a pinned tab or clicks its close button, THE tab SHALL stay in place, dimmed. | manual |
+| AC-14 | WHILE a folder is collapsed and Tore opens one of its tabs, THAT tab SHALL show below the folder title and go back inside when Tore opens another tab. | manual |
+| AC-15 | WHEN Vivaldi restarts, THE saved addresses SHALL be kept. | manual |
+| AC-16 | IF VivArcDi is uninstalled, THEN workspaces, pinned tabs and stacks SHALL remain usable in plain Vivaldi. | manual |
 
 ## Out of scope
 
 - Hover preview of a closed folder with list and search: [008](../008-folder-hover-preview/spec.md).
+- A keyboard shortcut or menu item for the reset: Vivaldi's menus and shortcut list cannot be
+  extended safely by a mod.
+- Changing what the "Close tab" item of the context menu does.
 - Sharing folders or workspaces.
-- Nested folders, unless Vivaldi stacks support them natively.
+- Nested folders, which Vivaldi stacks do not support.
 
 ## Open questions
 
-- [ ] Where to store saved URLs: `vivExtData` on the tab (private API), `chrome.storage`, or a file
-  in the profile? Needs a prototype.
-- [ ] Global Favorites: rely on Vivaldi's "pin in all workspaces" (7.8+) and only tell them apart in
-  the interface, or manage them ourselves?
-- [ ] Is "lock to domain" (Vivaldi 7.8+) enough for the reset behavior, so we only add the
-  affordance?
-- [ ] Peek-out of the active tab: can CSS on accordion stacks do it, or does it need DOM work? The
-  strategy marks this as the riskiest part; a prototype comes before the design.
+- [ ] Where to store saved addresses? Proposed: under a `vivarcdi` key in the tab's `vivExtData`,
+  which Vivaldi saves with the session, so the address follows the tab across restarts and
+  workspaces. To be confirmed by the probe below; if Vivaldi drops the key on restart, the fallback
+  is the `localStorage` of the browser window, keyed by workspace and position among pinned tabs.
+- [ ] Global Favorites? Proposed: rely on Vivaldi's "pin in all workspaces" and only tell them apart
+  in the interface (FR-1). Less code, and nothing to undo when VivArcDi is removed.
+- [ ] Is "lock to domain" enough for the reset? Proposed: no. It keeps the tab on one site but has
+  no way back to the saved page, and Arc lets pinned tabs leave their site. VivArcDi adds its own
+  reset and leaves "lock to domain" as an optional Vivaldi setting that works with it.
+- [ ] Context menu "Close tab"? Proposed: it keeps closing for real (Expected behavior).
+- [ ] Peek-out of the active tab: CSS on a mark, or a copy of the row? Proposed: a data attribute on
+  the active tab plus CSS when Vivaldi keeps the tabs of a collapsed stack in the page; a clickable
+  copy of the row drawn below the title when it removes them. To be decided by the probe below.
+
+The probe is a script Tore runs in Vivaldi's interface console (`phase-3/diagnostica-cartelle.js` in
+the project files). It reports the `vivExtData` of the tabs, the markup of a collapsed stack, and
+writes a test key that a second run, after a restart, reads back and removes.
 
 ## References
 
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr), section "Spaces, Pinned tabs e
   cartelle".
 - [docs/native-settings.md](../../docs/native-settings.md#favorites-and-pinned-tabs)
-- [007 Reopen pinned tabs](../007-reopen-pinned-tabs/spec.md) reuses the peek-out of FR-4.
+- [007 Reopen pinned tabs](../007-reopen-pinned-tabs/spec.md) matches addresses with FR-2 of 007
+  and reuses the peek-out of FR-5.

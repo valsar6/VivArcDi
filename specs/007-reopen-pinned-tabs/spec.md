@@ -35,7 +35,7 @@ In VivArcDi: the user presses Cmd/Ctrl+T and opens an address, typed or picked f
 suggestions. If that address matches a Favorite or a pinned tab of the current workspace, VivArcDi
 closes the new tab, activates the matching tab and loads it again if it was unloaded. The match uses
 the page the pinned tab shows now and the page it was pinned with (see [003](../003-pinned-tabs-and-folders/spec.md)).
-When the matching tab is inside a closed folder, it peeks out below the folder as in 003/AC-6.
+When the matching tab is inside a closed folder, it peeks out below the folder as in 003/AC-14.
 
 Arc and VivArcDi differ on purpose: Arc offers "Switch to Tab" as a suggestion before the user
 presses Enter. Vivaldi's address bar suggestions cannot be extended safely by a mod, so VivArcDi acts
