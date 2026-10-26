@@ -9,10 +9,12 @@ type Callback = (result: unknown) => void;
 interface FakeChrome {
   api: ChromeApi;
   listeners: Set<TabUpdateListener>;
+  calls: Array<[string, number]>;
 }
 
 function fakeChrome(): FakeChrome {
   const listeners = new Set<TabUpdateListener>();
+  const calls: Array<[string, number]> = [];
   const runtime: { lastError: { message: string } | undefined } = { lastError: undefined };
   const api = {
     runtime,
@@ -28,6 +30,8 @@ function fakeChrome(): FakeChrome {
       },
       update: (id: number, change: object, callback: Callback): void => callback({ id, ...change }),
       create: (properties: object, callback: Callback): void => callback({ id: 9, ...properties }),
+      reload: (id: number, callback: Callback): void => callback(calls.push(['reload', id])),
+      remove: (id: number, callback: Callback): void => callback(calls.push(['remove', id])),
       onUpdated: {
         addListener: (listener: TabUpdateListener): void => {
           listeners.add(listener);
@@ -38,7 +42,7 @@ function fakeChrome(): FakeChrome {
       },
     },
   } as unknown as ChromeApi;
-  return { api, listeners };
+  return { api, listeners, calls };
 }
 
 test('BrowserTabs turns callbacks into promises', async () => {
@@ -64,6 +68,21 @@ test('BrowserTabs creates and updates tabs', async () => {
   const tabs = new BrowserTabs(fakeChrome().api);
   assert.deepEqual(await tabs.create({ url: 'https://a.example/' }), { id: 9, url: 'https://a.example/' });
   assert.deepEqual(await tabs.update(7, { vivExtData: '{}' }), { id: 7, vivExtData: '{}' });
+});
+
+test('BrowserTabs reloads and removes tabs', async () => {
+  const { api, calls } = fakeChrome();
+  const tabs = new BrowserTabs(api);
+  await tabs.reload(4);
+  await tabs.remove(5);
+  assert.deepEqual(calls, [
+    ['reload', 4],
+    ['remove', 5],
+  ]);
+});
+
+test('BrowserTabs without onCreated throws when asked to listen to it', () => {
+  assert.throws(() => new BrowserTabs(fakeChrome().api).onCreated(() => {}), /onCreated is not available/);
 });
 
 test('BrowserTabs without onActivated throws when asked to listen to it', () => {
