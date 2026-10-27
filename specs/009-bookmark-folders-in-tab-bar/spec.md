@@ -38,7 +38,8 @@ then one row per folder with a folder icon and a bold title, then the pinned tab
 the other tabs. A folder opens to show its links, indented, each with its icon and title.
 
 In VivArcDi the section sits between the Favorites grid and the pinned and open tabs of Vivaldi's
-vertical tab bar. It shows the children of one bookmark folder, the **root** (an option). Each child
+vertical tab bar. It shows the children of one bookmark folder, the **root** (an option; for Tore it is
+`Importati da Firefox/Bookmarks Bar`, whose children are Programming, Music, Hobbies and the others). Each child
 folder is a row that opens and closes on click; a subfolder opens inside its parent, up to a depth
 limit. Folders start closed.
 
@@ -80,8 +81,10 @@ for a later spec.
   Favorites and pinned tabs.
 - **FR-9.** The last-opened dates of 007 are also recorded for the tabs that match a link of the
   root, so that [008](../008-folder-hover-preview/spec.md) can show them.
-- **FR-10.** Options in `config.json`: `enabled` (true), `root` (title of the bookmark folder to show,
-  `VivArcDi` by default), `maxDepth` (3).
+- **FR-10.** Options in `config.json`: `enabled` (true), `root` (the folder to show, as a path of
+  titles separated by `/`, for example `Importati da Firefox/Bookmarks Bar`; `VivArcDi` by default),
+  `maxDepth` (3). The path is searched from the top of the bookmarks tree and the first folder that
+  matches is used. IF no folder matches, THEN the section stays hidden and the reason is logged.
 
 ### Non-functional
 
@@ -119,26 +122,24 @@ for a later spec.
 
 - Creating, renaming, moving or deleting bookmarks, and dragging a tab into a folder to bookmark it.
 - Hiding the opened tab from Vivaldi's list of tabs, as Arc does.
-- A different set of folders for each workspace.
+- A different set of folders for each workspace. Tore wants it, as a second iteration once this one
+  works.
 - The hover panel with search and last-opened dates: [008](../008-folder-hover-preview/spec.md).
 - Tab stacks as folders: [003](../003-pinned-tabs-and-folders/spec.md).
 
 ## Open questions
 
-- [ ] **Which folder is the root?** In the Bookmarks panel the folders sit under "Barra dei preferiti >
-  Importati da … > Bookmarks…". Proposal: `root` is a title; Tore moves or renames so that `VivArcDi` (the
-  default) is the folder that holds Streaming, Hobbies, Music and Programming, or sets the title of
-  the imported folder in `config.json`. What is the exact title of the imported folder?
-- [ ] **Different folders for each workspace?** Vivaldi has no bookmarks per workspace, so the
-  proposal is the same folders in every workspace. Do you use workspaces with different sets of links?
-- [ ] **Open tab and list of tabs.** Proposal: the opened link also stays in Vivaldi's list of tabs,
-  with a dot in the folder (see Expected behavior). Acceptable for a first version?
-- [ ] **Subfolders.** Hobbies has subfolders such as Mahjong. Proposal: open inside the parent up to
-  3 levels. Enough?
+- [x] **Which folder is the root?** The folder `Bookmarks Bar` inside `Importati da Firefox`: option
+  `root` is a path of titles (Tore, 2026-10-27).
+- [x] **Different folders for each workspace?** Not in this version: the same folders in every
+  workspace. Tore wants it later, as a second iteration (Tore, 2026-10-27).
+- [x] **Open tab and list of tabs.** The opened link also stays in Vivaldi's list of tabs, with a dot
+  in the folder (Tore, 2026-10-27).
+- [x] **Subfolders.** Open inside the parent up to 3 levels (Tore, 2026-10-27).
 - [ ] **Prototype before the design.** Three things must be checked on a real Vivaldi: `chrome.bookmarks`
   can be read from the interface; an element added to the tab bar survives Vivaldi's redraws; the
   section can follow the auto-hide sidebar. A probe script is in the project files
-  (`phase-3/diagnostica-segnalibri.js`).
+  (`phase-3/diagnostica-segnalibri.js`). It blocks the design, not the approval of this spec.
 
 ## References
 
