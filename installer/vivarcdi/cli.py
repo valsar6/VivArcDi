@@ -4,7 +4,7 @@ from pathlib import Path
 
 from . import __version__
 from .backup import BackupStore
-from .commands import COMMANDS, Command, InstallerContext
+from .commands import COMMANDS, Command, InstallerContext, ReapplyCommand
 from .distribution import DIST_FOLDER
 from .errors import VivArcDiError
 from .patching import InstallationPatcher
@@ -17,9 +17,18 @@ from .window_patch import WindowHtmlPatcher
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def build_context(platform: Platform, reporter: Reporter, repo_root: Path = REPO_ROOT) -> InstallerContext:
-    """Wire the installer services for a platform."""
+def build_context(
+    platform: Platform,
+    reporter: Reporter,
+    repo_root: Path = REPO_ROOT,
+    background: bool = False,
+) -> InstallerContext:
+    """Wire the installer services for a platform.
+
+    `background` is True when the update hook runs the command, not the user.
+    """
     stager = SelfStager(repo_root, platform.data_dir)
+    staged_reapply = [sys.executable, str(stager.staged_installer), "reapply"]
     installations = InstallationPatcher(
         WindowHtmlPatcher(),
         PayloadDeployer(repo_root / DIST_FOLDER, __version__),
@@ -31,8 +40,10 @@ def build_context(platform: Platform, reporter: Reporter, repo_root: Path = REPO
         installations=installations,
         stager=stager,
         hook=platform.update_hook(),
-        reapply_command=[sys.executable, str(stager.staged_installer), "reapply", "--quiet"],
+        reapply_command=[*staged_reapply, "--quiet", "--background"],
         reporter=reporter,
+        handoff=platform.reapply_handoff(staged_reapply),
+        background=background,
     )
 
 
@@ -44,6 +55,8 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
     for command in COMMANDS:
         subparser = subcommands.add_parser(command.name, help=command.help)
         subparser.add_argument("--quiet", action="store_true", help="print only warnings and errors")
+        if command.name == ReapplyCommand.name:
+            subparser.add_argument("--background", action="store_true", help="run as the update hook")
     return parser.parse_args(argv)
 
 
@@ -60,7 +73,8 @@ def main(argv: list[str]) -> int:
         if not platform.allows_root and is_root():
             reporter.error(f"On {platform.name} run it without sudo: python3 installer {command.name}")
             return 1
-        return command.execute(build_context(platform, reporter))
+        background = getattr(arguments, "background", False)
+        return command.execute(build_context(platform, reporter, background=background))
     except VivArcDiError as error:
         reporter.error(str(error))
         return 1

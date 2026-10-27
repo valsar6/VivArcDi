@@ -12,8 +12,8 @@
 In Arc, resting the pointer on a folder in the sidebar opens a panel next to it with a search field
 and the folder's pinned tabs, each with the time since it was last opened. The user finds and opens
 a tab without expanding the folder, and sees at a glance which ones are used and which are forgotten.
-This spec brings that panel to Vivaldi folders (tab stacks, see [003](../003-pinned-tabs-and-folders/spec.md)),
-using the last-opened dates recorded by [007](../007-reopen-pinned-tabs/spec.md).
+This spec brings that panel to the bookmark folders shown in the tab bar (see
+[009](../009-bookmark-folders-in-tab-bar/spec.md)), using the last-opened dates recorded by [007](../007-reopen-pinned-tabs/spec.md).
 
 ## User stories
 
@@ -33,7 +33,7 @@ highlighted.
 In VivArcDi the panel opens after the pointer rests on a folder for a short delay and closes when the
 pointer leaves both the folder and the panel, or with Esc. Typing filters the rows by title and
 address. Arrow keys move the highlight; Enter or a click activates the tab, which then peeks out
-below the closed folder (003/AC-6) and becomes the most recent. A tab never opened since VivArcDi
+below the closed folder (009/AC-13) and becomes the most recent. A tab never opened since VivArcDi
 started recording shows "never opened" and sits at the bottom.
 
 ## Requirements
@@ -87,7 +87,8 @@ started recording shows "never opened" and sits at the bottom.
 
 ## References
 
-- [003 Pinned tabs and folders](../003-pinned-tabs-and-folders/spec.md): folders are Vivaldi tab stacks.
+- [009 Bookmark folders in the tab bar](../009-bookmark-folders-in-tab-bar/spec.md): folders are Vivaldi
+  bookmark folders shown in the tab bar.
 - [007 Reopen pinned tabs](../007-reopen-pinned-tabs/spec.md), FR-6: the last-opened records.
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr), section "Spaces, Pinned tabs e
   cartelle".

@@ -60,7 +60,10 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
   in the platform data folder and registers the update hook.
 - **FR-3.** The update hook is a per-user launchd agent on macOS, watching the Vivaldi framework
   folders and running every six hours, and a `DPkg::Post-Invoke` rule on Debian. It runs the staged
-  installer, so the cloned folder may be moved or deleted.
+  installer, so the cloned folder may be moved or deleted. On macOS the agent only checks the builds:
+  when one needs reapplying, it opens Terminal with a script that runs `reapply`, because App
+  Management lets only the apps the user allowed, such as the terminal used for `install`, change
+  `Vivaldi.app`. On Debian the hook patches directly.
 - **FR-4.** `reapply` touches only builds whose `window.html` lost the block or whose `build.json`
   differs from the current payload fingerprint and Vivaldi version.
 - **FR-5.** `uninstall` removes the block, the payload, the hook and the staged copy, and keeps the
@@ -116,13 +119,17 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 | AC-15 | WHEN a module fails to start, THE loader SHALL log it and start the other modules. | auto: `a failing module does not stop the others` |
 | AC-16 | THE loader SHALL start only modules enabled in `config.json` and warn about unknown ids. | auto: `createEnabled instantiates only enabled modules` |
 | AC-17 | WHEN Vivaldi starts after `install`, THE interface console SHALL show `[VivArcDi] <version> active on Vivaldi <version>`. | manual |
-| AC-18 | WHEN Vivaldi updates itself, THE hook SHALL reapply VivArcDi without user action, on Debian and on macOS. | manual |
+| AC-18 | WHEN Vivaldi updates itself, THE hook SHALL reapply VivArcDi: on Debian without user action, on macOS by opening a Terminal window that does it. | manual: update Vivaldi (or replace `window.html` with the backup), wait for the Terminal window, restart Vivaldi and look for the console line of AC-17 |
 | AC-19 | WHEN `uninstall` runs and Vivaldi restarts, THE browser SHALL look and behave as before the install. | manual |
 | AC-20 | WHEN Vivaldi rewrites the classes of the browser root, THE activation mark SHALL stay. | auto: `the activation mark survives a rewrite of the browser classes` |
 | AC-21 | WHEN the installer runs from a `dist` checkout, THE checkout SHALL stay clean in `git status`, because the `dist` branch carries the `.gitignore` that ignores Python bytecode. | manual: install from `git clone -b dist`, then `git status` shows nothing to commit |
 | AC-22 | WHEN `main` publishes a new build, THE `dist` branch SHALL grow by one commit on top of the previous one, so `git pull` on a `dist` checkout fast-forwards. | manual: after a merge into `main`, `git pull` on the `dist` checkout succeeds without hints about divergent branches |
 | AC-23 | THE `dist` branch SHALL contain the compiled payload `dist/`, so `install` works from a fresh `git clone -b dist`. | manual: `git clone -b dist`, then `python3 installer install` finds the payload |
 | AC-24 | WHEN CI publishes on `dist`, THE commit SHALL be authored by Tore and its message SHALL name the VivArcDi version and the `main` commit. | manual: `git log -1 origin/dist` shows `Salvatore` and `Publish the dist build of VivArcDi <version> from main at <sha>` |
+| AC-25 | WHEN the macOS hook finds a build that needs reapplying, THE installer SHALL open Terminal with a script that runs `reapply`, instead of writing to Vivaldi itself. | auto: `test_the_hook_runs_reapply_in_background_mode`, `test_background_reapply_on_macos_hands_off_to_terminal`, `test_terminal_script_runs_an_interactive_reapply` |
+| AC-26 | WHILE every build is up to date, THE macOS hook SHALL open nothing. | auto: `test_background_reapply_opens_nothing_when_up_to_date` |
+| AC-27 | WHEN `reapply` runs from the terminal, THE installer SHALL patch directly and delete the Terminal script, and `uninstall` SHALL delete it too. | auto: `test_interactive_reapply_on_macos_patches_and_clears_the_script`, `test_uninstall_removes_the_terminal_script` |
+| AC-28 | WHEN the Debian hook runs, THE installer SHALL patch directly. | auto: `test_background_reapply_without_handoff_patches_directly` |
 
 ## Out of scope
 
@@ -133,8 +140,8 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 
 ## Open questions
 
-- [ ] AC-18 on macOS: the launchd agent runs outside the terminal, so App Management may block it.
-  Until solved, the README tells users to run `install` again after a Vivaldi update.
+- [x] AC-18 on macOS: the launchd agent runs outside the terminal, so App Management may block it.
+  Resolved 2026-10-26 with Tore: the agent hands `reapply` to Terminal (FR-3, AC-25 to AC-27).
 
 ## References
 

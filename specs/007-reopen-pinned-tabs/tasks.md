@@ -16,4 +16,4 @@
 - [x] **T7.** `ReopenPinned` module, registry, `config.json`, clean stop.
 - [x] **T8.** Version 0.5.0 on `features/reopen-pinned`, README section, manual checklist for AC-9
   and AC-11 (`phase-3/verifica-riapertura.md` in the project files).
-- [ ] **T9.** Manual checks AC-9 and AC-11 on macOS and Debian; AC-10 once 003 is implemented.
+- [ ] **T9.** Manual checks AC-9 and AC-11 on macOS and Debian; AC-10 once 009 is implemented.
