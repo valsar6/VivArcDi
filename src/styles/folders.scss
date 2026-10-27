@@ -6,7 +6,8 @@
   box-sizing: border-box;
   max-height: max(#{$folders-min-height}, calc(var(--vivarcdi-folders-max-height, 60) * 1vh));
   padding: $folders-padding;
-  overflow-y: auto;
+  max-width: 100%;
+  overflow: hidden auto;
   color: var(--colorFg, inherit);
   font-size: 13px;
   user-select: none;

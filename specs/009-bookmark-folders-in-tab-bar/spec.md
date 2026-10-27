@@ -129,6 +129,7 @@ for a later spec.
 | AC-15 | IF the module is disabled or VivArcDi is uninstalled, THEN the bookmarks and the Bookmarks panel SHALL be unchanged. | manual |
 | AC-16 | WHILE a folder with many links is open, THE tab list SHALL stay reachable by scrolling. | manual |
 | AC-17 | THE section SHALL be marked as outside the window drag region, so that Vivaldi on macOS does not take its clicks and hover. | manual |
+| AC-18 | THE section SHALL keep the width of the tab bar, cutting long titles with an ellipsis instead of overflowing it. | manual |
 
 ## Out of scope
 
