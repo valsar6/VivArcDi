@@ -1,4 +1,5 @@
 import { createDefaultRegistry } from '../modules/index.js';
+import { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import { BrowserRuntime } from './BrowserRuntime.js';
 import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
@@ -8,7 +9,7 @@ import { ResourceLoader } from './ResourceLoader.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import { SelectorCatalog } from './SelectorCatalog.js';
 import { StyleInjector } from './StyleInjector.js';
-import type { BuildInfo, Config } from './types.js';
+import type { BuildInfo, Config, ModuleOptions } from './types.js';
 import { UiReadiness } from './UiReadiness.js';
 
 export interface VivArcDiDependencies {
@@ -22,6 +23,8 @@ export interface VivArcDiDependencies {
   document: Document;
   /** The tabs API given to modules. */
   tabs?: BrowserTabs;
+  /** The bookmarks API given to modules. */
+  bookmarks?: BrowserBookmarks;
   /** The runtime API given to modules. */
   runtime?: BrowserRuntime;
 }
@@ -32,6 +35,7 @@ export class VivArcDi {
   #logger: Logger;
   #document: Document;
   #tabs: BrowserTabs;
+  #bookmarks: BrowserBookmarks;
   #runtime: BrowserRuntime;
   #styles: StyleInjector;
   #started: EnabledModule[] = [];
@@ -48,6 +52,7 @@ export class VivArcDi {
     logger,
     document,
     tabs = new BrowserTabs(undefined),
+    bookmarks = new BrowserBookmarks(undefined),
     runtime = new BrowserRuntime(undefined),
   }: VivArcDiDependencies) {
     this.#loader = loader;
@@ -55,6 +60,7 @@ export class VivArcDi {
     this.#logger = logger;
     this.#document = document;
     this.#tabs = tabs;
+    this.#bookmarks = bookmarks;
     this.#runtime = runtime;
     this.#styles = new StyleInjector(document, loader);
   }
@@ -75,6 +81,7 @@ export class VivArcDi {
       logger: new Logger(),
       document,
       tabs: new BrowserTabs(chromeApi),
+      bookmarks: new BrowserBookmarks(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
     });
     try {
@@ -113,7 +120,7 @@ export class VivArcDi {
     const { modules, unknown } = this.#registry.createEnabled(config.modules);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, selectors, build);
+      await this.#startModule(entry, selectors, build, config.modules);
     }
 
     this.#logger.info(
@@ -137,7 +144,9 @@ export class VivArcDi {
     this.#styles.removeAll();
   }
 
-  async #startModule(entry: EnabledModule, selectors: SelectorCatalog, build: BuildInfo): Promise<void> {
+  async #startModule(entry: EnabledModule, selectors: SelectorCatalog, build: BuildInfo,
+    modules: Readonly<Record<string, ModuleOptions>>,
+  ): Promise<void> {
     const logger = this.#logger.child(entry.id);
     try {
       await entry.module.start({
@@ -147,6 +156,8 @@ export class VivArcDi {
         options: entry.options,
         build,
         tabs: this.#tabs,
+        bookmarks: this.#bookmarks,
+        modules,
         runtime: this.#runtime,
         payload: this.#loader,
       });

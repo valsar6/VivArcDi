@@ -1,3 +1,5 @@
+import type { BookmarksHost } from './bookmarks/BrowserBookmarks.js';
+
 export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove';
 
 export type TabUpdateListener = (
@@ -15,6 +17,8 @@ export type TabActivatedListener = (info: chrome.tabs.OnActivatedInfo) => void;
 
 export type TabCreatedListener = (tab: chrome.tabs.Tab) => void;
 
+export type TabRemovedListener = (tabId: number) => void;
+
 export interface ChromeEvent<Listener> {
   addListener(listener: Listener): void;
   removeListener(listener: Listener): void;
@@ -24,11 +28,12 @@ export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & {
   onUpdated: TabsEvent;
   onActivated?: ChromeEvent<TabActivatedListener> | undefined;
   onCreated?: ChromeEvent<TabCreatedListener> | undefined;
+  onRemoved?: ChromeEvent<TabRemovedListener> | undefined;
 };
 
 export type RuntimeMessageListener = (message: unknown) => void;
 
-export interface ChromeApi {
+export interface ChromeApi extends BookmarksHost {
   tabs?: TabsApi | undefined;
   runtime?:
     | {
@@ -174,6 +179,21 @@ export class BrowserTabs {
     }
     onCreated.addListener(listener);
     return () => onCreated.removeListener(listener);
+  }
+
+  /**
+   * Listens to `chrome.tabs.onRemoved`.
+   *
+   * @param listener Called with the id of every closed tab.
+   * @returns A function that removes the listener.
+   */
+  public onRemoved(listener: TabRemovedListener): () => void {
+    const { onRemoved } = this.#requireTabs();
+    if (onRemoved === undefined) {
+      throw new Error('chrome.tabs.onRemoved is not available');
+    }
+    onRemoved.addListener(listener);
+    return () => onRemoved.removeListener(listener);
   }
 
   #call<T>(method: TabsMethod, ...args: unknown[]): Promise<T> {

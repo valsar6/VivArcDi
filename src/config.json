@@ -2,6 +2,7 @@
   "styles": [
     "styles/base.css",
     "styles/favorites.css",
+    "styles/folders.css",
     "styles/peek.css"
   ],
   "modules": {
@@ -27,6 +28,12 @@
     },
     "reopen-pinned": {
       "enabled": true
+    },
+    "bookmark-folders": {
+      "enabled": true,
+      "root": "Importati da Firefox/Bookmarks Bar",
+      "maxDepth": 3,
+      "maxHeightPercent": 60
     }
   }
 }

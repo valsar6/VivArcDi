@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { ModuleContext } from '../../../src/core/Module.js';
+import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import type { FakeTab } from '../favorites/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
@@ -14,6 +15,8 @@ function start(pinned: FakeTab[]): ReopenTabs {
     logger: silentLogger(),
     options: {},
     tabs,
+    bookmarks: new BrowserBookmarks(undefined),
+    modules: {},
   } as unknown as ModuleContext;
   new ReopenPinned().start(context);
   return tabs;
@@ -83,6 +86,8 @@ test('reopen module stays off without tab events', () => {
     document: {},
     logger: silentLogger(),
     options: {},
+    bookmarks: new BrowserBookmarks(undefined),
+    modules: {},
     tabs: { available: true, onCreated: (): never => { throw new Error('missing'); }, onActivated: (): (() => void) => () => {}, onUpdated: (): (() => void) => () => {} },
   } as unknown as ModuleContext;
   assert.doesNotThrow(() => new ReopenPinned().start(context));

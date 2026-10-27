@@ -1,5 +1,6 @@
 import { ModuleRegistry } from '../core/ModuleRegistry.js';
 import { ActivationMarker } from './ActivationMarker.js';
+import { BookmarkFolders } from './folders/BookmarkFolders.js';
 import { FavoritesGrid } from './favorites/FavoritesGrid.js';
 import { Peek } from './peek/Peek.js';
 import { ReopenPinned } from './reopen/ReopenPinned.js';
@@ -11,5 +12,5 @@ import { ReopenPinned } from './reopen/ReopenPinned.js';
  * @returns A registry with all built-in modules.
  */
 export function createDefaultRegistry(): ModuleRegistry {
-  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(ReopenPinned);
+  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(ReopenPinned).register(BookmarkFolders);
 }

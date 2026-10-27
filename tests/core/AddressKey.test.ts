@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AddressKey } from '../../../src/modules/reopen/AddressKey.js';
+import { AddressKey } from '../../src/core/AddressKey.js';
 
 test('matches addresses that differ only by www, slash, query or fragment', () => {
   const key = AddressKey.from('https://mahjongsoul.game.yo-star.com/');

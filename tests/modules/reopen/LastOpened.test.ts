@@ -13,7 +13,7 @@ test('records the last opened date on activation', async () => {
   ]);
   const storage = new MemoryStorage();
   const store = new LastOpenedStore(storage, silentLogger());
-  new ActivationRecorder(tabs, store, silentLogger(), () => now).start();
+  new ActivationRecorder(tabs, store, silentLogger(), { now: (): Date => now }).start();
   tabs.activateByUser(1);
   tabs.activateByUser(2);
   await settle();

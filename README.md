@@ -15,7 +15,8 @@ It ships three things:
 
 ## Status
 
-Phase 3 of the [roadmap](#roadmap) has started with [reopening pinned tabs](#reopen-pinned-tabs), after
+Phase 3 of the [roadmap](#roadmap) has started with [reopening pinned tabs](#reopen-pinned-tabs) and
+[bookmark folders in the tab bar](#bookmark-folders), after
 [Peek](#peek) of phase 2, the [Favorites grid](#favorites) of phase 1
 and the module loader, the installer and the [native settings guide](docs/native-settings.md) of phase 0.
 
@@ -241,16 +242,34 @@ Options of `peek` in `config.json`:
 
 ## Reopen pinned tabs
 
-Opening from a new tab (Cmd/Ctrl+T or "+") the address of a Favorite or a pinned tab of the current
-workspace brings you to that tab instead of keeping a duplicate, like Arc's "Switch to Tab". The new
+Opening from a new tab (Cmd/Ctrl+T or "+") the address of a Favorite, a pinned tab or a link of the
+[bookmark folders](#bookmark-folders) of the current workspace brings you to that tab instead of keeping a duplicate, like Arc's "Switch to Tab". The new
 tab closes and the pinned tab is loaded again if it was unloaded. Two addresses match when they have
 the same host, ignoring `www.`, and the same path, ignoring a trailing `/`, the query and the fragment.
 Links clicked in pages are left alone.
 
-VivArcDi also remembers when each Favorite and pinned tab was last opened. The folder panel of
+VivArcDi also remembers when each Favorite, pinned tab and bookmark link was last opened. The folder panel of
 [spec 008](specs/008-folder-hover-preview/spec.md) will show these dates.
 
-The `reopen-pinned` module has only the `enabled` option.
+The `reopen-pinned` module has only the `enabled` option. The links it also reopens are those under
+the `root` of the `bookmark-folders` module, when that module is on.
+
+## Bookmark folders
+
+Shows a bookmark folder in the vertical tab bar, right below the Favorites grid, like the folders of
+Arc. Each folder opens and closes on click, subfolders open inside their parent, and the folders you
+left open stay open after a restart. A click on a link brings you to its tab if it is open in the
+current window and workspace, and opens it otherwise. A link that is open shows a dot and stays
+visible below its closed folder. The bookmarks are only read: they are created, renamed, moved and
+deleted in Vivaldi's Bookmarks panel, and the tab bar follows.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `root` | `VivArcDi` | The folder to show, as titles separated by `/`, compared exactly; the first match is used (`config.json` has `Importati da Firefox/Bookmarks Bar`) |
+| `maxDepth` | `3` | How many levels of folders are shown |
+| `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
+
+If no folder matches `root`, the section stays hidden and the console says so.
 
 ## Roadmap
 
@@ -259,7 +278,7 @@ The `reopen-pinned` module has only the `enabled` option.
 | 0 | Loader, installer, native settings guide |
 | 1 | Favorites: icon grid with adaptive columns, closing unloads instead of removing |
 | 2 | Peek: real overlay for Shift+click and for external links from pinned tabs and Favorites |
-| 3 | Pinned tabs per workspace: reopen instead of duplicating, reset to saved URL, folders that let the active tab peek out |
+| 3 | Pinned tabs per workspace: reopen instead of duplicating, bookmark folders in the tab bar, reset to saved URL, folders that let the active tab peek out |
 | 4 | Today tabs with auto-archive, Arc keyboard shortcuts |
 | 5 | Little Arc, optional browser extension |
 

@@ -5,3 +5,7 @@
   --vivarcdi-gap: #{$gap};
   --vivarcdi-transition: #{$transition};
 }
+
+#{$root} #{$anchor} {
+  flex: none;
+}

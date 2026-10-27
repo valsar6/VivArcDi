@@ -2,6 +2,7 @@
   "browser": "#browser",
   "tabBar": "#tabs-tabbar-container",
   "verticalTabBar": "#tabs-tabbar-container:is(.left, .right)",
+  "tabListHost": "#tabs-container > :has(> .tab-strip)",
   "tabStrip": "#tabs-container .tab-strip",
   "pinnedTab": ".tab-position.is-pinned",
   "tabWrapper": ".tab-wrapper",

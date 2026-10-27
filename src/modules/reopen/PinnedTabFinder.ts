@@ -1,6 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { AddressKey } from './AddressKey.js';
-import { Workspace } from './Workspace.js';
+import { AddressKey } from '../../core/AddressKey.js';
+import { TabData } from '../../core/TabData.js';
 
 export class PinnedTabFinder {
   #tabs: Pick<BrowserTabs, 'query'>;
@@ -27,7 +27,7 @@ export class PinnedTabFinder {
     }
     const pinned = await this.#tabs.query({ pinned: true, windowId: newTab.windowId });
     const matches = pinned.filter(
-      (tab) => tab.id !== newTab.id && Workspace.shares(tab, newTab) && AddressKey.from(tab.url ?? tab.pendingUrl) === key,
+      (tab) => tab.id !== newTab.id && TabData.shares(tab, newTab) && AddressKey.from(tab.url ?? tab.pendingUrl) === key,
     );
     return matches.sort((a, b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))[0] ?? null;
   }

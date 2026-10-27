@@ -1,9 +1,10 @@
+import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import type { BrowserRuntime } from './BrowserRuntime.js';
 import type { BrowserTabs } from './BrowserTabs.js';
 import type { Logger } from './Logger.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from './SelectorCatalog.js';
-import type { BuildInfo } from './types.js';
+import type { BuildInfo, ModuleOptions } from './types.js';
 
 export interface ModuleContext {
   /** The document of Vivaldi's browser window. */
@@ -16,6 +17,10 @@ export interface ModuleContext {
   options: Record<string, unknown>;
   /** The `chrome.tabs` API; check `tabs.available` first. */
   tabs: BrowserTabs;
+  /** The `chrome.bookmarks` API, read-only; check `bookmarks.available` first. */
+  bookmarks: BrowserBookmarks;
+  /** The options of every module in `config.json`, for modules that follow another one. */
+  modules: Readonly<Record<string, ModuleOptions>>;
   /** `chrome.runtime` messages and `chrome.windows`; check before use. */
   runtime: BrowserRuntime;
   /** Loads files that ship with VivArcDi. */
