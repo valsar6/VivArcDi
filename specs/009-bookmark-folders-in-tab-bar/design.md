@@ -93,6 +93,8 @@ pinned-only default.
 | `chrome://favicon/` in the interface | Icon of a link; the favicon of its open tab is used first | First letter of the title |
 | Marks: `data-vivarcdi-folders` on the section, `data-vivarcdi-folder-id`, `data-vivarcdi-open` on rows | Styles and 008 | |
 
+The tab bar is a window-drag region on macOS: real clicks and hover never reached the section until it was marked `-webkit-app-region: no-drag` (found by Tore with a console test, 2026-10-27, issue #30). The shared `TabBarAnchor` host carries the mark, so every section in it is covered (AC-17).
+
 Uninstalling VivArcDi removes the section and leaves every bookmark as it was (AC-15).
 
 ## Configuration
