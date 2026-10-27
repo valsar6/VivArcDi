@@ -1,5 +1,4 @@
-import type { Logger } from '../../core/Logger.js';
-import type { PagePolicy, PageScripts } from './PageScripts.js';
+import type { Logger } from './Logger.js';
 import { tabIdOf } from './Webview.js';
 import type { ConsoleMessageEvent, LoadCommitEvent, WebviewElement } from './Webview.js';
 
@@ -8,10 +7,12 @@ export interface InjectorDependencies {
   container: Element;
   /** Selector of the tab webviews inside the container. */
   webviewSelector: string;
-  /** The code to inject. */
-  scripts: PageScripts;
-  /** Builds the policy of a tab. */
-  policyFor: (tabId: number) => Promise<PagePolicy>;
+  /** Builds the code to inject into a tab's page, or null to leave that page alone. */
+  scriptFor: (tabId: number) => Promise<string | null>;
+  /** Code that removes the injected script from a page. */
+  uninstallScript: string;
+  /** What the script does, for the logs, such as `Peek links`. */
+  purpose: string;
   /** Receives console lines of tab pages, with the tab id. */
   onConsoleMessage: (message: string, tabId: number) => void;
   /** Reports failures. */
@@ -30,8 +31,8 @@ export class PageScriptInjector {
   #warned = false;
 
   /**
-   * Keeps the Peek page script in every tab's page: injects it into each tab webview,
-   * again after every top-level navigation, and removes it on detach.
+   * Keeps a script in the pages of tabs: injects it into each tab webview, again after
+   * every top-level navigation, and removes it on detach. The script is chosen per tab.
    *
    * @param dependencies Everything the injector collaborates with.
    */
@@ -66,7 +67,7 @@ export class PageScriptInjector {
     this.#tracked.forEach((listeners, webview) => {
       webview.removeEventListener('loadcommit', listeners.loadCommit);
       webview.removeEventListener('consolemessage', listeners.consoleMessage);
-      this.#execute(webview, this.#deps.scripts.uninstallLinks());
+      this.#execute(webview, this.#deps.uninstallScript);
     });
     this.#tracked.clear();
   }
@@ -110,9 +111,9 @@ export class PageScriptInjector {
       return;
     }
     this.#deps
-      .policyFor(tabId)
-      .then((policy) => this.#execute(webview, this.#deps.scripts.installLinks(policy)))
-      .catch((error: unknown) => this.#deps.logger.error(`Could not prepare Peek for tab ${tabId}`, error));
+      .scriptFor(tabId)
+      .then((code) => this.#execute(webview, code ?? this.#deps.uninstallScript))
+      .catch((error: unknown) => this.#deps.logger.error(`Could not prepare ${this.#deps.purpose} for tab ${tabId}`, error));
   }
 
   #execute(webview: WebviewElement, code: string): void {
@@ -121,7 +122,7 @@ export class PageScriptInjector {
     } catch (error) {
       if (!this.#warned) {
         this.#warned = true;
-        this.#deps.logger.warn('Cannot inject into pages, Peek links stay with Vivaldi', error);
+        this.#deps.logger.warn(`Cannot inject into pages: ${this.#deps.purpose} are off`, error);
       }
     }
   }

@@ -1,6 +1,5 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-
-type VivaldiTab = chrome.tabs.Tab & { vivExtData?: string };
+import { TabData } from '../../core/TabData.js';
 
 export class TabTiler {
   #tabs: Pick<BrowserTabs, 'get' | 'update'>;
@@ -30,17 +29,7 @@ export class TabTiler {
   }
 
   async #mark(tabId: number, tiling: Record<string, unknown>): Promise<void> {
-    const tab = (await this.#tabs.get(tabId)) as VivaldiTab;
-    const data = TabTiler.#parse(tab.vivExtData);
-    await this.#tabs.update(tabId, { vivExtData: JSON.stringify({ ...data, tiling }) });
-  }
-
-  static #parse(extData: string | undefined): Record<string, unknown> {
-    try {
-      const parsed: unknown = JSON.parse(extData ?? '{}');
-      return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
-    } catch {
-      return {};
-    }
+    const tab = await this.#tabs.get(tabId);
+    await this.#tabs.update(tabId, { vivExtData: TabData.with(tab, 'tiling', tiling) });
   }
 }

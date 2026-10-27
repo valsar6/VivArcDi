@@ -1,7 +1,20 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import { AddressKey } from './AddressKey.js';
+import { AddressKey } from '../../core/AddressKey.js';
+import { OwnPage } from '../../core/OwnPage.js';
 import type { LastOpenedStore } from './LastOpenedStore.js';
+
+export interface RecorderOptions {
+  /** Clock. */
+  now?: () => Date;
+  /** Which tabs get a date; by default the pinned ones. */
+  isTracked?: TrackedTab;
+}
+
+export type TrackedTab = (tab: chrome.tabs.Tab, key: string) => boolean;
+
+const currentDate = (): Date => new Date();
+const isPinned = (tab: chrome.tabs.Tab): boolean => tab.pinned;
 
 export type ActivationTabsApi = Pick<BrowserTabs, 'get' | 'onActivated'>;
 
@@ -10,21 +23,23 @@ export class ActivationRecorder {
   #store: Pick<LastOpenedStore, 'record'>;
   #logger: Logger;
   #now: () => Date;
+  #isTracked: TrackedTab;
   #unsubscribe: (() => void) | null = null;
 
   /**
-   * Records the date each time a Favorite or pinned tab becomes active, by any route.
+   * Records the date each time a tracked tab (a Favorite or pinned tab, or a bookmark link) becomes active, by any route.
    *
    * @param tabs Tabs API.
    * @param store Where dates are kept.
    * @param logger Logger for failures.
-   * @param now Clock.
+   * @param options Clock and the choice of tracked tabs.
    */
-  constructor(tabs: ActivationTabsApi, store: Pick<LastOpenedStore, 'record'>, logger: Logger, now: () => Date = () => new Date()) {
+  constructor(tabs: ActivationTabsApi, store: Pick<LastOpenedStore, 'record'>, logger: Logger, { now = currentDate, isTracked = isPinned }: RecorderOptions = {}) {
     this.#tabs = tabs;
     this.#store = store;
     this.#logger = logger;
     this.#now = now;
+    this.#isTracked = isTracked;
   }
 
   /**
@@ -45,8 +60,8 @@ export class ActivationRecorder {
   async #record(tabId: number): Promise<void> {
     try {
       const tab = await this.#tabs.get(tabId);
-      const key = AddressKey.from(tab.url ?? tab.pendingUrl);
-      if (tab.pinned && key !== null) {
+      const key = tab.pinned ? OwnPage.keyOf(tab) : AddressKey.from(tab.url ?? tab.pendingUrl);
+      if (key !== null && this.#isTracked(tab, key)) {
         this.#store.record(key, this.#now());
       }
     } catch (error) {

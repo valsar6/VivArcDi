@@ -13,7 +13,7 @@ test('records the last opened date on activation', async () => {
   ]);
   const storage = new MemoryStorage();
   const store = new LastOpenedStore(storage, silentLogger());
-  new ActivationRecorder(tabs, store, silentLogger(), () => now).start();
+  new ActivationRecorder(tabs, store, silentLogger(), { now: (): Date => now }).start();
   tabs.activateByUser(1);
   tabs.activateByUser(2);
   await settle();
@@ -46,4 +46,15 @@ test('last opened dates stay in memory when storage fails', () => {
   store.load(now);
   store.record('a.example', now);
   assert.deepEqual(store.get('a.example'), now);
+});
+
+test('dates a pinned tab by its own page', async () => {
+  const vivExtData = JSON.stringify({ vivarcdi: { pinnedUrl: 'https://docs.example/home' } });
+  const tabs = new ReopenTabs([{ id: 1, pinned: true, url: 'https://docs.example/other', vivExtData } as never]);
+  const store = new LastOpenedStore(new MemoryStorage(), silentLogger());
+  new ActivationRecorder(tabs, store, silentLogger(), { now: (): Date => now }).start();
+  tabs.activateByUser(1);
+  await settle();
+  assert.deepEqual(store.get('docs.example/home'), now);
+  assert.equal(store.get('docs.example/other'), null);
 });

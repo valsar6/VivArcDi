@@ -1,5 +1,5 @@
 import type { TabCreatedListener, TabUpdateListener } from '../../core/BrowserTabs.js';
-import { AddressKey } from './AddressKey.js';
+import { AddressKey } from '../../core/AddressKey.js';
 
 export interface NewTabEvents {
   onCreated(listener: TabCreatedListener): () => void;

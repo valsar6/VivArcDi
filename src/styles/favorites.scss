@@ -121,3 +121,70 @@
   opacity: $unloaded-opacity;
   filter: saturate($unloaded-saturation);
 }
+
+#{$root} #{$hidden-slot} {
+  display: none !important;
+}
+
+#{$root} #{$tiles} {
+  @include tint('', $tint-rest);
+  @include tint('-hover', $tint-hover);
+  @include tint('-active', $tint-active);
+
+  display: grid;
+  grid-template-columns: repeat(var(--vivarcdi-favorites-columns, #{$default-columns}), minmax(0, 1fr));
+  gap: var(--vivarcdi-favorites-gap, #{$gap});
+  padding: var(--vivarcdi-favorites-gap, #{$gap});
+  user-select: none;
+}
+
+#{$root} #{$own-tile} {
+  display: grid;
+  position: relative;
+  place-items: center;
+  height: var(--vivarcdi-favorites-tile-height, #{$tile-height});
+  border-radius: var(--vivarcdi-radius);
+  background-color: var(--vivarcdi-tile-bg);
+  color: var(--colorFg, inherit);
+  cursor: default;
+  transition:
+    background-color var(--vivarcdi-transition),
+    box-shadow var(--vivarcdi-transition);
+
+  &:hover {
+    background-color: var(--vivarcdi-tile-bg-hover);
+  }
+
+  > * {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--vivarcdi-transition),
+      filter var(--vivarcdi-transition);
+  }
+
+  > span {
+    font-size: $letter-size;
+    font-weight: 600;
+  }
+
+  > img {
+    width: $favicon-size;
+    height: $favicon-size;
+  }
+
+  > span:has(+ img) {
+    visibility: hidden;
+  }
+
+  &#{$tile-current} {
+    background-color: var(--vivarcdi-tile-bg-active);
+    box-shadow:
+      0 0 0 $glow-width color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$glow-strength}, transparent),
+      0 0 $glow-blur color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$glow-strength}, transparent);
+  }
+
+  &#{$unloaded} > * {
+    opacity: $unloaded-opacity;
+    filter: saturate($unloaded-saturation);
+  }
+}

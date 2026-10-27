@@ -1,0 +1,84 @@
+@use 'tokens' as *;
+
+#{$root} #{$folders} {
+  --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);
+
+  box-sizing: border-box;
+  max-height: max(#{$folders-min-height}, calc(var(--vivarcdi-folders-max-height, 60) * 1vh));
+  padding: $folders-padding;
+  overflow-y: auto;
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+  user-select: none;
+
+  &[hidden] {
+    display: none;
+  }
+
+  > [role] {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    box-sizing: border-box;
+    height: $folders-row-height;
+    padding-inline: $gap;
+    padding-inline-start: calc(#{$gap} + var(--vivarcdi-depth, 0) * #{$folders-indent});
+    border-radius: var(--vivarcdi-radius);
+    cursor: default;
+    transition: background-color var(--vivarcdi-transition);
+
+    &:hover {
+      background-color: var(--vivarcdi-folders-hover);
+    }
+  }
+
+  [data-vivarcdi-folder-id] .vivarcdi-folders-title {
+    font-weight: 600;
+  }
+
+  .vivarcdi-folders-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vivarcdi-folders-icon {
+    flex: none;
+    width: $folders-icon-size;
+    height: $folders-icon-size;
+    border-radius: 3px;
+    object-fit: contain;
+  }
+
+  .vivarcdi-folders-letter {
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    background-color: var(--vivarcdi-folders-hover);
+  }
+
+  .vivarcdi-folders-folder-icon {
+    flex: none;
+    width: $folders-icon-size;
+    height: $folders-icon-size;
+    background-color: currentcolor;
+    opacity: 0.7;
+    mask: $folder-glyph center / contain no-repeat;
+  }
+
+  [data-vivarcdi-open] .vivarcdi-folders-folder-icon {
+    opacity: 1;
+  }
+
+  [data-vivarcdi-link-open]::after {
+    flex: none;
+    width: $folders-dot-size;
+    height: $folders-dot-size;
+    border-radius: 50%;
+    background-color: var(--colorHighlightBg, currentcolor);
+    content: '';
+  }
+}

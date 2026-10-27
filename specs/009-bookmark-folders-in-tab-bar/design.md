@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -72,6 +72,7 @@ Rejected alternatives:
 | `src/modules/folders/OpenFolders.ts` | Ids of open folders, saved and restored (AC-7) | Repository |
 | `src/modules/folders/OpenLinks.ts` | Which link has which open tab, from tab events (AC-5, AC-6) | Observer |
 | `src/modules/folders/LinkActivator.ts` | Click on a link: activate, reload, or create (AC-4, AC-5) | Command |
+| `src/modules/folders/FolderRows.ts` | Pure: which rows to show, with the open links of a closed folder below it (AC-6) | |
 | `src/modules/folders/FolderSectionView.ts` | Rows, indentation, dots, open links below closed folders, one delegated listener | |
 | `src/modules/folders/BookmarkFolders.ts` | Module: options, wiring, clean stop | Facade |
 | `src/modules/reopen/TabTargets.ts` | Tries the finders of 007 in order | Chain of responsibility |
