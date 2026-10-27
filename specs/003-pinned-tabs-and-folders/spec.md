@@ -38,8 +38,8 @@ of tabs, because its tile already shows it: the active tile is highlighted and t
 tab is dimmed, as in 001. Each workspace has its own tab for a Favorite, since a Vivaldi tab belongs
 to one workspace.
 
-**Pinned tabs.** Vivaldi's pinned tabs of a workspace show as rows below the Favorites, then the
-folders of 009, then a separator and the other tabs. This replaces the rule of 001 that made the
+**Pinned tabs.** As in Arc, the tab bar shows the Favorites grid, the folders of 009, then
+Vivaldi's pinned tabs of the workspace as rows, then a separator and the other tabs. This replaces the rule of 001 that made the
 first pinned tabs into tiles.
 
 **Own page.** A Favorite's own page is its bookmark's address. A pinned tab's own page is the
@@ -142,4 +142,5 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 - [docs/native-settings.md](../../docs/native-settings.md#favorites-and-pinned-tabs)
 - [007 Reopen pinned tabs](../007-reopen-pinned-tabs/spec.md) matches addresses with FR-2 of 007.
 - [009 Bookmark folders in the tab bar](../009-bookmark-folders-in-tab-bar/spec.md) reads and draws
-  bookmarks in the tab bar; the grid shares its reader and its search of a folder by path.
+  bookmarks in the tab bar; the grid shares its reader and its search of a folder by path
+  (`src/core/bookmarks/`: `BrowserBookmarks`, `BookmarkFolderFinder`, `BookmarkNode`).
