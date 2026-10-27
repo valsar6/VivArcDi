@@ -1,0 +1,60 @@
+import { PreviewRows } from './PreviewRows.js';
+import type { PreviewRow } from './PreviewRows.js';
+
+export class PreviewSession {
+  #all: PreviewRow[];
+  #rows: PreviewRow[];
+  #index = 0;
+
+  /**
+   * The state of an open panel: what was typed, which rows are left and which one is highlighted.
+   *
+   * @param rows All rows of the folder, already sorted.
+   */
+  constructor(rows: PreviewRow[]) {
+    this.#all = rows;
+    this.#rows = rows;
+  }
+
+  /**
+   * @returns The rows left by the search.
+   */
+  public get rows(): PreviewRow[] {
+    return this.#rows;
+  }
+
+  /**
+   * @returns The position of the highlighted row.
+   */
+  public get highlighted(): number {
+    return this.#index;
+  }
+
+  /**
+   * Filters the rows and highlights the first one.
+   *
+   * @param query The text typed in the search field.
+   */
+  public setQuery(query: string): void {
+    this.#rows = PreviewRows.filter(this.#all, query);
+    this.#index = 0;
+  }
+
+  /**
+   * Moves the highlight, wrapping at the ends.
+   *
+   * @param step 1 for down, -1 for up.
+   */
+  public move(step: number): void {
+    const count = this.#rows.length;
+    this.#index = count === 0 ? 0 : (this.#index + step + count) % count;
+  }
+
+  /**
+   * @param position A position in the rows, if not the highlighted one.
+   * @returns The row to activate, or null when nothing is left.
+   */
+  public activate(position: number = this.#index): PreviewRow | null {
+    return this.#rows[position] ?? null;
+  }
+}
