@@ -117,7 +117,7 @@ export class DomNode {
 export class DomDocument {
   public list = new DomNode('div', this);
   public parent = new DomNode('div', this);
-  public defaultView: { localStorage?: Pick<Storage, 'getItem' | 'setItem'>; innerWidth?: number; innerHeight?: number; navigator?: { language: string } } | null = null;
+  public defaultView: { localStorage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null; innerWidth?: number; innerHeight?: number; navigator?: { language: string } } | null = null;
   public listeners = new Map<string, Array<(event: Event) => void>>();
 
   constructor() {

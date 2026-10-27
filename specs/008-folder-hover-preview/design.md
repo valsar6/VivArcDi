@@ -24,7 +24,7 @@ subfolders alike (spec 009 asks for both).
    Nothing is cached: the tree is read again at every opening, so renamed and moved bookmarks are
    current without listening to bookmark events.
 3. **Dates (FR-2, FR-3, AC-1, AC-2).** The records of [007](../007-reopen-pinned-tabs/design.md) are in the
-   interface's `localStorage` (`vivarcdi.lastOpened`, address keys to times). A new `LastOpenedStore`
+   shared `PersistentStorage` of the modules (`chrome.storage.local`, key `vivarcdi.lastOpened`, address keys to times). A new `LastOpenedStore`
    is loaded at every opening, so dates recorded since the last opening are seen.
    `PreviewRows` sorts: recorded links by time, newest first, then the unrecorded ones in folder
    order, which read "never opened". `RelativeTime` writes the time with `Intl.RelativeTimeFormat` in
@@ -79,7 +79,7 @@ Reused without change: `LastOpenedStore`, `AddressKey`, `LinkActivator`, `OpenLi
 | `chrome.bookmarks.getTree` | Links of a folder | No panel, logged (NFR-2) |
 | `chrome.tabs` | Activating a link | No panel, logged |
 | Selector `tabBar` (exists) | Where the panel is placed | Panel at the left edge of the window |
-| `localStorage` `vivarcdi.lastOpened` | Dates | All links read "never opened" |
+| `PersistentStorage` key `vivarcdi.lastOpened` | Dates | All links read "never opened" |
 | `chrome://favicon/` in the interface | Icon of a link | First letter, as in 009 |
 
 ## Configuration

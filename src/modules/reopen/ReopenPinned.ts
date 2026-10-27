@@ -4,7 +4,6 @@ import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { ActivationRecorder } from './ActivationRecorder.js';
 import { LastOpenedStore } from './LastOpenedStore.js';
-import type { KeyValueStorage } from './LastOpenedStore.js';
 import { NewTabWatcher } from './NewTabWatcher.js';
 import type { NewTabNavigation } from './NewTabWatcher.js';
 import { LinkedTabFinder } from './LinkedTabFinder.js';
@@ -32,7 +31,7 @@ export class ReopenPinned extends Module {
       logger.warn('chrome.tabs is missing: reopening pinned tabs is off');
       return;
     }
-    const store = new LastOpenedStore(ReopenPinned.#storageOf(context.document), logger);
+    const store = new LastOpenedStore(context.storage, logger);
     store.load(new Date());
     const links = ReopenPinned.#linksOf(context);
     const finder = new TabTargets([new PinnedTabFinder(tabs), ...(links === null ? [] : [new LinkedTabFinder(tabs, links)])]);
@@ -80,13 +79,6 @@ export class ReopenPinned extends Module {
     return LinkKeyIndex.acquire(bookmarks, BookmarkFolderFinder.parsePath(root), logger);
   }
 
-  static #storageOf(document: Document): KeyValueStorage | null {
-    try {
-      return document.defaultView?.localStorage ?? null;
-    } catch {
-      return null;
-    }
-  }
 
   async #reopen({ tab, url }: NewTabNavigation, finder: TabTargets, switcher: TabSwitcher, { logger }: ModuleContext): Promise<void> {
     try {

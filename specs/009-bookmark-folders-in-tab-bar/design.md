@@ -20,7 +20,7 @@ inside the tab strip is moved by Vivaldi's rebuilds. That spot is the shared `Ta
    deeper than `maxDepth` are dropped. Every bookmark event (`onCreated`, `onRemoved`, `onChanged`,
    `onMoved`) asks a `FrameTask` for one rebuild per frame, so a burst of changes redraws once.
 2. **Open and closed (FR-2, AC-7).** `OpenFolders` keeps the ids of open folders in the interface's
-   `localStorage` and restores them on start. Folders start closed.
+   the shared `PersistentStorage` (`chrome.storage.local`, since `localStorage` is null in Vivaldi 8.2's `window.html`) and restores them on start. Folders start closed.
 3. **Open links (FR-3, FR-4, AC-5, AC-6).** `OpenLinks` maps each link to the tab that shows it: same
    window, same workspace (`TabData`, shared with 003), same `AddressKey` as in 007, the most recently
    used tab when several match. It follows `tabs.onCreated`, `onUpdated` (address, discarded state),

@@ -9,13 +9,14 @@ import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
 import { FolderTabs, bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
 
 function context(dom: DomDocument, bookmarks: BrowserBookmarks): ModuleContext {
-  dom.defaultView = { localStorage: new MemoryStorage(), navigator: { language: 'it' } };
+  dom.defaultView = { navigator: { language: 'it' } };
   return {
     document: asDocument(dom),
     selectors: new SelectorCatalog({ browser: '.browser', tabBar: '.bar' }, 'test'),
     logger: silentLogger(),
     options: { hoverDelayMs: 50 },
     tabs: new FolderTabs(),
+    storage: new MemoryStorage(),
     bookmarks,
   } as unknown as ModuleContext;
 }

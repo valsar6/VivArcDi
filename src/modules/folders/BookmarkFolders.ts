@@ -41,7 +41,7 @@ export class BookmarkFolders extends Module {
     const maxHeight = BookmarkFolders.#number(options['maxHeightPercent'], DEFAULT_MAX_HEIGHT_PERCENT, MIN_PERCENT, MAX_PERCENT);
     const root = BookmarkFolderFinder.parsePath(typeof options['root'] === 'string' ? options['root'] : DEFAULT_ROOT);
 
-    const openFolders = new OpenFolders(BookmarkFolders.#storageOf(context.document), logger);
+    const openFolders = new OpenFolders(context.storage, logger);
     openFolders.load();
     const redraw = new FrameTask((): void => draw());
     const source = new FolderTreeSource(bookmarks, { path: root, maxDepth, onChange: (): void => redraw.request(), logger });
@@ -83,11 +83,4 @@ export class BookmarkFolders extends Module {
     return typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   }
 
-  static #storageOf(document: Document): Storage | null {
-    try {
-      return document.defaultView?.localStorage ?? null;
-    } catch {
-      return null;
-    }
-  }
 }

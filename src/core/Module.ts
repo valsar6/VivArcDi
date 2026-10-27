@@ -2,6 +2,7 @@ import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import type { BrowserRuntime } from './BrowserRuntime.js';
 import type { BrowserTabs } from './BrowserTabs.js';
 import type { Logger } from './Logger.js';
+import type { KeyValueStorage } from './PersistentStorage.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from './SelectorCatalog.js';
 import type { BuildInfo, ModuleOptions } from './types.js';
@@ -23,6 +24,8 @@ export interface ModuleContext {
   modules: Readonly<Record<string, ModuleOptions>>;
   /** `chrome.runtime` messages and `chrome.windows`; check before use. */
   runtime: BrowserRuntime;
+  /** Strings that survive a restart, shared by all modules. */
+  storage: KeyValueStorage;
   /** Loads files that ship with VivArcDi. */
   payload: PayloadSource;
   /** Versions written by the installer. */

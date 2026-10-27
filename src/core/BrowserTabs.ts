@@ -1,3 +1,4 @@
+import type { StorageHost } from './PersistentStorage.js';
 import type { BookmarksHost } from './bookmarks/BrowserBookmarks.js';
 
 export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove';
@@ -33,7 +34,7 @@ export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & {
 
 export type RuntimeMessageListener = (message: unknown) => void;
 
-export interface ChromeApi extends BookmarksHost {
+export interface ChromeApi extends BookmarksHost, StorageHost {
   tabs?: TabsApi | undefined;
   runtime?:
     | {

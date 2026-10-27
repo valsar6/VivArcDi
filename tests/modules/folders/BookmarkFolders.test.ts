@@ -14,7 +14,6 @@ const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', M
 
 function setup(tabs: FolderTabs, bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
   const dom = new DomDocument();
-  dom.defaultView = { localStorage: new MemoryStorage() };
   const context = {
     document: asDocument(dom),
     selectors: new SelectorCatalog({ tabListHost: '.list' }, 'test'),
@@ -22,6 +21,7 @@ function setup(tabs: FolderTabs, bookmarks: BrowserBookmarks = recordingChrome(T
     options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
     tabs,
     bookmarks,
+    storage: new MemoryStorage(),
   } as unknown as ModuleContext;
   return { dom, module: new BookmarkFolders(), context };
 }

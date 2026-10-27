@@ -13,7 +13,8 @@ const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Nix manual', NIX
 async function start(tabs: ReopenTabs, bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks): Promise<MemoryStorage> {
   const storage = new MemoryStorage();
   const context = {
-    document: { defaultView: { localStorage: storage } },
+    document: {},
+    storage,
     logger: silentLogger(),
     options: {},
     tabs,
