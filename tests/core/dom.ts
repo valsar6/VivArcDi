@@ -11,6 +11,8 @@ export class DomNode {
   public listeners = new Map<string, Listener[]>();
   public style = { setProperty: (name: string, value: string): Map<string, string> => this.properties.set(name, value) };
   public ownerDocument: DomDocument;
+  public offsetHeight = 0;
+  public focused = false;
 
   constructor(tagName: string, ownerDocument: DomDocument) {
     this.tagName = tagName.toUpperCase();
@@ -94,6 +96,14 @@ export class DomNode {
     this.bubble({ type: 'click', target: this } as unknown as Event);
   }
 
+  public focus(): void {
+    this.focused = true;
+  }
+
+  public querySelector(): DomNode | null {
+    return null;
+  }
+
   public bubble(event: Event): void {
     this.listeners.get(event.type)?.forEach((listener) => listener(event));
     this.parentElement?.bubble(event);
@@ -107,14 +117,36 @@ export class DomNode {
 export class DomDocument {
   public list = new DomNode('div', this);
   public parent = new DomNode('div', this);
-  public defaultView: { localStorage: Pick<Storage, 'getItem' | 'setItem'> } | null = null;
+  public defaultView: { localStorage?: Pick<Storage, 'getItem' | 'setItem'>; innerWidth?: number; innerHeight?: number; navigator?: { language: string } } | null = null;
+  public listeners = new Map<string, Array<(event: Event) => void>>();
 
   constructor() {
     this.parent.append(this.list);
   }
 
+  public addEventListener(type: string, listener: (event: Event) => void): void {
+    this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]);
+  }
+
+  public removeEventListener(type: string, listener: (event: Event) => void): void {
+    this.listeners.set(type, (this.listeners.get(type) ?? []).filter((candidate) => candidate !== listener));
+  }
+
+  public emit(type: string, event: Record<string, unknown>): void {
+    const full = { type, buttons: 0, ...event } as unknown as Event;
+    this.listeners.get(type)?.forEach((listener) => listener(full));
+  }
+
+  public created: DomNode[] = [];
+
   public createElement(tagName: string): DomNode {
-    return new DomNode(tagName, this);
+    const node = new DomNode(tagName, this);
+    this.created.push(node);
+    return node;
+  }
+
+  public createdPanel(): DomNode | undefined {
+    return this.created.findLast((node) => node.hasAttribute('data-vivarcdi-preview') && node.parentElement !== null);
   }
 
   public querySelector(): DomNode | null {
