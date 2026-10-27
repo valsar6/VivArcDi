@@ -1,4 +1,6 @@
-const FAVICON_URL = "chrome://favicon/size/16@2x/";
+import { LinkIcon } from "./LinkIcon.js";
+const ICON_CLASS = "vivarcdi-folders-icon";
+const LETTER_CLASS = "vivarcdi-folders-icon vivarcdi-folders-letter";
 const ROW_ATTRIBUTES = ["data-vivarcdi-folder-id", "data-vivarcdi-link-id"];
 class FolderSectionView {
   #document;
@@ -20,7 +22,7 @@ class FolderSectionView {
     this.#element.setAttribute("data-vivarcdi-folders", "");
     this.#element.style.setProperty("--vivarcdi-folders-max-height", String(maxHeightPercent));
     this.#element.addEventListener("click", (event) => this.#click(event));
-    this.#element.addEventListener("error", (event) => FolderSectionView.#fallbackIcon(event), true);
+    this.#element.addEventListener("error", (event) => LinkIcon.fallback(event, LETTER_CLASS), true);
   }
   /**
    * @returns The element to put in the tab bar.
@@ -71,25 +73,7 @@ class FolderSectionView {
     return icon;
   }
   #linkIcon(row) {
-    const icon = this.#document.createElement("img");
-    icon.className = "vivarcdi-folders-icon";
-    icon.setAttribute("alt", "");
-    icon.setAttribute("src", row.tab?.favIconUrl ?? `${FAVICON_URL}${row.url}`);
-    icon.setAttribute("data-letter", FolderSectionView.#letter(row.title));
-    return icon;
-  }
-  static #letter(title) {
-    return (title.trim()[0] ?? "?").toUpperCase();
-  }
-  /** An icon that fails to load is replaced by the first letter of the title. */
-  static #fallbackIcon(event) {
-    const target = event.target;
-    if (target?.tagName === "IMG") {
-      const letter = target.ownerDocument.createElement("span");
-      letter.className = "vivarcdi-folders-icon vivarcdi-folders-letter";
-      letter.textContent = target.getAttribute("data-letter");
-      target.replaceWith(letter);
-    }
+    return LinkIcon.create(this.#document, row, ICON_CLASS, row.tab?.favIconUrl);
   }
   #click(event) {
     const row = event.target?.closest(ROW_ATTRIBUTES.map((name) => `[${name}]`).join(","));

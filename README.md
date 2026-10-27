@@ -306,6 +306,23 @@ deleted in Vivaldi's Bookmarks panel, and the tab bar follows.
 
 If no folder matches `root`, the section stays hidden and the console says so.
 
+## Folder panel
+
+Resting the pointer on a closed folder of the [bookmark folders](#bookmark-folders), or on one of
+its subfolders, opens a panel next to the tab bar, like Arc. It has a search field with the focus
+and one row per link of the folder, subfolders included: favicon, title and the time since the link
+was last opened ("23 minuti fa"), the most recent first and the never opened ones last. Typing
+filters by title or address, Up and Down move the highlight, Enter or a click opens the link (or
+brings you to its tab), Esc closes the panel. It also closes when the pointer leaves the folder and
+the panel, and when the folder is opened. Expanded folders never open it.
+
+The dates are the ones recorded by [reopen pinned tabs](#reopen-pinned-tabs). The module needs
+`bookmark-folders` to be on.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `hoverDelayMs` | `400` | How long the pointer must rest, and may be away, in milliseconds (100 to 2000) |
+
 ## Roadmap
 
 | Phase | Content |
@@ -313,7 +330,7 @@ If no folder matches `root`, the section stays hidden and the console says so.
 | 0 | Loader, installer, native settings guide |
 | 1 | Favorites: icon grid with adaptive columns, closing unloads instead of removing |
 | 2 | Peek: real overlay for Shift+click and for external links from pinned tabs and Favorites |
-| 3 | Pinned tabs per workspace: reopen instead of duplicating, bookmark folders in the tab bar, reset to saved URL, folders that let the active tab peek out |
+| 3 | Pinned tabs per workspace: reopen instead of duplicating, bookmark folders in the tab bar and their hover panel, reset to saved URL, folders that let the active tab peek out |
 | 4 | Today tabs with auto-archive, Arc keyboard shortcuts |
 | 5 | Little Arc, optional browser extension |
 

@@ -1,0 +1,78 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] {
+  --vivarcdi-preview-highlight: color-mix(in srgb, var(--colorFg, #fff) 16%, transparent);
+  --vivarcdi-preview-field: color-mix(in srgb, var(--colorFg, #fff) 8%, transparent);
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 300px;
+  max-height: 60vh;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius);
+  outline: none;
+  background-color: var(--vivarcdi-preview-field);
+  color: inherit;
+  font: inherit;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] > div {
+  overflow-y: auto;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] [role=option] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 44px;
+  padding-inline: 8px;
+  border-radius: var(--vivarcdi-radius);
+  cursor: default;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] [role=option]:hover, #browser[data-vivarcdi-active] [data-vivarcdi-preview] [role=option][data-vivarcdi-highlight] {
+  background-color: var(--vivarcdi-preview-highlight);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-letter {
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  background-color: var(--vivarcdi-preview-field);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-title,
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-time {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-time {
+  opacity: 0.65;
+  font-size: 11px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-preview] .vivarcdi-preview-empty {
+  padding: 8px;
+  opacity: 0.65;
+}

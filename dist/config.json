@@ -2,6 +2,7 @@
   "styles": [
     "styles/base.css",
     "styles/favorites.css",
+    "styles/folder-preview.css",
     "styles/folders.css",
     "styles/peek.css",
     "styles/pinned.css"
@@ -36,6 +37,10 @@
       "root": "Importati da Firefox/Bookmarks Bar",
       "maxDepth": 3,
       "maxHeightPercent": 60
+    },
+    "folder-preview": {
+      "enabled": true,
+      "hoverDelayMs": 400
     },
     "pinned-tabs": {
       "enabled": true,
