@@ -52,6 +52,7 @@ Rejected alternatives:
 | `InstallationPatcher` | Combines the three above, explains permission errors | Facade |
 | `SelfStager` | Copies `dist/` and the installer to the data folder | |
 | `PermissionAdvisor`, `MacOSAdvisor`, `SudoAdvisor` | Explains how to fix a denied write | Strategy |
+| `ReapplyHandoff`, `TerminalHandoff`, `NoHandoff` | Who runs `reapply` when the background hook may not write: a Terminal window on macOS, nobody on Debian | Strategy, Null Object |
 | `Command` and subclasses | `install`, `reapply`, `uninstall`, `status` | Command |
 
 ## Vivaldi interface
@@ -71,5 +72,5 @@ Rejected alternatives:
 |---|---|
 | Vivaldi rewrites `window.html` on update | Update hook and `reapply` |
 | Vivaldi changes its DOM | One selector file per version; inactive on unknown older versions |
-| macOS App Management blocks writes | Advisor with exact steps; open question on the launchd agent |
+| macOS App Management blocks writes | Advisor with exact steps; the launchd agent hands `reapply` to Terminal, which the user allowed |
 | Code with browser privileges | No remote code, no third-party code without review |
