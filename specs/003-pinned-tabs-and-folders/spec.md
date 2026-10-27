@@ -98,19 +98,17 @@ to remove one.
 
 ## Open questions
 
-- [ ] Where to store saved addresses? Proposed: under a `vivarcdi` key in the tab's `vivExtData`,
-  which Vivaldi saves with the session, so the address follows the tab across restarts and
-  workspaces. To be confirmed by the probe below; if Vivaldi drops the key on restart, the fallback
-  is the `localStorage` of the browser window, keyed by workspace and position among pinned tabs.
+- [x] Where to store saved addresses? Under a `vivarcdi` key in the tab's `vivExtData`, which
+  Vivaldi saves with the session: the probe on Vivaldi 8.2 (macOS, 2026-10-27) found the key again
+  after a restart, while tab ids changed. The address follows the tab across restarts and workspaces.
 - [ ] Global Favorites? Proposed: rely on Vivaldi's "pin in all workspaces" and only tell them apart
-  in the interface (FR-1). Less code, and nothing to undo when VivArcDi is removed.
+  in the interface (FR-1). Less code, and nothing to undo when VivArcDi is removed. In the probe,
+  pinned tabs of one workspace carry a `workspaceId` in `vivExtData` and the others carry none, so
+  a pinned tab without `workspaceId` is a Favorite.
 - [ ] Is "lock to domain" enough for the reset? Proposed: no. It keeps the tab on one site but has
   no way back to the saved page, and Arc lets pinned tabs leave their site. VivArcDi adds its own
   reset and leaves "lock to domain" as an optional Vivaldi setting that works with it.
 - [ ] Context menu "Close tab"? Proposed: it keeps closing for real (Expected behavior).
-
-The probe is a script Tore runs in Vivaldi's interface console (`phase-3/diagnostica-cartelle.js` in
-the project files). It reports the `vivExtData` of the tabs and writes a test key that a second run, after a restart, reads back and removes.
 
 ## References
 
