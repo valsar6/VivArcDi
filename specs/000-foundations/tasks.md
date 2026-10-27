@@ -27,4 +27,4 @@ Reconstructed from PR #1 and PR #5.
 - [ ] **T14.** Publish `dist` as commits on top of the branch instead of a force-push, with a
   `.gitignore` of its own so the payload is not ignored, as found after 0.4.3 shipped without
   `dist/`. AC-22 to AC-24, checks after merge.
-- [ ] **T15.** Manual check AC-18 on macOS 27 with the Terminal handoff.
+- [x] **T15.** Manual check AC-18 on macOS 27 with the Terminal handoff (Tore, 2026-10-27).
