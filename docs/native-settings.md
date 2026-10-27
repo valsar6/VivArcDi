@@ -47,9 +47,9 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 ## Still missing
 
-The Favorites icon grid ships with VivArcDi (see the README). These still need modules and are on the
-roadmap: closing a pinned tab with Cmd/Ctrl+W without removing it, resetting a pinned tab to its saved URL, the active tab peeking out of a closed
-folder, Peek, and auto-archive.
+The Favorites icon grid, Peek, bookmark folders in the tab bar and pinned tabs that unload on
+Cmd/Ctrl+W and reset to their own page ship with VivArcDi (see the README). Auto-archive is still on
+the roadmap.
 
 Some setting names above come from release notes rather than the 8.1 interface itself. If one does not
 match, open an issue with the label you see.

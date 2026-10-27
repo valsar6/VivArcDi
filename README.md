@@ -15,8 +15,9 @@ It ships three things:
 
 ## Status
 
-Phase 3 of the [roadmap](#roadmap) has started with [reopening pinned tabs](#reopen-pinned-tabs) and
-[bookmark folders in the tab bar](#bookmark-folders), after
+Phase 3 of the [roadmap](#roadmap) has started with [reopening pinned tabs](#reopen-pinned-tabs),
+[bookmark folders in the tab bar](#bookmark-folders), [Favorites from a bookmark folder](#favorites)
+and [pinned tabs that reset and unload](#pinned-tabs), after
 [Peek](#peek) of phase 2, the [Favorites grid](#favorites) of phase 1
 and the module loader, the installer and the [native settings guide](docs/native-settings.md) of phase 0.
 
@@ -184,7 +185,8 @@ After an update, restart Vivaldi once more to load the reapplied modules.
   "styles": ["styles/base.css", "styles/favorites.css"],
   "modules": {
     "activation-marker": { "enabled": true },
-    "favorites-grid": { "enabled": true, "maxTiles": 12 }
+    "favorites-grid": { "enabled": true, "folder": "Favorites", "maxTiles": 12 },
+    "pinned-tabs": { "enabled": true }
   }
 }
 ```
@@ -194,29 +196,59 @@ first.
 
 ## Favorites
 
-With the tab bar on the left or right, the first pinned tabs become a grid of square icon tiles, as in
-Arc. Pinned tabs past the limit, and every other tab, keep their normal rows below the grid.
+With the tab bar on the left or right, the Favorites are a grid of square icon tiles at the top of the
+tab bar, as in Arc. They are the web links of a bookmark folder, `Favorites` by default, and they are
+the same in every workspace.
 
-- Three columns in a narrow tab bar, more as it gets wider.
-- The active tile is lighter; tiles of unloaded (hibernated) tabs are dimmed.
-- Middle click on a tile unloads the tab instead of closing it. The tile stays, and a click loads it
-  again. If the tile was the active tab, the most recently used tab takes its place.
-- Hovering a tile shows its title in Vivaldi's tooltip.
+- Create a bookmark folder named `Favorites` anywhere in your bookmarks and put the sites in it.
+  The order of the bookmarks is the order of the tiles. Renaming, moving or removing a bookmark
+  updates the grid.
+- A click on a tile brings you to the Favorite's tab of the current workspace, or opens it as a
+  pinned tab the first time. Each workspace has its own tab per Favorite, hidden from the tab list.
+- The tile of the current tab has a thin glowing border; tiles whose tab is unloaded, or not open
+  yet in this workspace, are dimmed.
+- A click on the current tile, after browsing away, brings the tab back to the bookmark's page.
+- Middle click, Cmd/Ctrl+W or the tab's close button unload the tab instead of closing it. The tile
+  stays, and a click loads it again. If the tile was the active tab, the most recently used tab
+  takes its place.
+- Three columns in a narrow tab bar, more as it gets wider. Hovering a tile shows its title.
 
-Tiles are the pinned tabs of the current workspace: Vivaldi 8.2 cannot show one tab in every
-workspace. Favorites shared by every workspace come with
-[spec 003](specs/003-pinned-tabs-and-folders/spec.md).
+If the folder is missing, the first pinned tabs of the current workspace become the tiles, as before
+0.7.0, and the console says so. Removing a bookmark from the folder turns its tabs into ordinary
+pinned tabs.
 
 Options of `favorites-grid` in `config.json`:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `maxTiles` | `12` | How many pinned tabs become tiles |
+| `folder` | `Favorites` | The bookmark folder of the Favorites, as titles separated by `/`, compared exactly; the first match is used |
+| `maxTiles` | `12` | How many Favorites become tiles |
 | `minColumns` | `3` | Columns of a narrow tab bar |
 | `tileMinWidth` | `64` | Narrowest tile, in pixels, before the grid drops a column |
 | `tileHeight` | `44` | Tile height, in pixels |
 | `gap` | `8` | Space between tiles and between their rows, in pixels |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
+
+## Pinned tabs
+
+Pinned tabs show as rows below the Favorites and the bookmark folders, followed by a separator and
+the other tabs. Each workspace has its own pinned tabs.
+
+- A pinned tab remembers the page it was pinned with, its own page. Unpinning forgets it.
+- When it shows another page, its favicon turns into a back arrow: a click brings the tab back to
+  its own page.
+- Cmd/Ctrl+W and the close button unload a pinned tab instead of closing it, with the focus in the
+  page or in the interface. "Close tab" in the context menu still closes it.
+
+Options of `pinned-tabs` in `config.json`:
+
+| Option | Default | Meaning |
+|---|---|---|
+| `resetButton` | `true` | The favicon of a pinned tab away from its own page brings it back |
+| `unloadOnClose` | `true` | Cmd/Ctrl+W and the close button unload Favorites and pinned tabs |
+
+Own pages are kept in the tab's own data in Vivaldi, so they survive a restart. Without VivArcDi,
+Favorites' tabs and pinned tabs are ordinary pinned tabs.
 
 ## Peek
 
@@ -243,7 +275,7 @@ Options of `peek` in `config.json`:
 
 ## Reopen pinned tabs
 
-Opening from a new tab (Cmd/Ctrl+T or "+") the address of a Favorite, a pinned tab or a link of the
+Opening from a new tab (Cmd/Ctrl+T or "+") the address of a Favorite, a pinned tab (its current page or its own page) or a link of the
 [bookmark folders](#bookmark-folders) of the current workspace brings you to that tab instead of keeping a duplicate, like Arc's "Switch to Tab". The new
 tab closes and the pinned tab is loaded again if it was unloaded. Two addresses match when they have
 the same host, ignoring `www.`, and the same path, ignoring a trailing `/`, the query and the fragment.

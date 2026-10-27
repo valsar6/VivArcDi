@@ -55,6 +55,10 @@ first pinned tabs of the current workspace, and Vivaldi 8.2 cannot show one tab 
 (checked 2026-10-27). Separating global Favorites from per-workspace pinned tabs
 belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 
+Since 0.7.0, [003](../003-pinned-tabs-and-folders/spec.md) replaces the tile rule of this spec when
+the Favorites bookmark folder exists: the tiles are the links of that folder, and pinned tabs stay
+rows. The first-pinned-tabs rule above remains the fallback when the folder is missing.
+
 ## Requirements
 
 ### Functional
