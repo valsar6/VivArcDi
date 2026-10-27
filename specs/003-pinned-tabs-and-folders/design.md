@@ -15,8 +15,11 @@ interface document with `chrome.bookmarks`, `chrome.tabs` and data attributes on
 1. **Favorites from bookmarks (FR-1, AC-1, AC-2).** The grid finds the folder by its path with
    `BookmarkFolderFinder`, shared with [009](../009-bookmark-folders-in-tab-bar/spec.md), keeps its
    web links in order and rebuilds them on every bookmark event. It draws one tile per link in its own
-   element, placed in the vertical tab bar above Vivaldi's tab strip and put back if a redraw of
-   Vivaldi removes it. Tile icons come from Vivaldi's favicon service (`chrome://favicon/`), with the
+   element, added with order 10 to the shared `TabBarAnchor`: a host placed in `#tabs-container`
+   before its child that holds `.tab-strip`, and created again if Vivaldi removes it. 009's second
+   probe (Vivaldi 8.2, 2026-10-27) showed this spot gives full-width rows above the tab list and
+   survives workspace switches, opening and closing tabs, pinning and the auto-hidden sidebar, while
+   an element inside the tab strip is moved by Vivaldi's rebuilds. Tile icons come from Vivaldi's favicon service (`chrome://favicon/`), with the
    first letter of the title when there is none. Column count and sizes reuse `GridLayout` of 001.
 2. **Linked tabs (FR-2, FR-3, AC-3 to AC-5).** A tab is linked to a Favorite by the bookmark id
    written in its `vivExtData` under VivArcDi's own key, `{"vivarcdi": {"favoriteId": "…",
@@ -43,9 +46,9 @@ interface document with `chrome.bookmarks`, `chrome.tabs` and data attributes on
    injected into pinned tabs' pages forwards Cmd/Ctrl+W to the interface, as Peek does for its panel.
    A click listener in the capture phase catches the close button of pinned rows. Ordinary tabs are
    left to Vivaldi.
-7. **Order of the tab bar.** Favorites grid, folders of 009, pinned rows, separator, other tabs. The
-   stylesheet orders the slots of the strip with CSS `order`, which works because 001 already lays the
-   strip out as a grid; the last pinned row gets `data-vivarcdi-pinned-last` for the separator.
+7. **Order of the tab bar.** Favorites grid (anchor order 10), folders of 009 (anchor order 20), then
+   Vivaldi's list, where pinned rows already come first, a separator, and the other tabs. The last
+   pinned row gets `data-vivarcdi-pinned-last` for the separator.
 
 Rejected alternatives:
 
@@ -63,6 +66,7 @@ Rejected alternatives:
 | `src/core/bookmarks/BrowserBookmarks.ts` | Promise-based `chrome.bookmarks`: `getTree`, change events (shared with 009) | Adapter |
 | `src/core/bookmarks/BookmarkFolderFinder.ts` | Finds a folder by a path of exact titles, first match (shared with 009) | |
 | `src/core/bookmarks/BookmarkNode.ts` | Bookmark type used by both modules | |
+| `src/core/TabBarAnchor.ts` | Host above the tab list shared with 009: created once, re-created if removed, `add(element, order)` | |
 | `src/core/TabData.ts` | Reads and writes `vivExtData`: workspace id and VivArcDi's key, other keys untouched | Adapter |
 | `src/core/AddressKey.ts` | Moved from `reopen/`, shared by 007, 003 and 009 | Value object |
 | `src/core/TabUnloader.ts` | Moved from `favorites/TileUnloader.ts` | |
@@ -80,7 +84,7 @@ Rejected alternatives:
 | `src/modules/pinned/CloseShortcut.ts` | Cmd/Ctrl+W and the close button unload pinned tabs; others pass through (AC-11, AC-12) | |
 | `src/page/pinned-keys.ts` | Page script: forwards Cmd/Ctrl+W of a pinned tab's page | |
 | `src/modules/pinned/PinnedTabs.ts` | Module: options, wiring, clean stop | Facade |
-| `src/styles/favorites.scss`, `src/styles/pinned.scss` | Own tiles with glow and dimming; hidden slots, reset arrow, slot order, separator | |
+| `src/styles/favorites.scss`, `src/styles/pinned.scss` | Own tiles with glow and dimming; hidden slots, reset arrow, separator | |
 
 `peek`, `reopen-pinned` and `favorites-grid` switch to the moved classes; their tests keep passing.
 As 007's design announced, 007 then also matches and dates a pinned tab by its own page.
@@ -95,7 +99,7 @@ As 007's design announced, 007 then also matches and dates a pinned tab by its o
 | `chrome.tabs` events, `query`, `get`, `create`, `update`, `discard`, `reload` | Links, state, open, reset, unload | Module does not start, logged; Vivaldi behaves as usual |
 | `chrome://favicon/` in the interface | Tile icons | First letter of the title |
 | `webview.executeScript` | Page script for Cmd/Ctrl+W | Only the interface shortcut is caught, logged once |
-| New selectors in `src/selectors/8.1.json`: `tabsContainer` (`#tabs-container`), `tabClose` (`.tab-header .close`), `tabFavicon` (`.tab-header .favicon`) | Grid placement, close button, reset target | The part that needs it stays off, logged |
+| New selectors in `src/selectors/8.1.json`: `tabListHost` (`#tabs-container > :has(> .tab-strip)`), `tabClose` (`.tab-header .close`), `tabFavicon` (`.tab-header .favicon`) | Grid placement, close button, reset target | The part that needs it stays off, logged |
 
 Uninstalling VivArcDi leaves the linked tabs as ordinary pinned tabs and the `vivarcdi` key in
 `vivExtData`, which plain Vivaldi ignores (AC-19).
@@ -125,7 +129,7 @@ Uninstalling VivArcDi leaves the linked tabs as ordinary pinned tabs and the `vi
 | Risk | Mitigation |
 |---|---|
 | A tab made with `chrome.tabs.create` lands outside the current workspace | Write the active tab's `workspaceId` into the new tab right away; manual check AC-15 |
-| Vivaldi removes our grid element on a redraw | A `MutationObserver` puts it back, as 009's probe showed survives a workspace switch; manual check AC-14 |
+| Vivaldi removes the anchor on a redraw | `TabBarAnchor` puts it back; 009's probe saw it survive every tested redraw; manual check AC-14 |
 | Hiding a slot leaves a gap | The strip is already laid out by the 001 grid stylesheet, where a hidden slot takes no room |
 | `chrome://favicon/` is not served to the interface | Letter fallback; manual check AC-14 |
 | Pinning a new linked tab triggers `PinWatcher` before the link is written | `PinWatcher` skips tabs without a web address yet, and the opener writes `pinnedUrl` itself |
