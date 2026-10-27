@@ -38,7 +38,9 @@ then one row per folder with a folder icon and a bold title, then the pinned tab
 the other tabs. A folder opens to show its links, indented, each with its icon and title.
 
 In VivArcDi the section sits between the Favorites grid and the pinned and open tabs of Vivaldi's
-vertical tab bar: Favorites grid, folders, pinned tabs of the workspace, other tabs, as in Arc. It shows the children of one bookmark folder, the **root** (an option; for Tore it is
+vertical tab bar: Favorites grid, folders, pinned tabs of the workspace, other tabs, as in Arc. The
+section is its own element above Vivaldi's tab list, right below the Favorites grid of 003, so
+Vivaldi's redraws of the tab list never move it. It shows the children of one bookmark folder, the **root** (an option; for Tore it is
 `Importati da Firefox/Bookmarks Bar`, whose children are Programming, Music, Hobbies and the others). Each child
 folder is a row that opens and closes on click; a subfolder opens inside its parent, up to a depth
 limit. Folders start closed.
@@ -137,14 +139,16 @@ for a later spec.
 - [x] **Open tab and list of tabs.** The opened link also stays in Vivaldi's list of tabs, with a dot
   in the folder (Tore, 2026-10-27).
 - [x] **Subfolders.** Open inside the parent up to 3 levels (Tore, 2026-10-27).
-- [ ] **Prototype before the design.** First probe, run by Tore on Vivaldi 8.2 on 2026-10-27:
-  `chrome.bookmarks` is readable with its four change events, and an element added above the tab list
-  survived a change of workspace. Still to check with the second probe
-  (`phase-3/diagnostica-segnalibri-2.js`): the Favorites grid lives inside the tab list, so the
-  section must be added inside it, right after the last pinned tab, and it must survive opening and
-  closing tabs, pinning and the auto-hide sidebar. If it does not, the fallback is to draw the section
-  above the tab list, which puts it above the Favorites grid instead of below. It blocks the design,
-  not the approval of this spec.
+- [x] **Prototype before the design.** Probes run by Tore on Vivaldi 8.2 on 2026-10-27:
+  `chrome.bookmarks` is readable with its four change events. An element added above the tab list,
+  inside `#tabs-container`, shows as a full-width row and survives changes of workspace, opening and
+  closing tabs, pinning and the auto-hide sidebar. An element added inside the tab list, after the last
+  pinned tab, survived too but ended above the Favorites tiles after the sidebar was shown again,
+  because Vivaldi rebuilds the tab list. So the section is drawn above the tab list, next to the
+  Favorites grid of [003](../003-pinned-tabs-and-folders/spec.md), and never inside it.
+- [ ] **Height of the section.** Hobbies alone has 20 links. Proposal: the section is at most half the
+  height of the tab bar and scrolls inside itself, so the tab list below always stays visible. Is that
+  right, or should the whole column scroll as in Arc?
 
 ## References
 
