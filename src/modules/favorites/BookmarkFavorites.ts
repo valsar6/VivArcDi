@@ -3,6 +3,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { SerialTask } from '../../core/SerialTask.js';
 import { TabUnloader } from '../../core/TabUnloader.js';
 import { FavoriteOpener } from './FavoriteOpener.js';
 import { FavoriteStates } from './FavoriteStates.js';
@@ -43,8 +44,7 @@ export class BookmarkFavorites {
   #folder: FavoritesFolder;
   #favorites: Favorite[] | null = null;
   #unsubscribe: Array<() => void> = [];
-  #reading: Promise<void> | null = null;
-  #readAgain = false;
+  #states: SerialTask;
 
   /**
    * The Favorites drawn from a bookmark folder: the same tiles in every workspace, each one
@@ -63,6 +63,10 @@ export class BookmarkFavorites {
     });
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#folder = new FavoritesFolder(bookmarks, folder, (favorites) => this.#receive(favorites));
+    this.#states = new SerialTask(
+      () => this.#applyStates(),
+      (error) => logger.error('Could not read the Favorites tabs', error),
+    );
   }
 
   /**
@@ -152,19 +156,7 @@ export class BookmarkFavorites {
   }
 
   #readStates(): void {
-    if (this.#reading !== null) {
-      this.#readAgain = true;
-      return;
-    }
-    this.#reading = this.#applyStates()
-      .catch((error: unknown) => this.#deps.logger.error('Could not read the Favorites tabs', error))
-      .finally(() => {
-        this.#reading = null;
-        if (this.#readAgain) {
-          this.#readAgain = false;
-          this.#readStates();
-        }
-      });
+    this.#states.request();
   }
 
   async #applyStates(): Promise<void> {

@@ -76,8 +76,8 @@ export class FavoriteOpener {
   }
 
   async #reset(tabId: number, tab: chrome.tabs.Tab): Promise<void> {
-    const own = OwnPage.of(tab);
-    if (own !== null && OwnPage.isAway(tab)) {
+    const own = OwnPage.resetTarget(tab);
+    if (own !== null) {
       await this.#tabs.update(tabId, { url: own });
     }
   }

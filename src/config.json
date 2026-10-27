@@ -3,7 +3,8 @@
     "styles/base.css",
     "styles/favorites.css",
     "styles/folders.css",
-    "styles/peek.css"
+    "styles/peek.css",
+    "styles/pinned.css"
   ],
   "modules": {
     "activation-marker": {
@@ -11,6 +12,7 @@
     },
     "favorites-grid": {
       "enabled": true,
+      "folder": "Favorites",
       "maxTiles": 12,
       "maxColumns": 3,
       "tileMinWidth": 64,
@@ -34,6 +36,11 @@
       "root": "Importati da Firefox/Bookmarks Bar",
       "maxDepth": 3,
       "maxHeightPercent": 60
+    },
+    "pinned-tabs": {
+      "enabled": true,
+      "resetButton": true,
+      "unloadOnClose": true
     }
   }
 }

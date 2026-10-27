@@ -22,4 +22,20 @@ export class OwnPage {
     const shown = AddressKey.from(tab.url ?? tab.pendingUrl);
     return own !== null && shown !== null && own !== shown;
   }
+
+  /**
+   * @param tab A tab.
+   * @returns The own page to load on reset when the tab is away, otherwise null.
+   */
+  public static resetTarget(tab: chrome.tabs.Tab): string | null {
+    return OwnPage.isAway(tab) ? OwnPage.of(tab) : null;
+  }
+
+  /**
+   * @param tab A tab.
+   * @returns The address key of the tab's own page, or of the page it shows when it has none.
+   */
+  public static keyOf(tab: chrome.tabs.Tab): string | null {
+    return AddressKey.from(OwnPage.of(tab) ?? tab.url ?? tab.pendingUrl);
+  }
 }

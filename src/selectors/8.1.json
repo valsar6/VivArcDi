@@ -7,5 +7,7 @@
   "pinnedTab": ".tab-position.is-pinned",
   "tabWrapper": ".tab-wrapper",
   "webviewContainer": "#webview-container",
-  "tabWebview": "#webview-container webview[tab_id]"
+  "tabWebview": "#webview-container webview[tab_id]",
+  "tabClose": ".tab-header .close",
+  "tabFavicon": ".tab-header .favicon"
 }

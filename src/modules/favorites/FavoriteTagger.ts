@@ -1,3 +1,4 @@
+import { TabSlot } from '../../core/TabSlot.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 
 export const FAVORITE_ATTRIBUTE = 'data-vivarcdi-favorite';
@@ -51,9 +52,7 @@ export class FavoriteTagger {
    * @returns The tab id, or null when the slot holds no tab.
    */
   public static tabIdOf(slot: Element, wrapperSelector: string): number | null {
-    const wrapper = (slot.matches(wrapperSelector) ? slot : slot.querySelector(wrapperSelector)) as HTMLElement | null;
-    const match = /^tab-(\d+)$/.exec(wrapper?.dataset['id'] ?? '');
-    return match?.[1] === undefined ? null : Number(match[1]);
+    return TabSlot.idOf(slot, wrapperSelector);
   }
 
   /**
