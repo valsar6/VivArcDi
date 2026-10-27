@@ -113,7 +113,7 @@ to 20 to 100.
 | Risk | Mitigation |
 |---|---|
 | `chrome://favicon/` is not served to the interface | Icon of the open tab first, then the first letter; manual check in the checklist |
-| A tab created by the click lands in another workspace | Write the active tab's `workspaceId` right after creating it, as 003 does; manual check AC-14 |
+| A tab created by the click lands in another workspace | Write the active tab's `workspaceId` right after creating it, as 003 does; manual check in the checklist |
 | A burst of bookmark events, for example an import, redraws the section many times | One rebuild per frame through `FrameTask` |
 | Hundreds of links make the section heavy | Closed folders do not draw their children; only open ones are in the DOM |
 | Vivaldi removes the anchor on a redraw | `TabBarAnchor` creates it again; the probes saw it survive every tested redraw; manual check AC-14 |
