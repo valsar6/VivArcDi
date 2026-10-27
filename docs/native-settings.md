@@ -24,7 +24,7 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 | Arc | Vivaldi setting |
 |---|---|
-| Favorites shared by every Space | Pin the tab, then keep it pinned in all workspaces (7.8+) |
+| Favorites shared by every Space | No native equivalent: Vivaldi 8.2 cannot show one tab in every workspace. VivArcDi draws them from a bookmark folder ([spec 003](../specs/003-pinned-tabs-and-folders/spec.md)) |
 | Pinned tabs of one Space | Pinned tabs in that workspace |
 | Pinned tab that keeps its site | Lock the pinned tab to its domain (7.8+) |
 | Folders | **Tab stacks**, shown as **accordion** in the vertical tab bar; colors from 7.5, drag-and-drop from 7.8 |

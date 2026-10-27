@@ -82,8 +82,8 @@ are dropped when the store is loaded, so it cannot grow forever.
 
 ## Folders
 
-The peek-out below a closed folder (AC-10) is drawn by 003. This module only activates the tab, so
-nothing changes here when 003 lands; AC-10 stays in the manual checklist and is checked then.
+The peek-out below a closed folder (AC-10) is drawn by 009. This module only activates the tab, so
+nothing changes here when 009 lands; AC-10 stays in the manual checklist and is checked then.
 
 ## Risks
 

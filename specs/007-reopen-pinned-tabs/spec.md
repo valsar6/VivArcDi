@@ -35,7 +35,7 @@ In VivArcDi: the user presses Cmd/Ctrl+T and opens an address, typed or picked f
 suggestions. If that address matches a Favorite or a pinned tab of the current workspace, VivArcDi
 closes the new tab, activates the matching tab and loads it again if it was unloaded. The match uses
 the page the pinned tab shows now and the page it was pinned with (see [003](../003-pinned-tabs-and-folders/spec.md)).
-When the matching tab is inside a closed folder, it peeks out below the folder as in 003/AC-6.
+When the matching tab is inside a closed folder, it peeks out below the folder as in 009/AC-13.
 
 Arc and VivArcDi differ on purpose: Arc offers "Switch to Tab" as a suggestion before the user
 presses Enter. Vivaldi's address bar suggestions cannot be extended safely by a mod, so VivArcDi acts
@@ -82,7 +82,7 @@ Each time a Favorite or pinned tab becomes active, by any route, VivArcDi record
 | AC-7 | IF the switch fails, THEN THE new tab SHALL stay open on the typed address. | auto: `keeps the new tab when the switch fails` |
 | AC-8 | WHEN a Favorite or pinned tab becomes active, THE module SHALL store the current date for it. | auto: `records the last opened date on activation` |
 | AC-9 | WHEN Tore opens the address of a Favorite from Cmd/Ctrl+T, THE Favorite SHALL become active and no new tab SHALL remain. | manual |
-| AC-10 | WHEN Tore opens the address of a pinned tab inside a closed folder, THE tab SHALL become active and show below the closed folder. Checked once 003 is implemented. | manual |
+| AC-10 | WHEN Tore opens the address of a pinned tab inside a closed folder, THE tab SHALL become active and show below the closed folder. Checked once 009 is implemented. | manual |
 | AC-11 | WHEN Vivaldi restarts, THE last-opened dates SHALL be kept. | manual |
 
 ## Out of scope
@@ -106,11 +106,12 @@ Each time a Favorite or pinned tab becomes active, by any route, VivArcDi record
   so it does not depend on them. If Vivaldi suggests the open tab and the user picks it, Vivaldi
   switches by itself and this module does nothing.
 - [x] Ship before 003? Yes: Favorites and pinned tabs outside folders first; the peek-out below a
-  closed folder (AC-10) follows 003 (Tore, 2026-10-26).
+  closed folder (AC-10) follows 009, which took folders over from 003 (Tore, 2026-10-26).
 
 ## References
 
-- [003 Pinned tabs and folders](../003-pinned-tabs-and-folders/spec.md), FR-4 and AC-6 for the
-  peek-out below a closed folder.
+- [003 Pinned tabs](../003-pinned-tabs-and-folders/spec.md) for the saved page of a pinned tab.
+- [009 Bookmark folders in the tab bar](../009-bookmark-folders-in-tab-bar/spec.md), AC-6 and AC-13
+  for the peek-out below a closed folder.
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr), section "Spaces, Pinned tabs e
   cartelle".
