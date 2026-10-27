@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-27 |
 
 ## Summary
 
@@ -51,6 +51,10 @@ the bookmark's address. A link with an open tab shows a dot next to its icon, an
 below its folder even when the folder is closed, indented, as the pinned tab does in Arc's video. When
 the tab closes, the link goes back inside the folder.
 
+A closed subfolder inside an open folder (Mahjong, Nix, Design in Hobbies) is a folder row too: a click
+opens it in place, and resting the pointer on it shows the panel with search and last-opened dates of
+[008](../008-folder-hover-preview/spec.md), as Arc does (screenshot by Tore, 2026-10-27).
+
 Two addresses are the same when they match as in 007: same host without `www.` and same path, ignoring
 a trailing `/`, the query and the fragment.
 
@@ -88,6 +92,9 @@ for a later spec.
   `maxDepth` (3). The path is searched from the top of the bookmarks tree, titles compared exactly
   (`Bookmarks Bar` and `Bookmarks bar` are different folders in Tore's bookmarks), and the first
   folder that matches is used. IF no folder matches, THEN the section stays hidden and the reason is logged.
+- **FR-11.** WHEN the section is taller than the room the tab bar leaves it, THEN the tab list below
+  stays reachable: Tore wants the whole column to scroll as one, as in Arc; the design says what
+  Vivaldi's layout allows.
 
 ### Non-functional
 
@@ -120,6 +127,7 @@ for a later spec.
 | AC-13 | WHILE a folder is closed and one of its links is open, THAT link SHALL appear below the folder, indented, with a dot. | manual |
 | AC-14 | WHEN Tore switches workspace, resizes the window or toggles the sidebar, THE section SHALL stay in place. | manual |
 | AC-15 | IF the module is disabled or VivArcDi is uninstalled, THEN the bookmarks and the Bookmarks panel SHALL be unchanged. | manual |
+| AC-16 | WHILE a folder with many links is open, THE tab list SHALL stay reachable by scrolling. | manual |
 
 ## Out of scope
 
@@ -146,9 +154,8 @@ for a later spec.
   pinned tab, survived too but ended above the Favorites tiles after the sidebar was shown again,
   because Vivaldi rebuilds the tab list. So the section is drawn above the tab list, next to the
   Favorites grid of [003](../003-pinned-tabs-and-folders/spec.md), and never inside it.
-- [ ] **Height of the section.** Hobbies alone has 20 links. Proposal: the section is at most half the
-  height of the tab bar and scrolls inside itself, so the tab list below always stays visible. Is that
-  right, or should the whole column scroll as in Arc?
+- [x] **Height of the section.** The whole column scrolls as one, as in Arc (Tore, 2026-10-27, with
+  screenshots of Arc). FR-11 keeps the requirement; the design explains how far Vivaldi's layout allows it.
 
 ## References
 
