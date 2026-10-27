@@ -34,8 +34,8 @@ changes a bookmark.
 A click on a tile brings the user to the Favorite's tab in the current workspace, loading it if it
 was unloaded. When the workspace has no tab for that Favorite yet, VivArcDi opens one with the
 bookmark's address, pins it and links it to the bookmark. A linked tab is hidden from Vivaldi's list
-of tabs, because its tile already shows it: the active tile is highlighted and the tile of an unloaded
-tab is dimmed, as in 001. Each workspace has its own tab for a Favorite, since a Vivaldi tab belongs
+of tabs, because its tile already shows it: while the user is on that Favorite, its tile has a thin
+glowing outer border, and the tile of an unloaded tab is dimmed, as in 001. Each workspace has its own tab for a Favorite, since a Vivaldi tab belongs
 to one workspace.
 
 **Pinned tabs.** As in Arc, the tab bar shows the Favorites grid, the folders of 009, then
@@ -61,8 +61,8 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 - **FR-2.** A click on a tile activates the tab linked to that Favorite in the current window and
   workspace, loading it if unloaded; with none, it opens the bookmark's address in a new pinned tab of
   the current workspace and links it to the bookmark.
-- **FR-3.** Tabs linked to a Favorite are hidden from the tab list; their tile shows them as active
-  or unloaded.
+- **FR-3.** Tabs linked to a Favorite are hidden from the tab list; their tile shows them as active,
+  with a thin glowing outer border, or unloaded, dimmed.
 - **FR-4.** Each pinned tab stores its own page: the address it had when pinned, or the one it shows
   when VivArcDi first sees it pinned. Unpinning removes it.
 - **FR-5.** WHILE a Favorite or pinned tab shows another page than its own, a click on the active tile
@@ -132,7 +132,8 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 - [x] Which folder holds the Favorites? A new folder `Favorites` that Tore creates in the Bookmarks
   panel, with WhatsApp, Reddit, Claude and Rasterbator; option `folder` points to it (Tore,
   2026-10-27).
-- [ ] Hide the Favorite's tab from the tab list? Proposed: yes, the tile shows it, as in Arc (FR-3).
+- [x] Hide the Favorite's tab from the tab list? Yes: it shows only as its tile, with a thin glowing
+  outer border while it is the active tab (Tore, 2026-10-27).
 - [x] One tab per Favorite in each workspace? Yes for now, opened only when the Favorite is first
   clicked in that workspace; a shared tab may come in a later iteration (Tore, 2026-10-27).
 
