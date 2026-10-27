@@ -8,6 +8,11 @@
 
 #{$root} #{$anchor} {
   flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
 }
 
 #{$root} :is(#{$anchor}, #{$preview}) {
