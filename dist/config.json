@@ -2,7 +2,9 @@
   "styles": [
     "styles/base.css",
     "styles/favorites.css",
-    "styles/peek.css"
+    "styles/folders.css",
+    "styles/peek.css",
+    "styles/pinned.css"
   ],
   "modules": {
     "activation-marker": {
@@ -10,6 +12,7 @@
     },
     "favorites-grid": {
       "enabled": true,
+      "folder": "Favorites",
       "maxTiles": 12,
       "maxColumns": 3,
       "tileMinWidth": 64,
@@ -27,6 +30,17 @@
     },
     "reopen-pinned": {
       "enabled": true
+    },
+    "bookmark-folders": {
+      "enabled": true,
+      "root": "Importati da Firefox/Bookmarks Bar",
+      "maxDepth": 3,
+      "maxHeightPercent": 60
+    },
+    "pinned-tabs": {
+      "enabled": true,
+      "resetButton": true,
+      "unloadOnClose": true
     }
   }
 }

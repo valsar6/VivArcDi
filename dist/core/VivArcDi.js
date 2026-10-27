@@ -1,4 +1,5 @@
 import { createDefaultRegistry } from "../modules/index.js";
+import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
 import { BrowserTabs } from "./BrowserTabs.js";
 import { Logger } from "./Logger.js";
@@ -12,6 +13,7 @@ class VivArcDi {
   #logger;
   #document;
   #tabs;
+  #bookmarks;
   #runtime;
   #styles;
   #started = [];
@@ -27,6 +29,7 @@ class VivArcDi {
     logger,
     document,
     tabs = new BrowserTabs(void 0),
+    bookmarks = new BrowserBookmarks(void 0),
     runtime = new BrowserRuntime(void 0)
   }) {
     this.#loader = loader;
@@ -34,6 +37,7 @@ class VivArcDi {
     this.#logger = logger;
     this.#document = document;
     this.#tabs = tabs;
+    this.#bookmarks = bookmarks;
     this.#runtime = runtime;
     this.#styles = new StyleInjector(document, loader);
   }
@@ -53,6 +57,7 @@ class VivArcDi {
       logger: new Logger(),
       document,
       tabs: new BrowserTabs(chromeApi),
+      bookmarks: new BrowserBookmarks(chromeApi),
       runtime: new BrowserRuntime(chromeApi)
     });
     try {
@@ -87,7 +92,7 @@ class VivArcDi {
     const { modules, unknown } = this.#registry.createEnabled(config.modules);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, selectors, build);
+      await this.#startModule(entry, selectors, build, config.modules);
     }
     this.#logger.info(
       `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
@@ -108,7 +113,7 @@ class VivArcDi {
     this.#started = [];
     this.#styles.removeAll();
   }
-  async #startModule(entry, selectors, build) {
+  async #startModule(entry, selectors, build, modules) {
     const logger = this.#logger.child(entry.id);
     try {
       await entry.module.start({
@@ -118,6 +123,8 @@ class VivArcDi {
         options: entry.options,
         build,
         tabs: this.#tabs,
+        bookmarks: this.#bookmarks,
+        modules,
         runtime: this.#runtime,
         payload: this.#loader
       });

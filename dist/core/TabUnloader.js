@@ -1,7 +1,7 @@
-class TileUnloader {
+class TabUnloader {
   #tabs;
   /**
-   * Unloads a Favorite instead of closing it: the tile stays, and a click loads it again.
+   * Unloads a tab instead of closing it: the tab stays in the tab bar, and a click loads it again.
    *
    * @param tabs Tabs API.
    */
@@ -32,7 +32,7 @@ class TileUnloader {
   async unload(tabId) {
     const tab = await this.#tabs.get(tabId);
     if (tab.active) {
-      const successor = TileUnloader.successorOf(await this.#tabs.query({ windowId: tab.windowId }), tab);
+      const successor = TabUnloader.successorOf(await this.#tabs.query({ windowId: tab.windowId }), tab);
       if (successor?.id === void 0) {
         return false;
       }
@@ -45,5 +45,5 @@ class TileUnloader {
   }
 }
 export {
-  TileUnloader
+  TabUnloader
 };

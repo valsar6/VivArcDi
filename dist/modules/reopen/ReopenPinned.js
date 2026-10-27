@@ -1,15 +1,20 @@
+import { BookmarkFolderFinder } from "../../core/bookmarks/BookmarkFolderFinder.js";
+import { LinkKeyIndex } from "../../core/bookmarks/LinkKeyIndex.js";
 import { Module } from "../../core/Module.js";
 import { ActivationRecorder } from "./ActivationRecorder.js";
 import { LastOpenedStore } from "./LastOpenedStore.js";
 import { NewTabWatcher } from "./NewTabWatcher.js";
+import { LinkedTabFinder } from "./LinkedTabFinder.js";
 import { PinnedTabFinder } from "./PinnedTabFinder.js";
 import { TabSwitcher } from "./TabSwitcher.js";
+import { TabTargets } from "./TabTargets.js";
 class ReopenPinned extends Module {
   static id = "reopen-pinned";
   #watcher = null;
   #recorder = null;
+  #links = null;
   /**
-   * Opening from a new tab the address of a Favorite or pinned tab of the current workspace
+   * Opening from a new tab the address of a Favorite, a pinned tab or a bookmark link of the current workspace
    * switches to that tab instead of keeping a duplicate, and the date each pinned tab is opened
    * is recorded. Without `chrome.tabs` or its events the module stays off.
    *
@@ -23,21 +28,26 @@ class ReopenPinned extends Module {
     }
     const store = new LastOpenedStore(ReopenPinned.#storageOf(context.document), logger);
     store.load(/* @__PURE__ */ new Date());
-    const finder = new PinnedTabFinder(tabs);
+    const links = ReopenPinned.#linksOf(context);
+    const finder = new TabTargets([new PinnedTabFinder(tabs), ...links === null ? [] : [new LinkedTabFinder(tabs, links)]]);
     const switcher = new TabSwitcher(tabs, logger);
     const watcher = new NewTabWatcher(tabs, (navigation) => void this.#reopen(navigation, finder, switcher, context));
-    const recorder = new ActivationRecorder(tabs, store, logger);
+    const recorder = new ActivationRecorder(tabs, store, logger, {
+      isTracked: (tab, key) => tab.pinned || links?.has(key) === true
+    });
     try {
       watcher.start();
       recorder.start();
     } catch (error) {
       watcher.stop();
       recorder.stop();
+      links?.release();
       logger.warn("tab events are missing: reopening pinned tabs is off", error);
       return;
     }
     this.#watcher = watcher;
     this.#recorder = recorder;
+    this.#links = links;
   }
   /**
    * Removes every listener. Saved dates stay.
@@ -47,6 +57,19 @@ class ReopenPinned extends Module {
     this.#recorder?.stop();
     this.#watcher = null;
     this.#recorder = null;
+    this.#links?.release();
+    this.#links = null;
+  }
+  /**
+   * The links of the `bookmark-folders` root are reopened too, when that module is on.
+   */
+  static #linksOf({ bookmarks, modules, logger }) {
+    const folders = modules["bookmark-folders"];
+    if (folders === void 0 || folders.enabled === false || !bookmarks.available) {
+      return null;
+    }
+    const root = typeof folders["root"] === "string" ? folders["root"] : "VivArcDi";
+    return LinkKeyIndex.acquire(bookmarks, BookmarkFolderFinder.parsePath(root), logger);
   }
   static #storageOf(document) {
     try {

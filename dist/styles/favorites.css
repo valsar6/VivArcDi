@@ -101,3 +101,56 @@
   opacity: 0.55;
   filter: saturate(0.4);
 }
+
+#browser[data-vivarcdi-active] [data-vivarcdi-hidden] {
+  display: none !important;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-tiles] {
+  --vivarcdi-tile-bg: color-mix(in srgb, var(--colorFg, #fff) 8%, transparent);
+  --vivarcdi-tile-bg-hover: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+  --vivarcdi-tile-bg-active: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+  display: grid;
+  grid-template-columns: repeat(var(--vivarcdi-favorites-columns, 3), minmax(0, 1fr));
+  gap: var(--vivarcdi-favorites-gap, 8px);
+  padding: var(--vivarcdi-favorites-gap, 8px);
+  user-select: none;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] {
+  display: grid;
+  position: relative;
+  place-items: center;
+  height: var(--vivarcdi-favorites-tile-height, 44px);
+  border-radius: var(--vivarcdi-radius);
+  background-color: var(--vivarcdi-tile-bg);
+  color: var(--colorFg, inherit);
+  cursor: default;
+  transition: background-color var(--vivarcdi-transition), box-shadow var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile]:hover {
+  background-color: var(--vivarcdi-tile-bg-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > * {
+  grid-area: 1/1;
+  transition: opacity var(--vivarcdi-transition), filter var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > span {
+  font-size: 15px;
+  font-weight: 600;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > img {
+  width: 24px;
+  height: 24px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > span:has(+ img) {
+  visibility: hidden;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile][data-vivarcdi-current] {
+  background-color: var(--vivarcdi-tile-bg-active);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) 55%, transparent), 0 0 8px color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) 55%, transparent);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile][data-vivarcdi-unloaded] > * {
+  opacity: 0.55;
+  filter: saturate(0.4);
+}

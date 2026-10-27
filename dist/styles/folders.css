@@ -1,0 +1,71 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] {
+  --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) 10%, transparent);
+  box-sizing: border-box;
+  max-height: max(120px, var(--vivarcdi-folders-max-height, 60) * 1vh);
+  padding: 6px;
+  overflow-y: auto;
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+  user-select: none;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders][hidden] {
+  display: none;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [role] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 30px;
+  padding-inline: 8px;
+  padding-inline-start: calc(8px + var(--vivarcdi-depth, 0) * 14px);
+  border-radius: var(--vivarcdi-radius);
+  cursor: default;
+  transition: background-color var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [role]:hover {
+  background-color: var(--vivarcdi-folders-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-folder-id] .vivarcdi-folders-title {
+  font-weight: 600;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: contain;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-letter {
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: var(--vivarcdi-folders-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-folder-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: currentcolor;
+  opacity: 0.7;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 4A1.5 1.5 0 0 1 3 2.5h3l1.5 1.5H13A1.5 1.5 0 0 1 14.5 5.500v6A1.5 1.5 0 0 1 13 13H3a1.5 1.5 0 0 1-1.500-1.500z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-open] .vivarcdi-folders-folder-icon {
+  opacity: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]::after {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--colorHighlightBg, currentcolor);
+  content: "";
+}

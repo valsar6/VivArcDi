@@ -1,3 +1,4 @@
+import { TabData } from "../../core/TabData.js";
 class TabTiler {
   #tabs;
   #newId;
@@ -24,16 +25,7 @@ class TabTiler {
   }
   async #mark(tabId, tiling) {
     const tab = await this.#tabs.get(tabId);
-    const data = TabTiler.#parse(tab.vivExtData);
-    await this.#tabs.update(tabId, { vivExtData: JSON.stringify({ ...data, tiling }) });
-  }
-  static #parse(extData) {
-    try {
-      const parsed = JSON.parse(extData ?? "{}");
-      return typeof parsed === "object" && parsed !== null ? parsed : {};
-    } catch {
-      return {};
-    }
+    await this.#tabs.update(tabId, { vivExtData: TabData.with(tab, "tiling", tiling) });
   }
 }
 export {

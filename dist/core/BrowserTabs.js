@@ -121,6 +121,20 @@ class BrowserTabs {
     onCreated.addListener(listener);
     return () => onCreated.removeListener(listener);
   }
+  /**
+   * Listens to `chrome.tabs.onRemoved`.
+   *
+   * @param listener Called with the id of every closed tab.
+   * @returns A function that removes the listener.
+   */
+  onRemoved(listener) {
+    const { onRemoved } = this.#requireTabs();
+    if (onRemoved === void 0) {
+      throw new Error("chrome.tabs.onRemoved is not available");
+    }
+    onRemoved.addListener(listener);
+    return () => onRemoved.removeListener(listener);
+  }
   #call(method, ...args) {
     const chromeApi = this.#require();
     const tabs = this.#requireTabs();

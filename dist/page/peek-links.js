@@ -180,9 +180,9 @@ var VivArcDiPeekLinks = (() => {
   var CONSOLE_PREFIX = "vivarcdi-peek:";
 
   // src/page/lib/PageChannel.ts
-  function sendToInterface(message) {
+  function sendToInterface(message, consolePrefix = CONSOLE_PREFIX) {
     if (!sendThroughRuntime(message)) {
-      console.debug(`${CONSOLE_PREFIX}${JSON.stringify(message)}`);
+      console.debug(`${consolePrefix}${JSON.stringify(message)}`);
     }
   }
   function sendThroughRuntime(message) {

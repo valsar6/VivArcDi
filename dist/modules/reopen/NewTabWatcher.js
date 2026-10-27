@@ -1,4 +1,4 @@
-import { AddressKey } from "./AddressKey.js";
+import { AddressKey } from "../../core/AddressKey.js";
 const START_PAGES = ["chrome://vivaldi-webui/startpage", "vivaldi://startpage", "chrome://newtab", "about:blank"];
 class NewTabWatcher {
   #events;
