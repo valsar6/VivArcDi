@@ -88,7 +88,7 @@ test('hides linked tabs and mirrors their state on the tile', async () => {
   ]);
   const snapshot = await new LinkedTabs(tabs).snapshot();
   const document = new DomDocument();
-  const view = new FavoritesView(asDocument(document), { open: () => undefined, unload: () => undefined });
+  const view = new FavoritesView(asDocument(document), { open: (): void => undefined, unload: (): void => undefined });
   view.show([whatsapp, reddit]);
   view.apply(FavoriteStates.of([whatsapp, reddit], snapshot));
   const [whatsappTile, redditTile] = (view.element as unknown as DomNode).children;
@@ -106,7 +106,7 @@ test('hides linked tabs and mirrors their state on the tile', async () => {
   };
   const slots = [slot(1), slot(2), slot(3)];
   const tabBar = new FakeNode(['#tabs-tabbar-container', 'vertical'], [new FakeNode(['strip'], slots)]);
-  new FavoriteTagger(selectors, 0, { has: () => false }, snapshot.linkedTabIds).apply(tabBar as unknown as Element);
+  new FavoriteTagger(selectors, 0, { has: (): boolean => false }, snapshot.linkedTabIds).apply(tabBar as unknown as Element);
   assert.deepEqual(
     slots.map((node) => node.hasAttribute('data-vivarcdi-hidden')),
     [true, true, false],

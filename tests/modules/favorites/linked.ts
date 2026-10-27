@@ -1,7 +1,6 @@
 import type { Logger } from '../../../src/core/Logger.js';
 import { silentLogger as reopenLogger } from '../reopen/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
-import type { FolderTab } from '../folders/fakes.js';
 
 export const silentLogger: Logger = reopenLogger();
 
@@ -18,9 +17,14 @@ export class LinkingTabs extends FolderTabs {
     const result = await super.update(tabId, properties);
     const tab = this.tabs.get(tabId);
     if (tab !== undefined) {
-      this.tabs.set(tabId, { ...tab, ...properties } as FolderTab);
+      this.tabs.set(tabId, { ...tab, ...properties });
     }
     return result;
+  }
+
+  public async discard(tabId: number): Promise<chrome.tabs.Tab> {
+    this.calls.push(['discard', tabId]);
+    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
   }
 
   public extData(tabId: number): Record<string, unknown> {
