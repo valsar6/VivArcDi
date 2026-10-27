@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-27 |
 
 ## Summary
 
@@ -101,14 +101,15 @@ to remove one.
 - [x] Where to store saved addresses? Under a `vivarcdi` key in the tab's `vivExtData`, which
   Vivaldi saves with the session: the probe on Vivaldi 8.2 (macOS, 2026-10-27) found the key again
   after a restart, while tab ids changed. The address follows the tab across restarts and workspaces.
-- [ ] Global Favorites? Proposed: rely on Vivaldi's "pin in all workspaces" and only tell them apart
+- [x] Global Favorites? Rely on Vivaldi's "pin in all workspaces" and only tell them apart
   in the interface (FR-1). Less code, and nothing to undo when VivArcDi is removed. In the probe,
   pinned tabs of one workspace carry a `workspaceId` in `vivExtData` and the others carry none, so
-  a pinned tab without `workspaceId` is a Favorite.
-- [ ] Is "lock to domain" enough for the reset? Proposed: no. It keeps the tab on one site but has
+  a pinned tab without `workspaceId` is a Favorite (Tore, 2026-10-27).
+- [x] Is "lock to domain" enough for the reset? No. It keeps the tab on one site but has
   no way back to the saved page, and Arc lets pinned tabs leave their site. VivArcDi adds its own
-  reset and leaves "lock to domain" as an optional Vivaldi setting that works with it.
-- [ ] Context menu "Close tab"? Proposed: it keeps closing for real (Expected behavior).
+  reset and leaves "lock to domain" as an optional Vivaldi setting that works with it
+  (Tore, 2026-10-27).
+- [x] Context menu "Close tab"? It keeps closing for real (Tore, 2026-10-27).
 
 ## References
 
