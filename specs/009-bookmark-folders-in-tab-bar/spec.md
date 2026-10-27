@@ -38,7 +38,7 @@ then one row per folder with a folder icon and a bold title, then the pinned tab
 the other tabs. A folder opens to show its links, indented, each with its icon and title.
 
 In VivArcDi the section sits between the Favorites grid and the pinned and open tabs of Vivaldi's
-vertical tab bar. It shows the children of one bookmark folder, the **root** (an option; for Tore it is
+vertical tab bar: Favorites grid, folders, pinned tabs of the workspace, other tabs, as in Arc. It shows the children of one bookmark folder, the **root** (an option; for Tore it is
 `Importati da Firefox/Bookmarks Bar`, whose children are Programming, Music, Hobbies and the others). Each child
 folder is a row that opens and closes on click; a subfolder opens inside its parent, up to a depth
 limit. Folders start closed.
