@@ -9,3 +9,7 @@
 #{$root} #{$anchor} {
   flex: none;
 }
+
+#{$root} :is(#{$anchor}, #{$preview}) {
+  -webkit-app-region: no-drag;
+}
