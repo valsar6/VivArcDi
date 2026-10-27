@@ -216,7 +216,7 @@ the same in every workspace.
 - Three columns in a narrow tab bar, more as it gets wider. Hovering a tile shows its title.
 
 If the folder is missing, the first pinned tabs of the current workspace become the tiles, as before
-0.7.0, and the console says so. Removing a bookmark from the folder turns its tabs into ordinary
+0.6.0, and the console says so. Removing a bookmark from the folder turns its tabs into ordinary
 pinned tabs.
 
 Options of `favorites-grid` in `config.json`:

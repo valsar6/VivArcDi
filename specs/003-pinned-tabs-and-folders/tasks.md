@@ -21,7 +21,7 @@
 - [x] **T8.** `CloseShortcut` and page script `pinned-keys`. AC-11, AC-12.
 - [x] **T9.** `PinnedTabs` module, registry, `config.json`, selectors, clean stop of both modules.
 - [x] **T10.** 007 matches and dates pinned tabs by their own page.
-- [x] **T11.** Version 0.7.0 on `features/pinned-tabs` (0.6.0 went to 009); README; note in 001 that 003 replaces its
+- [x] **T11.** Version 0.6.0 (shared with 009, which is in the same pull request); README; note in 001 that 003 replaces its
   tile rule; manual checklist for AC-14 to AC-19 with the setup of the `Favorites` folder
   (`phase-3/verifica-favorites-pinned.md` in the project files).
 - [ ] **T12.** Manual checks AC-14 to AC-19 on macOS and Debian.
