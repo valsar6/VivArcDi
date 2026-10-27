@@ -10,7 +10,7 @@ import type { UnloadedLookup } from './FavoriteTagger.js';
 import { GridLayout } from './GridLayout.js';
 import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
-import { TileUnloader } from './TileUnloader.js';
+import { TabUnloader } from '../../core/TabUnloader.js';
 import { UnloadedTabs } from './UnloadedTabs.js';
 
 const NO_UNLOADED_TABS: UnloadedLookup = { has: () => false };
@@ -100,7 +100,7 @@ export class FavoritesGrid extends Module {
     }
     this.#middleClick = new MiddleClickUnload({
       document: this.#document,
-      unloader: new TileUnloader(tabs),
+      unloader: new TabUnloader(tabs),
       wrapperSelector: this.#selectors.get('tabWrapper'),
       logger,
     });

@@ -1,12 +1,12 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserTabs } from './BrowserTabs.js';
 
 export type UnloaderTabs = Pick<BrowserTabs, 'get' | 'query' | 'activate' | 'discard'>;
 
-export class TileUnloader {
+export class TabUnloader {
   #tabs: UnloaderTabs;
 
   /**
-   * Unloads a Favorite instead of closing it: the tile stays, and a click loads it again.
+   * Unloads a tab instead of closing it: the tab stays in the tab bar, and a click loads it again.
    *
    * @param tabs Tabs API.
    */
@@ -44,7 +44,7 @@ export class TileUnloader {
   public async unload(tabId: number): Promise<boolean> {
     const tab = await this.#tabs.get(tabId);
     if (tab.active) {
-      const successor = TileUnloader.successorOf(await this.#tabs.query({ windowId: tab.windowId }), tab);
+      const successor = TabUnloader.successorOf(await this.#tabs.query({ windowId: tab.windowId }), tab);
       if (successor?.id === undefined) {
         return false;
       }
