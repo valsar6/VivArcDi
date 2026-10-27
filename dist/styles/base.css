@@ -7,3 +7,7 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-anchor] {
   flex: none;
 }
+
+#browser[data-vivarcdi-active] :is([data-vivarcdi-anchor], [data-vivarcdi-preview]) {
+  -webkit-app-region: no-drag;
+}

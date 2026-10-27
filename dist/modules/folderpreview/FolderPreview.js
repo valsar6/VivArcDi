@@ -31,7 +31,7 @@ class FolderPreview extends Module {
       bookmarks,
       openLinks,
       activator: new LinkActivator(tabs, openLinks, logger),
-      storage: FolderPreview.#storageOf(document),
+      storage: context.storage,
       locale: document.defaultView?.navigator.language ?? "en",
       delayMs: typeof delay === "number" ? Math.min(MAX_DELAY_MS, Math.max(MIN_DELAY_MS, delay)) : DEFAULT_DELAY_MS,
       logger
@@ -44,13 +44,6 @@ class FolderPreview extends Module {
   stop() {
     this.#controller?.stop();
     this.#controller = null;
-  }
-  static #storageOf(document) {
-    try {
-      return document.defaultView?.localStorage ?? null;
-    } catch {
-      return null;
-    }
   }
 }
 export {

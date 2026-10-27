@@ -26,7 +26,7 @@ class ReopenPinned extends Module {
       logger.warn("chrome.tabs is missing: reopening pinned tabs is off");
       return;
     }
-    const store = new LastOpenedStore(ReopenPinned.#storageOf(context.document), logger);
+    const store = new LastOpenedStore(context.storage, logger);
     store.load(/* @__PURE__ */ new Date());
     const links = ReopenPinned.#linksOf(context);
     const finder = new TabTargets([new PinnedTabFinder(tabs), ...links === null ? [] : [new LinkedTabFinder(tabs, links)]]);
@@ -70,13 +70,6 @@ class ReopenPinned extends Module {
     }
     const root = typeof folders["root"] === "string" ? folders["root"] : "VivArcDi";
     return LinkKeyIndex.acquire(bookmarks, BookmarkFolderFinder.parsePath(root), logger);
-  }
-  static #storageOf(document) {
-    try {
-      return document.defaultView?.localStorage ?? null;
-    } catch {
-      return null;
-    }
   }
   async #reopen({ tab, url }, finder, switcher, { logger }) {
     try {

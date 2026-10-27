@@ -3,6 +3,7 @@ import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
 import { BrowserTabs } from "./BrowserTabs.js";
 import { Logger } from "./Logger.js";
+import { PersistentStorage } from "./PersistentStorage.js";
 import { ResourceLoader } from "./ResourceLoader.js";
 import { SelectorCatalog } from "./SelectorCatalog.js";
 import { StyleInjector } from "./StyleInjector.js";
@@ -15,6 +16,7 @@ class VivArcDi {
   #tabs;
   #bookmarks;
   #runtime;
+  #storage;
   #styles;
   #started = [];
   /**
@@ -30,7 +32,8 @@ class VivArcDi {
     document,
     tabs = new BrowserTabs(void 0),
     bookmarks = new BrowserBookmarks(void 0),
-    runtime = new BrowserRuntime(void 0)
+    runtime = new BrowserRuntime(void 0),
+    storage = new PersistentStorage(/* @__PURE__ */ new Map(), null, void 0, logger)
   }) {
     this.#loader = loader;
     this.#registry = registry;
@@ -39,6 +42,7 @@ class VivArcDi {
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
     this.#runtime = runtime;
+    this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
   }
   /**
@@ -51,14 +55,16 @@ class VivArcDi {
    */
   static async boot(baseUrl, document = globalThis.document) {
     const chromeApi = globalThis.chrome;
+    const logger = new Logger();
     const app = new VivArcDi({
       loader: new ResourceLoader(baseUrl),
       registry: createDefaultRegistry(),
-      logger: new Logger(),
+      logger,
       document,
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
-      runtime: new BrowserRuntime(chromeApi)
+      runtime: new BrowserRuntime(chromeApi),
+      storage: await PersistentStorage.open(document, chromeApi, logger)
     });
     try {
       await app.start();
@@ -126,6 +132,7 @@ class VivArcDi {
         bookmarks: this.#bookmarks,
         modules,
         runtime: this.#runtime,
+        storage: this.#storage,
         payload: this.#loader
       });
       this.#started.push(entry);
