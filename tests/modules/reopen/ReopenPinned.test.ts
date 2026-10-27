@@ -92,3 +92,10 @@ test('reopen module stays off without tab events', () => {
   } as unknown as ModuleContext;
   assert.doesNotThrow(() => new ReopenPinned().start(context));
 });
+
+test('reuses a pinned tab that left its own page', async () => {
+  const vivExtData = JSON.stringify({ vivarcdi: { pinnedUrl: MAHJONG } });
+  const tabs = start([{ id: 1, pinned: true, windowId: 1, url: 'https://elsewhere.example/', vivExtData } as FakeTab]);
+  await openFromNewTab(tabs, MAHJONG);
+  assert.deepEqual(tabs.actions()[0], ['activate', 1]);
+});
