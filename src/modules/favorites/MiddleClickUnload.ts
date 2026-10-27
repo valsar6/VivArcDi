@@ -1,6 +1,6 @@
 import type { Logger } from '../../core/Logger.js';
 import { FAVORITE_ATTRIBUTE, FavoriteTagger } from './FavoriteTagger.js';
-import type { TileUnloader } from './TileUnloader.js';
+import type { TabUnloader } from '../../core/TabUnloader.js';
 
 const MIDDLE_BUTTON = 1;
 const BLOCKED_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'auxclick'];
@@ -9,7 +9,7 @@ export interface MiddleClickDependencies {
   /** The document of Vivaldi's browser window. */
   document: Document;
   /** Unloads tabs. */
-  unloader: Pick<TileUnloader, 'unload'>;
+  unloader: Pick<TabUnloader, 'unload'>;
   /** Selector of the tab wrapper holding the tab id. */
   wrapperSelector: string;
   /** Reports failed unloads. */
@@ -18,7 +18,7 @@ export interface MiddleClickDependencies {
 
 export class MiddleClickUnload {
   #document: Document;
-  #unloader: Pick<TileUnloader, 'unload'>;
+  #unloader: Pick<TabUnloader, 'unload'>;
   #wrapperSelector: string;
   #logger: Logger;
   #listener = (event: Event): void => this.#handle(event as MouseEvent);

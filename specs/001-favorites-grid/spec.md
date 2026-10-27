@@ -51,9 +51,13 @@ unpinning, reordering and switching workspace update the grid on their own. With
 top or bottom there is no grid and Vivaldi looks as before.
 
 Differences from Arc: Arc's Favorites are shared by every Space by design. In Vivaldi they are the
-first pinned tabs of the current workspace; to have the same Favorites everywhere, the user pins
-them in all workspaces (native setting). Separating global Favorites from per-workspace pinned tabs
+first pinned tabs of the current workspace, and Vivaldi 8.2 cannot show one tab in every workspace
+(checked 2026-10-27). Separating global Favorites from per-workspace pinned tabs
 belongs to [003](../003-pinned-tabs-and-folders/spec.md).
+
+Since 0.7.0, [003](../003-pinned-tabs-and-folders/spec.md) replaces the tile rule of this spec when
+the Favorites bookmark folder exists: the tiles are the links of that folder, and pinned tabs stay
+rows. The first-pinned-tabs rule above remains the fallback when the folder is missing.
 
 ## Requirements
 
@@ -111,7 +115,7 @@ belongs to [003](../003-pinned-tabs-and-folders/spec.md).
 - Notification badges read from the page title, and Cmd+1…9 on Favorites: candidates for a later
   revision of this spec.
 - Adding a Favorite by dragging a tab above the workspace title.
-- Favorites shared by every workspace without the native "pin in all workspaces" setting.
+- Favorites shared by every workspace: [003](../003-pinned-tabs-and-folders/spec.md).
 
 ## Open questions
 

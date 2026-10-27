@@ -1,3 +1,4 @@
+import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
 import { DomQuery } from '../../core/DomQuery.js';
 import { FrameTask } from '../../core/FrameTask.js';
 import type { Logger } from '../../core/Logger.js';
@@ -5,18 +6,21 @@ import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import { TabUnloader } from '../../core/TabUnloader.js';
+import { BookmarkFavorites } from './BookmarkFavorites.js';
 import { FavoriteTagger } from './FavoriteTagger.js';
 import type { UnloadedLookup } from './FavoriteTagger.js';
 import { GridLayout } from './GridLayout.js';
 import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
-import { TileUnloader } from './TileUnloader.js';
 import { UnloadedTabs } from './UnloadedTabs.js';
 
-const NO_UNLOADED_TABS: UnloadedLookup = { has: () => false };
+const NO_TABS: UnloadedLookup = { has: () => false };
 
 export interface FavoritesGridSettings extends GridSettings {
-  /** How many pinned tabs become tiles. */
+  /** Bookmark folder that holds the Favorites, as a path of titles separated by `/`. */
+  folder: string;
+  /** How many Favorites become tiles. */
   maxTiles: number;
   /** Whether a middle click unloads a tile instead of closing it. */
   unloadOnMiddleClick: boolean;
@@ -29,6 +33,7 @@ export class FavoritesGrid extends Module {
    * Options accepted in `config.json`, with their defaults.
    */
   public static readonly defaults: Readonly<FavoritesGridSettings> = Object.freeze({
+    folder: 'Favorites',
     maxTiles: 12,
     maxColumns: 3,
     tileMinWidth: 64,
@@ -39,22 +44,28 @@ export class FavoritesGrid extends Module {
 
   #document: Document | null = null;
   #selectors: SelectorCatalog | null = null;
+  #settings: FavoritesGridSettings = FavoritesGrid.defaults;
   #observer: MutationObserver | null = null;
   #refresh: FrameTask | null = null;
   #tagger: FavoriteTagger | null = null;
   #layout: GridLayout | null = null;
   #unloadedTabs: UnloadedTabs | null = null;
   #middleClick: MiddleClickUnload | null = null;
+  #fromBookmarks: BookmarkFavorites | null = null;
+  #hiddenTabs = new Set<number>();
 
   /**
-   * Shows the first pinned tabs of a vertical tab bar as an Arc-style grid of icon tiles.
-   * The grid follows Vivaldi's tab bar as it changes, dims tiles of unloaded tabs,
-   * and, when `chrome.tabs` exists, unloads a tile on middle click instead of closing it.
+   * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
+   * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
+   * the same in every workspace, and each opens a pinned tab hidden from the list. Without them,
+   * or while the folder is missing, the first pinned tabs become the tiles. Tiles of unloaded
+   * tabs are dimmed, and a middle click unloads a tile instead of closing it.
    *
    * @param context What the module may use.
    */
-  public override async start({ document, selectors, logger, options, tabs }: ModuleContext): Promise<void> {
-    const settings = { ...FavoritesGrid.defaults, ...options };
+  public override async start({ document, selectors, logger, options, tabs, bookmarks }: ModuleContext): Promise<void> {
+    const settings: FavoritesGridSettings = { ...FavoritesGrid.defaults, ...options };
+    this.#settings = settings;
     this.#document = document;
     this.#selectors = selectors;
     this.#refresh = new FrameTask(() => this.#update());
@@ -66,7 +77,7 @@ export class FavoritesGrid extends Module {
     } else {
       logger.warn('chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs');
     }
-    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_UNLOADED_TABS);
+    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_TABS, this.#hiddenTabs);
 
     this.#observer = new MutationObserver(() => this.#refresh?.request());
     this.#observer.observe(DomQuery.require(document, selectors.get('browser')), {
@@ -77,6 +88,7 @@ export class FavoritesGrid extends Module {
     });
     this.#update();
     await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
+    await this.#startBookmarks(tabs, bookmarks, logger);
   }
 
   /**
@@ -87,11 +99,13 @@ export class FavoritesGrid extends Module {
     this.#refresh?.cancel();
     this.#middleClick?.detach();
     this.#unloadedTabs?.stop();
+    this.#fromBookmarks?.stop();
     this.#layout?.release();
     this.#tagger?.clear();
     this.#observer = null;
     this.#middleClick = null;
     this.#unloadedTabs = null;
+    this.#fromBookmarks = null;
   }
 
   #startMiddleClick(settings: FavoritesGridSettings, tabs: BrowserTabs, logger: Logger): void {
@@ -100,19 +114,59 @@ export class FavoritesGrid extends Module {
     }
     this.#middleClick = new MiddleClickUnload({
       document: this.#document,
-      unloader: new TileUnloader(tabs),
+      unloader: new TabUnloader(tabs),
       wrapperSelector: this.#selectors.get('tabWrapper'),
       logger,
     });
     this.#middleClick.attach();
   }
 
-  #update(): void {
-    if (this.#document === null || this.#selectors === null) {
+  async #startBookmarks(tabs: BrowserTabs, bookmarks: BrowserBookmarks | undefined, logger: Logger): Promise<void> {
+    const document = this.#document;
+    const selectors = this.#selectors;
+    if (!tabs.available || bookmarks?.available !== true || document === null || selectors?.has('tabListHost') !== true) {
+      logger.warn('Bookmarks, tabs or the tab list are missing: the Favorites are the first pinned tabs');
       return;
     }
-    const tabBar = this.#document.querySelector(this.#selectors.get('tabBar'));
-    const strip = this.#tagger?.apply(tabBar) ?? null;
-    this.#layout?.follow(strip, this.#tagger?.tileCount ?? 0);
+    this.#fromBookmarks = new BookmarkFavorites({
+      document,
+      selectors,
+      tabs,
+      bookmarks,
+      logger,
+      folder: this.#settings.folder,
+      maxTiles: this.#settings.maxTiles,
+      hiddenTabs: this.#hiddenTabs,
+      onChange: (): void => this.#refresh?.request(),
+    });
+    await this.#fromBookmarks.start().catch((error: unknown) => logger.error('Could not read the Favorites folder', error));
+  }
+
+  #update(): void {
+    const tagger = this.#tagger;
+    const tabBar = this.#tabBar();
+    if (tagger === null || tabBar === undefined) {
+      return;
+    }
+    const fromBookmarks = this.#fromBookmarks?.active === true ? this.#fromBookmarks : null;
+    tagger.maxTiles = fromBookmarks === null ? this.#settings.maxTiles : 0;
+    const strip = tagger.apply(tabBar);
+    if (fromBookmarks === null) {
+      this.#showPinnedTiles(strip, tagger.tileCount);
+    } else {
+      this.#layout?.follow(fromBookmarks.place(strip !== null), fromBookmarks.count);
+    }
+  }
+
+  #tabBar(): Element | null | undefined {
+    if (this.#document === null || this.#selectors === null) {
+      return undefined;
+    }
+    return this.#document.querySelector(this.#selectors.get('tabBar'));
+  }
+
+  #showPinnedTiles(strip: HTMLElement | null, count: number): void {
+    this.#fromBookmarks?.place(false);
+    this.#layout?.follow(strip, count);
   }
 }

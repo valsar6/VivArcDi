@@ -24,7 +24,7 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 | Arc | Vivaldi setting |
 |---|---|
-| Favorites shared by every Space | Pin the tab, then keep it pinned in all workspaces (7.8+) |
+| Favorites shared by every Space | No native equivalent: Vivaldi 8.2 cannot show one tab in every workspace. VivArcDi draws them from a bookmark folder ([spec 003](../specs/003-pinned-tabs-and-folders/spec.md)) |
 | Pinned tabs of one Space | Pinned tabs in that workspace |
 | Pinned tab that keeps its site | Lock the pinned tab to its domain (7.8+) |
 | Folders | **Tab stacks**, shown as **accordion** in the vertical tab bar; colors from 7.5, drag-and-drop from 7.8 |
@@ -47,9 +47,9 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 ## Still missing
 
-The Favorites icon grid ships with VivArcDi (see the README). These still need modules and are on the
-roadmap: closing a pinned tab with Cmd/Ctrl+W without removing it, resetting a pinned tab to its saved URL, the active tab peeking out of a closed
-folder, Peek, and auto-archive.
+The Favorites icon grid, Peek, bookmark folders in the tab bar and pinned tabs that unload on
+Cmd/Ctrl+W and reset to their own page ship with VivArcDi (see the README). Auto-archive is still on
+the roadmap.
 
 Some setting names above come from release notes rather than the 8.1 interface itself. If one does not
 match, open an issue with the label you see.

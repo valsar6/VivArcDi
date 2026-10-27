@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TileUnloader } from '../../../src/modules/favorites/TileUnloader.js';
+import { TabUnloader } from '../../../src/core/TabUnloader.js';
 import { UnloadedTabs } from '../../../src/modules/favorites/UnloadedTabs.js';
 import { FakeTabs } from './fakes.js';
 
@@ -40,7 +40,7 @@ test('UnloadedTabs stops listening on stop', async () => {
 
 test('an inactive tile is unloaded in place', async () => {
   const tabs = new FakeTabs([{ id: 1, windowId: 9, active: false }]);
-  assert.equal(await new TileUnloader(tabs).unload(1), true);
+  assert.equal(await new TabUnloader(tabs).unload(1), true);
   assert.deepEqual(tabs.calls, [['discard', 1]]);
 });
 
@@ -51,13 +51,13 @@ test('an active tile hands focus to the most recently used tab first', async () 
     { id: 3, windowId: 9, index: 2, lastAccessed: 200 },
     { id: 4, windowId: 9, index: 3, lastAccessed: 250, discarded: true },
   ]);
-  await new TileUnloader(tabs).unload(1);
+  await new TabUnloader(tabs).unload(1);
   assert.deepEqual(tabs.calls.slice(1), [['activate', 3], ['discard', 1]]);
 });
 
 test('the only tab of a window is not unloaded', async () => {
   const tabs = new FakeTabs([{ id: 1, windowId: 9, index: 0, active: true }]);
-  assert.equal(await new TileUnloader(tabs).unload(1), false);
+  assert.equal(await new TabUnloader(tabs).unload(1), false);
   assert.deepEqual(tabs.calls.map(([name]) => name), ['query']);
 });
 
@@ -69,5 +69,5 @@ test('without access times the nearest tab is chosen', () => {
     { id: 6, index: 5 },
     { id: 7, index: 6 },
   ] as chrome.tabs.Tab[];
-  assert.equal(TileUnloader.successorOf(windowTabs, leaving)?.id, 6);
+  assert.equal(TabUnloader.successorOf(windowTabs, leaving)?.id, 6);
 });

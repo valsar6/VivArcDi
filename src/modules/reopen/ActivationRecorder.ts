@@ -1,6 +1,7 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { AddressKey } from '../../core/AddressKey.js';
+import { OwnPage } from '../../core/OwnPage.js';
 import type { LastOpenedStore } from './LastOpenedStore.js';
 
 export interface RecorderOptions {
@@ -59,7 +60,7 @@ export class ActivationRecorder {
   async #record(tabId: number): Promise<void> {
     try {
       const tab = await this.#tabs.get(tabId);
-      const key = AddressKey.from(tab.url ?? tab.pendingUrl);
+      const key = tab.pinned ? OwnPage.keyOf(tab) : AddressKey.from(tab.url ?? tab.pendingUrl);
       if (key !== null && this.#isTracked(tab, key)) {
         this.#store.record(key, this.#now());
       }

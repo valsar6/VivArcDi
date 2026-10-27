@@ -5,7 +5,7 @@ import type { ModuleContext } from '../../core/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';
 import { LinkOpener } from './LinkOpener.js';
 import type { LinkRequest } from './LinkOpener.js';
-import { PageScriptInjector } from './PageScriptInjector.js';
+import { PageScriptInjector } from '../../core/PageScriptInjector.js';
 import { PageScripts } from './PageScripts.js';
 import { PeekController } from './PeekController.js';
 import { PeekKeys } from './PeekKeys.js';
@@ -13,7 +13,7 @@ import { parsePeekMessage } from './PeekMessage.js';
 import { PeekPanel } from './PeekPanel.js';
 import type { PanelCommand, PanelSize } from './PeekPanel.js';
 import { TabTiler } from './TabTiler.js';
-import { TAB_ID_ATTRIBUTE } from './Webview.js';
+import { TAB_ID_ATTRIBUTE } from '../../core/Webview.js';
 
 export const OPEN_ATTRIBUTE = 'data-vivarcdi-peek';
 
@@ -128,13 +128,15 @@ export class Peek extends Module {
     return new PageScriptInjector({
       container: this.#container as HTMLElement,
       webviewSelector: selectors.get('tabWebview'),
-      scripts,
-      policyFor: async (tabId) => ({
-        triggers: { shiftClick, pinnedCrossSite, anyCrossSite },
-        pinned: (await tabs.get(tabId)).pinned,
-        tabId,
-        token: this.#token,
-      }),
+      scriptFor: async (tabId) =>
+        scripts.installLinks({
+          triggers: { shiftClick, pinnedCrossSite, anyCrossSite },
+          pinned: (await tabs.get(tabId)).pinned,
+          tabId,
+          token: this.#token,
+        }),
+      uninstallScript: scripts.uninstallLinks(),
+      purpose: 'Peek links',
       onConsoleMessage: (message, tabId) => this.#receive(message, tabId),
       logger,
     });

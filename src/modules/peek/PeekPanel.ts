@@ -1,5 +1,5 @@
 import type { PageScripts } from './PageScripts.js';
-import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from './Webview.js';
+import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from '../../core/Webview.js';
 
 export type PanelCommand = 'close' | 'expand' | 'split';
 
