@@ -11,7 +11,8 @@ const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 function start(pinned: FakeTab[]): ReopenTabs {
   const tabs = new ReopenTabs(pinned);
   const context = {
-    document: { defaultView: { localStorage: new MemoryStorage() } },
+    document: {},
+    storage: new MemoryStorage(),
     logger: silentLogger(),
     options: {},
     tabs,

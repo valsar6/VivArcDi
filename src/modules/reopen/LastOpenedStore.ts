@@ -1,6 +1,7 @@
 import type { Logger } from '../../core/Logger.js';
+import type { KeyValueStorage } from '../../core/PersistentStorage.js';
 
-export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>;
+export type { KeyValueStorage };
 
 export const LAST_OPENED_STORAGE_KEY = 'vivarcdi.lastOpened';
 

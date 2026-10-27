@@ -20,7 +20,7 @@ inside the tab strip is moved by Vivaldi's rebuilds. That spot is the shared `Ta
    deeper than `maxDepth` are dropped. Every bookmark event (`onCreated`, `onRemoved`, `onChanged`,
    `onMoved`) asks a `FrameTask` for one rebuild per frame, so a burst of changes redraws once.
 2. **Open and closed (FR-2, AC-7).** `OpenFolders` keeps the ids of open folders in the interface's
-   `localStorage` and restores them on start. Folders start closed.
+   the shared `PersistentStorage` (`chrome.storage.local`, since `localStorage` is null in Vivaldi 8.2's `window.html`) and restores them on start. Folders start closed.
 3. **Open links (FR-3, FR-4, AC-5, AC-6).** `OpenLinks` maps each link to the tab that shows it: same
    window, same workspace (`TabData`, shared with 003), same `AddressKey` as in 007, the most recently
    used tab when several match. It follows `tabs.onCreated`, `onUpdated` (address, discarded state),
@@ -92,6 +92,8 @@ pinned-only default.
 | Selector `tabListHost` (`#tabs-container > :has(> .tab-strip)`), added by 003 or here | `TabBarAnchor` | Module stays off, logged |
 | `chrome://favicon/` in the interface | Icon of a link; the favicon of its open tab is used first | First letter of the title |
 | Marks: `data-vivarcdi-folders` on the section, `data-vivarcdi-folder-id`, `data-vivarcdi-open` on rows | Styles and 008 | |
+
+The tab bar is a window-drag region on macOS: real clicks and hover never reached the section until it was marked `-webkit-app-region: no-drag` (found by Tore with a console test, 2026-10-27, issue #30). The shared `TabBarAnchor` host carries the mark, so every section in it is covered (AC-17).
 
 Uninstalling VivArcDi removes the section and leaves every bookmark as it was (AC-15).
 

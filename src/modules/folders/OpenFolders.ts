@@ -1,5 +1,5 @@
 import type { Logger } from '../../core/Logger.js';
-import type { KeyValueStorage } from '../reopen/LastOpenedStore.js';
+import type { KeyValueStorage } from '../../core/PersistentStorage.js';
 
 export const OPEN_FOLDERS_STORAGE_KEY = 'vivarcdi.openFolders';
 

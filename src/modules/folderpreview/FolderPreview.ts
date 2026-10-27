@@ -2,7 +2,6 @@ import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { LinkActivator } from '../folders/LinkActivator.js';
 import { OpenLinks } from '../folders/OpenLinks.js';
-import type { KeyValueStorage } from '../reopen/LastOpenedStore.js';
 import { PreviewController } from './PreviewController.js';
 
 const DEFAULT_DELAY_MS = 400;
@@ -37,7 +36,7 @@ export class FolderPreview extends Module {
       bookmarks,
       openLinks,
       activator: new LinkActivator(tabs, openLinks, logger),
-      storage: FolderPreview.#storageOf(document),
+      storage: context.storage,
       locale: document.defaultView?.navigator.language ?? 'en',
       delayMs: typeof delay === 'number' ? Math.min(MAX_DELAY_MS, Math.max(MIN_DELAY_MS, delay)) : DEFAULT_DELAY_MS,
       logger,
@@ -53,11 +52,4 @@ export class FolderPreview extends Module {
     this.#controller = null;
   }
 
-  static #storageOf(document: Document): KeyValueStorage | null {
-    try {
-      return document.defaultView?.localStorage ?? null;
-    } catch {
-      return null;
-    }
-  }
 }

@@ -60,7 +60,7 @@ No selectors and no DOM marks: the module only uses tab data.
 | `chrome.tabs.onCreated`, `onUpdated`, `onActivated` | Watch new tabs and activations | Module does not start, logged; Vivaldi behaves as usual |
 | `chrome.tabs.query`, `update`, `reload`, `remove` | Find, activate, reload, close | The new tab stays open, logged (AC-7) |
 | `vivExtData.workspaceId` on tabs | Same-workspace filter | A tab without it belongs to no workspace; Favorites pinned in all workspaces are kept as candidates everywhere |
-| `localStorage` of the interface document | Last-opened dates | Dates are kept for the session only, logged once |
+| `chrome.storage.local`, through the shared `PersistentStorage` (`localStorage` is null in Vivaldi 8.2's `window.html`, probe by Tore 2026-10-27; it is used when a window has a working one) | Last-opened dates | Dates are kept for the session only, logged once |
 
 The start page is recognised by a short list of addresses (`chrome://vivaldi-webui/startpage`,
 `vivaldi://startpage`, `about:blank`, empty), kept in `NewTabWatcher` and covered by its tests.

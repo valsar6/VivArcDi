@@ -5,6 +5,8 @@ import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
 import { Logger } from './Logger.js';
 import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
+import { PersistentStorage } from './PersistentStorage.js';
+import type { KeyValueStorage } from './PersistentStorage.js';
 import { ResourceLoader } from './ResourceLoader.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import { SelectorCatalog } from './SelectorCatalog.js';
@@ -27,6 +29,8 @@ export interface VivArcDiDependencies {
   bookmarks?: BrowserBookmarks;
   /** The runtime API given to modules. */
   runtime?: BrowserRuntime;
+  /** The persistent storage given to modules. */
+  storage?: KeyValueStorage;
 }
 
 export class VivArcDi {
@@ -37,6 +41,7 @@ export class VivArcDi {
   #tabs: BrowserTabs;
   #bookmarks: BrowserBookmarks;
   #runtime: BrowserRuntime;
+  #storage: KeyValueStorage;
   #styles: StyleInjector;
   #started: EnabledModule[] = [];
 
@@ -54,6 +59,7 @@ export class VivArcDi {
     tabs = new BrowserTabs(undefined),
     bookmarks = new BrowserBookmarks(undefined),
     runtime = new BrowserRuntime(undefined),
+    storage = new PersistentStorage(new Map(), null, undefined, logger),
   }: VivArcDiDependencies) {
     this.#loader = loader;
     this.#registry = registry;
@@ -62,6 +68,7 @@ export class VivArcDi {
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
     this.#runtime = runtime;
+    this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
   }
 
@@ -75,14 +82,16 @@ export class VivArcDi {
    */
   public static async boot(baseUrl: string | URL, document: Document = globalThis.document): Promise<VivArcDi> {
     const chromeApi = globalThis.chrome as unknown as ChromeApi | undefined;
+    const logger = new Logger();
     const app = new VivArcDi({
       loader: new ResourceLoader(baseUrl),
       registry: createDefaultRegistry(),
-      logger: new Logger(),
+      logger,
       document,
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
+      storage: await PersistentStorage.open(document, chromeApi, logger),
     });
     try {
       await app.start();
@@ -159,6 +168,7 @@ export class VivArcDi {
         bookmarks: this.#bookmarks,
         modules,
         runtime: this.#runtime,
+        storage: this.#storage,
         payload: this.#loader,
       });
       this.#started.push(entry);
