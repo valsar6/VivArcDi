@@ -129,11 +129,12 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 - [x] Is "lock to domain" enough for the reset? No: it keeps the tab on one site but has no way back
   to its own page. It stays an optional Vivaldi setting that works with the reset (Tore, 2026-10-27).
 - [x] Context menu "Close tab"? It keeps closing for real (Tore, 2026-10-27).
-- [ ] Which folder holds the Favorites? Proposed: a new folder `Favorites` that Tore creates in the
-  Bookmarks panel, with WhatsApp, Reddit, Claude and Rasterbator; option `folder` points to it.
+- [x] Which folder holds the Favorites? A new folder `Favorites` that Tore creates in the Bookmarks
+  panel, with WhatsApp, Reddit, Claude and Rasterbator; option `folder` points to it (Tore,
+  2026-10-27).
 - [ ] Hide the Favorite's tab from the tab list? Proposed: yes, the tile shows it, as in Arc (FR-3).
-- [ ] One tab per Favorite in each workspace? Proposed: yes, opened only when the Favorite is first
-  clicked in that workspace and unloaded like any other.
+- [x] One tab per Favorite in each workspace? Yes for now, opened only when the Favorite is first
+  clicked in that workspace; a shared tab may come in a later iteration (Tore, 2026-10-27).
 
 ## References
 
