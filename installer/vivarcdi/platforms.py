@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from .errors import UnsupportedPlatformError
+from .handoff import NoHandoff, ReapplyHandoff, TerminalHandoff
 from .hooks import AptHook, LaunchAgentHook, UpdateHook
 from .installation import VivaldiInstallation
 from .permissions import MacOSAdvisor, PermissionAdvisor, SudoAdvisor
@@ -43,6 +44,10 @@ class Platform(ABC):
     @abstractmethod
     def permission_advisor(self) -> PermissionAdvisor:
         """Explains how to fix a path the installer cannot write to."""
+
+    def reapply_handoff(self, reapply_command: list[str]) -> ReapplyHandoff:
+        """Who runs `reapply` when the background hook cannot write to Vivaldi itself."""
+        return NoHandoff()
 
 
 class MacOSPlatform(Platform):
@@ -90,6 +95,9 @@ class MacOSPlatform(Platform):
 
     def permission_advisor(self) -> PermissionAdvisor:
         return MacOSAdvisor()
+
+    def reapply_handoff(self, reapply_command: list[str]) -> ReapplyHandoff:
+        return TerminalHandoff(self.data_dir, reapply_command, self._runner)
 
     def _versions_dirs(self) -> list[tuple[str, Path]]:
         found = []
