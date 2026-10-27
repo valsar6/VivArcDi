@@ -203,8 +203,9 @@ Arc. Pinned tabs past the limit, and every other tab, keep their normal rows bel
   again. If the tile was the active tab, the most recently used tab takes its place.
 - Hovering a tile shows its title in Vivaldi's tooltip.
 
-To have the same Favorites in every workspace, pin the tabs and keep them in all workspaces (see
-[native settings](docs/native-settings.md#favorites-and-pinned-tabs)).
+Tiles are the pinned tabs of the current workspace: Vivaldi 8.2 cannot show one tab in every
+workspace. Favorites shared by every workspace come with
+[spec 003](specs/003-pinned-tabs-and-folders/spec.md).
 
 Options of `favorites-grid` in `config.json`:
 
