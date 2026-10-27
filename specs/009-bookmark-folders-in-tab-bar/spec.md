@@ -83,8 +83,9 @@ for a later spec.
   root, so that [008](../008-folder-hover-preview/spec.md) can show them.
 - **FR-10.** Options in `config.json`: `enabled` (true), `root` (the folder to show, as a path of
   titles separated by `/`, for example `Importati da Firefox/Bookmarks Bar`; `VivArcDi` by default),
-  `maxDepth` (3). The path is searched from the top of the bookmarks tree and the first folder that
-  matches is used. IF no folder matches, THEN the section stays hidden and the reason is logged.
+  `maxDepth` (3). The path is searched from the top of the bookmarks tree, titles compared exactly
+  (`Bookmarks Bar` and `Bookmarks bar` are different folders in Tore's bookmarks), and the first
+  folder that matches is used. IF no folder matches, THEN the section stays hidden and the reason is logged.
 
 ### Non-functional
 
@@ -136,10 +137,14 @@ for a later spec.
 - [x] **Open tab and list of tabs.** The opened link also stays in Vivaldi's list of tabs, with a dot
   in the folder (Tore, 2026-10-27).
 - [x] **Subfolders.** Open inside the parent up to 3 levels (Tore, 2026-10-27).
-- [ ] **Prototype before the design.** Three things must be checked on a real Vivaldi: `chrome.bookmarks`
-  can be read from the interface; an element added to the tab bar survives Vivaldi's redraws; the
-  section can follow the auto-hide sidebar. A probe script is in the project files
-  (`phase-3/diagnostica-segnalibri.js`). It blocks the design, not the approval of this spec.
+- [ ] **Prototype before the design.** First probe, run by Tore on Vivaldi 8.2 on 2026-10-27:
+  `chrome.bookmarks` is readable with its four change events, and an element added above the tab list
+  survived a change of workspace. Still to check with the second probe
+  (`phase-3/diagnostica-segnalibri-2.js`): the Favorites grid lives inside the tab list, so the
+  section must be added inside it, right after the last pinned tab, and it must survive opening and
+  closing tabs, pinning and the auto-hide sidebar. If it does not, the fallback is to draw the section
+  above the tab list, which puts it above the Favorites grid instead of below. It blocks the design,
+  not the approval of this spec.
 
 ## References
 
