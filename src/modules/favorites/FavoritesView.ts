@@ -141,8 +141,7 @@ export class FavoritesView {
   }
 
   #favoriteAt(target: EventTarget | null): Favorite | undefined {
-    const tile = target instanceof Element ? target.closest(`[${TILE_ATTRIBUTE}]`) : null;
-    const id = tile?.getAttribute(TILE_ATTRIBUTE);
+    const id = (target as Element | null)?.closest(`[${TILE_ATTRIBUTE}]`)?.getAttribute(TILE_ATTRIBUTE);
     return id === null || id === undefined ? undefined : this.#favorites.get(id);
   }
 }
