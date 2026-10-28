@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft (revision of 2026-10-28; first version approved) |
+| Status | Approved (revision approved 2026-10-28) |
 | Spec | [spec.md](spec.md) |
 
 ## Approach

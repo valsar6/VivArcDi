@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft (T13 to T20 added on 2026-10-28) |
+| Status | Approved (T13 to T21 approved 2026-10-28) |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
