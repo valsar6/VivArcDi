@@ -1,0 +1,27 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-toast] {
+  position: fixed;
+  z-index: 60;
+  bottom: 24px;
+  left: 50%;
+  padding: 8px 14px;
+  border-radius: 8px;
+  opacity: 0;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--colorFg, #fff);
+  font-size: 13px;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity 160ms ease, transform 160ms ease;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-toast][data-vivarcdi-visible] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@starting-style {
+  #browser[data-vivarcdi-active] [data-vivarcdi-toast][data-vivarcdi-visible] {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}

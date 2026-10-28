@@ -1,4 +1,5 @@
 const OWN_KEY = "vivarcdi";
+const STACK_KEY = "group";
 class TabData {
   /**
    * Reads the workspace a tab belongs to from Vivaldi's `vivExtData`.
@@ -9,6 +10,17 @@ class TabData {
   static of(tab) {
     const id = TabData.#parse(tab.vivExtData)["workspaceId"];
     return typeof id === "number" || typeof id === "string" ? String(id) : null;
+  }
+  /**
+   * Reads the tab stack a tab belongs to from Vivaldi's `vivExtData`. The key is still to be
+   * confirmed on Vivaldi 8.2, so it is read here and nowhere else.
+   *
+   * @param tab A tab.
+   * @returns The stack id, or null for a tab outside any stack.
+   */
+  static stackOf(tab) {
+    const id = TabData.extDataOf(tab)[STACK_KEY];
+    return typeof id === "string" && id !== "" || typeof id === "number" ? String(id) : null;
   }
   /**
    * A tab outside any workspace, like a Favorite pinned in every workspace, is shared by all.
@@ -54,10 +66,11 @@ class TabData {
     if (typeof own !== "object" || own === null) {
       return {};
     }
-    const { favoriteId, pinnedUrl } = own;
+    const { favoriteId, pinnedUrl, lastActive } = own;
     return {
       ...typeof favoriteId === "string" ? { favoriteId } : {},
-      ...typeof pinnedUrl === "string" ? { pinnedUrl } : {}
+      ...typeof pinnedUrl === "string" ? { pinnedUrl } : {},
+      ...typeof lastActive === "number" && Number.isFinite(lastActive) ? { lastActive } : {}
     };
   }
   /**

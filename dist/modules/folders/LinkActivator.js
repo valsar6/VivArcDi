@@ -1,7 +1,9 @@
 import { TabData } from "../../core/TabData.js";
+import { WorkspaceTabs } from "../../core/WorkspaceTabs.js";
 import { UnloadedTabs } from "../favorites/UnloadedTabs.js";
 class LinkActivator {
   #tabs;
+  #workspaceTabs;
   #openLinks;
   #logger;
   /**
@@ -13,6 +15,7 @@ class LinkActivator {
    */
   constructor(tabs, openLinks, logger) {
     this.#tabs = tabs;
+    this.#workspaceTabs = new WorkspaceTabs(tabs, logger);
     this.#openLinks = openLinks;
     this.#logger = logger;
   }
@@ -41,15 +44,7 @@ class LinkActivator {
   }
   async #open(url) {
     const [active] = await this.#tabs.query({ active: true, currentWindow: true });
-    const created = await this.#tabs.create({ url, active: true });
-    const workspace = active === void 0 ? null : TabData.of(active);
-    if (workspace !== null && created.id !== void 0) {
-      try {
-        await this.#tabs.update(created.id, { vivExtData: TabData.withWorkspace(TabData.dataOf(created), workspace) });
-      } catch (error) {
-        this.#logger.warn("could not put the new tab in the current workspace", error);
-      }
-    }
+    await this.#workspaceTabs.open(url, active === void 0 ? null : TabData.of(active));
   }
 }
 export {

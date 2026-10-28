@@ -5,7 +5,9 @@
     "styles/folder-preview.css",
     "styles/folders.css",
     "styles/peek.css",
-    "styles/pinned.css"
+    "styles/pinned.css",
+    "styles/today.css",
+    "styles/toast.css"
   ],
   "modules": {
     "activation-marker": {
@@ -46,6 +48,15 @@
       "enabled": true,
       "resetButton": true,
       "unloadOnClose": true
+    },
+    "today-archive": {
+      "enabled": true,
+      "archiveAfterHours": 12,
+      "archiveLimit": 500
+    },
+    "copy-url": {
+      "enabled": true,
+      "toastMs": 2000
     }
   }
 }

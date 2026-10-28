@@ -1,6 +1,7 @@
 {
   "browser": "#browser",
   "tabBar": "#tabs-tabbar-container",
+  "tabsContainer": "#tabs-container",
   "verticalTabBar": "#tabs-tabbar-container:is(.left, .right)",
   "tabListHost": "#tabs-container > :has(> .tab-strip)",
   "tabStrip": "#tabs-container .tab-strip",

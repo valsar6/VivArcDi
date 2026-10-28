@@ -6,10 +6,13 @@ class PersistentStorage {
   #host;
   #logger;
   #warned = false;
+  #onChanged = (changes, areaName) => this.#follow(changes, areaName);
   /**
    * Strings that survive a restart of Vivaldi, readable and writable without waiting. Everything
    * VivArcDi saved is read once when it starts and kept in memory; a write changes the memory at
-   * once and reaches `chrome.storage.local` right after. Use `open`, which chooses the medium.
+   * once and reaches `chrome.storage.local` right after. A change another window makes to
+   * `chrome.storage.local` updates the memory too; that listener lives as long as the window.
+   * Use `open`, which chooses the medium.
    *
    * @param initial What was saved before.
    * @param area The `chrome.storage.local` area to write to, or null to keep values in memory only.
@@ -21,6 +24,9 @@ class PersistentStorage {
     this.#area = area;
     this.#host = host;
     this.#logger = logger;
+    if (area !== null) {
+      host?.storage?.onChanged?.addListener(this.#onChanged);
+    }
   }
   /**
    * Opens the best storage the interface offers. Vivaldi 8.2's `window.html` has no usable
@@ -93,6 +99,21 @@ class PersistentStorage {
         resolve(new Map(saved));
       });
     });
+  }
+  #follow(changes, areaName) {
+    if (areaName !== "local") {
+      return;
+    }
+    for (const [key, change] of Object.entries(changes)) {
+      if (!key.startsWith(KEY_PREFIX)) {
+        continue;
+      }
+      if (change.newValue === void 0) {
+        this.#cache.delete(key);
+      } else if (typeof change.newValue === "string") {
+        this.#cache.set(key, change.newValue);
+      }
+    }
   }
   #checkWrite() {
     const error = this.#host?.runtime?.lastError;

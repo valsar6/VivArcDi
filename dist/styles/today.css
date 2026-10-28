@@ -1,0 +1,162 @@
+#browser[data-vivarcdi-active] :is([data-vivarcdi-archive], [data-vivarcdi-archive-footer], [data-vivarcdi-clear]) {
+  -webkit-app-region: no-drag;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] {
+  --vivarcdi-archive-highlight: color-mix(in srgb, var(--colorFg, #fff) 16%, transparent);
+  --vivarcdi-archive-field: color-mix(in srgb, var(--colorFg, #fff) 8%, transparent);
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 340px;
+  max-height: 70vh;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-inline: 4px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-heading {
+  font-weight: 600;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] button {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius);
+  background-color: var(--vivarcdi-archive-field);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] button:hover {
+  background-color: var(--vivarcdi-archive-highlight);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius);
+  outline: none;
+  background-color: var(--vivarcdi-archive-field);
+  color: inherit;
+  font: inherit;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-list {
+  overflow-y: auto;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-day {
+  padding: 8px 8px 4px;
+  opacity: 0.65;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] [role=option] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 44px;
+  padding-inline: 8px;
+  border-radius: var(--vivarcdi-radius);
+  cursor: default;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] [role=option]:hover, #browser[data-vivarcdi-active] [data-vivarcdi-archive] [role=option][data-vivarcdi-highlight] {
+  background-color: var(--vivarcdi-archive-highlight);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-letter {
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  background-color: var(--vivarcdi-archive-field);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-title,
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-meta {
+  opacity: 0.65;
+  font-size: 11px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive] .vivarcdi-archive-empty {
+  padding: 8px;
+  opacity: 0.65;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-pinned-last] [data-vivarcdi-clear] {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  height: 13px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--colorFg, inherit);
+  font: inherit;
+  font-size: 11px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-pinned-last] [data-vivarcdi-clear]:hover, #browser[data-vivarcdi-active] [data-vivarcdi-pinned-last] [data-vivarcdi-clear]:focus-visible {
+  opacity: 0.8;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-archive-footer] {
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 8px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive-footer] button {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius);
+  background: transparent;
+  color: var(--colorFg, inherit);
+  font: inherit;
+  font-size: 12px;
+  text-align: start;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: background-color var(--vivarcdi-transition), opacity var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-archive-footer] button:hover {
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 10%, transparent);
+  opacity: 1;
+}
