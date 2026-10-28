@@ -1,5 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { OwnPage } from '../../core/OwnPage.js';
+import { TabDataWriter } from '../../core/TabDataWriter.js';
 import { TabData } from '../../core/TabData.js';
 import type { OwnTabChanges } from '../../core/TabData.js';
 
@@ -9,6 +10,7 @@ const WEB_URL = /^https?:\/\//i;
 
 export class SavedAddresses {
   #tabs: SavedAddressTabs;
+  #writer: TabDataWriter;
 
   /**
    * Keeps the own page of pinned tabs in their `vivExtData`, under VivArcDi's key, so it
@@ -18,6 +20,7 @@ export class SavedAddresses {
    */
   constructor(tabs: SavedAddressTabs) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
 
   /**
@@ -44,11 +47,11 @@ export class SavedAddresses {
    * @param tabId The tab.
    */
   public async forget(tabId: number): Promise<void> {
-    const tab = await this.#tabs.get(tabId);
-    const { favoriteId, pinnedUrl } = TabData.ownOf(tab);
-    if (favoriteId !== undefined || pinnedUrl !== undefined) {
-      await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(tab, { favoriteId: undefined, pinnedUrl: undefined }) });
-    }
+    await this.#writer.write(tabId, (tab) => {
+      const { favoriteId, pinnedUrl } = TabData.ownOf(tab);
+      const linked = favoriteId !== undefined || pinnedUrl !== undefined;
+      return linked ? TabData.withOwn(tab, { favoriteId: undefined, pinnedUrl: undefined }) : null;
+    });
   }
 
   /**
@@ -64,7 +67,6 @@ export class SavedAddresses {
   }
 
   async #rewrite(tabId: number, changes: OwnTabChanges): Promise<void> {
-    const tab = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(tab, changes) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, changes));
   }
 }
