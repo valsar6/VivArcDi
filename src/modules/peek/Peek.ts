@@ -1,5 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { DomQuery } from '../../core/DomQuery.js';
+import { KeptTab } from '../../core/KeptTab.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';
@@ -46,7 +47,7 @@ export class Peek extends Module {
 
   /**
    * Opens links in Peek, a floating panel over the current page that shows the real page:
-   * on Shift+click, and on links that leave the site of a pinned tab.
+   * on Shift+click, and on links that leave the site of a pinned tab, a Favorite or the tab of a folder link.
    * Without `chrome.tabs` the module stays off and links behave as usual.
    *
    * @param context What the module may use.
@@ -131,7 +132,7 @@ export class Peek extends Module {
       scriptFor: async (tabId) =>
         scripts.installLinks({
           triggers: { shiftClick, pinnedCrossSite, anyCrossSite },
-          pinned: (await tabs.get(tabId)).pinned,
+          pinned: KeptTab.is(await tabs.get(tabId)),
           tabId,
           token: this.#token,
         }),
@@ -148,7 +149,7 @@ export class Peek extends Module {
     }
     this.#unsubscribe.push(
       tabs.onUpdated((tabId, change) => {
-        if (change.pinned !== undefined) {
+        if (change.pinned !== undefined || 'vivExtData' in change) {
           this.#injector?.refresh(tabId);
         }
       }),

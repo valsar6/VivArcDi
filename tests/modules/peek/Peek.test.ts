@@ -47,7 +47,7 @@ const selectors = new SelectorCatalog(
 );
 const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
-function setUp(): {
+function setUp(tab: { pinned?: boolean; vivExtData?: string } = { pinned: true }): {
   context: ModuleContext;
   document: FakeDocument;
   container: FakeElement;
@@ -60,7 +60,7 @@ function setUp(): {
   container.append(webview);
   const document = new FakeDocument({ '#webview-container': container });
   const messages = new FakeEvent<RuntimeMessageListener>();
-  const tabs = new ActivatableTabs([{ id: 1, pinned: true, index: 0, windowId: 1 }]);
+  const tabs = new ActivatableTabs([{ ...tab, id: 1, index: 0, windowId: 1 }]);
   const context = {
     document,
     selectors,
@@ -87,6 +87,15 @@ test('peek module injects the page script with the tab policy', async () => {
   const code = webview.executed[0] ?? '';
   assert.match(code, /^LINKS\nVivArcDiPeekLinks\.install\(/);
   assert.match(code, /"pinned":true,"tabId":1/);
+  peek.stop();
+});
+
+test('peek module gives the tab of a folder link the policy of a pinned tab', async () => {
+  const { context, webview } = setUp({ vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11' } }) });
+  const peek = new Peek();
+  await peek.start(context);
+  await settle();
+  assert.match(webview.executed[0] ?? '', /"pinned":true,"tabId":1/);
   peek.stop();
 });
 
