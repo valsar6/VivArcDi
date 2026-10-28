@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-27 (first version); revision of 2026-10-28 awaiting approval |
+| Approved | 2026-10-27; revision approved 2026-10-28 |
 
 ## Summary
 
