@@ -5,7 +5,7 @@ import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
 import { UnloadedTabs } from '../favorites/UnloadedTabs.js';
 import type { OpenLinks } from './OpenLinks.js';
 
-export type ActivatorTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'create' | 'update' | 'remove'>;
+export type ActivatorTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'create' | 'get' | 'update' | 'remove'>;
 
 export class LinkActivator {
   #tabs: ActivatorTabs;

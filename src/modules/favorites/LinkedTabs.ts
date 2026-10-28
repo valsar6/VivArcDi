@@ -1,4 +1,5 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import { TabDataWriter } from '../../core/TabDataWriter.js';
 import { TabData } from '../../core/TabData.js';
 import type { OwnTabChanges } from '../../core/TabData.js';
 import type { Favorite } from './FavoritesFolder.js';
@@ -18,6 +19,7 @@ export type LinkedTabsApi = Pick<BrowserTabs, 'query' | 'get' | 'update'>;
 
 export class LinkedTabs {
   #tabs: LinkedTabsApi;
+  #writer: TabDataWriter;
 
   /**
    * Knows which tabs are linked to which Favorite. The link is the bookmark id that
@@ -27,6 +29,7 @@ export class LinkedTabs {
    */
   constructor(tabs: LinkedTabsApi) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
 
   /**
@@ -67,11 +70,10 @@ export class LinkedTabs {
    * @param workspaceId Raw workspace id to give the tab, or undefined to leave it.
    */
   public async link(tabId: number, favorite: Favorite, workspaceId: unknown): Promise<void> {
-    const tab = await this.#tabs.get(tabId);
     const extra = workspaceId === undefined ? {} : { workspaceId };
-    await this.#tabs.update(tabId, {
-      vivExtData: TabData.withOwn(tab, { favoriteId: favorite.id, pinnedUrl: favorite.url }, extra),
-    });
+    await this.#writer.write(tabId, (tab) =>
+      TabData.withOwn(tab, { favoriteId: favorite.id, pinnedUrl: favorite.url }, extra),
+    );
   }
 
   /**
@@ -99,8 +101,7 @@ export class LinkedTabs {
   }
 
   async #rewrite(tabId: number, changes: OwnTabChanges): Promise<void> {
-    const fresh = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(fresh, changes) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, changes));
   }
 
   static #preferred(candidate: chrome.tabs.Tab, current: chrome.tabs.Tab | undefined): boolean {

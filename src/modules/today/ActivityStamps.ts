@@ -1,11 +1,13 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
+import { TabDataWriter } from '../../core/TabDataWriter.js';
 import { TabData } from '../../core/TabData.js';
 
 export type StampTabs = Pick<BrowserTabs, 'get' | 'query' | 'update' | 'onActivated' | 'onCreated' | 'onRemoved'>;
 
 export class ActivityStamps {
   #tabs: StampTabs;
+  #writer: TabDataWriter;
   #now: () => number;
   #logger: Logger;
   #active = new Map<number, number>();
@@ -23,6 +25,7 @@ export class ActivityStamps {
    */
   constructor(tabs: StampTabs, now: () => number, logger: Logger) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
     this.#now = now;
     this.#logger = logger;
   }
@@ -60,8 +63,7 @@ export class ActivityStamps {
    */
   public async stamp(tabId: number): Promise<void> {
     try {
-      const tab = await this.#tabs.get(tabId);
-      await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(tab, { lastActive: this.#now() }) });
+      await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { lastActive: this.#now() }));
     } catch (error) {
       this.#logger.warn(`could not record when tab ${tabId} was last active`, error);
     }

@@ -1,10 +1,12 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import { TabDataWriter } from '../../core/TabDataWriter.js';
 import { TabData } from '../../core/TabData.js';
 
 export type TabLinksApi = Pick<BrowserTabs, 'query' | 'get' | 'update'>;
 
 export class TabLinks {
   #tabs: TabLinksApi;
+  #writer: TabDataWriter;
 
   /**
    * Writes the link between a tab and a bookmark into the tab's `vivExtData`, where it survives a
@@ -14,6 +16,7 @@ export class TabLinks {
    */
   constructor(tabs: TabLinksApi) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
 
   /**
@@ -42,7 +45,6 @@ export class TabLinks {
   }
 
   async #write(tabId: number, bookmarkId: string | undefined): Promise<void> {
-    const fresh = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(fresh, { bookmarkId }) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { bookmarkId }));
   }
 }

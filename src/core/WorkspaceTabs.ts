@@ -1,12 +1,14 @@
 import type { BrowserTabs } from './BrowserTabs.js';
 import type { Logger } from './Logger.js';
+import { TabDataWriter } from './TabDataWriter.js';
 import { TabData } from './TabData.js';
 import type { OwnTabChanges } from './TabData.js';
 
-export type WorkspaceTabsApi = Pick<BrowserTabs, 'create' | 'update'>;
+export type WorkspaceTabsApi = Pick<BrowserTabs, 'create' | 'get' | 'update'>;
 
 export class WorkspaceTabs {
   #tabs: WorkspaceTabsApi;
+  #writer: TabDataWriter;
   #logger: Logger;
 
   /**
@@ -17,12 +19,13 @@ export class WorkspaceTabs {
    */
   constructor(tabs: WorkspaceTabsApi, logger: Logger) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
     this.#logger = logger;
   }
 
   /**
    * Opens an address in a new active tab, then writes the workspace and VivArcDi's own values into
-   * its `vivExtData` with one update. When they cannot be written, the tab stays where Vivaldi
+   * its `vivExtData` in one write that reads the tab again. When they cannot be written, the tab stays where Vivaldi
    * put it.
    *
    * @param url The address to open.
@@ -35,7 +38,7 @@ export class WorkspaceTabs {
     if ((workspace !== null || Object.keys(own).length > 0) && created.id !== undefined) {
       try {
         const extra = workspace === null ? {} : { workspaceId: TabData.rawWorkspace(workspace) };
-        await this.#tabs.update(created.id, { vivExtData: TabData.withOwn(created, own, extra) });
+        await this.#writer.write(created.id, (tab) => TabData.withOwn(tab, own, extra));
       } catch (error) {
         this.#logger.warn('could not store the workspace and link of the new tab', error);
       }

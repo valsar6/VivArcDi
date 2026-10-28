@@ -1,8 +1,9 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import { TabDataWriter } from '../../core/TabDataWriter.js';
 import { TabData } from '../../core/TabData.js';
 
 export class TabTiler {
-  #tabs: Pick<BrowserTabs, 'get' | 'update'>;
+  #writer: TabDataWriter;
   #newId: () => string;
 
   /**
@@ -13,7 +14,7 @@ export class TabTiler {
    * @param newId Creates the id of a tiling group.
    */
   constructor(tabs: Pick<BrowserTabs, 'get' | 'update'>, newId: () => string = () => crypto.randomUUID()) {
-    this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
     this.#newId = newId;
   }
 
@@ -29,7 +30,6 @@ export class TabTiler {
   }
 
   async #mark(tabId: number, tiling: Record<string, unknown>): Promise<void> {
-    const tab = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.with(tab, 'tiling', tiling) });
+    await this.#writer.write(tabId, (tab) => TabData.with(tab, 'tiling', tiling));
   }
 }
