@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-28 |
 
 ## Summary
 
@@ -121,11 +121,11 @@ Later specs, in Tore's priority order of 2026-10-28:
 
 ## Open questions
 
-- [ ] **What does a click do?** Proposed: a click anywhere on the header toggles it, the arrow only
-  shows the state. In Arc only the arrow toggles; a whole-row target is easier to hit.
-- [ ] **Default area name?** Proposed: `Tabs`. Alternative: no header outside a workspace.
-- [ ] **Unloaded but active pinned tab?** Proposed: the active tab always stays visible, even when
-  Vivaldi reports it unloaded.
+- [x] **What does a click do?** A click anywhere on the header toggles it; the arrow only shows the
+  state (Tore, 2026-10-28).
+- [x] **Default area name?** `Tabs` (Tore, 2026-10-28).
+- [x] **Unloaded but active pinned tab?** The active tab always stays visible, even when Vivaldi
+  reports it unloaded (Tore, 2026-10-28).
 
 ## References
 
