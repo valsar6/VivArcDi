@@ -29,11 +29,13 @@ export class HiddenTabMarker {
   #watch: StripWatcher;
   #task: FrameTask;
   #stops: Array<() => void> = [];
+  #collapsed = new WeakSet<Element>();
 
   /**
-   * Marks the slots of Vivaldi's tab strip whose tab is hidden, so that a stylesheet can take them
-   * out of the list. The marks are data attributes, which Vivaldi's redraws of the strip leave
-   * alone; the marker still repeats them after every change of the strip, for slots that are new.
+   * Marks the slots of Vivaldi's tab strip whose tab is hidden and takes them out of the list. The
+   * marks are data attributes, which Vivaldi's redraws of the strip leave alone, and the slots are
+   * collapsed with an inline style, since Vivaldi's own `!important` rules beat a stylesheet. The
+   * marker repeats both after every change of the strip, for slots that are new.
    * Several markers may run at once, since each one writes the marks the shared set asks for.
    *
    * @param document The browser window document.
@@ -71,7 +73,7 @@ export class HiddenTabMarker {
   }
 
   /**
-   * Marks the slots of hidden tabs and unmarks the others.
+   * Marks and collapses the slots of hidden tabs and restores the others.
    */
   public apply(): void {
     const strip = this.#document.querySelector(this.#selectors.get('tabStrip'));
@@ -81,7 +83,18 @@ export class HiddenTabMarker {
     const wrapper = this.#selectors.get('tabWrapper');
     for (const slot of strip.children) {
       const tabId = TabSlot.idOf(slot, wrapper);
-      slot.toggleAttribute(HIDDEN_ATTRIBUTE, tabId !== null && this.#hidden.has(tabId));
+      const hidden = tabId !== null && this.#hidden.has(tabId);
+      slot.toggleAttribute(HIDDEN_ATTRIBUTE, hidden);
+      this.#collapse(slot as HTMLElement, hidden);
+    }
+  }
+
+  #collapse(slot: HTMLElement, hidden: boolean): void {
+    if (hidden) {
+      slot.style.setProperty('display', 'none', 'important');
+      this.#collapsed.add(slot);
+    } else if (this.#collapsed.delete(slot)) {
+      slot.style.removeProperty('display');
     }
   }
 }
