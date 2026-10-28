@@ -106,13 +106,15 @@ recently used order, documented in [docs/native-settings.md](../../docs/native-s
 
 ## Open questions
 
-Proposed answers are already written above; Tore confirms or changes them.
+Answered by Tore on 2026-10-28; every proposal was accepted.
 
-- [ ] Own archive in `chrome.storage.local` instead of Vivaldi's "recently closed"? Proposed: yes.
-- [ ] Tabs opened from a bookmark folder (009) are archived like any Today tab? Proposed: yes.
-- [ ] Archive in its own panel, button at the bottom of the tab bar and Cmd/Ctrl+Shift+A? Proposed: yes.
-- [ ] VivArcDi handles Cmd/Ctrl+Shift+C with a toast, overriding Vivaldi's binding? Proposed: yes.
-- [ ] Defaults 12 hours and 500 entries? Proposed: yes.
+- [x] Own archive in `chrome.storage.local` instead of Vivaldi's "recently closed": yes.
+- [x] Tabs opened from a bookmark folder (009) are archived like any Today tab: yes.
+- [x] Archive in its own panel, button at the bottom of the tab bar and Cmd/Ctrl+Shift+A: yes, in the
+  style of the existing folder panel.
+- [x] VivArcDi handles Cmd/Ctrl+Shift+C with a toast: yes. Vivaldi's own command creation stays an
+  option if a later need arises.
+- [x] Defaults 12 hours and 500 entries, divider with "Clear": yes.
 
 ## References
 
