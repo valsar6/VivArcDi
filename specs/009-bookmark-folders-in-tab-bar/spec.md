@@ -23,7 +23,7 @@ Revised with Tore on 2026-10-28, after a screen recording of 0.8.0: a click on `
 Development` opened a `Jira` tab in the list of today's tabs, and `MahjongSoul` showed both in the
 `Hobbies` folder and in the list. Tore wants the open tabs to be the rows of the Favorites, the pinned
 tabs and the folders, never a new tab in the list. The first version left this out on purpose; this
-revision brings it in (FR-12 to FR-16, AC-19 to AC-25).
+revision brings it in (FR-12 to FR-17, AC-19 to AC-26).
 
 ## User stories
 
@@ -127,6 +127,8 @@ Favorite.
   that has no tab becomes its tab.
 - **FR-15.** Closing the tab of a link closes it; the link returns inside its closed folder.
 - **FR-16.** The Today archive of 004 skips the tabs of links.
+- **FR-17.** Peek of 002 treats the tab of a link as a Favorite or pinned tab: a click on a link to
+  another site opens in Peek (option `pinnedCrossSite`).
 
 ### Non-functional
 
@@ -169,6 +171,7 @@ Favorite.
 | AC-23 | WHEN the user closes the tab of a link from its row, THE module SHALL close the tab. | auto: `closes the tab of a link from its row` |
 | AC-24 | THE Today archive SHALL never archive the tab of a link. | auto: `does not archive the tab of a link` |
 | AC-25 | WHEN Tore clicks `Board Rame Development` and logs in through `id.atlassian.com`, THE tab list SHALL show no new tab and the link row SHALL show the active page. | manual |
+| AC-26 | WHEN the user clicks a link to another site in the tab of a link, THE page SHALL open in Peek and the tab SHALL keep its page. | manual |
 
 ## Out of scope
 
@@ -198,13 +201,14 @@ Favorite.
 - [x] **Height of the section.** The whole column scrolls as one, as in Arc (Tore, 2026-10-27, with
   screenshots of Arc). FR-11 keeps the requirement; the design explains how far Vivaldi's layout allows it.
 
-- [ ] **Closing.** Proposed: Cmd/Ctrl+W and the close button close the tab of a link, as in Arc.
-  Alternative: unload it like a Favorite in 003, keeping the dot dimmed.
-- [ ] **Leaving the site.** Proposed: the tab stays linked whatever page it shows, as in Arc; the
-  favicon click of 003 that resets a pinned tab also brings it back to the bookmark's address.
-  Alternative: unlink the tab when it leaves the bookmark's site, so it goes back to the list.
-- [ ] **Tabs already open.** Proposed: at start-up an open tab with the address of a link becomes its
-  tab and leaves the list. Alternative: only tabs opened after the update are linked.
+- [x] **Closing.** Cmd/Ctrl+W and the close button close the tab of a link: the link goes back inside
+  its folder and is no longer highlighted (Tore, 2026-10-28).
+- [x] **Leaving the site.** A click on a link to another site opens it in Peek, the window linked to
+  the tab of [002](../002-peek/spec.md), as for Favorites and pinned tabs; the tab stays on its site
+  and stays linked. A redirect is not a click, so the tab follows it and stays linked (Tore,
+  2026-10-28).
+- [x] **Tabs already open.** At start-up an open tab with the address of a link becomes its tab and
+  leaves the list; to be tried on Vivaldi (Tore, 2026-10-28).
 
 ## References
 
