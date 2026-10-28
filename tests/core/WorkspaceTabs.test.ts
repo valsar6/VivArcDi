@@ -16,6 +16,15 @@ test('opens an active tab and puts it in the given workspace', async () => {
   ]);
 });
 
+test('stores the values of VivArcDi together with the workspace in one update', async () => {
+  const tabs = new FolderTabs();
+  await new WorkspaceTabs(tabs, silentLogger()).open(URL, '7', { bookmarkId: '11' });
+  assert.deepEqual(tabs.actions(), [
+    ['create', { url: URL, active: true }],
+    ['update', 100, { vivExtData: JSON.stringify({ workspaceId: 7, vivarcdi: { bookmarkId: '11' } }) }],
+  ]);
+});
+
 test('leaves a tab without a workspace where Vivaldi puts it', async () => {
   const tabs = new FolderTabs();
   await new WorkspaceTabs(tabs, silentLogger()).open(URL, null);
