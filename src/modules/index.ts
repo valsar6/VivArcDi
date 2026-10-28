@@ -7,6 +7,7 @@ import { FolderPreview } from './folderpreview/FolderPreview.js';
 import { Peek } from './peek/Peek.js';
 import { PinnedTabs } from './pinned/PinnedTabs.js';
 import { ReopenPinned } from './reopen/ReopenPinned.js';
+import { SpaceHeader } from './spaceheader/SpaceHeader.js';
 import { TodayArchive } from './today/TodayArchive.js';
 
 /**
@@ -16,5 +17,5 @@ import { TodayArchive } from './today/TodayArchive.js';
  * @returns A registry with all built-in modules.
  */
 export function createDefaultRegistry(): ModuleRegistry {
-  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(PinnedTabs).register(ReopenPinned).register(BookmarkFolders).register(FolderPreview).register(TodayArchive).register(CopyUrl);
+  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(PinnedTabs).register(ReopenPinned).register(BookmarkFolders).register(FolderPreview).register(TodayArchive).register(CopyUrl).register(SpaceHeader);
 }

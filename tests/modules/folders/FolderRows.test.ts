@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { FolderRows } from '../../../src/modules/folders/FolderRows.js';
-import type { Row } from '../../../src/modules/folders/FolderRows.js';
+import type { Row, RowSources } from '../../../src/modules/folders/FolderRows.js';
 import { FolderTree } from '../../../src/modules/folders/FolderTree.js';
 import { OpenFolders } from '../../../src/modules/folders/OpenFolders.js';
 import type { LinkRef, OpenTab } from '../../../src/modules/folders/OpenLinks.js';
@@ -21,6 +21,8 @@ const entries = FolderTree.build(
 
 const describe = (rows: Row[]): string[] => rows.map((row) => `${row.depth}:${row.title}${row.kind === 'link' && row.tab ? '*' : ''}`);
 
+const isLink = (row: Row): boolean => row.kind === 'link';
+
 const tabOf = (key: string | null, title?: string): OpenTab => ({ tabId: 1, title, key, favIconUrl: undefined, active: false, unloaded: false });
 
 const tabFor = (...open: string[]) => (link: LinkRef): OpenTab | undefined => (open.includes(link.key) ? tabOf(link.key) : undefined);
@@ -34,6 +36,21 @@ test('marks open links and keeps them visible below a closed folder', () => {
 
   const opened = FolderRows.build(entries, { isOpen: (id) => id === '10', tabFor: tabFor('nixos.org/manual') });
   assert.deepEqual(describe(opened), ['0:Hobbies', '1:Mahjong Soul', '1:Nix', '2:Nix manual*', '0:Music']);
+});
+
+test('hides folders and closed links while collapsed', () => {
+  assert.deepEqual(describe(FolderRows.build(entries, { isOpen: () => true, tabFor: tabFor() }, true)), []);
+});
+
+test('keeps open links visible while collapsed', () => {
+  const sources: RowSources = { isOpen: () => true, tabFor: tabFor('nixos.org/manual', 'radio.example') };
+  const rows = FolderRows.build(entries, sources, true);
+  assert.deepEqual(describe(rows), ['1:Nix manual*', '1:Radio*']);
+  assert.deepEqual(describe(rows), describe(FolderRows.build(entries, { ...sources, isOpen: (): boolean => false }).filter(isLink)));
+
+  const atRoot = FolderTree.build([link('1', 'Top', 'https://top.example/'), folder('2', 'F', [link('3', 'In', 'https://in.example/')])], 3);
+  const top = FolderRows.build(atRoot, { isOpen: () => false, tabFor: tabFor('top.example', 'in.example') }, true);
+  assert.deepEqual(describe(top), ['0:Top*', '1:In*']);
 });
 
 test('a link whose tab shows another page takes the title of that page', () => {

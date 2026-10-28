@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ActiveWorkspace } from '../../../src/modules/folders/ActiveWorkspace.js';
-import { silentLogger, settle } from '../reopen/fakes.js';
-import { FolderTabs } from './fakes.js';
+import { ActiveWorkspace } from '../../src/core/ActiveWorkspace.js';
+import { silentLogger, settle } from '../modules/reopen/fakes.js';
+import { FolderTabs } from '../modules/folders/fakes.js';
 
 const inWorkspace = (workspaceId: number): string => JSON.stringify({ workspaceId });
 

@@ -70,3 +70,22 @@ test('has no names and logs once when the preferences are missing or malformed',
   assert.equal(malformed.nameOf('2'), 'Ok');
   assert.equal(malformed.nameOf('1'), null);
 });
+
+test('answers the icon of a workspace as Vivaldi stores it', async () => {
+  const api = new FakePrefsApi();
+  api.values.set(LIST, [CASETTA, { id: 9, name: 'Bare' }, { id: 10, name: 'Odd', icon: 5 }]);
+  let changes = 0;
+  const names = new WorkspaceNames(new BrowserPrefs(api), () => (changes += 1), recordingLogger().logger);
+  await names.start();
+  assert.equal(names.iconOf(String(CASETTA.id)), 'workspace_icon_1');
+  assert.equal(names.iconOf('9'), null);
+  assert.equal(names.iconOf('10'), null);
+  assert.equal(names.iconOf('404'), null);
+  assert.equal(names.iconOf(null), null);
+
+  api.set(LIST, [{ ...CASETTA, icon: '\u2764' }]);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(names.iconOf(String(CASETTA.id)), '\u2764');
+  assert.equal(changes, 2);
+  names.stop();
+});

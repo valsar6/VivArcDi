@@ -3,13 +3,18 @@ import type { Logger } from './Logger.js';
 
 export type WorkspacePrefs = Pick<BrowserPrefs, 'available' | 'canFollow' | 'get' | 'onChange'>;
 
+interface WorkspaceEntry {
+  name: string;
+  icon: string | null;
+}
+
 const LIST_KEY = 'vivaldi.workspaces.list';
 
 export class WorkspaceNames {
   #prefs: WorkspacePrefs;
   #onChange: () => void;
   #logger: Logger;
-  #names = new Map<string, string>();
+  #workspaces = new Map<string, WorkspaceEntry>();
   #warned = false;
   #unsubscribe: (() => void) | null = null;
 
@@ -56,9 +61,9 @@ export class WorkspaceNames {
    * Reads the list again and reports a change of names.
    */
   public async refresh(): Promise<void> {
-    const names = await this.#read();
-    if (!WorkspaceNames.#same(names, this.#names)) {
-      this.#names = names;
+    const workspaces = await this.#read();
+    if (!WorkspaceNames.#same(workspaces, this.#workspaces)) {
+      this.#workspaces = workspaces;
       this.#onChange();
     }
   }
@@ -68,30 +73,43 @@ export class WorkspaceNames {
    * @returns Its name, or null for no workspace or an unknown one.
    */
   public nameOf(workspaceId: string | null): string | null {
-    return workspaceId === null ? null : (this.#names.get(workspaceId) ?? null);
+    return workspaceId === null ? null : (this.#workspaces.get(workspaceId)?.name ?? null);
   }
 
-  static #same(left: Map<string, string>, right: Map<string, string>): boolean {
-    return left.size === right.size && [...left].every(([id, name]) => right.get(id) === name);
+  /**
+   * The format of the icon is not known: it is returned as Vivaldi stores it, and the caller
+   * decides whether it can be shown.
+   *
+   * @param workspaceId The id of a workspace, as `TabData.of` returns it, or null.
+   * @returns Its `icon` text, or null for no workspace, an unknown one or one without an icon.
+   */
+  public iconOf(workspaceId: string | null): string | null {
+    return workspaceId === null ? null : (this.#workspaces.get(workspaceId)?.icon ?? null);
   }
 
-  static #parse(value: unknown): Map<string, string> {
-    const names = new Map<string, string>();
+  static #same(left: Map<string, WorkspaceEntry>, right: Map<string, WorkspaceEntry>): boolean {
+    return left.size === right.size && [...left].every(([id, { name, icon }]) => right.get(id)?.name === name && right.get(id)?.icon === icon);
+  }
+
+  static #parse(value: unknown): Map<string, WorkspaceEntry> {
+    const workspaces = new Map<string, WorkspaceEntry>();
     for (const item of Array.isArray(value) ? (value as unknown[]) : []) {
       const entry = WorkspaceNames.#entry(item);
-      if (entry !== null && !names.has(entry.id)) {
-        names.set(entry.id, entry.name);
+      if (entry !== null && !workspaces.has(entry.id)) {
+        workspaces.set(entry.id, { name: entry.name, icon: entry.icon });
       }
     }
-    return names;
+    return workspaces;
   }
 
-  static #entry(item: unknown): { id: string; name: string } | null {
-    const { id, name } = (typeof item === 'object' && item !== null ? item : {}) as Record<string, unknown>;
-    return (typeof id === 'number' || typeof id === 'string') && typeof name === 'string' ? { id: String(id), name } : null;
+  static #entry(item: unknown): ({ id: string } & WorkspaceEntry) | null {
+    const { id, name, icon } = (typeof item === 'object' && item !== null ? item : {}) as Record<string, unknown>;
+    return (typeof id === 'number' || typeof id === 'string') && typeof name === 'string'
+      ? { id: String(id), name, icon: typeof icon === 'string' && icon !== '' ? icon : null }
+      : null;
   }
 
-  async #read(): Promise<Map<string, string>> {
+  async #read(): Promise<Map<string, WorkspaceEntry>> {
     if (!this.#prefs.available) {
       this.#warn('vivaldi.prefs is missing: every workspace uses the default root');
       return new Map();
