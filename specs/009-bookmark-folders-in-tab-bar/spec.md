@@ -173,6 +173,7 @@ Favorite.
 | AC-25 | WHEN Tore clicks `Board Rame Development` and logs in through `id.atlassian.com`, THE tab list SHALL show no new tab and the link row SHALL show the active page. | manual |
 | AC-26 | WHEN the user clicks a link to another site in the tab of a link, THE page SHALL open in Peek and the tab SHALL keep its page. | manual |
 | AC-27 | WHILE another module writes the data of the tab of a link at the same time, THE module SHALL keep the bookmark id in the tab. | auto: `keeps the bookmark id when another module writes the tab at the same time` |
+| AC-28 | THE module SHALL collapse the slot of the tab of a link with an inline style, since Vivaldi's own rules beat the stylesheet. | auto: `collapses the slot of a hidden tab with an inline style` |
 
 ## Out of scope
 
