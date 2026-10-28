@@ -41,7 +41,9 @@ that Tore asked for when 009 was approved.
 }
 ```
 
-The section shows the root of the active workspace. When the user switches workspace, the section
+Names come from Vivaldi's own list of workspaces (the preference `vivaldi.workspaces.list`, which
+holds an id and a name for each, e.g. `Casetta`). Tabs outside any workspace, Vivaldi's default area,
+have no name and use `root`. The section shows the root of the active workspace. When the user switches workspace, the section
 changes to the folders of the new one, with its own open and closed folders remembered. A workspace
 with no entry in the map uses `root`, the default root, which is empty out of the box: the section
 shows nothing and takes no space. Tore's current setup (`root` set, no map) keeps working as before.
@@ -56,9 +58,11 @@ The same bookmark shown by two workspaces has an independent tab in each. Bookma
 
 - **FR-1.** The option `workspaces` maps a workspace name to a root folder path; paths use the same
   title-path syntax as `root`.
+- **FR-8.** Workspace names are read from `vivaldi.workspaces.list`; a workspace is matched by name,
+  and a renamed workspace follows its new name.
 - **FR-2.** The section shows the root of the active workspace and follows a change of workspace
   without a restart.
-- **FR-3.** A workspace with no entry uses `root`; with an empty `root` the section is hidden.
+- **FR-3.** A workspace with no entry, and the area outside any workspace, use `root`; with an empty `root` the section is hidden.
 - **FR-4.** Open folders are remembered for each workspace and restored after a restart.
 - **FR-5.** The tab of a link belongs to the workspace in which it was opened, and a link looks for
   its tab only in the active workspace.
@@ -79,8 +83,9 @@ The same bookmark shown by two workspaces has an independent tab in each. Bookma
 | ID | Criterion | Check |
 |---|---|---|
 | AC-1 | THE module SHALL read the root of each workspace from the option `workspaces`. | auto: `reads the root folder of each workspace from the options` |
+| AC-13 | THE module SHALL find the name of the active workspace from the list of workspaces. | auto: `finds the name of the workspace of a tab` |
 | AC-2 | WHEN the active workspace changes, THE section SHALL show the folders of the new workspace's root. | auto: `shows the folders of the active workspace` |
-| AC-3 | WHEN a workspace has no entry, THE section SHALL use `root`. | auto: `falls back to the default root for a workspace with no entry` |
+| AC-3 | WHEN a workspace has no entry or the tab is outside any workspace, THE section SHALL use `root`. | auto: `falls back to the default root for a workspace with no entry` |
 | AC-4 | WHILE the root in use is empty, THE section SHALL be hidden. | auto: `hides the section when the root is empty` |
 | AC-5 | THE module SHALL save the open folders separately for each workspace. | auto: `remembers the open folders of each workspace separately` |
 | AC-6 | WHEN a link is clicked, THE module SHALL look for its tab only in the active workspace. | auto: `looks for the tab of a link only in the active workspace` |
@@ -104,10 +109,9 @@ The same bookmark shown by two workspaces has an independent tab in each. Bookma
 - [x] **Workspace without an entry?** Default root, empty out of the box (Tore, 2026-10-28).
 - [x] **Tab of a link and workspace?** It stays in the workspace where it was opened (Tore,
   2026-10-28).
-- [ ] **How does the module know the name of a workspace?** A tab stores only the workspace id in
-  `vivExtData`. Proposed answer: a probe on Vivaldi 8.2 checks whether the names can be read from
-  Vivaldi's own settings; if so, the map uses names, otherwise it uses the numeric ids that the probe
-  prints. The design waits for the probe result.
+- [x] **How does the module know the name of a workspace?** Probe on Vivaldi 8.2 (Tore, 2026-10-28):
+  `vivaldi.workspaces.list` holds `{ id, name, icon }` (workspace `Casetta`, id `1781382688540`), and a
+  tab stores that id in `vivExtData.workspaceId`; tabs in the default area have none. The map uses names.
 
 ## References
 
