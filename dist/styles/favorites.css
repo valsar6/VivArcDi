@@ -102,10 +102,6 @@
   filter: saturate(0.4);
 }
 
-#browser[data-vivarcdi-active] [data-vivarcdi-hidden] {
-  display: none !important;
-}
-
 #browser[data-vivarcdi-active] [data-vivarcdi-tiles] {
   --vivarcdi-tile-bg: color-mix(in srgb, var(--colorFg, #fff) 8%, transparent);
   --vivarcdi-tile-bg-hover: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);

@@ -41,7 +41,14 @@ class TabData {
    * @returns The new `vivExtData` text.
    */
   static withWorkspace(data, workspace) {
-    return JSON.stringify({ ...TabData.#parse(data), workspaceId: Number.isNaN(Number(workspace)) ? workspace : Number(workspace) });
+    return JSON.stringify({ ...TabData.#parse(data), workspaceId: TabData.rawWorkspace(workspace) });
+  }
+  /**
+   * @param workspace A workspace id as returned by `of`.
+   * @returns The value Vivaldi stores in `vivExtData`: a number when the id is numeric.
+   */
+  static rawWorkspace(workspace) {
+    return Number.isNaN(Number(workspace)) ? workspace : Number(workspace);
   }
   /**
    * @param tab A tab.
@@ -66,9 +73,10 @@ class TabData {
     if (typeof own !== "object" || own === null) {
       return {};
     }
-    const { favoriteId, pinnedUrl, lastActive } = own;
+    const { favoriteId, bookmarkId, pinnedUrl, lastActive } = own;
     return {
       ...typeof favoriteId === "string" ? { favoriteId } : {},
+      ...typeof bookmarkId === "string" ? { bookmarkId } : {},
       ...typeof pinnedUrl === "string" ? { pinnedUrl } : {},
       ...typeof lastActive === "number" && Number.isFinite(lastActive) ? { lastActive } : {}
     };

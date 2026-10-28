@@ -2,30 +2,26 @@ import { TabSlot } from "../../core/TabSlot.js";
 const FAVORITE_ATTRIBUTE = "data-vivarcdi-favorite";
 const UNLOADED_ATTRIBUTE = "data-vivarcdi-unloaded";
 const GRID_ATTRIBUTE = "data-vivarcdi-favorites";
-const HIDDEN_ATTRIBUTE = "data-vivarcdi-hidden";
 class FavoriteTagger {
   #selectors;
   #maxTiles;
   #unloadedTabs;
-  #hiddenTabs;
   #strip = null;
   #tileCount = 0;
   /**
    * Marks the slots of a vertical tab bar: the first pinned tabs as Favorites tiles when the
-   * Favorites come from pinned tabs, and the tabs to hide from the list.
+   * Favorites come from pinned tabs.
    * Marks are data attributes, which Vivaldi's own re-renders leave alone,
    * and stylesheets lay out the tab strip from them.
    *
    * @param selectors Needs `verticalTabBar`, `tabStrip`, `pinnedTab` and `tabWrapper`.
    * @param maxTiles How many pinned tabs become tiles; the others stay rows.
    * @param unloadedTabs Ids of tabs unloaded from memory.
-   * @param hiddenTabs Ids of tabs shown by a tile drawn elsewhere, hidden from the list.
    */
-  constructor(selectors, maxTiles, unloadedTabs, hiddenTabs = { has: () => false }) {
+  constructor(selectors, maxTiles, unloadedTabs) {
     this.#selectors = selectors;
     this.#maxTiles = maxTiles;
     this.#unloadedTabs = unloadedTabs;
-    this.#hiddenTabs = hiddenTabs;
   }
   /**
    * @param value How many pinned tabs become tiles from the next `apply`; 0 when the Favorites
@@ -89,7 +85,6 @@ class FavoriteTagger {
     for (const slot of this.#strip.children) {
       slot.removeAttribute(FAVORITE_ATTRIBUTE);
       slot.removeAttribute(UNLOADED_ATTRIBUTE);
-      slot.removeAttribute(HIDDEN_ATTRIBUTE);
     }
     this.#strip = null;
     this.#tileCount = 0;
@@ -108,13 +103,11 @@ class FavoriteTagger {
     slot.toggleAttribute(FAVORITE_ATTRIBUTE, isTile);
     const tabId = FavoriteTagger.tabIdOf(slot, this.#selectors.get("tabWrapper"));
     slot.toggleAttribute(UNLOADED_ATTRIBUTE, isTile && tabId !== null && this.#unloadedTabs.has(tabId));
-    slot.toggleAttribute(HIDDEN_ATTRIBUTE, tabId !== null && this.#hiddenTabs.has(tabId));
   }
 }
 export {
   FAVORITE_ATTRIBUTE,
   FavoriteTagger,
   GRID_ATTRIBUTE,
-  HIDDEN_ATTRIBUTE,
   UNLOADED_ATTRIBUTE
 };

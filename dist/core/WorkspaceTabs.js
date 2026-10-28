@@ -13,20 +13,23 @@ class WorkspaceTabs {
     this.#logger = logger;
   }
   /**
-   * Opens an address in a new active tab, then writes the workspace into its `vivExtData`. When
-   * the workspace cannot be written, the tab stays where Vivaldi put it.
+   * Opens an address in a new active tab, then writes the workspace and VivArcDi's own values into
+   * its `vivExtData` with one update. When they cannot be written, the tab stays where Vivaldi
+   * put it.
    *
    * @param url The address to open.
    * @param workspace The workspace id, or null to leave the tab where Vivaldi puts it.
+   * @param own Values to store under VivArcDi's own key, such as the bookmark the tab stands for.
    * @returns The new tab.
    */
-  async open(url, workspace) {
+  async open(url, workspace, own = {}) {
     const created = await this.#tabs.create({ url, active: true });
-    if (workspace !== null && created.id !== void 0) {
+    if ((workspace !== null || Object.keys(own).length > 0) && created.id !== void 0) {
       try {
-        await this.#tabs.update(created.id, { vivExtData: TabData.withWorkspace(TabData.dataOf(created), workspace) });
+        const extra = workspace === null ? {} : { workspaceId: TabData.rawWorkspace(workspace) };
+        await this.#tabs.update(created.id, { vivExtData: TabData.withOwn(created, own, extra) });
       } catch (error) {
-        this.#logger.warn("could not put the new tab in its workspace", error);
+        this.#logger.warn("could not store the workspace and link of the new tab", error);
       }
     }
     return created;

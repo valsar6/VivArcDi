@@ -1,5 +1,7 @@
 import { DomQuery } from "../../core/DomQuery.js";
 import { FrameTask } from "../../core/FrameTask.js";
+import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
+import { HiddenTabs } from "../../core/HiddenTabs.js";
 import { Module } from "../../core/Module.js";
 import { TabUnloader } from "../../core/TabUnloader.js";
 import { BookmarkFavorites } from "./BookmarkFavorites.js";
@@ -32,7 +34,8 @@ class FavoritesGrid extends Module {
   #unloadedTabs = null;
   #middleClick = null;
   #fromBookmarks = null;
-  #hiddenTabs = /* @__PURE__ */ new Set();
+  #hiddenTabs = null;
+  #hiddenMarker = null;
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
    * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
@@ -55,7 +58,10 @@ class FavoritesGrid extends Module {
     } else {
       logger.warn("chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs");
     }
-    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_TABS, this.#hiddenTabs);
+    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_TABS);
+    this.#hiddenTabs = HiddenTabs.of(document);
+    this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
+    this.#hiddenMarker.start();
     this.#observer = new MutationObserver(() => this.#refresh?.request());
     this.#observer.observe(DomQuery.require(document, selectors.get("browser")), {
       childList: true,
@@ -75,13 +81,19 @@ class FavoritesGrid extends Module {
     this.#refresh?.cancel();
     this.#middleClick?.detach();
     this.#unloadedTabs?.stop();
-    this.#fromBookmarks?.stop();
+    this.#stopBookmarks();
     this.#layout?.release();
     this.#tagger?.clear();
     this.#observer = null;
     this.#middleClick = null;
     this.#unloadedTabs = null;
+  }
+  #stopBookmarks() {
+    this.#fromBookmarks?.stop();
+    this.#hiddenMarker?.stop();
     this.#fromBookmarks = null;
+    this.#hiddenMarker = null;
+    this.#hiddenTabs = null;
   }
   #startMiddleClick(settings, tabs, logger) {
     if (!settings.unloadOnMiddleClick || this.#document === null || this.#selectors === null) {
@@ -98,7 +110,8 @@ class FavoritesGrid extends Module {
   async #startBookmarks(tabs, bookmarks, logger) {
     const document = this.#document;
     const selectors = this.#selectors;
-    if (!tabs.available || bookmarks?.available !== true || document === null || selectors?.has("tabListHost") !== true) {
+    const hiddenTabs = this.#hiddenTabs;
+    if (!tabs.available || bookmarks?.available !== true || document === null || hiddenTabs === null || selectors?.has("tabListHost") !== true) {
       logger.warn("Bookmarks, tabs or the tab list are missing: the Favorites are the first pinned tabs");
       return;
     }
@@ -110,7 +123,7 @@ class FavoritesGrid extends Module {
       logger,
       folder: this.#settings.folder,
       maxTiles: this.#settings.maxTiles,
-      hiddenTabs: this.#hiddenTabs,
+      hiddenTabs,
       onChange: () => this.#refresh?.request()
     });
     await this.#fromBookmarks.start().catch((error) => logger.error("Could not read the Favorites folder", error));

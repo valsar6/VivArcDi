@@ -10,6 +10,7 @@ class FolderTreeSource {
   #task;
   #entries = [];
   #generation = 0;
+  #found = false;
   #warnedMissing = false;
   #unsubscribe = null;
   /**
@@ -32,6 +33,12 @@ class FolderTreeSource {
    */
   get entries() {
     return this.#entries;
+  }
+  /**
+   * @returns Whether the root folder was found the last time the bookmarks were read.
+   */
+  get found() {
+    return this.#found;
   }
   /**
    * Reads the tree and starts following the bookmarks. Throws when a bookmark event is missing.
@@ -62,6 +69,7 @@ class FolderTreeSource {
       if (root === null) {
         this.#warnMissing();
       }
+      this.#found = root !== null;
       this.#entries = root === null ? [] : FolderTree.build(root.children ?? [], this.#maxDepth);
       this.#onChange();
     } catch (error) {

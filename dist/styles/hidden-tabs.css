@@ -1,0 +1,3 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-hidden] {
+  display: none !important;
+}

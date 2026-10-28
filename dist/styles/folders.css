@@ -1,3 +1,4 @@
+@charset "UTF-8";
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] {
   --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) 10%, transparent);
   box-sizing: border-box;
@@ -61,6 +62,33 @@
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-open] .vivarcdi-folders-folder-icon {
   opacity: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-active] {
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-unloaded] > :not(.vivarcdi-folders-close) {
+  opacity: 0.55;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-close {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  line-height: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-close::before {
+  content: "×";
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-close:hover {
+  background-color: var(--vivarcdi-folders-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]:hover .vivarcdi-folders-close {
+  display: grid;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]:hover::after {
+  display: none;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]::after {
   flex: none;

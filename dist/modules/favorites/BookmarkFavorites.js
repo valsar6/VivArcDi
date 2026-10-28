@@ -7,6 +7,7 @@ import { FavoritesFolder } from "./FavoritesFolder.js";
 import { FavoritesView } from "./FavoritesView.js";
 import { LinkedTabs } from "./LinkedTabs.js";
 const GRID_ORDER = 10;
+const HIDDEN_OWNER = "favorites-grid";
 class BookmarkFavorites {
   #deps;
   #links;
@@ -67,7 +68,7 @@ class BookmarkFavorites {
     this.#unsubscribe = [];
     this.place(false);
     this.#view.destroy();
-    this.#deps.hiddenTabs.clear();
+    this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
   }
   /**
    * Shows or hides the tiles above the tab list; the shared anchor keeps them there
@@ -128,8 +129,7 @@ class BookmarkFavorites {
     const snapshot = await this.#links.snapshot();
     this.#view.apply(FavoriteStates.of(this.#favorites, snapshot));
     const { hiddenTabs } = this.#deps;
-    hiddenTabs.clear();
-    snapshot.linkedTabIds.forEach((id) => hiddenTabs.add(id));
+    hiddenTabs.set(HIDDEN_OWNER, snapshot.linkedTabIds);
     this.#deps.onChange();
   }
 }
