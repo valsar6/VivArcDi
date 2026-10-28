@@ -3,6 +3,8 @@ type VivaldiTab = chrome.tabs.Tab & { vivExtData?: string };
 export interface OwnTabData {
   /** Id of the Favorites bookmark the tab is linked to. */
   favoriteId?: string;
+  /** Id of the bookmark whose link row the tab stands for in the folders of the tab bar. */
+  bookmarkId?: string;
   /** Address of the page the pinned tab goes back to on reset. */
   pinnedUrl?: string;
   /** When the tab last stopped being active, in milliseconds since the epoch. */
@@ -58,7 +60,15 @@ export class TabData {
    * @returns The new `vivExtData` text.
    */
   public static withWorkspace(data: string | undefined, workspace: string): string {
-    return JSON.stringify({ ...TabData.#parse(data), workspaceId: Number.isNaN(Number(workspace)) ? workspace : Number(workspace) });
+    return JSON.stringify({ ...TabData.#parse(data), workspaceId: TabData.rawWorkspace(workspace) });
+  }
+
+  /**
+   * @param workspace A workspace id as returned by `of`.
+   * @returns The value Vivaldi stores in `vivExtData`: a number when the id is numeric.
+   */
+  public static rawWorkspace(workspace: string): string | number {
+    return Number.isNaN(Number(workspace)) ? workspace : Number(workspace);
   }
 
   /**
@@ -86,9 +96,10 @@ export class TabData {
     if (typeof own !== 'object' || own === null) {
       return {};
     }
-    const { favoriteId, pinnedUrl, lastActive } = own as Record<string, unknown>;
+    const { favoriteId, bookmarkId, pinnedUrl, lastActive } = own as Record<string, unknown>;
     return {
       ...(typeof favoriteId === 'string' ? { favoriteId } : {}),
+      ...(typeof bookmarkId === 'string' ? { bookmarkId } : {}),
       ...(typeof pinnedUrl === 'string' ? { pinnedUrl } : {}),
       ...(typeof lastActive === 'number' && Number.isFinite(lastActive) ? { lastActive } : {}),
     };
