@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-28 |
 
 ## Summary
 
@@ -151,19 +151,21 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 
 ## Open questions
 
-- [ ] **Where is the `+`?** Proposed: on the space header, on hover, since we have no space menu yet.
+- [x] **Where is the `+`?** On the space header, on hover (Tore, 2026-10-28), since we have no space menu yet.
   Alternative: a right-click menu on the header with "Nuova cartella".
-- [ ] **Root of an unconfigured workspace?** Proposed: `VivArcDi/<workspace name>`, created on the
+- [x] **Root of an unconfigured workspace?** Approved (Tore, 2026-10-28): `VivArcDi/<workspace name>`, created on the
   first write. Renaming the workspace in Vivaldi would then show a new, empty folder; the old one stays
   in the Bookmarks panel. Alternative: remember the folder by workspace id in VivArcDi's storage.
-- [ ] **Does Vivaldi already pin a tab dragged among the pinned tabs?** Proposed: a short probe on
-  Tore's Vivaldi before the design; if yes, FR-8 needs no code.
-- [ ] **What does "drag the Favorites folders into the workspaces" mean?** Proposed reading: drag a
-  bookmark folder (from the Bookmarks panel) onto a workspace to make it that workspace's root. Other
-  reading: copy the folder's links into the workspace folder. Please confirm.
-- [ ] **Where is the choice saved?** Proposed: in VivArcDi's storage by workspace id, so a rename does
+- [ ] **Does Vivaldi already pin a tab dragged among the pinned tabs, and can a folder of the
+  Bookmarks panel be dropped on the header or on the workspace switcher?** Two read-only probes on
+  Tore's Vivaldi before the design (`spaces/diagnostica-trascinamento.md`). If Vivaldi already pins, FR-8
+  needs no code; if the switcher takes no drop, only the header is a target for FR-10.
+- [x] **What does "drag the Favorites folders into the workspaces" mean?** Approved reading (Tore, 2026-10-28): drag a
+  bookmark folder (from the Bookmarks panel) onto a workspace to make it that workspace's root. The
+  other reading, copying the folder's links, is not done.
+- [x] **Where is the choice saved?** Approved (Tore, 2026-10-28): in VivArcDi's storage by workspace id, so a rename does
   not lose it; `config.json` keeps working as the fallback.
-- [ ] **Where does a dropped link go?** Proposed: at the end of the folder. Arc puts it where it is
+- [x] **Where does a dropped link go?** Approved (Tore, 2026-10-28): at the end of the folder. Arc puts it where it is
   dropped, which needs reordering (out of scope).
 
 ## References

@@ -20,7 +20,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [009 Bookmark folders in the tab bar](009-bookmark-folders-in-tab-bar/spec.md) | 3 | Approved |
 | [010 Folders per workspace](010-folders-per-workspace/spec.md) | 3 | Approved |
 | [011 Space header](011-space-header/spec.md) | 3 | Approved |
-| [012 Editable folders](012-editable-folders/spec.md) | 3 | Draft |
+| [012 Editable folders](012-editable-folders/spec.md) | 3 | Approved |
 
 ## Layout
 
