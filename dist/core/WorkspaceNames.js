@@ -3,7 +3,7 @@ class WorkspaceNames {
   #prefs;
   #onChange;
   #logger;
-  #names = /* @__PURE__ */ new Map();
+  #workspaces = /* @__PURE__ */ new Map();
   #warned = false;
   #unsubscribe = null;
   /**
@@ -45,9 +45,9 @@ class WorkspaceNames {
    * Reads the list again and reports a change of names.
    */
   async refresh() {
-    const names = await this.#read();
-    if (!WorkspaceNames.#same(names, this.#names)) {
-      this.#names = names;
+    const workspaces = await this.#read();
+    if (!WorkspaceNames.#same(workspaces, this.#workspaces)) {
+      this.#workspaces = workspaces;
       this.#onChange();
     }
   }
@@ -56,24 +56,34 @@ class WorkspaceNames {
    * @returns Its name, or null for no workspace or an unknown one.
    */
   nameOf(workspaceId) {
-    return workspaceId === null ? null : this.#names.get(workspaceId) ?? null;
+    return workspaceId === null ? null : this.#workspaces.get(workspaceId)?.name ?? null;
+  }
+  /**
+   * The format of the icon is not known: it is returned as Vivaldi stores it, and the caller
+   * decides whether it can be shown.
+   *
+   * @param workspaceId The id of a workspace, as `TabData.of` returns it, or null.
+   * @returns Its `icon` text, or null for no workspace, an unknown one or one without an icon.
+   */
+  iconOf(workspaceId) {
+    return workspaceId === null ? null : this.#workspaces.get(workspaceId)?.icon ?? null;
   }
   static #same(left, right) {
-    return left.size === right.size && [...left].every(([id, name]) => right.get(id) === name);
+    return left.size === right.size && [...left].every(([id, { name, icon }]) => right.get(id)?.name === name && right.get(id)?.icon === icon);
   }
   static #parse(value) {
-    const names = /* @__PURE__ */ new Map();
+    const workspaces = /* @__PURE__ */ new Map();
     for (const item of Array.isArray(value) ? value : []) {
       const entry = WorkspaceNames.#entry(item);
-      if (entry !== null && !names.has(entry.id)) {
-        names.set(entry.id, entry.name);
+      if (entry !== null && !workspaces.has(entry.id)) {
+        workspaces.set(entry.id, { name: entry.name, icon: entry.icon });
       }
     }
-    return names;
+    return workspaces;
   }
   static #entry(item) {
-    const { id, name } = typeof item === "object" && item !== null ? item : {};
-    return (typeof id === "number" || typeof id === "string") && typeof name === "string" ? { id: String(id), name } : null;
+    const { id, name, icon } = typeof item === "object" && item !== null ? item : {};
+    return (typeof id === "number" || typeof id === "string") && typeof name === "string" ? { id: String(id), name, icon: typeof icon === "string" && icon !== "" ? icon : null } : null;
   }
   async #read() {
     if (!this.#prefs.available) {

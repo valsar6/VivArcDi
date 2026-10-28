@@ -1,9 +1,10 @@
+import { ActiveWorkspace } from "../../core/ActiveWorkspace.js";
 import { FrameTask } from "../../core/FrameTask.js";
 import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
 import { HiddenTabs } from "../../core/HiddenTabs.js";
+import { SpaceCollapse } from "../../core/SpaceCollapse.js";
 import { TabBarAnchor } from "../../core/TabBarAnchor.js";
 import { WorkspaceNames } from "../../core/WorkspaceNames.js";
-import { ActiveWorkspace } from "./ActiveWorkspace.js";
 import { FolderRows } from "./FolderRows.js";
 import { FolderSectionView } from "./FolderSectionView.js";
 import { FolderTree } from "./FolderTree.js";
@@ -26,6 +27,7 @@ class FolderSection {
   #view;
   #hiddenTabs;
   #hiddenMarker;
+  #collapse;
   #roots;
   #names;
   #active;
@@ -59,6 +61,7 @@ class FolderSection {
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
     this.#hiddenTabs = HiddenTabs.of(document);
+    this.#collapse = SpaceCollapse.of(document);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
     this.#view = new FolderSectionView(
@@ -73,14 +76,15 @@ class FolderSection {
   }
   /**
    * Puts the section in the tab bar and starts following the bookmarks, the tabs and the active
-   * workspace, whose root it shows. Tabs that already show the address of a link become the tab of
-   * that link. Throws when the tab bar or
-   * a tab event is missing; call `stop` then.
+   * workspace, whose root it shows, and the collapsed state of the space. Tabs that already show
+   * the address of a link become the tab of that link. Throws when the tab bar or a tab event is
+   * missing; call `stop` then.
    */
   async start() {
     this.#stops.push(TabBarAnchor.of(this.#context.document, this.#context.selectors.get("tabListHost")).add(this.#view.element, ANCHOR_ORDER));
     this.#hiddenMarker.start();
     this.#stops.push(
+      this.#collapse.onChange(() => this.#redraw.request()),
       () => this.#hiddenMarker.stop(),
       () => this.#hiddenTabs.clear(HIDDEN_OWNER),
       () => this.#redraw.cancel(),
@@ -145,7 +149,7 @@ class FolderSection {
       isOpen: (id) => this.#openFolders.has(id),
       tabFor: (link) => this.#openLinks.tabFor(link)
     };
-    this.#view.render(FolderRows.build(this.#source.entries, sources));
+    this.#view.render(FolderRows.build(this.#source.entries, sources, this.#collapse.collapsed));
   }
 }
 export {

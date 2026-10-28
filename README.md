@@ -290,6 +290,28 @@ VivArcDi also remembers when each Favorite, pinned tab and bookmark link was las
 The `reopen-pinned` module has only the `enabled` option. The links it also reopens are those under
 the `root` of the `bookmark-folders` module, when that module is on.
 
+## Space header
+
+Shows a row between the Favorites grid and the [bookmark folders](#bookmark-folders), like the space
+header of Arc: the icon and the name of the active workspace, and an arrow. A click anywhere on the
+row collapses the workspace, and a second click opens it again. While it is collapsed the arrow
+points to the side and:
+
+- the folders section shows only the links that have an open tab, without the folder rows;
+- the pinned tabs of the workspace that are unloaded are hidden, while the loaded ones and the
+  active one stay. Opening a hidden pinned tab or link another way shows it at once.
+
+Each workspace remembers if you left it collapsed, also after a restart. Outside any workspace the
+row is named `Tabs`, with no icon. The row has no menu: renaming, changing the icon and deleting a
+workspace stay in Vivaldi's workspace menu, and a rename shows in the row.
+
+Vivaldi's `icon` field of a workspace has no documented format. The row shows it as text when it is
+a short emoji or symbol (at most two characters), and otherwise draws the first letter of the name
+in a circle. If the list of workspaces cannot be read, the row is named `Tabs` and the console says
+so once.
+
+The module has only the `enabled` option. Set it to `false` and no row is drawn and nothing is hidden.
+
 ## Bookmark folders
 
 Shows a bookmark folder in the vertical tab bar, right below the Favorites grid, like the folders of

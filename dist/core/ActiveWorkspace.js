@@ -1,4 +1,4 @@
-import { TabData } from "../../core/TabData.js";
+import { TabData } from "./TabData.js";
 class ActiveWorkspace {
   #tabs;
   #onChange;
