@@ -172,6 +172,7 @@ Favorite.
 | AC-24 | THE Today archive SHALL never archive the tab of a link. | auto: `does not archive the tab of a link` |
 | AC-25 | WHEN Tore clicks `Board Rame Development` and logs in through `id.atlassian.com`, THE tab list SHALL show no new tab and the link row SHALL show the active page. | manual |
 | AC-26 | WHEN the user clicks a link to another site in the tab of a link, THE page SHALL open in Peek and the tab SHALL keep its page. | manual |
+| AC-27 | WHILE another module writes the data of the tab of a link at the same time, THE module SHALL keep the bookmark id in the tab. | auto: `keeps the bookmark id when another module writes the tab at the same time` |
 
 ## Out of scope
 

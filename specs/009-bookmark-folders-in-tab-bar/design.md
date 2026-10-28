@@ -106,12 +106,22 @@ Rejected alternatives:
 | `src/modules/folders/BookmarkFolders.ts` | Module: options, wiring, clean stop | Facade |
 | `src/core/HiddenTabs.ts` | Ids of tabs hidden from the list, by owner; the union is what is hidden | Observer |
 | `src/core/HiddenTabMarker.ts` | Marks the slots of hidden tabs with `data-vivarcdi-hidden`, after every redraw of the strip (AC-19) | |
+| `src/core/TabDataWriter.ts` | Serialized, fresh-read writes of `vivExtData` per tab, shared by the modules of a window (AC-27) | Command queue |
 | `src/core/KeptTab.ts` | Whether a tab is pinned, a Favorite or the tab of a link (AC-24, AC-26) | |
 | `src/modules/folders/LinkTabAdopter.ts` | Links tabs open at start and new tabs on their first navigation to a link's address (AC-22) | Observer |
 | `src/styles/hidden-tabs.scss` | The rule that hides a marked slot, shared by 003 and 009 | |
 | `src/modules/reopen/TabTargets.ts` | Tries the finders of 007 in order | Chain of responsibility |
 | `src/modules/reopen/LinkedTabFinder.ts` | Tab whose address key is in the `LinkKeyIndex` (AC-9) | Strategy |
 | `src/styles/folders.scss` | Rows, indentation, dot, hover, scroll limit, theme colors | |
+
+**One writer for `vivExtData`.** Several modules write the same tab at once: the new tab of a link
+gets its workspace and bookmark id while the Today archive stamps it. Each did read, change and write
+with a copy that could be stale, so the last write erased the keys of the other and the tab came back
+in the list (AC-27). `src/core/TabDataWriter.ts` is shared by every module of a window through
+`TabDataWriter.of(tabs)`, queues the writes of each tab, and when its turn comes reads the tab again,
+builds the text with `TabData.withOwn` or `TabData.with`, and updates it. A failed write rejects to its
+caller and does not block the next one. `WorkspaceTabs`, `TabLinks`, `LinkedTabs`, `SavedAddresses`,
+`TabTiler` and `ActivityStamps` write only through it.
 
 `ActivationRecorder` receives a predicate for the tabs it records; 007's tests keep passing with the
 pinned-only default.
