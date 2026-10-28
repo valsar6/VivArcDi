@@ -43,3 +43,5 @@ Revision of 2026-10-28, on `features/bookmark-link-tabs` (minor bump to 0.9.0):
 - [ ] **T21.** Manual checks AC-25 and AC-26 on macOS and Debian.
 - [x] **T22.** Fix 0.9.1: `TabDataWriter` serializes every `vivExtData` write per tab and reads the tab
   again before writing; all writers use it. AC-27.
+- [x] **T23.** Fix 0.9.2: `HiddenTabMarker` also collapses the marked slots with an inline
+  `display: none !important`, because on Vivaldi 8.2 the stylesheet rule has no effect. AC-28.

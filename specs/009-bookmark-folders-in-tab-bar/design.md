@@ -68,6 +68,9 @@ inside the tab strip is moved by Vivaldi's rebuilds. That spot is the shared `Ta
      strip and marks each slot whose tab id is in the union, so the Favorites and the folders never
      undo each other's marks and the folders hide their tabs with the Favorites module off (AC-19).
      The rule that hides a marked slot moves from `favorites.scss` to a shared `hidden-tabs.scss`.
+     On Vivaldi 8.2 that rule is loaded but a rule of Vivaldi wins over it, so the marker also sets
+     `display: none !important` as an inline style on each marked slot and removes it again when the
+     tab is shown (AC-28); an inline `!important` is the one thing no stylesheet rule beats.
    - The row of an open link gets a close button that calls `tabs.remove` (AC-23). Cmd/Ctrl+W is
      Vivaldi's own close, since the tab is not pinned and the close shortcut of 003 does not touch it.
      The tab's removal takes the link back inside its closed folder through `OpenLinks`.
