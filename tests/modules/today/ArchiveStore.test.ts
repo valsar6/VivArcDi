@@ -45,3 +45,27 @@ test('adds nothing when the archive cannot be saved', () => {
   assert.throws(() => store.add([entry('https://a.example/', 'A', NOW)]), /quota/);
   assert.equal(store.entries.length, 0);
 });
+
+test('keeps entries another window added', () => {
+  const storage = new MemoryStorage();
+  const first = new ArchiveStore(storage, 500, silentLogger());
+  const second = new ArchiveStore(storage, 500, silentLogger());
+  first.load();
+  second.load();
+  first.add([entry('https://a.example/', 'A', NOW)]);
+  second.add([entry('https://b.example/', 'B', NOW + 1)]);
+  assert.deepEqual(first.entries.map(({ url }) => url), ['https://b.example/', 'https://a.example/']);
+  assert.equal((JSON.parse(storage.getItem(ARCHIVE_STORAGE_KEY) ?? '[]') as unknown[]).length, 2);
+});
+
+test('removes an entry by value after another window changed the archive', () => {
+  const storage = new MemoryStorage();
+  const first = new ArchiveStore(storage, 500, silentLogger());
+  const second = new ArchiveStore(storage, 500, silentLogger());
+  first.add([entry('https://a.example/', 'A', NOW), entry('https://b.example/', 'B', NOW - 1)]);
+  const [target] = first.entries;
+  assert.ok(target);
+  second.add([entry('https://c.example/', 'C', NOW + 5)]);
+  first.remove({ ...target });
+  assert.deepEqual(second.entries.map(({ url }) => url), ['https://c.example/', 'https://b.example/']);
+});

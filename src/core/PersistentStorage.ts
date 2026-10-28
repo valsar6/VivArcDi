@@ -7,8 +7,19 @@ export interface StorageArea {
   set: (items: Record<string, unknown>, callback?: () => void) => void;
 }
 
+export interface StorageChange {
+  newValue?: unknown;
+}
+
+export type StorageChangeListener = (changes: Record<string, StorageChange>, areaName: string) => void;
+
+export interface StorageChangeEvent {
+  addListener: (listener: StorageChangeListener) => void;
+  removeListener: (listener: StorageChangeListener) => void;
+}
+
 export interface StorageHost {
-  storage?: { local?: StorageArea | undefined } | undefined;
+  storage?: { local?: StorageArea | undefined; onChanged?: StorageChangeEvent | undefined } | undefined;
   runtime?: { lastError?: { message?: string } | undefined } | undefined;
 }
 
@@ -21,11 +32,14 @@ export class PersistentStorage implements KeyValueStorage {
   #host: StorageHost | undefined;
   #logger: Logger;
   #warned = false;
+  #onChanged: StorageChangeListener = (changes, areaName) => this.#follow(changes, areaName);
 
   /**
    * Strings that survive a restart of Vivaldi, readable and writable without waiting. Everything
    * VivArcDi saved is read once when it starts and kept in memory; a write changes the memory at
-   * once and reaches `chrome.storage.local` right after. Use `open`, which chooses the medium.
+   * once and reaches `chrome.storage.local` right after. A change another window makes to
+   * `chrome.storage.local` updates the memory too; that listener lives as long as the window.
+   * Use `open`, which chooses the medium.
    *
    * @param initial What was saved before.
    * @param area The `chrome.storage.local` area to write to, or null to keep values in memory only.
@@ -37,6 +51,9 @@ export class PersistentStorage implements KeyValueStorage {
     this.#area = area;
     this.#host = host;
     this.#logger = logger;
+    if (area !== null) {
+      host?.storage?.onChanged?.addListener(this.#onChanged);
+    }
   }
 
   /**
@@ -114,6 +131,22 @@ export class PersistentStorage implements KeyValueStorage {
         resolve(new Map(saved));
       });
     });
+  }
+
+  #follow(changes: Record<string, StorageChange>, areaName: string): void {
+    if (areaName !== 'local') {
+      return;
+    }
+    for (const [key, change] of Object.entries(changes)) {
+      if (!key.startsWith(KEY_PREFIX)) {
+        continue;
+      }
+      if (change.newValue === undefined) {
+        this.#cache.delete(key);
+      } else if (typeof change.newValue === 'string') {
+        this.#cache.set(key, change.newValue);
+      }
+    }
   }
 
   #checkWrite(): void {

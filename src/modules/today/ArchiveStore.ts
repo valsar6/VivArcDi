@@ -31,7 +31,7 @@ export class ArchiveStore {
   #storage: KeyValueStorage;
   #limit: number;
   #logger: Logger;
-  #entries: ArchiveEntry[] = [];
+  #warned = false;
 
   /**
    * The archive of closed Today tabs, newest first, kept in VivArcDi's shared storage so that it
@@ -48,46 +48,51 @@ export class ArchiveStore {
   }
 
   /**
-   * @returns The entries, newest first.
+   * @returns The entries, newest first, as saved now: a change made by another window shows.
    */
   public get entries(): readonly ArchiveEntry[] {
-    return this.#entries;
+    return this.#current();
   }
 
   /**
    * Reads the saved entries. Malformed ones are skipped, with one warning.
    */
   public load(): void {
-    const saved = this.#read();
-    const valid = saved.filter((entry): entry is ArchiveEntry => ArchiveStore.#isEntry(entry));
-    if (valid.length < saved.length) {
-      this.#logger.warn(`skipped ${saved.length - valid.length} malformed archive entries`);
-    }
-    this.#entries = ArchiveStore.#newestFirst(valid).slice(0, this.#limit);
+    this.#current();
   }
 
   /**
-   * Adds entries and saves the archive, dropping the oldest past the limit.
+   * Adds entries to what is saved now and saves the archive, dropping the oldest past the limit.
    *
    * @param entries The entries to add.
    * @throws {Error} When the archive cannot be saved; nothing is added then.
    */
   public add(entries: ArchiveEntry[]): void {
-    this.#save(ArchiveStore.#newestFirst([...entries, ...this.#entries]).slice(0, this.#limit));
+    this.#save(ArchiveStore.#newestFirst([...entries, ...this.#current()]).slice(0, this.#limit));
   }
 
   /**
-   * Removes one entry and saves the archive.
+   * Removes one entry from what is saved now and saves the archive. The entry is matched by its
+   * address, its time and its workspace.
    *
    * @param entry An entry as read from `entries`.
    */
   public remove(entry: ArchiveEntry): void {
-    this.#save(this.#entries.filter((candidate) => candidate !== entry));
+    this.#save(this.#current().filter((candidate) => !ArchiveStore.#same(candidate, entry)));
   }
 
   #save(entries: ArchiveEntry[]): void {
     this.#storage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(entries));
-    this.#entries = entries;
+  }
+
+  #current(): ArchiveEntry[] {
+    const saved = this.#read();
+    const valid = saved.filter((entry): entry is ArchiveEntry => ArchiveStore.#isEntry(entry));
+    if (valid.length < saved.length && !this.#warned) {
+      this.#warned = true;
+      this.#logger.warn(`skipped ${saved.length - valid.length} malformed archive entries`);
+    }
+    return ArchiveStore.#newestFirst(valid).slice(0, this.#limit);
   }
 
   #read(): unknown[] {
@@ -98,6 +103,10 @@ export class ArchiveStore {
       this.#logger.warn('the saved archive cannot be read', error);
       return [];
     }
+  }
+
+  static #same(a: ArchiveEntry, b: ArchiveEntry): boolean {
+    return a.url === b.url && a.archivedAt === b.archivedAt && a.workspace === b.workspace;
   }
 
   static #newestFirst(entries: ArchiveEntry[]): ArchiveEntry[] {
