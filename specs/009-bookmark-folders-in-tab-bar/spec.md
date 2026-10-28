@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Draft |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-27 |
+| Approved | 2026-10-27 (first version); revision of 2026-10-28 awaiting approval |
 
 ## Summary
 
@@ -13,10 +13,17 @@ In Arc, a space shows its folders of links right below the Favorites grid, in th
 tabs: no panel to open. In Vivaldi the same folders, here imported from Arc, are bookmarks that live in
 the separate Bookmarks panel. This spec shows a folder of bookmarks in the vertical tab bar, below the
 Favorites grid, with Arc's behavior: folders open and close, a click on a link opens its tab, and a
-link that is open stays visible below its closed folder.
+link that is open stays visible below its closed folder. As in Arc, the link row is the tab: the tab
+it opens does not show a second time in Vivaldi's list of tabs.
 
 Decided with Tore on 2026-10-26: the folders stay bookmarks and are shown in the tab bar, instead of
 becoming tab stacks as the first draft of [003](../003-pinned-tabs-and-folders/spec.md) assumed.
+
+Revised with Tore on 2026-10-28, after a screen recording of 0.8.0: a click on `Board Rame
+Development` opened a `Jira` tab in the list of today's tabs, and `MahjongSoul` showed both in the
+`Hobbies` folder and in the list. Tore wants the open tabs to be the rows of the Favorites, the pinned
+tabs and the folders, never a new tab in the list. The first version left this out on purpose; this
+revision brings it in (FR-12 to FR-16, AC-19 to AC-25).
 
 ## User stories
 
@@ -30,6 +37,10 @@ becoming tab stacks as the first draft of [003](../003-pinned-tabs-and-folders/s
   see what I am using without expanding anything.
 - **US-5.** As a user, I want Cmd/Ctrl+T followed by the address of one of these links to bring me to
   its open tab, like [007](../007-reopen-pinned-tabs/spec.md) does for Favorites and pinned tabs.
+- **US-6.** As a user, I want the tab of a link to live only in its folder row, so that my list of
+  today's tabs holds only the pages I opened outside Favorites, pinned tabs and folders.
+- **US-7.** As a user, I want a link to keep its tab while I browse inside it, so that a redirect or a
+  login page does not turn it into a stray tab.
 
 ## Expected behavior
 
@@ -61,10 +72,21 @@ a trailing `/`, the query and the fragment.
 The section is read-only. Creating, renaming, moving and deleting bookmarks stays in the Bookmarks
 panel; the tab bar follows the changes as they happen.
 
-Arc and VivArcDi differ on purpose: in Arc the opened link becomes the tab itself and leaves the list
-of today's tabs. In VivArcDi the opened tab is a normal Vivaldi tab and also shows in the tab list;
-the link only shows a dot. Hiding it from the list needs changes inside Vivaldi's own list and is left
-for a later spec.
+**The link row is the tab.** As in Arc, the tab that a link opens is not a today's tab: Vivaldi's tab
+list hides it, with the same mark that [003](../003-pinned-tabs-and-folders/spec.md) uses for the tabs
+of the Favorites. The link row stands for it: a dot while it is open, the look of an active tab while
+it is the active tab, its page's title and icon while it shows another page of the same site, and a
+close button on hover. The tab is linked to the bookmark, not only to the address: the link is stored
+in the tab's `vivExtData` (`vivarcdi: { bookmarkId }`), so it survives a restart, a redirect (`Jira`
+going to `id.atlassian.com/login`) and the pages opened inside it.
+
+A tab becomes the tab of a link when the link opens it, when Cmd/Ctrl+T opens the link's address and
+no tab of the link is open (007 already switches when one is), and, at start-up, when an existing tab
+of the window and workspace has the link's address and no link yet. A link has at most one tab in each
+workspace. Closing the tab, with the close button of the row, Cmd/Ctrl+W or Vivaldi's menu, closes it
+for real: the link goes back inside its closed folder. The Today archive of
+[004](../004-today-tabs-and-keyboard/spec.md) never archives the tab of a link, as it never archives a
+Favorite.
 
 ## Requirements
 
@@ -95,6 +117,16 @@ for a later spec.
 - **FR-11.** WHEN the section is taller than the room the tab bar leaves it, THEN the tab list below
   stays reachable: Tore wants the whole column to scroll as one, as in Arc; the design says what
   Vivaldi's layout allows.
+- **FR-12.** The tab of a link is marked as hidden in Vivaldi's tab list, as the tabs of the
+  Favorites are in 003; the link row shows its state (open, active, unloaded) and has a close button.
+- **FR-13.** A tab opened from a link, or adopted as the tab of a link, stores the bookmark id in its
+  `vivExtData`; the link and the tab stay linked while the tab navigates, until the tab closes or the
+  bookmark is removed.
+- **FR-14.** WHEN a new tab opens the address of a link that has no tab in the window and workspace,
+  THEN that tab becomes the tab of the link. At start-up, an existing tab with the address of a link
+  that has no tab becomes its tab.
+- **FR-15.** Closing the tab of a link closes it; the link returns inside its closed folder.
+- **FR-16.** The Today archive of 004 skips the tabs of links.
 
 ### Non-functional
 
@@ -130,11 +162,17 @@ for a later spec.
 | AC-16 | WHILE a folder with many links is open, THE tab list SHALL stay reachable by scrolling. | manual |
 | AC-17 | THE section SHALL be marked as outside the window drag region, so that Vivaldi on macOS does not take its clicks and hover. | manual |
 | AC-18 | THE section SHALL keep the width of the tab bar, cutting long titles with an ellipsis instead of overflowing it. | manual |
+| AC-19 | THE module SHALL mark the tab of a link as hidden from the tab list. | auto: `hides the tab of a link from the tab list` |
+| AC-20 | WHEN the user clicks a link with no open tab, THE module SHALL store the bookmark id in the new tab. | auto: `links the tab opened from a link to its bookmark` |
+| AC-21 | WHILE the tab of a link shows another address, THE section SHALL keep it as the tab of that link. | auto: `keeps the tab of a link while it navigates away` |
+| AC-22 | WHEN a new tab opens the address of a link that has no tab, THE module SHALL make it the tab of that link. | auto: `adopts a new tab that opens the address of a link` |
+| AC-23 | WHEN the user closes the tab of a link from its row, THE module SHALL close the tab. | auto: `closes the tab of a link from its row` |
+| AC-24 | THE Today archive SHALL never archive the tab of a link. | auto: `does not archive the tab of a link` |
+| AC-25 | WHEN Tore clicks `Board Rame Development` and logs in through `id.atlassian.com`, THE tab list SHALL show no new tab and the link row SHALL show the active page. | manual |
 
 ## Out of scope
 
 - Creating, renaming, moving or deleting bookmarks, and dragging a tab into a folder to bookmark it.
-- Hiding the opened tab from Vivaldi's list of tabs, as Arc does.
 - A different set of folders for each workspace. Tore wants it, as a second iteration once this one
   works.
 - The hover panel with search and last-opened dates: [008](../008-folder-hover-preview/spec.md).
@@ -146,8 +184,9 @@ for a later spec.
   `root` is a path of titles (Tore, 2026-10-27).
 - [x] **Different folders for each workspace?** Not in this version: the same folders in every
   workspace. Tore wants it later, as a second iteration (Tore, 2026-10-27).
-- [x] **Open tab and list of tabs.** The opened link also stays in Vivaldi's list of tabs, with a dot
-  in the folder (Tore, 2026-10-27).
+- [x] **Open tab and list of tabs.** First answer: the opened link also stays in Vivaldi's list of
+  tabs, with a dot in the folder (Tore, 2026-10-27). Changed on 2026-10-28: the tab lives only in its
+  link row, hidden from the list, as in Arc (Tore, screen recording of 0.8.0).
 - [x] **Subfolders.** Open inside the parent up to 3 levels (Tore, 2026-10-27).
 - [x] **Prototype before the design.** Probes run by Tore on Vivaldi 8.2 on 2026-10-27:
   `chrome.bookmarks` is readable with its four change events. An element added above the tab list,
@@ -158,6 +197,14 @@ for a later spec.
   Favorites grid of [003](../003-pinned-tabs-and-folders/spec.md), and never inside it.
 - [x] **Height of the section.** The whole column scrolls as one, as in Arc (Tore, 2026-10-27, with
   screenshots of Arc). FR-11 keeps the requirement; the design explains how far Vivaldi's layout allows it.
+
+- [ ] **Closing.** Proposed: Cmd/Ctrl+W and the close button close the tab of a link, as in Arc.
+  Alternative: unload it like a Favorite in 003, keeping the dot dimmed.
+- [ ] **Leaving the site.** Proposed: the tab stays linked whatever page it shows, as in Arc; the
+  favicon click of 003 that resets a pinned tab also brings it back to the bookmark's address.
+  Alternative: unlink the tab when it leaves the bookmark's site, so it goes back to the list.
+- [ ] **Tabs already open.** Proposed: at start-up an open tab with the address of a link becomes its
+  tab and leaves the list. Alternative: only tabs opened after the update are linked.
 
 ## References
 
