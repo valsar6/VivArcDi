@@ -63,7 +63,7 @@ export class TabBarAnchor {
    * Puts an element in the host, after those with a smaller order.
    *
    * @param element The element to show.
-   * @param order Its place among the sections: the Favorites grid is 10, the folders 20.
+   * @param order Its place among the sections: the Favorites grid is 10, the space header 15, the folders 20.
    * @returns A function that removes the element again.
    * @throws {Error} When the tab list is not found.
    */
