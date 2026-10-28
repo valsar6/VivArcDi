@@ -43,6 +43,7 @@ export class Peek extends Module {
   #controller: PeekController | null = null;
   #injector: PageScriptInjector | null = null;
   #keys: PeekKeys | null = null;
+  #keptTabs = new Map<number, boolean>();
   #unsubscribe: Array<() => void> = [];
 
   /**
@@ -76,6 +77,7 @@ export class Peek extends Module {
   public override stop(): void {
     this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
     this.#unsubscribe = [];
+    this.#keptTabs.clear();
     this.#keys?.detach();
     this.#injector?.detach();
     this.#controller?.close();
@@ -148,13 +150,21 @@ export class Peek extends Module {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message, null)));
     }
     this.#unsubscribe.push(
-      tabs.onUpdated((tabId, change) => {
+      tabs.onUpdated((tabId, change, tab) => {
         if (change.pinned !== undefined || 'vivExtData' in change) {
-          this.#injector?.refresh(tabId);
+          this.#refreshWhenKeptChanges(tabId, tab);
         }
       }),
     );
     this.#subscribeToActivation(tabs, () => logger.warn('chrome.tabs.onActivated is missing: switching tab keeps the Peek'));
+  }
+
+  #refreshWhenKeptChanges(tabId: number, tab: chrome.tabs.Tab): void {
+    const kept = KeptTab.is(tab);
+    if (this.#keptTabs.get(tabId) !== kept) {
+      this.#keptTabs.set(tabId, kept);
+      this.#injector?.refresh(tabId);
+    }
   }
 
   #subscribeToActivation(tabs: BrowserTabs, onMissing: () => void): void {
