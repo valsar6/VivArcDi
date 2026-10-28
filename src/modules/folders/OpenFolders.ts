@@ -6,6 +6,7 @@ export const OPEN_FOLDERS_STORAGE_KEY = 'vivarcdi.openFolders';
 export class OpenFolders {
   #storage: KeyValueStorage | null;
   #logger: Logger;
+  #key = OPEN_FOLDERS_STORAGE_KEY;
   #ids = new Set<string>();
 
   /**
@@ -21,11 +22,22 @@ export class OpenFolders {
   }
 
   /**
-   * Reads the saved ids.
+   * Switches to the folders of a workspace, each with its own saved ids, and reads them.
+   *
+   * @param workspaceId The workspace id, or null for the area outside any workspace.
+   */
+  public useWorkspace(workspaceId: string | null): void {
+    this.#key = workspaceId === null ? OPEN_FOLDERS_STORAGE_KEY : `${OPEN_FOLDERS_STORAGE_KEY}.${workspaceId}`;
+    this.load();
+  }
+
+  /**
+   * Reads the saved ids of the current workspace.
    */
   public load(): void {
+    this.#ids = new Set();
     try {
-      const saved: unknown = JSON.parse(this.#storage?.getItem(OPEN_FOLDERS_STORAGE_KEY) ?? '[]');
+      const saved: unknown = JSON.parse(this.#storage?.getItem(this.#key) ?? '[]');
       this.#ids = new Set(Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string') : []);
     } catch (error) {
       this.#logger.warn('open folders are kept for this session only', error);
@@ -50,7 +62,7 @@ export class OpenFolders {
       this.#ids.add(id);
     }
     try {
-      this.#storage?.setItem(OPEN_FOLDERS_STORAGE_KEY, JSON.stringify([...this.#ids]));
+      this.#storage?.setItem(this.#key, JSON.stringify([...this.#ids]));
     } catch (error) {
       this.#logger.warn('open folders are kept for this session only', error);
     }
