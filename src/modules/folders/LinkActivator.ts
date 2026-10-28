@@ -1,6 +1,7 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
+import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
 import { UnloadedTabs } from '../favorites/UnloadedTabs.js';
 import type { OpenLinks } from './OpenLinks.js';
 
@@ -8,6 +9,7 @@ export type ActivatorTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 
 
 export class LinkActivator {
   #tabs: ActivatorTabs;
+  #workspaceTabs: WorkspaceTabs;
   #openLinks: Pick<OpenLinks, 'tabFor'>;
   #logger: Logger;
 
@@ -20,6 +22,7 @@ export class LinkActivator {
    */
   constructor(tabs: ActivatorTabs, openLinks: Pick<OpenLinks, 'tabFor'>, logger: Logger) {
     this.#tabs = tabs;
+    this.#workspaceTabs = new WorkspaceTabs(tabs, logger);
     this.#openLinks = openLinks;
     this.#logger = logger;
   }
@@ -50,14 +53,6 @@ export class LinkActivator {
 
   async #open(url: string): Promise<void> {
     const [active] = await this.#tabs.query({ active: true, currentWindow: true });
-    const created = await this.#tabs.create({ url, active: true });
-    const workspace = active === undefined ? null : TabData.of(active);
-    if (workspace !== null && created.id !== undefined) {
-      try {
-        await this.#tabs.update(created.id, { vivExtData: TabData.withWorkspace(TabData.dataOf(created), workspace) });
-      } catch (error) {
-        this.#logger.warn('could not put the new tab in the current workspace', error);
-      }
-    }
+    await this.#workspaceTabs.open(url, active === undefined ? null : TabData.of(active));
   }
 }
