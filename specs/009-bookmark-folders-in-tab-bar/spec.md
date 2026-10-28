@@ -178,7 +178,7 @@ Favorite.
 ## Out of scope
 
 - Creating, renaming, moving or deleting bookmarks, and dragging a tab into a folder to bookmark it.
-- A different set of folders for each workspace. Tore wants it, as a second iteration once this one
+- A different set of folders for each workspace: [010](../010-folders-per-workspace/spec.md). Tore wants it as a second iteration once this one
   works.
 - The hover panel with search and last-opened dates: [008](../008-folder-hover-preview/spec.md).
 - Tab stacks as folders: [003](../003-pinned-tabs-and-folders/spec.md).
