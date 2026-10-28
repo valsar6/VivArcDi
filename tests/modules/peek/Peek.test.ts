@@ -99,6 +99,57 @@ test('peek module gives the tab of a folder link the policy of a pinned tab', as
   peek.stop();
 });
 
+async function startedPeek(tab: { pinned?: boolean; vivExtData?: string }): Promise<{ peek: Peek; webview: FakeElement; tabs: ActivatableTabs }> {
+  const { context, webview, tabs } = setUp(tab);
+  const peek = new Peek();
+  await peek.start(context);
+  await settle();
+  return { peek, webview, tabs };
+}
+
+const extDataChange = (vivExtData: string): chrome.tabs.OnUpdatedInfo => ({ vivExtData }) as chrome.tabs.OnUpdatedInfo;
+const ownData = (own: Record<string, unknown>): string => JSON.stringify({ workspaceId: 7, vivarcdi: own });
+
+test('peek module does not refresh the page script when a change only writes lastActive', async () => {
+  const { peek, webview, tabs } = await startedPeek({ pinned: false });
+  tabs.emit(1, extDataChange(ownData({ lastActive: 100 })));
+  await settle();
+  const known = webview.executed.length;
+  tabs.emit(1, extDataChange(ownData({ lastActive: 200 })));
+  tabs.emit(1, extDataChange(ownData({ lastActive: 300 })));
+  await settle();
+  assert.equal(webview.executed.length, known);
+  peek.stop();
+});
+
+test('peek module refreshes the page script when a change adds a bookmarkId', async () => {
+  const { peek, webview, tabs } = await startedPeek({ pinned: false });
+  tabs.emit(1, extDataChange(ownData({ lastActive: 100 })));
+  await settle();
+  const known = webview.executed.length;
+  tabs.emit(1, extDataChange(ownData({ lastActive: 100, bookmarkId: '11' })));
+  await settle();
+  assert.equal(webview.executed.length, known + 1);
+  assert.match(webview.executed.at(-1) ?? '', /"pinned":true,"tabId":1/);
+  peek.stop();
+});
+
+test('peek module refreshes the page script when a pinned change flips the kept state', async () => {
+  const { peek, webview, tabs } = await startedPeek({ pinned: false });
+  tabs.emit(1, { pinned: false });
+  await settle();
+  const known = webview.executed.length;
+  tabs.emit(1, { pinned: true });
+  await settle();
+  assert.equal(webview.executed.length, known + 1);
+  assert.match(webview.executed.at(-1) ?? '', /"pinned":true,"tabId":1/);
+  tabs.emit(1, { pinned: false });
+  await settle();
+  assert.equal(webview.executed.length, known + 2);
+  assert.match(webview.executed.at(-1) ?? '', /"pinned":false,"tabId":1/);
+  peek.stop();
+});
+
 test('peek module opens a panel for a message with its token only', async () => {
   const { context, container, webview, messages } = setUp();
   const peek = new Peek();
