@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,6 +40,30 @@ class MissingDistTest(unittest.TestCase):
         self.assertTrue((data_dir / "dist" / "loader.js").exists())
         self.assertTrue((data_dir / "installer" / "__main__.py").exists())
         self.assertFalse((data_dir / "src").exists())
+
+
+class UserConfigTest(unittest.TestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        self.source = make_payload_source(self.root)
+        self.installation = VivaldiInstallation(
+            channel="stable", version="8.1.3740.12", resources_dir=make_debian_vivaldi(self.root)
+        )
+        self.config = {"modules": {"bookmark-folders": {"root": "My/Own Folder", "workspaces": {"Work": "My/Work"}}}}
+        (self.source / "config.json").write_text(json.dumps(self.config))
+
+    def deployed_config(self):
+        return json.loads((self.installation.payload_dir / "config.json").read_text())
+
+    def test_the_options_the_user_set_in_config_json_are_deployed_unchanged(self):
+        PayloadDeployer(self.source, "0.10.0").deploy(self.installation)
+        self.assertEqual(self.deployed_config(), self.config)
+
+    def test_a_reinstall_keeps_the_options_of_the_config_json_it_copies(self):
+        deployer = PayloadDeployer(self.source, "0.10.0")
+        deployer.deploy(self.installation)
+        deployer.deploy(self.installation)
+        self.assertEqual(self.deployed_config(), self.config)
 
 
 if __name__ == "__main__":
