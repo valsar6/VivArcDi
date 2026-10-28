@@ -105,13 +105,17 @@ export class FavoritesGrid extends Module {
     this.#refresh?.cancel();
     this.#middleClick?.detach();
     this.#unloadedTabs?.stop();
-    this.#fromBookmarks?.stop();
-    this.#hiddenMarker?.stop();
+    this.#stopBookmarks();
     this.#layout?.release();
     this.#tagger?.clear();
     this.#observer = null;
     this.#middleClick = null;
     this.#unloadedTabs = null;
+  }
+
+  #stopBookmarks(): void {
+    this.#fromBookmarks?.stop();
+    this.#hiddenMarker?.stop();
     this.#fromBookmarks = null;
     this.#hiddenMarker = null;
     this.#hiddenTabs = null;

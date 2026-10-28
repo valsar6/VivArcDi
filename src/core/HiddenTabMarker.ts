@@ -7,6 +7,13 @@ import { TabSlot } from './TabSlot.js';
 
 export type StripWatcher = (target: Node, onChange: () => void) => () => void;
 
+export interface MarkerOptions {
+  /** Reports changes under the browser root, replaceable in tests. */
+  watch?: StripWatcher;
+  /** Frame scheduling for the repeats, replaceable in tests. */
+  timing?: FrameTiming;
+}
+
 export const HIDDEN_ATTRIBUTE = 'data-vivarcdi-hidden';
 
 const watchSubtree: StripWatcher = (target, onChange) => {
@@ -32,10 +39,9 @@ export class HiddenTabMarker {
    * @param document The browser window document.
    * @param selectors Needs `browser`, `tabStrip` and `tabWrapper`.
    * @param hidden The tabs to hide.
-   * @param watch Reports changes under the browser root, replaceable in tests.
-   * @param timing Frame scheduling for the repeats, replaceable in tests.
+   * @param options Replaceable watching and frame scheduling, for tests.
    */
-  constructor(document: Document, selectors: SelectorCatalog, hidden: HiddenTabs, watch: StripWatcher = watchSubtree, timing: FrameTiming = {}) {
+  constructor(document: Document, selectors: SelectorCatalog, hidden: HiddenTabs, { watch = watchSubtree, timing = {} }: MarkerOptions = {}) {
     this.#document = document;
     this.#selectors = selectors;
     this.#hidden = hidden;

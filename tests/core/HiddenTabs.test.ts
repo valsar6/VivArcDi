@@ -12,16 +12,11 @@ function setup(): { hidden: HiddenTabs; strip: FakeNode; marker: HiddenTabMarker
   const document = { querySelector: (selector: string): FakeNode | null => (selector === '#browser' ? browser : selector === 'strip' ? strip : null) } as unknown as Document;
   let notify = (): void => undefined;
   const hidden = new HiddenTabs();
-  const marker = new HiddenTabMarker(
-    document,
-    selectors,
-    hidden,
-    (_target, onChange) => {
-      notify = onChange;
-      return () => undefined;
-    },
-    immediate,
-  );
+  const watch = (_target: Node, onChange: () => void): (() => void) => {
+    notify = onChange;
+    return () => undefined;
+  };
+  const marker = new HiddenTabMarker(document, selectors, hidden, { watch, timing: immediate });
   return { hidden, strip, marker, changed: () => notify() };
 }
 
