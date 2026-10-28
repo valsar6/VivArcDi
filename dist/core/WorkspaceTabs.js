@@ -1,6 +1,8 @@
+import { TabDataWriter } from "./TabDataWriter.js";
 import { TabData } from "./TabData.js";
 class WorkspaceTabs {
   #tabs;
+  #writer;
   #logger;
   /**
    * Opens tabs inside a chosen workspace, which `chrome.tabs.create` cannot do by itself.
@@ -10,11 +12,12 @@ class WorkspaceTabs {
    */
   constructor(tabs, logger) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
     this.#logger = logger;
   }
   /**
    * Opens an address in a new active tab, then writes the workspace and VivArcDi's own values into
-   * its `vivExtData` with one update. When they cannot be written, the tab stays where Vivaldi
+   * its `vivExtData` in one write that reads the tab again. When they cannot be written, the tab stays where Vivaldi
    * put it.
    *
    * @param url The address to open.
@@ -27,7 +30,7 @@ class WorkspaceTabs {
     if ((workspace !== null || Object.keys(own).length > 0) && created.id !== void 0) {
       try {
         const extra = workspace === null ? {} : { workspaceId: TabData.rawWorkspace(workspace) };
-        await this.#tabs.update(created.id, { vivExtData: TabData.withOwn(created, own, extra) });
+        await this.#writer.write(created.id, (tab) => TabData.withOwn(tab, own, extra));
       } catch (error) {
         this.#logger.warn("could not store the workspace and link of the new tab", error);
       }

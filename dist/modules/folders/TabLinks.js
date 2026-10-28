@@ -1,6 +1,8 @@
+import { TabDataWriter } from "../../core/TabDataWriter.js";
 import { TabData } from "../../core/TabData.js";
 class TabLinks {
   #tabs;
+  #writer;
   /**
    * Writes the link between a tab and a bookmark into the tab's `vivExtData`, where it survives a
    * restart. Everything else Vivaldi stored there is kept.
@@ -9,6 +11,7 @@ class TabLinks {
    */
   constructor(tabs) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
   /**
    * Makes a tab the tab of a bookmark.
@@ -34,8 +37,7 @@ class TabLinks {
     }
   }
   async #write(tabId, bookmarkId) {
-    const fresh = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(fresh, { bookmarkId }) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { bookmarkId }));
   }
 }
 export {

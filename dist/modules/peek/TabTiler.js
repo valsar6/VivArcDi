@@ -1,6 +1,7 @@
+import { TabDataWriter } from "../../core/TabDataWriter.js";
 import { TabData } from "../../core/TabData.js";
 class TabTiler {
-  #tabs;
+  #writer;
   #newId;
   /**
    * Tiles tabs side by side the way Vivaldi's own "Tile tabs" command does: by
@@ -10,7 +11,7 @@ class TabTiler {
    * @param newId Creates the id of a tiling group.
    */
   constructor(tabs, newId = () => crypto.randomUUID()) {
-    this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
     this.#newId = newId;
   }
   /**
@@ -24,8 +25,7 @@ class TabTiler {
     );
   }
   async #mark(tabId, tiling) {
-    const tab = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.with(tab, "tiling", tiling) });
+    await this.#writer.write(tabId, (tab) => TabData.with(tab, "tiling", tiling));
   }
 }
 export {

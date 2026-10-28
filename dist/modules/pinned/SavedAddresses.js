@@ -1,8 +1,10 @@
 import { OwnPage } from "../../core/OwnPage.js";
+import { TabDataWriter } from "../../core/TabDataWriter.js";
 import { TabData } from "../../core/TabData.js";
 const WEB_URL = /^https?:\/\//i;
 class SavedAddresses {
   #tabs;
+  #writer;
   /**
    * Keeps the own page of pinned tabs in their `vivExtData`, under VivArcDi's key, so it
    * follows the tab across restarts. Every write reads the tab again and leaves the other keys.
@@ -11,6 +13,7 @@ class SavedAddresses {
    */
   constructor(tabs) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
   /**
    * @param tab A tab.
@@ -34,11 +37,11 @@ class SavedAddresses {
    * @param tabId The tab.
    */
   async forget(tabId) {
-    const tab = await this.#tabs.get(tabId);
-    const { favoriteId, pinnedUrl } = TabData.ownOf(tab);
-    if (favoriteId !== void 0 || pinnedUrl !== void 0) {
-      await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(tab, { favoriteId: void 0, pinnedUrl: void 0 }) });
-    }
+    await this.#writer.write(tabId, (tab) => {
+      const { favoriteId, pinnedUrl } = TabData.ownOf(tab);
+      const linked = favoriteId !== void 0 || pinnedUrl !== void 0;
+      return linked ? TabData.withOwn(tab, { favoriteId: void 0, pinnedUrl: void 0 }) : null;
+    });
   }
   /**
    * Brings a tab back to its own page when it shows another one.
@@ -52,8 +55,7 @@ class SavedAddresses {
     }
   }
   async #rewrite(tabId, changes) {
-    const tab = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(tab, changes) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, changes));
   }
 }
 export {

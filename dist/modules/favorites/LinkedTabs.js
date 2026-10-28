@@ -1,6 +1,8 @@
+import { TabDataWriter } from "../../core/TabDataWriter.js";
 import { TabData } from "../../core/TabData.js";
 class LinkedTabs {
   #tabs;
+  #writer;
   /**
    * Knows which tabs are linked to which Favorite. The link is the bookmark id that
    * VivArcDi writes into the tab's `vivExtData`, so it survives restarts.
@@ -9,6 +11,7 @@ class LinkedTabs {
    */
   constructor(tabs) {
     this.#tabs = tabs;
+    this.#writer = TabDataWriter.of(tabs);
   }
   /**
    * @returns The links of the current window, as seen from its active tab's workspace.
@@ -45,11 +48,11 @@ class LinkedTabs {
    * @param workspaceId Raw workspace id to give the tab, or undefined to leave it.
    */
   async link(tabId, favorite, workspaceId) {
-    const tab = await this.#tabs.get(tabId);
     const extra = workspaceId === void 0 ? {} : { workspaceId };
-    await this.#tabs.update(tabId, {
-      vivExtData: TabData.withOwn(tab, { favoriteId: favorite.id, pinnedUrl: favorite.url }, extra)
-    });
+    await this.#writer.write(
+      tabId,
+      (tab) => TabData.withOwn(tab, { favoriteId: favorite.id, pinnedUrl: favorite.url }, extra)
+    );
   }
   /**
    * Follows a change of the Favorites folder: tabs of removed Favorites are unlinked and show
@@ -75,8 +78,7 @@ class LinkedTabs {
     }
   }
   async #rewrite(tabId, changes) {
-    const fresh = await this.#tabs.get(tabId);
-    await this.#tabs.update(tabId, { vivExtData: TabData.withOwn(fresh, changes) });
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, changes));
   }
   static #preferred(candidate, current) {
     return current === void 0 || candidate.active || (candidate.lastAccessed ?? 0) > (current.lastAccessed ?? 0);
