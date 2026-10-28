@@ -1,0 +1,41 @@
+@use 'tokens' as *;
+
+$toast: '[data-vivarcdi-toast]';
+$toast-visible: '[data-vivarcdi-visible]';
+$toast-offset: 24px;
+$toast-layer: 60;
+$toast-radius: 8px;
+$toast-padding-block: 8px;
+$toast-padding-inline: 14px;
+$toast-shadow: 0 8px 24px rgb(0 0 0 / 30%);
+$toast-shift: 8px;
+
+#{$root} #{$toast} {
+  position: fixed;
+  z-index: $toast-layer;
+  bottom: $toast-offset;
+  left: 50%;
+  padding: $toast-padding-block $toast-padding-inline;
+  border-radius: $toast-radius;
+  opacity: 0;
+  background-color: var(--colorBg, #222);
+  box-shadow: $toast-shadow;
+  color: var(--colorFg, #fff);
+  font-size: 13px;
+  pointer-events: none;
+  transform: translate(-50%, $toast-shift);
+  transition:
+    opacity $transition,
+    transform $transition;
+  -webkit-app-region: no-drag;
+
+  &#{$toast-visible} {
+    opacity: 1;
+    transform: translate(-50%, 0);
+
+    @starting-style {
+      opacity: 0;
+      transform: translate(-50%, $toast-shift);
+    }
+  }
+}

@@ -5,11 +5,14 @@ export interface OwnTabData {
   favoriteId?: string;
   /** Address of the page the pinned tab goes back to on reset. */
   pinnedUrl?: string;
+  /** When the tab last stopped being active, in milliseconds since the epoch. */
+  lastActive?: number;
 }
 
 export type OwnTabChanges = { [Key in keyof OwnTabData]: OwnTabData[Key] | undefined };
 
 const OWN_KEY = 'vivarcdi';
+const STACK_KEY = 'group';
 
 export class TabData {
   /**
@@ -21,6 +24,18 @@ export class TabData {
   public static of(tab: chrome.tabs.Tab): string | null {
     const id = TabData.#parse((tab as VivaldiTab).vivExtData)['workspaceId'];
     return typeof id === 'number' || typeof id === 'string' ? String(id) : null;
+  }
+
+  /**
+   * Reads the tab stack a tab belongs to from Vivaldi's `vivExtData`. The key is still to be
+   * confirmed on Vivaldi 8.2, so it is read here and nowhere else.
+   *
+   * @param tab A tab.
+   * @returns The stack id, or null for a tab outside any stack.
+   */
+  public static stackOf(tab: chrome.tabs.Tab): string | null {
+    const id = TabData.extDataOf(tab)[STACK_KEY];
+    return (typeof id === 'string' && id !== '') || typeof id === 'number' ? String(id) : null;
   }
 
   /**
@@ -71,10 +86,11 @@ export class TabData {
     if (typeof own !== 'object' || own === null) {
       return {};
     }
-    const { favoriteId, pinnedUrl } = own as Record<string, unknown>;
+    const { favoriteId, pinnedUrl, lastActive } = own as Record<string, unknown>;
     return {
       ...(typeof favoriteId === 'string' ? { favoriteId } : {}),
       ...(typeof pinnedUrl === 'string' ? { pinnedUrl } : {}),
+      ...(typeof lastActive === 'number' && Number.isFinite(lastActive) ? { lastActive } : {}),
     };
   }
 
@@ -89,7 +105,7 @@ export class TabData {
   public static withOwn(tab: chrome.tabs.Tab, changes: OwnTabChanges, extra: Record<string, unknown> = {}): string {
     const data = TabData.extDataOf(tab);
     delete data[OWN_KEY];
-    const own: Record<string, string> = { ...TabData.ownOf(tab) };
+    const own: Record<string, string | number> = { ...TabData.ownOf(tab) };
     for (const [key, value] of Object.entries(changes)) {
       if (value === undefined) {
         delete own[key];

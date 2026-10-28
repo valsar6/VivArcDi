@@ -1,10 +1,12 @@
+import type { CopyMessage } from '../../modules/copyurl/CopyMessage.js';
 import { CONSOLE_PREFIX } from '../../modules/peek/PeekMessage.js';
 import type { PeekMessage } from '../../modules/peek/PeekMessage.js';
 import type { PinnedMessage } from '../../modules/pinned/PinnedMessage.js';
+import type { ArchiveMessage } from '../../modules/today/ArchiveMessage.js';
 
 type SendMessage = (value: unknown) => void;
 
-type InterfaceMessage = PeekMessage | PinnedMessage;
+type InterfaceMessage = PeekMessage | PinnedMessage | CopyMessage | ArchiveMessage;
 
 /**
  * Sends a message from a script injected into a page to Vivaldi's interface.

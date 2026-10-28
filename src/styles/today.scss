@@ -1,0 +1,193 @@
+@use 'tokens' as *;
+
+$archive: '[data-vivarcdi-archive]';
+$archive-footer: '[data-vivarcdi-archive-footer]';
+$clear: '[data-vivarcdi-clear]';
+$archive-width: 340px;
+$archive-max-height: 70vh;
+$archive-row-height: 44px;
+$clear-height: $separator-gap * 2 + 1px;
+
+#{$root} :is(#{$archive}, #{$archive-footer}, #{$clear}) {
+  -webkit-app-region: no-drag;
+}
+
+#{$root} #{$archive} {
+  --vivarcdi-archive-highlight: color-mix(in srgb, var(--colorFg, #fff) #{$preview-tint-highlight}, transparent);
+  --vivarcdi-archive-field: color-mix(in srgb, var(--colorFg, #fff) #{$preview-tint-field}, transparent);
+
+  position: fixed;
+  z-index: $preview-layer;
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  box-sizing: border-box;
+  width: $archive-width;
+  max-height: $archive-max-height;
+  padding: $gap;
+  border-radius: $preview-radius;
+  background-color: var(--colorBg, #222);
+  box-shadow: $preview-shadow;
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+
+  .vivarcdi-archive-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $gap;
+    padding-inline: $gap * 0.5;
+  }
+
+  .vivarcdi-archive-heading {
+    font-weight: 600;
+  }
+
+  button {
+    padding: 4px $gap;
+    border: 0;
+    border-radius: var(--vivarcdi-radius);
+    background-color: var(--vivarcdi-archive-field);
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--vivarcdi-archive-highlight);
+    }
+  }
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 6px $gap;
+    border: 0;
+    border-radius: var(--vivarcdi-radius);
+    outline: none;
+    background-color: var(--vivarcdi-archive-field);
+    color: inherit;
+    font: inherit;
+  }
+
+  .vivarcdi-archive-list {
+    overflow-y: auto;
+  }
+
+  .vivarcdi-archive-day {
+    padding: $gap $gap 4px;
+    opacity: 0.65;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  [role='option'] {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    box-sizing: border-box;
+    height: $archive-row-height;
+    padding-inline: $gap;
+    border-radius: var(--vivarcdi-radius);
+    cursor: default;
+
+    &:hover,
+    &[data-vivarcdi-highlight] {
+      background-color: var(--vivarcdi-archive-highlight);
+    }
+  }
+
+  .vivarcdi-archive-icon {
+    flex: none;
+    width: $preview-icon-size;
+    height: $preview-icon-size;
+    border-radius: 4px;
+    object-fit: contain;
+  }
+
+  .vivarcdi-archive-letter {
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    background-color: var(--vivarcdi-archive-field);
+  }
+
+  .vivarcdi-archive-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .vivarcdi-archive-title,
+  .vivarcdi-archive-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vivarcdi-archive-meta {
+    opacity: 0.65;
+    font-size: 11px;
+  }
+
+  .vivarcdi-archive-empty {
+    padding: $gap;
+    opacity: 0.65;
+  }
+}
+
+#{$root} #{$pinned-last} #{$clear} {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  height: $clear-height;
+  padding: 0 $gap;
+  border: 0;
+  background: transparent;
+  color: var(--colorFg, inherit);
+  font: inherit;
+  font-size: 11px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--vivarcdi-transition);
+
+  &:hover,
+  &:focus-visible {
+    opacity: 0.8;
+  }
+}
+
+#{$root} #{$archive-footer} {
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  padding: $gap * 0.5 $gap;
+
+  button {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px $gap;
+    border: 0;
+    border-radius: var(--vivarcdi-radius);
+    background: transparent;
+    color: var(--colorFg, inherit);
+    font: inherit;
+    font-size: 12px;
+    text-align: start;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: background-color var(--vivarcdi-transition), opacity var(--vivarcdi-transition);
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);
+      opacity: 1;
+    }
+  }
+}

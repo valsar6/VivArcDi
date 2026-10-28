@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PersistentStorage } from '../../src/core/PersistentStorage.js';
-import type { StorageArea, StorageHost } from '../../src/core/PersistentStorage.js';
+import type { StorageArea, StorageChangeListener, StorageHost } from '../../src/core/PersistentStorage.js';
 import { silentLogger } from '../modules/reopen/fakes.js';
 import { DomDocument, asDocument } from './dom.js';
 
@@ -10,6 +10,7 @@ class FakeArea implements StorageArea {
   public writes: Array<Record<string, unknown>> = [];
   public failing = false;
   public host: StorageHost = { runtime: {} };
+  public listeners: StorageChangeListener[] = [];
 
   constructor(items: Record<string, unknown> = {}) {
     this.items = items;
@@ -28,7 +29,7 @@ class FakeArea implements StorageArea {
 }
 
 const hostOf = (area: FakeArea): StorageHost => {
-  area.host = { storage: { local: area }, runtime: {} };
+  area.host = { storage: { local: area, onChanged: { addListener: (listener): void => void area.listeners.push(listener), removeListener: (listener): void => void (area.listeners = area.listeners.filter((candidate) => candidate !== listener)) } }, runtime: {} };
   return area.host;
 };
 
@@ -83,4 +84,36 @@ test('keeps the value in memory when a write fails', async () => {
   };
   storage.setItem('vivarcdi.c', '3');
   assert.equal(storage.getItem('vivarcdi.c'), '3');
+});
+
+const openOnArea = async (area: FakeArea, host: StorageHost = hostOf(area)): Promise<Awaited<ReturnType<typeof PersistentStorage.open>>> => {
+  const dom = new DomDocument();
+  dom.defaultView = null;
+  return PersistentStorage.open(asDocument(dom), host, silentLogger());
+};
+
+test('follows changes another window makes to chrome.storage.local', async () => {
+  const area = new FakeArea({ 'vivarcdi.a': '1', 'vivarcdi.b': '2' });
+  const storage = await openOnArea(area);
+  assert.equal(area.listeners.length, 1);
+  area.listeners[0]?.({ 'vivarcdi.a': { newValue: '10' }, 'vivarcdi.c': { newValue: '3' }, 'vivarcdi.b': { newValue: undefined } }, 'local');
+  assert.equal(storage.getItem('vivarcdi.a'), '10');
+  assert.equal(storage.getItem('vivarcdi.c'), '3');
+  assert.equal(storage.getItem('vivarcdi.b'), null);
+});
+
+test('ignores changes in other areas and to keys that are not VivArcDi\'s', async () => {
+  const area = new FakeArea({ 'vivarcdi.a': '1' });
+  const storage = await openOnArea(area);
+  area.listeners[0]?.({ 'vivarcdi.a': { newValue: 'sync' } }, 'sync');
+  area.listeners[0]?.({ other: { newValue: 'x' }, 'vivarcdi.a': { newValue: 5 } }, 'local');
+  assert.equal(storage.getItem('vivarcdi.a'), '1');
+  assert.equal(storage.getItem('other'), null);
+});
+
+test('works when chrome.storage has no onChanged', async () => {
+  const area = new FakeArea({ 'vivarcdi.a': '1' });
+  const storage = await openOnArea(area, { storage: { local: area }, runtime: {} });
+  storage.setItem('vivarcdi.a', '2');
+  assert.equal(storage.getItem('vivarcdi.a'), '2');
 });
