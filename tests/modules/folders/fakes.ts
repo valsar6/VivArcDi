@@ -92,6 +92,15 @@ export class FolderTabs {
     ) as chrome.tabs.Tab[];
   }
 
+  public async get(tabId: number): Promise<chrome.tabs.Tab> {
+    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
+  }
+
+  public async remove(tabId: number): Promise<void> {
+    this.calls.push(['remove', tabId]);
+    this.close(tabId);
+  }
+
   public async activate(tabId: number): Promise<chrome.tabs.Tab> {
     this.calls.push(['activate', tabId]);
     return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
@@ -112,6 +121,10 @@ export class FolderTabs {
     this.calls.push(['update', tabId, properties]);
     if (this.failing.has('update')) {
       throw new Error('update failed');
+    }
+    const tab = this.tabs.get(tabId);
+    if (tab !== undefined) {
+      this.tabs.set(tabId, { ...tab, ...properties });
     }
     return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
   }
@@ -139,6 +152,12 @@ export class FolderTabs {
   public open(tab: FolderTab): void {
     this.tabs.set(tab.id, { windowId: 1, ...tab });
     this.created.forEach((listener) => listener({ ...tab } as chrome.tabs.Tab));
+  }
+
+  public navigate(tabId: number, url: string): void {
+    const tab = { ...this.tabs.get(tabId), url } as FolderTab;
+    this.tabs.set(tabId, tab);
+    this.updated.forEach((listener) => listener(tabId, { url }, tab as chrome.tabs.Tab));
   }
 
   public close(tabId: number): void {

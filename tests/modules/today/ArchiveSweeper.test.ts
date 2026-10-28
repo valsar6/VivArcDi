@@ -47,6 +47,16 @@ test('never archives protected tabs', async () => {
   assert.equal(store.entries.length, 0);
 });
 
+test('does not archive the tab of a link', async () => {
+  const old = NOW - 100 * HOUR;
+  const linked: FolderTab = { id: 2, url: 'https://jira.example/board', vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11', lastActive: old } }) };
+  const { tabs, store, sweeper } = setup([ACTIVE, linked]);
+  await sweeper.sweep();
+  await sweeper.clear();
+  assert.deepEqual(tabs.removedIds(), []);
+  assert.equal(store.entries.length, 0);
+});
+
 test('activation resets the timer', async () => {
   const clock = { now: NOW - 13 * HOUR };
   const { tabs, sweeper, stamps } = setup([ACTIVE, { id: 2, url: 'https://read.example/', vivExtData: stamped(NOW - 20 * HOUR) }], clock);

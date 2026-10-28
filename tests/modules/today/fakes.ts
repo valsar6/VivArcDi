@@ -20,7 +20,7 @@ export const entry = (url: string, title: string, archivedAt: number, workspace:
 export class TodayTabs extends LinkingTabs {
   public failingRemove = false;
 
-  public async remove(tabId: number): Promise<void> {
+  public override async remove(tabId: number): Promise<void> {
     this.calls.push(['remove', tabId]);
     if (this.failingRemove) {
       throw new Error('remove failed');

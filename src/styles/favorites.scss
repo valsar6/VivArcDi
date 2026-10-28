@@ -122,10 +122,6 @@
   filter: saturate($unloaded-saturation);
 }
 
-#{$root} #{$hidden-slot} {
-  display: none !important;
-}
-
 #{$root} #{$tiles} {
   @include tint('', $tint-rest);
   @include tint('-hover', $tint-hover);

@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { HiddenTabMarker } from '../../../src/core/HiddenTabMarker.js';
+import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { TabUnloader } from '../../../src/core/TabUnloader.js';
 import { FavoriteOpener } from '../../../src/modules/favorites/FavoriteOpener.js';
 import { FavoriteStates } from '../../../src/modules/favorites/FavoriteStates.js';
-import { FavoriteTagger } from '../../../src/modules/favorites/FavoriteTagger.js';
 import { FavoritesFolder } from '../../../src/modules/favorites/FavoritesFolder.js';
 import type { Favorite } from '../../../src/modules/favorites/FavoritesFolder.js';
 import { CURRENT_ATTRIBUTE, DIMMED_ATTRIBUTE, FavoritesView, TILE_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
@@ -105,8 +106,11 @@ test('hides linked tabs and mirrors their state on the tile', async () => {
     return node;
   };
   const slots = [slot(1), slot(2), slot(3)];
-  const tabBar = new FakeNode(['#tabs-tabbar-container', 'vertical'], [new FakeNode(['strip'], slots)]);
-  new FavoriteTagger(selectors, 0, { has: (): boolean => false }, snapshot.linkedTabIds).apply(tabBar as unknown as Element);
+  const strip = new FakeNode(['strip'], slots);
+  const hidden = new HiddenTabs();
+  hidden.set('favorites-grid', snapshot.linkedTabIds);
+  const stripDocument = { querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null) } as unknown as Document;
+  new HiddenTabMarker(stripDocument, selectors, hidden).apply();
   assert.deepEqual(
     slots.map((node) => node.hasAttribute('data-vivarcdi-hidden')),
     [true, true, false],

@@ -1,6 +1,6 @@
 import type { FolderEntry, LinkEntry, TreeEntry } from './FolderTree.js';
 import { FolderTree } from './FolderTree.js';
-import type { OpenTab } from './OpenLinks.js';
+import type { LinkRef, OpenTab } from './OpenLinks.js';
 
 export interface FolderRow {
   kind: 'folder';
@@ -25,14 +25,15 @@ export type Row = FolderRow | LinkRow;
 
 export interface RowSources {
   isOpen: (folderId: string) => boolean;
-  tabFor: (key: string) => OpenTab | undefined;
+  tabFor: (link: LinkRef) => OpenTab | undefined;
 }
 
 export class FolderRows {
   /**
    * Decides which rows the section shows. An open folder shows its children. A closed folder shows
    * none of them, except the links that have an open tab, which stay below it, one level in, so
-   * that what is in use is always visible.
+   * that what is in use is always visible. A link whose tab shows another page of the web takes
+   * that page's title.
    *
    * @param entries The tree of folders and links.
    * @param sources Which folders are open and which links have a tab.
@@ -48,11 +49,13 @@ export class FolderRows {
     if (open) {
       return [own, ...FolderRows.build(folder.children, sources)];
     }
-    const staying = FolderTree.links(folder.children).filter((link) => sources.tabFor(link.key) !== undefined);
+    const staying = FolderTree.links(folder.children).filter((link) => sources.tabFor(link) !== undefined);
     return [own, ...staying.map((link) => FolderRows.#link(link, folder.depth + 1, sources))];
   }
 
   static #link(link: LinkEntry, depth: number, sources: RowSources): LinkRow {
-    return { kind: 'link', id: link.id, title: link.title, url: link.url, key: link.key, depth, tab: sources.tabFor(link.key) };
+    const tab = sources.tabFor(link);
+    const otherTitle = tab !== undefined && tab.key !== link.key ? tab.title : undefined;
+    return { kind: 'link', id: link.id, title: otherTitle !== undefined && otherTitle !== '' ? otherTitle : link.title, url: link.url, key: link.key, depth, tab };
   }
 }

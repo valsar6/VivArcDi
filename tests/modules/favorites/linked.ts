@@ -7,21 +7,8 @@ export const silentLogger: Logger = reopenLogger();
 export const own = (data: Record<string, unknown>, favoriteId?: string, pinnedUrl?: string): string =>
   JSON.stringify({ ...data, vivarcdi: { ...(favoriteId === undefined ? {} : { favoriteId }), ...(pinnedUrl === undefined ? {} : { pinnedUrl }) } });
 
-/** Tabs that keep what `update` writes, so a later read sees it. */
+/** Folder tabs with `discard` and a parsed read of `vivExtData`. */
 export class LinkingTabs extends FolderTabs {
-  public async get(tabId: number): Promise<chrome.tabs.Tab> {
-    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
-  }
-
-  public override async update(tabId: number, properties: Record<string, unknown>): Promise<chrome.tabs.Tab> {
-    const result = await super.update(tabId, properties);
-    const tab = this.tabs.get(tabId);
-    if (tab !== undefined) {
-      this.tabs.set(tabId, { ...tab, ...properties });
-    }
-    return result;
-  }
-
   public async discard(tabId: number): Promise<chrome.tabs.Tab> {
     this.calls.push(['discard', tabId]);
     return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;

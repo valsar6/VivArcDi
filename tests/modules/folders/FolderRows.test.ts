@@ -4,7 +4,7 @@ import { FolderRows } from '../../../src/modules/folders/FolderRows.js';
 import type { Row } from '../../../src/modules/folders/FolderRows.js';
 import { FolderTree } from '../../../src/modules/folders/FolderTree.js';
 import { OpenFolders } from '../../../src/modules/folders/OpenFolders.js';
-import type { OpenTab } from '../../../src/modules/folders/OpenLinks.js';
+import type { LinkRef, OpenTab } from '../../../src/modules/folders/OpenLinks.js';
 import { silentLogger, MemoryStorage } from '../reopen/fakes.js';
 import { folder, link } from './fakes.js';
 
@@ -21,7 +21,9 @@ const entries = FolderTree.build(
 
 const describe = (rows: Row[]): string[] => rows.map((row) => `${row.depth}:${row.title}${row.kind === 'link' && row.tab ? '*' : ''}`);
 
-const tabFor = (...open: string[]) => (key: string): OpenTab | undefined => (open.includes(key) ? { tabId: 1, favIconUrl: undefined } : undefined);
+const tabOf = (key: string | null, title?: string): OpenTab => ({ tabId: 1, title, key, favIconUrl: undefined, active: false, unloaded: false });
+
+const tabFor = (...open: string[]) => (link: LinkRef): OpenTab | undefined => (open.includes(link.key) ? tabOf(link.key) : undefined);
 
 test('marks open links and keeps them visible below a closed folder', () => {
   const closed = FolderRows.build(entries, { isOpen: () => false, tabFor: tabFor('nixos.org/manual', 'mahjongsoul.game.yo-star.com') });
@@ -32,6 +34,12 @@ test('marks open links and keeps them visible below a closed folder', () => {
 
   const opened = FolderRows.build(entries, { isOpen: (id) => id === '10', tabFor: tabFor('nixos.org/manual') });
   assert.deepEqual(describe(opened), ['0:Hobbies', '1:Mahjong Soul', '1:Nix', '2:Nix manual*', '0:Music']);
+});
+
+test('a link whose tab shows another page takes the title of that page', () => {
+  const login = (link: LinkRef): OpenTab | undefined => (link.id === '11' ? tabOf('id.atlassian.com/login', 'Log in') : undefined);
+  const rows = FolderRows.build(entries, { isOpen: (id) => id === '10', tabFor: login });
+  assert.deepEqual(describe(rows), ['0:Hobbies', '1:Log in*', '1:Nix', '0:Music']);
 });
 
 test('remembers which folders are open', () => {

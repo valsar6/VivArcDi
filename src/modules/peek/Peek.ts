@@ -1,5 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { DomQuery } from '../../core/DomQuery.js';
+import { KeptTab } from '../../core/KeptTab.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';
@@ -42,11 +43,12 @@ export class Peek extends Module {
   #controller: PeekController | null = null;
   #injector: PageScriptInjector | null = null;
   #keys: PeekKeys | null = null;
+  #keptTabs = new Map<number, boolean>();
   #unsubscribe: Array<() => void> = [];
 
   /**
    * Opens links in Peek, a floating panel over the current page that shows the real page:
-   * on Shift+click, and on links that leave the site of a pinned tab.
+   * on Shift+click, and on links that leave the site of a pinned tab, a Favorite or the tab of a folder link.
    * Without `chrome.tabs` the module stays off and links behave as usual.
    *
    * @param context What the module may use.
@@ -75,6 +77,7 @@ export class Peek extends Module {
   public override stop(): void {
     this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
     this.#unsubscribe = [];
+    this.#keptTabs.clear();
     this.#keys?.detach();
     this.#injector?.detach();
     this.#controller?.close();
@@ -131,7 +134,7 @@ export class Peek extends Module {
       scriptFor: async (tabId) =>
         scripts.installLinks({
           triggers: { shiftClick, pinnedCrossSite, anyCrossSite },
-          pinned: (await tabs.get(tabId)).pinned,
+          pinned: KeptTab.is(await tabs.get(tabId)),
           tabId,
           token: this.#token,
         }),
@@ -147,13 +150,21 @@ export class Peek extends Module {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message, null)));
     }
     this.#unsubscribe.push(
-      tabs.onUpdated((tabId, change) => {
-        if (change.pinned !== undefined) {
-          this.#injector?.refresh(tabId);
+      tabs.onUpdated((tabId, change, tab) => {
+        if (change.pinned !== undefined || 'vivExtData' in change) {
+          this.#refreshWhenKeptChanges(tabId, tab);
         }
       }),
     );
     this.#subscribeToActivation(tabs, () => logger.warn('chrome.tabs.onActivated is missing: switching tab keeps the Peek'));
+  }
+
+  #refreshWhenKeptChanges(tabId: number, tab: chrome.tabs.Tab): void {
+    const kept = KeptTab.is(tab);
+    if (this.#keptTabs.get(tabId) !== kept) {
+      this.#keptTabs.set(tabId, kept);
+      this.#injector?.refresh(tabId);
+    }
   }
 
   #subscribeToActivation(tabs: BrowserTabs, onMissing: () => void): void {
