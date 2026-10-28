@@ -315,11 +315,41 @@ panel, and the tab bar follows.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `root` | `VivArcDi` | The folder to show, as titles separated by `/`, compared exactly; the first match is used (`config.json` has `Importati da Firefox/Bookmarks Bar`) |
+| `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty shows nothing |
+| `workspaces` | `{}` | The folder of each workspace: the name of the workspace (as in Vivaldi's workspace menu) and the path of its folder, written like `root` |
 | `maxDepth` | `3` | How many levels of folders are shown |
 | `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
 
-If no folder matches `root`, the section stays hidden and the console says so.
+Each workspace can show its own folders, as the spaces of Arc do:
+
+```json
+"bookmark-folders": {
+  "enabled": true,
+  "root": "",
+  "workspaces": {
+    "Work": "Importati da Firefox/Bookmarks Bar/Work",
+    "Personal": "Importati da Firefox/Bookmarks Bar/Personal"
+  }
+}
+```
+
+The section shows the folder of the active workspace and changes when you switch workspace. Each
+workspace remembers which of its folders are open. A workspace with no entry, and the area outside
+any workspace, use `root`; since `root` is empty by default, the section is then hidden and takes no
+space. A workspace renamed in Vivaldi is matched by its new name. An entry with an empty path hides
+the section in that workspace. A `workspaces` option that is not an object of text paths is ignored
+and the console says so.
+
+A link has at most one tab in each workspace: the tab stays in the workspace where it was opened, and
+the same bookmark shown by two workspaces has its own tab in each.
+
+Before 0.10.0 `root` was `Importati da Firefox/Bookmarks Bar`, shown in every workspace. To keep that
+behavior, set `root` to your folder again in `config.json` (or write the same path for each workspace
+in `workspaces`) and run `install` again; the installer copies `config.json` as it is and never
+merges options from an older install.
+
+If no folder matches the root of the active workspace, the section stays hidden and the console says
+so once for that path.
 
 ## Folder panel
 

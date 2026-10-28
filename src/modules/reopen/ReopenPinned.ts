@@ -75,7 +75,7 @@ export class ReopenPinned extends Module {
     if (folders === undefined || folders.enabled === false || !bookmarks.available) {
       return null;
     }
-    const root = typeof folders['root'] === 'string' ? folders['root'] : 'VivArcDi';
+    const root = typeof folders['root'] === 'string' ? folders['root'] : '';
     return LinkKeyIndex.acquire(bookmarks, BookmarkFolderFinder.parsePath(root), logger);
   }
 

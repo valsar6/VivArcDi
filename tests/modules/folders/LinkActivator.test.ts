@@ -80,3 +80,24 @@ test('keeps the new tab where it is when the workspace cannot be written', async
   await activator.activate(MAHJONG_LINK);
   assert.equal(tabs.calls[0]?.[0], 'create');
 });
+
+test('looks for the tab of a link only in the active workspace', async () => {
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/', vivExtData: JSON.stringify({ workspaceId: 7 }) },
+    { id: 2, url: MAHJONG, vivExtData: linkedTo('11', 8) },
+  ]);
+  const open = new OpenLinks(tabs, () => undefined, silentLogger(), immediateFrames);
+  const activator = new LinkActivator(tabs, open, silentLogger());
+  await open.refresh();
+  await activator.activate(MAHJONG_LINK);
+  assert.deepEqual(tabs.actions()[0], ['create', { url: MAHJONG, active: true }]);
+  assert.deepEqual(tabs.actions()[1], ['update', 100, { vivExtData: linkedTo('11', 7) }]);
+  assert.equal(tabs.actions().filter(([name]) => name === 'activate').length, 0);
+
+  tabs.tabs.set(1, { ...tabs.tabs.get(1), active: false } as never);
+  tabs.tabs.set(2, { ...tabs.tabs.get(2), active: true } as never);
+  tabs.calls.length = 0;
+  await open.refresh();
+  await activator.activate(MAHJONG_LINK);
+  assert.deepEqual(tabs.actions(), [['activate', 2]]);
+});

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
 import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
@@ -52,6 +53,7 @@ function running(tabs: RacingFolderTabs): Running {
     options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
     tabs,
     bookmarks: new FakeBookmarks(TREE),
+    prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
   } as unknown as ModuleContext;
   const module = new BookmarkFolders();

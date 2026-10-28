@@ -3,6 +3,8 @@ import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
 import { HiddenTabs } from '../../core/HiddenTabs.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import { ActiveWorkspace } from './ActiveWorkspace.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
 import { FolderTree } from './FolderTree.js';
@@ -14,13 +16,14 @@ import { OpenFolders } from './OpenFolders.js';
 import { OpenLinks } from './OpenLinks.js';
 import type { LinkRef, OpenTab } from './OpenLinks.js';
 import { TabLinks } from './TabLinks.js';
+import type { WorkspaceRoots } from './WorkspaceRoots.js';
 
 const ANCHOR_ORDER = 20;
 const HIDDEN_OWNER = 'bookmark-folders';
 
 export interface SectionSettings {
-  /** Titles of the root folder. */
-  root: string[];
+  /** The root folder of each workspace. */
+  roots: WorkspaceRoots;
   /** How many levels of folders are shown. */
   maxDepth: number;
   /** The most the section may take of the window's height, in percent. */
@@ -38,6 +41,10 @@ export class FolderSection {
   #view: FolderSectionView;
   #hiddenTabs: HiddenTabs;
   #hiddenMarker: HiddenTabMarker;
+  #roots: WorkspaceRoots;
+  #names: WorkspaceNames;
+  #active: ActiveWorkspace;
+  #workspace: string | null | undefined;
   #stops: Array<() => void> = [];
 
   /**
@@ -46,15 +53,24 @@ export class FolderSection {
    * hidden from Vivaldi's tab list, since their rows stand for them.
    *
    * @param context What the module may use.
-   * @param settings The root folder and the sizes.
+   * @param settings The root folders and the sizes.
    */
-  constructor(context: ModuleContext, { root, maxDepth, maxHeightPercent }: SectionSettings) {
-    const { document, selectors, tabs, bookmarks, logger } = context;
+  constructor(context: ModuleContext, { roots, maxDepth, maxHeightPercent }: SectionSettings) {
+    const { document, selectors, tabs, bookmarks, prefs, logger } = context;
     const links = (): LinkEntry[] => FolderTree.links(this.#source.entries);
     this.#context = context;
     this.#redraw = new FrameTask(() => this.#draw());
     this.#openFolders = new OpenFolders(context.storage, logger);
-    this.#source = new FolderTreeSource(bookmarks, { path: root, maxDepth, onChange: (): void => this.#treeChanged(), logger });
+    this.#roots = roots;
+    this.#names = new WorkspaceNames(prefs, (): void => this.#namesChanged(), logger);
+    this.#active = new ActiveWorkspace(tabs, (workspace): void => void this.#show(workspace), logger);
+    this.#source = new FolderTreeSource(bookmarks, {
+      path: [],
+      maxDepth,
+      otherPaths: roots.allPaths,
+      onChange: (): void => this.#treeChanged(),
+      logger,
+    });
     this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger);
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
@@ -73,12 +89,12 @@ export class FolderSection {
   }
 
   /**
-   * Puts the section in the tab bar and starts following the bookmarks and the tabs. Tabs that
-   * already show the address of a link become the tab of that link. Throws when the tab bar or
+   * Puts the section in the tab bar and starts following the bookmarks, the tabs and the active
+   * workspace, whose root it shows. Tabs that already show the address of a link become the tab of
+   * that link. Throws when the tab bar or
    * a tab event is missing; call `stop` then.
    */
   public async start(): Promise<void> {
-    this.#openFolders.load();
     this.#stops.push(TabBarAnchor.of(this.#context.document, this.#context.selectors.get('tabListHost')).add(this.#view.element, ANCHOR_ORDER));
     this.#hiddenMarker.start();
     this.#stops.push(
@@ -88,8 +104,13 @@ export class FolderSection {
       () => this.#source.stop(),
       () => this.#openLinks.stop(),
       () => this.#adopter.stop(),
+      () => this.#active.stop(),
+      () => this.#names.stop(),
     );
-    await Promise.all([this.#source.start(), this.#openLinks.start()]);
+    await this.#names.start();
+    await this.#active.start();
+    await this.#useWorkspace(this.#active.current);
+    await Promise.all([this.#source.start(), this.#openLinks.start(), this.#active.refresh()]);
     this.#adopter.start();
     await this.#adopter.adoptOpenTabs();
     await this.#openLinks.refresh();
@@ -104,6 +125,28 @@ export class FolderSection {
     this.#stops = [];
   }
 
+  async #useWorkspace(workspace: string | null): Promise<void> {
+    this.#workspace = workspace;
+    const root = this.#roots.rootFor(this.#names.nameOf(workspace));
+    this.#openFolders.useWorkspace(workspace);
+    this.#view.setEmpty(root.length === 0);
+    await this.#source.useRoot(root);
+  }
+
+  async #show(workspace: string | null): Promise<void> {
+    if (!this.#names.following) {
+      await this.#names.refresh();
+    }
+    await this.#useWorkspace(workspace);
+    this.#redraw.request();
+  }
+
+  #namesChanged(): void {
+    if (this.#workspace !== undefined) {
+      void this.#useWorkspace(this.#workspace);
+    }
+  }
+
   #toggle(folderId: string): void {
     this.#openFolders.toggle(folderId);
     this.#redraw.request();
@@ -116,8 +159,8 @@ export class FolderSection {
 
   #treeChanged(): void {
     this.#redraw.request();
-    if (this.#source.found) {
-      const ids = new Set(FolderTree.links(this.#source.entries).map((link) => link.id));
+    const ids = this.#source.linkIds;
+    if (ids !== null) {
       this.#tabLinks.unlinkExcept(ids).catch((error: unknown) => this.#context.logger.warn('could not unlink the tabs of removed bookmarks', error));
     }
   }

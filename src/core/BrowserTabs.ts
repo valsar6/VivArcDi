@@ -1,3 +1,4 @@
+import type { PrefsApi } from './BrowserPrefs.js';
 import type { StorageHost } from './PersistentStorage.js';
 import type { BookmarksHost } from './bookmarks/BrowserBookmarks.js';
 
@@ -43,6 +44,7 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
       }
     | undefined;
   windows?: { create: (...args: unknown[]) => void } | undefined;
+  vivaldiPrivate?: { prefs?: PrefsApi | undefined } | undefined;
 }
 
 export class BrowserTabs {

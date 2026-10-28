@@ -12,7 +12,8 @@
   font-size: 13px;
   user-select: none;
 
-  &[hidden] {
+  &[hidden],
+  &[data-vivarcdi-empty] {
     display: none;
   }
 

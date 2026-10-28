@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
+import type { Logger } from '../../../src/core/Logger.js';
+import { TabData } from '../../../src/core/TabData.js';
 import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
@@ -9,20 +12,34 @@ import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
+import { CASETTA, FakePrefsApi, WORK } from '../../core/prefs.js';
 import { FolderTabs, bookmarkTree, folder, link, recordingChrome } from './fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG)]), folder('20', 'Music')]);
 
-function setup(tabs: FolderTabs, bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
+const DEFAULT_OPTIONS = { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 };
+
+interface SetupExtras {
+  options?: Record<string, unknown>;
+  prefs?: BrowserPrefs;
+  logger?: Logger;
+}
+
+function setup(
+  tabs: FolderTabs,
+  bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks,
+  { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger() }: SetupExtras = {},
+): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
   const dom = new DomDocument();
   const context = {
     document: asDocument(dom),
     selectors: new SelectorCatalog({ tabListHost: '.list', browser: '#browser', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
-    logger: silentLogger(),
-    options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
+    logger,
+    options,
     tabs,
     bookmarks,
+    prefs,
     storage: new MemoryStorage(),
   } as unknown as ModuleContext;
   return { dom, module: new BookmarkFolders(), context };
@@ -122,4 +139,123 @@ test('bookmark folders stay off when the tab list is missing', async () => {
   dom.list.remove();
   await module.start(context);
   assert.equal(tabs.listenerCount(), 0);
+});
+
+const WORKSPACE_TREE = bookmarkTree([
+  folder('10', 'Work', [folder('11', 'Jira', [link('12', 'Board', 'https://jira.example/')])]),
+  folder('20', 'Music', [folder('21', 'Radio'), link('22', 'Player', 'https://player.example/')]),
+]);
+const BAR = 'Importati da Firefox/Bookmarks Bar';
+const WORKSPACE_OPTIONS = { root: '', workspaces: { Casetta: `${BAR}/Work`, Work: `${BAR}/Music` }, maxDepth: 3, maxHeightPercent: 60 };
+
+const inWorkspace = (workspaceId: number): string => JSON.stringify({ workspaceId });
+
+function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS): { tabs: FolderTabs; prefs: FakePrefsApi; dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/', vivExtData: inWorkspace(CASETTA.id) },
+    { id: 2, url: 'https://example.org/', vivExtData: inWorkspace(WORK.id) },
+    { id: 3, url: 'https://example.net/' },
+  ]);
+  const prefs = new FakePrefsApi();
+  prefs.values.set('vivaldi.workspaces.list', [CASETTA, WORK]);
+  return { tabs, prefs, ...setup(tabs, recordingChrome(WORKSPACE_TREE).bookmarks, { options, prefs: new BrowserPrefs(prefs) }) };
+}
+
+function activate(tabs: FolderTabs, tabId: number): void {
+  tabs.tabs.forEach((tab, id) => tabs.tabs.set(id, { ...tab, active: id === tabId }));
+  tabs.activated.forEach((listener) => listener({ tabId, windowId: 1 }));
+}
+
+const titles = (dom: DomDocument): Array<string | undefined> => rows(dom).map((row) => (row.textContent === '' ? row.children[1]?.textContent : row.textContent));
+const sectionOf = (dom: DomDocument): DomNode | undefined => dom.parent.children[0]?.children[0];
+
+test('shows the folders of the active workspace', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  await module.start(context);
+  await frame();
+  assert.deepEqual(titles(dom), ['Jira']);
+
+  activate(tabs, 2);
+  await frame();
+  assert.deepEqual(titles(dom), ['Radio', 'Player']);
+
+  activate(tabs, 1);
+  await frame();
+  assert.deepEqual(titles(dom), ['Jira']);
+  module.stop();
+});
+
+test('follows a renamed workspace', async (t) => {
+  installFrames(t);
+  const { tabs, prefs, dom, module, context } = workspaceSetup();
+  await module.start(context);
+  activate(tabs, 2);
+  await frame();
+  assert.deepEqual(titles(dom), ['Radio', 'Player']);
+
+  prefs.set('vivaldi.workspaces.list', [CASETTA, { ...WORK, name: 'Elsewhere' }]);
+  await frame();
+  assert.deepEqual(titles(dom), [], 'a workspace with no entry uses the empty root');
+  module.stop();
+});
+
+test('falls back to the default root outside any workspace', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup({ ...WORKSPACE_OPTIONS, root: `${BAR}/Music` });
+  await module.start(context);
+  activate(tabs, 3);
+  await frame();
+  assert.deepEqual(titles(dom), ['Radio', 'Player']);
+  module.stop();
+});
+
+test('hides the section when the root is empty', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  await module.start(context);
+  await frame();
+  assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), false);
+
+  activate(tabs, 3);
+  await frame();
+  assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), true);
+  assert.deepEqual(titles(dom), []);
+
+  activate(tabs, 2);
+  await frame();
+  assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), false);
+  module.stop();
+});
+
+test('keeps the folders open in each workspace apart', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup({ ...WORKSPACE_OPTIONS, workspaces: { Casetta: `${BAR}/Work`, Work: `${BAR}/Work` } });
+  await module.start(context);
+  await frame();
+  rows(dom)[0]?.click();
+  await frame();
+  assert.equal(rows(dom).length, 2);
+
+  activate(tabs, 2);
+  await frame();
+  assert.equal(rows(dom).length, 1);
+
+  activate(tabs, 1);
+  await frame();
+  assert.equal(rows(dom).length, 2);
+  module.stop();
+});
+
+test('keeps the tab of a link linked while another workspace shows its own folders', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  tabs.tabs.set(4, { id: 4, windowId: 1, url: 'https://jira.example/', vivExtData: JSON.stringify({ workspaceId: CASETTA.id, vivarcdi: { bookmarkId: '12' } }) });
+  await module.start(context);
+  activate(tabs, 2);
+  await frame();
+  await frame();
+  assert.deepEqual(titles(dom), ['Radio', 'Player']);
+  assert.equal(TabData.ownOf(tabs.tabs.get(4) as chrome.tabs.Tab).bookmarkId, '12');
+  module.stop();
 });

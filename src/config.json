@@ -37,7 +37,8 @@
     },
     "bookmark-folders": {
       "enabled": true,
-      "root": "Importati da Firefox/Bookmarks Bar",
+      "root": "",
+      "workspaces": {},
       "maxDepth": 3,
       "maxHeightPercent": 60
     },
