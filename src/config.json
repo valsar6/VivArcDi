@@ -4,6 +4,7 @@
     "styles/favorites.css",
     "styles/folder-preview.css",
     "styles/folders.css",
+    "styles/hidden-tabs.css",
     "styles/peek.css",
     "styles/pinned.css",
     "styles/today.css",

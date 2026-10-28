@@ -1,0 +1,5 @@
+@use 'tokens' as *;
+
+#{$root} #{$hidden-slot} {
+  display: none !important;
+}

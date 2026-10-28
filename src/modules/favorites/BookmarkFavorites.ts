@@ -1,5 +1,6 @@
 import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { HiddenTabs } from '../../core/HiddenTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
@@ -13,6 +14,7 @@ import { FavoritesView } from './FavoritesView.js';
 import { LinkedTabs } from './LinkedTabs.js';
 
 const GRID_ORDER = 10;
+const HIDDEN_OWNER = 'favorites-grid';
 
 export interface BookmarkFavoritesDependencies {
   /** The document of Vivaldi's browser window. */
@@ -29,8 +31,8 @@ export interface BookmarkFavoritesDependencies {
   folder: string;
   /** Most tiles shown. */
   maxTiles: number;
-  /** Filled with the ids of the tabs that tiles stand for, to hide them from the list. */
-  hiddenTabs: Set<number>;
+  /** Receives the ids of the tabs that tiles stand for, to hide them from the list. */
+  hiddenTabs: HiddenTabs;
   /** Called when the tab bar needs marking again. */
   onChange: () => void;
 }
@@ -100,7 +102,7 @@ export class BookmarkFavorites {
     this.#unsubscribe = [];
     this.place(false);
     this.#view.destroy();
-    this.#deps.hiddenTabs.clear();
+    this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
   }
 
   /**
@@ -166,8 +168,7 @@ export class BookmarkFavorites {
     const snapshot = await this.#links.snapshot();
     this.#view.apply(FavoriteStates.of(this.#favorites, snapshot));
     const { hiddenTabs } = this.#deps;
-    hiddenTabs.clear();
-    snapshot.linkedTabIds.forEach((id) => hiddenTabs.add(id));
+    hiddenTabs.set(HIDDEN_OWNER, snapshot.linkedTabIds);
     this.#deps.onChange();
   }
 }
