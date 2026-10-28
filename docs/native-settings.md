@@ -42,14 +42,14 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 |---|---|
 | Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard |
 | Ctrl+Tab in recent order | Settings > Tabs > Tab Cycling: **recently used order** |
-| Copy URL (Cmd/Ctrl+Shift+C) | Settings > Keyboard: search "copy" and bind the copy page address action |
+| Copy URL (Cmd/Ctrl+Shift+C) | Ships with VivArcDi (`copy-url`); leave the shortcut unbound in Vivaldi |
 | Split View | **Tab Tiling**, and "Open link as split tab" (7.8+) |
 
 ## Still missing
 
 The Favorites icon grid, Peek, bookmark folders in the tab bar and pinned tabs that unload on
-Cmd/Ctrl+W and reset to their own page ship with VivArcDi (see the README). Auto-archive is still on
-the roadmap.
+Cmd/Ctrl+W and reset to their own page ship with VivArcDi (see the README), and so do the Today
+archive and copy URL with a toast.
 
 Some setting names above come from release notes rather than the 8.1 interface itself. If one does not
 match, open an issue with the label you see.

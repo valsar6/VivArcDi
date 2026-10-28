@@ -15,7 +15,8 @@ It ships three things:
 
 ## Status
 
-Phase 3 of the [roadmap](#roadmap) has started with [reopening pinned tabs](#reopen-pinned-tabs),
+Phase 4 of the [roadmap](#roadmap) brings the [Today archive](#today-archive) and
+[copy URL](#copy-url), after phase 3 with [reopening pinned tabs](#reopen-pinned-tabs),
 [bookmark folders in the tab bar](#bookmark-folders), [Favorites from a bookmark folder](#favorites)
 and [pinned tabs that reset and unload](#pinned-tabs), after
 [Peek](#peek) of phase 2, the [Favorites grid](#favorites) of phase 1
@@ -322,6 +323,38 @@ The dates are the ones recorded by [reopen pinned tabs](#reopen-pinned-tabs). Th
 | Option | Default | Meaning |
 |---|---|---|
 | `hoverDelayMs` | `400` | How long the pointer must rest, and may be away, in milliseconds (100 to 2000) |
+
+## Today archive
+
+Like Arc, closes the tabs of today that you have not looked at for a while and keeps them in an
+archive, so the tab bar stays short without losing anything. A Today tab is a tab that is not pinned,
+not a Favorite and not in a stack; a tab opened from a [bookmark folder](#bookmark-folders) is one too.
+The time a tab was last active is saved in the tab itself, so the hours Vivaldi was closed count as
+well. The active tab and a tab playing audio are never archived.
+
+The archive opens from the button at the bottom of the tab bar or with Cmd/Ctrl+Shift+A: a search
+field, then the closed tabs grouped by day with favicon, title, host and time. Up and Down move the
+highlight, Enter or a click reopens the tab in its workspace and removes it from the archive, Esc
+closes the panel. Resting the pointer on the line under the pinned tabs shows **Clear**, which
+archives every Today tab of the workspace except the active one; the panel has the same action.
+
+The archive stays on your machine, in Vivaldi's extension storage.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `archiveAfterHours` | `12` | Hours without being active before a Today tab is archived (1 to 720) |
+| `archiveLimit` | `500` | Entries kept; the oldest go first (50 to 5000) |
+
+Set `enabled` to `false` and VivArcDi never closes a tab.
+
+## Copy URL
+
+Cmd/Ctrl+Shift+C copies the address of the active tab, also while the page has the focus, and shows
+a small "Copied" toast at the bottom of the window.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `toastMs` | `2000` | How long the toast stays, in milliseconds (500 to 10000) |
 
 ## Roadmap
 
