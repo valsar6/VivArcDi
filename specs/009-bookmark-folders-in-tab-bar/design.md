@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Approved (revision approved 2026-10-28) |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -47,6 +47,35 @@ inside the tab strip is moved by Vivaldi's rebuilds. That spot is the shared `Ta
    Vivaldi lays out and scrolls its own list, which a mod should not do blindly. It is left for an
    iteration after Tore sees the first version, and the option can be set to 100 to try it.
 
+8. **The link row is the tab (revision of 2026-10-28, FR-12 to FR-17, AC-19 to AC-26).** The tab of a
+   link is found by identity, not by address. `TabData.ownOf` gains `bookmarkId`, written under
+   VivArcDi's own key of `vivExtData` with `TabData.withOwn`, as 003 does with `favoriteId`.
+   - `OpenLinks` maps a link to the tab whose `bookmarkId` is the link's id, in the window and
+     workspace; the address no longer decides once a tab is linked, so a redirect or a page opened
+     inside the tab keeps the link (AC-21). The row shows the tab's title and favicon, a dot, and the
+     active and unloaded states.
+   - `LinkActivator` writes `bookmarkId` together with the workspace id in the same `tabs.update`
+     right after `tabs.create` (AC-20).
+   - `LinkTabAdopter` links tabs that are not linked yet: at start, every tab of the window whose
+     address key is the key of a link without a tab in that workspace (FR-14, tried on Vivaldi); then
+     every tab created after start, on its first navigation to a web address, with the same rule
+     (AC-22). A tab that was already showing a page when it navigates is never adopted, so following a
+     link inside a today's tab does not pull it into a folder. When 007 switches to an existing tab,
+     the new tab closes before it navigates and is never adopted.
+   - `HiddenTabs`, in `src/core`, replaces the private set of 003: each module adds and removes the
+     ids it hides under its own owner name, and the union is the set to hide. `HiddenTabMarker`, also
+     in `src/core`, moves the `data-vivarcdi-hidden` mark out of `FavoriteTagger`: it watches the tab
+     strip and marks each slot whose tab id is in the union, so the Favorites and the folders never
+     undo each other's marks and the folders hide their tabs with the Favorites module off (AC-19).
+     The rule that hides a marked slot moves from `favorites.scss` to a shared `hidden-tabs.scss`.
+   - The row of an open link gets a close button that calls `tabs.remove` (AC-23). Cmd/Ctrl+W is
+     Vivaldi's own close, since the tab is not pinned and the close shortcut of 003 does not touch it.
+     The tab's removal takes the link back inside its closed folder through `OpenLinks`.
+   - `KeptTab.is(tab)`, in `src/core`, says whether a tab is pinned or carries a `favoriteId` or a
+     `bookmarkId`. `TodayTabPolicy` skips kept tabs (AC-24) and Peek passes `pinned: KeptTab.is(tab)`
+     to its page scripts, so `pinnedCrossSite` covers link tabs (AC-26).
+   - When a bookmark is removed, its tab loses its `bookmarkId` and comes back to the tab list.
+
 Rejected alternatives:
 
 - **Tab stacks as folders** (first draft of 003): each link would have to be a real tab, and the
@@ -75,6 +104,11 @@ Rejected alternatives:
 | `src/modules/folders/FolderRows.ts` | Pure: which rows to show, with the open links of a closed folder below it (AC-6) | |
 | `src/modules/folders/FolderSectionView.ts` | Rows, indentation, dots, open links below closed folders, one delegated listener | |
 | `src/modules/folders/BookmarkFolders.ts` | Module: options, wiring, clean stop | Facade |
+| `src/core/HiddenTabs.ts` | Ids of tabs hidden from the list, by owner; the union is what is hidden | Observer |
+| `src/core/HiddenTabMarker.ts` | Marks the slots of hidden tabs with `data-vivarcdi-hidden`, after every redraw of the strip (AC-19) | |
+| `src/core/KeptTab.ts` | Whether a tab is pinned, a Favorite or the tab of a link (AC-24, AC-26) | |
+| `src/modules/folders/LinkTabAdopter.ts` | Links tabs open at start and new tabs on their first navigation to a link's address (AC-22) | Observer |
+| `src/styles/hidden-tabs.scss` | The rule that hides a marked slot, shared by 003 and 009 | |
 | `src/modules/reopen/TabTargets.ts` | Tries the finders of 007 in order | Chain of responsibility |
 | `src/modules/reopen/LinkedTabFinder.ts` | Tab whose address key is in the `LinkKeyIndex` (AC-9) | Strategy |
 | `src/styles/folders.scss` | Rows, indentation, dot, hover, scroll limit, theme colors | |
@@ -91,6 +125,8 @@ pinned-only default.
 | `vivExtData.workspaceId` | Workspace of tabs | Tabs are matched by window only, logged once |
 | Selector `tabListHost` (`#tabs-container > :has(> .tab-strip)`), added by 003 or here | `TabBarAnchor` | Module stays off, logged |
 | `chrome://favicon/` in the interface | Icon of a link; the favicon of its open tab is used first | First letter of the title |
+| `vivExtData.vivarcdi.bookmarkId` | Link between a tab and its bookmark, kept across restarts | Tabs are linked by address only, as in the first version, logged once |
+| Marks: `data-vivarcdi-hidden` on tab slots, by `HiddenTabMarker` | Hides the tab of a link from the list | |
 | Marks: `data-vivarcdi-folders` on the section, `data-vivarcdi-folder-id`, `data-vivarcdi-open` on rows | Styles and 008 | |
 
 The tab bar is a window-drag region on macOS: real clicks and hover never reached the section until it was marked `-webkit-app-region: no-drag` (found by Tore with a console test, 2026-10-27, issue #30). The shared `TabBarAnchor` host carries the mark, so every section in it is covered (AC-17).
@@ -121,4 +157,7 @@ to 20 to 100.
 | Hundreds of links make the section heavy | Closed folders do not draw their children; only open ones are in the DOM |
 | Vivaldi removes the anchor on a redraw | `TabBarAnchor` creates it again; the probes saw it survive every tested redraw; manual check AC-14 |
 | Two folders with the same title, such as `Bookmarks Bar` and `Bookmarks bar` | Exact, case-sensitive path; the first match wins and is logged |
+| A hidden tab is the active one and Vivaldi scrolls the list to it | The row shows it as active; manual check AC-25 |
+| Adopting tabs at start pulls in a tab Tore meant as a today's tab | Only exact address keys of links are adopted; Tore tries it on Vivaldi (FR-14) |
+| Vivaldi rewrites `vivExtData` and drops our key | Workspace and own keys are always written together through `TabData.withOwn`, as 003 does; restart check in the checklist |
 | The scroll limit hides the tab list in a very short window | The limit is a percentage with a floor of 120 px; `maxHeightPercent` is an option |
