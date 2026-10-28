@@ -259,7 +259,7 @@ Some links open in Peek: a rounded panel over the current page, which stays visi
 behind it. The panel shows the real page, so you can scroll, type and follow links inside it.
 
 - **Shift+click** on a link opens it in Peek instead of a new window.
-- In a Favorite or pinned tab, a link to **another site** opens in Peek, so the tab keeps its page.
+- In a Favorite, a pinned tab or the tab of a [bookmark folder](#bookmark-folders) link, a link to **another site** opens in Peek, so the tab keeps its page.
   Subdomains count as the same site: from `mail.google.com`, `docs.google.com` opens in the tab.
 - **Expand** (or Cmd/Ctrl+O) opens the page as a tab right after the current one.
 - **Split** opens it as a tab and tiles it side by side with the current one.
@@ -296,8 +296,22 @@ Shows a bookmark folder in the vertical tab bar, right below the Favorites grid,
 Arc. Each folder opens and closes on click, subfolders open inside their parent, and the folders you
 left open stay open after a restart. A click on a link brings you to its tab if it is open in the
 current window and workspace, and opens it otherwise. A link that is open shows a dot and stays
-visible below its closed folder. The bookmarks are only read: they are created, renamed, moved and
-deleted in Vivaldi's Bookmarks panel, and the tab bar follows.
+visible below its closed folder.
+
+As in Arc, the link row is the tab. The tab a link opens is linked to its bookmark and hidden from
+Vivaldi's list of tabs, so the list holds only the pages you opened outside the Favorites, the pinned
+tabs and the folders. The row shows the dot, the look of an active tab while the tab is the active
+one, a dimmed look while the tab is unloaded, and, on hover, a close button that closes the tab. The
+tab stays linked while it navigates, so a redirect or a login page does not turn it into a stray tab,
+and it keeps the link after a restart. Closing the tab, with the button, Cmd/Ctrl+W or Vivaldi's menu,
+puts the link back inside its closed folder. A new tab becomes the tab of a link when it opens the
+address of a link that has no tab, and when VivArcDi starts, an open tab with the address of a link
+that has no tab becomes its tab. The Today archive never archives these tabs, and a click on a link to
+another site inside one opens in [Peek](#peek), as for pinned tabs. When a bookmark is removed, its
+tab goes back to the list.
+
+The bookmarks are only read: they are created, renamed, moved and deleted in Vivaldi's Bookmarks
+panel, and the tab bar follows.
 
 | Option | Default | Meaning |
 |---|---|---|
@@ -328,7 +342,7 @@ The dates are the ones recorded by [reopen pinned tabs](#reopen-pinned-tabs). Th
 
 Like Arc, closes the tabs of today that you have not looked at for a while and keeps them in an
 archive, so the tab bar stays short without losing anything. A Today tab is a tab that is not pinned,
-not a Favorite and not in a stack; a tab opened from a [bookmark folder](#bookmark-folders) is one too.
+not a Favorite, not the tab of a [bookmark folder](#bookmark-folders) link and not in a stack.
 The time a tab was last active is saved in the tab itself, so the hours Vivaldi was closed count as
 well. The active tab and a tab playing audio are never archived.
 
