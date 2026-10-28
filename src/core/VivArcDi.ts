@@ -1,5 +1,7 @@
 import { createDefaultRegistry } from '../modules/index.js';
 import { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
+import { BrowserPrefs } from './BrowserPrefs.js';
+import type { PrefsApi } from './BrowserPrefs.js';
 import { BrowserRuntime } from './BrowserRuntime.js';
 import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
@@ -29,6 +31,8 @@ export interface VivArcDiDependencies {
   bookmarks?: BrowserBookmarks;
   /** The runtime API given to modules. */
   runtime?: BrowserRuntime;
+  /** Vivaldi's preferences given to modules. */
+  prefs?: BrowserPrefs;
   /** The persistent storage given to modules. */
   storage?: KeyValueStorage;
 }
@@ -41,6 +45,7 @@ export class VivArcDi {
   #tabs: BrowserTabs;
   #bookmarks: BrowserBookmarks;
   #runtime: BrowserRuntime;
+  #prefs: BrowserPrefs;
   #storage: KeyValueStorage;
   #styles: StyleInjector;
   #started: EnabledModule[] = [];
@@ -59,6 +64,7 @@ export class VivArcDi {
     tabs = new BrowserTabs(undefined),
     bookmarks = new BrowserBookmarks(undefined),
     runtime = new BrowserRuntime(undefined),
+    prefs = new BrowserPrefs(undefined),
     storage = new PersistentStorage(new Map(), null, undefined, logger),
   }: VivArcDiDependencies) {
     this.#loader = loader;
@@ -68,6 +74,7 @@ export class VivArcDi {
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
     this.#runtime = runtime;
+    this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
   }
@@ -91,6 +98,7 @@ export class VivArcDi {
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
+      prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger),
     });
     try {
@@ -99,6 +107,11 @@ export class VivArcDi {
       app.#logger.error('Startup failed', error);
     }
     return app;
+  }
+
+  static #prefsApi(chromeApi: ChromeApi | undefined): PrefsApi | undefined {
+    const vivaldi = (globalThis as { vivaldi?: { prefs?: PrefsApi } }).vivaldi;
+    return vivaldi?.prefs ?? chromeApi?.vivaldiPrivate?.prefs;
   }
 
   /**
@@ -168,6 +181,7 @@ export class VivArcDi {
         bookmarks: this.#bookmarks,
         modules,
         runtime: this.#runtime,
+        prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader,
       });
