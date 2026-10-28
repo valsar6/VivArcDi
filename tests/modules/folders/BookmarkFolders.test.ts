@@ -1,5 +1,7 @@
 import { test } from 'node:test';
+import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
@@ -16,7 +18,7 @@ function setup(tabs: FolderTabs, bookmarks: BrowserBookmarks = recordingChrome(T
   const dom = new DomDocument();
   const context = {
     document: asDocument(dom),
-    selectors: new SelectorCatalog({ tabListHost: '.list' }, 'test'),
+    selectors: new SelectorCatalog({ tabListHost: '.list', browser: '#browser', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
     logger: silentLogger(),
     options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
     tabs,
@@ -33,7 +35,7 @@ const frame = async (): Promise<void> => {
 
 const rows = (dom: DomDocument): DomNode[] => dom.parent.children[0]?.children[0]?.children ?? [];
 
-test('draws the folders above the tab list and removes them on stop', async (t) => {
+function installFrames(t: TestContext): void {
   const frames = globalThis as unknown as Record<string, unknown>;
   frames['requestAnimationFrame'] = (run: () => void): NodeJS.Timeout => setTimeout(run, 0);
   frames['cancelAnimationFrame'] = (handle: NodeJS.Timeout): void => clearTimeout(handle);
@@ -46,6 +48,10 @@ test('draws the folders above the tab list and removes them on stop', async (t) 
     delete frames['cancelAnimationFrame'];
     delete frames['MutationObserver'];
   });
+}
+
+test('draws the folders above the tab list and removes them on stop', async (t) => {
+  installFrames(t);
   const tabs = new FolderTabs([{ id: 1, active: true, url: 'https://example.com/' }]);
   const { dom, module, context } = setup(tabs);
   await module.start(context);
@@ -66,6 +72,40 @@ test('draws the folders above the tab list and removes them on stop', async (t) 
   module.stop();
   assert.deepEqual(dom.parent.children, [dom.list]);
   assert.equal(tabs.listenerCount(), 0);
+});
+
+test('hides the tab of a link from the tab list', async (t) => {
+  installFrames(t);
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/' },
+    { id: 2, url: 'https://id.atlassian.com/login', vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11' } }) },
+  ]);
+  const { dom, module, context } = setup(tabs);
+  const hidden = HiddenTabs.of(context.document);
+  await module.start(context);
+  await frame();
+  assert.deepEqual([1, 2].map((id) => hidden.has(id)), [false, true]);
+
+  module.stop();
+  assert.deepEqual([1, 2].map((id) => hidden.has(id)), [false, false]);
+  assert.deepEqual(dom.parent.children, [dom.list]);
+});
+
+test('links the open tab of a link at start and unlinks the tab of a removed bookmark', async (t) => {
+  installFrames(t);
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/' },
+    { id: 2, url: MAHJONG },
+    { id: 3, url: 'https://old.example/', vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '99' } }) },
+  ]);
+  const { module, context } = setup(tabs);
+  const hidden = HiddenTabs.of(context.document);
+  await module.start(context);
+  await frame();
+  assert.deepEqual(JSON.parse(tabs.tabs.get(2)?.vivExtData ?? '{}'), { vivarcdi: { bookmarkId: '11' } });
+  assert.equal(tabs.tabs.get(3)?.vivExtData, '{}');
+  assert.deepEqual([2, 3].map((id) => hidden.has(id)), [true, false]);
+  module.stop();
 });
 
 test('bookmark folders stay off without chrome.bookmarks', async () => {

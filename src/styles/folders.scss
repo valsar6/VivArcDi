@@ -74,6 +74,42 @@
     opacity: 1;
   }
 
+  [data-vivarcdi-link-active] {
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-active}, transparent);
+  }
+
+  [data-vivarcdi-link-unloaded] > :not(.vivarcdi-folders-close) {
+    opacity: $unloaded-opacity;
+  }
+
+  .vivarcdi-folders-close {
+    display: none;
+    flex: none;
+    place-items: center;
+    width: $folders-icon-size;
+    height: $folders-icon-size;
+    border-radius: 3px;
+    line-height: 1;
+
+    &::before {
+      content: '\00d7';
+    }
+
+    &:hover {
+      background-color: var(--vivarcdi-folders-hover);
+    }
+  }
+
+  [data-vivarcdi-link-open]:hover {
+    .vivarcdi-folders-close {
+      display: grid;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+
   [data-vivarcdi-link-open]::after {
     flex: none;
     width: $folders-dot-size;

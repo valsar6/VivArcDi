@@ -29,6 +29,7 @@ export class FolderTreeSource {
   #task: FrameTask;
   #entries: TreeEntry[] = [];
   #generation = 0;
+  #found = false;
   #warnedMissing = false;
   #unsubscribe: (() => void) | null = null;
 
@@ -53,6 +54,13 @@ export class FolderTreeSource {
    */
   public get entries(): TreeEntry[] {
     return this.#entries;
+  }
+
+  /**
+   * @returns Whether the root folder was found the last time the bookmarks were read.
+   */
+  public get found(): boolean {
+    return this.#found;
   }
 
   /**
@@ -86,6 +94,7 @@ export class FolderTreeSource {
       if (root === null) {
         this.#warnMissing();
       }
+      this.#found = root !== null;
       this.#entries = root === null ? [] : FolderTree.build(root.children ?? [], this.#maxDepth);
       this.#onChange();
     } catch (error) {
