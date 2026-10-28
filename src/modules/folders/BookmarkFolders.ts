@@ -1,9 +1,8 @@
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { FolderSection } from './FolderSection.js';
+import { WorkspaceRoots } from './WorkspaceRoots.js';
 
-const DEFAULT_ROOT = 'VivArcDi';
 const DEFAULT_MAX_DEPTH = 3;
 const DEFAULT_MAX_HEIGHT_PERCENT = 60;
 const MAX_DEPTH_LIMIT = 10;
@@ -18,7 +17,8 @@ export class BookmarkFolders extends Module {
   /**
    * Shows a bookmark folder in the vertical tab bar, below the Favorites grid: folders open and
    * close, a click opens a link or brings its tab forward, and the tab of a link lives in its row
-   * instead of Vivaldi's tab list. Bookmarks are only read. Without `chrome.bookmarks`,
+   * instead of Vivaldi's tab list. Each workspace shows its own root folder (option `workspaces`,
+   * else `root`); an empty root shows nothing. Bookmarks are only read. Without `chrome.bookmarks`,
    * `chrome.tabs` or the tab bar it stays off.
    *
    * @param context What the module may use.
@@ -30,7 +30,7 @@ export class BookmarkFolders extends Module {
       return;
     }
     this.#section = new FolderSection(context, {
-      root: BookmarkFolderFinder.parsePath(typeof options['root'] === 'string' ? options['root'] : DEFAULT_ROOT),
+      roots: new WorkspaceRoots({ root: options['root'], workspaces: options['workspaces'] }, logger),
       maxDepth: BookmarkFolders.#number(options['maxDepth'], DEFAULT_MAX_DEPTH, 1, MAX_DEPTH_LIMIT),
       maxHeightPercent: BookmarkFolders.#number(options['maxHeightPercent'], DEFAULT_MAX_HEIGHT_PERCENT, MIN_PERCENT, MAX_PERCENT),
     });
