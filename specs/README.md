@@ -12,7 +12,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [001 Favorites grid](001-favorites-grid/spec.md) | 1 | Implemented |
 | [002 Peek](002-peek/spec.md) | 2 | Approved |
 | [003 Favorites and pinned tabs](003-pinned-tabs-and-folders/spec.md) | 3 | Approved |
-| [004 Today tabs and keyboard](004-today-tabs-and-keyboard/spec.md) | 4 | Draft |
+| [004 Today tabs and keyboard](004-today-tabs-and-keyboard/spec.md) | 4 | Approved |
 | [005 Little Arc and extras](005-little-arc-and-extras/spec.md) | 5 | Draft |
 | [006 Versioning and releases](006-versioning-and-releases/spec.md) | Tooling | Approved |
 | [007 Reopen pinned tabs](007-reopen-pinned-tabs/spec.md) | 3 | Approved |
