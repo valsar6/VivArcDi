@@ -1,5 +1,6 @@
 import { createDefaultRegistry } from "../modules/index.js";
 import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
+import { BrowserPrefs } from "./BrowserPrefs.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
 import { BrowserTabs } from "./BrowserTabs.js";
 import { Logger } from "./Logger.js";
@@ -16,6 +17,7 @@ class VivArcDi {
   #tabs;
   #bookmarks;
   #runtime;
+  #prefs;
   #storage;
   #styles;
   #started = [];
@@ -33,6 +35,7 @@ class VivArcDi {
     tabs = new BrowserTabs(void 0),
     bookmarks = new BrowserBookmarks(void 0),
     runtime = new BrowserRuntime(void 0),
+    prefs = new BrowserPrefs(void 0),
     storage = new PersistentStorage(/* @__PURE__ */ new Map(), null, void 0, logger)
   }) {
     this.#loader = loader;
@@ -42,6 +45,7 @@ class VivArcDi {
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
     this.#runtime = runtime;
+    this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
   }
@@ -64,6 +68,7 @@ class VivArcDi {
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
+      prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger)
     });
     try {
@@ -72,6 +77,10 @@ class VivArcDi {
       app.#logger.error("Startup failed", error);
     }
     return app;
+  }
+  static #prefsApi(chromeApi) {
+    const vivaldi = globalThis.vivaldi;
+    return vivaldi?.prefs ?? chromeApi?.vivaldiPrivate?.prefs;
   }
   /**
    * @returns Ids of the modules that started successfully.
@@ -132,6 +141,7 @@ class VivArcDi {
         bookmarks: this.#bookmarks,
         modules,
         runtime: this.#runtime,
+        prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader
       });

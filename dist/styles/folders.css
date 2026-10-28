@@ -10,7 +10,7 @@
   font-size: 13px;
   user-select: none;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-folders][hidden] {
+#browser[data-vivarcdi-active] [data-vivarcdi-folders][hidden], #browser[data-vivarcdi-active] [data-vivarcdi-folders][data-vivarcdi-empty] {
   display: none;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [role] {

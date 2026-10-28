@@ -43,6 +43,14 @@ class FolderSectionView {
     this.#element.toggleAttribute("hidden", rows.length === 0);
   }
   /**
+   * Hides the section without leaving a gap while there is no root folder to show.
+   *
+   * @param empty Whether the root in use is empty.
+   */
+  setEmpty(empty) {
+    this.#element.toggleAttribute("data-vivarcdi-empty", empty);
+  }
+  /**
    * Removes the section from the document.
    */
   remove() {
