@@ -21,6 +21,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [010 Folders per workspace](010-folders-per-workspace/spec.md) | 3 | Approved |
 | [011 Space header](011-space-header/spec.md) | 3 | Approved |
 | [012 Editable folders](012-editable-folders/spec.md) | 3 | Approved |
+| [013 Incognito mode](013-incognito-mode/spec.md) | 3 | Draft |
 | [014 Arc shortcuts](014-arc-shortcuts/spec.md) | 0 | Draft |
 
 ## Layout
