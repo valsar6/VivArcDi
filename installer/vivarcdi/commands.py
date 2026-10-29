@@ -6,6 +6,7 @@ from .hooks import UpdateHook
 from .patching import InstallationPatcher
 from .platforms import Platform
 from .reporter import Reporter
+from .shortcuts import ShortcutService
 from .staging import SelfStager
 
 
@@ -20,7 +21,11 @@ class InstallerContext:
     reapply_command: list[str]
     reporter: Reporter
     handoff: ReapplyHandoff
+    shortcuts: ShortcutService
     background: bool = False
+    shortcut_action: str = "status"
+    dry_run: bool = False
+    restore_shortcuts: bool = False
 
 
 class Command(ABC):
@@ -29,6 +34,7 @@ class Command(ABC):
     name: str
     help: str
     needs_root: bool = True
+    refuses_root: bool = False
 
     @abstractmethod
     def execute(self, context: InstallerContext) -> int:
@@ -102,6 +108,8 @@ class UninstallCommand(Command):
         context.handoff.clear()
         context.stager.unstage()
         report.info(f"Backups of the original window.html stay in {context.platform.data_dir}")
+        if context.restore_shortcuts:
+            return context.shortcuts.restore()
         report.info("Restart Vivaldi to finish.")
         return 0
 
@@ -132,4 +140,28 @@ class StatusCommand(Command):
         return 0
 
 
-COMMANDS: tuple[Command, ...] = (InstallCommand(), ReapplyCommand(), UninstallCommand(), StatusCommand())
+class ShortcutsCommand(Command):
+    """Sets Vivaldi's shortcuts and Quick Commands option the Arc way, on request only."""
+
+    name = "shortcuts"
+    help = "apply, restore or check the Arc-style keyboard shortcuts"
+    needs_root = False
+    refuses_root = True
+    actions = ("apply", "restore", "status")
+
+    def execute(self, context: InstallerContext) -> int:
+        service = context.shortcuts
+        if context.shortcut_action == "apply":
+            return service.apply(dry_run=context.dry_run)
+        if context.shortcut_action == "restore":
+            return service.restore()
+        return service.status()
+
+
+COMMANDS: tuple[Command, ...] = (
+    InstallCommand(),
+    ReapplyCommand(),
+    UninstallCommand(),
+    StatusCommand(),
+    ShortcutsCommand(),
+)

@@ -159,8 +159,11 @@ installer stops and tells you to download a release build or to run `make build`
 | `reapply` | Patches again any Vivaldi build that an update reset; run automatically by the hook |
 | `uninstall` | Removes the patch, the payload and the hook; keeps the backups |
 | `status` | Shows which builds are patched and whether the hook is active |
+| `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
 
-Add `--quiet` to print only warnings and errors. On Debian, every command but `status` needs `sudo`.
+Add `--quiet` to print only warnings and errors. On Debian, every command but `status` and `shortcuts` needs `sudo`; `shortcuts` refuses it.
+
+`shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
 
 ### How updates are handled
 

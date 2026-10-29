@@ -1,0 +1,14 @@
+{
+  "options": {
+    "vivaldi.quick_commands.open_url_in_new_tab": true
+  },
+  "commands": {
+    "COMMAND_NEW_TAB": [],
+    "COMMAND_SHOW_QUICK_COMMANDS": ["{mod}+t"],
+    "COMMAND_SAVE_PAGE": [],
+    "COMMAND_MAIN_TOGGLE_TAB_BAR": ["{mod}+s"],
+    "COMMAND_ADD_BOOKMARK": [],
+    "COMMAND_PIN_TAB": ["{mod}+d"],
+    "COMMAND_PRINT_PAGE": ["{mod}+p"]
+  }
+}
