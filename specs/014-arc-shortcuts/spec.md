@@ -65,6 +65,7 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 - **FR-6.** The command refuses to run while a Vivaldi process is running.
 - **FR-7.** Applying twice gives the same file as applying once.
 - **FR-8.** Settings not in the table stay as they are, byte-for-byte in meaning.
+- **FR-10.** WHERE `uninstall --restore-shortcuts` is given, `uninstall` also runs `shortcuts restore`; without the option it leaves shortcuts alone.
 - **FR-9.** `shortcuts` runs as the user. On Debian it refuses `sudo`, because the profile belongs to
   the user.
 
@@ -91,6 +92,7 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 | AC-10 | IF `Preferences` is not valid JSON, THEN THE installer SHALL write nothing and name the file. | auto: `test_invalid_preferences_are_left_alone` |
 | AC-11 | THE installer SHALL find the profiles of stable and snapshot builds on both systems. | auto: `test_profiles_are_found_on_both_systems` |
 | AC-12 | WHEN `status` runs, THE installer SHALL report for each profile whether the table matches. | auto: `test_status_reports_match_per_profile` |
+| AC-16 | WHERE `uninstall --restore-shortcuts` is given, THE installer SHALL restore the saved `Preferences`; without it, THE installer SHALL leave shortcuts unchanged. | auto: `test_uninstall_restores_shortcuts_only_when_asked` |
 | AC-13 | WHEN Vivaldi restarts after `apply`, THE keyboard SHALL follow the table and Settings > Keyboard SHALL show it. | manual |
 | AC-14 | WHEN Vivaldi restarts after `restore`, THE keyboard SHALL be as before `apply`. | manual |
 | AC-15 | WHEN Vivaldi restarts after `apply`, Quick Commands SHALL open links in a new tab. | manual |
@@ -106,16 +108,14 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 
 - [x] **Where do the settings live?** Confirmed by Tore's probe (2026-10-29, Vivaldi on macOS): `vivaldi.actions` is a list with one object; each command is a key `COMMAND_<NAME>` holding `{"shortcuts": [...]}`, with `gestures` kept beside it. The option is `vivaldi.quick_commands.open_url_in_new_tab` (boolean). Command ids: `COMMAND_NEW_TAB`, `COMMAND_SHOW_QUICK_COMMANDS`, `COMMAND_SAVE_PAGE`, `COMMAND_MAIN_TOGGLE_TAB_BAR`, `COMMAND_ADD_BOOKMARK`, `COMMAND_PIN_TAB`, `COMMAND_PRINT_PAGE`, `COMMAND_MAIN_TOGGLE_PANEL_TOGGLE`.
 - [x] **Does Vivaldi accept an edited file?** The file has no `protection` hash, so nothing signs the keys. Whether Vivaldi keeps an edit at startup is checked by AC-13; if it reverts, the spec drops back to a manual guide.
-- [ ] **Removing a shortcut.** Tore's file shows a removed command as `{}` or without `shortcuts`, and an emptied one as `"shortcuts": []`. Proposal: write `"shortcuts": []`, keep `gestures`, and let AC-13 prove it.
+- [x] **Removing a shortcut.** Agreed by Tore 2026-10-29. Tore's file shows a removed command as `{}` or without `shortcuts`, and an emptied one as `"shortcuts": []`. Proposal: write `"shortcuts": []`, keep `gestures`, and let AC-13 prove it.
 - [ ] **Print and Panel.** Tore's current file has Panel on `meta+p` and Print on `shift+meta+p`, while his last message says Cmd+P stays on Print. Proposal: the table leaves both alone, so the installer keeps whatever the user has. Tore confirms which he wants.
 - [x] **Command names.** Decided by Tore 2026-10-29: "Tab Bar" is the command that shows the workspace area (the tab bar); Panel and Print are not changed, Print keeps Cmd+P. The probe still confirms the exact command ids.
 - [x] **Conflicts.** Decided by Tore 2026-10-29: remove the old shortcuts that Cmd+T, Cmd+S and Cmd+D would override, as listed in the table. Cmd+P is not remapped, so Print is left alone.
 - [ ] **Sync.** If Vivaldi Sync carries keyboard settings, a synced device may overwrite the change.
   Proposal: mention it in the command output and do nothing more.
-- [ ] **Scope.** Proposal: opt-in `shortcuts` command only, never part of `install`; `uninstall`
-  does not restore shortcuts, only `shortcuts restore` does.
-- [ ] **Debian keys.** Ctrl+T, Ctrl+S, Ctrl+D, Ctrl+P on Linux, or the same table with `ctrl`? The
-  proposal is `ctrl`, as in the table above.
+- [x] **Scope.** Decided by Tore 2026-10-29: opt-in `shortcuts` command, never part of `install`; `uninstall` restores shortcuts only with `--restore-shortcuts`.
+- [x] **Debian keys.** Decided by Tore 2026-10-29: `ctrl` on Debian, `meta` on macOS.
 
 ## References
 
