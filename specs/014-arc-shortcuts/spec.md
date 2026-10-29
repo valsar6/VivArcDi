@@ -104,15 +104,10 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 
 ## Open questions
 
-- [ ] **Where do the settings live?** I could not confirm the `Preferences` keys. A forum post shows
-  `"COMMAND_NEW_WINDOW": {"shortcuts": ["meta+n"]}`, but not under which parent (`vivaldi.actions` is
-  suggested and disputed), and I found nothing on the Quick Commands option. Proposal: Tore runs the
-  read-only probe `diagnostica-scorciatoie.py` after setting the options by hand, and the design
-  follows the real format.
-- [ ] **Does Vivaldi accept an edited file?** Chromium protects some preferences with a hash; I expect
-  `vivaldi.*` keys are not protected, and the probe prints whether `protection` exists. Proposal: if
-  edits are reverted at startup, the spec is dropped back to a manual guide in
-  `docs/native-settings.md`.
+- [x] **Where do the settings live?** Confirmed by Tore's probe (2026-10-29, Vivaldi on macOS): `vivaldi.actions` is a list with one object; each command is a key `COMMAND_<NAME>` holding `{"shortcuts": [...]}`, with `gestures` kept beside it. The option is `vivaldi.quick_commands.open_url_in_new_tab` (boolean). Command ids: `COMMAND_NEW_TAB`, `COMMAND_SHOW_QUICK_COMMANDS`, `COMMAND_SAVE_PAGE`, `COMMAND_MAIN_TOGGLE_TAB_BAR`, `COMMAND_ADD_BOOKMARK`, `COMMAND_PIN_TAB`, `COMMAND_PRINT_PAGE`, `COMMAND_MAIN_TOGGLE_PANEL_TOGGLE`.
+- [x] **Does Vivaldi accept an edited file?** The file has no `protection` hash, so nothing signs the keys. Whether Vivaldi keeps an edit at startup is checked by AC-13; if it reverts, the spec drops back to a manual guide.
+- [ ] **Removing a shortcut.** Tore's file shows a removed command as `{}` or without `shortcuts`, and an emptied one as `"shortcuts": []`. Proposal: write `"shortcuts": []`, keep `gestures`, and let AC-13 prove it.
+- [ ] **Print and Panel.** Tore's current file has Panel on `meta+p` and Print on `shift+meta+p`, while his last message says Cmd+P stays on Print. Proposal: the table leaves both alone, so the installer keeps whatever the user has. Tore confirms which he wants.
 - [x] **Command names.** Decided by Tore 2026-10-29: "Tab Bar" is the command that shows the workspace area (the tab bar); Panel and Print are not changed, Print keeps Cmd+P. The probe still confirms the exact command ids.
 - [x] **Conflicts.** Decided by Tore 2026-10-29: remove the old shortcuts that Cmd+T, Cmd+S and Cmd+D would override, as listed in the table. Cmd+P is not remapped, so Print is left alone.
 - [ ] **Sync.** If Vivaldi Sync carries keyboard settings, a synced device may overwrite the change.
