@@ -73,7 +73,7 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 ### Functional
 
 - **FR-1.** A new module `incognito` detects whether the window is a private window, once at
-  start-up.
+  start-up, from the `incognito` flag of `chrome.windows.getCurrent`.
 - **FR-2.** In a private window, the modules `favorites-grid`, `space-header`, `bookmark-folders`,
   `folder-preview`, `pinned-tabs`, `reopen-pinned` and `today-archive` do not start.
 - **FR-3.** In a private window, the module draws the title `Incognito Tabs` with `Clear`, the
@@ -129,9 +129,9 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 
 ## Open questions
 
-- [ ] **How is a private window recognized in `window.html`?** Proposed: from `chrome.windows.getCurrent`
-  (`incognito: true`) or a class Vivaldi puts on `#browser`; a probe script for Tore's Vivaldi 8.2
-  decides before the design.
+- [x] **How is a private window recognized in `window.html`?** `chrome.windows.getCurrent` returns
+  `incognito: true` in a private window; `#browser` has no private class (Tore's probe on Vivaldi 8.2,
+  2026-10-29).
 - [ ] **What does the Library open?** Proposed: Vivaldi's Downloads panel. Alternatives: a small menu
   with Downloads, Notes and Captures, or Vivaldi's Window panel.
 - [ ] **What does `Clear` close?** Proposed: all tabs except the active one, as Clear does for Today
