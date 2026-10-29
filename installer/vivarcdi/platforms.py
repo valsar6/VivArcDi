@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import platform
+import pwd
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -48,6 +49,19 @@ class Platform(ABC):
     def reapply_handoff(self, reapply_command: list[str]) -> ReapplyHandoff:
         """Who runs `reapply` when the background hook cannot write to Vivaldi itself."""
         return NoHandoff()
+
+    @property
+    @abstractmethod
+    def modifier(self) -> str:
+        """The key Vivaldi calls the command modifier: `meta` or `ctrl`."""
+
+    @abstractmethod
+    def profile_roots(self) -> list[tuple[str, Path]]:
+        """The user-data folder of each Vivaldi channel."""
+
+    @abstractmethod
+    def process_names(self) -> list[str]:
+        """Names of the running Vivaldi processes."""
 
 
 class MacOSPlatform(Platform):
@@ -99,6 +113,17 @@ class MacOSPlatform(Platform):
     def reapply_handoff(self, reapply_command: list[str]) -> ReapplyHandoff:
         return TerminalHandoff(self.data_dir, reapply_command, self._runner)
 
+    @property
+    def modifier(self) -> str:
+        return "meta"
+
+    def profile_roots(self) -> list[tuple[str, Path]]:
+        support = self._home / "Library" / "Application Support"
+        return [("stable", support / "Vivaldi"), ("snapshot", support / "Vivaldi Snapshot")]
+
+    def process_names(self) -> list[str]:
+        return ["Vivaldi", "Vivaldi Snapshot"]
+
     def _versions_dirs(self) -> list[tuple[str, Path]]:
         found = []
         for channel, bundle in self.APP_BUNDLES.items():
@@ -121,9 +146,15 @@ class DebianPlatform(Platform):
         "snapshot": ("opt/vivaldi-snapshot", "vivaldi-snapshot"),
     }
 
-    def __init__(self, root: Path = Path("/"), runner: CommandRunner | None = None):
+    def __init__(
+        self,
+        root: Path = Path("/"),
+        runner: CommandRunner | None = None,
+        home: Path | None = None,
+    ):
         self._root = root
         self._runner = runner or CommandRunner()
+        self._home = home or invoking_user_home()
 
     def find_installations(self) -> list[VivaldiInstallation]:
         installations = []
@@ -146,6 +177,17 @@ class DebianPlatform(Platform):
 
     def permission_advisor(self) -> PermissionAdvisor:
         return SudoAdvisor()
+
+    @property
+    def modifier(self) -> str:
+        return "ctrl"
+
+    def profile_roots(self) -> list[tuple[str, Path]]:
+        config = self._home / ".config"
+        return [("stable", config / "vivaldi"), ("snapshot", config / "vivaldi-snapshot")]
+
+    def process_names(self) -> list[str]:
+        return ["vivaldi-bin"]
 
     def _package_version(self, package: str) -> str:
         result = self._runner.run(["dpkg-query", "--showformat=${Version}", "--show", package])
@@ -183,6 +225,17 @@ class PlatformFactory:
             fields[key] = value.strip('"')
         family = {fields.get("ID", "")} | set(fields.get("ID_LIKE", "").split())
         return "debian" in family
+
+
+def invoking_user_home() -> Path:
+    """The home of the person at the keyboard, also when the installer runs under sudo."""
+    sudo_user = os.environ.get("SUDO_USER")
+    if sudo_user:
+        try:
+            return Path(pwd.getpwnam(sudo_user).pw_dir)
+        except KeyError:
+            pass
+    return Path.home()
 
 
 def is_root() -> bool:

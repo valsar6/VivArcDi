@@ -40,7 +40,7 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 | Arc | Vivaldi setting |
 |---|---|
-| Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard |
+| Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard, or run `python3 installer shortcuts apply`, which also turns on "Open Links In New Tab" and moves Tab Bar, Pin / Unpin Tab and Print to Cmd/Ctrl+S, D and P ([spec 014](../specs/014-arc-shortcuts/spec.md)) |
 | Ctrl+Tab in recent order | Settings > Tabs > Tab Cycling: **recently used order** |
 | Copy URL (Cmd/Ctrl+Shift+C) | Ships with VivArcDi (`copy-url`); leave the shortcut unbound in Vivaldi |
 | Split View | **Tab Tiling**, and "Open link as split tab" (7.8+) |
