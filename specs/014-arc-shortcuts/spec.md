@@ -12,7 +12,7 @@ Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/RE
 ## Summary
 
 The installer can set the Vivaldi settings that make the keyboard feel like Arc's: Quick Commands on
-Cmd/Ctrl+T, "Open Links In New Tab" on, and the shortcuts Arc does not use removed or moved. The
+Cmd/Ctrl+T, "Open Links In New Tab" on, and the shortcuts Arc does not use removed or moved. Print stays on Cmd/Ctrl+P, as Tore decided on 2026-10-29. The
 change is opt-in, backed up and reversible. VivalArc recommends the same settings by hand; here one
 command applies them.
 
@@ -40,13 +40,13 @@ these settings:
 | Tab Bar | Cmd+S (Ctrl+S on Debian) |
 | Create Bookmark | no shortcut |
 | Pin / Unpin Tab | Cmd+D (Ctrl+D on Debian) |
-| Print | no shortcut |
-| Panel | Cmd+P (Ctrl+P on Debian) |
+| Print | unchanged, keeps Cmd+P (Ctrl+P on Debian) |
+| Panel | unchanged |
 
 `shortcuts apply --dry-run` lists the differences and writes nothing. `shortcuts restore` puts back
 the saved `Preferences`. `status` reports whether the shortcuts match the table. Vivaldi has to be
 closed, because it rewrites `Preferences` when it quits; if it is running, the command stops and says
-so. A shortcut that Cmd+T, Cmd+S, Cmd+D or Cmd+P collides with is removed from the other command, so
+so. A shortcut that Cmd+T, Cmd+S or Cmd+D collides with is removed from the other command, so
 no key is bound twice. `install` never touches shortcuts unless asked.
 
 ## Requirements
@@ -113,10 +113,8 @@ no key is bound twice. `install` never touches shortcuts unless asked.
   `vivaldi.*` keys are not protected, and the probe prints whether `protection` exists. Proposal: if
   edits are reverted at startup, the spec is dropped back to a manual guide in
   `docs/native-settings.md`.
-- [ ] **Command names.** "Tab Bar" and "Panel" are ambiguous: toggle the tab bar or focus it, toggle
-  the panel or the sidebar? Proposal: the probe lists the matching commands, and Tore picks.
-- [ ] **Conflicts.** Cmd+S, Cmd+D, Cmd+P are default Save, Bookmark and Print. Proposal: remove those
-  three too, as in the table, and report any other command that held one of the four keys.
+- [x] **Command names.** Decided by Tore 2026-10-29: "Tab Bar" is the command that shows the workspace area (the tab bar); Panel and Print are not changed, Print keeps Cmd+P. The probe still confirms the exact command ids.
+- [x] **Conflicts.** Decided by Tore 2026-10-29: remove the old shortcuts that Cmd+T, Cmd+S and Cmd+D would override, as listed in the table. Cmd+P is not remapped, so Print is left alone.
 - [ ] **Sync.** If Vivaldi Sync carries keyboard settings, a synced device may overwrite the change.
   Proposal: mention it in the command output and do nothing more.
 - [ ] **Scope.** Proposal: opt-in `shortcuts` command only, never part of `install`; `uninstall`
