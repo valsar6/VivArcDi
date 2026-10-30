@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -70,5 +70,5 @@ Sizes keep the 40-100 clamp. Users who set sizes explicitly keep them.
 | Risk | Mitigation |
 |---|---|
 | Sites that open every internal link with `_blank` make pinned tabs full of Peeks | That is Arc's behavior; `pinnedNewTab` turns it off |
-| At 90% width the margin beside the panel is narrow in small windows, and the column would overlap the page | The column sits in the margin; below 700 px of page width it moves inside the panel's top right corner |
+| At 90% width the margin beside the panel is narrow in small windows, and the column would overlap the page | The column sits in the margin; when the margin is too narrow the column is held inside the page area, over the panel's top right corner |
 | The tooltip shows the wrong key on Debian | Labels come from `PeekKeyMap`, which already picks Cmd or Ctrl by platform |

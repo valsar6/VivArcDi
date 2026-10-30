@@ -30,8 +30,10 @@
       "shiftClick": true,
       "pinnedCrossSite": true,
       "anyCrossSite": false,
-      "widthPercent": 80,
-      "heightPercent": 90
+      "pinnedNewTab": true,
+      "anyNewTab": false,
+      "widthPercent": 90,
+      "heightPercent": 94
     },
     "reopen-pinned": {
       "enabled": true

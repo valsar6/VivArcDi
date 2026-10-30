@@ -1,10 +1,12 @@
 import type { PageScripts } from './PageScripts.js';
+import { shortcutLabels } from './PeekKeyMap.js';
 import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from '../../core/Webview.js';
 
 export type PanelCommand = 'close' | 'expand' | 'split';
 
 export const BACKDROP_CLASS = 'vivarcdi-peek-backdrop';
 export const PANEL_CLASS = 'vivarcdi-peek-panel';
+export const ACTIONS_CLASS = 'vivarcdi-peek-actions';
 
 export interface PanelSize {
   /** Width as a percentage of the page area. */
@@ -33,21 +35,22 @@ export interface PanelDependencies {
 }
 
 const BUTTONS: Array<[PanelCommand, string, string]> = [
-  ['expand', 'Open as tab', '↗'],
-  ['split', 'Show side by side', '◫'],
   ['close', 'Close', '✕'],
+  ['expand', 'Open as tab', '↗'],
+  ['split', 'Create split view', '◫'],
 ];
 
 export class PeekPanel {
   #deps: PanelDependencies;
   #backdrop: HTMLElement;
   #panel: HTMLElement;
+  #actions: HTMLElement;
   #webview: WebviewElement;
   #url: string;
 
   /**
    * The Peek: a dimmed backdrop over the page area and a rounded panel above it
-   * that shows the real page in its own webview, with Expand, Split and Close buttons.
+   * that shows the real page in its own webview, with Close, Expand and Split buttons in a column beside it.
    *
    * @param url Address to show.
    * @param dependencies Everything the panel collaborates with.
@@ -59,7 +62,8 @@ export class PeekPanel {
     this.#backdrop.addEventListener('click', () => dependencies.onCommand('close'));
     this.#webview = this.#createWebview(url);
     this.#panel = this.#createPanel();
-    dependencies.container.append(this.#backdrop, this.#panel);
+    this.#actions = this.#createActions();
+    dependencies.container.append(this.#backdrop, this.#panel, this.#actions);
   }
 
   /**
@@ -75,21 +79,32 @@ export class PeekPanel {
   public remove(): void {
     this.#backdrop.remove();
     this.#panel.remove();
+    this.#actions.remove();
   }
 
   #createPanel(): HTMLElement {
     const panel = this.#element('div', PANEL_CLASS);
     panel.style.setProperty('--vivarcdi-peek-width', `${this.#deps.size.widthPercent}%`);
     panel.style.setProperty('--vivarcdi-peek-height', `${this.#deps.size.heightPercent}%`);
-    const toolbar = this.#element('div', 'vivarcdi-peek-toolbar');
-    BUTTONS.forEach(([command, label, glyph]) => toolbar.append(this.#button(command, label, glyph)));
-    panel.append(toolbar, this.#webview);
+    panel.append(this.#webview);
     return panel;
   }
 
-  #button(command: PanelCommand, label: string, glyph: string): HTMLElement {
+  #createActions(): HTMLElement {
+    const actions = this.#element('div', ACTIONS_CLASS);
+    actions.style.setProperty('--vivarcdi-peek-width', `${this.#deps.size.widthPercent}%`);
+    actions.style.setProperty('--vivarcdi-peek-height', `${this.#deps.size.heightPercent}%`);
+    const shortcuts = shortcutLabels(this.#deps.document.defaultView?.navigator.platform ?? '');
+    BUTTONS.forEach(([command, label, glyph]) => {
+      const shortcut = command === 'split' ? '' : ` (${shortcuts[command]})`;
+      actions.append(this.#button(command, label, glyph, `${label}${shortcut}`));
+    });
+    return actions;
+  }
+
+  #button(command: PanelCommand, label: string, glyph: string, tooltip: string): HTMLElement {
     const button = this.#element('button', `vivarcdi-peek-${command}`);
-    button.title = label;
+    button.title = tooltip;
     button.setAttribute('aria-label', label);
     button.textContent = glyph;
     button.addEventListener('click', () => this.#deps.onCommand(command));
