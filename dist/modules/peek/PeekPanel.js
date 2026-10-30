@@ -1,19 +1,22 @@
+import { shortcutLabels } from "./PeekKeyMap.js";
 const BACKDROP_CLASS = "vivarcdi-peek-backdrop";
 const PANEL_CLASS = "vivarcdi-peek-panel";
+const ACTIONS_CLASS = "vivarcdi-peek-actions";
 const BUTTONS = [
+  ["close", "Close", "\u2715"],
   ["expand", "Open as tab", "\u2197"],
-  ["split", "Show side by side", "\u25EB"],
-  ["close", "Close", "\u2715"]
+  ["split", "Create split view", "\u25EB"]
 ];
 class PeekPanel {
   #deps;
   #backdrop;
   #panel;
+  #actions;
   #webview;
   #url;
   /**
    * The Peek: a dimmed backdrop over the page area and a rounded panel above it
-   * that shows the real page in its own webview, with Expand, Split and Close buttons.
+   * that shows the real page in its own webview, with Close, Expand and Split buttons in a column beside it.
    *
    * @param url Address to show.
    * @param dependencies Everything the panel collaborates with.
@@ -25,7 +28,8 @@ class PeekPanel {
     this.#backdrop.addEventListener("click", () => dependencies.onCommand("close"));
     this.#webview = this.#createWebview(url);
     this.#panel = this.#createPanel();
-    dependencies.container.append(this.#backdrop, this.#panel);
+    this.#actions = this.#createActions();
+    dependencies.container.append(this.#backdrop, this.#panel, this.#actions);
   }
   /**
    * @returns The address the panel shows now, after any navigation inside it.
@@ -39,19 +43,29 @@ class PeekPanel {
   remove() {
     this.#backdrop.remove();
     this.#panel.remove();
+    this.#actions.remove();
   }
   #createPanel() {
     const panel = this.#element("div", PANEL_CLASS);
     panel.style.setProperty("--vivarcdi-peek-width", `${this.#deps.size.widthPercent}%`);
     panel.style.setProperty("--vivarcdi-peek-height", `${this.#deps.size.heightPercent}%`);
-    const toolbar = this.#element("div", "vivarcdi-peek-toolbar");
-    BUTTONS.forEach(([command, label, glyph]) => toolbar.append(this.#button(command, label, glyph)));
-    panel.append(toolbar, this.#webview);
+    panel.append(this.#webview);
     return panel;
   }
-  #button(command, label, glyph) {
+  #createActions() {
+    const actions = this.#element("div", ACTIONS_CLASS);
+    actions.style.setProperty("--vivarcdi-peek-width", `${this.#deps.size.widthPercent}%`);
+    actions.style.setProperty("--vivarcdi-peek-height", `${this.#deps.size.heightPercent}%`);
+    const shortcuts = shortcutLabels(this.#deps.document.defaultView?.navigator.platform ?? "");
+    BUTTONS.forEach(([command, label, glyph]) => {
+      const shortcut = command === "split" ? "" : ` (${shortcuts[command]})`;
+      actions.append(this.#button(command, label, glyph, `${label}${shortcut}`));
+    });
+    return actions;
+  }
+  #button(command, label, glyph, tooltip) {
     const button = this.#element("button", `vivarcdi-peek-${command}`);
-    button.title = label;
+    button.title = tooltip;
     button.setAttribute("aria-label", label);
     button.textContent = glyph;
     button.addEventListener("click", () => this.#deps.onCommand(command));
@@ -92,6 +106,7 @@ class PeekPanel {
   }
 }
 export {
+  ACTIONS_CLASS,
   BACKDROP_CLASS,
   PANEL_CLASS,
   PeekPanel

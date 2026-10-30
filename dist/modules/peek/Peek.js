@@ -23,8 +23,10 @@ class Peek extends Module {
     shiftClick: true,
     pinnedCrossSite: true,
     anyCrossSite: false,
-    widthPercent: 80,
-    heightPercent: 90
+    pinnedNewTab: true,
+    anyNewTab: false,
+    widthPercent: 90,
+    heightPercent: 94
   });
   #token = "";
   #container = null;
@@ -35,7 +37,8 @@ class Peek extends Module {
   #unsubscribe = [];
   /**
    * Opens links in Peek, a floating panel over the current page that shows the real page:
-   * on Shift+click, and on links that leave the site of a pinned tab, a Favorite or the tab of a folder link.
+   * on Shift+click, on links that leave the site of a pinned tab, a Favorite or the tab of a folder link,
+   * and on links that ask for a new tab in a pinned tab or a Favorite.
    * Without `chrome.tabs` the module stays off and links behave as usual.
    *
    * @param context What the module may use.
@@ -85,6 +88,8 @@ class Peek extends Module {
       shiftClick: settings.shiftClick === true,
       pinnedCrossSite: settings.pinnedCrossSite === true,
       anyCrossSite: settings.anyCrossSite === true,
+      pinnedNewTab: settings.pinnedNewTab === true,
+      anyNewTab: settings.anyNewTab === true,
       widthPercent: clamp(settings.widthPercent),
       heightPercent: clamp(settings.heightPercent)
     };
@@ -109,12 +114,12 @@ class Peek extends Module {
     });
   }
   #createInjector({ selectors, tabs, logger }, triggers, scripts) {
-    const { shiftClick, pinnedCrossSite, anyCrossSite } = triggers;
+    const { shiftClick, pinnedCrossSite, anyCrossSite, pinnedNewTab, anyNewTab } = triggers;
     return new PageScriptInjector({
       container: this.#container,
       webviewSelector: selectors.get("tabWebview"),
       scriptFor: async (tabId) => scripts.installLinks({
-        triggers: { shiftClick, pinnedCrossSite, anyCrossSite },
+        triggers: { shiftClick, pinnedCrossSite, anyCrossSite, pinnedNewTab, anyNewTab },
         pinned: KeptTab.is(await tabs.get(tabId)),
         tabId,
         token: this.#token

@@ -11,6 +11,11 @@ function commandFor(event) {
   }
   return key === "o" ? "expand" : null;
 }
+function shortcutLabels(platform) {
+  const modifier = platform.toLowerCase().startsWith("mac") ? "Cmd" : "Ctrl";
+  return { close: `${modifier}+W`, expand: `${modifier}+O` };
+}
 export {
-  commandFor
+  commandFor,
+  shortcutLabels
 };

@@ -141,7 +141,9 @@ var VivArcDiPeekLinks = (() => {
       this.#rules = [
         triggers.shiftClick ? (click) => click.shiftKey : null,
         triggers.pinnedCrossSite ? (click, crossSite) => click.pinned && crossSite : null,
-        triggers.anyCrossSite ? (click, crossSite) => !click.pinned && crossSite : null
+        triggers.anyCrossSite ? (click, crossSite) => !click.pinned && crossSite : null,
+        triggers.pinnedNewTab ? (click) => click.pinned && _LinkClassifier.#asksNewTab(click) : null,
+        triggers.anyNewTab ? (click) => !click.pinned && _LinkClassifier.#asksNewTab(click) : null
       ].filter((rule) => rule !== null);
     }
     /**
@@ -159,6 +161,9 @@ var VivArcDiPeekLinks = (() => {
     #isCandidate(click) {
       const plainOrShift = !click.ctrlKey && !click.metaKey && !click.altKey;
       return click.button === MAIN_BUTTON && plainOrShift && _LinkClassifier.#isWebUrl(click.href);
+    }
+    static #asksNewTab(click) {
+      return click.target === "_blank";
     }
     static #dispositionOf(click) {
       if (click.shiftKey) {
