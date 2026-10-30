@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -18,4 +18,4 @@ Ordered, small and independently reviewable.
 - [x] **T5.** Version bump to 0.13.0 (feature) in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`; README section on the new options.
 - [x] **T6.** Write the manual verification checklist for Tore from AC-1 to AC-5 (macOS and Debian).
-- [ ] **T7.** Manual checks AC-1 to AC-5 by Tore.
+- [x] **T7.** Manual checks AC-1 to AC-5 by Tore.
