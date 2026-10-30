@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 2 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-30 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -90,12 +90,12 @@ nor Cmd/Ctrl+O, and Peek only takes them while it is open.
 
 ## Open questions
 
-- [ ] **Scripted windows.** Many sites open pages with `window.open` rather than a link. Proposed:
+- [x] **Scripted windows.** Approved by Tore 2026-10-30 with the proposals below. Many sites open pages with `window.open` rather than a link. Proposed:
   leave them to a later spec; this one covers clicked links only.
-- [ ] **Layout.** Proposed: buttons outside the panel as in Arc, size 90% by 94%. The alternative
+- [x] **Layout.** Proposed: buttons outside the panel as in Arc, size 90% by 94%. The alternative
   is to keep 002's buttons inside the panel.
-- [ ] **Ordinary tabs.** Proposed: `anyNewTab` off by default, as 002's `anyCrossSite`.
-- [ ] **Cmd+O.** Vivaldi binds Cmd+O to Open File. Proposed: Peek takes it only while open, as in
+- [x] **Ordinary tabs.** Proposed: `anyNewTab` off by default, as 002's `anyCrossSite`.
+- [x] **Cmd+O.** Vivaldi binds Cmd+O to Open File. Proposed: Peek takes it only while open, as in
   002; no change to 014.
 
 ## References

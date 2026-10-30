@@ -23,7 +23,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [012 Editable folders](012-editable-folders/spec.md) | 3 | Approved |
 | [013 Incognito mode](013-incognito-mode/spec.md) | 3 | Draft |
 | [014 Arc shortcuts](014-arc-shortcuts/spec.md) | 0 | Implemented |
-| [015 Peek for new-tab links](015-peek-new-tab-links/spec.md) | 2 | Draft |
+| [015 Peek for new-tab links](015-peek-new-tab-links/spec.md) | 2 | Approved |
 
 ## Layout
 
