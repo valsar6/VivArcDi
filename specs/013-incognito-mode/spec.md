@@ -80,8 +80,10 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
   `New Tab` row and the bottom bar with Library and `+`.
 - **FR-4.** `Clear` closes all tabs of the private window except the active one, without archiving.
 - **FR-5.** `New Tab` opens a new tab in the private window.
-- **FR-6.** The Library button opens Vivaldi's Downloads panel.
-- **FR-7.** The `+` button opens Vivaldi's Quick Commands.
+- **FR-6.** The Library button opens Vivaldi's Downloads panel, by playing the shortcut of
+  `COMMAND_SHOW_DOWNLOADS_PANEL`, or else by a click on Vivaldi's own Downloads button.
+- **FR-7.** The `+` button opens Vivaldi's Quick Commands, by playing the shortcut of
+  `COMMAND_SHOW_QUICK_COMMANDS` as the user set it.
 - **FR-8.** In a private window, Vivaldi's own new tab button and workspace switcher in the tab bar
   are hidden.
 - **FR-9.** The module is enabled by default and disabled with `"incognito": false` in `config.json`;
@@ -132,16 +134,18 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 - [x] **How is a private window recognized in `window.html`?** `chrome.windows.getCurrent` returns
   `incognito: true` in a private window; `#browser` has no private class (Tore's probe on Vivaldi 8.2,
   2026-10-29).
-- [ ] **What does the Library open?** Proposed: Vivaldi's Downloads panel. Alternatives: a small menu
-  with Downloads, Notes and Captures, or Vivaldi's Window panel.
-- [ ] **What does `Clear` close?** Proposed: all tabs except the active one, as Clear does for Today
-  tabs. Alternative: all tabs, leaving one new tab.
-- [ ] **What does `New Tab` do?** Proposed: the same as Cmd/Ctrl+T in that window (a new tab, or Quick
-  Commands if Tore set Cmd/Ctrl+T that way). Alternative: always Quick Commands, as Arc's command bar.
-- [ ] **Peek in a private window?** Proposed: kept, since it opens the link in the same private
-  window and stores nothing. Alternative: disabled.
-- [ ] **Can a mod open Quick Commands and the Downloads panel?** Proposed: through Vivaldi's own
-  commands if `window.html` exposes them, else by a click on Vivaldi's own buttons; the probe checks it.
+- [x] **What does the Library open?** Vivaldi's Downloads panel (Tore, 2026-10-30).
+- [x] **What does `Clear` close?** All tabs except the active one (Tore, 2026-10-30).
+- [x] **What does `New Tab` do?** The same as Cmd/Ctrl+T in that window (Tore, 2026-10-30).
+- [x] **Peek in a private window?** Kept (Tore, 2026-10-30).
+- [x] **Can a mod open Quick Commands and the Downloads panel?** `vivaldi.utilities` has no call that
+  runs a Vivaldi command, and the interface has no Quick Commands button. The commands exist as
+  `COMMAND_SHOW_QUICK_COMMANDS` (Cmd+T) and `COMMAND_SHOW_DOWNLOADS_PANEL` (Alt+Cmd+L) in the
+  shortcut list, and the panel bar has a Downloads button (probe of Tore on Vivaldi 8.2, 2026-10-30).
+  Decided: the module reads the shortcut of the command from `vivaldi.actions` and plays it with
+  `vivaldi.utilities.emulateUserInput`, so it follows the shortcuts the user set (014); for Downloads
+  it clicks Vivaldi's own `Trasferimenti` button if the shortcut cannot be played. The design starts
+  with a probe that proves the shortcut is accepted from a mod.
 
 ## References
 
