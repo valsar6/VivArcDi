@@ -9,6 +9,10 @@ export interface PeekTriggers {
   pinnedCrossSite: boolean;
   /** A link to another site in any other tab opens Peek. */
   anyCrossSite: boolean;
+  /** A link that asks for a new tab or window in a Favorite or pinned tab opens Peek, on any site. */
+  pinnedNewTab: boolean;
+  /** A link that asks for a new tab or window in any other tab opens Peek. */
+  anyNewTab: boolean;
 }
 
 export interface LinkClick {
@@ -57,6 +61,8 @@ export class LinkClassifier {
       triggers.shiftClick ? (click: LinkClick): boolean => click.shiftKey : null,
       triggers.pinnedCrossSite ? (click: LinkClick, crossSite: boolean): boolean => click.pinned && crossSite : null,
       triggers.anyCrossSite ? (click: LinkClick, crossSite: boolean): boolean => !click.pinned && crossSite : null,
+      triggers.pinnedNewTab ? (click: LinkClick): boolean => click.pinned && LinkClassifier.#asksNewTab(click) : null,
+      triggers.anyNewTab ? (click: LinkClick): boolean => !click.pinned && LinkClassifier.#asksNewTab(click) : null,
     ].filter((rule): rule is Rule => rule !== null);
   }
 
@@ -76,6 +82,10 @@ export class LinkClassifier {
   #isCandidate(click: LinkClick): boolean {
     const plainOrShift = !click.ctrlKey && !click.metaKey && !click.altKey;
     return click.button === MAIN_BUTTON && plainOrShift && LinkClassifier.#isWebUrl(click.href);
+  }
+
+  static #asksNewTab(click: LinkClick): boolean {
+    return click.target === '_blank';
   }
 
   static #dispositionOf(click: LinkClick): Disposition {

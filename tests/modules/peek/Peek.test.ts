@@ -184,7 +184,7 @@ test('peek module cleans up on stop', async () => {
       disposition: 'same-tab',
     }),
   );
-  assert.equal(container.children.length, 3);
+  assert.equal(container.children.length, 4);
   peek.stop();
   assert.deepEqual(container.children, [webview]);
   assert.equal(container.hasAttribute(OPEN_ATTRIBUTE), false);
@@ -209,6 +209,8 @@ test('peek settings keep sizes between 40 and 100 percent', () => {
     shiftClick: true,
     pinnedCrossSite: true,
     anyCrossSite: true,
+    pinnedNewTab: true,
+    anyNewTab: false,
     widthPercent: 40,
     heightPercent: 100,
   });

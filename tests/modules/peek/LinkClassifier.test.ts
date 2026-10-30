@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { LinkClassifier } from '../../../src/modules/peek/LinkClassifier.js';
 import type { LinkClick, PeekTriggers } from '../../../src/modules/peek/LinkClassifier.js';
 
-const allOn: PeekTriggers = { shiftClick: true, pinnedCrossSite: true, anyCrossSite: true };
-const defaults: PeekTriggers = { shiftClick: true, pinnedCrossSite: true, anyCrossSite: false };
+const allOn: PeekTriggers = { shiftClick: true, pinnedCrossSite: true, anyCrossSite: true, pinnedNewTab: true, anyNewTab: true };
+const defaults: PeekTriggers = { shiftClick: true, pinnedCrossSite: true, anyCrossSite: false, pinnedNewTab: true, anyNewTab: false };
 
 function click(change: Partial<LinkClick> = {}): LinkClick {
   return {
@@ -25,7 +25,7 @@ const peeks = (triggers: PeekTriggers, change: Partial<LinkClick>): boolean =>
   new LinkClassifier(triggers).classify(click(change)).peek;
 
 test('link classifier ignores disabled triggers', () => {
-  const none: PeekTriggers = { shiftClick: false, pinnedCrossSite: false, anyCrossSite: false };
+  const none: PeekTriggers = { shiftClick: false, pinnedCrossSite: false, anyCrossSite: false, pinnedNewTab: false, anyNewTab: false };
   assert.equal(peeks(none, { shiftKey: true }), false);
   assert.equal(peeks(none, { pinned: true }), false);
   assert.equal(peeks(none, {}), false);
@@ -60,4 +60,26 @@ test('link classifier reports what Vivaldi would have done', () => {
   const classifier = new LinkClassifier(defaults);
   assert.equal(classifier.classify(click({ pinned: true, target: '_blank' })).disposition, 'new-tab');
   assert.equal(classifier.classify(click({ pinned: true })).disposition, 'same-tab');
+});
+
+test('link classifier peeks same-site blank links in pinned tabs', () => {
+  const blank = { pinned: true, target: '_blank', href: 'https://mail.google.com/other' };
+  assert.equal(peeks(defaults, blank), true);
+  assert.equal(new LinkClassifier(defaults).classify(click(blank)).disposition, 'new-tab');
+});
+
+test('link classifier ignores disabled new-tab trigger', () => {
+  const blank = { pinned: true, target: '_blank', href: 'https://mail.google.com/other' };
+  assert.equal(peeks({ ...defaults, pinnedNewTab: false }, blank), false);
+  assert.equal(peeks({ ...allOn, anyNewTab: false, pinnedNewTab: false }, { ...blank, pinned: false }), false);
+});
+
+test('link classifier leaves blank links in ordinary tabs by default', () => {
+  const blank = { target: '_blank', href: 'https://mail.google.com/other' };
+  assert.equal(peeks(defaults, blank), false);
+  assert.equal(peeks({ ...defaults, anyNewTab: true }, blank), true);
+});
+
+test('link classifier leaves same-site plain links in pinned tabs', () => {
+  assert.equal(peeks(defaults, { pinned: true, href: 'https://mail.google.com/other' }), false);
 });

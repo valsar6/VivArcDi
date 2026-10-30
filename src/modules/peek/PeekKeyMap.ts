@@ -19,3 +19,12 @@ export function commandFor(event: Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlK
   }
   return key === 'o' ? 'expand' : null;
 }
+
+/**
+ * @param platform The value of `navigator.platform`.
+ * @returns The shortcut texts shown in the tooltips: Cmd on macOS, Ctrl elsewhere.
+ */
+export function shortcutLabels(platform: string): Record<PeekCommand, string> {
+  const modifier = platform.toLowerCase().startsWith('mac') ? 'Cmd' : 'Ctrl';
+  return { close: `${modifier}+W`, expand: `${modifier}+O` };
+}

@@ -29,35 +29,35 @@
   animation: vivarcdi-peek-rise $peek-duration $peek-easing;
 }
 
-#{$root} .vivarcdi-peek-toolbar {
+#{$root} .vivarcdi-peek-actions {
+  position: absolute;
+  top: calc((100% - var(--vivarcdi-peek-height, 94%)) / 2);
+  left: min(calc(50% + var(--vivarcdi-peek-width, 90%) / 2 + $peek-action-gap), calc(100% - $peek-button-size - $peek-action-gap));
+  z-index: $peek-layer + 1;
   display: flex;
-  flex: 0 0 $peek-toolbar-height;
-  gap: 4px;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 6px;
-  background: var(--colorBgDark, #eee);
+  flex-direction: column;
+  gap: $peek-action-gap;
+  animation: vivarcdi-peek-fade $peek-duration ease-out;
 }
 
-#{$root} .vivarcdi-peek-toolbar button {
+#{$root} .vivarcdi-peek-actions button {
   width: $peek-button-size;
   height: $peek-button-size;
   border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--colorFg, #222);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
 }
 
-#{$root} .vivarcdi-peek-toolbar button:hover {
-  background: color-mix(in srgb, var(--colorFg, #222) 14%, transparent);
+#{$root} .vivarcdi-peek-actions button:hover {
+  background: rgb(0 0 0 / 80%);
 }
 
-#{$root} .vivarcdi-peek-toolbar .vivarcdi-peek-close:hover {
+#{$root} .vivarcdi-peek-actions .vivarcdi-peek-close:hover {
   background: #e5484d;
-  color: #fff;
 }
 
 #{$root} .vivarcdi-peek-page {

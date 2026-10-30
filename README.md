@@ -276,8 +276,10 @@ Options of `peek` in `config.json`:
 | `shiftClick` | `true` | Shift+click opens Peek |
 | `pinnedCrossSite` | `true` | Links to another site in Favorites and pinned tabs open Peek |
 | `anyCrossSite` | `false` | Links to another site in every other tab open Peek too |
-| `widthPercent` | `80` | Panel width, as a percentage of the page area (40 to 100) |
-| `heightPercent` | `90` | Panel height, as a percentage of the page area (40 to 100) |
+| `pinnedNewTab` | `true` | Links that ask for a new tab (`target="_blank"`) in Favorites and pinned tabs open Peek, even on the same site |
+| `anyNewTab` | `false` | Links that ask for a new tab in every other tab open Peek too |
+| `widthPercent` | `90` | Panel width, as a percentage of the page area (40 to 100) |
+| `heightPercent` | `94` | Panel height, as a percentage of the page area (40 to 100) |
 
 ## Reopen pinned tabs
 
