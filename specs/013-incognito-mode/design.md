@@ -81,10 +81,11 @@ Every class takes its dependencies in the constructor, so each is tested with fa
 
 - `chrome.windows.getCurrent` (`incognito`), `chrome.tabs.query/remove/create`, as `BrowserTabs`
   already wraps them.
-- Selectors added to the catalog: `newTabButton` (`.button-toolbar.newtab`), `workspaceButton`
-  (`.tabbar-workspace-button`), `downloadsButton` (a button of the panel bar titled
-  `Trasferimenti`/`Downloads`; matched by the title attribute prefix) and `addressField` (the input
-  of the address bar, probably `.UrlBar-AddressField input`, confirmed in T1).
+- Selectors added to the catalog (confirmed by Tore's probe on Vivaldi 8.2, 2026-10-31):
+  `newTabButton` (`.button-toolbar.newtab`), `workspaceButton` (`.tabbar-workspace-button`),
+  `addressField` (`input.UrlBar-UrlField`) and `downloadsButton` (a `button` of the panel bar whose
+  `title` starts with `Trasferimenti` or `Downloads`, matched by `DownloadsButton` since the title
+  follows the user's language).
 - Marks: `data-vivarcdi-private`, `data-vivarcdi-incognito-header`, `data-vivarcdi-bottom-bar`.
 
 ## Configuration
@@ -101,7 +102,7 @@ and `styles/incognito.css` in the list of styles.
 
 | Risk | Mitigation |
 |---|---|
-| The address field selector is wrong or the field appears late | T1 reads it on Tore's Vivaldi; `AddressField` retries for a short time and gives up silently, the blank tab still opens |
+| The address field appears late | `AddressField` retries for a short time and gives up silently, the blank tab still opens |
 | The Downloads button is hidden with the panel bar, or titled in another language | The title is matched by the shortcut hint `(⌥⌘L)` and the label of the user's language; if the click does nothing, AC-15 fails and Tore decides |
 | The user does not use Cmd+T for Quick Commands | Not our concern: the buttons do not depend on it |
 | `chrome.storage.local` is shared with normal windows | No module that stores data runs in a private window, proven by a test with a fake storage that fails on writes |

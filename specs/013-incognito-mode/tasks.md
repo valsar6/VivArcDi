@@ -10,8 +10,8 @@ Ordered, small and independently reviewable. Each task names the acceptance crit
 and is done when its check passes. Branch `features/incognito-mode`, minor bump to 0.14.0.
 
 - [x] **T1.** Probes for Tore on a private window: a mod cannot play shortcuts (2026-10-30 and
-  2026-10-31). Left to find: the selector of the address field and of Vivaldi's Downloads button
-  (`incognito/diagnostica-selettori.js` in the project files).
+  2026-10-31); selectors of the address field (`input.UrlBar-UrlField`) and of Vivaldi's Downloads
+  button found (2026-10-31).
 - [ ] **T2.** `BrowserRuntime.isPrivateWindow()`, `Module.privateWindows`, `ModuleRegistry.createEnabled`
   with the window kind, `VivArcDi` detection, policies of the existing modules. AC-1, AC-2, AC-3,
   AC-11.
