@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -27,4 +27,4 @@ and is done when its check passes.
   modules; minor version bump on `features/today-archive`.
 - [x] **T13.** Manual verification checklist for Tore from AC-6, AC-7, AC-8, AC-10, AC-11
   (`phase-4/verifica-archivio.md` in the project files).
-- [ ] **T14.** Manual checks on macOS and Debian.
+- [x] **T14.** Manual checks on macOS and Debian (passed, Tore, 2026-10-31).
