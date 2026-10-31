@@ -29,6 +29,11 @@ class Platform(ABC):
         """Stable folder for the installer's own copy and the backups."""
 
     @property
+    def package_data_dir(self) -> Path:
+        """Data folder of the packaged app or package, which holds the `managed-by` marker."""
+        return self.data_dir
+
+    @property
     @abstractmethod
     def requires_root(self) -> bool:
         """True when installing needs administrator rights."""
@@ -96,6 +101,11 @@ class MacOSPlatform(Platform):
         return self._home / "Library" / "Application Support" / "VivArcDi"
 
     @property
+    def launch_agents_dir(self) -> Path:
+        """Folder of the user's launchd agents."""
+        return self._home / "Library" / "LaunchAgents"
+
+    @property
     def requires_root(self) -> bool:
         return False
 
@@ -105,7 +115,7 @@ class MacOSPlatform(Platform):
 
     def update_hook(self) -> UpdateHook:
         watch_paths = [versions_dir for _, versions_dir in self._versions_dirs()]
-        return LaunchAgentHook(self._home / "Library" / "LaunchAgents", watch_paths, self._runner)
+        return LaunchAgentHook(self.launch_agents_dir, watch_paths, self._runner)
 
     def permission_advisor(self) -> PermissionAdvisor:
         return MacOSAdvisor()
@@ -167,6 +177,15 @@ class DebianPlatform(Platform):
     @property
     def data_dir(self) -> Path:
         return self._root / "usr" / "local" / "share" / "vivarcdi"
+
+    @property
+    def package_data_dir(self) -> Path:
+        return self._root / "var" / "lib" / "vivarcdi"
+
+    @property
+    def root(self) -> Path:
+        """The filesystem root the platform looks under, `/` outside tests."""
+        return self._root
 
     @property
     def requires_root(self) -> bool:

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 
 from .handoff import ReapplyHandoff
 from .hooks import UpdateHook
@@ -7,7 +8,8 @@ from .patching import InstallationPatcher
 from .platforms import Platform
 from .reporter import Reporter
 from .shortcuts import ShortcutService
-from .staging import SelfStager
+from .modes import InstallMode
+from .staging import Stager
 
 
 @dataclass
@@ -16,12 +18,14 @@ class InstallerContext:
 
     platform: Platform
     installations: InstallationPatcher
-    stager: SelfStager
+    stager: Stager
     hook: UpdateHook
     reapply_command: list[str]
     reporter: Reporter
     handoff: ReapplyHandoff
     shortcuts: ShortcutService
+    mode: InstallMode
+    data_dir: Path
     background: bool = False
     shortcut_action: str = "status"
     dry_run: bool = False
@@ -107,7 +111,7 @@ class UninstallCommand(Command):
         context.hook.remove()
         context.handoff.clear()
         context.stager.unstage()
-        report.info(f"Backups of the original window.html stay in {context.platform.data_dir}")
+        report.info(f"Backups of the original window.html stay in {context.data_dir}")
         if context.restore_shortcuts:
             return context.shortcuts.restore()
         report.info("Restart Vivaldi to finish.")

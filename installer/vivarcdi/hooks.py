@@ -53,6 +53,22 @@ class AptHook(UpdateHook):
         return f"apt hook {self._path}"
 
 
+class PackageTriggerHook(UpdateHook):
+    """The dpkg trigger declared by the vivarcdi package: dpkg owns it, so there is nothing to manage."""
+
+    def install(self, command: list[str]) -> None:
+        pass
+
+    def remove(self) -> None:
+        pass
+
+    def is_installed(self) -> bool:
+        return True
+
+    def describe(self) -> str:
+        return "dpkg trigger of the vivarcdi package"
+
+
 class LaunchAgentHook(UpdateHook):
     """A per-user launchd agent that watches the Vivaldi app bundles.
 
