@@ -11,9 +11,12 @@ It ships three things:
 1. **Stylesheets** for the look.
 2. **JavaScript modules** that run inside Vivaldi's own interface for the behavior.
 3. **An installer** for macOS and Debian that applies both, and reapplies them on its own after every
-   Vivaldi update.
+   Vivaldi update. It comes as a downloadable app (macOS) and package (Debian), or as a
+   [command line installer](#advanced-command-line-installer).
 
 ## Status
+
+Version 0.15.0 brings the downloadable app (macOS) and package (Debian): no terminal and no Python needed.
 
 Phase 4 of the [roadmap](#roadmap) brings the [Today archive](#today-archive) and
 [copy URL](#copy-url), after phase 3 with [reopening pinned tabs](#reopen-pinned-tabs),
@@ -25,27 +28,107 @@ and the module loader, the installer and the [native settings guide](docs/native
 Tested against the Vivaldi 8.1 interface. Other versions stay untouched until they get a
 [selector file](docs/architecture.md#selectors).
 
+## Download
+
+Get the latest version from the [Releases page](https://github.com/valsar6/VivArcDi/releases/latest):
+
+- **macOS:** `VivArcDi-<version>.dmg`
+- **Debian:** `vivarcdi_<version>_all.deb`
+
+Replace `<version>` with the number of the release, for example `0.15.0`.
+
 ## Requirements
 
 - Vivaldi stable or snapshot, from the official `.dmg` on macOS or the official `.deb` on Debian.
-- Python 3.9 or newer. Debian 13 ships it. On macOS run `xcode-select --install` if `python3` is missing.
+- Nothing else for the app and the package: they bring everything they need, Python included.
+- Only the [command line installer](#advanced-command-line-installer) needs Python 3.9 or newer.
+  Debian 13 ships it. On macOS run `xcode-select --install` if `python3` is missing.
 
 ## Install
 
 VivArcDi is not a Vivaldi extension: there is nothing to add from Vivaldi's settings or from the Chrome
-Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it once from a terminal.
+Web Store. The app (macOS) or the package (Debian) copies VivArcDi into Vivaldi's own files.
+You do not need a terminal.
 
 ### macOS
 
 1. Install Vivaldi from [vivaldi.com](https://vivaldi.com) and move it to `/Applications`.
-2. Open Terminal and check that Python is there:
+2. [Download](#download) `VivArcDi-<version>.dmg` and open it.
+3. Drag **VivArcDi** onto the **Applications** folder. Then open VivArcDi from Applications.
+4. The first time, macOS says it cannot verify the developer. VivArcDi is free and is not signed with
+   an Apple Developer ID. To open it anyway:
+   - Open System Settings > Privacy & Security.
+   - Scroll down to the message about VivArcDi and click **Open Anyway**.
+   - Confirm with your password or Touch ID, then open VivArcDi again.
+5. Click **Install**. If Vivaldi is open, VivArcDi offers to quit it for you.
+6. If macOS blocks the change, VivArcDi says so and shows **Open Settings**:
+   - Click **Open Settings**. It opens System Settings > Privacy & Security > App Management.
+   - Turn VivArcDi on.
+   - Go back to VivArcDi and click **Try again**.
+7. Open Vivaldi.
+
+Good to know:
+
+- The window has a checkbox, "Also use Arc's keyboard shortcuts". Tick it if you want them.
+  They are also covered in the [native settings guide](docs/native-settings.md).
+- After a VivArcDi update, macOS may ask for App Management again. VivArcDi has no Apple signature
+  (only a local one), so macOS sees each new version as a new app. Do step 6 again.
+- When Vivaldi updates, VivArcDi applies itself again and shows a notification that asks you to
+  restart Vivaldi. If the permission is missing, the VivArcDi window opens by itself with **Try again**.
+
+### Debian
+
+1. Install Vivaldi from the official `.deb` on [vivaldi.com](https://vivaldi.com). It also adds the
+   Vivaldi apt repository, which keeps Vivaldi updated.
+2. [Download](#download) `vivarcdi_<version>_all.deb`.
+3. Double-click it. Your software center (GNOME Software) opens. Click **Install** and type your password.
+   If double-click does nothing, open a terminal in the download folder and run:
 
    ```sh
-   python3 --version
+   sudo apt install ./vivarcdi_<version>_all.deb
    ```
 
-   If macOS offers to install the command line developer tools, accept and wait for it to finish.
-3. Download VivArcDi (the `dist` branch holds the ready-to-install build, see
+4. Restart Vivaldi.
+
+Open the **VivArcDi** entry in your application menu to see the state of each Vivaldi, and to apply
+or restore Arc's keyboard shortcuts (**Use Arc's shortcuts**, **Restore my shortcuts**). When Vivaldi updates, VivArcDi applies itself again on its own.
+Restart Vivaldi once more to load it.
+
+### Update VivArcDi
+
+Download the new `.dmg` or `.deb` and install it as above. The VivArcDi window tells you when a new
+version exists, with a link to the download.
+
+### Coming from the command line installer
+
+Install the app or the package as above. It takes over by itself: it removes the old update hook and
+keeps your backups. You can delete the cloned folder afterwards.
+
+### Uninstall
+
+- **macOS:** click **Uninstall** in the VivArcDi window, restart Vivaldi, then delete VivArcDi from Applications.
+- **Debian:** remove VivArcDi in your software center, or run `sudo apt remove vivarcdi`.
+  `sudo apt purge vivarcdi` also deletes the backups in `/var/lib/vivarcdi`.
+
+Restart Vivaldi afterwards.
+
+### Check that it works
+
+The VivArcDi window should list your Vivaldi as installed. You can also open
+`vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for the line
+`[VivArcDi] <version> active on Vivaldi …` in the console.
+
+## Advanced: command line installer
+
+This is the way to install before 0.15.0, and it still works. It needs Python 3.9 or newer.
+`install` stops with a message when the app or the package manages VivArcDi: use the app or the
+package instead, or uninstall it first.
+
+### Install
+
+1. Install Vivaldi and make sure `python3 --version` works. On macOS, accept the offer to install the
+   command line developer tools if it appears. On Debian run `sudo apt install git python3`.
+2. Download VivArcDi (the `dist` branch holds the ready-to-install build, see
    [Release builds](#release-builds)):
 
    ```sh
@@ -53,14 +136,15 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
    cd VivArcDi
    ```
 
-4. Quit Vivaldi (Cmd+Q), then install:
+3. Quit Vivaldi, then install:
 
    ```sh
    python3 installer install
    ```
 
-   Do not use `sudo` here: it does not help on macOS, and the update hook must be able to change
-   Vivaldi as your user. If the installer stops with a permission error, it prints the steps:
+   On Debian use `sudo python3 installer install`. On macOS do not use `sudo`: it does not help,
+   and the update hook must be able to change Vivaldi as your user. If the installer stops with a
+   permission error on macOS, it prints the steps:
 
    - **App Management.** macOS stops any program, even with `sudo`, from changing a signed app.
      Open System Settings > Privacy & Security > App Management, turn your terminal app on, quit
@@ -72,45 +156,12 @@ Web Store. The installer copies VivArcDi into Vivaldi's own files, so you run it
      sudo chown -R "$(whoami)" /Applications/Vivaldi.app
      ```
 
-5. Open Vivaldi.
+4. Open Vivaldi.
 
-### Debian
+Check it with `python3 installer status`: it should list your Vivaldi as `patched, up to date` and
+the update hook as `active`.
 
-1. Install Vivaldi from the official `.deb` on [vivaldi.com](https://vivaldi.com). It also adds the
-   Vivaldi apt repository, which keeps Vivaldi updated.
-2. Install git if it is missing:
-
-   ```sh
-   sudo apt install git python3
-   ```
-
-3. Download VivArcDi (the `dist` branch holds the ready-to-install build, see
-   [Release builds](#release-builds)):
-
-   ```sh
-   git clone -b dist https://github.com/valsar6/VivArcDi.git
-   cd VivArcDi
-   ```
-
-4. Close Vivaldi, then install:
-
-   ```sh
-   sudo python3 installer install
-   ```
-
-5. Open Vivaldi.
-
-### Check that it works
-
-```sh
-python3 installer status
-```
-
-should list your Vivaldi as `patched, up to date` and the update hook as `active`.
-You can also open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for the line
-`[VivArcDi] <version> active on Vivaldi …` in the console.
-
-### Update VivArcDi
+### Update and uninstall
 
 From the `VivArcDi` folder (cloned from the `dist` branch):
 
@@ -119,16 +170,8 @@ git pull
 python3 installer install
 ```
 
-(with `sudo` on Debian), then restart Vivaldi. Vivaldi's own updates need nothing from you: see
-[How updates are handled](#how-updates-are-handled).
-
-### Uninstall
-
-```sh
-python3 installer uninstall
-```
-
-(with `sudo` on Debian), then restart Vivaldi.
+(with `sudo` on Debian), then restart Vivaldi. To remove VivArcDi, run `python3 installer uninstall`
+(with `sudo` on Debian) and restart Vivaldi.
 
 ### Release builds
 
@@ -151,23 +194,28 @@ was rewritten by every publish, need `git fetch origin && git reset --hard origi
 you clone `main` instead, the
 installer stops and tells you to download a release build or to run `make build` (it needs Node 24).
 
-## Commands
+### Commands
 
 | Command | What it does |
 |---|---|
-| `install` | Backs up `window.html`, copies the payload, patches `window.html`, registers the update hook |
+| `install` | Backs up `window.html`, copies the payload, patches `window.html`, registers the update hook. Refuses when the app or the package manages VivArcDi |
 | `reapply` | Patches again any Vivaldi build that an update reset; run automatically by the hook |
 | `uninstall` | Removes the patch, the payload and the hook; keeps the backups |
 | `status` | Shows which builds are patched and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
+| `window` | Opens the VivArcDi window, the same one as in the app and the package |
 
 Add `--quiet` to print only warnings and errors. On Debian, every command but `status` and `shortcuts` needs `sudo`; `shortcuts` refuses it.
+
+`--mode cli|app|deb` says who manages VivArcDi. The default is `cli`. The app and the package pass
+`app` and `deb` themselves, so you do not need it. `window` needs a desktop and Tkinter.
 
 `shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
 
 ### How updates are handled
 
-Vivaldi overwrites `window.html` when it updates, which removes VivArcDi.
+Vivaldi overwrites `window.html` when it updates, which removes VivArcDi. The app and the package
+handle this as described in [Install](#install). For the command line installer:
 
 - **macOS:** a launchd agent (`~/Library/LaunchAgents/io.github.valsar6.vivarcdi.reapply.plist`)
   watches the Vivaldi app bundles and runs `reapply` when they change, plus every six hours.

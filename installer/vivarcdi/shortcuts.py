@@ -6,6 +6,7 @@ from .profiles import ProfileLocator
 from .reporter import Reporter
 from .running import ProcessGuard
 
+ALREADY_SET = "already set"
 SYNC_NOTE = "If Vivaldi Sync carries keyboard settings, another device may overwrite them."
 
 
@@ -59,6 +60,10 @@ class ShortcutService:
                 self._reporter.info(f"No backup for {profile.label}, left unchanged")
         return 0
 
+    def has_backup(self) -> bool:
+        """True when at least one profile has saved shortcuts that `restore` could put back."""
+        return any(self._backups.latest(profile) is not None for profile in self._locator.find())
+
     def status(self) -> int:
         """Say, for each profile, whether the table matches."""
         for profile in self._locator.find():
@@ -74,7 +79,7 @@ class ShortcutService:
     def _apply_to(self, profile, document: PreferencesDocument, dry_run: bool) -> None:
         changes = document.plan(self._table)
         if not changes:
-            self._reporter.info(f"{profile.label}: already set")
+            self._reporter.info(f"{profile.label}: {ALREADY_SET}")
             return
         for change in changes:
             self._reporter.info(f"{profile.label}: {change.label}: {change.current} -> {change.new}")
