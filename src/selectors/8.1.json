@@ -10,5 +10,6 @@
   "webviewContainer": "#webview-container",
   "tabWebview": "#webview-container webview[tab_id]",
   "tabClose": ".tab-header .close",
-  "tabFavicon": ".tab-header .favicon"
+  "tabFavicon": ".tab-header .favicon",
+  "addressField": "input.UrlBar-UrlField"
 }
