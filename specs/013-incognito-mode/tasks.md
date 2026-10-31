@@ -24,6 +24,6 @@ and is done when its check passes. Branch `features/incognito-mode`, minor bump 
 - [x] **T7.** `IncognitoHeader`, `NewTabRow`, `incognito.scss`, selectors of the catalog. AC-4.
 - [x] **T8.** `Incognito` module wiring, mark, registry, `config.json`, disabled option, README
   section, minor version bump. AC-12.
-- [ ] **T9.** Manual verification checklist for Tore from AC-13 to AC-16
+- [x] **T9.** Manual verification checklist for Tore from AC-13 to AC-16
   (`incognito/verifica-incognito.md` in the project files).
-- [ ] **T10.** Manual checks AC-13 to AC-16 on macOS and Debian.
+- [x] **T10.** Manual checks AC-13 to AC-16 on macOS and Debian.
