@@ -8,7 +8,7 @@ from pathlib import Path
 from .handoff import NoHandoff, ReapplyHandoff
 from .hooks import LaunchAgentHook, PackageTriggerHook, UpdateHook
 from .ownership import CommandLineOwnership, Ownership, PackageMarker, PackageOwnership
-from .permissions import PermissionAdvisor
+from .permissions import AppManagementAdvisor, PermissionAdvisor
 from .platforms import MacOSPlatform, Platform
 from .staging import NoStager, SelfStager, Stager, staged_installer_path
 from .system import CommandRunner
@@ -133,7 +133,7 @@ class MacAppMode(InstallMode):
         return platform.update_hook()
 
     def permission_advisor(self, platform: Platform) -> PermissionAdvisor:
-        return platform.permission_advisor()
+        return AppManagementAdvisor()
 
     def reapply_command(self, repo_root: Path, data_dir: Path) -> list[str]:
         return [str(self._app_executable), "reapply", "--mode", self.name]
