@@ -1,14 +1,16 @@
 class BrowserRuntime {
+  #chrome;
   #onMessage;
-  #createWindow;
+  #windows;
   /**
    * Access to `chrome.runtime` messages and `chrome.windows` from Vivaldi's interface.
    *
    * @param chromeApi The global `chrome` object, or undefined where it does not exist.
    */
   constructor(chromeApi) {
+    this.#chrome = chromeApi;
     this.#onMessage = chromeApi?.runtime?.onMessage ?? null;
-    this.#createWindow = chromeApi?.windows?.create ?? null;
+    this.#windows = chromeApi?.windows ?? null;
   }
   /**
    * @returns Whether messages from injected scripts can be received.
@@ -38,11 +40,45 @@ class BrowserRuntime {
    * @returns Resolves once the window was requested.
    */
   openWindow(url) {
-    const create = this.#createWindow;
-    if (create === null) {
+    const windows = this.#windows;
+    if (windows === null) {
       return Promise.reject(new Error("chrome.windows is not available"));
     }
-    return new Promise((resolve) => create({ url }, () => resolve()));
+    return new Promise((resolve) => windows.create({ url }, () => resolve()));
+  }
+  /**
+   * @returns Whether this window is a private window.
+   * @throws {Error} When `chrome.windows.getCurrent` is missing or fails.
+   */
+  async isPrivateWindow() {
+    return (await this.#currentWindow()).incognito === true;
+  }
+  /**
+   * @returns The id of this window, as `chrome.tabs` knows it.
+   * @throws {Error} When `chrome.windows.getCurrent` is missing or fails, or gives no id.
+   */
+  async currentWindowId() {
+    const { id } = await this.#currentWindow();
+    if (id === void 0) {
+      throw new Error("The current window has no id");
+    }
+    return id;
+  }
+  #currentWindow() {
+    const getCurrent = this.#windows?.getCurrent;
+    if (getCurrent === void 0) {
+      return Promise.reject(new Error("chrome.windows.getCurrent is not available"));
+    }
+    return new Promise((resolve, reject) => {
+      getCurrent.call(this.#windows, (info) => {
+        const error = this.#chrome?.runtime?.lastError;
+        if (error) {
+          reject(new Error(error.message));
+        } else {
+          resolve(info ?? {});
+        }
+      });
+    });
   }
 }
 export {

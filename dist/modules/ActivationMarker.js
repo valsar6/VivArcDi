@@ -2,6 +2,7 @@ import { DomQuery } from "../core/DomQuery.js";
 import { Module } from "../core/Module.js";
 class ActivationMarker extends Module {
   static id = "activation-marker";
+  static privateWindows = "allowed";
   #element = null;
   /**
    * Marks Vivaldi's root element with the `data-vivarcdi-active` attribute and the

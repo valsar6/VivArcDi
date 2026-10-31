@@ -1,4 +1,4 @@
-import { FrameTask } from "../../core/FrameTask.js";
+import { FrameTask } from "./FrameTask.js";
 const watchSubtree = (attributeFilter = []) => (target, onChange) => {
   const observer = new MutationObserver(onChange);
   observer.observe(target, { childList: true, subtree: true, ...attributeFilter.length > 0 ? { attributes: true, attributeFilter } : {} });

@@ -1,3 +1,8 @@
+const FITS = {
+  never: (privateWindow) => !privateWindow,
+  allowed: () => true,
+  only: (privateWindow) => privateWindow
+};
 class ModuleRegistry {
   #classes = /* @__PURE__ */ new Map();
   /**
@@ -28,10 +33,13 @@ class ModuleRegistry {
   /**
    * Creates an instance of every module that `config.json` enables.
    *
+   * Modules whose `privateWindows` policy does not fit the kind of window are left out.
+   *
    * @param settings The `modules` section of `config.json`.
+   * @param privateWindow Whether the window is a private window.
    * @returns The new instances, and the enabled ids that no module matches.
    */
-  createEnabled(settings) {
+  createEnabled(settings, privateWindow = false) {
     const modules = [];
     const unknown = [];
     for (const [id, options] of Object.entries(settings)) {
@@ -41,6 +49,9 @@ class ModuleRegistry {
       const moduleClass = this.#classes.get(id);
       if (moduleClass === void 0) {
         unknown.push(id);
+        continue;
+      }
+      if (!FITS[moduleClass.privateWindows](privateWindow)) {
         continue;
       }
       modules.push({ id, module: new moduleClass(), options });

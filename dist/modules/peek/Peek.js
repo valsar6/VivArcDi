@@ -16,6 +16,7 @@ const MAX_PERCENT = 100;
 const WEB_URL = /^https?:\/\//i;
 class Peek extends Module {
   static id = "peek";
+  static privateWindows = "allowed";
   /**
    * Options accepted in `config.json`, with their defaults.
    */

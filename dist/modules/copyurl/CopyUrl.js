@@ -13,6 +13,7 @@ const MIN_TOAST_MS = 500;
 const MAX_TOAST_MS = 1e4;
 class CopyUrl extends Module {
   static id = "copy-url";
+  static privateWindows = "allowed";
   /**
    * Options accepted in `config.json`, with their defaults.
    */

@@ -1,0 +1,119 @@
+#browser[data-vivarcdi-private] {
+  --vivarcdi-incognito-hover: color-mix(in srgb, var(--colorFg, #fff) 10%, transparent);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-private-hidden] {
+  display: none !important;
+}
+#browser[data-vivarcdi-private] :is([data-vivarcdi-incognito-header], [data-vivarcdi-new-tab-row], [data-vivarcdi-bottom-bar]) {
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 30px;
+  max-width: 100%;
+  margin: 6px;
+  padding-inline: 8px;
+  color: var(--colorFg, inherit);
+  font-size: 13px;
+  user-select: none;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header] .vivarcdi-incognito-title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header] button {
+  padding: 2px 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius, 10px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--vivarcdi-transition, 160ms ease), background-color var(--vivarcdi-transition, 160ms ease);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header] button:hover {
+  background-color: var(--vivarcdi-incognito-hover);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header]:hover button,
+#browser[data-vivarcdi-private] [data-vivarcdi-incognito-header] button:focus-visible {
+  opacity: 0.8;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-new-tab-row] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  height: 30px;
+  margin: 6px;
+  padding-inline: 8px;
+  border: 0;
+  border-radius: var(--vivarcdi-radius, 10px);
+  background: transparent;
+  color: var(--colorFg, inherit);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--vivarcdi-transition, 160ms ease);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-new-tab-row]:hover {
+  background-color: var(--vivarcdi-incognito-hover);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-new-tab-row] .vivarcdi-new-tab-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.250 2h1.500v5.250H14v1.500H8.750V14h-1.500V8.750H2v-1.500h5.250z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 8px;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] [data-vivarcdi-bar-button] {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--vivarcdi-radius, 10px);
+  background: transparent;
+  color: var(--colorFg, inherit);
+  font: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity var(--vivarcdi-transition, 160ms ease), background-color var(--vivarcdi-transition, 160ms ease);
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] [data-vivarcdi-bar-button]:hover {
+  background-color: var(--vivarcdi-incognito-hover);
+  opacity: 1;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] [data-vivarcdi-bar-button]::before {
+  width: 18px;
+  height: 18px;
+  background-color: currentcolor;
+  content: "";
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] [data-vivarcdi-bar-button][data-vivarcdi-bar-button=library]::before {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h2.500v12H2zM5.500 2H8v12H5.500zM9.200 3.200l2.400-.6 3 11.200-2.400.6z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+#browser[data-vivarcdi-private] [data-vivarcdi-bottom-bar] [data-vivarcdi-bar-button][data-vivarcdi-bar-button=plus]::before {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.250 2h1.500v5.250H14v1.500H8.750V14h-1.500V8.750H2v-1.500h5.250z'/%3E%3C/svg%3E") center/contain no-repeat;
+}

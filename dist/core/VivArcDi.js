@@ -104,7 +104,7 @@ class VivArcDi {
     }
     await new UiReadiness(this.#document).waitFor(selectors.get("browser"));
     config.styles.forEach((path) => this.#styles.inject(path));
-    const { modules, unknown } = this.#registry.createEnabled(config.modules);
+    const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
       await this.#startModule(entry, selectors, build, config.modules);
@@ -127,6 +127,14 @@ class VivArcDi {
     }
     this.#started = [];
     this.#styles.removeAll();
+  }
+  async #isPrivateWindow() {
+    try {
+      return await this.#runtime.isPrivateWindow();
+    } catch (error) {
+      this.#logger.warn("Cannot tell if this is a private window, treating it as a normal window", error);
+      return false;
+    }
   }
   async #startModule(entry, selectors, build, modules) {
     const logger = this.#logger.child(entry.id);

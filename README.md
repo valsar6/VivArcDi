@@ -427,6 +427,29 @@ a small "Copied" toast at the bottom of the window.
 |---|---|---|
 | `toastMs` | `2000` | How long the toast stays, in milliseconds (500 to 10000) |
 
+## Incognito mode
+
+A private window of Vivaldi gets the bare sidebar of Arc's incognito window. From top to bottom the
+tab bar shows the title **Incognito Tabs**, with **Clear** on its right when the pointer rests on it,
+a **New Tab** row, the private tabs as Vivaldi draws them, and a bottom bar with the Library button
+on the left and the `+` button on the right. Vivaldi's own new tab button and workspace switcher are
+hidden.
+
+- **New Tab** and `+` open a blank tab in the private window and put the cursor in the address field
+  with its text selected, so typing searches or opens a site. Cmd/Ctrl+T still opens Quick Commands,
+  as set by the [keyboard shortcuts](docs/native-settings.md).
+- **Library** opens Vivaldi's Downloads panel.
+- **Clear** closes every tab of the private window except the active one. Nothing goes to the
+  [Today archive](#today-archive).
+
+In a private window VivArcDi stores nothing, whether this module is on or not. Only the activation
+mark, [Peek](#peek) and [copy URL](#copy-url), which keep nothing, run there. The Favorites grid, the
+space header, the folders and their preview, the pinned tab marks and the Today archive do not start.
+A normal window open at the same time does not change.
+
+The module has only the `enabled` option. Set it to `false` and a private window looks like plain
+Vivaldi, with no VivArcDi section at all.
+
 ## Roadmap
 
 | Phase | Content |

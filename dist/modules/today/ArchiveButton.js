@@ -1,5 +1,5 @@
 import { ARCHIVE_FOOTER_ATTRIBUTE } from "./ArchivePanelView.js";
-import { KeptElement } from "./KeptElement.js";
+import { KeptElement } from "../../core/KeptElement.js";
 class ArchiveButton {
   #kept;
   /**
