@@ -5,6 +5,7 @@
     "styles/folder-preview.css",
     "styles/folders.css",
     "styles/hidden-tabs.css",
+    "styles/incognito.css",
     "styles/peek.css",
     "styles/pinned.css",
     "styles/space-header.css",
@@ -65,6 +66,9 @@
     "copy-url": {
       "enabled": true,
       "toastMs": 2000
+    },
+    "incognito": {
+      "enabled": true
     }
   }
 }

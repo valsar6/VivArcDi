@@ -1,0 +1,138 @@
+@use 'tokens' as *;
+
+#{$private} {
+  --vivarcdi-incognito-hover: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);
+
+  #{$private-hidden} {
+    display: none !important;
+  }
+
+  :is(#{$incognito-header}, #{$new-tab-row}, #{$bottom-bar}) {
+    -webkit-app-region: no-drag;
+  }
+
+  #{$incognito-header} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $gap;
+    box-sizing: border-box;
+    height: $folders-row-height;
+    max-width: 100%;
+    margin: $folders-padding;
+    padding-inline: $gap;
+    color: var(--colorFg, inherit);
+    font-size: 13px;
+    user-select: none;
+
+    .vivarcdi-incognito-title {
+      min-width: 0;
+      overflow: hidden;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    button {
+      padding: 2px $gap;
+      border: 0;
+      border-radius: var(--vivarcdi-radius, #{$radius});
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 12px;
+      opacity: 0;
+      cursor: pointer;
+      transition: opacity var(--vivarcdi-transition, #{$transition}), background-color var(--vivarcdi-transition, #{$transition});
+
+      &:hover {
+        background-color: var(--vivarcdi-incognito-hover);
+      }
+    }
+
+    &:hover button,
+    button:focus-visible {
+      opacity: 0.8;
+    }
+  }
+
+  #{$new-tab-row} {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    box-sizing: border-box;
+    width: calc(100% - #{$folders-padding * 2});
+    height: $folders-row-height;
+    margin: $folders-padding;
+    padding-inline: $gap;
+    border: 0;
+    border-radius: var(--vivarcdi-radius, #{$radius});
+    background: transparent;
+    color: var(--colorFg, inherit);
+    font: inherit;
+    font-size: 13px;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--vivarcdi-transition, #{$transition});
+
+    &:hover {
+      background-color: var(--vivarcdi-incognito-hover);
+    }
+
+    .vivarcdi-new-tab-icon {
+      flex: none;
+      width: $folders-icon-size;
+      height: $folders-icon-size;
+      background-color: currentcolor;
+      mask: $plus-glyph center / contain no-repeat;
+    }
+  }
+
+  #{$bottom-bar} {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    padding: $gap * 0.5 $gap;
+
+    #{$bar-button} {
+      display: grid;
+      flex: none;
+      place-items: center;
+      width: $bar-button-size;
+      height: $bar-button-size;
+      padding: 0;
+      border: 0;
+      border-radius: var(--vivarcdi-radius, #{$radius});
+      background: transparent;
+      color: var(--colorFg, inherit);
+      font: inherit;
+      opacity: 0.7;
+      cursor: pointer;
+      transition: opacity var(--vivarcdi-transition, #{$transition}), background-color var(--vivarcdi-transition, #{$transition});
+
+      &:hover {
+        background-color: var(--vivarcdi-incognito-hover);
+        opacity: 1;
+      }
+
+      &::before {
+        width: $bar-icon-size;
+        height: $bar-icon-size;
+        background-color: currentcolor;
+        content: '';
+      }
+
+      &[data-vivarcdi-bar-button='library']::before {
+        mask: $library-glyph center / contain no-repeat;
+      }
+
+      &[data-vivarcdi-bar-button='plus']::before {
+        mask: $plus-glyph center / contain no-repeat;
+      }
+    }
+
+  }
+}

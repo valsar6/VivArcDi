@@ -63,6 +63,10 @@ export class DomNode {
     this.attributes.set(name, value);
   }
 
+  public removeAttribute(name: string): void {
+    this.attributes.delete(name);
+  }
+
   public getAttribute(name: string): string | null {
     return this.attributes.get(name) ?? null;
   }

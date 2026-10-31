@@ -1,9 +1,10 @@
 import { DomQuery } from '../core/DomQuery.js';
 import { Module } from '../core/Module.js';
-import type { ModuleContext } from '../core/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../core/Module.js';
 
 export class ActivationMarker extends Module {
   public static override id = 'activation-marker';
+  public static override privateWindows: PrivateWindowPolicy = 'allowed';
 
   #element: HTMLElement | null = null;
 

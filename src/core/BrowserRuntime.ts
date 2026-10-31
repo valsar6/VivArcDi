@@ -1,8 +1,16 @@
 import type { ChromeApi, ChromeEvent, RuntimeMessageListener } from './BrowserTabs.js';
 
+export interface WindowInfo {
+  id?: number | undefined;
+  incognito?: boolean | undefined;
+}
+
+type ChromeWindows = NonNullable<ChromeApi['windows']>;
+
 export class BrowserRuntime {
+  #chrome: ChromeApi | undefined;
   #onMessage: ChromeEvent<RuntimeMessageListener> | null;
-  #createWindow: ((...args: unknown[]) => void) | null;
+  #windows: ChromeWindows | null;
 
   /**
    * Access to `chrome.runtime` messages and `chrome.windows` from Vivaldi's interface.
@@ -10,8 +18,9 @@ export class BrowserRuntime {
    * @param chromeApi The global `chrome` object, or undefined where it does not exist.
    */
   constructor(chromeApi: ChromeApi | undefined) {
+    this.#chrome = chromeApi;
     this.#onMessage = chromeApi?.runtime?.onMessage ?? null;
-    this.#createWindow = chromeApi?.windows?.create ?? null;
+    this.#windows = chromeApi?.windows ?? null;
   }
 
   /**
@@ -44,10 +53,47 @@ export class BrowserRuntime {
    * @returns Resolves once the window was requested.
    */
   public openWindow(url: string): Promise<void> {
-    const create = this.#createWindow;
-    if (create === null) {
+    const windows = this.#windows;
+    if (windows === null) {
       return Promise.reject(new Error('chrome.windows is not available'));
     }
-    return new Promise((resolve) => create({ url }, () => resolve()));
+    return new Promise((resolve) => windows.create({ url }, () => resolve()));
+  }
+
+  /**
+   * @returns Whether this window is a private window.
+   * @throws {Error} When `chrome.windows.getCurrent` is missing or fails.
+   */
+  public async isPrivateWindow(): Promise<boolean> {
+    return (await this.#currentWindow()).incognito === true;
+  }
+
+  /**
+   * @returns The id of this window, as `chrome.tabs` knows it.
+   * @throws {Error} When `chrome.windows.getCurrent` is missing or fails, or gives no id.
+   */
+  public async currentWindowId(): Promise<number> {
+    const { id } = await this.#currentWindow();
+    if (id === undefined) {
+      throw new Error('The current window has no id');
+    }
+    return id;
+  }
+
+  #currentWindow(): Promise<WindowInfo> {
+    const getCurrent = this.#windows?.getCurrent;
+    if (getCurrent === undefined) {
+      return Promise.reject(new Error('chrome.windows.getCurrent is not available'));
+    }
+    return new Promise((resolve, reject) => {
+      getCurrent.call(this.#windows, (info: WindowInfo | undefined) => {
+        const error = this.#chrome?.runtime?.lastError;
+        if (error) {
+          reject(new Error(error.message));
+        } else {
+          resolve(info ?? {});
+        }
+      });
+    });
   }
 }

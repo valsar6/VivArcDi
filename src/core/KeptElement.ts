@@ -1,5 +1,5 @@
-import { FrameTask } from '../../core/FrameTask.js';
-import type { FrameTiming } from '../../core/FrameTask.js';
+import { FrameTask } from './FrameTask.js';
+import type { FrameTiming } from './FrameTask.js';
 
 export type SubtreeWatcher = (target: Node, onChange: () => void) => () => void;
 

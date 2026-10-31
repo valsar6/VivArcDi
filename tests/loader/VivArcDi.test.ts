@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Logger } from '../../src/core/Logger.js';
+import type { BrowserRuntime } from '../../src/core/BrowserRuntime.js';
 import { Module } from '../../src/core/Module.js';
+import type { PrivateWindowPolicy } from '../../src/core/Module.js';
 import { ModuleRegistry } from '../../src/core/ModuleRegistry.js';
 import type { ModuleOptions } from '../../src/core/types.js';
 import { VivArcDi } from '../../src/core/VivArcDi.js';
@@ -16,12 +18,28 @@ class Broken extends Module {
   }
 }
 
+class Hidden extends Module {
+  public static override id = 'hidden';
+
+  public override start(): void {}
+}
+
+class Private extends Module {
+  public static override id = 'private';
+  public static override privateWindows: PrivateWindowPolicy = 'only';
+
+  public override start(): void {}
+}
+
+const runtimeAnswering = (answer: () => Promise<boolean>): BrowserRuntime => ({ isPrivateWindow: answer }) as unknown as BrowserRuntime;
+
 interface AppOptions {
+  runtime?: BrowserRuntime;
   vivaldiVersion?: string;
   modules?: Record<string, ModuleOptions>;
 }
 
-function createApp({ vivaldiVersion = '8.1.3740.12', modules }: AppOptions = {}): {
+function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime }: AppOptions = {}): {
   app: VivArcDi;
   browser: FakeElement;
   document: FakeDocument;
@@ -39,12 +57,13 @@ function createApp({ vivaldiVersion = '8.1.3740.12', modules }: AppOptions = {})
     'selectors/index.json': { versions: ['8.1'] },
     'selectors/8.1.json': { browser: '#browser' },
   });
-  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken);
+  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken).register(Hidden).register(Private);
   const app = new VivArcDi({
     loader,
     registry,
     logger: new Logger('test', sink),
     document: document as unknown as Document,
+    ...(runtime === undefined ? {} : { runtime }),
   });
   return { app, browser, document, sink };
 }
@@ -91,4 +110,28 @@ test('stop undoes modules and styles', async () => {
   assert.equal('vivarcdiVersion' in browser.dataset, false);
   assert.equal(document.head.children.length, 0);
   assert.deepEqual(app.startedModules, []);
+});
+
+const ALL_KINDS = { hidden: { enabled: true }, private: { enabled: true }, 'activation-marker': { enabled: true } };
+
+test('start asks for the window kind and starts only the modules that fit a private window', async () => {
+  const { app } = createApp({ modules: ALL_KINDS, runtime: runtimeAnswering(async () => true) });
+  await app.start();
+  assert.deepEqual(app.startedModules, ['private', 'activation-marker']);
+});
+
+test('start keeps private-only modules out of a normal window', async () => {
+  const { app } = createApp({ modules: ALL_KINDS, runtime: runtimeAnswering(async () => false) });
+  await app.start();
+  assert.deepEqual(app.startedModules, ['hidden', 'activation-marker']);
+});
+
+test('treats an unreadable window as normal', async () => {
+  const { app, sink } = createApp({
+    modules: ALL_KINDS,
+    runtime: runtimeAnswering(() => Promise.reject(new Error('no window'))),
+  });
+  await app.start();
+  assert.deepEqual(app.startedModules, ['hidden', 'activation-marker']);
+  assert.equal(sink.lines.filter(([level]) => level === 'warn').length, 1);
 });

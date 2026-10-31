@@ -1,5 +1,5 @@
 import { Module } from '../../core/Module.js';
-import type { ModuleContext } from '../../core/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
 import { PageScriptInjector } from '../../core/PageScriptInjector.js';
 import { ShortcutKeys } from '../../core/ShortcutKeys.js';
 import { parseCopyMessage } from './CopyMessage.js';
@@ -22,6 +22,7 @@ const MAX_TOAST_MS = 10000;
 
 export class CopyUrl extends Module {
   public static override id = 'copy-url';
+  public static override privateWindows: PrivateWindowPolicy = 'allowed';
 
   /**
    * Options accepted in `config.json`, with their defaults.
