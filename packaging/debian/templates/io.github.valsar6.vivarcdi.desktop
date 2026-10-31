@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=VivArcDi
+Comment=Make Vivaldi behave like Arc
+Exec=vivarcdi window --mode deb
+Icon=io.github.valsar6.vivarcdi
+Terminal=false
+Categories=Utility;

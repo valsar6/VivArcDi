@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.

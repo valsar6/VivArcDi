@@ -24,6 +24,14 @@ def first_unwritable(paths: list[Path]) -> Path | None:
     return None
 
 
+def app_bundle_of(path: Path) -> Path:
+    """Return the `.app` bundle that contains a path, or the path itself when it is in none."""
+    for candidate in (path, *path.parents):
+        if candidate.suffix == ".app":
+            return candidate
+    return path
+
+
 class PermissionAdvisor(ABC):
     """Explains to the user why a path is not writable and how to fix it."""
 
@@ -52,7 +60,7 @@ class MacOSAdvisor(PermissionAdvisor):
         self._current_user = current_user or getpass.getuser()
 
     def explain(self, path: Path) -> str:
-        bundle = self._app_bundle(path)
+        bundle = app_bundle_of(path)
         owner = owner_of(path) if path.exists() else self._current_user
         steps = [
             "Open System Settings > Privacy & Security > App Management and allow your terminal app.",
@@ -64,9 +72,14 @@ class MacOSAdvisor(PermissionAdvisor):
         numbered = "\n".join(f"  {index}. {step}" for index, step in enumerate(steps, start=1))
         return f"macOS did not let the installer change {path} (owner: {owner}).\n{numbered}"
 
-    @staticmethod
-    def _app_bundle(path: Path) -> Path:
-        for candidate in (path, *path.parents):
-            if candidate.suffix == ".app":
-                return candidate
-        return path
+
+class AppManagementAdvisor(PermissionAdvisor):
+    """For the macOS app: the permission belongs to VivArcDi itself, so the advice is a setting, not a tool."""
+
+    def explain(self, path: Path) -> str:
+        bundle = app_bundle_of(path)
+        return (
+            f"macOS did not let VivArcDi change {bundle.name}. "
+            "Open System Settings > Privacy & Security > App Management, turn VivArcDi on, "
+            "then come back here and press Try again."
+        )

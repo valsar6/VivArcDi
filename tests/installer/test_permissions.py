@@ -7,7 +7,7 @@ from vivarcdi.backup import BackupStore
 from vivarcdi.errors import PermissionDeniedError
 from vivarcdi.installation import VivaldiInstallation
 from vivarcdi.patching import InstallationPatcher
-from vivarcdi.permissions import MacOSAdvisor, SudoAdvisor, owner_of
+from vivarcdi.permissions import AppManagementAdvisor, MacOSAdvisor, SudoAdvisor, owner_of
 from vivarcdi.window_patch import WindowHtmlPatcher
 
 
@@ -56,6 +56,17 @@ class MacOSAdvisorTest(unittest.TestCase):
         message = MacOSAdvisor(current_user=self.owner).explain(self.resources)
         self.assertNotIn("chown", message)
         self.assertIn("3. Run the installer again", message)
+
+
+class AppManagementAdvisorTest(unittest.TestCase):
+    def test_names_app_management_and_vivarcdi_without_sudo_or_terminal(self):
+        path = Path("/Applications/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework")
+        message = AppManagementAdvisor().explain(path)
+        self.assertIn("App Management", message)
+        self.assertIn("VivArcDi", message)
+        self.assertIn("Vivaldi.app", message)
+        self.assertNotIn("sudo", message.lower())
+        self.assertNotIn("terminal", message.lower())
 
 
 class SudoAdvisorTest(unittest.TestCase):

@@ -1,0 +1,6 @@
+vivarcdi (@VERSION@) unstable; urgency=medium
+
+  * Release @VERSION@. The release notes are at
+    https://github.com/valsar6/VivArcDi/releases
+
+ -- Salvatore <25297596+valsar6@users.noreply.github.com>  Thu, 01 Jan 2026 00:00:00 +0000

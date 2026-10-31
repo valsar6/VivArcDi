@@ -1,0 +1,10 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: VivArcDi
+Source: https://github.com/valsar6/VivArcDi
+
+Files: *
+Copyright: 2026 VivArcDi contributors
+License: MIT
+
+License: MIT
+@LICENSE_TEXT@

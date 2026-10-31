@@ -27,6 +27,61 @@ jobs:
       - run: make test-py
       - run: npm run build
 
+  package-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: npm ci
+      - run: npm run build
+      - run: python3 packaging/debian/build_deb.py --out build
+      - run: python3 -m unittest discover -s tests/packaging
+      - run: sudo apt-get install -y lintian && lintian --fail-on error build/*.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vivarcdi-deb
+          path: build/*.deb
+
+  package-macos:
+    runs-on: macos-latest
+    env:
+      MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install the universal2 Python from python.org
+        run: |
+          curl -fsSL -o "${RUNNER_TEMP}/python.pkg" https://www.python.org/ftp/python/3.13.1/python-3.13.1-macos11.pkg
+          sudo installer -pkg "${RUNNER_TEMP}/python.pkg" -target /
+      - name: Install PyInstaller in a virtual environment
+        run: |
+          /Library/Frameworks/Python.framework/Versions/3.13/bin/python3 -m venv build/venv
+          build/venv/bin/python -m pip install -r packaging/macos/requirements.txt
+      - name: Build the app and the disk image
+        run: build/venv/bin/python packaging/macos/build_dmg.py --out build
+      - name: Check the app bundle
+        env:
+          VIVARCDI_APP_BUNDLE: ${{ github.workspace }}/build/pyinstaller/dist/VivArcDi.app
+        run: build/venv/bin/python -m unittest discover -s tests/packaging -p "test_app_bundle.py" -v
+      - name: Sign with a Developer ID
+        if: env.MACOS_SIGNING_IDENTITY != ''
+        run: echo "A Developer ID is configured. Signing and notarizing are not implemented yet, the app keeps its ad hoc signature."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vivarcdi-dmg
+          path: build/VivArcDi-*.dmg
+
   branch-policy:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -47,6 +102,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      created: ${{ steps.release.outputs.created }}
+      tag: ${{ steps.release.outputs.tag }}
     concurrency:
       group: release
       cancel-in-progress: false
@@ -58,14 +116,56 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Tag and release a new version
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="$(npm run -s release tag)"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
           if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
             echo "${tag} already exists, nothing to release"
+            echo "created=false" >> "${GITHUB_OUTPUT}"
           else
             gh release create "${tag}" --target "${GITHUB_SHA}" --title "VivArcDi ${tag}" --generate-notes
+            echo "created=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+  upload-packages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.release.outputs.created == 'true'
+    needs: [release, package-deb, package-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vivarcdi-deb
+          path: packages
+      - uses: actions/download-artifact@v4
+        with:
+          name: vivarcdi-dmg
+          path: packages
+      - name: Upload the packages and add the Download section to the release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          version="${TAG#v}"
+          deb="vivarcdi_${version}_all.deb"
+          dmg="VivArcDi-${version}.dmg"
+          test -f "packages/${deb}"
+          test -f "packages/${dmg}"
+          gh release upload "${TAG}" "packages/${deb}" "packages/${dmg}" --clobber
+          gh release view "${TAG}" --json body --jq .body > notes.md
+          if ! grep -q '^## Download' notes.md; then
+            base="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
+            {
+              printf '\n## Download\n\n'
+              printf -- '- [VivArcDi for macOS (%s)](%s/%s)\n' "${dmg}" "${base}" "${dmg}"
+              printf -- '- [VivArcDi for Debian and Ubuntu (%s)](%s/%s)\n' "${deb}" "${base}" "${deb}"
+            } >> notes.md
+            gh release edit "${TAG}" --notes-file notes.md
           fi
 
   publish-dist:

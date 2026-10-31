@@ -1,8 +1,21 @@
+import sys
 from pathlib import Path
 
 from .errors import InstallerError
 
 DIST_FOLDER = "dist"
+
+
+def payload_root() -> Path:
+    """The folder that holds `dist/` and `installer/`.
+
+    That is the repository when the installer runs from source, and the data
+    folder of the bundle (`sys._MEIPASS`) when PyInstaller froze it.
+    """
+    bundle = getattr(sys, "_MEIPASS", None)
+    if bundle:
+        return Path(bundle)
+    return Path(__file__).resolve().parents[2]
 
 
 def require_dist(dist_dir: Path) -> Path:

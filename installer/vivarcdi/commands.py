@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Callable, Protocol
 
 from .handoff import ReapplyHandoff
+from .errors import PermissionDeniedError
 from .hooks import UpdateHook
+from .notifier import ReapplyOutcome, SilentOutcome
 from .patching import InstallationPatcher
 from .platforms import Platform
 from .reporter import Reporter
 from .shortcuts import ShortcutService
-from .staging import SelfStager
+from .modes import InstallMode
+from .ownership import Ownership
+from .staging import Stager
+from .takeover import LegacyTakeover
 
 
 @dataclass
@@ -16,16 +23,22 @@ class InstallerContext:
 
     platform: Platform
     installations: InstallationPatcher
-    stager: SelfStager
+    stager: Stager
     hook: UpdateHook
     reapply_command: list[str]
     reporter: Reporter
     handoff: ReapplyHandoff
     shortcuts: ShortcutService
+    mode: InstallMode
+    data_dir: Path
+    ownership: Ownership
+    takeover: LegacyTakeover
+    outcome: ReapplyOutcome = field(default_factory=SilentOutcome)
     background: bool = False
     shortcut_action: str = "status"
     dry_run: bool = False
     restore_shortcuts: bool = False
+    needs_reapply: bool = False
 
 
 class Command(ABC):
@@ -49,15 +62,22 @@ class InstallCommand(Command):
 
     def execute(self, context: InstallerContext) -> int:
         report = context.reporter
+        conflict = context.ownership.conflict()
+        if conflict:
+            report.error(conflict)
+            return 1
         found = context.platform.find_installations()
         if not found:
             report.error(f"No Vivaldi installation found on {context.platform.name}")
             return 1
+        if context.takeover.run():
+            report.info("Took over the command line installation")
         context.stager.stage()
         for installation in found:
             context.installations.apply(installation)
             report.info(f"Patched {installation.label}")
         context.hook.install(context.reapply_command)
+        context.ownership.claim()
         report.info(f"Registered {context.hook.describe()}")
         report.info("Restart Vivaldi to load VivArcDi.")
         return 0
@@ -68,7 +88,8 @@ class ReapplyCommand(Command):
 
     Run by the update hook in the background, it hands the work to the
     platform's handoff when there is one, because on macOS only the apps the
-    user allowed in App Management may change Vivaldi.
+    user allowed in App Management may change Vivaldi. Without a handoff it
+    writes itself and tells the mode's outcome how it went.
     """
 
     name = "reapply"
@@ -86,11 +107,23 @@ class ReapplyCommand(Command):
             context.handoff.request()
             context.reporter.info("Asked the terminal to apply VivArcDi again")
             return 0
+        try:
+            self._apply_all(context, outdated)
+        except PermissionDeniedError as error:
+            if context.background and context.outcome.denied(error):
+                context.reporter.warn(str(error))
+                return 0
+            raise
+        context.handoff.clear()
+        if context.background:
+            context.outcome.applied()
+        return 0
+
+    @staticmethod
+    def _apply_all(context: InstallerContext, outdated: list) -> None:
         for installation in outdated:
             context.installations.apply(installation)
             context.reporter.info(f"Reapplied VivArcDi to {installation.label}")
-        context.handoff.clear()
-        return 0
 
 
 class UninstallCommand(Command):
@@ -107,7 +140,8 @@ class UninstallCommand(Command):
         context.hook.remove()
         context.handoff.clear()
         context.stager.unstage()
-        report.info(f"Backups of the original window.html stay in {context.platform.data_dir}")
+        context.ownership.release()
+        report.info(f"Backups of the original window.html stay in {context.data_dir}")
         if context.restore_shortcuts:
             return context.shortcuts.restore()
         report.info("Restart Vivaldi to finish.")
@@ -158,10 +192,42 @@ class ShortcutsCommand(Command):
         return service.status()
 
 
+class WindowLauncher(Protocol):
+    """Opens the window and returns when it is closed."""
+
+    def run(self, platform: Platform, mode: InstallMode, needs_reapply: bool = False) -> int:
+        """Show the window for `mode` and return the process exit code.
+
+        `needs_reapply` is True when a background reapply was denied and the window must say so.
+        """
+
+
+def load_window_launcher() -> WindowLauncher:
+    from .window.launcher import TkWindowLauncher
+
+    return TkWindowLauncher()
+
+
+class WindowCommand(Command):
+    """Opens the VivArcDi window, which acts on the profile and the Vivaldi builds of the user."""
+
+    name = "window"
+    help = "open the VivArcDi window"
+    needs_root = False
+    refuses_root = True
+
+    def __init__(self, launcher_factory: Callable[[], WindowLauncher] = load_window_launcher):
+        self._launcher_factory = launcher_factory
+
+    def execute(self, context: InstallerContext) -> int:
+        return self._launcher_factory().run(context.platform, context.mode, context.needs_reapply)
+
+
 COMMANDS: tuple[Command, ...] = (
     InstallCommand(),
     ReapplyCommand(),
     UninstallCommand(),
     StatusCommand(),
     ShortcutsCommand(),
+    WindowCommand(),
 )

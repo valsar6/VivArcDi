@@ -1,13 +1,26 @@
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from support import make_debian_vivaldi, make_payload_source
+from vivarcdi.distribution import payload_root
 from vivarcdi.errors import InstallerError
 from vivarcdi.installation import VivaldiInstallation
 from vivarcdi.payload import PayloadDeployer
 from vivarcdi.staging import SelfStager
+
+
+class PayloadRootTest(unittest.TestCase):
+    def test_payload_root_is_the_repository_when_running_from_source(self):
+        root = payload_root()
+        self.assertTrue((root / "installer" / "vivarcdi").is_dir())
+
+    def test_payload_root_is_the_bundle_data_folder_when_frozen(self):
+        with mock.patch.object(sys, "_MEIPASS", "/Applications/VivArcDi.app/Contents/Frameworks", create=True):
+            self.assertEqual(payload_root(), Path("/Applications/VivArcDi.app/Contents/Frameworks"))
 
 
 class MissingDistTest(unittest.TestCase):
