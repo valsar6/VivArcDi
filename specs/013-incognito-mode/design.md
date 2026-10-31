@@ -37,26 +37,22 @@ even when `incognito` is disabled or fails.
 6. **Clear.** `PrivateTabs.clear()` queries the tabs of the window (`chrome.tabs.query` with
    `currentWindow`), and removes all of them but the active one with `BrowserTabs.remove`. It does
    not touch the archive, which no module writes in a private window (AC-6).
-7. **Opening Quick Commands, Downloads and the new tab.** `vivaldi.utilities` has no call that runs a
-   command (probe, 2026-10-30), so `CommandShortcut` does what the spec decided:
-   - `ShortcutLookup` reads `vivaldi.actions` through `BrowserPrefs` and returns the first keyboard
-     shortcut of a command (`COMMAND_SHOW_QUICK_COMMANDS`, `COMMAND_SHOW_DOWNLOADS_PANEL`). Values
-     that are not an array of strings (gestures) are ignored.
-   - `ShortcutPlayer` plays the shortcut (`meta+t`, `alt+meta+l`) with
-     `vivaldi.utilities.emulateUserInput`, or by a `keydown`/`keyup` pair on the document if task T1
-     finds that Vivaldi accepts it. It is the only class that touches the API.
-   - Library: if the shortcut is missing or cannot be played, `DownloadsButton` clicks Vivaldi's own
-     `Trasferimenti` button of the panel bar. That bar may be hidden, so this is the fallback only.
-   - `+`: plays the shortcut of Quick Commands as the user set it.
-   - `New Tab`: plays Cmd/Ctrl+T (`meta+t` on macOS, `ctrl+t` elsewhere), so it does what the key does
-     in that window, as Tore chose. If it cannot be played, it opens a blank tab with
-     `BrowserTabs.create` in the window (AC-7).
+7. **Library, `+` and `New Tab`.** A mod cannot run Vivaldi commands or press keys (probes of
+   2026-10-30 and 2026-10-31), so `CommandLauncher` uses the interface itself:
+   - `newTab()`: `BrowserTabs.create` opens a blank tab in the window (the id from `getCurrent`), then
+     `AddressField.focus()` finds the address field with the `addressField` selector, focuses it and
+     selects its text. The field may appear after the tab is created, so `AddressField` retries on the
+     next frames for a short, fixed time and gives up silently. `New Tab` and `+` both call `newTab()`.
+   - `openLibrary()`: `DownloadsButton.click()` clicks Vivaldi's Downloads button of the panel bar. The
+     bar may be hidden by auto-hide; the click on a hidden button still reaches its handler, and the
+     manual check AC-15 proves it.
+   Cmd/Ctrl+T is not handled: it stays Quick Commands natively (014).
 8. **Hiding Vivaldi's own buttons.** In `incognito.css`, under the mark, the new tab button and the
    workspace button of the tab bar get `display: none` through selectors of the catalog
    (`newTabButton`, `workspaceButton`), not from the stylesheet text (FR-8). If a selector no longer
    matches in a future Vivaldi, the button just stays visible.
 
-Rejected: reading the window type from a class of `#browser` (the probe found none); a `if (private)`
+Rejected: playing the shortcut of Quick Commands from the mod (probe: it does nothing); an own command panel (a spec of its own); reading the window type from a class of `#browser` (the probe found none); a `if (private)`
 check inside every module (each new module would have to remember it, and a mistake would store
 private data); sending the `+` to a URL such as `vivaldi://newtab` (not Quick Commands).
 
@@ -74,9 +70,9 @@ private data); sending the `+` to a URL such as `vivaldi://newtab` (not Quick Co
 | `src/modules/incognito/NewTabRow.ts` | The `New Tab` row | - |
 | `src/modules/incognito/BottomBar.ts` | Footer with `BarButton`s | Composite |
 | `src/modules/incognito/PrivateTabs.ts` | `clear()` of the window's tabs | - |
-| `src/modules/incognito/ShortcutLookup.ts` | Shortcut of a command from `vivaldi.actions` | - |
-| `src/modules/incognito/ShortcutPlayer.ts` | Plays a shortcut | Adapter |
-| `src/modules/incognito/CommandLauncher.ts` | Library, `+`, `New Tab` with their fallbacks | Strategy |
+| `src/modules/incognito/AddressField.ts` | Finds, focuses and selects the address field | - |
+| `src/modules/incognito/DownloadsButton.ts` | Clicks Vivaldi's Downloads button | - |
+| `src/modules/incognito/CommandLauncher.ts` | `newTab()` and `openLibrary()` for the three buttons | Facade |
 | `src/styles/incognito.scss` | Rows, bottom bar, hidden Vivaldi buttons, all under the mark | - |
 
 Every class takes its dependencies in the constructor, so each is tested with fakes.
@@ -85,12 +81,11 @@ Every class takes its dependencies in the constructor, so each is tested with fa
 
 - `chrome.windows.getCurrent` (`incognito`), `chrome.tabs.query/remove/create`, as `BrowserTabs`
   already wraps them.
-- `vivaldi.prefs` key `vivaldi.actions`, read only. Its shape was confirmed by the probe of 014:
-  `vivaldi.actions[0].COMMAND_X.shortcuts`.
-- `vivaldi.utilities.emulateUserInput`: its signature is not documented; T1 finds it.
-- Selectors added to the catalog: `newTabButton` (`.button-toolbar.newtab`), `workspaceButton`
-  (`.tabbar-workspace-button`), `downloadsButton` (a button of the panel bar titled
-  `Trasferimenti`/`Downloads`; matched by the command's title attribute prefix).
+- Selectors added to the catalog (confirmed by Tore's probe on Vivaldi 8.2, 2026-10-31):
+  `newTabButton` (`.button-toolbar.newtab`), `workspaceButton` (`.tabbar-workspace-button`),
+  `addressField` (`input.UrlBar-UrlField`) and `downloadsButton` (a `button` of the panel bar whose
+  `title` starts with `Trasferimenti` or `Downloads`, matched by `DownloadsButton` since the title
+  follows the user's language).
 - Marks: `data-vivarcdi-private`, `data-vivarcdi-incognito-header`, `data-vivarcdi-bottom-bar`.
 
 ## Configuration
@@ -107,9 +102,9 @@ and `styles/incognito.css` in the list of styles.
 
 | Risk | Mitigation |
 |---|---|
-| Vivaldi ignores a shortcut played by a mod | T1 proves it on Tore's Vivaldi before any other code; the Downloads button is the fallback, Quick Commands has none, so the `+` would be hidden and the problem reported to Tore |
-| The panel bar is hidden or the button has another title in another language | Fallback only; the title is matched by the command id first, then by the label of the user's language |
-| The user changed Cmd+T to something else | `New Tab` plays Cmd/Ctrl+T as a key, which is what Tore asked; Quick Commands follows its own shortcut |
+| The address field appears late | `AddressField` retries for a short time and gives up silently, the blank tab still opens |
+| The Downloads button is hidden with the panel bar, or titled in another language | The title is matched by the shortcut hint `(⌥⌘L)` and the label of the user's language; if the click does nothing, AC-15 fails and Tore decides |
+| The user does not use Cmd+T for Quick Commands | Not our concern: the buttons do not depend on it |
 | `chrome.storage.local` is shared with normal windows | No module that stores data runs in a private window, proven by a test with a fake storage that fails on writes |
 | Closing the active-window tabs by `currentWindow` hits a normal window | `PrivateTabs` passes the window id from `getCurrent`, not `currentWindow` |
 | A future module forgets the policy | The default is `never` |
