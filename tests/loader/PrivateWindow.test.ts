@@ -56,7 +56,13 @@ class WriteLog {
   }
 }
 
-async function runPrivateWindow(incognito: boolean): Promise<string[]> {
+interface Run {
+  attempts: string[];
+  marked: boolean;
+  started: string[];
+}
+
+async function runWindow(privateWindow: boolean, incognito: boolean): Promise<Run> {
   const log = new WriteLog();
   const bookmarks = recordingChrome([]);
   const chromeApi = { tabs: log.tabsApi() } as unknown as ChromeApi;
@@ -73,15 +79,29 @@ async function runPrivateWindow(incognito: boolean): Promise<string[]> {
     document: new FakeDocument({ '#browser': browser }) as unknown as Document,
     tabs: new BrowserTabs(chromeApi),
     bookmarks: new BrowserBookmarks(bookmarks.host),
-    runtime: { isPrivateWindow: async () => true, currentWindowId: async () => 1 } as unknown as BrowserRuntime,
+    runtime: { isPrivateWindow: async () => privateWindow, currentWindowId: async () => 1 } as unknown as BrowserRuntime,
     storage: log.storage,
   });
   await app.start();
+  const started = app.startedModules;
+  const marked = 'vivarcdiPrivate' in browser.dataset;
   await app.stop();
-  return [...log.attempts, ...bookmarks.calls.filter((call) => WRITING_BOOKMARK_CALLS.includes(call))];
+  return { attempts: [...log.attempts, ...bookmarks.calls.filter((call) => WRITING_BOOKMARK_CALLS.includes(call))], marked, started };
 }
 
 test('stores nothing from a private window', async () => {
-  assert.deepEqual(await runPrivateWindow(true), []);
-  assert.deepEqual(await runPrivateWindow(false), []);
+  assert.deepEqual((await runWindow(true, true)).attempts, []);
+  assert.deepEqual((await runWindow(true, false)).attempts, []);
+});
+
+test('draws nothing in a normal window', async () => {
+  const { started, marked } = await runWindow(false, true);
+  assert.equal(started.includes('incognito'), false);
+  assert.equal(marked, false);
+});
+
+test('disabled module leaves private windows plain', async () => {
+  const { started, marked } = await runWindow(true, false);
+  assert.equal(started.includes('incognito'), false);
+  assert.equal(marked, false);
 });

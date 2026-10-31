@@ -59,9 +59,10 @@ test('createEnabled keeps modules out of private windows unless they opt in', ()
 
 test('skips spaces, favorites and folders in a private window', () => {
   const settings = Object.fromEntries(
-    ['activation-marker', 'favorites-grid', 'peek', 'reopen-pinned', 'bookmark-folders', 'folder-preview', 'pinned-tabs', 'space-header', 'today-archive', 'copy-url'].map((id) => [id, { enabled: true }]),
+    ['activation-marker', 'favorites-grid', 'peek', 'reopen-pinned', 'bookmark-folders', 'folder-preview', 'pinned-tabs', 'space-header', 'today-archive', 'copy-url', 'incognito'].map((id) => [id, { enabled: true }]),
   );
   const ids = (privateWindow: boolean): string[] => createDefaultRegistry().createEnabled(settings, privateWindow).modules.map(({ id }) => id);
-  assert.deepEqual(ids(true), ['activation-marker', 'peek', 'copy-url']);
+  assert.deepEqual(ids(true), ['activation-marker', 'peek', 'copy-url', 'incognito']);
   assert.equal(ids(false).length, 10);
+  assert.equal(ids(false).includes('incognito'), false);
 });
