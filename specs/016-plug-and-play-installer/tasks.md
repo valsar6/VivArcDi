@@ -38,7 +38,7 @@ T13 (macOS app, release upload, docs).
   add `MacNotifier` and `AppOpener` for background reapply in app mode. Satisfies AC-10, AC-11. Done
   when `test_launch_agent_runs_the_app_executable` and
   `test_denied_background_reapply_notifies_instead_of_terminal` pass.
-- [ ] **T10.** Add `packaging/macos/` (entry point, PyInstaller spec, pinned requirements,
+- [x] **T10.** Add `packaging/macos/` (entry point, PyInstaller spec, pinned requirements,
   `build_dmg.py`, icon) and the `package-macos` CI job with the bundle test. Satisfies AC-2, NFR-3.
   Done when `test_app_bundle_contains_runtime_installer_and_payload` passes in CI and the `.dmg` is
   under 40 MB.
