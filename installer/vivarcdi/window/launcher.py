@@ -43,8 +43,11 @@ class TkWindowLauncher:
         self._repo_root = repo_root
         self._home = home
 
-    def run(self, platform: Platform, mode: InstallMode) -> int:
-        """Open the window and return 0 when it is closed. Raises WindowUnavailableError without Tkinter."""
+    def run(self, platform: Platform, mode: InstallMode, needs_reapply: bool = False) -> int:
+        """Open the window and return 0 when it is closed. Raises WindowUnavailableError without Tkinter.
+
+        `needs_reapply` opens it with the App Management message of a denied background reapply.
+        """
         try:
             view = self._load_window()()
         except ImportError as error:
@@ -54,6 +57,7 @@ class TkWindowLauncher:
         presenter = build_presenter(
             platform, mode, view, self._repo_root, self._runner, state_dir=state_dir, release_checker=checker
         )
+        presenter.prepare(needs_reapply)
         view.run(presenter)
         return 0
 

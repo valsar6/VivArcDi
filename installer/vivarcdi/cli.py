@@ -5,7 +5,7 @@ from pathlib import Path
 
 from . import __version__
 from .backup import BackupStore
-from .commands import COMMANDS, Command, InstallerContext, ReapplyCommand, ShortcutsCommand, UninstallCommand
+from .commands import COMMANDS, Command, InstallerContext, ReapplyCommand, ShortcutsCommand, UninstallCommand, WindowCommand
 from .distribution import DIST_FOLDER
 from .errors import VivArcDiError
 from .modes import MODES, CommandLineMode, InstallMode, mode_named
@@ -68,6 +68,7 @@ def build_context(
         data_dir=data_dir,
         ownership=mode.ownership(platform, data_dir),
         takeover=mode.takeover(platform, data_dir, runner),
+        outcome=mode.reapply_outcome(runner),
         background=background,
     )
 
@@ -87,6 +88,10 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
         if command.name == UninstallCommand.name:
             subparser.add_argument(
                 "--restore-shortcuts", action="store_true", help="also put back the saved keyboard shortcuts"
+            )
+        if command.name == WindowCommand.name:
+            subparser.add_argument(
+                "--needs-reapply", action="store_true", help="start with the message about a denied background reapply"
             )
         if isinstance(command, ShortcutsCommand):
             subparser.add_argument("action", choices=command.actions, help="what to do with the shortcuts")
@@ -120,6 +125,7 @@ def main(argv: list[str]) -> int:
         context.shortcut_action = getattr(arguments, "action", "status")
         context.dry_run = getattr(arguments, "dry_run", False)
         context.restore_shortcuts = getattr(arguments, "restore_shortcuts", False)
+        context.needs_reapply = getattr(arguments, "needs_reapply", False)
         return command.execute(context)
     except VivArcDiError as error:
         reporter.error(str(error))

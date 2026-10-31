@@ -113,9 +113,9 @@ class MacOSPlatform(Platform):
     def allows_root(self) -> bool:
         return False
 
-    def update_hook(self) -> UpdateHook:
+    def update_hook(self, bundle_id: str | None = None) -> UpdateHook:
         watch_paths = [versions_dir for _, versions_dir in self._versions_dirs()]
-        return LaunchAgentHook(self.launch_agents_dir, watch_paths, self._runner)
+        return LaunchAgentHook(self.launch_agents_dir, watch_paths, self._runner, bundle_id=bundle_id)
 
     def permission_advisor(self) -> PermissionAdvisor:
         return MacOSAdvisor()

@@ -100,15 +100,15 @@ class MissingTkinterTest(unittest.TestCase):
         calls = []
 
         class Launcher:
-            def run(self, platform, mode):
-                calls.append((platform.name, mode.name))
+            def run(self, platform, mode, needs_reapply=False):
+                calls.append((platform.name, mode.name, needs_reapply))
                 return 0
 
         root = Path(tempfile.mkdtemp())
         platform = DebianPlatform(root, FakeRunner(), home=root)
         context = cli.build_context(platform, mock.Mock(), repo_root=root)
         self.assertEqual(WindowCommand(Launcher).execute(context), 0)
-        self.assertEqual(calls, [("Debian", "cli")])
+        self.assertEqual(calls, [("Debian", "cli", False)])
 
     def test_window_command_does_not_run_as_root(self):
         self.assertTrue(WindowCommand.refuses_root)

@@ -132,6 +132,17 @@ class WindowPresenter:
         """The installer context the actions run in."""
         return self._context
 
+    def prepare(self, needs_reapply: bool = False) -> None:
+        """Get ready before the window shows its first state.
+
+        When the mode manages VivArcDi, the update hook is registered again if it runs another
+        executable, which happens after the app is moved. With `needs_reapply`, the first state carries
+        the message that explains the permission, with Open Settings and Try again.
+        """
+        self._register_hook_again()
+        if needs_reapply:
+            self._explain_denied_reapply()
+
     def refresh(self) -> None:
         """Read the builds again and redraw."""
         self._view.show_state(self._state())
@@ -153,6 +164,23 @@ class WindowPresenter:
     def show_log(self) -> None:
         """Open the log file, which holds the details the messages leave out."""
         self._view.open_path(self._error_log.path)
+
+    def _register_hook_again(self) -> None:
+        if not self._context.ownership.is_registered():
+            return
+        try:
+            self._context.hook.refresh(self._context.reapply_command)
+        except Exception as error:
+            self._error_log.record(error)
+
+    def _explain_denied_reapply(self) -> None:
+        context = self._context
+        for installation in context.platform.find_installations():
+            if context.installations.state(installation).needs_reapply:
+                advice = context.mode.permission_advisor(context.platform).explain(installation.resources_dir)
+                self._last_action = WindowAction.REAPPLY
+                self._notice = Notice(advice, self._permission_buttons())
+                return
 
     def _state(self) -> WindowState:
         rows = tuple(self._model.statuses())

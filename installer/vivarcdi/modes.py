@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .handoff import NoHandoff, ReapplyHandoff
 from .hooks import LaunchAgentHook, PackageTriggerHook, UpdateHook
+from .notifier import APP_BUNDLE_ID, AppOpener, AppOutcome, MacNotifier, ReapplyOutcome, SilentOutcome
 from .ownership import CommandLineOwnership, Ownership, PackageMarker, PackageOwnership
 from .permissions import AppManagementAdvisor, PermissionAdvisor
 from .platforms import MacOSPlatform, Platform
@@ -75,6 +76,10 @@ class InstallMode(ABC):
         """Removes a command line installation before a package registers itself; nothing by default."""
         return NoTakeover()
 
+    def reapply_outcome(self, runner: CommandRunner) -> ReapplyOutcome:
+        """What the user hears when a background `reapply` ends; nothing by default."""
+        return SilentOutcome()
+
     def ownership(self, platform: Platform, data_dir: Path) -> Ownership:
         """Writes the `managed-by` marker in package modes, defers to it in command line mode."""
         if self.marker_name is None:
@@ -130,7 +135,7 @@ class MacAppMode(InstallMode):
         return platform.package_data_dir
 
     def update_hook(self, platform: Platform) -> UpdateHook:
-        return platform.update_hook()
+        return platform.update_hook(bundle_id=APP_BUNDLE_ID)
 
     def permission_advisor(self, platform: Platform) -> PermissionAdvisor:
         return AppManagementAdvisor()
@@ -147,6 +152,9 @@ class MacAppMode(InstallMode):
     def takeover(self, platform: Platform, data_dir: Path, runner: CommandRunner) -> LegacyTakeover:
         agent = platform.launch_agents_dir / f"{LaunchAgentHook.LABEL}.plist"
         return MacOSTakeover(agent, data_dir, self._app_executable, runner)
+
+    def reapply_outcome(self, runner: CommandRunner) -> ReapplyOutcome:
+        return AppOutcome(MacNotifier(runner), AppOpener(runner))
 
 
 class DebPackageMode(InstallMode):

@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Protocol
 
 from .handoff import ReapplyHandoff
+from .errors import PermissionDeniedError
 from .hooks import UpdateHook
+from .notifier import ReapplyOutcome, SilentOutcome
 from .patching import InstallationPatcher
 from .platforms import Platform
 from .reporter import Reporter
@@ -31,10 +33,12 @@ class InstallerContext:
     data_dir: Path
     ownership: Ownership
     takeover: LegacyTakeover
+    outcome: ReapplyOutcome = field(default_factory=SilentOutcome)
     background: bool = False
     shortcut_action: str = "status"
     dry_run: bool = False
     restore_shortcuts: bool = False
+    needs_reapply: bool = False
 
 
 class Command(ABC):
@@ -84,7 +88,8 @@ class ReapplyCommand(Command):
 
     Run by the update hook in the background, it hands the work to the
     platform's handoff when there is one, because on macOS only the apps the
-    user allowed in App Management may change Vivaldi.
+    user allowed in App Management may change Vivaldi. Without a handoff it
+    writes itself and tells the mode's outcome how it went.
     """
 
     name = "reapply"
@@ -102,11 +107,23 @@ class ReapplyCommand(Command):
             context.handoff.request()
             context.reporter.info("Asked the terminal to apply VivArcDi again")
             return 0
+        try:
+            self._apply_all(context, outdated)
+        except PermissionDeniedError as error:
+            if context.background and context.outcome.denied(error):
+                context.reporter.warn(str(error))
+                return 0
+            raise
+        context.handoff.clear()
+        if context.background:
+            context.outcome.applied()
+        return 0
+
+    @staticmethod
+    def _apply_all(context: InstallerContext, outdated: list) -> None:
         for installation in outdated:
             context.installations.apply(installation)
             context.reporter.info(f"Reapplied VivArcDi to {installation.label}")
-        context.handoff.clear()
-        return 0
 
 
 class UninstallCommand(Command):
@@ -178,8 +195,11 @@ class ShortcutsCommand(Command):
 class WindowLauncher(Protocol):
     """Opens the window and returns when it is closed."""
 
-    def run(self, platform: Platform, mode: InstallMode) -> int:
-        """Show the window for `mode` and return the process exit code."""
+    def run(self, platform: Platform, mode: InstallMode, needs_reapply: bool = False) -> int:
+        """Show the window for `mode` and return the process exit code.
+
+        `needs_reapply` is True when a background reapply was denied and the window must say so.
+        """
 
 
 def load_window_launcher() -> WindowLauncher:
@@ -200,7 +220,7 @@ class WindowCommand(Command):
         self._launcher_factory = launcher_factory
 
     def execute(self, context: InstallerContext) -> int:
-        return self._launcher_factory().run(context.platform, context.mode)
+        return self._launcher_factory().run(context.platform, context.mode, context.needs_reapply)
 
 
 COMMANDS: tuple[Command, ...] = (
