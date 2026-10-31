@@ -16,3 +16,7 @@ class PermissionDeniedError(VivArcDiError):
 
 class InstallerError(VivArcDiError):
     """The installer cannot continue because something it needs is missing."""
+
+
+class WindowUnavailableError(VivArcDiError):
+    """The window cannot open, for example because Tkinter is not installed."""

@@ -7,6 +7,7 @@ from ..commands import InstallerContext
 from ..modes import InstallMode
 from ..platforms import MacOSPlatform, Platform
 from ..quitter import VivaldiQuitter
+from ..releases import ReleaseChecker
 from ..reporter import CollectingReporter
 from ..running import ProcessGuard
 from ..system import CommandRunner
@@ -21,8 +22,12 @@ def assemble_presenter(
     view: WindowView,
     runner: CommandRunner,
     quitter: VivaldiQuitter | None = None,
+    state_dir: Path | None = None,
+    release_checker: ReleaseChecker | None = None,
 ) -> WindowPresenter:
     """Wire a presenter around an installer context built with `reporter`.
+
+    The error log goes to `state_dir`, the data folder when omitted.
 
     A macOS context gets a VivaldiQuitter unless `quitter` is given; other systems get none.
     """
@@ -30,8 +35,8 @@ def assemble_presenter(
     if quitter is None and isinstance(context.platform, MacOSPlatform):
         quitter = VivaldiQuitter(runner, guard)
     model = StatusModel(context.platform, context.installations, context.ownership.is_registered)
-    error_log = ErrorLog(context.data_dir)
-    return WindowPresenter(context, reporter, model, view, guard, quitter, error_log)
+    error_log = ErrorLog(state_dir or context.data_dir)
+    return WindowPresenter(context, reporter, model, view, guard, quitter, error_log, release_checker)
 
 
 def build_presenter(
@@ -40,9 +45,11 @@ def build_presenter(
     view: WindowView,
     repo_root: Path = REPO_ROOT,
     runner: CommandRunner | None = None,
+    state_dir: Path | None = None,
+    release_checker: ReleaseChecker | None = None,
 ) -> WindowPresenter:
     """Build the installer context for `mode` and a presenter that drives `view`."""
     runner = runner or CommandRunner()
     reporter = CollectingReporter()
     context = build_context(platform, reporter, repo_root=repo_root, runner=runner, mode=mode)
-    return assemble_presenter(context, reporter, view, runner)
+    return assemble_presenter(context, reporter, view, runner, None, state_dir, release_checker)

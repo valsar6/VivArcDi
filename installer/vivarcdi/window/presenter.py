@@ -9,6 +9,7 @@ from ..commands import Command, InstallCommand, InstallerContext, ReapplyCommand
 from ..errors import PermissionDeniedError, VivArcDiError
 from ..modes import WindowAction
 from ..quitter import VivaldiQuitter
+from ..releases import ReleaseChecker
 from ..reporter import CollectingReporter
 from ..running import ProcessGuard
 from ..shortcuts import ALREADY_SET
@@ -24,6 +25,7 @@ UNEXPECTED_ERROR = "Something went wrong. Press Show log for the details."
 SHORTCUTS_MATCH = "Vivaldi already uses Arc's shortcuts. Nothing to change."
 SHORTCUTS_QUESTION = "Change Vivaldi's keyboard shortcuts as listed below?"
 RESTORE_QUESTION = "Put back the keyboard shortcuts that were saved before VivArcDi changed them?"
+APP_MODE = "app"
 DECLINED = "Nothing was changed."
 SUCCESS_MESSAGES = {
     WindowAction.INSTALL: "VivArcDi is installed. Restart Vivaldi to load it.",
@@ -62,6 +64,9 @@ class WindowState:
     enabled_actions: frozenset
     message: str = ""
     message_buttons: tuple[MessageButton, ...] = ()
+    offer_shortcuts: bool = False
+    update_version: str = ""
+    update_url: str = ""
 
 
 class WindowView(ABC):
@@ -90,6 +95,7 @@ class Notice:
 
     text: str
     buttons: tuple[MessageButton, ...] = ()
+    offer_shortcuts: bool = False
 
 
 class WindowPresenter:
@@ -108,6 +114,7 @@ class WindowPresenter:
         guard: ProcessGuard,
         quitter: VivaldiQuitter | None,
         error_log: ErrorLog,
+        release_checker: ReleaseChecker | None = None,
     ):
         self._context = context
         self._reporter = reporter
@@ -116,6 +123,7 @@ class WindowPresenter:
         self._guard = guard
         self._quitter = quitter
         self._error_log = error_log
+        self._release_checker = release_checker
         self._notice = Notice("")
         self._last_action: WindowAction | None = None
 
@@ -148,12 +156,16 @@ class WindowPresenter:
 
     def _state(self) -> WindowState:
         rows = tuple(self._model.statuses())
+        release = self._release_checker.newer_release() if self._release_checker else None
         return WindowState(
             rows=rows,
             visible_actions=self._context.mode.visible_actions,
             enabled_actions=self._enabled_actions(rows),
             message=self._notice.text,
             message_buttons=self._notice.buttons,
+            offer_shortcuts=self._notice.offer_shortcuts,
+            update_version=release.version if release else "",
+            update_url=release.url if release else "",
         )
 
     def _enabled_actions(self, rows: tuple[BuildStatus, ...]) -> frozenset:
@@ -213,7 +225,8 @@ class WindowPresenter:
             return blocked
         if command.execute(self._context) != 0:
             return self._failure()
-        return Notice(SUCCESS_MESSAGES[action])
+        offer = action is WindowAction.INSTALL and self._context.mode.name == APP_MODE
+        return Notice(SUCCESS_MESSAGES[action], offer_shortcuts=offer)
 
     def _apply_shortcuts(self) -> Notice:
         shortcuts = self._context.shortcuts

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable, Protocol
 
 from .handoff import ReapplyHandoff
 from .hooks import UpdateHook
@@ -174,10 +175,39 @@ class ShortcutsCommand(Command):
         return service.status()
 
 
+class WindowLauncher(Protocol):
+    """Opens the window and returns when it is closed."""
+
+    def run(self, platform: Platform, mode: InstallMode) -> int:
+        """Show the window for `mode` and return the process exit code."""
+
+
+def load_window_launcher() -> WindowLauncher:
+    from .window.launcher import TkWindowLauncher
+
+    return TkWindowLauncher()
+
+
+class WindowCommand(Command):
+    """Opens the VivArcDi window, which acts on the profile and the Vivaldi builds of the user."""
+
+    name = "window"
+    help = "open the VivArcDi window"
+    needs_root = False
+    refuses_root = True
+
+    def __init__(self, launcher_factory: Callable[[], WindowLauncher] = load_window_launcher):
+        self._launcher_factory = launcher_factory
+
+    def execute(self, context: InstallerContext) -> int:
+        return self._launcher_factory().run(context.platform, context.mode)
+
+
 COMMANDS: tuple[Command, ...] = (
     InstallCommand(),
     ReapplyCommand(),
     UninstallCommand(),
     StatusCommand(),
     ShortcutsCommand(),
+    WindowCommand(),
 )
