@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .handoff import NoHandoff, ReapplyHandoff
 from .hooks import PackageTriggerHook, UpdateHook
+from .ownership import CommandLineOwnership, Ownership, PackageMarker, PackageOwnership
 from .permissions import PermissionAdvisor
 from .platforms import MacOSPlatform, Platform
 from .staging import NoStager, SelfStager, Stager, staged_installer_path
@@ -67,6 +68,12 @@ class InstallMode(ABC):
     @abstractmethod
     def stager(self, repo_root: Path, data_dir: Path) -> Stager:
         """Stages a copy of the installer, or does nothing in package modes."""
+
+    def ownership(self, platform: Platform, data_dir: Path) -> Ownership:
+        """Writes the `managed-by` marker in package modes, defers to it in command line mode."""
+        if self.marker_name is None:
+            return CommandLineOwnership(PackageMarker(platform.package_data_dir))
+        return PackageOwnership(PackageMarker(data_dir), self.marker_name)
 
 
 class CommandLineMode(InstallMode):

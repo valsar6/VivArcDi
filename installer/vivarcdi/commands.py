@@ -9,6 +9,7 @@ from .platforms import Platform
 from .reporter import Reporter
 from .shortcuts import ShortcutService
 from .modes import InstallMode
+from .ownership import Ownership
 from .staging import Stager
 
 
@@ -26,6 +27,7 @@ class InstallerContext:
     shortcuts: ShortcutService
     mode: InstallMode
     data_dir: Path
+    ownership: Ownership
     background: bool = False
     shortcut_action: str = "status"
     dry_run: bool = False
@@ -53,6 +55,10 @@ class InstallCommand(Command):
 
     def execute(self, context: InstallerContext) -> int:
         report = context.reporter
+        conflict = context.ownership.conflict()
+        if conflict:
+            report.error(conflict)
+            return 1
         found = context.platform.find_installations()
         if not found:
             report.error(f"No Vivaldi installation found on {context.platform.name}")
@@ -62,6 +68,7 @@ class InstallCommand(Command):
             context.installations.apply(installation)
             report.info(f"Patched {installation.label}")
         context.hook.install(context.reapply_command)
+        context.ownership.claim()
         report.info(f"Registered {context.hook.describe()}")
         report.info("Restart Vivaldi to load VivArcDi.")
         return 0
@@ -111,6 +118,7 @@ class UninstallCommand(Command):
         context.hook.remove()
         context.handoff.clear()
         context.stager.unstage()
+        context.ownership.release()
         report.info(f"Backups of the original window.html stay in {context.data_dir}")
         if context.restore_shortcuts:
             return context.shortcuts.restore()

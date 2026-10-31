@@ -65,6 +65,7 @@ def build_context(
         shortcuts=shortcuts,
         mode=mode,
         data_dir=data_dir,
+        ownership=mode.ownership(platform, data_dir),
         background=background,
     )
 
