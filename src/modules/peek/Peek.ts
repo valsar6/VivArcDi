@@ -2,7 +2,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { DomQuery } from '../../core/DomQuery.js';
 import { KeptTab } from '../../core/KeptTab.js';
 import { Module } from '../../core/Module.js';
-import type { ModuleContext } from '../../core/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';
 import { LinkOpener } from './LinkOpener.js';
 import type { LinkRequest } from './LinkOpener.js';
@@ -26,6 +26,7 @@ const WEB_URL = /^https?:\/\//i;
 
 export class Peek extends Module {
   public static override id = 'peek';
+  public static override privateWindows: PrivateWindowPolicy = 'allowed';
 
   /**
    * Options accepted in `config.json`, with their defaults.

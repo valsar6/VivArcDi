@@ -1,4 +1,4 @@
-import type { Module } from './Module.js';
+import type { Module, PrivateWindowPolicy } from './Module.js';
 import type { ModuleOptions } from './types.js';
 
 export interface EnabledModule {
@@ -14,7 +14,14 @@ export interface ModuleClass {
   new (): Module;
   id: string;
   name: string;
+  privateWindows: PrivateWindowPolicy;
 }
+
+const FITS: Record<PrivateWindowPolicy, (privateWindow: boolean) => boolean> = {
+  never: (privateWindow) => !privateWindow,
+  allowed: () => true,
+  only: (privateWindow) => privateWindow,
+};
 
 export class ModuleRegistry {
   #classes = new Map<string, ModuleClass>();
@@ -49,10 +56,13 @@ export class ModuleRegistry {
   /**
    * Creates an instance of every module that `config.json` enables.
    *
+   * Modules whose `privateWindows` policy does not fit the kind of window are left out.
+   *
    * @param settings The `modules` section of `config.json`.
+   * @param privateWindow Whether the window is a private window.
    * @returns The new instances, and the enabled ids that no module matches.
    */
-  public createEnabled(settings: Record<string, ModuleOptions>): {
+  public createEnabled(settings: Record<string, ModuleOptions>, privateWindow = false): {
     modules: EnabledModule[];
     unknown: string[];
   } {
@@ -65,6 +75,9 @@ export class ModuleRegistry {
       const moduleClass = this.#classes.get(id);
       if (moduleClass === undefined) {
         unknown.push(id);
+        continue;
+      }
+      if (!FITS[moduleClass.privateWindows](privateWindow)) {
         continue;
       }
       modules.push({ id, module: new moduleClass(), options });

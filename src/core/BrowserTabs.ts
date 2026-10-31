@@ -43,7 +43,7 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
         onMessage?: ChromeEvent<RuntimeMessageListener> | undefined;
       }
     | undefined;
-  windows?: { create: (...args: unknown[]) => void } | undefined;
+  windows?: { create: (...args: unknown[]) => void; getCurrent?: ((...args: unknown[]) => void) | undefined } | undefined;
   vivaldiPrivate?: { prefs?: PrefsApi | undefined } | undefined;
 }
 

@@ -35,12 +35,21 @@ export interface ModuleContext {
   build: BuildInfo;
 }
 
+export type PrivateWindowPolicy = 'never' | 'allowed' | 'only';
+
 export class Module {
   /**
    * Unique id used in `config.json` to enable and configure the module.
    * Every subclass must override it.
    */
   public static id = '';
+
+  /**
+   * Whether the module may start in a private window: `never` (the default, for modules that store
+   * anything or draw the normal tab bar), `allowed` (acts the same in both kinds of window) or
+   * `only` (private windows alone). A module that stores data must keep `never`.
+   */
+  public static privateWindows: PrivateWindowPolicy = 'never';
 
   /**
    * Starts the module. Called once, after Vivaldi's interface is ready.
