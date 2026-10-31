@@ -13,12 +13,18 @@ def staged_installer_path(data_dir: Path) -> Path:
     return data_dir / "installer"
 
 
-def remove_staged_copy(data_dir: Path) -> None:
-    """Delete the staged copy (and the legacy `src` folder) from a data folder, keeping the rest."""
+def remove_staged_copy(data_dir: Path) -> bool:
+    """Delete the staged copy (and the legacy `src` folder) from a data folder, keeping the rest.
+
+    Returns True when something was deleted.
+    """
+    removed = False
     for folder in STAGED_FOLDERS + LEGACY_FOLDERS:
         target = data_dir / folder
         if target.exists():
             shutil.rmtree(target)
+            removed = True
+    return removed
 
 
 class Stager(ABC):

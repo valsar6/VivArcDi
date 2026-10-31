@@ -39,6 +39,7 @@ def build_context(
     `mode` defaults to the command line mode.
     """
     mode = mode or CommandLineMode()
+    runner = runner or CommandRunner()
     data_dir = mode.data_dir(platform)
     reapply = mode.reapply_command(repo_root, data_dir)
     installations = InstallationPatcher(
@@ -51,7 +52,7 @@ def build_context(
         ProfileLocator(platform.profile_roots()),
         ShortcutTable.load(platform.modifier),
         PreferencesBackupStore(data_dir / "preferences-backups"),
-        ProcessGuard(platform.process_names(), runner or CommandRunner()),
+        ProcessGuard(platform.process_names(), runner),
         reporter,
     )
     return InstallerContext(
@@ -66,6 +67,7 @@ def build_context(
         mode=mode,
         data_dir=data_dir,
         ownership=mode.ownership(platform, data_dir),
+        takeover=mode.takeover(platform, data_dir, runner),
         background=background,
     )
 

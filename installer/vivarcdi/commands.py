@@ -11,6 +11,7 @@ from .shortcuts import ShortcutService
 from .modes import InstallMode
 from .ownership import Ownership
 from .staging import Stager
+from .takeover import LegacyTakeover
 
 
 @dataclass
@@ -28,6 +29,7 @@ class InstallerContext:
     mode: InstallMode
     data_dir: Path
     ownership: Ownership
+    takeover: LegacyTakeover
     background: bool = False
     shortcut_action: str = "status"
     dry_run: bool = False
@@ -63,6 +65,8 @@ class InstallCommand(Command):
         if not found:
             report.error(f"No Vivaldi installation found on {context.platform.name}")
             return 1
+        if context.takeover.run():
+            report.info("Took over the command line installation")
         context.stager.stage()
         for installation in found:
             context.installations.apply(installation)

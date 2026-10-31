@@ -6,11 +6,13 @@ from enum import Enum
 from pathlib import Path
 
 from .handoff import NoHandoff, ReapplyHandoff
-from .hooks import PackageTriggerHook, UpdateHook
+from .hooks import LaunchAgentHook, PackageTriggerHook, UpdateHook
 from .ownership import CommandLineOwnership, Ownership, PackageMarker, PackageOwnership
 from .permissions import PermissionAdvisor
 from .platforms import MacOSPlatform, Platform
 from .staging import NoStager, SelfStager, Stager, staged_installer_path
+from .system import CommandRunner
+from .takeover import DebianTakeover, LegacyTakeover, MacOSTakeover, NoTakeover
 
 
 class WindowAction(Enum):
@@ -68,6 +70,10 @@ class InstallMode(ABC):
     @abstractmethod
     def stager(self, repo_root: Path, data_dir: Path) -> Stager:
         """Stages a copy of the installer, or does nothing in package modes."""
+
+    def takeover(self, platform: Platform, data_dir: Path, runner: CommandRunner) -> LegacyTakeover:
+        """Removes a command line installation before a package registers itself; nothing by default."""
+        return NoTakeover()
 
     def ownership(self, platform: Platform, data_dir: Path) -> Ownership:
         """Writes the `managed-by` marker in package modes, defers to it in command line mode."""
@@ -138,6 +144,10 @@ class MacAppMode(InstallMode):
     def stager(self, repo_root: Path, data_dir: Path) -> Stager:
         return NoStager()
 
+    def takeover(self, platform: Platform, data_dir: Path, runner: CommandRunner) -> LegacyTakeover:
+        agent = platform.launch_agents_dir / f"{LaunchAgentHook.LABEL}.plist"
+        return MacOSTakeover(agent, data_dir, self._app_executable, runner)
+
 
 class DebPackageMode(InstallMode):
     """The Debian package: dpkg owns the files and the trigger, so the window only offers shortcuts."""
@@ -166,6 +176,13 @@ class DebPackageMode(InstallMode):
 
     def stager(self, repo_root: Path, data_dir: Path) -> Stager:
         return NoStager()
+
+    def takeover(self, platform: Platform, data_dir: Path, runner: CommandRunner) -> LegacyTakeover:
+        return DebianTakeover(
+            platform.root / "etc" / "apt" / "apt.conf.d" / "99vivarcdi",
+            platform.data_dir,
+            data_dir,
+        )
 
 
 MODES: tuple[InstallMode, ...] = (CommandLineMode(), MacAppMode(), DebPackageMode())
