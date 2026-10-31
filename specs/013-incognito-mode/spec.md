@@ -40,8 +40,9 @@ In VivArcDi, in a private window of Vivaldi, the tab bar shows from top to botto
 
 1. The title `Incognito Tabs`. Resting the pointer on it shows `Clear` on its right, like the Today
    divider of [004](../004-today-tabs-and-keyboard/spec.md).
-2. A `New Tab` row with a `+` icon. A click opens a new tab in the private window, the same as
-   Cmd/Ctrl+T there.
+2. A `New Tab` row with a `+` icon. A click opens a blank tab in the private window and puts the
+   cursor in the address field with its text selected, so typing searches or opens a site, as Vivaldi's
+   own new tab button does.
 3. Vivaldi's own private tabs, as Vivaldi draws them.
 4. A bottom bar with the Library button on the left and the `+` button on the right.
 
@@ -57,8 +58,11 @@ The Library button opens Vivaldi's Downloads panel. Arc's Library collects downl
 and spaces; Vivaldi has no single equivalent, and downloads are what a private window produces. See
 the open questions.
 
-The `+` button opens Vivaldi's Quick Commands, which play the role of Arc's command bar, as 004
-already decided for Cmd/Ctrl+T in normal windows.
+The `+` button does the same as `New Tab`: a blank tab and the cursor in the address field, whose
+suggestions list tabs, bookmarks and history. Tore's screen recording of 2026-10-31 shows this
+behavior on Vivaldi's own new tab button. A mod cannot open Quick Commands (probe of 2026-10-31), so
+the button cannot do that; Cmd/Ctrl+T keeps opening Quick Commands natively, also in a private window,
+as set by [014](../014-arc-shortcuts/spec.md).
 
 Peek (002) and copy URL (004) keep working in a private window: they only act on the window's own
 tabs and store nothing.
@@ -79,11 +83,11 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 - **FR-3.** In a private window, the module draws the title `Incognito Tabs` with `Clear`, the
   `New Tab` row and the bottom bar with Library and `+`.
 - **FR-4.** `Clear` closes all tabs of the private window except the active one, without archiving.
-- **FR-5.** `New Tab` opens a new tab in the private window.
-- **FR-6.** The Library button opens Vivaldi's Downloads panel, by playing the shortcut of
-  `COMMAND_SHOW_DOWNLOADS_PANEL`, or else by a click on Vivaldi's own Downloads button.
-- **FR-7.** The `+` button opens Vivaldi's Quick Commands, by playing the shortcut of
-  `COMMAND_SHOW_QUICK_COMMANDS` as the user set it.
+- **FR-5.** `New Tab` opens a blank tab in the private window and focuses the address field with its
+  text selected.
+- **FR-6.** The Library button opens Vivaldi's Downloads panel by a click on Vivaldi's own Downloads
+  button of the panel bar.
+- **FR-7.** The `+` button does what `New Tab` does.
 - **FR-8.** In a private window, Vivaldi's own new tab button and workspace switcher in the tab bar
   are hidden.
 - **FR-9.** The module is enabled by default and disabled with `"incognito": false` in `config.json`;
@@ -109,21 +113,22 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 | AC-4 | WHILE the window is private, THE module SHALL draw the title, the `New Tab` row and the bottom bar. | auto: `draws the private tab bar` |
 | AC-5 | WHEN `Clear` is clicked, THE module SHALL close every tab of the window except the active one. | auto: `clear closes all private tabs but the active one` |
 | AC-6 | WHEN `Clear` is clicked, THE module SHALL add nothing to the archive. | auto: `clear archives nothing` |
-| AC-7 | WHEN `New Tab` is clicked, THE module SHALL open a new tab in the private window. | auto: `new tab row opens a tab in the window` |
-| AC-8 | WHEN the Library button is clicked, THE module SHALL open the Downloads panel. | auto: `library opens the downloads panel` |
-| AC-9 | WHEN the `+` button is clicked, THE module SHALL open Quick Commands. | auto: `plus opens quick commands` |
+| AC-7 | WHEN `New Tab` is clicked, THE module SHALL open a blank tab in the private window and focus the address field. | auto: `new tab row opens a blank tab and focuses the address field` |
+| AC-8 | WHEN the Library button is clicked, THE module SHALL click Vivaldi's Downloads button. | auto: `library clicks the downloads button` |
+| AC-9 | WHEN the `+` button is clicked, THE module SHALL open a blank tab and focus the address field. | auto: `plus opens a blank tab and focuses the address field` |
 | AC-10 | WHILE the window is private, THE modules SHALL write nothing to storage, bookmarks or tab data. | auto: `stores nothing from a private window` |
 | AC-11 | IF the window type cannot be read, THEN THE module SHALL treat the window as normal and log once. | auto: `treats an unreadable window as normal` |
 | AC-12 | WHERE `incognito` is disabled, THE module SHALL draw nothing and the private window SHALL show no VivArcDi section. | auto: `disabled module leaves private windows plain` |
 | AC-13 | WHEN Tore opens a private window, THE tab bar SHALL show only `Incognito Tabs`, `New Tab`, the private tabs and the bottom bar. | manual |
 | AC-14 | WHEN Tore clicks `Clear` with three private tabs, ONLY the active tab SHALL stay, and the archive (Cmd/Ctrl+Shift+A in a normal window) SHALL not list the others. | manual |
-| AC-15 | WHEN Tore clicks `New Tab`, Library and `+` on macOS, THEY SHALL open a private tab, the Downloads panel and Quick Commands. | manual |
+| AC-15 | WHEN Tore clicks `New Tab`, Library and `+` on macOS, `New Tab` and `+` SHALL open a blank private tab with the cursor in the address field, and Library SHALL open the Downloads panel. | manual |
 | AC-16 | WHILE a private window is open, THE normal window SHALL keep its Favorites, space header, folders and pinned tabs. | manual |
 
 ## Out of scope
 
 - A full Arc Library (captures, easels, spaces); only the Downloads panel is opened.
-- Arc's command bar beyond Vivaldi's Quick Commands.
+- Arc's command bar. A command panel of VivArcDi (tabs, bookmarks, history) would be its own spec;
+  Quick Commands stays on Cmd/Ctrl+T.
 - Restyling Vivaldi's private tab rows or theme like Arc's.
 - Turning a private tab into a normal one ("move to a normal window").
 - The bottom bar of space icons for normal windows (Spaces analysis, B11): this spec's bottom bar is
@@ -136,16 +141,15 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
   2026-10-29).
 - [x] **What does the Library open?** Vivaldi's Downloads panel (Tore, 2026-10-30).
 - [x] **What does `Clear` close?** All tabs except the active one (Tore, 2026-10-30).
-- [x] **What does `New Tab` do?** The same as Cmd/Ctrl+T in that window (Tore, 2026-10-30).
+- [x] **What does `New Tab` do?** A blank tab with the cursor in the address field, like Vivaldi's own
+  new tab button; Cmd/Ctrl+T stays Quick Commands natively (Tore, 2026-10-31, replaces the answer of
+  2026-10-30).
 - [x] **Peek in a private window?** Kept (Tore, 2026-10-30).
-- [x] **Can a mod open Quick Commands and the Downloads panel?** `vivaldi.utilities` has no call that
-  runs a Vivaldi command, and the interface has no Quick Commands button. The commands exist as
-  `COMMAND_SHOW_QUICK_COMMANDS` (Cmd+T) and `COMMAND_SHOW_DOWNLOADS_PANEL` (Alt+Cmd+L) in the
-  shortcut list, and the panel bar has a Downloads button (probe of Tore on Vivaldi 8.2, 2026-10-30).
-  Decided: the module reads the shortcut of the command from `vivaldi.actions` and plays it with
-  `vivaldi.utilities.emulateUserInput`, so it follows the shortcuts the user set (014); for Downloads
-  it clicks Vivaldi's own `Trasferimenti` button if the shortcut cannot be played. The design starts
-  with a probe that proves the shortcut is accepted from a mod.
+- [x] **Can a mod open Quick Commands and the Downloads panel?** Not Quick Commands: `emulateUserInput`
+  takes only a window id, a played Cmd+T changes nothing in the page, and no API runs a command
+  (probes of Tore on Vivaldi 8.2, 2026-10-30 and 2026-10-31). The panel bar has a Downloads button
+  that the module clicks. Decided: the `+` focuses the address field of a new blank tab (Tore,
+  2026-10-31).
 
 ## References
 
