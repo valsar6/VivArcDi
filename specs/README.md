@@ -24,7 +24,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [013 Incognito mode](013-incognito-mode/spec.md) | 3 | Implemented |
 | [014 Arc shortcuts](014-arc-shortcuts/spec.md) | 0 | Implemented |
 | [015 Peek for new-tab links](015-peek-new-tab-links/spec.md) | 2 | Implemented |
-| [016 Plug-and-play installer](016-plug-and-play-installer/spec.md) | 0 | Draft |
+| [016 Plug-and-play installer](016-plug-and-play-installer/spec.md) | 0 | Approved |
 
 ## Layout
 

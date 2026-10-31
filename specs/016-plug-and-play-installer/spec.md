@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-10-31 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -167,46 +167,32 @@ so the two never fight.
 ## Out of scope
 
 - Windows, Flatpak/Snap Vivaldi, other Linux families (spec 000 FR-1 still applies).
-- Automatic updates of VivArcDi itself (a Debian apt repository, an in-app updater): a later spec.
-  The app may only say that a newer release exists, see the open questions.
+- Automatic updates of VivArcDi itself (an in-app updater): the window only says that a newer
+  release exists (Q5).
+- A Homebrew tap (`brew install --cask`) and a VivArcDi apt repository, which Tore wants to publish
+  later from the same release files: a later spec.
 - Editing `config.json` from the window: modules stay configured by file.
 - Removing the command line installer or the `dist` branch.
 - Publishing on the Mac App Store (it cannot change other apps).
 
 ## Open questions
 
-Each question has a proposed answer. Approving the spec without comments accepts the proposals.
+Answered by Tore on 2026-10-31: the proposals are accepted.
 
-- [ ] **Q1. Apple signing.** An app that is not signed with an Apple Developer ID and notarized is
-  blocked by Gatekeeper the first time: on recent macOS the user must go to System Settings > Privacy
-  & Security and click "Open Anyway". The Developer ID costs 99 USD a year and needs your Apple
-  account; CI would sign and notarize with secrets you add to the repository. There is a second
-  effect: macOS ties the App Management permission to the signature, and an unsigned (ad-hoc signed)
-  app gets a new signature with every build, so **after every VivArcDi update the user would have
-  to allow App Management again**. *Proposal:* start ad-hoc signed, with the "Open Anyway" step and
-  the App Management step shown in the README and in the app; design CI so that Developer ID signing
-  and notarization switch on as soon as the secrets exist. Do you plan to get a Developer ID?
-- [ ] **Q2. How the macOS app is built.** *Proposal:* freeze the existing Python installer with a
-  standard bundler (PyInstaller or Briefcase, chosen in the design) and a minimal native window, so
-  the code that already works is reused. The alternative, a rewrite in Swift, gives a smaller and
-  more native app but duplicates the installer logic.
-- [ ] **Q3. Debian: Python from the system.** *Proposal:* the `.deb` depends on the system
-  `python3`, already present on Debian 13 desktops and installed automatically by the package
-  manager otherwise. The user never sees it. Bundling a frozen Python instead would make the package
-  about 15 MB for no visible gain. OK?
-- [ ] **Q4. Debian window.** The Debian package installs as root, but shortcuts belong to the user's
-  profile. *Proposal:* a menu entry "VivArcDi" that opens a small window (state + shortcuts) run as
-  the user, built with the GTK dialogs that GNOME already ships (`zenity`, declared as a dependency).
-  Install, update and removal stay in the software installer. Or do you want install/uninstall
-  buttons in that window too (they would ask for the password)?
-- [ ] **Q5. Notice of new VivArcDi versions.** *Proposal:* no automatic update in this spec; the
-  window shows "VivArcDi <x> is available" with a link to the release page, by checking the GitHub
-  releases at most once a day. Or nothing at all, to keep the app fully offline?
-- [ ] **Q6. When Vivaldi is running on Debian.** *Proposal:* the package applies anyway and the
-  change shows at the next Vivaldi start, because a package install cannot ask questions in GNOME
-  Software. Same as the apt hook today.
-- [ ] **Q7. Language of the window.** *Proposal:* English only, like the rest of the project. Italian
-  could follow as a translation file if you want it.
+- [x] **Q1. Apple signing.** No Apple Developer ID for now. The app is ad-hoc signed: the first open
+  needs "Open Anyway" in System Settings > Privacy & Security, and App Management must be allowed
+  again after each VivArcDi update, because macOS ties it to the signature. The README and the app
+  show both steps. CI is ready to sign and notarize if the secrets are added one day.
+- [x] **Q2. How the macOS app is built.** Freeze the existing Python installer with a standard
+  bundler and a minimal native window, reusing the installer code.
+- [x] **Q3. Debian: Python from the system.** The `.deb` depends on the system `python3`.
+- [x] **Q4. Debian window.** A menu entry "VivArcDi" opens a small window run as the user, with the
+  state and the shortcuts. Install, update and removal stay in the software installer.
+- [x] **Q5. Notice of new VivArcDi versions.** The window says when a newer release exists, with a
+  link to its page, checking the GitHub releases at most once a day.
+- [x] **Q6. When Vivaldi is running on Debian.** The package applies anyway; the change shows at the
+  next Vivaldi start.
+- [x] **Q7. Language of the window.** English only.
 
 ## References
 
