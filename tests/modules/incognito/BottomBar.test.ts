@@ -12,8 +12,8 @@ function setup(): { dom: TodayDocument; bar: BottomBar; clicks: string[]; change
   let change = (): void => undefined;
   const document = asDocument(dom);
   const buttons = [
-    new BarButton(document, { name: 'library', title: 'Library', text: '', onClick: (): void => void clicks.push('library') }),
-    new BarButton(document, { name: 'plus', title: 'New tab', text: '+', onClick: (): void => void clicks.push('plus') }),
+    new BarButton(document, { name: 'library', title: 'Library', onClick: (): void => void clicks.push('library') }),
+    new BarButton(document, { name: 'plus', title: 'New tab', onClick: (): void => void clicks.push('plus') }),
   ];
   const watch = (_target: Node, onChange: () => void): (() => void) => {
     change = onChange;
@@ -31,7 +31,6 @@ test('keeps the bottom bar at the end of the tab container, library first and pl
   assert.ok(footer.hasAttribute('data-vivarcdi-bottom-bar'));
   assert.deepEqual(footer.children.map((button) => button.getAttribute('data-vivarcdi-bar-button')), ['library', 'plus']);
   assert.deepEqual(footer.children.map((button) => button.getAttribute('title')), ['Library', 'New tab']);
-  assert.equal(footer.children[1]?.textContent, '+');
   footer.children.forEach((button) => button.click());
   assert.deepEqual(clicks, ['library', 'plus']);
 });

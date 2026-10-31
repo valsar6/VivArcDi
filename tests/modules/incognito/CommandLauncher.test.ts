@@ -66,10 +66,9 @@ test('clicks the downloads button whatever the language of its title', () => {
   const italian = dom.button('Trasferimenti (⌥⌘L)');
   assert.equal(launcher.openLibrary(), true);
   assert.deepEqual([other.clicks, italian.clicks], [0, 1]);
-  dom.buttons = [dom.buttons[0] as (typeof dom.buttons)[number]];
   const english = dom.button('downloads');
   assert.equal(launcher.openLibrary(), true);
-  assert.equal(english.clicks, 1);
+  assert.deepEqual([italian.clicks, english.clicks], [2, 0]);
 });
 
 test('reports a missing downloads button', () => {

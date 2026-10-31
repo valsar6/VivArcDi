@@ -18,26 +18,41 @@ export class ButtonNode extends DomNode {
   }
 }
 
-/** A document that holds an address field, which tests can show late, and the buttons of the panel bar. */
+export class BrowserNode extends DomNode {
+  public dataset: Record<string, string> = {};
+}
+
+/** A document with Vivaldi's browser root, an address field that tests can show late, and buttons found by selector. */
 export class IncognitoDocument extends DomDocument {
+  public browser = new BrowserNode('div', this);
   public field: FieldNode | null = null;
-  public buttons: ButtonNode[] = [];
-  public queries: string[] = [];
+  public found = new Map<string, DomNode[]>();
 
   public override querySelector(selector?: string): DomNode | null {
-    this.queries.push(String(selector));
+    if (selector === '#browser') {
+      return this.browser;
+    }
     return selector === 'input.address' ? this.field : super.querySelector();
   }
 
-  public querySelectorAll(): ButtonNode[] {
-    return this.buttons;
+  public querySelectorAll(selector: string): DomNode[] {
+    if (selector.startsWith('[')) {
+      return [...this.found.values()].flat().filter((node) => node.hasAttribute(selector.slice(1, -1)));
+    }
+    return this.found.get(selector) ?? [];
   }
 
   public button(title: string): ButtonNode {
     const button = new ButtonNode('button', this);
     button.setAttribute('title', title);
-    this.buttons.push(button);
+    this.found.set('button[title]', [...(this.found.get('button[title]') ?? []), button]);
     return button;
+  }
+
+  public vivaldiButton(selector: string): DomNode {
+    const node = new DomNode('button', this);
+    this.found.set(selector, [...(this.found.get(selector) ?? []), node]);
+    return node;
   }
 }
 

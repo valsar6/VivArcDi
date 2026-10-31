@@ -11,5 +11,7 @@
   "tabWebview": "#webview-container webview[tab_id]",
   "tabClose": ".tab-header .close",
   "tabFavicon": ".tab-header .favicon",
-  "addressField": "input.UrlBar-UrlField"
+  "addressField": "input.UrlBar-UrlField",
+  "newTabButton": ".button-toolbar.newtab",
+  "workspaceButton": ".tabbar-workspace-button"
 }
