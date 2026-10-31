@@ -40,7 +40,7 @@ Revision of 2026-10-28, on `features/bookmark-link-tabs` (minor bump to 0.9.0):
 - [x] **T19.** `TodayTabPolicy` and Peek use `KeptTab`. AC-24, AC-26.
 - [x] **T20.** Version 0.9.0, README section, manual checklist for Tore from AC-25 and AC-26
   (`phase-3/verifica-schede-link.md` in the project files).
-- [ ] **T21.** Manual checks AC-25 and AC-26 on macOS and Debian.
+- [x] **T21.** Manual checks AC-25 and AC-26 on macOS and Debian (Tore, 2026-10-31).
 - [x] **T22.** Fix 0.9.1: `TabDataWriter` serializes every `vivExtData` write per tab and reads the tab
   again before writing; all writers use it. AC-27.
 - [x] **T23.** Fix 0.9.2: `HiddenTabMarker` also collapses the marked slots with an inline
