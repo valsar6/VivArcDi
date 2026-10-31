@@ -6,7 +6,7 @@ from pathlib import Path
 from . import __version__
 from .backup import BackupStore
 from .commands import COMMANDS, Command, InstallerContext, ReapplyCommand, ShortcutsCommand, UninstallCommand, WindowCommand
-from .distribution import DIST_FOLDER
+from .distribution import DIST_FOLDER, payload_root
 from .errors import VivArcDiError
 from .modes import MODES, CommandLineMode, InstallMode, mode_named
 from .patching import InstallationPatcher
@@ -22,7 +22,7 @@ from .system import CommandRunner
 from .window_patch import WindowHtmlPatcher
 
 MODE_HELP = "who manages VivArcDi: the command line (cli), the macOS app (app) or the Debian package (deb)"
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = payload_root()
 
 
 def build_context(
