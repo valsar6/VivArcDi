@@ -19,6 +19,7 @@ test-js:
 
 test-py:
 	python3 -m unittest discover -s tests/installer
+	python3 -m unittest discover -s tests/packaging
 
 check: lint typecheck test build
 
