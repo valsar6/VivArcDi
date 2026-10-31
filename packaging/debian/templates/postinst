@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+configure)
+    vivarcdi install --mode deb --quiet || true
+    ;;
+triggered)
+    vivarcdi reapply --mode deb --quiet || true
+    ;;
+esac
+
+exit 0
