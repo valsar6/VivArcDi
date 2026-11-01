@@ -118,6 +118,8 @@ class TkWindow(WindowView):
         link = ttk.Label(self._frame, text=f"VivArcDi {state.update_version} is available", foreground="#1a5fb4", cursor="hand2")
         link.pack(anchor="w", pady=(PADDING, 0))
         link.bind("<Button-1>", lambda event: self.open_url(state.update_url))
+        if state.update_advice:
+            ttk.Label(self._frame, text=state.update_advice, wraplength=MESSAGE_WIDTH).pack(anchor="w")
 
     def _button(self, parent, text: str, command, enabled: bool) -> None:
         button = ttk.Button(parent, text=text, command=command, state="normal" if enabled else "disabled")

@@ -1,0 +1,1 @@
+vivarcdi: package-installs-apt-sources [etc/apt/sources.list.d/vivarcdi.sources]

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -63,7 +63,7 @@ app before `brew uninstall` so that Vivaldi is restored (Q3).
 The tap repository holds `Casks/vivarcdi.rb` and a short README. `publish-tap` checks it out with the
 `HOMEBREW_TAP_TOKEN` secret, runs `cask.py`, and commits only when the file changed, authored by
 Salvatore, with the subject "Update VivArcDi to <version>" (AC-8). Before pushing it runs
-`ruby -c` on the file; `brew audit` runs on the macOS runner in the pull request job.
+`ruby -c` on the file; `brew style --cask` runs on the macOS runner in the pull request job. `brew audit` refuses to load a cask from a tap that CI just created ("untrusted tap") even after `brew trust`, so the full audit is left to the first real release.
 
 ### Apt repository (`packaging/apt/`)
 
@@ -81,14 +81,15 @@ apt/
 - `PackageIndex` reads the `control` file of each `.deb` with `dpkg-deb -f` and writes the
   `Packages` entry with `Filename`, `Size`, `MD5sum`, `SHA1` and `SHA256`. `Release` lists the digests
   of `Packages` and `Packages.gz`, with `Suite: stable`, `Components: main`, `Architectures: all` and
-  the `Date` (AC-4).
+  the `Date` (AC-4). `Release` carries SHA-256 digests only.
 - `RetentionPolicy` keeps the three highest versions and deletes the rest of the pool (AC-5, FR-5).
-- `ReleaseSigner` calls `gpg` with a temporary home that imports the `APT_SIGNING_KEY` secret, and
-  writes `InRelease` (clear-signed) and `Release.gpg` (detached). The key is Ed25519; SHA-256 is the
+- `ReleaseSigner` calls `gpg` with a temporary home that imports the `APT_SIGNING_KEY` secret (read
+  from the environment and passed on standard input), and writes `InRelease` (clear-signed) and
+  `Release.gpg` (detached, armored). It also exports the public key to the site. The key is Ed25519; SHA-256 is the
   digest (NFR-3). The temporary home is deleted at the end and the key never reaches a log (FR-9).
 - Idempotence (AC-8, NFR-2): adding a version that is already in the pool replaces it with the same
-  file and gives the same indexes, so the second run produces no git change; `Date` is taken from the
-  `.deb` build time recorded in the release, not from the clock.
+  file and gives the same indexes, so the second run produces no git change; `Date` is the time the GitHub release was published (`--date`, required), not the clock. A signed
+  file is written again only when its content changed, because a new signature differs on every run.
 
 `publish-apt` checks out `gh-pages` into a folder, copies the new `.deb` next to the existing pool,
 runs `apt_repo.py`, commits with the subject "Publish VivArcDi <version> to the apt repository"
@@ -99,11 +100,11 @@ far under the 100 MB limit (NFR-4).
 
 ### Enrollment in the `.deb`
 
-`build_deb.py` adds two files from templates (AC-6):
+`build_deb.py` adds the sources file and the public keyring (AC-6):
 
 ```text
 etc/apt/sources.list.d/vivarcdi.sources
-usr/share/keyrings/vivarcdi-archive-keyring.gpg
+usr/share/vivarcdi/vivarcdi-archive-keyring.gpg
 ```
 
 ```text
@@ -115,9 +116,20 @@ Signed-By: /usr/share/keyrings/vivarcdi-archive-keyring.gpg
 ```
 
 The keyring is the public key committed in `packaging/apt/vivarcdi-archive-keyring.gpg`. The sources
-file is a conffile so a user can edit or delete it, and dpkg keeps their change. The `postrm`
-template gains a purge branch that deletes both files (AC-7); on `remove` it does nothing. The keyring
-file belongs to the package, so `remove` leaves it and `purge` deletes it, as conffile semantics ask.
+file is a conffile (`DEBIAN/conffiles`), so a user can edit or delete it and dpkg keeps their change.
+
+dpkg deletes the files it owns on `remove`, which would leave a sources file whose `Signed-By` points
+to nothing and make `apt update` fail. So the keyring is not a dpkg-owned file in `/usr/share/keyrings`:
+the package ships it under `/usr/share/vivarcdi/`, `postinst configure` installs it to
+`/usr/share/keyrings/vivarcdi-archive-keyring.gpg` (and so replaces it on every upgrade, which makes a
+key rotation reach installed copies), and `postrm purge` deletes the sources file and that keyring
+(AC-7). On `remove` it does nothing, so apt keeps working.
+
+Where the keyring comes from: `build_deb.py` reads `packaging/apt/vivarcdi-archive-keyring.gpg`, or the
+file given with `--keyring` or the variable `VIVARCDI_KEYRING`, and fails with a message that points to
+the runbook when neither exists. The real keyring is generated once by the maintainer with
+`scripts/make-apt-key.sh` and committed. Pull request builds in CI use a throwaway keyring while none
+is committed; a build on `main` never does, so a release cannot ship a package with a test key.
 
 Version bump of the key: the package ships the key that signed it; a rotation (runbook) publishes a
 release signed by the old key that carries the new keyring, then switches CI to the new key.
@@ -162,16 +174,17 @@ tap repository and Pages.
 | `packaging/homebrew/templates/vivarcdi.rb` | The cask text with placeholders | |
 | `packaging/apt/apt_repo.py` `PackageIndex`, `RetentionPolicy`, `ReleaseSigner`, `AptRepository` | Pool, indexes, retention, signing | Facade over small steps |
 | `packaging/apt/vivarcdi-archive-keyring.gpg` | The public key shipped in the repository and the `.deb` | |
-| `packaging/debian/build_deb.py`, `templates/vivarcdi.sources`, `templates/postrm` | Enrollment files and purge | |
+| `packaging/debian/build_deb.py`, `templates/vivarcdi.sources`, `templates/conffiles`, `templates/postinst`, `templates/postrm` | Enrollment files, keyring install and purge | |
 | `installer/vivarcdi/update_advice.py` `InstallSource`, `HomebrewSource`, `AptSource`, `DirectSource`, `UpdateAdvisor` | Update text per install source | Strategy |
 | `installer/vivarcdi/window/presenter.py` | Shows the advice | |
-| `scripts/make-apt-key.sh` | Creates the signing key once | |
+| `scripts/make-apt-key.sh` | Creates the signing key once; `--throwaway <folder>` makes a test key for CI | |
+| `scripts/check-apt-repo.sh` | Builds a signed test repository from a `.deb` and reads it with `apt-get` | |
 | `docs/package-managers-setup.md` | The runbook | |
 | `.github/workflows/tests.yml` | `publish-tap`, `publish-apt`; validation on pull requests | |
 
 Tests: `tests/packaging/test_cask.py`, `test_apt_repo.py` (runs `gpg` and `dpkg-deb`, available on
-the Ubuntu runner and skipped with a message elsewhere), extended `test_deb.py`, and
-`tests/installer/test_update_advice.py`.
+the Ubuntu runner and skipped with a message elsewhere; the key is a throwaway one created in a
+temporary home), `test_runbook.py`, extended `test_deb.py`, and `tests/installer/test_update_advice.py`.
 
 ## Vivaldi interface
 
@@ -187,7 +200,7 @@ repository that has not done the setup yet still succeeds.
 
 - Pull requests: `package-deb` also checks that the sources file and the keyring are in the `.deb`
   and that `apt_repo.py` builds a repository from it and `apt-get` can read it with `file:` and the
-  test key; `package-macos` runs `brew audit --cask` on the rendered cask with a placeholder
+  test key; `package-macos` runs `ruby -c` and `brew style --cask` on the rendered cask with a placeholder
   checksum.
 - `main`: after `upload-packages`, `publish-tap` and `publish-apt` run in parallel. Both are skipped
   when the release was not created, both can be re-run alone (NFR-2), and neither touches the release

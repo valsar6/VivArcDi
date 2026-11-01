@@ -12,6 +12,7 @@ sys.path.insert(0, str(REPO_ROOT / "packaging" / "debian"))
 from build_deb import DebBuildError, DebPackager, DebTreeBuilder, read_version
 
 VERSION = "9.8.7"
+KEYRING_BYTES = b"\x99public keyring"
 RECORDER = '#!/bin/sh\necho "$(basename "$0") $*" >> "$RECORD_FILE"\n'
 
 
@@ -36,8 +37,10 @@ class DebCase(unittest.TestCase):
     def setUp(self):
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root, True)
+        self.keyring = self.root / "keyring.gpg"
+        self.keyring.write_bytes(KEYRING_BYTES)
         self.builder = DebTreeBuilder(
-            VERSION, make_fake_installer(self.root), make_fake_dist(self.root), REPO_ROOT / "LICENSE"
+            VERSION, make_fake_installer(self.root), make_fake_dist(self.root), REPO_ROOT / "LICENSE", keyring=self.keyring
         )
         self.tree = self.builder.build(self.root / "tree")
 
@@ -115,15 +118,59 @@ class DebTreeTest(DebCase):
         with self.assertRaisesRegex(DebBuildError, "npm run build"):
             self.builder.build(self.root / "again")
 
+    def test_deb_enrolls_the_vivarcdi_repository(self):
+        sources = self.read("etc/apt/sources.list.d/vivarcdi.sources")
+        with self.subTest("the sources file names the repository and its key"):
+            self.assertEqual(
+                sources.splitlines(),
+                [
+                    "Types: deb",
+                    "URIs: https://valsar6.github.io/vivarcdi/apt",
+                    "Suites: stable",
+                    "Components: main",
+                    "Signed-By: /usr/share/keyrings/vivarcdi-archive-keyring.gpg",
+                ],
+            )
+        with self.subTest("lintian is told that the sources file is on purpose"):
+            self.assertIn(
+                "package-installs-apt-sources [etc/apt/sources.list.d/vivarcdi.sources]",
+                self.read("usr/share/lintian/overrides/vivarcdi"),
+            )
+        with self.subTest("the keyring is shipped and installed where Signed-By points"):
+            self.assertEqual((self.tree / "usr/share/vivarcdi/vivarcdi-archive-keyring.gpg").read_bytes(), KEYRING_BYTES)
+            calls = self.run_script("postinst", self.fake_commands("vivarcdi", "install"), "configure")
+            self.assertEqual(
+                calls[0],
+                "install -D -m 0644 /usr/share/vivarcdi/vivarcdi-archive-keyring.gpg"
+                " /usr/share/keyrings/vivarcdi-archive-keyring.gpg",
+            )
+        with self.subTest("the sources file is a conffile, so edits and deletion are kept"):
+            self.assertEqual(self.read("DEBIAN/conffiles").splitlines(), ["/etc/apt/sources.list.d/vivarcdi.sources"])
+
+    def test_deb_purge_removes_the_repository(self):
+        environment = self.fake_commands("vivarcdi", "rm")
+        with self.subTest("remove keeps the sources file and the keyring"):
+            self.assertEqual(self.run_script("postrm", environment, "remove"), [])
+        with self.subTest("purge deletes both"):
+            calls = self.run_script("postrm", environment, "purge")
+            self.assertIn(
+                "rm -f /etc/apt/sources.list.d/vivarcdi.sources /usr/share/keyrings/vivarcdi-archive-keyring.gpg", calls
+            )
+
+    def test_missing_keyring_is_reported(self):
+        self.keyring.unlink()
+        with self.assertRaisesRegex(DebBuildError, "make-apt-key.sh"):
+            self.builder.build(self.root / "again")
+
     def test_package_version_comes_from_package_json(self):
         self.assertRegex(read_version(REPO_ROOT), r"^\d+\.\d+\.\d+$")
 
 
 class DebScriptsTest(DebCase):
     def test_deb_postinst_installs_and_reapplies_on_trigger(self):
-        environment = self.fake_commands("vivarcdi")
+        environment = self.fake_commands("vivarcdi", "install")
         with self.subTest("configure installs"):
-            self.assertEqual(self.run_script("postinst", environment, "configure", "0.1"), ["vivarcdi install --mode deb --quiet"])
+            self.assertEqual(self.run_script("postinst", environment, "configure", "0.1")[-1], "vivarcdi install --mode deb --quiet")
         with self.subTest("trigger reapplies"):
             calls = self.run_script("postinst", environment, "triggered", "/opt/vivaldi")
             self.assertEqual(calls[-1], "vivarcdi reapply --mode deb --quiet")
@@ -131,7 +178,7 @@ class DebScriptsTest(DebCase):
             Path(environment["PATH"].split(":")[0], "vivarcdi").write_text("#!/bin/sh\nexit 3\n")
             self.run_script("postinst", environment, "configure")
         with self.subTest("other actions do nothing"):
-            self.assertEqual(len(self.run_script("postinst", environment, "abort-upgrade")), 2)
+            self.assertEqual(len(self.run_script("postinst", environment, "abort-upgrade")), 4)
 
     def test_deb_prerm_uninstalls_and_keeps_backups(self):
         environment = self.fake_commands("vivarcdi", "rm")
@@ -155,6 +202,7 @@ class DebPackageTest(DebCase):
         self.assertIn(f"Version: {VERSION}", info)
         contents = subprocess.run(["dpkg-deb", "--contents", str(package)], capture_output=True, text=True, check=True).stdout
         self.assertIn("./usr/bin/vivarcdi", contents)
+        self.assertIn("./etc/apt/sources.list.d/vivarcdi.sources", contents)
         self.assertIn("root/root", contents)
 
     def test_packager_reports_a_failing_dpkg_deb(self):

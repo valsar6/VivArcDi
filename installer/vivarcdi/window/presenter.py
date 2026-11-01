@@ -13,6 +13,7 @@ from ..releases import ReleaseChecker
 from ..reporter import CollectingReporter
 from ..running import ProcessGuard
 from ..shortcuts import ALREADY_SET
+from ..update_advice import UpdateAdvisor
 from .errorlog import ErrorLog
 from .model import BuildState, BuildStatus, StatusModel
 
@@ -67,6 +68,7 @@ class WindowState:
     offer_shortcuts: bool = False
     update_version: str = ""
     update_url: str = ""
+    update_advice: str = ""
 
 
 class WindowView(ABC):
@@ -115,6 +117,7 @@ class WindowPresenter:
         quitter: VivaldiQuitter | None,
         error_log: ErrorLog,
         release_checker: ReleaseChecker | None = None,
+        update_advisor: UpdateAdvisor | None = None,
     ):
         self._context = context
         self._reporter = reporter
@@ -124,6 +127,7 @@ class WindowPresenter:
         self._quitter = quitter
         self._error_log = error_log
         self._release_checker = release_checker
+        self._update_advisor = update_advisor or UpdateAdvisor.for_mode(context.mode)
         self._notice = Notice("")
         self._last_action: WindowAction | None = None
 
@@ -194,6 +198,7 @@ class WindowPresenter:
             offer_shortcuts=self._notice.offer_shortcuts,
             update_version=release.version if release else "",
             update_url=release.url if release else "",
+            update_advice=self._update_advisor.advise(release) if release else "",
         )
 
     def _enabled_actions(self, rows: tuple[BuildStatus, ...]) -> frozenset:

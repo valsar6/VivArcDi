@@ -40,8 +40,22 @@ jobs:
           python-version: "3.13"
       - run: npm ci
       - run: npm run build
+      - name: Use a throwaway keyring while none is committed (pull requests only)
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ ! -f packaging/apt/vivarcdi-archive-keyring.gpg ]; then
+            scripts/make-apt-key.sh --throwaway build/test-key > /dev/null 2>&1
+            echo "VIVARCDI_KEYRING=${GITHUB_WORKSPACE}/build/test-key/vivarcdi-archive-keyring.gpg" >> "${GITHUB_ENV}"
+          fi
       - run: python3 packaging/debian/build_deb.py --out build
       - run: python3 -m unittest discover -s tests/packaging
+      - name: Check the apt enrollment files in the package
+        run: |
+          contents="$(dpkg-deb --contents build/*.deb)"
+          echo "${contents}" | grep -q './etc/apt/sources.list.d/vivarcdi.sources'
+          echo "${contents}" | grep -q './usr/share/vivarcdi/vivarcdi-archive-keyring.gpg'
+      - name: Build a signed test repository from the package and read it with apt
+        run: scripts/check-apt-repo.sh build/vivarcdi_*_all.deb
       - run: sudo apt-get install -y lintian && lintian --fail-on error build/*.deb
       - uses: actions/upload-artifact@v4
         with:
@@ -70,6 +84,15 @@ jobs:
           build/venv/bin/python -m pip install -r packaging/macos/requirements.txt
       - name: Build the app and the disk image
         run: build/venv/bin/python packaging/macos/build_dmg.py --out build
+      - name: Validate the cask with ruby and brew style
+        run: |
+          version="$(npm run -s release version)"
+          tap="$(brew --repository)/Library/Taps/valsar6/homebrew-vivarcdi"
+          mkdir -p "${tap}"
+          git -C "${tap}" init --quiet
+          python3 packaging/homebrew/cask.py --version "${version}" --sha256 "$(printf '0%.0s' $(seq 64))" --out "${tap}/Casks/vivarcdi.rb"
+          ruby -c "${tap}/Casks/vivarcdi.rb"
+          brew style --cask "${tap}/Casks/vivarcdi.rb"
       - name: Check the app bundle
         env:
           VIVARCDI_APP_BUNDLE: ${{ github.workspace }}/build/pyinstaller/dist/VivArcDi.app
@@ -221,3 +244,98 @@ jobs:
             git -C published tag "${tag}"
             git -C published push origin "refs/tags/${tag}"
           fi
+
+  publish-tap:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.release.outputs.created == 'true'
+    needs: [release, upload-packages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: publish-tap
+      cancel-in-progress: false
+    env:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - name: Report that the tap is not configured
+        if: env.HOMEBREW_TAP_TOKEN == ''
+        run: echo "publish-tap is not configured. Add the HOMEBREW_TAP_TOKEN secret as in docs/package-managers-setup.md. Nothing was published."
+      - uses: actions/checkout@v7
+        if: env.HOMEBREW_TAP_TOKEN != ''
+      - uses: actions/checkout@v7
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        with:
+          repository: valsar6/homebrew-vivarcdi
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Write the cask for the release and push it when it changed
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          version="${TAG#v}"
+          gh release download "${TAG}" --pattern "VivArcDi-${version}.dmg" --dir packages --clobber
+          python3 packaging/homebrew/cask.py --version "${version}" --dmg "packages/VivArcDi-${version}.dmg" --out tap/Casks/vivarcdi.rb
+          ruby -c tap/Casks/vivarcdi.rb
+          git -C tap add Casks/vivarcdi.rb
+          if git -C tap diff --cached --quiet; then
+            echo "The tap already holds ${version}, nothing to publish"
+            exit 0
+          fi
+          git -C tap config user.name "Salvatore"
+          git -C tap config user.email "25297596+valsar6@users.noreply.github.com"
+          git -C tap commit --message "Update VivArcDi to ${version}"
+          git -C tap push origin HEAD
+
+  publish-apt:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.release.outputs.created == 'true'
+    needs: [release, upload-packages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-apt
+      cancel-in-progress: false
+    env:
+      APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+    steps:
+      - name: Report that the apt repository is not configured
+        if: env.APT_SIGNING_KEY == ''
+        run: echo "publish-apt is not configured. Add the APT_SIGNING_KEY secret as in docs/package-managers-setup.md. Nothing was published."
+      - uses: actions/checkout@v7
+        if: env.APT_SIGNING_KEY != ''
+      - uses: actions/setup-python@v7
+        if: env.APT_SIGNING_KEY != ''
+        with:
+          python-version: "3.13"
+      - name: Check out the gh-pages branch
+        if: env.APT_SIGNING_KEY != ''
+        run: |
+          if git fetch --depth=1 origin gh-pages; then
+            git worktree add --detach published FETCH_HEAD
+          else
+            git worktree add --orphan published
+          fi
+      - name: Add the package, sign the indexes and push the site
+        if: env.APT_SIGNING_KEY != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          version="${TAG#v}"
+          gh release download "${TAG}" --pattern "vivarcdi_${version}_all.deb" --dir packages --clobber
+          published_at="$(gh release view "${TAG}" --json publishedAt --jq .publishedAt)"
+          python3 packaging/apt/apt_repo.py --root published/apt --deb "packages/vivarcdi_${version}_all.deb" --date "${published_at}"
+          touch published/.nojekyll
+          git -C published add --all
+          if git -C published diff --cached --quiet; then
+            echo "The apt repository already lists ${version}, nothing to publish"
+            exit 0
+          fi
+          git config user.name "Salvatore"
+          git config user.email "25297596+valsar6@users.noreply.github.com"
+          git -C published commit --message "Publish VivArcDi ${version} to the apt repository"
+          git -C published push origin HEAD:refs/heads/gh-pages
