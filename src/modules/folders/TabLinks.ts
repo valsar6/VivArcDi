@@ -30,6 +30,15 @@ export class TabLinks {
   }
 
   /**
+   * Makes a tab an ordinary tab again, so that it shows in the tab list.
+   *
+   * @param tabId The tab.
+   */
+  public async unlink(tabId: number): Promise<void> {
+    await this.#write(tabId, undefined);
+  }
+
+  /**
    * Unlinks every tab whose bookmark is no longer among the given ones, so that it comes back to
    * the tab list.
    *

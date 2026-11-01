@@ -138,7 +138,7 @@ test('knows the links of optional roots that exist and skips those that do not',
     ]),
   );
   const optional = [[...ROOT_PATH, 'Music'], [...ROOT_PATH, 'Missing'], [...ROOT_PATH, 'Work']];
-  const tree = new FolderTreeSource(bookmarks, { path: [...ROOT_PATH, 'Work'], optionalPaths: () => optional, maxDepth: 3, onChange: (): void => undefined, logger: silentLogger(), timing: immediateFrames });
+  const tree = new FolderTreeSource(bookmarks, { path: [...ROOT_PATH, 'Work'], optionalPaths: (): string[][] => optional, maxDepth: 3, onChange: (): void => undefined, logger: silentLogger(), timing: immediateFrames });
   await tree.start();
   assert.deepEqual([...(tree.linkIds ?? [])], ['11', '21', '22']);
   assert.deepEqual(tree.childIds, ['11']);

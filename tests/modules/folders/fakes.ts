@@ -207,31 +207,28 @@ export class WritableChrome implements WriterHost {
       onRemoved: event,
       onChanged: event,
       onMoved: event,
-      getTree: (callback): void => this.#answer('getTree', () => callback(this.tree)),
-      getChildren: (id, callback): void => this.#answer('getChildren', () => callback(findNode(this.tree, id)?.children ?? [])),
+      getTree: (callback): void => this.#answer('getTree', callback, () => this.tree),
+      getChildren: (id, callback): void => this.#answer('getChildren', callback, () => findNode(this.tree, id)?.children ?? []),
       create: (details, callback): void =>
-        this.#answer(`create ${details.title}`, () => {
+        this.#answer(`create ${details.title}`, callback, () => {
           const parent = findNode(this.tree, details.parentId ?? '2') ?? findNode(this.tree, '1');
           const node: BookmarkNode = { id: String(this.#nextId++), title: details.title, url: details.url, children: details.url === undefined ? [] : undefined };
           const children = parent?.children ?? [];
           children.splice(details.index ?? children.length, 0, node);
-          callback(node);
+          return node;
         }),
       update: (id, changes, callback): void =>
-        this.#answer(`update ${id}`, () => {
-          const node = findNode(this.tree, id);
-          if (node !== undefined) {
-            node.title = changes.title;
-            callback(node);
-          }
+        this.#answer(`update ${id}`, callback, () => {
+          const node = findNode(this.tree, id) as BookmarkNode;
+          node.title = changes.title;
+          return node;
         }),
       remove: (id, callback): void =>
-        this.#answer(`remove ${id}`, () => {
+        this.#answer(`remove ${id}`, callback, () => {
           const parent = this.#parentOf(this.tree, id);
           if (parent?.children !== undefined) {
             parent.children = parent.children.filter((child) => child.id !== id);
           }
-          callback();
         }),
     };
   }
@@ -261,12 +258,13 @@ export class WritableChrome implements WriterHost {
     return undefined;
   }
 
-  #answer(call: string, run: () => void): void {
+  #answer<T>(call: string, callback: (value: T) => void, run: () => T | void): void {
     this.calls.push(call);
-    this.runtime.lastError = this.failing.has(call.split(' ')[0] ?? '') ? { message: `${call} failed` } : undefined;
-    run();
+    const failed = this.failing.has(call.split(' ')[0] ?? '');
+    this.runtime.lastError = failed ? { message: `${call} failed` } : undefined;
+    callback((failed ? undefined : run()) as T);
     this.runtime.lastError = undefined;
-    if (!call.startsWith('get')) {
+    if (!failed && !call.startsWith('get')) {
       this.listeners.forEach((listener) => listener());
     }
   }
