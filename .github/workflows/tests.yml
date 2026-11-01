@@ -84,16 +84,15 @@ jobs:
           build/venv/bin/python -m pip install -r packaging/macos/requirements.txt
       - name: Build the app and the disk image
         run: build/venv/bin/python packaging/macos/build_dmg.py --out build
-      - name: Validate the cask with brew audit
+      - name: Validate the cask with ruby and brew style
         run: |
           version="$(npm run -s release version)"
           tap="$(brew --repository)/Library/Taps/valsar6/homebrew-vivarcdi"
           mkdir -p "${tap}"
           git -C "${tap}" init --quiet
           python3 packaging/homebrew/cask.py --version "${version}" --sha256 "$(printf '0%.0s' $(seq 64))" --out "${tap}/Casks/vivarcdi.rb"
-          brew trust valsar6/vivarcdi
-          brew trust --cask valsar6/vivarcdi/vivarcdi
-          brew audit --cask valsar6/vivarcdi/vivarcdi
+          ruby -c "${tap}/Casks/vivarcdi.rb"
+          brew style --cask "${tap}/Casks/vivarcdi.rb"
       - name: Check the app bundle
         env:
           VIVARCDI_APP_BUNDLE: ${{ github.workspace }}/build/pyinstaller/dist/VivArcDi.app

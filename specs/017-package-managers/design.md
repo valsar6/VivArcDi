@@ -63,7 +63,7 @@ app before `brew uninstall` so that Vivaldi is restored (Q3).
 The tap repository holds `Casks/vivarcdi.rb` and a short README. `publish-tap` checks it out with the
 `HOMEBREW_TAP_TOKEN` secret, runs `cask.py`, and commits only when the file changed, authored by
 Salvatore, with the subject "Update VivArcDi to <version>" (AC-8). Before pushing it runs
-`ruby -c` on the file; `brew audit` runs on the macOS runner in the pull request job.
+`ruby -c` on the file; `brew style --cask` runs on the macOS runner in the pull request job. `brew audit` refuses to load a cask from a tap that CI just created ("untrusted tap") even after `brew trust`, so the full audit is left to the first real release.
 
 ### Apt repository (`packaging/apt/`)
 
@@ -200,7 +200,7 @@ repository that has not done the setup yet still succeeds.
 
 - Pull requests: `package-deb` also checks that the sources file and the keyring are in the `.deb`
   and that `apt_repo.py` builds a repository from it and `apt-get` can read it with `file:` and the
-  test key; `package-macos` runs `brew audit --cask` on the rendered cask with a placeholder
+  test key; `package-macos` runs `ruby -c` and `brew style --cask` on the rendered cask with a placeholder
   checksum.
 - `main`: after `upload-packages`, `publish-tap` and `publish-apt` run in parallel. Both are skipped
   when the release was not created, both can be re-run alone (NFR-2), and neither touches the release
