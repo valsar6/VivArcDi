@@ -30,10 +30,15 @@ Tested against the Vivaldi 8.1 interface. Other versions stay untouched until th
 
 ## Download
 
-Get the latest version from the [Releases page](https://github.com/valsar6/VivArcDi/releases/latest):
+Use your package manager, or download the file from the
+[Releases page](https://github.com/valsar6/VivArcDi/releases/latest):
 
-- **macOS:** `VivArcDi-<version>.dmg`
-- **Debian:** `vivarcdi_<version>_all.deb`
+- **macOS:**
+  - Homebrew: `brew install --cask valsar6/vivarcdi/vivarcdi`
+  - Direct download: `VivArcDi-<version>.dmg`
+- **Debian:**
+  - Apt repository: [set it up in the terminal](#debian-apt-repository), or install the `.deb` and it enrolls the repository for you.
+  - Direct download: `vivarcdi_<version>_all.deb`
 
 Replace `<version>` with the number of the release, for example `0.15.0`.
 
@@ -53,8 +58,15 @@ You do not need a terminal.
 ### macOS
 
 1. Install Vivaldi from [vivaldi.com](https://vivaldi.com) and move it to `/Applications`.
-2. [Download](#download) `VivArcDi-<version>.dmg` and open it.
-3. Drag **VivArcDi** onto the **Applications** folder. Then open VivArcDi from Applications.
+2. Install VivArcDi with Homebrew:
+
+   ```sh
+   brew install --cask valsar6/vivarcdi/vivarcdi
+   ```
+
+   Or [download](#download) `VivArcDi-<version>.dmg`, open it and drag **VivArcDi** onto the
+   **Applications** folder.
+3. Open VivArcDi from Applications.
 4. The first time, macOS says it cannot verify the developer. VivArcDi is free and is not signed with
    an Apple Developer ID. To open it anyway:
    - Open System Settings > Privacy & Security.
@@ -71,6 +83,7 @@ Good to know:
 
 - The window has a checkbox, "Also use Arc's keyboard shortcuts". Tick it if you want them.
   They are also covered in the [native settings guide](docs/native-settings.md).
+- Homebrew keeps the macOS quarantine flag, so the "Open Anyway" step applies to it as well.
 - After a VivArcDi update, macOS may ask for App Management again. VivArcDi has no Apple signature
   (only a local one), so macOS sees each new version as a new app. Do step 6 again.
 - When Vivaldi updates, VivArcDi applies itself again and shows a notification that asks you to
@@ -80,8 +93,9 @@ Good to know:
 
 1. Install Vivaldi from the official `.deb` on [vivaldi.com](https://vivaldi.com). It also adds the
    Vivaldi apt repository, which keeps Vivaldi updated.
-2. [Download](#download) `vivarcdi_<version>_all.deb`.
-3. Double-click it. Your software center (GNOME Software) opens. Click **Install** and type your password.
+2. [Download](#download) `vivarcdi_<version>_all.deb`, or set up the
+   [apt repository](#debian-apt-repository) and run `sudo apt install vivarcdi`.
+3. Double-click the `.deb`. Your software center (GNOME Software) opens. Click **Install** and type your password.
    If double-click does nothing, open a terminal in the download folder and run:
 
    ```sh
@@ -94,10 +108,25 @@ Open the **VivArcDi** entry in your application menu to see the state of each Vi
 or restore Arc's keyboard shortcuts (**Use Arc's shortcuts**, **Restore my shortcuts**). When Vivaldi updates, VivArcDi applies itself again on its own.
 Restart Vivaldi once more to load it.
 
+### Debian apt repository
+
+The `.deb` adds the VivArcDi apt repository by itself, so after the first install the software
+updater and `sudo apt upgrade` bring every new version. To subscribe from a terminal before you
+install anything:
+
+```sh
+curl -fsSL https://valsar6.github.io/vivarcdi/apt/vivarcdi-archive-keyring.gpg | sudo tee /usr/share/keyrings/vivarcdi-archive-keyring.gpg > /dev/null
+printf 'Types: deb\nURIs: https://valsar6.github.io/vivarcdi/apt\nSuites: stable\nComponents: main\nSigned-By: /usr/share/keyrings/vivarcdi-archive-keyring.gpg\n' | sudo tee /etc/apt/sources.list.d/vivarcdi.sources > /dev/null
+sudo apt update && sudo apt install vivarcdi
+```
+
 ### Update VivArcDi
 
-Download the new `.dmg` or `.deb` and install it as above. The VivArcDi window tells you when a new
-version exists, with a link to the download.
+- **macOS with Homebrew:** `brew upgrade --cask vivarcdi`. macOS may ask for App Management again.
+- **Debian:** the software updater, or `sudo apt update && sudo apt upgrade`.
+- **Direct download:** download the new `.dmg` or `.deb` and install it as above.
+
+The VivArcDi window tells you when a new version exists, and names the command that installs it.
 
 ### Coming from the command line installer
 
@@ -106,9 +135,10 @@ keeps your backups. You can delete the cloned folder afterwards.
 
 ### Uninstall
 
-- **macOS:** click **Uninstall** in the VivArcDi window, restart Vivaldi, then delete VivArcDi from Applications.
+- **macOS:** click **Uninstall** in the VivArcDi window, restart Vivaldi, then delete VivArcDi from
+  Applications, or run `brew uninstall --cask vivarcdi` if you installed it with Homebrew.
 - **Debian:** remove VivArcDi in your software center, or run `sudo apt remove vivarcdi`.
-  `sudo apt purge vivarcdi` also deletes the backups in `/var/lib/vivarcdi`.
+  `sudo apt purge vivarcdi` also deletes the backups in `/var/lib/vivarcdi` and the apt repository entry.
 
 Restart Vivaldi afterwards.
 
