@@ -34,6 +34,20 @@
     }
   }
 
+  > [data-vivarcdi-drop='into'] {
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-active}, transparent);
+    outline: 1px solid var(--colorHighlightBg, currentcolor);
+    outline-offset: -1px;
+  }
+
+  > [data-vivarcdi-drop='before'] {
+    box-shadow: inset 0 2px 0 var(--colorHighlightBg, currentcolor);
+  }
+
+  > [data-vivarcdi-drop='after'] {
+    box-shadow: inset 0 -2px 0 var(--colorHighlightBg, currentcolor);
+  }
+
   [data-vivarcdi-folder-id] .vivarcdi-folders-title {
     font-weight: 600;
   }

@@ -18,8 +18,14 @@
   user-select: none;
   transition: background-color var(--vivarcdi-transition);
 
-  &:hover {
+  &:hover,
+  &[data-vivarcdi-drop] {
     background-color: var(--vivarcdi-space-hover);
+  }
+
+  &[data-vivarcdi-drop] {
+    outline: 1px solid var(--colorHighlightBg, currentcolor);
+    outline-offset: -1px;
   }
 
   .vivarcdi-space-arrow {

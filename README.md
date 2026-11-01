@@ -347,7 +347,8 @@ the `root` of the `bookmark-folders` module, when that module is on.
 
 Shows a row between the Favorites grid and the [bookmark folders](#bookmark-folders), like the space
 header of Arc: the icon and the name of the active workspace, and an arrow. A click anywhere on the
-row collapses the workspace, and a second click opens it again. While it is collapsed the arrow
+row collapses the workspace, and a second click opens it again. Resting the pointer on the row shows a
+`+` button that adds a folder to the workspace (see [bookmark folders](#bookmark-folders)). While it is collapsed the arrow
 points to the side and:
 
 - the folders section shows only the links that have an open tab, without the folder rows;
@@ -385,8 +386,25 @@ that has no tab becomes its tab. The Today archive never archives these tabs, an
 another site inside one opens in [Peek](#peek), as for pinned tabs. When a bookmark is removed, its
 tab goes back to the list.
 
-The bookmarks are only read: they are created, renamed, moved and deleted in Vivaldi's Bookmarks
-panel, and the tab bar follows.
+The folders can be edited from the tab bar, and every change is a real bookmark, so it shows in
+Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
+
+- **New folder.** Rest the pointer on the space header and click the `+`. A folder named `Untitled`
+  is added at the end of the workspace's folder, with its name ready to type. Enter saves the name;
+  Escape and an empty name keep `Untitled`.
+- **Rename.** Double click a folder. A single click still opens and closes it, after a short wait.
+- **Add a tab to a folder.** Drag a tab of the list onto a folder row and release: it becomes a link at
+  the end of that folder and leaves the list. Released on the space header it becomes a link at the end
+  of the workspace's folder, and released between two rows it goes there. A Favorite, a pinned tab, a
+  tab that is already a link and a page that is not `http` or `https` are left alone. Dropping a tab on
+  the Favorites grid pins it, as Vivaldi does.
+- **Cmd/Ctrl+D.** Adds the page you are on to the end of the workspace's folder, as Arc does with its
+  favorites area; press it again and the tab goes back to the list. The bookmark is removed only if
+  VivArcDi created it; a link that existed before keeps its bookmark and a message says so. Cmd/Ctrl+D
+  replaces the Pin/Unpin mapping of [Arc's keyboard shortcuts](docs/native-settings.md); pinning to the Favorites grid is done by dragging.
+
+Removing and moving folders and links stays in the Bookmarks panel. A write that fails is logged in
+the console and leaves the section as it was.
 
 | Option | Default | Meaning |
 |---|---|---|

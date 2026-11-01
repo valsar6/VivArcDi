@@ -22,7 +22,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
   AC-23, AC-24, AC-25.
 - [x] **T6.** `FolderSectionView` edit mode, delayed single click, `+` button of the header. AC-1,
   AC-2, AC-3, AC-4.
-- [ ] **T7.** `TabPointerDrag`, `DropTargets`, drop highlight; add at the drop position. AC-8, AC-9,
+- [x] **T7.** `TabPointerDrag`, `DropTargets`, drop highlight; add at the drop position. AC-8, AC-9,
   AC-10, AC-26.
 - [ ] **T8.** 014: `COMMAND_PIN_TAB` empty in `shortcuts.json`, installer tests, README table. AC-27.
 - [ ] **T9.** `SavedRoots`, `PanelFolderDrag` and `Reset folders`, if T1 allows it. AC-19, AC-20,

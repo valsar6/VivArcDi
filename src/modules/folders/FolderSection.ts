@@ -1,15 +1,12 @@
 import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
-import { FolderCommands } from '../../core/FolderCommands.js';
 import { FrameTask } from '../../core/FrameTask.js';
 import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
 import { HiddenTabs } from '../../core/HiddenTabs.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { SpaceCollapse } from '../../core/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
-import { Toast } from '../../core/Toast.js';
 import { WorkspaceNames } from '../../core/WorkspaceNames.js';
-import { CreatedLinks } from './CreatedLinks.js';
-import { FavoriteShortcut } from './FavoriteShortcut.js';
+import { FolderEditing } from './FolderEditing.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
 import { FolderTree } from './FolderTree.js';
@@ -21,12 +18,10 @@ import { OpenFolders } from './OpenFolders.js';
 import { OpenLinks } from './OpenLinks.js';
 import type { LinkRef, OpenTab } from './OpenLinks.js';
 import { TabLinks } from './TabLinks.js';
-import { WorkspaceFavorites } from './WorkspaceFavorites.js';
 import type { WorkspaceRoots } from './WorkspaceRoots.js';
 
 const ANCHOR_ORDER = 20;
 const HIDDEN_OWNER = 'bookmark-folders';
-const TOAST_MS = 2000;
 
 export interface SectionSettings {
   /** The root folder of each workspace. */
@@ -45,7 +40,7 @@ export class FolderSection {
   #openLinks: OpenLinks;
   #tabLinks: TabLinks;
   #adopter: LinkTabAdopter;
-  #favorites: WorkspaceFavorites;
+  #editing: FolderEditing;
   #view: FolderSectionView;
   #hiddenTabs: HiddenTabs;
   #hiddenMarker: HiddenTabMarker;
@@ -84,7 +79,6 @@ export class FolderSection {
     this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger);
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
-    this.#favorites = this.#createFavorites();
     this.#hiddenTabs = HiddenTabs.of(document);
     this.#collapse = SpaceCollapse.of(document);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
@@ -95,10 +89,11 @@ export class FolderSection {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => void activator.activate(link),
         onClose: (tabId): void => void activator.close(tabId),
-        onRename: (id, name): void => void this.#rename(id, name),
+        onRename: (id, name): void => void this.#editing.rename(id, name),
       },
       maxHeightPercent,
     );
+    this.#editing = this.#createEditing();
   }
 
   /**
@@ -126,8 +121,8 @@ export class FolderSection {
     await this.#useWorkspace(this.#active.current);
     await Promise.all([this.#source.start(), this.#openLinks.start(), this.#active.refresh()]);
     this.#adopter.start();
-    this.#startShortcut();
-    this.#stops.push(FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()));
+    this.#editing.start();
+    this.#stops.push(() => this.#editing.stop());
     await this.#adopter.adoptOpenTabs();
     await this.#openLinks.refresh();
     this.#draw();
@@ -141,32 +136,13 @@ export class FolderSection {
     this.#stops = [];
   }
 
-  #createFavorites(): WorkspaceFavorites {
-    return new WorkspaceFavorites({
-      writer: this.#context.bookmarkWriter,
-      links: this.#tabLinks,
-      created: new CreatedLinks(this.#context.storage),
+  #createEditing(): FolderEditing {
+    return new FolderEditing(this.#context, this.#view, {
       root: (): string[] => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
-      logger: this.#context.logger,
+      childIds: (): readonly string[] => this.#source.childIds,
+      redraw: (): void => this.#redraw.request(),
+      tabLinks: this.#tabLinks,
     });
-  }
-
-  #startShortcut(): void {
-    const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
-    if (!bookmarkWriter.available) {
-      logger.warn('chrome.bookmarks cannot write: the favorites shortcut is off');
-      return;
-    }
-    const toast = new Toast({ document, parent: document.querySelector(selectors.get('browser')) ?? document.body, durationMs: TOAST_MS });
-    const shortcut = new FavoriteShortcut({
-      document,
-      activeTab: async (): Promise<chrome.tabs.Tab | undefined> => (await tabs.query({ active: true, currentWindow: true }))[0],
-      favorites: this.#favorites,
-      notify: (text): void => toast.show(text),
-      logger,
-    });
-    shortcut.attach();
-    this.#stops.push(() => shortcut.detach(), () => toast.remove());
   }
 
   async #useWorkspace(workspace: string | null): Promise<void> {
@@ -188,22 +164,6 @@ export class FolderSection {
   #namesChanged(): void {
     if (this.#workspace !== undefined) {
       void this.#useWorkspace(this.#workspace);
-    }
-  }
-
-  async #rename(folderId: string, name: string): Promise<void> {
-    try {
-      await this.#context.bookmarkWriter.update(folderId, name);
-    } catch (error) {
-      this.#context.logger.warn('could not rename the folder', error);
-      this.#redraw.request();
-    }
-  }
-
-  async #newFolder(): Promise<void> {
-    const id = await this.#favorites.addFolder();
-    if (id !== null) {
-      this.#view.edit(id);
     }
   }
 

@@ -378,3 +378,55 @@ test('edits the new folder right after the plus button asks for it', async (t) =
   assert.equal(field?.selected, true);
   module.stop();
 });
+
+const TODAY_TAB_ID = 7;
+
+function todayTabTarget(): unknown {
+  const wrapper = { dataset: { id: `tab-${TODAY_TAB_ID}` }, closest: (): unknown => wrapper, querySelector: (): null => null };
+  return { closest: (): unknown => wrapper, querySelector: (): unknown => wrapper };
+}
+
+function dragFromList(dom: DomDocument, from: { x: number; y: number }, to: { x: number; y: number }): void {
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: from.x, clientY: from.y, target: todayTabTarget() });
+  dom.emit('mousemove', { buttons: 1, clientX: to.x, clientY: to.y });
+  dom.emit('mouseup', { buttons: 0, clientX: to.x, clientY: to.y });
+}
+
+function layOut(dom: DomDocument): void {
+  const section = sectionOf(dom);
+  assert.ok(section);
+  section.rect = { left: 0, right: 200, top: 0, bottom: section.children.length * 30 };
+  section.children.forEach((row, index) => (row.rect = { left: 0, right: 200, top: index * 30, bottom: index * 30 + 30 }));
+}
+
+const WORK_LINKS = bookmarkTree([folder('10', 'Work', [link('21', 'First', 'https://first.example/'), link('22', 'Second', 'https://second.example/')])]);
+
+test('adds a dropped tab at the position of the drop', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORK_LINKS);
+  const { tabs, dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  tabs.open({ id: TODAY_TAB_ID, url: 'https://dropped.example/', title: 'Dropped' });
+  await module.start(context);
+  await frame();
+  layOut(dom);
+  dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 35 });
+  await frame();
+  assert.deepEqual(chrome.created, ['Dropped']);
+  assert.deepEqual(titles(dom), ['First', 'Dropped', 'Second']);
+  assert.equal(TabData.ownOf(await tabs.get(TODAY_TAB_ID)).bookmarkId, '500');
+  module.stop();
+});
+
+test('adds a dropped tab at the end when it is released under the last row', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORK_LINKS);
+  const { tabs, dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  tabs.open({ id: TODAY_TAB_ID, url: 'https://dropped.example/', title: 'Dropped' });
+  await module.start(context);
+  await frame();
+  layOut(dom);
+  dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 55 });
+  await frame();
+  assert.deepEqual(titles(dom), ['First', 'Second', 'Dropped']);
+  module.stop();
+});

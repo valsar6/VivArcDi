@@ -128,6 +128,7 @@ export class FolderSectionView {
     element.setAttribute('role', row.kind === 'folder' ? 'treeitem' : 'link');
     element.setAttribute('title', row.title);
     element.style.setProperty('--vivarcdi-depth', String(row.depth));
+    element.setAttribute('data-vivarcdi-depth', String(row.depth));
     const label = this.#document.createElement('span');
     label.className = 'vivarcdi-folders-title';
     label.textContent = row.title;
