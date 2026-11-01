@@ -20,12 +20,10 @@ that already follows the bookmark events draws the result.
    `update` and `remove` of `chrome.bookmarks` and `getChildren`; it is the only class that writes.
    `ensurePath(path)` creates the missing folders of a title path (`VivArcDi/Riposino`) one level at a
    time and returns the id of the last one.
-2. **Which root.** `WorkspaceRoots` (010) grows the order of FR-4: saved root of the workspace
-   (`SavedRoots`, FR-10), entry in `workspaces`, `root` when not empty, else
+2. **Which root.** `WorkspaceRoots` (010) grows the order of FR-4: entry in `workspaces`, `root` when not empty, else
    `<workspacesBase>/<workspace name>` (`<workspacesBase>/Tabs` outside any workspace). `rootFor` still
    returns the title path; the new default path is returned even when the folder does not exist yet, and
-   the view stays hidden until it does (AC-7). `SavedRoots` keeps `vivarcdi.workspaceRoot.<id>` in the
-   shared store.
+   the view stays hidden until it does (AC-7).
 3. **Adding and taking back.** `WorkspaceFavorites` exposes `add(tab, index?)`, `addFolder()` and
    `take(tab)`. `add` finds or creates the root with `BookmarkWriter.ensurePath`, creates the bookmark
    (title and address of the tab, at `index` or at the end), links the tab with `TabLinks.link` (009)
@@ -51,11 +49,8 @@ that already follows the bookmark events draws the result.
    the point is in the upper or lower half, giving `folder(id)`, `between(index)` or `header`. It
    never calls `preventDefault`, so Vivaldi's own drag keeps working; its result is ignored because
    the tab leaves the list when it is linked. A drop on the Favorites grid is not handled (FR-8).
-7. **Folder of the Bookmarks panel onto the header (FR-10).** Done last, behind the probe of T1: the
-   panel is a different part of the window and its rows may or may not use HTML5 drag. If its rows
-   expose the id of the folder under the pointer at `mousedown`, `PanelFolderDrag` uses the same
-   pointer logic as step 6 with the header as target and `SavedRoots.save`. `Reset folders` is an item
-   of the header's hover menu that calls `SavedRoots.forget`.
+7. **Folder of the Bookmarks panel onto the header.** Dropped with FR-10; see
+   [018](../018-copy-bookmarks-to-workspace/spec.md).
 8. **014.** The table of 014 drops `COMMAND_PIN_TAB: Cmd+D` (revised 2026-11-01). The installer data
    `shortcuts.json` and its tests change in this feature, since Cmd+D must stay unbound for
    `FavoriteShortcut`; whoever applied the earlier table runs `shortcuts apply` again.
@@ -70,7 +65,6 @@ second press (could remove a bookmark Tore made himself).
 |---|---|---|
 | `src/core/bookmarks/BookmarkWriter.ts` | The only writer of bookmarks: `create`, `update`, `remove`, `ensurePath` | Adapter |
 | `src/core/Toast.ts` | Moved from `src/modules/copyurl` | - |
-| `src/modules/folders/SavedRoots.ts` | Saved root of each workspace (FR-10) in the shared store | Repository |
 | `src/modules/folders/CreatedLinks.ts` | Ids of the bookmarks VivArcDi created, to decide what a second press removes | Repository |
 | `src/modules/folders/WorkspaceRoots.ts` | Order of FR-4 and `workspacesBase` | Value object |
 | `src/modules/folders/WorkspaceFavorites.ts` | `add`, `addFolder`, `take`: bookmark, link and tab together | Facade |
@@ -78,8 +72,7 @@ second press (could remove a bookmark Tore made himself).
 | `src/core/TabPointerDrag.ts` | Pointer drag of a tab row, reports the release point | Observer |
 | `src/modules/folders/DropTargets.ts` | Maps a point to `folder(id)`, `between(index)` or `header` | - |
 | `src/modules/folders/FolderSectionView.ts` | Edit mode of a row, delayed toggle, drop highlight | - |
-| `src/modules/spaceheader/SpaceHeaderView.ts` | `+` button and `Reset folders` item | - |
-| `src/modules/folders/PanelFolderDrag.ts` | Bookmarks panel folder dropped on the header (after T1) | Observer |
+| `src/modules/spaceheader/SpaceHeaderView.ts` | `+` button | - |
 | `installer/vivarcdi/shortcuts.json` and tests | `COMMAND_PIN_TAB` empty | - |
 
 All of them take their dependencies in the constructor, so every one is tested with fakes.
@@ -109,7 +102,6 @@ Documented in the README next to `root` and `workspaces`.
 | Risk | Mitigation |
 |---|---|
 | Vivaldi handles Cmd+D before the page sees it | T1 also checks it; if so the shortcut is set in `Preferences` to a command VivArcDi listens to instead |
-| The Bookmarks panel rows give no folder id to a mod | FR-10 stays behind T1; if impossible, an item `Use this folder` in the header's hover menu with a path field replaces it, and the spec is revised |
 | A second press removes a bookmark Tore made | Only ids in `CreatedLinks` are removed, AC-24 and AC-25 |
 | Vivaldi reorders its list on the same drag that we read | The linked tab is hidden from the list right after the drop; nothing is cancelled |
 | A write fails halfway (folder created, bookmark not) | Errors are caught per call, logged, the tab stays unlinked (NFR-1); the empty folder is harmless |

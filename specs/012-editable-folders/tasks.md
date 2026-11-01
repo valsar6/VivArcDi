@@ -11,8 +11,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
 
 - [ ] **T1.** Read-only probe for Tore: does the page see Cmd/Ctrl+D with Vivaldi's own command
   unbound, and which element and attributes does a folder row of the Bookmarks panel have under the
-  pointer (`spaces/diagnostica-cmd-d-pannello.js` in the project files). Decides FR-10 and the risks of
-  step 4.
+  pointer (`spaces/diagnostica-cmd-d-pannello.js` in the project files). Decides the risks of step 4 (the panel part now feeds 018).
 - [x] **T2.** `BookmarkWriter` with `create`, `update`, `remove`, `ensurePath`; `BrowserBookmarks` stays
   read-only. AC-6, AC-12.
 - [x] **T3.** `WorkspaceRoots` order of FR-4 and `workspacesBase`; config and README. AC-5, AC-7.
@@ -25,9 +24,9 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
 - [x] **T7.** `TabPointerDrag`, `DropTargets`, drop highlight; add at the drop position. AC-8, AC-9,
   AC-10, AC-26.
 - [x] **T8.** 014: `COMMAND_PIN_TAB` empty in `shortcuts.json`, installer tests, README table. AC-27.
-- [ ] **T9.** `SavedRoots`, `PanelFolderDrag` and `Reset folders`, if T1 allows it. AC-19, AC-20,
-  AC-21.
-- [ ] **T10.** Manual verification checklist for Tore from AC-11, AC-13 to AC-18, AC-22, AC-27 and
+- [x] **T9.** Dropped: FR-10 and FR-11 are replaced by [018](../018-copy-bookmarks-to-workspace/spec.md)
+  (Tore, 2026-11-01).
+- [ ] **T10.** Manual verification checklist for Tore from AC-11, AC-13 to AC-18, AC-27 and
   AC-28 (`spaces/verifica-cartelle-modificabili.md` in the project files).
 - [ ] **T11.** Manual checks on macOS and Debian.
 - [x] **T12.** Empty Favorites grid: placeholder with a hint and pointer drop that pins the tab (FR-15). AC-29,
