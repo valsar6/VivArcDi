@@ -184,3 +184,27 @@
     filter: saturate($unloaded-saturation);
   }
 }
+
+#{$root} #{$anchor} > #{$empty-grid} {
+  box-sizing: border-box;
+  margin: 0 0 var(--vivarcdi-favorites-gap, #{$gap});
+  padding: $gap;
+  border: 1px dashed color-mix(in srgb, var(--colorFg, #fff) #{$tint-active}, transparent);
+  border-radius: var(--vivarcdi-radius);
+  color: var(--colorFg, inherit);
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.7;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  transition:
+    background-color var(--vivarcdi-transition),
+    border-color var(--vivarcdi-transition),
+    opacity var(--vivarcdi-transition);
+
+  &[data-vivarcdi-drop-over] {
+    border-color: var(--colorHighlightBg, currentcolor);
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-active}, transparent);
+    opacity: 1;
+  }
+}
