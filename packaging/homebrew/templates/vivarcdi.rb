@@ -7,7 +7,7 @@ cask "vivarcdi" do
   desc "Make Vivaldi behave like Arc"
   homepage "https://github.com/valsar6/VivArcDi"
 
-  depends_on macos: ">= :big_sur"
+  depends_on macos: :big_sur
 
   app "VivArcDi.app"
 
