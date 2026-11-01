@@ -7,7 +7,7 @@
 | Design | [design.md](design.md) |
 
 Ordered, small and independently reviewable. Each task names the acceptance criteria it satisfies
-and is done when its check passes. Branch `features/package-managers`, next minor version (0.17.0).
+and is done when its check passes. Branch `features/package-managers`, next free minor version (0.17.0 is taken by the empty Favorites grid of spec 012, so check the version on `main` before bumping; 0.18.0 if it has merged).
 T1 to T6 can land in one pull request; T7 and T8 need Tore's one-time setup and are checked on a
 real release.
 
