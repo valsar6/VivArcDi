@@ -7,7 +7,7 @@
 | Design | [design.md](design.md) |
 
 Ordered, small and independently reviewable. Each task names the acceptance criteria it satisfies
-and is done when its check passes. Branch `features/package-managers`, next free minor version (0.17.0 is taken by the empty Favorites grid of spec 012, so check the version on `main` before bumping; 0.18.0 if it has merged).
+and is done when its check passes. Branch `features/package-managers`, next free minor version (0.18.0, because 0.17.0 went to the empty Favorites grid of spec 012).
 T1 to T6 can land in one pull request; T7 and T8 need Tore's one-time setup and are checked on a
 real release.
 
@@ -38,7 +38,7 @@ real release.
   `package.json`, `package-lock.json` and `installer/vivarcdi/__init__.py`. Satisfies FR-10. Done
   when `make check` passes.
 - [ ] **T8.** Tore follows the runbook once (tap repository, token, key, Pages), then the release of
-  0.17.0 publishes both. Satisfies AC-10. Done when the tap shows the new cask version and the Pages
+  0.18.0 publishes both. Satisfies AC-10. Done when the tap shows the new cask version and the Pages
   site lists the new package.
 - [ ] **T9.** Write the manual verification checklist for Tore, in Italian, from AC-10 to AC-15
   (`package-managers/verifica-package-manager.md` in the project files).

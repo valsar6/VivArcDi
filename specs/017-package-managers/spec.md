@@ -179,7 +179,7 @@ Answered by Tore on 2026-11-01.
 - [x] **Q6. One-time setup.** Accepted, and documented as a runbook (FR-12): creating the tap
   repository, the token, GitHub Pages and the signing key, step by step.
 - [x] **Q7. Version.** Accepted: a feature (`features/package-managers`, next minor version; 0.16.0
-  went to spec 012, so 0.17.0). Everything that Tore has to do by hand is documented in the
+  went to spec 012, then 0.17.0 to the empty Favorites grid, so 0.18.0). Everything that Tore has to do by hand is documented in the
   repository.
 
 ## References
