@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 0 |
 | Owner | Tore |
 | Approved | 2026-10-31 |
@@ -174,6 +174,12 @@ so the two never fight.
 - Editing `config.json` from the window: modules stay configured by file.
 - Removing the command line installer or the `dist` branch.
 - Publishing on the Mac App Store (it cannot change other apps).
+
+## Verification
+
+Tore checked the macOS app and closed the spec as done on 2026-11-01. Release v0.15.0 carries both
+packages (AC-1). The Debian checks (AC-18, AC-19, and AC-20 on Debian) are still to be run by Tore;
+a problem found there reopens this spec with a new acceptance criterion.
 
 ## Open questions
 

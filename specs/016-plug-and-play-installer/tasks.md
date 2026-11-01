@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -27,7 +27,7 @@ T13 (macOS app, release upload, docs).
   when `test_running_vivaldi_is_quit_only_after_confirmation` passes.
 - [x] **T6.** Add `AppManagementAdvisor` and the Open Settings / Try again flow. Satisfies AC-9. Done
   when `test_app_management_denial_offers_the_settings_page` passes.
-- [ ] **T7.** Add `TkWindow`, `ReleaseChecker` and the `window` command. Satisfies FR-4, FR-10, Q5.
+- [x] **T7.** Add `TkWindow`, `ReleaseChecker` and the `window` command. Satisfies FR-4, FR-10, Q5.
   Done when the window opens with `python3 installer window` on Tore's machines (checked in T13).
 - [x] **T8.** Add `PackageTriggerHook`, `packaging/debian/` with `build_deb.py`, the templates, the
   launcher, the desktop entry and the icon, and the `package-deb` CI job. Satisfies AC-3, AC-4, AC-5.
@@ -42,7 +42,7 @@ T13 (macOS app, release upload, docs).
   `build_dmg.py`, icon) and the `package-macos` CI job with the bundle test. Satisfies AC-2, NFR-3.
   Done when `test_app_bundle_contains_runtime_installer_and_payload` passes in CI and the `.dmg` is
   under 40 MB.
-- [ ] **T11.** Upload both packages to the GitHub release from `main`, and add the Download section
+- [x] **T11.** Upload both packages to the GitHub release from `main`, and add the Download section
   to the release notes. Satisfies AC-1. Done when the workflow passes `actionlint` and a dry run on a
   pull request builds both artifacts.
 - [x] **T12.** Update the README: a Download section first, the macOS "Open Anyway" and App Management
