@@ -1,4 +1,5 @@
 import { createDefaultRegistry } from "../modules/index.js";
+import { BookmarkWriter } from "./bookmarks/BookmarkWriter.js";
 import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
 import { BrowserPrefs } from "./BrowserPrefs.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
@@ -16,6 +17,7 @@ class VivArcDi {
   #document;
   #tabs;
   #bookmarks;
+  #bookmarkWriter;
   #runtime;
   #prefs;
   #storage;
@@ -34,6 +36,7 @@ class VivArcDi {
     document,
     tabs = new BrowserTabs(void 0),
     bookmarks = new BrowserBookmarks(void 0),
+    bookmarkWriter = new BookmarkWriter(void 0),
     runtime = new BrowserRuntime(void 0),
     prefs = new BrowserPrefs(void 0),
     storage = new PersistentStorage(/* @__PURE__ */ new Map(), null, void 0, logger)
@@ -44,6 +47,7 @@ class VivArcDi {
     this.#document = document;
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
+    this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
     this.#prefs = prefs;
     this.#storage = storage;
@@ -67,6 +71,7 @@ class VivArcDi {
       document,
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
+      bookmarkWriter: new BookmarkWriter(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger)
@@ -147,6 +152,7 @@ class VivArcDi {
         build,
         tabs: this.#tabs,
         bookmarks: this.#bookmarks,
+        bookmarkWriter: this.#bookmarkWriter,
         modules,
         runtime: this.#runtime,
         prefs: this.#prefs,

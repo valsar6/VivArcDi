@@ -13,7 +13,8 @@ class BookmarkFolders extends Module {
    * Shows a bookmark folder in the vertical tab bar, below the Favorites grid: folders open and
    * close, a click opens a link or brings its tab forward, and the tab of a link lives in its row
    * instead of Vivaldi's tab list. Each workspace shows its own root folder (option `workspaces`,
-   * else `root`); an empty root shows nothing. Bookmarks are only read. Without `chrome.bookmarks`,
+   * else `root`, else `<workspacesBase>/<workspace name>`); a root that does not exist yet shows
+   * nothing and is created by the first write. Without `chrome.bookmarks`,
    * `chrome.tabs` or the tab bar it stays off.
    *
    * @param context What the module may use.
@@ -25,7 +26,7 @@ class BookmarkFolders extends Module {
       return;
     }
     this.#section = new FolderSection(context, {
-      roots: new WorkspaceRoots({ root: options["root"], workspaces: options["workspaces"] }, logger),
+      roots: new WorkspaceRoots({ root: options["root"], workspaces: options["workspaces"], workspacesBase: options["workspacesBase"] }, logger),
       maxDepth: BookmarkFolders.#number(options["maxDepth"], DEFAULT_MAX_DEPTH, 1, MAX_DEPTH_LIMIT),
       maxHeightPercent: BookmarkFolders.#number(options["maxHeightPercent"], DEFAULT_MAX_HEIGHT_PERCENT, MIN_PERCENT, MAX_PERCENT)
     });

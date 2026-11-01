@@ -5,6 +5,7 @@ import { HiddenTabs } from "../../core/HiddenTabs.js";
 import { SpaceCollapse } from "../../core/SpaceCollapse.js";
 import { TabBarAnchor } from "../../core/TabBarAnchor.js";
 import { WorkspaceNames } from "../../core/WorkspaceNames.js";
+import { FolderEditing } from "./FolderEditing.js";
 import { FolderRows } from "./FolderRows.js";
 import { FolderSectionView } from "./FolderSectionView.js";
 import { FolderTree } from "./FolderTree.js";
@@ -24,6 +25,7 @@ class FolderSection {
   #openLinks;
   #tabLinks;
   #adopter;
+  #editing;
   #view;
   #hiddenTabs;
   #hiddenMarker;
@@ -54,6 +56,7 @@ class FolderSection {
       path: [],
       maxDepth,
       otherPaths: roots.allPaths,
+      optionalPaths: () => roots.pathsFor([...this.#names.names, null]),
       onChange: () => this.#treeChanged(),
       logger
     });
@@ -69,10 +72,12 @@ class FolderSection {
       {
         onFolder: (id) => this.#toggle(id),
         onLink: (link) => void activator.activate(link),
-        onClose: (tabId) => void activator.close(tabId)
+        onClose: (tabId) => void activator.close(tabId),
+        onRename: (id, name) => void this.#editing.rename(id, name)
       },
       maxHeightPercent
     );
+    this.#editing = this.#createEditing();
   }
   /**
    * Puts the section in the tab bar and starts following the bookmarks, the tabs and the active
@@ -99,6 +104,8 @@ class FolderSection {
     await this.#useWorkspace(this.#active.current);
     await Promise.all([this.#source.start(), this.#openLinks.start(), this.#active.refresh()]);
     this.#adopter.start();
+    this.#editing.start();
+    this.#stops.push(() => this.#editing.stop());
     await this.#adopter.adoptOpenTabs();
     await this.#openLinks.refresh();
     this.#draw();
@@ -109,6 +116,14 @@ class FolderSection {
   stop() {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
+  }
+  #createEditing() {
+    return new FolderEditing(this.#context, this.#view, {
+      root: () => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
+      childIds: () => this.#source.childIds,
+      redraw: () => this.#redraw.request(),
+      tabLinks: this.#tabLinks
+    });
   }
   async #useWorkspace(workspace) {
     this.#workspace = workspace;

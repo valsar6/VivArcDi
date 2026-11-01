@@ -28,6 +28,17 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [role]:hover {
   background-color: var(--vivarcdi-folders-hover);
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-drop=into] {
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+  outline: 1px solid var(--colorHighlightBg, currentcolor);
+  outline-offset: -1px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-drop=before] {
+  box-shadow: inset 0 2px 0 var(--colorHighlightBg, currentcolor);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-drop=after] {
+  box-shadow: inset 0 -2px 0 var(--colorHighlightBg, currentcolor);
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-folder-id] .vivarcdi-folders-title {
   font-weight: 600;
 }
@@ -37,6 +48,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-edit {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 4px;
+  border: 1px solid var(--colorHighlightBg, currentcolor);
+  border-radius: 3px;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  background-color: var(--vivarcdi-folders-hover);
+  user-select: text;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-icon {
   flex: none;

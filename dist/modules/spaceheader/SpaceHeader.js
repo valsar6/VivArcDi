@@ -1,5 +1,6 @@
 import { ActiveWorkspace } from "../../core/ActiveWorkspace.js";
 import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
+import { FolderCommands } from "../../core/FolderCommands.js";
 import { HiddenTabs } from "../../core/HiddenTabs.js";
 import { Module } from "../../core/Module.js";
 import { SpaceCollapse } from "../../core/SpaceCollapse.js";
@@ -55,7 +56,7 @@ class SpaceHeader extends Module {
     return {
       collapse,
       spaces: new CollapsedSpaces(storage, logger),
-      view: new SpaceHeaderView(document, () => this.#toggle()),
+      view: new SpaceHeaderView(document, () => this.#toggle(), () => FolderCommands.of(document).requestNewFolder()),
       names: new WorkspaceNames(prefs, () => this.#render(), logger),
       active,
       marker: new HiddenTabMarker(document, selectors, hidden),

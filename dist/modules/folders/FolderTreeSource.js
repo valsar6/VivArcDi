@@ -12,6 +12,8 @@ class FolderTreeSource {
   #generation = 0;
   #found = false;
   #otherPaths;
+  #optionalPaths;
+  #childIds = [];
   #linkIds = null;
   #started = false;
   #warned = /* @__PURE__ */ new Set();
@@ -23,11 +25,12 @@ class FolderTreeSource {
    * @param bookmarks Bookmarks API.
    * @param settings The root folder, the depth, and what to call and log.
    */
-  constructor(bookmarks, { path, maxDepth, otherPaths = [], onChange, logger, timing = {} }) {
+  constructor(bookmarks, { path, maxDepth, otherPaths = [], optionalPaths = () => [], onChange, logger, timing = {} }) {
     this.#bookmarks = bookmarks;
     this.#path = path;
     this.#maxDepth = maxDepth;
     this.#otherPaths = otherPaths;
+    this.#optionalPaths = optionalPaths;
     this.#onChange = onChange;
     this.#logger = logger;
     this.#task = new FrameTask(() => void this.rebuild(), timing);
@@ -43,6 +46,13 @@ class FolderTreeSource {
    */
   get found() {
     return this.#found;
+  }
+  /**
+   * @returns The ids of every child of the root folder, in Vivaldi's order, including those the
+   *   section does not show; a bookmark is added at the index of one of them.
+   */
+  get childIds() {
+    return this.#childIds;
   }
   /**
    * @returns The ids of the links under the current root and every other root, or null while any of
@@ -89,26 +99,35 @@ class FolderTreeSource {
       if (generation !== this.#generation) {
         return;
       }
-      const root = BookmarkFolderFinder.find(tree, this.#path);
-      if (root === null) {
-        this.#warnMissing();
-      }
-      this.#found = root !== null;
-      this.#entries = root === null ? [] : FolderTree.build(root.children ?? [], this.#maxDepth);
+      this.#read(BookmarkFolderFinder.find(tree, this.#path));
       this.#linkIds = this.#idsOfAllRoots(tree);
       this.#onChange();
     } catch (error) {
       this.#logger.warn("could not read the bookmarks", error);
     }
   }
+  #read(root) {
+    if (root === null) {
+      this.#warnMissing();
+    }
+    this.#found = root !== null;
+    this.#childIds = root?.children?.map((child) => child.id) ?? [];
+    this.#entries = root === null ? [] : FolderTree.build(root.children ?? [], this.#maxDepth);
+  }
   #idsOfAllRoots(tree) {
-    const paths = [this.#path, ...this.#otherPaths].filter((path) => path.length > 0);
-    const roots = paths.map((path) => BookmarkFolderFinder.find(tree, path));
+    const required = FolderTreeSource.#filled([this.#path, ...this.#otherPaths]);
+    const roots = required.map((path) => BookmarkFolderFinder.find(tree, path));
     if (roots.length === 0 || roots.includes(null)) {
       return null;
     }
-    const links = roots.flatMap((root) => FolderTree.links(FolderTree.build(root?.children ?? [], this.#maxDepth)));
+    const known = new Set(required.map((path) => path.join("/")));
+    const optional = FolderTreeSource.#filled(this.#optionalPaths()).filter((path) => !known.has(path.join("/")));
+    const found = [...roots, ...optional.map((path) => BookmarkFolderFinder.find(tree, path))];
+    const links = found.flatMap((root) => root === null ? [] : FolderTree.links(FolderTree.build(root.children ?? [], this.#maxDepth)));
     return new Set(links.map((entry) => entry.id));
+  }
+  static #filled(paths) {
+    return paths.filter((path) => path.length > 0);
   }
   #warnMissing() {
     const name = this.#path.join("/");

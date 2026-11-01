@@ -15,8 +15,12 @@
   user-select: none;
   transition: background-color var(--vivarcdi-transition);
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-space-header]:hover {
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header]:hover, #browser[data-vivarcdi-active] [data-vivarcdi-space-header][data-vivarcdi-drop] {
   background-color: var(--vivarcdi-space-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header][data-vivarcdi-drop] {
+  outline: 1px solid var(--colorHighlightBg, currentcolor);
+  outline-offset: -1px;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-space-header] .vivarcdi-space-arrow {
   flex: none;
@@ -55,4 +59,28 @@
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header] .vivarcdi-space-add {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity var(--vivarcdi-transition), background-color var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header] .vivarcdi-space-add::before {
+  content: "+";
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header] .vivarcdi-space-add:hover {
+  background-color: var(--vivarcdi-space-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header]:hover .vivarcdi-space-add {
+  opacity: 0.7;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-space-header]:hover .vivarcdi-space-add:hover {
+  opacity: 1;
 }

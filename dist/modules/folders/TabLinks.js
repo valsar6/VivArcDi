@@ -23,6 +23,14 @@ class TabLinks {
     await this.#write(tabId, bookmarkId);
   }
   /**
+   * Makes a tab an ordinary tab again, so that it shows in the tab list.
+   *
+   * @param tabId The tab.
+   */
+  async unlink(tabId) {
+    await this.#write(tabId, void 0);
+  }
+  /**
    * Unlinks every tab whose bookmark is no longer among the given ones, so that it comes back to
    * the tab list.
    *

@@ -52,6 +52,12 @@ class WorkspaceNames {
     }
   }
   /**
+   * @returns The names of the workspaces Vivaldi lists, in its order.
+   */
+  get names() {
+    return [...this.#workspaces.values()].map(({ name }) => name);
+  }
+  /**
    * @param workspaceId The id of a workspace, as `TabData.of` returns it, or null.
    * @returns Its name, or null for no workspace or an unknown one.
    */
