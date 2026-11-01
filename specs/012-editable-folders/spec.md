@@ -136,6 +136,8 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - **FR-13.** A drop of a tab of today's list between two rows of the area adds the bookmark at that
   position of the root; a drop on a folder keeps FR-6.
 - **FR-14.** Drop targets are found by the pointer position on mouse release.
+- **FR-15.** While the Favorites grid has no tiles, a placeholder of the grid's place says "Drag a tab here to pin it" (Tore, 2026-11-01).
+  Releasing a tab of today's list on it pins the tab through `chrome.tabs`. With tiles, FR-8 holds: Vivaldi pins by its own drag.
 - **FR-9.** Options of `bookmark-folders` in `config.json`: `workspacesBase` (`VivArcDi`). FR-7 of 009
   ("never creates, changes or deletes a bookmark") is replaced by FR-1 to FR-6.
 
@@ -178,6 +180,9 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 | AC-15 | WHEN Tore drags a tab of today into the pinned tabs, THE tab SHALL become pinned. | manual |
 | AC-16 | WHEN Tore double clicks a folder and types a new name, THE Bookmarks panel SHALL show the new name. | manual |
 | AC-17 | WHEN Tore collapses the workspace after these steps, ONLY the open links and loaded pinned tabs SHALL stay visible (011 AC-14). | manual |
+| AC-29 | WHILE the Favorites grid has no tiles, THE module SHALL show a placeholder with a hint where the grid goes, and remove it when a tile exists. | auto: `shows a placeholder while the grid has no tiles` |
+| AC-30 | WHEN a tab of today is released on the placeholder, THE module SHALL pin the tab; IF the tab is already pinned, THEN it SHALL do nothing. | auto: `pins a tab released on the empty grid` |
+| AC-31 | WHEN Tore drags a tab onto the empty grid, THE tab SHALL become pinned and the grid SHALL show it as a tile. | manual |
 | AC-18 | THE `+` button, the edit field and the drops SHALL work on macOS without moving the window. | manual |
 
 ## Out of scope
@@ -201,6 +206,7 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
   the keys itself (Tore, 2026-11-01).
 - [x] **Second press on a link that existed before.** The bookmark and link stay, a toast says so, so
   that a bookmark Tore made himself is never deleted (Tore, 2026-11-01).
+- [x] **Empty grid (2026-11-01).** AC-11/15 failed on Vivaldi 8.2: with no Favorites folder and no pinned tab the grid is not drawn, so there is nowhere to drag. FR-15 adds a placeholder; Tore approved on a decision card (2026-11-01).
 - [x] **FR-8 and AC-11.** Pinning a tab dragged onto the Favorites grid is left to Vivaldi and
   checked in the manual steps (Tore, 2026-11-01).
 - [x] **What does "drag the Favorites folders into the workspaces" mean?** Approved reading (Tore, 2026-10-28): drag a

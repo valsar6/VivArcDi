@@ -30,3 +30,5 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
 - [ ] **T10.** Manual verification checklist for Tore from AC-11, AC-13 to AC-18, AC-22, AC-27 and
   AC-28 (`spaces/verifica-cartelle-modificabili.md` in the project files).
 - [ ] **T11.** Manual checks on macOS and Debian.
+- [ ] **T12.** Empty Favorites grid: placeholder with a hint and pointer drop that pins the tab (FR-15). AC-29,
+  AC-30; manual AC-31 is added to the checklist.
