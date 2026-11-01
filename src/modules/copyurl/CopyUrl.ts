@@ -2,8 +2,8 @@ import { Module } from '../../core/Module.js';
 import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
 import { PageScriptInjector } from '../../core/PageScriptInjector.js';
 import { ShortcutKeys } from '../../core/ShortcutKeys.js';
+import { Toast } from '../../core/Toast.js';
 import { parseCopyMessage } from './CopyMessage.js';
-import { Toast } from './Toast.js';
 import { UrlCopier } from './UrlCopier.js';
 
 export interface CopyUrlSettings {

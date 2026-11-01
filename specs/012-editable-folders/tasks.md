@@ -18,7 +18,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
 - [x] **T3.** `WorkspaceRoots` order of FR-4 and `workspacesBase`; config and README. AC-5, AC-7.
 - [x] **T4.** `CreatedLinks` and `WorkspaceFavorites` (`add`, `addFolder`, `take`). AC-1, AC-6, AC-8,
   AC-9, AC-12, AC-24, AC-25.
-- [ ] **T5.** Move `Toast` to `src/core`; `FavoriteShortcut` and its wiring in the folders module.
+- [x] **T5.** Move `Toast` to `src/core`; `FavoriteShortcut` and its wiring in the folders module.
   AC-23, AC-24, AC-25.
 - [ ] **T6.** `FolderSectionView` edit mode, delayed single click, `+` button of the header. AC-1,
   AC-2, AC-3, AC-4.

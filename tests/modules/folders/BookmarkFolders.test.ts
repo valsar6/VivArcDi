@@ -10,6 +10,7 @@ import type { ModuleContext } from '../../../src/core/Module.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
+import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
 import { CASETTA, FakePrefsApi, WORK } from '../../core/prefs.js';
@@ -24,12 +25,13 @@ interface SetupExtras {
   options?: Record<string, unknown>;
   prefs?: BrowserPrefs;
   logger?: Logger;
+  bookmarkWriter?: BookmarkWriter;
 }
 
 function setup(
   tabs: FolderTabs,
   bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks,
-  { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger() }: SetupExtras = {},
+  { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger(), bookmarkWriter = new BookmarkWriter(undefined) }: SetupExtras = {},
 ): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
   const dom = new DomDocument();
   const context = {
@@ -39,6 +41,7 @@ function setup(
     options,
     tabs,
     bookmarks,
+    bookmarkWriter,
     prefs,
     storage: new MemoryStorage(),
   } as unknown as ModuleContext;
@@ -158,7 +161,7 @@ function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS, ch
   ]);
   const prefs = new FakePrefsApi();
   prefs.values.set('vivaldi.workspaces.list', [CASETTA, WORK]);
-  return { tabs, prefs, ...setup(tabs, chrome?.reader ?? recordingChrome(WORKSPACE_TREE).bookmarks, { options, prefs: new BrowserPrefs(prefs) }) };
+  return { tabs, prefs, ...setup(tabs, chrome?.reader ?? recordingChrome(WORKSPACE_TREE).bookmarks, { options, prefs: new BrowserPrefs(prefs), ...(chrome === undefined ? {} : { bookmarkWriter: chrome.writer }) }) };
 }
 
 function activate(tabs: FolderTabs, tabId: number): void {
@@ -282,4 +285,14 @@ test('shows the folder named after the workspace once it exists', async (t) => {
   await frame();
   assert.deepEqual(titles(dom), ['Hobbies', 'Chess']);
   module.stop();
+});
+
+test('listens to Cmd/Ctrl+D while it runs and stops on stop', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  await module.start(context);
+  assert.equal(dom.listeners.get('keydown')?.length, 1);
+  module.stop();
+  assert.deepEqual(dom.listeners.get('keydown'), []);
 });
