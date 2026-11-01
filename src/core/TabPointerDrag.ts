@@ -1,4 +1,4 @@
-import { TabSlot } from '../../core/TabSlot.js';
+import { TabSlot } from './TabSlot.js';
 
 export interface PointerDragDependencies {
   /** The document of Vivaldi's browser window. */

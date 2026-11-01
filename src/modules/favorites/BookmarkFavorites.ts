@@ -13,7 +13,7 @@ import type { Favorite } from './FavoritesFolder.js';
 import { FavoritesView } from './FavoritesView.js';
 import { LinkedTabs } from './LinkedTabs.js';
 
-const GRID_ORDER = 10;
+export const GRID_ORDER = 10;
 const HIDDEN_OWNER = 'favorites-grid';
 
 export interface BookmarkFavoritesDependencies {

@@ -54,6 +54,12 @@ const frame = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 5));
 };
 
+const untilTitles = async (dom: DomDocument, expected: string[]): Promise<void> => {
+  for (let attempt = 0; attempt < 40 && titles(dom).join('|') !== expected.join('|'); attempt += 1) {
+    await frame();
+  }
+};
+
 const toggleDelay = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 280));
 
 const rows = (dom: DomDocument): DomNode[] => dom.parent.children[0]?.children[0]?.children ?? [];
@@ -410,7 +416,7 @@ test('adds a dropped tab at the position of the drop', async (t) => {
   await frame();
   layOut(dom);
   dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 35 });
-  await frame();
+  await untilTitles(dom, ['First', 'Dropped', 'Second']);
   assert.deepEqual(chrome.created, ['Dropped']);
   assert.deepEqual(titles(dom), ['First', 'Dropped', 'Second']);
   assert.equal(TabData.ownOf(await tabs.get(TODAY_TAB_ID)).bookmarkId, '500');
@@ -426,7 +432,7 @@ test('adds a dropped tab at the end when it is released under the last row', asy
   await frame();
   layOut(dom);
   dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 55 });
-  await frame();
+  await untilTitles(dom, ['First', 'Second', 'Dropped']);
   assert.deepEqual(titles(dom), ['First', 'Second', 'Dropped']);
   module.stop();
 });

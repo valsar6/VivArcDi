@@ -75,7 +75,7 @@ second press (could remove a bookmark Tore made himself).
 | `src/modules/folders/WorkspaceRoots.ts` | Order of FR-4 and `workspacesBase` | Value object |
 | `src/modules/folders/WorkspaceFavorites.ts` | `add`, `addFolder`, `take`: bookmark, link and tab together | Facade |
 | `src/modules/folders/FavoriteShortcut.ts` | Cmd/Ctrl+D | - |
-| `src/modules/folders/TabPointerDrag.ts` | Pointer drag of a tab row, reports the release point | Observer |
+| `src/core/TabPointerDrag.ts` | Pointer drag of a tab row, reports the release point | Observer |
 | `src/modules/folders/DropTargets.ts` | Maps a point to `folder(id)`, `between(index)` or `header` | - |
 | `src/modules/folders/FolderSectionView.ts` | Edit mode of a row, delayed toggle, drop highlight | - |
 | `src/modules/spaceheader/SpaceHeaderView.ts` | `+` button and `Reset folders` item | - |

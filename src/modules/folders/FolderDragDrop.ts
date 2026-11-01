@@ -2,7 +2,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { DropTargets } from './DropTargets.js';
 import { TabDrops } from './TabDrops.js';
-import { TabPointerDrag } from './TabPointerDrag.js';
+import { TabPointerDrag } from '../../core/TabPointerDrag.js';
 import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
 
 export interface FolderDragDropDependencies {

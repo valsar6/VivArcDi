@@ -282,6 +282,7 @@ Options of `favorites-grid` in `config.json`:
 | `tileHeight` | `44` | Tile height, in pixels |
 | `gap` | `8` | Space between tiles and between their rows, in pixels |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
+| `emptyHint` | `Drag a tab here to pin it` | Text of the placeholder shown while the grid has no tiles; dropping a tab on it pins the tab |
 
 ## Pinned tabs
 
