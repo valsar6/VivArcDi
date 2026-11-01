@@ -3,9 +3,9 @@ import type { FrameTiming } from '../../../src/core/FrameTask.js';
 import { DomDocument, DomNode } from '../../core/dom.js';
 
 export class FieldNode extends DomNode {
-  public selected = false;
+  public override selected = false;
 
-  public select(): void {
+  public override select(): void {
     this.selected = true;
   }
 }

@@ -1,4 +1,6 @@
-import type { BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import type { BookmarksApi, BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
+import type { WritableBookmarksApi, WriterHost } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
 import type { TabActivatedListener, TabCreatedListener, TabRemovedListener, TabUpdateListener } from '../../../src/core/BrowserTabs.js';
@@ -171,5 +173,99 @@ export class FolderTabs {
 
   public actions(): Array<[string, ...unknown[]]> {
     return this.calls;
+  }
+}
+
+const findNode = (nodes: BookmarkNode[], id: string): BookmarkNode | undefined => {
+  for (const node of nodes) {
+    const found = node.id === id ? node : findNode(node.children ?? [], id);
+    if (found !== undefined) {
+      return found;
+    }
+  }
+  return undefined;
+};
+
+/** A `chrome.bookmarks` with an in-memory tree that creates, renames and removes, and records the calls. */
+export class WritableChrome implements WriterHost {
+  public tree: BookmarkNode[];
+  public calls: string[] = [];
+  public failing = new Set<string>();
+  public runtime: { lastError?: { message?: string } | undefined } = {};
+  public bookmarks: WritableBookmarksApi & Required<Pick<BookmarksApi, 'onCreated' | 'onRemoved' | 'onChanged' | 'onMoved'>>;
+  public listeners = new Set<() => void>();
+  #nextId = 500;
+
+  constructor(tree: BookmarkNode[]) {
+    this.tree = structuredClone(tree);
+    const event = {
+      addListener: (listener: () => void): void => void this.listeners.add(listener),
+      removeListener: (listener: () => void): void => void this.listeners.delete(listener),
+    };
+    this.bookmarks = {
+      onCreated: event,
+      onRemoved: event,
+      onChanged: event,
+      onMoved: event,
+      getTree: (callback): void => this.#answer('getTree', callback, () => this.tree),
+      getChildren: (id, callback): void => this.#answer('getChildren', callback, () => findNode(this.tree, id)?.children ?? []),
+      create: (details, callback): void =>
+        this.#answer(`create ${details.title}`, callback, () => {
+          const parent = findNode(this.tree, details.parentId ?? '2') ?? findNode(this.tree, '1');
+          const node: BookmarkNode = { id: String(this.#nextId++), title: details.title, url: details.url, children: details.url === undefined ? [] : undefined };
+          const children = parent?.children ?? [];
+          children.splice(details.index ?? children.length, 0, node);
+          return node;
+        }),
+      update: (id, changes, callback): void =>
+        this.#answer(`update ${id}`, callback, () => {
+          const node = findNode(this.tree, id) as BookmarkNode;
+          node.title = changes.title;
+          return node;
+        }),
+      remove: (id, callback): void =>
+        this.#answer(`remove ${id}`, callback, () => {
+          const parent = this.#parentOf(this.tree, id);
+          if (parent?.children !== undefined) {
+            parent.children = parent.children.filter((child) => child.id !== id);
+          }
+        }),
+    };
+  }
+
+  public get writer(): BookmarkWriter {
+    return new BookmarkWriter(this);
+  }
+
+  public get reader(): BrowserBookmarks {
+    return new BrowserBookmarks(this);
+  }
+
+  public get created(): string[] {
+    return this.calls.filter((call) => call.startsWith('create ')).map((call) => call.slice('create '.length));
+  }
+
+  #parentOf(nodes: BookmarkNode[], id: string): BookmarkNode | undefined {
+    for (const node of nodes) {
+      if (node.children?.some((child) => child.id === id) === true) {
+        return node;
+      }
+      const found = this.#parentOf(node.children ?? [], id);
+      if (found !== undefined) {
+        return found;
+      }
+    }
+    return undefined;
+  }
+
+  #answer<T>(call: string, callback: (value: T) => void, run: () => T | void): void {
+    this.calls.push(call);
+    const failed = this.failing.has(call.split(' ')[0] ?? '');
+    this.runtime.lastError = failed ? { message: `${call} failed` } : undefined;
+    callback((failed ? undefined : run()) as T);
+    this.runtime.lastError = undefined;
+    if (!failed && !call.startsWith('get')) {
+      this.listeners.forEach((listener) => listener());
+    }
   }
 }

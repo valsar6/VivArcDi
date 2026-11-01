@@ -115,3 +115,19 @@ Documented in the README next to `root` and `workspaces`.
 | A write fails halfway (folder created, bookmark not) | Errors are caught per call, logged, the tab stays unlinked (NFR-1); the empty folder is harmless |
 | Renaming a workspace in Vivaldi orphans `VivArcDi/<name>` | Accepted in the spec; the old folder stays in the Bookmarks panel |
 | The delayed single click feels slow | 250 ms is the system double-click time; only on folder rows |
+
+## Empty Favorites grid (added 2026-11-01)
+
+With neither a `Favorites` bookmark folder nor pinned tabs, `FavoritesGrid` draws nothing (`tileCount`
+and the bookmark count are 0) and Vivaldi has no pinned strip to drop on. FR-15 adds
+`EmptyGridDrop` in `src/modules/favorites`:
+
+- `FavoritesGrid.#update` already knows when there are no tiles. It then asks `EmptyGridDrop` to show a
+  placeholder element (`data-vivarcdi-empty-grid`) at the anchor of the grid (order 10 in `TabBarAnchor`),
+  with the hint text, and to remove it as soon as a tile exists. The hint is in `config.json` (`emptyHint`).
+- The drop uses the same pointer tracking as the folders (`TabPointerDrag`, moved to `src/core` so both
+  modules share it): on mouse release over the placeholder, `chrome.tabs.update(tabId, { pinned: true })`.
+  A tab that is already pinned, a link or not a web page is ignored (AC-30).
+- Only the placeholder takes drops; with tiles Vivaldi's own drag keeps pinning (FR-8, NFR-3).
+- The placeholder is outside the window drag region (NFR-2).
+- Risk: if Vivaldi pins a tab a moment after release, a second `pinned: true` is harmless.

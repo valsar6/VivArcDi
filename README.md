@@ -347,7 +347,8 @@ the `root` of the `bookmark-folders` module, when that module is on.
 
 Shows a row between the Favorites grid and the [bookmark folders](#bookmark-folders), like the space
 header of Arc: the icon and the name of the active workspace, and an arrow. A click anywhere on the
-row collapses the workspace, and a second click opens it again. While it is collapsed the arrow
+row collapses the workspace, and a second click opens it again. Resting the pointer on the row shows a
+`+` button that adds a folder to the workspace (see [bookmark folders](#bookmark-folders)). While it is collapsed the arrow
 points to the side and:
 
 - the folders section shows only the links that have an open tab, without the folder rows;
@@ -385,13 +386,31 @@ that has no tab becomes its tab. The Today archive never archives these tabs, an
 another site inside one opens in [Peek](#peek), as for pinned tabs. When a bookmark is removed, its
 tab goes back to the list.
 
-The bookmarks are only read: they are created, renamed, moved and deleted in Vivaldi's Bookmarks
-panel, and the tab bar follows.
+The folders can be edited from the tab bar, and every change is a real bookmark, so it shows in
+Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
+
+- **New folder.** Rest the pointer on the space header and click the `+`. A folder named `Untitled`
+  is added at the end of the workspace's folder, with its name ready to type. Enter saves the name;
+  Escape and an empty name keep `Untitled`.
+- **Rename.** Double click a folder. A single click still opens and closes it, after a short wait.
+- **Add a tab to a folder.** Drag a tab of the list onto a folder row and release: it becomes a link at
+  the end of that folder and leaves the list. Released on the space header it becomes a link at the end
+  of the workspace's folder, and released between two rows it goes there. A Favorite, a pinned tab, a
+  tab that is already a link and a page that is not `http` or `https` are left alone. Dropping a tab on
+  the Favorites grid pins it, as Vivaldi does.
+- **Cmd/Ctrl+D.** Adds the page you are on to the end of the workspace's folder, as Arc does with its
+  favorites area; press it again and the tab goes back to the list. The bookmark is removed only if
+  VivArcDi created it; a link that existed before keeps its bookmark and a message says so. Cmd/Ctrl+D
+  replaces the Pin/Unpin mapping of [Arc's keyboard shortcuts](docs/native-settings.md); pinning to the Favorites grid is done by dragging.
+
+Removing and moving folders and links stays in the Bookmarks panel. A write that fails is logged in
+the console and leaves the section as it was.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty shows nothing |
+| `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty uses `<workspacesBase>/<workspace name>` |
 | `workspaces` | `{}` | The folder of each workspace: the name of the workspace (as in Vivaldi's workspace menu) and the path of its folder, written like `root` |
+| `workspacesBase` | `VivArcDi` | The folder that holds the default folder of each workspace, written like `root`. It is created the first time you write in a workspace |
 | `maxDepth` | `3` | How many levels of folders are shown |
 | `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
 
@@ -409,10 +428,12 @@ Each workspace can show its own folders, as the spaces of Arc do:
 ```
 
 The section shows the folder of the active workspace and changes when you switch workspace. Each
-workspace remembers which of its folders are open. A workspace with no entry, and the area outside
-any workspace, use `root`; since `root` is empty by default, the section is then hidden and takes no
-space. A workspace renamed in Vivaldi is matched by its new name. An entry with an empty path hides
-the section in that workspace. A `workspaces` option that is not an object of text paths is ignored
+workspace remembers which of its folders are open. A workspace with no entry uses `root` when it is
+not empty, otherwise the folder `VivArcDi/<workspace name>` (the base is the option `workspacesBase`),
+and the area outside any workspace uses `root`, otherwise `VivArcDi/Tabs`. Until that folder exists,
+which happens the first time you write in the workspace, the section is hidden and takes no space. A
+workspace renamed in Vivaldi is matched by its new name, so it looks for a new default folder and the
+old one stays in the Bookmarks panel. An entry with an empty path hides the section in that workspace. A `workspaces` option that is not an object of text paths is ignored
 and the console says so.
 
 A link has at most one tab in each workspace: the tab stays in the workspace where it was opened, and

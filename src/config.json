@@ -43,6 +43,7 @@
       "enabled": true,
       "root": "",
       "workspaces": {},
+      "workspacesBase": "VivArcDi",
       "maxDepth": 3,
       "maxHeightPercent": 60
     },

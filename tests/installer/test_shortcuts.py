@@ -76,7 +76,7 @@ class ShortcutsTest(unittest.TestCase):
         actions = result["vivaldi"]["actions"][0]
         self.assertEqual(actions["COMMAND_SHOW_QUICK_COMMANDS"]["shortcuts"], ["meta+t"])
         self.assertEqual(actions["COMMAND_MAIN_TOGGLE_TAB_BAR"]["shortcuts"], ["meta+s"])
-        self.assertEqual(actions["COMMAND_PIN_TAB"]["shortcuts"], ["meta+d"])
+        self.assertEqual(actions["COMMAND_PIN_TAB"]["shortcuts"], [])
         self.assertEqual(actions["COMMAND_PRINT_PAGE"]["shortcuts"], ["meta+p"])
         for removed in ("COMMAND_NEW_TAB", "COMMAND_SAVE_PAGE", "COMMAND_ADD_BOOKMARK"):
             self.assertEqual(actions[removed]["shortcuts"], [])
@@ -140,9 +140,19 @@ class ShortcutsTest(unittest.TestCase):
         panel = self.read_preferences()["vivaldi"]["actions"][0]["COMMAND_MAIN_TOGGLE_PANEL_TOGGLE"]
         self.assertEqual(panel["shortcuts"], ["f4"])
 
+    def test_command_d_is_left_to_vivarcdi(self):
+        actions = default_actions()
+        actions["COMMAND_PIN_TAB"] = {"shortcuts": ["meta+d"]}
+        self.write_preferences(preferences_with(actions))
+        self.assertEqual(self.run_shortcuts("apply"), 0)
+        result = self.read_preferences()["vivaldi"]["actions"][0]
+        holders = [name for name, entry in result.items() if "meta+d" in entry.get("shortcuts", [])]
+        self.assertEqual(holders, [])
+        self.assertEqual(result["COMMAND_PIN_TAB"]["shortcuts"], [])
+
     def test_modifier_follows_the_platform(self):
-        self.assertEqual(ShortcutTable.load("meta").commands["COMMAND_PIN_TAB"], ["meta+d"])
-        self.assertEqual(ShortcutTable.load("ctrl").commands["COMMAND_PIN_TAB"], ["ctrl+d"])
+        self.assertEqual(ShortcutTable.load("meta").commands["COMMAND_SHOW_QUICK_COMMANDS"], ["meta+t"])
+        self.assertEqual(ShortcutTable.load("ctrl").commands["COMMAND_SHOW_QUICK_COMMANDS"], ["ctrl+t"])
         self.assertEqual(self.platform.modifier, "meta")
         self.assertEqual(DebianPlatform(self.root, self.runner, self.home).modifier, "ctrl")
 

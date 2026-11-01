@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
 import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
@@ -53,6 +54,7 @@ function running(tabs: RacingFolderTabs): Running {
     options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
     tabs,
     bookmarks: new FakeBookmarks(TREE),
+    bookmarkWriter: new BookmarkWriter(undefined),
     prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
   } as unknown as ModuleContext;
@@ -81,6 +83,7 @@ test('hides the tab opened from a link while Today stamps the same tab', async (
   const { dom, module, hidden, stamps, start } = running(tabs);
   await start();
   rows(dom)[0]?.click();
+  await new Promise((resolve) => setTimeout(resolve, 280));
   await settled();
   rows(dom)[1]?.click();
   await settled();
