@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-01 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -61,8 +61,8 @@ is opened or closed by a copy.
 a panel folder dropped on the space header becomes the root of the workspace, linked and not copied.
 On 2026-10-28 Tore chose that reading and left copying out; his recording now drops on the area and
 asks for a copy. Both need the same detection of a drag from the panel, so this spec and T9 share it.
-Two meanings for one gesture would confuse, so this spec proposes to supersede 012 FR-10, FR-11, AC-19
-to AC-22 and T9: dropping on the header copies too. See the first open question.
+Two meanings for one gesture would confuse, so this spec supersedes 012 FR-10, FR-11, AC-19 to AC-22
+and T9: dropping on the header copies too (Tore, 2026-11-01).
 
 ## Requirements
 
@@ -125,17 +125,16 @@ to AC-22 and T9: dropping on the header copies too. See the first open question.
 
 ## Open questions
 
-- [ ] **Does this replace 012 T9?** Proposed: yes. Dropping a panel folder anywhere in the area,
-  header included, copies it; 012 FR-10, FR-11, AC-19 to AC-22 and T9 are removed when this spec is
-  approved, and `config.json` (`workspaces`) stays the way to link a folder as a workspace's root.
+- [x] **Does this replace 012 T9?** Yes (Tore, 2026-11-01). Dropping a panel folder anywhere in the area,
+  header included, copies it; 012 FR-10, FR-11, AC-19 to AC-22 and T9 are removed, and `config.json` (`workspaces`) stays the way to link a folder as a workspace's root.
   Alternative: keep both, header = link as root, rows = copy.
-- [ ] **Duplicates.** Proposed: always copy, even when the same address is already in the target
+- [x] **Duplicates.** Always copy (Tore, 2026-11-01), even when the same address is already in the target
   folder; the panel removes extra ones. Alternative: skip a bookmark whose address is already there.
-- [ ] **Subfolders.** Proposed: copied with all their levels, since 009 already shows nested folders.
+- [x] **Subfolders.** Copied with all their levels (Tore, 2026-11-01), since 009 already shows nested folders.
   Alternative: copy only the folder's direct links.
-- [ ] **Can a mod see the panel's drag?** The panel's rows are `div[tree-row][draggable=true]` inside
+- [x] **Can a mod see the panel's drag?** Moved to the design. The panel's rows are `div[tree-row][draggable=true]` inside
   `div[tree-item][data-id=<bookmark id>]` (probe of 2026-11-01), and the recording shows a real HTML5
-  drag (Vivaldi's drag image with a green `+`), unlike tabs (012 FR-14). Proposed: a probe before the
+  drag (Vivaldi's drag image with a green `+`), unlike tabs (012 FR-14). A probe before the
   design records the drag events and data in `window.html` and whether the tab bar accepts the drop. If
   it does not, the drop is found by the pointer on mouse release, as for tabs.
 
