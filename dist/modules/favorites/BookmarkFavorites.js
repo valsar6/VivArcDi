@@ -134,5 +134,6 @@ class BookmarkFavorites {
   }
 }
 export {
-  BookmarkFavorites
+  BookmarkFavorites,
+  GRID_ORDER
 };

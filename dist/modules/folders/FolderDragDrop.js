@@ -1,6 +1,6 @@
 import { DropTargets } from "./DropTargets.js";
 import { TabDrops } from "./TabDrops.js";
-import { TabPointerDrag } from "./TabPointerDrag.js";
+import { TabPointerDrag } from "../../core/TabPointerDrag.js";
 class FolderDragDrop {
   #drag;
   /**

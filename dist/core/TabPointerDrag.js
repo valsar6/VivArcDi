@@ -1,4 +1,4 @@
-import { TabSlot } from "../../core/TabSlot.js";
+import { TabSlot } from "./TabSlot.js";
 const DRAG_DISTANCE_PX = 6;
 const PRIMARY_BUTTON = 0;
 class TabPointerDrag {

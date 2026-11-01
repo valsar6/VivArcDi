@@ -150,3 +150,23 @@
   opacity: 0.55;
   filter: saturate(0.4);
 }
+
+#browser[data-vivarcdi-active] [data-vivarcdi-anchor] > [data-vivarcdi-empty-grid] {
+  box-sizing: border-box;
+  margin: 0 0 var(--vivarcdi-favorites-gap, 8px);
+  padding: 8px;
+  border: 1px dashed color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+  border-radius: var(--vivarcdi-radius);
+  color: var(--colorFg, inherit);
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.7;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  transition: background-color var(--vivarcdi-transition), border-color var(--vivarcdi-transition), opacity var(--vivarcdi-transition);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-anchor] > [data-vivarcdi-empty-grid][data-vivarcdi-drop-over] {
+  border-color: var(--colorHighlightBg, currentcolor);
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+  opacity: 1;
+}

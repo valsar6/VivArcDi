@@ -4,7 +4,9 @@ import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
 import { HiddenTabs } from "../../core/HiddenTabs.js";
 import { Module } from "../../core/Module.js";
 import { TabUnloader } from "../../core/TabUnloader.js";
+import { TabBarAnchor } from "../../core/TabBarAnchor.js";
 import { BookmarkFavorites } from "./BookmarkFavorites.js";
+import { EmptyGridDrop } from "./EmptyGridDrop.js";
 import { FavoriteTagger } from "./FavoriteTagger.js";
 import { GridLayout } from "./GridLayout.js";
 import { MiddleClickUnload } from "./MiddleClickUnload.js";
@@ -22,7 +24,8 @@ class FavoritesGrid extends Module {
     tileMinWidth: 64,
     tileHeight: 44,
     gap: 8,
-    unloadOnMiddleClick: true
+    unloadOnMiddleClick: true,
+    emptyHint: "Drag a tab here to pin it"
   });
   #document = null;
   #selectors = null;
@@ -36,6 +39,7 @@ class FavoritesGrid extends Module {
   #fromBookmarks = null;
   #hiddenTabs = null;
   #hiddenMarker = null;
+  #emptyDrop = null;
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
    * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
@@ -55,6 +59,7 @@ class FavoritesGrid extends Module {
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
       this.#startMiddleClick(settings, tabs, logger);
+      this.#startEmptyDrop(settings, tabs, logger);
     } else {
       logger.warn("chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs");
     }
@@ -80,6 +85,8 @@ class FavoritesGrid extends Module {
     this.#observer?.disconnect();
     this.#refresh?.cancel();
     this.#middleClick?.detach();
+    this.#emptyDrop?.stop();
+    this.#emptyDrop = null;
     this.#unloadedTabs?.stop();
     this.#stopBookmarks();
     this.#layout?.release();
@@ -106,6 +113,20 @@ class FavoritesGrid extends Module {
       logger
     });
     this.#middleClick.attach();
+  }
+  #startEmptyDrop(settings, tabs, logger) {
+    if (this.#document === null || this.#selectors?.has("tabListHost") !== true) {
+      return;
+    }
+    this.#emptyDrop = new EmptyGridDrop({
+      document: this.#document,
+      wrapperSelector: this.#selectors.get("tabWrapper"),
+      anchor: TabBarAnchor.of(this.#document, this.#selectors.get("tabListHost")),
+      tabs,
+      hint: settings.emptyHint,
+      logger
+    });
+    this.#emptyDrop.start();
   }
   async #startBookmarks(tabs, bookmarks, logger) {
     const document = this.#document;
@@ -137,11 +158,16 @@ class FavoritesGrid extends Module {
     const fromBookmarks = this.#fromBookmarks?.active === true ? this.#fromBookmarks : null;
     tagger.maxTiles = fromBookmarks === null ? this.#settings.maxTiles : 0;
     const strip = tagger.apply(tabBar);
+    const tiles = this.#layTiles(fromBookmarks, strip, tagger.tileCount);
+    this.#emptyDrop?.show(strip !== null && tiles === 0);
+  }
+  #layTiles(fromBookmarks, strip, pinnedTiles) {
     if (fromBookmarks === null) {
-      this.#showPinnedTiles(strip, tagger.tileCount);
-    } else {
-      this.#layout?.follow(fromBookmarks.place(strip !== null), fromBookmarks.count);
+      this.#showPinnedTiles(strip, pinnedTiles);
+      return pinnedTiles;
     }
+    this.#layout?.follow(fromBookmarks.place(strip !== null), fromBookmarks.count);
+    return fromBookmarks.count;
   }
   #tabBar() {
     if (this.#document === null || this.#selectors === null) {
