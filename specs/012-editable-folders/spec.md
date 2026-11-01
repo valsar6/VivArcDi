@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Draft |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-28 |
+| Approved | 2026-10-28; revision pending |
 
 ## Summary
 
@@ -29,6 +29,8 @@ editable, writing to Vivaldi's bookmarks, as Tore accepted on 2026-10-28 (gaps B
 - **US-4.** As a user, I want to rename a folder with a double click, as in Arc.
 - **US-5.** As a user, I want a workspace I never configured to get its own folders as soon as I
   create the first one.
+- **US-7.** As a user, I want Cmd/Ctrl+D to add the page I am on to the favorites area of my workspace,
+  and the same keys again to take it back to my open tabs, as in Arc (Tore, 2026-11-01).
 - **US-6.** As a user, I want to drag a bookmark folder from the Bookmarks panel onto a workspace, so
   that the folder becomes what that workspace shows, without editing `config.json` (Tore, 2026-10-28).
 
@@ -40,7 +42,32 @@ An `Untitled` folder appears at the end of the pinned area with its name selecte
 `MyFolder`: the tab leaves the list and shows below the closed folder, since it is open. Earlier he
 drags `Rame Magazine` from today's tabs to the pinned area, and it becomes a pinned tab.
 
+Revised with Tore on 2026-11-01, after a recording of Arc (`Registrazione schermo 2026-11-01 alle
+01.04.27.mov`) and his annotated screenshot. The words: **Pinned Tabs** are Vivaldi's pinned tabs, the
+Favorites grid of 001 and 003; **workspace favorites** are the blue area of the screenshot, the
+folders section of 009 to 011 below the space header, where folders and single links live. In the
+recording Tore presses Cmd+D on `Taglialegna`: the tab leaves today's list and shows at the end of the
+workspace favorites, under `MyFolder`; he presses Cmd+D again and it goes back to the open tabs. He also
+drags a tab from today's list into the area and drops it between two rows, where it stays.
+
 In VivArcDi:
+
+**Cmd/Ctrl+D.** On a page that is `http` or `https`, Cmd/Ctrl+D adds it to the workspace favorites: a
+bookmark with the page's title and address at the end of the workspace's root, linked to the tab (as
+in 009), so the tab leaves today's list and its row shows at the end of the area. The same keys with
+the active tab already linked to a link of the root take it back: the tab shows again in today's list,
+and the bookmark is removed only if VivArcDi created it with Cmd/Ctrl+D or a drop; a link that existed
+before keeps its bookmark and stays in the area, and a toast says so. Cmd/Ctrl+D replaces the Pin/Unpin
+mapping of [014](../014-arc-shortcuts/spec.md); Vivaldi's own Pin/Unpin stays in its menus, and pinning
+to the Favorites grid is done by drag, as in Arc.
+
+**Drop position.** A tab of today's list dropped between two rows of the area is added there, not at
+the end (Arc, recording). Rows already in the area are not reordered: moving a link stays in the
+Bookmarks panel.
+
+**Mouse, not drag events.** The probe of 2026-10-31 saw no drag events in `window.html`: Vivaldi moves
+tabs with the mouse. Drop targets are found by the pointer position when the button is released over
+the area, not by `dragover` and `drop`.
 
 **New folder.** The space header of 011 shows a `+` button on hover (the `…` menu of Arc is a later
 spec). A click adds a folder named `Untitled` at the end of the workspace's root, as a real bookmark
@@ -103,6 +130,12 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - **FR-10.** Dropping a bookmark folder on the header, or on a workspace of the switcher, saves its
   path as the root of that workspace; it wins over `workspaces`, `root` and the default folder.
 - **FR-11.** `Reset folders` forgets the saved root of the active workspace.
+- **FR-12.** Cmd/Ctrl+D on a web page adds a bookmark with its title and address at the end of the
+  workspace's root and links the tab to it; on the tab of such a link it takes the tab back to today's
+  list and removes the bookmark when VivArcDi created it.
+- **FR-13.** A drop of a tab of today's list between two rows of the area adds the bookmark at that
+  position of the root; a drop on a folder keeps FR-6.
+- **FR-14.** Drop targets are found by the pointer position on mouse release.
 - **FR-9.** Options of `bookmark-folders` in `config.json`: `workspacesBase` (`VivArcDi`). FR-7 of 009
   ("never creates, changes or deletes a bookmark") is replaced by FR-1 to FR-6.
 
@@ -134,6 +167,12 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 | AC-20 | WHILE a workspace has a saved root, THE root SHALL win over `workspaces`, `root` and the default folder. | auto: `prefers the dropped folder to every other root` |
 | AC-21 | WHEN `Reset folders` is used, THE module SHALL forget the saved root of the active workspace. | auto: `forgets the dropped folder on reset` |
 | AC-22 | WHEN Tore drags a folder from the Bookmarks panel onto a workspace, THE workspace SHALL show its links and no other workspace SHALL change. | manual |
+| AC-23 | WHEN Cmd/Ctrl+D is pressed on a web page that is not a link, THE module SHALL add a bookmark at the end of the root and link the tab to it. | auto: `adds the active tab to the workspace favorites on the shortcut` |
+| AC-24 | WHEN Cmd/Ctrl+D is pressed on the tab of a link that VivArcDi created, THE module SHALL remove the bookmark and show the tab in today's list. | auto: `takes the tab back on a second press` |
+| AC-25 | WHEN Cmd/Ctrl+D is pressed on the tab of a link that existed before, THE module SHALL keep the bookmark and the link. | auto: `keeps an existing bookmark on a second press` |
+| AC-26 | WHEN a tab is released between two rows of the area, THE module SHALL add its bookmark at that position. | auto: `adds a dropped tab at the position of the drop` |
+| AC-27 | WHEN Tore presses Cmd/Ctrl+D on a page, THE tab SHALL move to the end of the workspace favorites; WHEN he presses it again, THE tab SHALL go back to the open tabs. | manual |
+| AC-28 | WHEN Tore drags a tab of today into the area and releases it between two rows, THE tab SHALL stay there. | manual |
 | AC-13 | WHEN Tore clicks `+` in a workspace he never configured, types a name and presses Enter, THE folder SHALL appear in that workspace only. | manual |
 | AC-14 | WHEN Tore drags a tab of today onto that folder, THE tab SHALL leave today's list and show below the closed folder. | manual |
 | AC-15 | WHEN Tore drags a tab of today into the pinned tabs, THE tab SHALL become pinned. | manual |
@@ -156,10 +195,14 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - [x] **Root of an unconfigured workspace?** Approved (Tore, 2026-10-28): `VivArcDi/<workspace name>`, created on the
   first write. Renaming the workspace in Vivaldi would then show a new, empty folder; the old one stays
   in the Bookmarks panel. Alternative: remember the folder by workspace id in VivArcDi's storage.
-- [ ] **Does Vivaldi already pin a tab dragged among the pinned tabs, and can a folder of the
-  Bookmarks panel be dropped on the header or on the workspace switcher?** Two read-only probes on
-  Tore's Vivaldi before the design (`spaces/diagnostica-trascinamento.md`). If Vivaldi already pins, FR-8
-  needs no code; if the switcher takes no drop, only the header is a target for FR-10.
+- [x] **Does Vivaldi already pin a tab dragged among the pinned tabs?** Probe of 2026-10-31: no drag
+  events; the tab became pinned and unpinned again. Drops are found by the pointer (FR-14).
+- [ ] **Cmd/Ctrl+D replaces Pin/Unpin in 014.** Proposed: yes, 014 gets a revision that drops the
+  Cmd+D mapping and VivArcDi handles the keys itself.
+- [ ] **Second press on a link that existed before.** Proposed: the bookmark and link stay, a toast
+  says so, so that a bookmark Tore made himself is never deleted.
+- [ ] **FR-8 and AC-11.** The Arc recording shows a tab dragged from today's list onto the Favorites
+  grid; Vivaldi's own drag may already pin it. Proposed: no code of ours, checked in the manual steps.
 - [x] **What does "drag the Favorites folders into the workspaces" mean?** Approved reading (Tore, 2026-10-28): drag a
   bookmark folder (from the Bookmarks panel) onto a workspace to make it that workspace's root. The
   other reading, copying the folder's links, is not done.
