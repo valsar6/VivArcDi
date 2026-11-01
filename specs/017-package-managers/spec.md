@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-01 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -163,7 +163,7 @@ Chocolatey, winget and Scoop install Windows software only, and Windows is out o
 
 ## Open questions
 
-Answered by Tore on 2026-11-01, except Q4.
+Answered by Tore on 2026-11-01.
 
 - [x] **Q1. Chocolatey.** Windows is out of scope (spec 000 FR-1) and Chocolatey installs Windows
   software only. Chocolatey and winget are set aside together with the future Windows extension
@@ -172,14 +172,15 @@ Answered by Tore on 2026-11-01, except Q4.
   in the cask caveats, as with the `.dmg`.
 - [x] **Q3. Restoring Vivaldi on `brew uninstall`.** Accepted: the caveats and README say "click
   Uninstall in the app first"; the cask only removes the app and the agent.
-- [ ] **Q4. Where the apt repository lives.** Proposal: the `gh-pages` branch of this repository,
-  served at `https://valsar6.github.io/vivarcdi/apt`, so no second repository is needed. The
-  alternative is a separate repository `valsar6/vivarcdi-apt`. Tore is still looking into it.
+- [x] **Q4. Where the apt repository lives.** The `gh-pages` branch of this repository, served at
+  `https://valsar6.github.io/vivarcdi/apt`, so no second repository is needed (Tore accepted the
+  proposal, 2026-11-01).
 - [x] **Q5. The `.deb` enrolls the repository.** Accepted (US-3).
 - [x] **Q6. One-time setup.** Accepted, and documented as a runbook (FR-12): creating the tap
   repository, the token, GitHub Pages and the signing key, step by step.
-- [x] **Q7. Version.** Accepted: a feature (`features/package-managers`, 0.16.0). Everything
-  that Tore has to do by hand is documented in the repository.
+- [x] **Q7. Version.** Accepted: a feature (`features/package-managers`, next minor version; 0.16.0
+  went to spec 012, so 0.17.0). Everything that Tore has to do by hand is documented in the
+  repository.
 
 ## References
 
