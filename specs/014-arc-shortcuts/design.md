@@ -32,7 +32,7 @@ code (FR-3):
     "COMMAND_SAVE_PAGE": [],
     "COMMAND_MAIN_TOGGLE_TAB_BAR": ["{mod}+s"],
     "COMMAND_ADD_BOOKMARK": [],
-    "COMMAND_PIN_TAB": ["{mod}+d"],
+    "COMMAND_PIN_TAB": [],
     "COMMAND_PRINT_PAGE": ["{mod}+p"]
   }
 }
