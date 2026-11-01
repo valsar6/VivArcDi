@@ -39,9 +39,13 @@ these settings:
 | Save Page As | no shortcut |
 | Tab Bar | Cmd+S (Ctrl+S on Debian) |
 | Create Bookmark | no shortcut |
-| Pin / Unpin Tab | Cmd+D (Ctrl+D on Debian) |
+| Pin / Unpin Tab | no shortcut (Cmd+D belongs to the workspace favorites of [012](../012-editable-folders/spec.md)) |
 | Print | Cmd+P (Ctrl+P on Debian) |
 | Panel | loses Cmd+P (Ctrl+P), keeps its other shortcuts |
+
+Revised with Tore on 2026-11-01: Cmd+D, which this table gave to Pin / Unpin Tab, is taken by VivArcDi to
+add the page to the workspace favorites (012). Pin / Unpin Tab loses its shortcut here and stays in
+Vivaldi's menus. Anyone who applied the earlier table runs `shortcuts apply` again.
 
 `shortcuts apply --dry-run` lists the differences and writes nothing. `shortcuts restore` puts back
 the saved `Preferences`. `status` reports whether the shortcuts match the table. Vivaldi has to be
