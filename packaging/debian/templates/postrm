@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
 purge)
+    rm -f /etc/apt/sources.list.d/vivarcdi.sources /usr/share/keyrings/vivarcdi-archive-keyring.gpg
     rm -rf /var/lib/vivarcdi
     ;;
 esac

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -15,7 +16,10 @@ TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 ICON_PATH = REPO_ROOT / "packaging" / "assets" / "icon.png"
 APP_ID = "io.github.valsar6.vivarcdi"
 EXECUTABLES = ("DEBIAN/postinst", "DEBIAN/prerm", "DEBIAN/postrm", "usr/bin/vivarcdi")
-DEBIAN_FILES = ("control", "triggers", "postinst", "prerm", "postrm")
+DEBIAN_FILES = ("control", "triggers", "conffiles", "postinst", "prerm", "postrm")
+DEFAULT_KEYRING = REPO_ROOT / "packaging" / "apt" / "vivarcdi-archive-keyring.gpg"
+KEYRING_VARIABLE = "VIVARCDI_KEYRING"
+KEYRING_FILE = "vivarcdi-archive-keyring.gpg"
 IGNORED = shutil.ignore_patterns("__pycache__", "*.pyc")
 EXECUTABLE_MODE = 0o755
 FILE_MODE = 0o644
@@ -49,7 +53,8 @@ class DebTreeBuilder:
     """Assembles the file tree of the package, ready for `dpkg-deb`, without building the package.
 
     The tree holds the installer and the built payload under `usr/share/vivarcdi`, the launcher, the
-    desktop entry, the icon, the documentation and the `DEBIAN` control files.
+    desktop entry, the icon, the documentation, the apt repository enrollment (the sources file and
+    the public keyring that signs the repository) and the `DEBIAN` control files.
     """
 
     def __init__(
@@ -60,21 +65,33 @@ class DebTreeBuilder:
         license_file: Path = REPO_ROOT / "LICENSE",
         icon: Path = ICON_PATH,
         templates_dir: Path = TEMPLATES_DIR,
+        keyring: Path = DEFAULT_KEYRING,
     ):
         self._installer_dir = installer_dir
         self._dist_dir = dist_dir
         self._icon = icon
+        self._keyring = keyring
         self._templates = TemplateStore(
             templates_dir, {"VERSION": version, "LICENSE_TEXT": self._indented(license_file.read_text())}
         )
 
     def build(self, tree: Path) -> Path:
-        """Fill `tree` (a new or empty folder) and return it. Raises DebBuildError if dist/ is missing."""
+        """Fill `tree` (a new or empty folder) and return it.
+
+        Raises DebBuildError if dist/ or the public keyring is missing.
+        """
         if not (self._dist_dir / "loader.js").is_file():
             raise DebBuildError(f"{self._dist_dir} has no build. Run: npm ci && npm run build")
+        if not self._keyring.is_file():
+            raise DebBuildError(
+                f"{self._keyring} is missing. Generate the apt signing key once with scripts/make-apt-key.sh and "
+                f"commit the keyring (docs/package-managers-setup.md), or set {KEYRING_VARIABLE} or pass --keyring"
+            )
         self._copy_program(tree / "usr" / "share" / "vivarcdi")
         self._write("usr/bin/vivarcdi", tree, "vivarcdi")
         self._write(f"usr/share/applications/{APP_ID}.desktop", tree, f"{APP_ID}.desktop")
+        self._write("etc/apt/sources.list.d/vivarcdi.sources", tree, "vivarcdi.sources")
+        self._copy_keyring(tree / "usr" / "share" / "vivarcdi" / KEYRING_FILE)
         self._copy_icon(tree / "usr" / "share" / "icons" / "hicolor" / "256x256" / "apps" / f"{APP_ID}.png")
         self._write_documentation(tree / "usr" / "share" / "doc" / "vivarcdi")
         for name in DEBIAN_FILES:
@@ -99,6 +116,10 @@ class DebTreeBuilder:
     def _copy_icon(self, target: Path) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(self._icon, target)
+
+    def _copy_keyring(self, target: Path) -> None:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(self._keyring, target)
 
     def _write_documentation(self, folder: Path) -> None:
         folder.mkdir(parents=True)
@@ -156,10 +177,16 @@ def main(argv: list[str]) -> int:
     """Command line: `build_deb.py --out <folder>` builds the package and prints its path."""
     parser = argparse.ArgumentParser(description="Build the VivArcDi Debian package.")
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "build", help="folder for the .deb")
+    parser.add_argument(
+        "--keyring",
+        type=Path,
+        default=Path(os.environ.get(KEYRING_VARIABLE) or DEFAULT_KEYRING),
+        help=f"public keyring of the apt repository, default ${KEYRING_VARIABLE} or packaging/apt",
+    )
     arguments = parser.parse_args(argv)
     version = read_version(REPO_ROOT)
     try:
-        print(DebPackager(DebTreeBuilder(version), version).package(arguments.out))
+        print(DebPackager(DebTreeBuilder(version, keyring=arguments.keyring), version).package(arguments.out))
     except DebBuildError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
