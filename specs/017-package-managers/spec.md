@@ -86,7 +86,7 @@ finishes the publication.
 ### Windows package managers
 
 Chocolatey, winget and Scoop install Windows software only, and Windows is out of scope of VivArcDi
-(spec 000 FR-1). See Q1.
+(spec 000 FR-1). See Q1: set aside with the future Windows extension.
 
 ## Requirements
 
@@ -113,6 +113,8 @@ Chocolatey, winget and Scoop install Windows software only, and Windows is out o
   token is ever committed or printed in logs.
 - **FR-10.** The README Download section lists, per system, the package manager command first and
   the direct download second.
+- **FR-12.** A runbook in `docs/` lists every one-time step for the maintainer (tap repository,
+  token and secret, GitHub Pages, signing key and secret, key rotation) and how to check each one.
 - **FR-11.** The window of spec 016, when it reports a newer release (016 Q5), names the command
   that installs it for a package-manager install (`brew upgrade --cask vivarcdi`, or the software
   updater on Debian) instead of only the release link.
@@ -141,6 +143,7 @@ Chocolatey, winget and Scoop install Windows software only, and Windows is out o
 | AC-7 | WHEN the package is purged, THE post-removal step SHALL delete the sources file and the keyring; WHEN it is only removed, it SHALL keep them. | auto: `test_deb_purge_removes_the_repository` |
 | AC-8 | IF a publish job runs twice for the same version, THEN the second run SHALL leave the tap and the repository unchanged. | auto: `test_publication_is_idempotent` |
 | AC-9 | WHEN the window reports a newer release for a Homebrew install, IT SHALL show `brew upgrade --cask vivarcdi`. | auto: `test_update_notice_names_the_package_manager_command` |
+| AC-16 | THE repository SHALL contain a runbook that names each one-time setup step and the secret it produces. | auto: `test_runbook_lists_every_one_time_setup_step` |
 | AC-10 | WHEN a version is released, the tap SHALL show the new cask version and the apt repository SHALL list the new package. | manual: `brew info --cask valsar6/vivarcdi/vivarcdi` and the Pages site show the new version |
 | AC-11 | WHEN the user runs `brew install --cask valsar6/vivarcdi/vivarcdi`, `VivArcDi.app` SHALL be in Applications and Install SHALL work as in 016/AC-15. | manual |
 | AC-12 | WHEN a newer release exists, `brew upgrade --cask vivarcdi` SHALL install it and the app SHALL report it as current. | manual |
@@ -150,7 +153,8 @@ Chocolatey, winget and Scoop install Windows software only, and Windows is out o
 
 ## Out of scope
 
-- Windows and its package managers (Chocolatey, winget, Scoop), unless Tore decides otherwise (Q1).
+- Windows and its package managers (Chocolatey, winget, Scoop): set aside with the future Windows
+  extension (Q1).
 - The official `homebrew/cask` and the official Debian archive: they need a notarized app and a
   Debian sponsor respectively.
 - MacPorts, Flatpak, Snap, AUR, rpm repositories (other Linux families stay out, spec 000 FR-1).
@@ -159,33 +163,23 @@ Chocolatey, winget and Scoop install Windows software only, and Windows is out o
 
 ## Open questions
 
-- [ ] **Q1. Chocolatey.** VivArcDi does not support Windows (spec 000 FR-1), and Chocolatey only
-  installs Windows software, so a Chocolatey package would need Windows support first: a Windows
-  Vivaldi path finder, patcher and update hook, plus a Windows window. Proposal: leave Windows and
-  Chocolatey out of this spec; if Tore wants Windows, it becomes its own spec (Windows support), and
-  Chocolatey and winget come after it.
-- [ ] **Q2. Gatekeeper with Homebrew.** Homebrew downloads keep the macOS quarantine flag, so the
-  first open still needs "Open Anyway" (Homebrew has deprecated its `--no-quarantine` option). The cask could clear
-  the flag itself in a `postflight` step, which skips the warning but also skips a macOS safety
-  check. Proposal: keep the flag and the "Open Anyway" step, explained in the caveats, as with the
-  `.dmg`.
-- [ ] **Q3. Restoring Vivaldi on `brew uninstall`.** Restoring Vivaldi needs the App Management
-  grant of `VivArcDi.app`; a script run by `brew` runs under Terminal, which usually lacks it, so
-  `brew uninstall` cannot restore Vivaldi reliably. Proposal: the caveats and README say "click
+Answered by Tore on 2026-11-01, except Q4.
+
+- [x] **Q1. Chocolatey.** Windows is out of scope (spec 000 FR-1) and Chocolatey installs Windows
+  software only. Chocolatey and winget are set aside together with the future Windows extension
+  of VivArcDi, and come after it.
+- [x] **Q2. Gatekeeper with Homebrew.** Keep the quarantine flag. The "Open Anyway" step is stated
+  in the cask caveats, as with the `.dmg`.
+- [x] **Q3. Restoring Vivaldi on `brew uninstall`.** Accepted: the caveats and README say "click
   Uninstall in the app first"; the cask only removes the app and the agent.
 - [ ] **Q4. Where the apt repository lives.** Proposal: the `gh-pages` branch of this repository,
   served at `https://valsar6.github.io/vivarcdi/apt`, so no second repository is needed. The
-  alternative is a separate repository `valsar6/vivarcdi-apt`.
-- [ ] **Q5. The `.deb` enrolls the repository.** Proposal: yes (US-3), as Vivaldi and Chrome do, so a
-  double-click install gets updates. The alternative is a repository only for users who set it up
-  by hand.
-- [ ] **Q6. One-time setup by Tore.** Proposal: Tore creates the empty public repository
-  `valsar6/homebrew-vivarcdi`, a fine-grained token with Contents write on that repository only
-  (secret `HOMEBREW_TAP_TOKEN`), and enables GitHub Pages; CI generates nothing secret. The GPG key
-  is created once on Tore's machine with a script from this repository, which prints the private
-  key to paste as secret `APT_SIGNING_KEY` and commits only the public key.
-- [ ] **Q7. Version.** Proposal: a feature, so `features/package-managers` bumps the minor version
-  (0.16.0); the cask and the repository start from that release.
+  alternative is a separate repository `valsar6/vivarcdi-apt`. Tore is still looking into it.
+- [x] **Q5. The `.deb` enrolls the repository.** Accepted (US-3).
+- [x] **Q6. One-time setup.** Accepted, and documented as a runbook (FR-12): creating the tap
+  repository, the token, GitHub Pages and the signing key, step by step.
+- [x] **Q7. Version.** Accepted: a feature (`features/package-managers`, 0.16.0). Everything
+  that Tore has to do by hand is documented in the repository.
 
 ## References
 
