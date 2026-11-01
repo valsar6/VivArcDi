@@ -24,7 +24,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
   AC-2, AC-3, AC-4.
 - [x] **T7.** `TabPointerDrag`, `DropTargets`, drop highlight; add at the drop position. AC-8, AC-9,
   AC-10, AC-26.
-- [ ] **T8.** 014: `COMMAND_PIN_TAB` empty in `shortcuts.json`, installer tests, README table. AC-27.
+- [x] **T8.** 014: `COMMAND_PIN_TAB` empty in `shortcuts.json`, installer tests, README table. AC-27.
 - [ ] **T9.** `SavedRoots`, `PanelFolderDrag` and `Reset folders`, if T1 allows it. AC-19, AC-20,
   AC-21.
 - [ ] **T10.** Manual verification checklist for Tore from AC-11, AC-13 to AC-18, AC-22, AC-27 and
