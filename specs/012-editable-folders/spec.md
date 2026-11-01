@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-28; revision pending |
+| Approved | 2026-10-28; revision approved 2026-11-01 |
 
 ## Summary
 
@@ -126,8 +126,8 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
   the root.
 - **FR-7.** Tabs that are links, Favorites or pinned, and pages that are not `http` or `https`, cannot
   be dropped.
-- **FR-8.** Dropping a tab of today's list on the pinned area pins it, unless Vivaldi already does so.
-- **FR-10.** Dropping a bookmark folder on the header, or on a workspace of the switcher, saves its
+- **FR-8.** Dropping a tab of today's list on the Favorites grid pins it through Vivaldi's own drag; VivArcDi adds no code for it.
+- **FR-10.** Dropping a bookmark folder on the header saves its
   path as the root of that workspace; it wins over `workspaces`, `root` and the default folder.
 - **FR-11.** `Reset folders` forgets the saved root of the active workspace.
 - **FR-12.** Cmd/Ctrl+D on a web page adds a bookmark with its title and address at the end of the
@@ -161,7 +161,7 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 | AC-8 | WHEN a tab of today is dropped on a folder row, THE module SHALL add a bookmark with its title and address to that folder and link the tab to it. | auto: `bookmarks a dropped tab into the folder and links it` |
 | AC-9 | WHEN a tab is dropped on the header, THE module SHALL add the bookmark at the top level of the root. | auto: `bookmarks a tab dropped on the header at the top level` |
 | AC-10 | IF the dropped tab is a link, a Favorite, a pinned tab or not a web page, THEN THE module SHALL ignore the drop. | auto: `ignores drops of tabs that cannot become links` |
-| AC-11 | WHEN a tab of today is dropped on the pinned area, THE tab SHALL be pinned in its workspace. | auto: `pins a tab dropped on the pinned area` |
+| AC-11 | WHEN a tab of today is dropped on the Favorites grid, THE tab SHALL be pinned in its workspace. | manual |
 | AC-12 | IF a bookmark write fails, THEN THE section SHALL stay as it was and log the problem. | auto: `keeps the section when a bookmark write fails` |
 | AC-19 | WHEN a bookmark folder is dropped on the header, THE module SHALL save it as the root of the active workspace and show its children. | auto: `saves a dropped bookmark folder as the root of the workspace` |
 | AC-20 | WHILE a workspace has a saved root, THE root SHALL win over `workspaces`, `root` and the default folder. | auto: `prefers the dropped folder to every other root` |
@@ -197,12 +197,12 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
   in the Bookmarks panel. Alternative: remember the folder by workspace id in VivArcDi's storage.
 - [x] **Does Vivaldi already pin a tab dragged among the pinned tabs?** Probe of 2026-10-31: no drag
   events; the tab became pinned and unpinned again. Drops are found by the pointer (FR-14).
-- [ ] **Cmd/Ctrl+D replaces Pin/Unpin in 014.** Proposed: yes, 014 gets a revision that drops the
-  Cmd+D mapping and VivArcDi handles the keys itself.
-- [ ] **Second press on a link that existed before.** Proposed: the bookmark and link stay, a toast
-  says so, so that a bookmark Tore made himself is never deleted.
-- [ ] **FR-8 and AC-11.** The Arc recording shows a tab dragged from today's list onto the Favorites
-  grid; Vivaldi's own drag may already pin it. Proposed: no code of ours, checked in the manual steps.
+- [x] **Cmd/Ctrl+D replaces Pin/Unpin in 014.** Yes: 014 drops the Cmd+D mapping and VivArcDi handles
+  the keys itself (Tore, 2026-11-01).
+- [x] **Second press on a link that existed before.** The bookmark and link stay, a toast says so, so
+  that a bookmark Tore made himself is never deleted (Tore, 2026-11-01).
+- [x] **FR-8 and AC-11.** Pinning a tab dragged onto the Favorites grid is left to Vivaldi and
+  checked in the manual steps (Tore, 2026-11-01).
 - [x] **What does "drag the Favorites folders into the workspaces" mean?** Approved reading (Tore, 2026-10-28): drag a
   bookmark folder (from the Bookmarks panel) onto a workspace to make it that workspace's root. The
   other reading, copying the folder's links, is not done.
