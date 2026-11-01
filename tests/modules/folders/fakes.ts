@@ -197,7 +197,7 @@ export class WritableChrome implements WriterHost {
   #nextId = 500;
 
   constructor(tree: BookmarkNode[]) {
-    this.tree = tree;
+    this.tree = structuredClone(tree);
     const event = {
       addListener: (listener: () => void): void => void this.listeners.add(listener),
       removeListener: (listener: () => void): void => void this.listeners.delete(listener),

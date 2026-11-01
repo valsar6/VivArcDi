@@ -66,4 +66,33 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  .vivarcdi-space-add {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: $space-icon-size;
+    height: $space-icon-size;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity var(--vivarcdi-transition), background-color var(--vivarcdi-transition);
+
+    &::before {
+      content: '+';
+    }
+
+    &:hover {
+      background-color: var(--vivarcdi-space-hover);
+    }
+  }
+
+  &:hover .vivarcdi-space-add {
+    opacity: 0.7;
+  }
+
+  &:hover .vivarcdi-space-add:hover {
+    opacity: 1;
+  }
 }

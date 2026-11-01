@@ -1,4 +1,5 @@
 import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
+import { FolderCommands } from '../../core/FolderCommands.js';
 import { FrameTask } from '../../core/FrameTask.js';
 import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
 import { HiddenTabs } from '../../core/HiddenTabs.js';
@@ -94,6 +95,7 @@ export class FolderSection {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => void activator.activate(link),
         onClose: (tabId): void => void activator.close(tabId),
+        onRename: (id, name): void => void this.#rename(id, name),
       },
       maxHeightPercent,
     );
@@ -125,6 +127,7 @@ export class FolderSection {
     await Promise.all([this.#source.start(), this.#openLinks.start(), this.#active.refresh()]);
     this.#adopter.start();
     this.#startShortcut();
+    this.#stops.push(FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()));
     await this.#adopter.adoptOpenTabs();
     await this.#openLinks.refresh();
     this.#draw();
@@ -185,6 +188,22 @@ export class FolderSection {
   #namesChanged(): void {
     if (this.#workspace !== undefined) {
       void this.#useWorkspace(this.#workspace);
+    }
+  }
+
+  async #rename(folderId: string, name: string): Promise<void> {
+    try {
+      await this.#context.bookmarkWriter.update(folderId, name);
+    } catch (error) {
+      this.#context.logger.warn('could not rename the folder', error);
+      this.#redraw.request();
+    }
+  }
+
+  async #newFolder(): Promise<void> {
+    const id = await this.#favorites.addFolder();
+    if (id !== null) {
+      this.#view.edit(id);
     }
   }
 

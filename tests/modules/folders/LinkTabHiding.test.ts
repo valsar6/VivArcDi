@@ -83,6 +83,7 @@ test('hides the tab opened from a link while Today stamps the same tab', async (
   const { dom, module, hidden, stamps, start } = running(tabs);
   await start();
   rows(dom)[0]?.click();
+  await new Promise((resolve) => setTimeout(resolve, 280));
   await settled();
   rows(dom)[1]?.click();
   await settled();

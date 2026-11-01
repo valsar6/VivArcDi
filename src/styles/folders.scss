@@ -46,6 +46,23 @@
     white-space: nowrap;
   }
 
+  .vivarcdi-folders-edit {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 4px;
+    border: 1px solid var(--colorHighlightBg, currentcolor);
+    border-radius: 3px;
+    outline: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    background-color: var(--vivarcdi-folders-hover);
+    user-select: text;
+  }
+
   .vivarcdi-folders-icon {
     flex: none;
     width: $folders-icon-size;

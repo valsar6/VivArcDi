@@ -20,7 +20,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
   AC-9, AC-12, AC-24, AC-25.
 - [x] **T5.** Move `Toast` to `src/core`; `FavoriteShortcut` and its wiring in the folders module.
   AC-23, AC-24, AC-25.
-- [ ] **T6.** `FolderSectionView` edit mode, delayed single click, `+` button of the header. AC-1,
+- [x] **T6.** `FolderSectionView` edit mode, delayed single click, `+` button of the header. AC-1,
   AC-2, AC-3, AC-4.
 - [ ] **T7.** `TabPointerDrag`, `DropTargets`, drop highlight; add at the drop position. AC-8, AC-9,
   AC-10, AC-26.

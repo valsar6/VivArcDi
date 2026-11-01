@@ -10,6 +10,7 @@ import type { ModuleContext } from '../../../src/core/Module.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
+import { FolderCommands } from '../../../src/core/FolderCommands.js';
 import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
@@ -53,6 +54,8 @@ const frame = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 5));
 };
 
+const toggleDelay = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 280));
+
 const rows = (dom: DomDocument): DomNode[] => dom.parent.children[0]?.children[0]?.children ?? [];
 
 function installFrames(t: TestContext): void {
@@ -82,6 +85,7 @@ test('draws the folders above the tab list and removes them on stop', async (t) 
   );
 
   rows(dom)[0]?.click();
+  await toggleDelay();
   await frame();
   assert.equal(rows(dom).length, 3);
 
@@ -237,6 +241,7 @@ test('keeps the folders open in each workspace apart', async (t) => {
   await module.start(context);
   await frame();
   rows(dom)[0]?.click();
+  await toggleDelay();
   await frame();
   assert.equal(rows(dom).length, 2);
 
@@ -295,4 +300,81 @@ test('listens to Cmd/Ctrl+D while it runs and stops on stop', async (t) => {
   assert.equal(dom.listeners.get('keydown')?.length, 1);
   module.stop();
   assert.deepEqual(dom.listeners.get('keydown'), []);
+});
+
+const EDITABLE = { root: '', workspaces: { Casetta: `${BAR}/Work` }, maxDepth: 3, maxHeightPercent: 60 };
+const fieldOf = (dom: DomDocument): DomNode | undefined => rows(dom)[0]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
+const keyOn = (node: DomNode | undefined, key: string): void => node?.bubble({ type: 'keydown', key, stopPropagation: (): void => undefined, preventDefault: (): void => undefined } as unknown as Event);
+const doubleClickFirst = (dom: DomDocument): void => rows(dom)[0]?.bubble({ type: 'dblclick', target: rows(dom)[0] } as unknown as Event);
+
+test('saves the typed name of a folder', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const field = fieldOf(dom);
+  assert.ok(field);
+  field.value = 'Boards';
+  keyOn(field, 'Enter');
+  await frame();
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('update')), ['update 11']);
+  assert.deepEqual(titles(dom), ['Boards']);
+  module.stop();
+});
+
+test('keeps the name on escape or empty text', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const escaped = fieldOf(dom);
+  assert.ok(escaped);
+  escaped.value = 'Never';
+  keyOn(escaped, 'Escape');
+  doubleClickFirst(dom);
+  const empty = fieldOf(dom);
+  assert.ok(empty);
+  empty.value = '  ';
+  keyOn(empty, 'Enter');
+  await frame();
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('update')), []);
+  assert.deepEqual(titles(dom), ['Jira']);
+  module.stop();
+});
+
+test('puts the folder back to its name when the rename fails', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  chrome.failing.add('update');
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const field = fieldOf(dom);
+  assert.ok(field);
+  field.value = 'Boards';
+  keyOn(field, 'Enter');
+  await frame();
+  assert.deepEqual(titles(dom), ['Jira']);
+  module.stop();
+});
+
+test('edits the new folder right after the plus button asks for it', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  FolderCommands.of(context.document).requestNewFolder();
+  await frame();
+  assert.deepEqual(chrome.created, ['Untitled']);
+  assert.deepEqual(titles(dom).length, 2);
+  const field = rows(dom)[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
+  assert.equal(field?.value, 'Untitled');
+  assert.equal(field?.selected, true);
+  module.stop();
 });
