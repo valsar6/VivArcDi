@@ -91,6 +91,7 @@ class DebTreeBuilder:
         self._write("usr/bin/vivarcdi", tree, "vivarcdi")
         self._write(f"usr/share/applications/{APP_ID}.desktop", tree, f"{APP_ID}.desktop")
         self._write("etc/apt/sources.list.d/vivarcdi.sources", tree, "vivarcdi.sources")
+        self._write("usr/share/lintian/overrides/vivarcdi", tree, "lintian-overrides")
         self._copy_keyring(tree / "usr" / "share" / "vivarcdi" / KEYRING_FILE)
         self._copy_icon(tree / "usr" / "share" / "icons" / "hicolor" / "256x256" / "apps" / f"{APP_ID}.png")
         self._write_documentation(tree / "usr" / "share" / "doc" / "vivarcdi")

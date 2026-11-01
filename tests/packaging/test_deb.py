@@ -131,6 +131,11 @@ class DebTreeTest(DebCase):
                     "Signed-By: /usr/share/keyrings/vivarcdi-archive-keyring.gpg",
                 ],
             )
+        with self.subTest("lintian is told that the sources file is on purpose"):
+            self.assertIn(
+                "package-installs-apt-sources [etc/apt/sources.list.d/vivarcdi.sources]",
+                self.read("usr/share/lintian/overrides/vivarcdi"),
+            )
         with self.subTest("the keyring is shipped and installed where Signed-By points"):
             self.assertEqual((self.tree / "usr/share/vivarcdi/vivarcdi-archive-keyring.gpg").read_bytes(), KEYRING_BYTES)
             calls = self.run_script("postinst", self.fake_commands("vivarcdi", "install"), "configure")
