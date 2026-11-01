@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
+import { FolderCommands } from '../../../src/core/FolderCommands.js';
 import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { Logger } from '../../../src/core/Logger.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
@@ -58,8 +59,9 @@ function installFrames(t: TestContext): void {
 }
 
 const headerOf = (dom: DomDocument): DomNode | undefined => dom.parent.children[0]?.children[0];
-const partsOf = (dom: DomDocument): string[] => headerOf(dom)?.children.map((part) => part.textContent) ?? [];
-const nameOf = (dom: DomDocument): string | undefined => headerOf(dom)?.children.at(-1)?.textContent;
+const shownParts = (dom: DomDocument): DomNode[] => headerOf(dom)?.children.filter((part) => !part.hasAttribute('data-vivarcdi-space-add')) ?? [];
+const partsOf = (dom: DomDocument): string[] => shownParts(dom).map((part) => part.textContent);
+const nameOf = (dom: DomDocument): string | undefined => shownParts(dom).at(-1)?.textContent;
 const isCollapsed = (dom: DomDocument): boolean => headerOf(dom)?.hasAttribute('data-vivarcdi-collapsed') === true;
 
 function switchTo(tabs: FolderTabs, tabId: number): void {
@@ -208,4 +210,20 @@ test('disabled module draws no header', async (t) => {
   assert.equal(tabs.listenerCount(), 0);
   assert.equal([1, 2, 3].some((id) => HiddenTabs.of(context.document).has(id)), false);
   assert.equal(SpaceCollapse.of(context.document).collapsed, false);
+});
+
+test('asks the folders section for a new folder from the plus button without collapsing the space', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = setup(TABS(), { api: twoWorkspaces() });
+  const asked: string[] = [];
+  const stop = FolderCommands.of(context.document).onNewFolder(() => void asked.push('new folder'));
+  await module.start(context);
+  const add = headerOf(dom)?.children.find((part) => part.hasAttribute('data-vivarcdi-space-add'));
+  assert.ok(add);
+  assert.equal(add.getAttribute('aria-label'), 'New folder');
+  add.click();
+  assert.deepEqual(asked, ['new folder']);
+  assert.equal(isCollapsed(dom), false);
+  stop();
+  module.stop();
 });

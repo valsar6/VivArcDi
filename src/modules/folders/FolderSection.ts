@@ -6,6 +6,7 @@ import type { ModuleContext } from '../../core/Module.js';
 import { SpaceCollapse } from '../../core/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
 import { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import { FolderEditing } from './FolderEditing.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
 import { FolderTree } from './FolderTree.js';
@@ -39,6 +40,7 @@ export class FolderSection {
   #openLinks: OpenLinks;
   #tabLinks: TabLinks;
   #adopter: LinkTabAdopter;
+  #editing: FolderEditing;
   #view: FolderSectionView;
   #hiddenTabs: HiddenTabs;
   #hiddenMarker: HiddenTabMarker;
@@ -70,6 +72,7 @@ export class FolderSection {
       path: [],
       maxDepth,
       otherPaths: roots.allPaths,
+      optionalPaths: (): string[][] => roots.pathsFor([...this.#names.names, null]),
       onChange: (): void => this.#treeChanged(),
       logger,
     });
@@ -86,9 +89,11 @@ export class FolderSection {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => void activator.activate(link),
         onClose: (tabId): void => void activator.close(tabId),
+        onRename: (id, name): void => void this.#editing.rename(id, name),
       },
       maxHeightPercent,
     );
+    this.#editing = this.#createEditing();
   }
 
   /**
@@ -116,6 +121,8 @@ export class FolderSection {
     await this.#useWorkspace(this.#active.current);
     await Promise.all([this.#source.start(), this.#openLinks.start(), this.#active.refresh()]);
     this.#adopter.start();
+    this.#editing.start();
+    this.#stops.push(() => this.#editing.stop());
     await this.#adopter.adoptOpenTabs();
     await this.#openLinks.refresh();
     this.#draw();
@@ -127,6 +134,15 @@ export class FolderSection {
   public stop(): void {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
+  }
+
+  #createEditing(): FolderEditing {
+    return new FolderEditing(this.#context, this.#view, {
+      root: (): string[] => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
+      childIds: (): readonly string[] => this.#source.childIds,
+      redraw: (): void => this.#redraw.request(),
+      tabLinks: this.#tabLinks,
+    });
   }
 
   async #useWorkspace(workspace: string | null): Promise<void> {

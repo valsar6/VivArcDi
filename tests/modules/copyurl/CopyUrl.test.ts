@@ -7,7 +7,7 @@ import type { ModuleContext } from '../../../src/core/Module.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import { COPY_CONSOLE_PREFIX, COPY_MESSAGE_TYPE } from '../../../src/modules/copyurl/CopyMessage.js';
 import { COPIED_TEXT, CopyUrl, FAILED_TEXT } from '../../../src/modules/copyurl/CopyUrl.js';
-import { TOAST_ATTRIBUTE } from '../../../src/modules/copyurl/Toast.js';
+import { TOAST_ATTRIBUTE } from '../../../src/core/Toast.js';
 import { FakeLoader, SilentSink } from '../../loader/fakes.js';
 import { FakeTabs } from '../favorites/fakes.js';
 import { event } from '../pinned/fakes.js';

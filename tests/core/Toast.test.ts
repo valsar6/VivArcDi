@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../../src/modules/copyurl/Toast.js';
-import { FakeElement } from '../peek/fakes.js';
-import { asDocument, CopyDocument, ManualTimers } from './fakes.js';
+import { Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../src/core/Toast.js';
+import { FakeElement } from '../modules/peek/fakes.js';
+import { asDocument, CopyDocument, ManualTimers } from '../modules/copyurl/fakes.js';
 
 const setUp = (): { toast: Toast; parent: FakeElement; timers: ManualTimers } => {
   const parent = new FakeElement('div');

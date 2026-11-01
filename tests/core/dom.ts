@@ -13,6 +13,10 @@ export class DomNode {
   public ownerDocument: DomDocument;
   public offsetHeight = 0;
   public focused = false;
+  public value = '';
+  public rect = { left: 0, right: 0, top: 0, bottom: 0 };
+  public selected = false;
+  public caret: number | null = null;
 
   constructor(tagName: string, ownerDocument: DomDocument) {
     this.tagName = tagName.toUpperCase();
@@ -102,6 +106,18 @@ export class DomNode {
 
   public focus(): void {
     this.focused = true;
+  }
+
+  public getBoundingClientRect(): { left: number; right: number; top: number; bottom: number; height: number } {
+    return { ...this.rect, height: this.rect.bottom - this.rect.top };
+  }
+
+  public select(): void {
+    this.selected = true;
+  }
+
+  public setSelectionRange(start: number): void {
+    this.caret = start;
   }
 
   public querySelector(): DomNode | null {

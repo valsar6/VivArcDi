@@ -1,3 +1,4 @@
+import type { BookmarkWriter } from './bookmarks/BookmarkWriter.js';
 import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import type { BrowserPrefs } from './BrowserPrefs.js';
 import type { BrowserRuntime } from './BrowserRuntime.js';
@@ -21,6 +22,8 @@ export interface ModuleContext {
   tabs: BrowserTabs;
   /** The `chrome.bookmarks` API, read-only; check `bookmarks.available` first. */
   bookmarks: BrowserBookmarks;
+  /** The only way to create, rename and delete bookmarks; check `bookmarkWriter.available` first. */
+  bookmarkWriter: BookmarkWriter;
   /** The options of every module in `config.json`, for modules that follow another one. */
   modules: Readonly<Record<string, ModuleOptions>>;
   /** `chrome.runtime` messages and `chrome.windows`; check before use. */

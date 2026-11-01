@@ -59,7 +59,7 @@ export class ManualTimer {
 }
 
 export class TodayNode extends DomNode {
-  public value = '';
+  public override value = '';
 
   public get lastElementChild(): DomNode | null {
     return this.children.at(-1) ?? null;

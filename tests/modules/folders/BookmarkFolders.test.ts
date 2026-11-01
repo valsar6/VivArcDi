@@ -10,10 +10,12 @@ import type { ModuleContext } from '../../../src/core/Module.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
+import { FolderCommands } from '../../../src/core/FolderCommands.js';
+import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
 import { CASETTA, FakePrefsApi, WORK } from '../../core/prefs.js';
-import { FolderTabs, bookmarkTree, folder, link, recordingChrome } from './fakes.js';
+import { FolderTabs, WritableChrome, bookmarkTree, folder, link, recordingChrome } from './fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG)]), folder('20', 'Music')]);
@@ -24,12 +26,13 @@ interface SetupExtras {
   options?: Record<string, unknown>;
   prefs?: BrowserPrefs;
   logger?: Logger;
+  bookmarkWriter?: BookmarkWriter;
 }
 
 function setup(
   tabs: FolderTabs,
   bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks,
-  { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger() }: SetupExtras = {},
+  { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger(), bookmarkWriter = new BookmarkWriter(undefined) }: SetupExtras = {},
 ): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
   const dom = new DomDocument();
   const context = {
@@ -39,6 +42,7 @@ function setup(
     options,
     tabs,
     bookmarks,
+    bookmarkWriter,
     prefs,
     storage: new MemoryStorage(),
   } as unknown as ModuleContext;
@@ -49,6 +53,8 @@ const frame = async (): Promise<void> => {
   await settle();
   await new Promise((resolve) => setTimeout(resolve, 5));
 };
+
+const toggleDelay = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 280));
 
 const rows = (dom: DomDocument): DomNode[] => dom.parent.children[0]?.children[0]?.children ?? [];
 
@@ -79,6 +85,7 @@ test('draws the folders above the tab list and removes them on stop', async (t) 
   );
 
   rows(dom)[0]?.click();
+  await toggleDelay();
   await frame();
   assert.equal(rows(dom).length, 3);
 
@@ -150,7 +157,7 @@ const WORKSPACE_OPTIONS = { root: '', workspaces: { Casetta: `${BAR}/Work`, Work
 
 const inWorkspace = (workspaceId: number): string => JSON.stringify({ workspaceId });
 
-function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS): { tabs: FolderTabs; prefs: FakePrefsApi; dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
+function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS, chrome?: WritableChrome): { tabs: FolderTabs; prefs: FakePrefsApi; dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
   const tabs = new FolderTabs([
     { id: 1, active: true, url: 'https://example.com/', vivExtData: inWorkspace(CASETTA.id) },
     { id: 2, url: 'https://example.org/', vivExtData: inWorkspace(WORK.id) },
@@ -158,7 +165,7 @@ function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS): {
   ]);
   const prefs = new FakePrefsApi();
   prefs.values.set('vivaldi.workspaces.list', [CASETTA, WORK]);
-  return { tabs, prefs, ...setup(tabs, recordingChrome(WORKSPACE_TREE).bookmarks, { options, prefs: new BrowserPrefs(prefs) }) };
+  return { tabs, prefs, ...setup(tabs, chrome?.reader ?? recordingChrome(WORKSPACE_TREE).bookmarks, { options, prefs: new BrowserPrefs(prefs), ...(chrome === undefined ? {} : { bookmarkWriter: chrome.writer }) }) };
 }
 
 function activate(tabs: FolderTabs, tabId: number): void {
@@ -212,17 +219,17 @@ test('falls back to the default root outside any workspace', async (t) => {
 
 test('hides the section when the root is empty', async (t) => {
   installFrames(t);
-  const { tabs, dom, module, context } = workspaceSetup();
+  const { tabs, dom, module, context } = workspaceSetup({ ...WORKSPACE_OPTIONS, workspaces: { Casetta: `${BAR}/Work`, Work: '' } });
   await module.start(context);
   await frame();
   assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), false);
 
-  activate(tabs, 3);
+  activate(tabs, 2);
   await frame();
   assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), true);
   assert.deepEqual(titles(dom), []);
 
-  activate(tabs, 2);
+  activate(tabs, 1);
   await frame();
   assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), false);
   module.stop();
@@ -234,6 +241,7 @@ test('keeps the folders open in each workspace apart', async (t) => {
   await module.start(context);
   await frame();
   rows(dom)[0]?.click();
+  await toggleDelay();
   await frame();
   assert.equal(rows(dom).length, 2);
 
@@ -257,5 +265,168 @@ test('keeps the tab of a link linked while another workspace shows its own folde
   await frame();
   assert.deepEqual(titles(dom), ['Radio', 'Player']);
   assert.equal(TabData.ownOf(tabs.tabs.get(4) as chrome.tabs.Tab).bookmarkId, '12');
+  module.stop();
+});
+
+test('creates nothing until the first write', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { tabs, dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  await module.start(context);
+  await frame();
+  activate(tabs, 2);
+  await frame();
+  assert.equal(sectionOf(dom)?.hasAttribute('hidden'), true);
+  assert.deepEqual(titles(dom), []);
+  assert.deepEqual(chrome.calls.filter((call) => !call.startsWith('get')), []);
+  module.stop();
+});
+
+test('shows the folder named after the workspace once it exists', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', [folder('32', 'Hobbies'), link('33', 'Chess', 'https://chess.com/')])])]));
+  const { dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  await module.start(context);
+  await frame();
+  assert.deepEqual(titles(dom), ['Hobbies', 'Chess']);
+  module.stop();
+});
+
+test('listens to Cmd/Ctrl+D while it runs and stops on stop', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  await module.start(context);
+  assert.equal(dom.listeners.get('keydown')?.length, 1);
+  module.stop();
+  assert.deepEqual(dom.listeners.get('keydown'), []);
+});
+
+const EDITABLE = { root: '', workspaces: { Casetta: `${BAR}/Work` }, maxDepth: 3, maxHeightPercent: 60 };
+const fieldOf = (dom: DomDocument): DomNode | undefined => rows(dom)[0]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
+const keyOn = (node: DomNode | undefined, key: string): void => node?.bubble({ type: 'keydown', key, stopPropagation: (): void => undefined, preventDefault: (): void => undefined } as unknown as Event);
+const doubleClickFirst = (dom: DomDocument): void => rows(dom)[0]?.bubble({ type: 'dblclick', target: rows(dom)[0] } as unknown as Event);
+
+test('saves the typed name of a folder', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const field = fieldOf(dom);
+  assert.ok(field);
+  field.value = 'Boards';
+  keyOn(field, 'Enter');
+  await frame();
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('update')), ['update 11']);
+  assert.deepEqual(titles(dom), ['Boards']);
+  module.stop();
+});
+
+test('keeps the name on escape or empty text', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const escaped = fieldOf(dom);
+  assert.ok(escaped);
+  escaped.value = 'Never';
+  keyOn(escaped, 'Escape');
+  doubleClickFirst(dom);
+  const empty = fieldOf(dom);
+  assert.ok(empty);
+  empty.value = '  ';
+  keyOn(empty, 'Enter');
+  await frame();
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('update')), []);
+  assert.deepEqual(titles(dom), ['Jira']);
+  module.stop();
+});
+
+test('puts the folder back to its name when the rename fails', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  chrome.failing.add('update');
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  doubleClickFirst(dom);
+  const field = fieldOf(dom);
+  assert.ok(field);
+  field.value = 'Boards';
+  keyOn(field, 'Enter');
+  await frame();
+  assert.deepEqual(titles(dom), ['Jira']);
+  module.stop();
+});
+
+test('edits the new folder right after the plus button asks for it', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  await module.start(context);
+  await frame();
+  FolderCommands.of(context.document).requestNewFolder();
+  await frame();
+  assert.deepEqual(chrome.created, ['Untitled']);
+  assert.deepEqual(titles(dom).length, 2);
+  const field = rows(dom)[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
+  assert.equal(field?.value, 'Untitled');
+  assert.equal(field?.selected, true);
+  module.stop();
+});
+
+const TODAY_TAB_ID = 7;
+
+function todayTabTarget(): unknown {
+  const wrapper = { dataset: { id: `tab-${TODAY_TAB_ID}` }, closest: (): unknown => wrapper, querySelector: (): null => null };
+  return { closest: (): unknown => wrapper, querySelector: (): unknown => wrapper };
+}
+
+function dragFromList(dom: DomDocument, from: { x: number; y: number }, to: { x: number; y: number }): void {
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: from.x, clientY: from.y, target: todayTabTarget() });
+  dom.emit('mousemove', { buttons: 1, clientX: to.x, clientY: to.y });
+  dom.emit('mouseup', { buttons: 0, clientX: to.x, clientY: to.y });
+}
+
+function layOut(dom: DomDocument): void {
+  const section = sectionOf(dom);
+  assert.ok(section);
+  section.rect = { left: 0, right: 200, top: 0, bottom: section.children.length * 30 };
+  section.children.forEach((row, index) => (row.rect = { left: 0, right: 200, top: index * 30, bottom: index * 30 + 30 }));
+}
+
+const WORK_LINKS = bookmarkTree([folder('10', 'Work', [link('21', 'First', 'https://first.example/'), link('22', 'Second', 'https://second.example/')])]);
+
+test('adds a dropped tab at the position of the drop', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORK_LINKS);
+  const { tabs, dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  tabs.open({ id: TODAY_TAB_ID, url: 'https://dropped.example/', title: 'Dropped' });
+  await module.start(context);
+  await frame();
+  layOut(dom);
+  dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 35 });
+  await frame();
+  assert.deepEqual(chrome.created, ['Dropped']);
+  assert.deepEqual(titles(dom), ['First', 'Dropped', 'Second']);
+  assert.equal(TabData.ownOf(await tabs.get(TODAY_TAB_ID)).bookmarkId, '500');
+  module.stop();
+});
+
+test('adds a dropped tab at the end when it is released under the last row', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORK_LINKS);
+  const { tabs, dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  tabs.open({ id: TODAY_TAB_ID, url: 'https://dropped.example/', title: 'Dropped' });
+  await module.start(context);
+  await frame();
+  layOut(dom);
+  dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 55 });
+  await frame();
+  assert.deepEqual(titles(dom), ['First', 'Second', 'Dropped']);
   module.stop();
 });

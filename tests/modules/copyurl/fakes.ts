@@ -1,5 +1,5 @@
 import type { ClipboardWriter } from '../../../src/modules/copyurl/UrlCopier.js';
-import type { ToastTimers } from '../../../src/modules/copyurl/Toast.js';
+import type { ToastTimers } from '../../../src/core/Toast.js';
 import { FakeElement } from '../peek/fakes.js';
 
 export class FakeField extends FakeElement {

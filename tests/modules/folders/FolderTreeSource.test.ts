@@ -129,3 +129,18 @@ test('knows the links of every root so that tabs of other roots stay linked', as
   assert.equal(tree.linkIds, null, 'a missing root unlinks nothing');
   tree.stop();
 });
+
+test('knows the links of optional roots that exist and skips those that do not', async () => {
+  const bookmarks = new FakeBookmarks(
+    bookmarkTree([
+      folder('10', 'Work', [link('11', 'Jira', 'https://jira.example/')]),
+      folder('20', 'Music', [link('21', 'Radio', 'https://radio.example/'), link('22', 'Chess', 'https://chess.example/')]),
+    ]),
+  );
+  const optional = [[...ROOT_PATH, 'Music'], [...ROOT_PATH, 'Missing'], [...ROOT_PATH, 'Work']];
+  const tree = new FolderTreeSource(bookmarks, { path: [...ROOT_PATH, 'Work'], optionalPaths: (): string[][] => optional, maxDepth: 3, onChange: (): void => undefined, logger: silentLogger(), timing: immediateFrames });
+  await tree.start();
+  assert.deepEqual([...(tree.linkIds ?? [])], ['11', '21', '22']);
+  assert.deepEqual(tree.childIds, ['11']);
+  tree.stop();
+});
