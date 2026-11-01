@@ -24,7 +24,8 @@
       "tileMinWidth": 64,
       "tileHeight": 44,
       "gap": 8,
-      "unloadOnMiddleClick": true
+      "unloadOnMiddleClick": true,
+      "emptyHint": "Drag a tab here to pin it"
     },
     "peek": {
       "enabled": true,
