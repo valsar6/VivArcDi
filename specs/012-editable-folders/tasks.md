@@ -13,7 +13,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
   unbound, and which element and attributes does a folder row of the Bookmarks panel have under the
   pointer (`spaces/diagnostica-cmd-d-pannello.js` in the project files). Decides FR-10 and the risks of
   step 4.
-- [ ] **T2.** `BookmarkWriter` with `create`, `update`, `remove`, `ensurePath`; `BrowserBookmarks` stays
+- [x] **T2.** `BookmarkWriter` with `create`, `update`, `remove`, `ensurePath`; `BrowserBookmarks` stays
   read-only. AC-6, AC-12.
 - [ ] **T3.** `WorkspaceRoots` order of FR-4 and `workspacesBase`; config and README. AC-5, AC-7.
 - [ ] **T4.** `CreatedLinks` and `WorkspaceFavorites` (`add`, `addFolder`, `take`). AC-1, AC-6, AC-8,

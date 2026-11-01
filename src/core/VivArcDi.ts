@@ -1,4 +1,5 @@
 import { createDefaultRegistry } from '../modules/index.js';
+import { BookmarkWriter } from './bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import { BrowserPrefs } from './BrowserPrefs.js';
 import type { PrefsApi } from './BrowserPrefs.js';
@@ -29,6 +30,8 @@ export interface VivArcDiDependencies {
   tabs?: BrowserTabs;
   /** The bookmarks API given to modules. */
   bookmarks?: BrowserBookmarks;
+  /** The bookmark writer given to modules. */
+  bookmarkWriter?: BookmarkWriter;
   /** The runtime API given to modules. */
   runtime?: BrowserRuntime;
   /** Vivaldi's preferences given to modules. */
@@ -44,6 +47,7 @@ export class VivArcDi {
   #document: Document;
   #tabs: BrowserTabs;
   #bookmarks: BrowserBookmarks;
+  #bookmarkWriter: BookmarkWriter;
   #runtime: BrowserRuntime;
   #prefs: BrowserPrefs;
   #storage: KeyValueStorage;
@@ -63,6 +67,7 @@ export class VivArcDi {
     document,
     tabs = new BrowserTabs(undefined),
     bookmarks = new BrowserBookmarks(undefined),
+    bookmarkWriter = new BookmarkWriter(undefined),
     runtime = new BrowserRuntime(undefined),
     prefs = new BrowserPrefs(undefined),
     storage = new PersistentStorage(new Map(), null, undefined, logger),
@@ -73,6 +78,7 @@ export class VivArcDi {
     this.#document = document;
     this.#tabs = tabs;
     this.#bookmarks = bookmarks;
+    this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
     this.#prefs = prefs;
     this.#storage = storage;
@@ -97,6 +103,7 @@ export class VivArcDi {
       document,
       tabs: new BrowserTabs(chromeApi),
       bookmarks: new BrowserBookmarks(chromeApi),
+      bookmarkWriter: new BookmarkWriter(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger),
@@ -188,6 +195,7 @@ export class VivArcDi {
         build,
         tabs: this.#tabs,
         bookmarks: this.#bookmarks,
+        bookmarkWriter: this.#bookmarkWriter,
         modules,
         runtime: this.#runtime,
         prefs: this.#prefs,

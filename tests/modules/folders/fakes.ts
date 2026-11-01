@@ -1,4 +1,6 @@
 import type { BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
+import type { WritableBookmarksApi, WriterHost } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
 import type { TabActivatedListener, TabCreatedListener, TabRemovedListener, TabUpdateListener } from '../../../src/core/BrowserTabs.js';
@@ -171,5 +173,81 @@ export class FolderTabs {
 
   public actions(): Array<[string, ...unknown[]]> {
     return this.calls;
+  }
+}
+
+const findNode = (nodes: BookmarkNode[], id: string): BookmarkNode | undefined => {
+  for (const node of nodes) {
+    const found = node.id === id ? node : findNode(node.children ?? [], id);
+    if (found !== undefined) {
+      return found;
+    }
+  }
+  return undefined;
+};
+
+/** A `chrome.bookmarks` with an in-memory tree that creates, renames and removes, and records the calls. */
+export class WritableChrome implements WriterHost {
+  public tree: BookmarkNode[];
+  public calls: string[] = [];
+  public failing = new Set<string>();
+  public runtime: { lastError?: { message?: string } | undefined } = {};
+  public bookmarks: WritableBookmarksApi;
+  #nextId = 500;
+
+  constructor(tree: BookmarkNode[]) {
+    this.tree = tree;
+    this.bookmarks = {
+      getTree: (callback): void => this.#answer('getTree', () => callback(this.tree)),
+      getChildren: (id, callback): void => this.#answer('getChildren', () => callback(findNode(this.tree, id)?.children ?? [])),
+      create: (details, callback): void =>
+        this.#answer(`create ${details.title}`, () => {
+          const parent = findNode(this.tree, details.parentId ?? '2') ?? findNode(this.tree, '1');
+          const node: BookmarkNode = { id: String(this.#nextId++), title: details.title, url: details.url, children: details.url === undefined ? [] : undefined };
+          const children = parent?.children ?? [];
+          children.splice(details.index ?? children.length, 0, node);
+          callback(node);
+        }),
+      update: (id, changes, callback): void =>
+        this.#answer(`update ${id}`, () => {
+          const node = findNode(this.tree, id);
+          if (node !== undefined) {
+            node.title = changes.title;
+            callback(node);
+          }
+        }),
+      remove: (id, callback): void =>
+        this.#answer(`remove ${id}`, () => {
+          const parent = this.#parentOf(this.tree, id);
+          if (parent?.children !== undefined) {
+            parent.children = parent.children.filter((child) => child.id !== id);
+          }
+          callback();
+        }),
+    };
+  }
+
+  public get writer(): BookmarkWriter {
+    return new BookmarkWriter(this);
+  }
+
+  #parentOf(nodes: BookmarkNode[], id: string): BookmarkNode | undefined {
+    for (const node of nodes) {
+      if (node.children?.some((child) => child.id === id) === true) {
+        return node;
+      }
+      const found = this.#parentOf(node.children ?? [], id);
+      if (found !== undefined) {
+        return found;
+      }
+    }
+    return undefined;
+  }
+
+  #answer(call: string, run: () => void): void {
+    this.calls.push(call);
+    this.runtime.lastError = this.failing.has(call.split(' ')[0] ?? '') ? { message: `${call} failed` } : undefined;
+    run();
+    this.runtime.lastError = undefined;
   }
 }
