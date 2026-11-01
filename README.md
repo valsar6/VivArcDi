@@ -390,8 +390,9 @@ panel, and the tab bar follows.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty shows nothing |
+| `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty uses `<workspacesBase>/<workspace name>` |
 | `workspaces` | `{}` | The folder of each workspace: the name of the workspace (as in Vivaldi's workspace menu) and the path of its folder, written like `root` |
+| `workspacesBase` | `VivArcDi` | The folder that holds the default folder of each workspace, written like `root`. It is created the first time you write in a workspace |
 | `maxDepth` | `3` | How many levels of folders are shown |
 | `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
 
@@ -409,10 +410,12 @@ Each workspace can show its own folders, as the spaces of Arc do:
 ```
 
 The section shows the folder of the active workspace and changes when you switch workspace. Each
-workspace remembers which of its folders are open. A workspace with no entry, and the area outside
-any workspace, use `root`; since `root` is empty by default, the section is then hidden and takes no
-space. A workspace renamed in Vivaldi is matched by its new name. An entry with an empty path hides
-the section in that workspace. A `workspaces` option that is not an object of text paths is ignored
+workspace remembers which of its folders are open. A workspace with no entry uses `root` when it is
+not empty, otherwise the folder `VivArcDi/<workspace name>` (the base is the option `workspacesBase`),
+and the area outside any workspace uses `root`, otherwise `VivArcDi/Tabs`. Until that folder exists,
+which happens the first time you write in the workspace, the section is hidden and takes no space. A
+workspace renamed in Vivaldi is matched by its new name, so it looks for a new default folder and the
+old one stays in the Bookmarks panel. An entry with an empty path hides the section in that workspace. A `workspaces` option that is not an object of text paths is ignored
 and the console says so.
 
 A link has at most one tab in each workspace: the tab stays in the workspace where it was opened, and

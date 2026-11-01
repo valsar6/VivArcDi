@@ -1,39 +1,69 @@
 import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
 import type { Logger } from '../../core/Logger.js';
 
+const DEFAULT_BASE = 'VivArcDi';
+const OUTSIDE_NAME = 'Tabs';
+
 export class WorkspaceRoots {
   #root: string[];
+  #base: string[];
   #byName = new Map<string, string[]>();
 
   /**
-   * The root folder of each workspace, from the options `root` and `workspaces`. A workspace with
-   * no entry, and the area outside any workspace, use `root`. An empty path means no folders. An
-   * invalid `workspaces` is ignored and logged once.
+   * The root folder of each workspace, from the options `workspaces`, `root` and `workspacesBase`.
+   * A workspace with an entry uses it; an empty entry means no folders. A workspace with no entry
+   * uses `root` when it is not empty, else a folder named after it inside the base folder. The
+   * area outside any workspace uses `root`, else `<base>/Tabs`. An invalid `workspaces` is ignored
+   * and logged once.
    *
    * @param options The options of the module.
    * @param options.root The default root as a path of titles separated by `/`.
    * @param options.workspaces The map from a workspace name to its root path.
+   * @param options.workspacesBase The folder that holds the default folder of each workspace; `VivArcDi` when missing or empty.
    * @param logger Logger for the invalid option.
    */
-  constructor({ root, workspaces }: { root: unknown; workspaces: unknown }, logger: Logger) {
+  constructor({ root, workspaces, workspacesBase }: { root: unknown; workspaces: unknown; workspacesBase?: unknown }, logger: Logger) {
     this.#root = BookmarkFolderFinder.parsePath(typeof root === 'string' ? root : '');
+    const base = BookmarkFolderFinder.parsePath(typeof workspacesBase === 'string' ? workspacesBase : '');
+    this.#base = base.length > 0 ? base : [DEFAULT_BASE];
     this.#byName = WorkspaceRoots.#parse(workspaces, logger);
   }
 
   /**
    * @param workspaceName The name of the active workspace, or null outside any workspace.
-   * @returns The titles of its root folder; empty when no folders are shown.
+   * @returns The titles of its root folder, which may not exist yet; empty when no folders are shown.
    */
   public rootFor(workspaceName: string | null): string[] {
-    return (workspaceName === null ? undefined : this.#byName.get(workspaceName)) ?? this.#root;
+    const configured = workspaceName === null ? undefined : this.#byName.get(workspaceName);
+    if (configured !== undefined) {
+      return configured;
+    }
+    return this.#root.length > 0 ? this.#root : [...this.#base, WorkspaceRoots.#folderName(workspaceName)];
   }
 
   /**
-   * @returns Every non-empty root that any workspace may show, without repeats.
+   * @returns Every non-empty root written in the options, without repeats.
    */
   public get allPaths(): string[][] {
-    const paths = [this.#root, ...this.#byName.values()].filter((path) => path.length > 0);
-    return paths.filter((path, index) => paths.findIndex((other) => other.join('/') === path.join('/')) === index);
+    return WorkspaceRoots.#distinct([this.#root, ...this.#byName.values()]);
+  }
+
+  /**
+   * @param workspaceNames The names of the workspaces that exist; null stands for the area outside any workspace.
+   * @returns The non-empty root of each of them, without repeats.
+   */
+  public pathsFor(workspaceNames: Array<string | null>): string[][] {
+    return WorkspaceRoots.#distinct(workspaceNames.map((name) => this.rootFor(name)));
+  }
+
+  static #folderName(workspaceName: string | null): string {
+    const name = workspaceName?.trim() ?? '';
+    return name === '' ? OUTSIDE_NAME : name;
+  }
+
+  static #distinct(paths: string[][]): string[][] {
+    const filled = paths.filter((path) => path.length > 0);
+    return filled.filter((path, index) => filled.findIndex((other) => other.join('/') === path.join('/')) === index);
   }
 
   static #parse(value: unknown, logger: Logger): Map<string, string[]> {

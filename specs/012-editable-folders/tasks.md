@@ -15,7 +15,7 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
   step 4.
 - [x] **T2.** `BookmarkWriter` with `create`, `update`, `remove`, `ensurePath`; `BrowserBookmarks` stays
   read-only. AC-6, AC-12.
-- [ ] **T3.** `WorkspaceRoots` order of FR-4 and `workspacesBase`; config and README. AC-5, AC-7.
+- [x] **T3.** `WorkspaceRoots` order of FR-4 and `workspacesBase`; config and README. AC-5, AC-7.
 - [ ] **T4.** `CreatedLinks` and `WorkspaceFavorites` (`add`, `addFolder`, `take`). AC-1, AC-6, AC-8,
   AC-9, AC-12, AC-24, AC-25.
 - [ ] **T5.** Move `Toast` to `src/core`; `FavoriteShortcut` and its wiring in the folders module.

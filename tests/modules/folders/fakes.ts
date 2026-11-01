@@ -1,4 +1,4 @@
-import type { BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import type { BookmarksApi, BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import type { WritableBookmarksApi, WriterHost } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
@@ -192,12 +192,21 @@ export class WritableChrome implements WriterHost {
   public calls: string[] = [];
   public failing = new Set<string>();
   public runtime: { lastError?: { message?: string } | undefined } = {};
-  public bookmarks: WritableBookmarksApi;
+  public bookmarks: WritableBookmarksApi & Required<Pick<BookmarksApi, 'onCreated' | 'onRemoved' | 'onChanged' | 'onMoved'>>;
+  public listeners = new Set<() => void>();
   #nextId = 500;
 
   constructor(tree: BookmarkNode[]) {
     this.tree = tree;
+    const event = {
+      addListener: (listener: () => void): void => void this.listeners.add(listener),
+      removeListener: (listener: () => void): void => void this.listeners.delete(listener),
+    };
     this.bookmarks = {
+      onCreated: event,
+      onRemoved: event,
+      onChanged: event,
+      onMoved: event,
       getTree: (callback): void => this.#answer('getTree', () => callback(this.tree)),
       getChildren: (id, callback): void => this.#answer('getChildren', () => callback(findNode(this.tree, id)?.children ?? [])),
       create: (details, callback): void =>
@@ -231,6 +240,14 @@ export class WritableChrome implements WriterHost {
     return new BookmarkWriter(this);
   }
 
+  public get reader(): BrowserBookmarks {
+    return new BrowserBookmarks(this);
+  }
+
+  public get created(): string[] {
+    return this.calls.filter((call) => call.startsWith('create ')).map((call) => call.slice('create '.length));
+  }
+
   #parentOf(nodes: BookmarkNode[], id: string): BookmarkNode | undefined {
     for (const node of nodes) {
       if (node.children?.some((child) => child.id === id) === true) {
@@ -249,5 +266,8 @@ export class WritableChrome implements WriterHost {
     this.runtime.lastError = this.failing.has(call.split(' ')[0] ?? '') ? { message: `${call} failed` } : undefined;
     run();
     this.runtime.lastError = undefined;
+    if (!call.startsWith('get')) {
+      this.listeners.forEach((listener) => listener());
+    }
   }
 }

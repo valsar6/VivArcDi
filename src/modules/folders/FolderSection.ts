@@ -70,6 +70,7 @@ export class FolderSection {
       path: [],
       maxDepth,
       otherPaths: roots.allPaths,
+      optionalPaths: (): string[][] => roots.pathsFor([...this.#names.names, null]),
       onChange: (): void => this.#treeChanged(),
       logger,
     });
