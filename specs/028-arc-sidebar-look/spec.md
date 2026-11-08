@@ -147,6 +147,8 @@ changes.
 
 - [x] The dashed "Drag a tab here to pin it" box is not a pinned tab and goes away; the four tiles are the
       Favorites, at most three per row (Tore, 2026-11-08).
+- [x] Vivaldi's own group of pinned tabs (`span.pinned-group`) must never show (Tore, 2026-11-08): every
+      pinned tab that no Favorite stands for becomes a tile under the Favorites.
 - [x] Panel bar: leave it for now (Tore, 2026-11-08).
 - [x] Two-line address field: out of this spec.
 - [x] Without a workspace color: Arc's light blue by default, with six close palettes (Tore, 2026-11-08).

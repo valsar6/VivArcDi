@@ -5,7 +5,6 @@ import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
 import { Logger } from '../../../src/core/Logger.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import { PinnedFavorites, TILE_SOURCE_ATTRIBUTE } from '../../../src/modules/favorites/PinnedFavorites.js';
-import { TileSourceChoice } from '../../../src/modules/favorites/TileSource.js';
 import { TILE_ATTRIBUTE, CURRENT_ATTRIBUTE, DIMMED_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
 import { asDocument, DomDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
@@ -83,6 +82,12 @@ test('the first pinned tabs of the active workspace become the tiles, by positio
   assert.deepEqual(PinnedFavorites.tilesOf(tabs, 2).map(({ id }) => id), [1, 3]);
 });
 
+test('pinned tabs linked to a favorite do not become tiles', () => {
+  const linked = JSON.stringify({ workspaceId: 7, vivarcdi: { favoriteId: 'b1', pinnedUrl: 'https://site1.example/' } });
+  const tabs = [pinned(1, 7, { vivExtData: linked }), pinned(2), { id: 5, index: 5, active: true, vivExtData: inWorkspace(7) }] as chrome.tabs.Tab[];
+  assert.deepEqual(PinnedFavorites.tilesOf(tabs, 12).map(({ id }) => id), [2]);
+});
+
 test('draws one tile per pinned tab, hides their slots and marks the source', async (t) => {
   const { favorites, hidden, changes } = setup(t, [pinned(1, 7, { active: true }), pinned(2, 7, { discarded: true }), pinned(3, 8), { id: 4, index: 4, vivExtData: inWorkspace(7) }]);
   await favorites.start();
@@ -144,21 +149,4 @@ test('stop removes the tiles, the hiding and the listeners', async (t) => {
   favorites.stop();
   assert.equal(hidden.has(1), false);
   assert.equal(tabs.listenerCount(), 0);
-});
-
-test('the source choice prefers the bookmarks with links over the pinned tabs', () => {
-  const source = (count: number): { count: number; place: () => null } => ({ count, place: (): null => null });
-  const [bookmarks, pinnedTabs] = [source(2), source(5)];
-  assert.equal(TileSourceChoice.of([bookmarks, pinnedTabs]), bookmarks);
-});
-
-test('the source choice falls back to the pinned tabs when the folder has no links', () => {
-  const source = (count: number): { count: number; place: () => null } => ({ count, place: (): null => null });
-  const [bookmarks, pinnedTabs] = [source(0), source(3)];
-  assert.equal(TileSourceChoice.of([bookmarks, pinnedTabs]), pinnedTabs);
-});
-
-test('the source choice is null when no source has tiles', () => {
-  assert.equal(TileSourceChoice.of([{ count: 0, place: (): null => null }]), null);
-  assert.equal(TileSourceChoice.of([]), null);
 });
