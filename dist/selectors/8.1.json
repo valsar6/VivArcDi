@@ -6,6 +6,7 @@
   "tabListHost": "#tabs-container > :has(> .tab-strip)",
   "tabStrip": "#tabs-container .tab-strip",
   "pinnedTab": ".tab-position.is-pinned",
+  "pinnedGroup": ".pinned-group",
   "tabWrapper": ".tab-wrapper",
   "webviewContainer": "#webview-container",
   "tabWebview": "#webview-container webview[tab_id]",

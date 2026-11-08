@@ -11,7 +11,7 @@
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) #tabs-container {
   background-color: var(--vivarcdi-space) !important;
 }
-#browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) .button-toolbar.newtab {
+#browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
   display: none !important;
 }
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) #tabs-container ::-webkit-scrollbar {
