@@ -1,7 +1,8 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import type { DropTarget } from './DropTargets.js';
-import type { AddPlace, WorkspaceFavorites } from './WorkspaceFavorites.js';
+import { DropPlace } from './DropPlace.js';
+import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
 
 export interface TabDropDependencies {
   tabs: Pick<BrowserTabs, 'get'>;
@@ -13,6 +14,7 @@ export interface TabDropDependencies {
 
 export class TabDrops {
   #deps: TabDropDependencies;
+  #place: DropPlace;
 
   /**
    * Turns a tab of today's list released over a target into a link: in a folder at its end, in the
@@ -23,6 +25,7 @@ export class TabDrops {
    */
   constructor(dependencies: TabDropDependencies) {
     this.#deps = dependencies;
+    this.#place = new DropPlace(dependencies.indexBefore);
   }
 
   /**
@@ -34,16 +37,9 @@ export class TabDrops {
       return;
     }
     try {
-      await this.#deps.favorites.add(await this.#deps.tabs.get(tabId), this.#placeOf(target));
+      await this.#deps.favorites.add(await this.#deps.tabs.get(tabId), this.#place.of(target));
     } catch (error) {
       this.#deps.logger.warn('could not add the dropped tab', error);
     }
-  }
-
-  #placeOf(target: DropTarget): AddPlace {
-    if (target.kind === 'folder') {
-      return { parentId: target.id };
-    }
-    return target.kind === 'between' ? { index: this.#deps.indexBefore(target.before) } : {};
   }
 }
