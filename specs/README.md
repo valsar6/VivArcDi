@@ -36,6 +36,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [025 Annotated screenshots](025-annotated-screenshots/spec.md) | 5 | Draft |
 | [026 Live folders](026-live-folders/spec.md) | 3 | Draft |
 | [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Draft |
+| [028 Arc sidebar look](028-arc-sidebar-look/spec.md) | 3 | Draft |
 
 ## Layout
 
