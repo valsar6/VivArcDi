@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -46,7 +46,7 @@ A right click on a pinned row or a Favorite tile adds "Rename…" and "Change ic
 
 ## Open questions
 
-- [ ] Show the stored name in Vivaldi's own bookmarks panel too, or only in VivArcDi rows?
+- [x] Show the stored name in Vivaldi's own bookmarks panel too, or only in VivArcDi rows?
 
 ## References
 

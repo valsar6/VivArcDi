@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -47,9 +47,9 @@ In `config.json` the user adds a live folder: a name, the source `github-pull-re
 
 ## Open questions
 
-- [ ] Where to store the token? Keychain on macOS and a file with mode 600 on Debian is the proposal.
-- [ ] Filter by author or label in the first version?
-- [ ] Do virtual rows fit the 009 tree, or must they be real bookmarks in a hidden folder?
+- [x] Where to store the token? Keychain on macOS and a file with mode 600 on Debian is the proposal.
+- [x] Filter by author or label in the first version?
+- [x] Do virtual rows fit the 009 tree, or must they be real bookmarks in a hidden folder?
 
 ## References
 

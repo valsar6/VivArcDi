@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -45,7 +45,7 @@ After a capture the user sees it in a panel with a toolbar: arrow, rectangle, fr
 
 ## Open questions
 
-- [ ] Can a mod receive the image from Vivaldi's capture, or must VivArcDi offer its own capture shortcut? Probe requested.
+- [x] Can a mod receive the image from Vivaldi's capture, or must VivArcDi offer its own capture shortcut? Probe requested.
 
 ## References
 
