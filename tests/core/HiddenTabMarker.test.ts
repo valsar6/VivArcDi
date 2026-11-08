@@ -10,9 +10,12 @@ const slot = (id: number): FakeNode => {
   return new FakeNode([], [wrapper]);
 };
 
-const markerOver = (slots: FakeNode[], hidden: HiddenTabs): HiddenTabMarker => {
+const markerOver = (slots: FakeNode[], hidden: HiddenTabs, outside: FakeNode[] = []): HiddenTabMarker => {
   const strip = new FakeNode(['strip'], slots);
-  const document = { querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null) } as unknown as Document;
+  const document = {
+    querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null),
+    querySelectorAll: (selector: string): FakeNode[] => [...slots, ...outside].filter((node) => node.matches(selector)),
+  } as unknown as Document;
   return new HiddenTabMarker(document, selectors, hidden);
 };
 
@@ -62,7 +65,10 @@ test('keeps the slot collapsed while another module still hides its tab', () => 
 test('collapses the slot of a tab that shows up after the first pass', () => {
   const slots = [slot(1)];
   const strip = new FakeNode(['strip'], slots);
-  const document = { querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null) } as unknown as Document;
+  const document = {
+    querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null),
+    querySelectorAll: (): FakeNode[] => [],
+  } as unknown as Document;
   const hidden = new HiddenTabs();
   hidden.set('bookmark-folders', [2]);
   const marker = new HiddenTabMarker(document, selectors, hidden);
@@ -103,5 +109,17 @@ test('keeps the group of pinned tabs while one of its tabs is shown', () => {
   assert.deepEqual(
     [group, ...pinned].map((node) => node.properties.get('display')),
     [undefined, 'none', undefined],
+  );
+});
+
+test('collapses a group of pinned tabs that sits outside the tab strip', () => {
+  const pinned = [slot(1), slot(2)];
+  const group = groupOf(pinned);
+  const hidden = new HiddenTabs();
+  hidden.set('pinned-favorites', [1, 2]);
+  markerOver([slot(3)], hidden, [group]).apply();
+  assert.deepEqual(
+    [group, ...pinned].map((node) => node.properties.get('display')),
+    ['none', 'none', 'none'],
   );
 });

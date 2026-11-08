@@ -9,7 +9,7 @@ const immediate = { schedule: (run: () => void): void => run(), cancel: (): void
 function setup(): { hidden: HiddenTabs; strip: FakeNode; marker: HiddenTabMarker; changed: () => void } {
   const strip = new FakeNode(['strip'], [tabSlot(1), tabSlot(2), tabSlot(3)]);
   const browser = new FakeNode(['#browser']);
-  const document = { querySelector: (selector: string): FakeNode | null => (selector === '#browser' ? browser : selector === 'strip' ? strip : null) } as unknown as Document;
+  const document = { querySelector: (selector: string): FakeNode | null => (selector === '#browser' ? browser : selector === 'strip' ? strip : null), querySelectorAll: (): FakeNode[] => [] } as unknown as Document;
   let notify = (): void => undefined;
   const hidden = new HiddenTabs();
   const watch = (_target: Node, onChange: () => void): (() => void) => {
