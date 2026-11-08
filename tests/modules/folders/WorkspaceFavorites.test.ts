@@ -162,7 +162,7 @@ test('creates the workspace root on the first copy', async () => {
 });
 
 test('does not link copies to tabs or remember them as created links', async () => {
-  const { chrome, tabs, created, favorites } = withPanel();
+  const { tabs, created, favorites } = withPanel();
   await favorites.copy(['63'], {});
   assert.equal(created.has('500'), false);
   assert.deepEqual(tabs.calls, []);
