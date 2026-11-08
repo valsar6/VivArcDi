@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-08 |
+| Approved | Tore, 2026-11-08; revision 2026-11-08 (default palette `arclight` of 029) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -71,8 +71,9 @@ whatever the width of the tab bar (Tore, 2026-11-08). In the screenshot four til
 spec makes that impossible. The dashed "Drag a tab here to pin it" box is not part of Arc's tab bar and
 goes away (change request to [012](../012-editable-folders/spec.md) FR-15).
 
-**Default color.** Right after VivArcDi is installed, a workspace without a color of its own uses Arc's
-light blue (`#a3cee0`), not Vivaldi's theme colors. Next to it VivArcDi offers six palettes close to that
+**Default color.** Right after VivArcDi is installed, a workspace without a color of its own uses the
+`arclight` gradient of [029](../029-arc-light-theme/spec.md) (revised by Tore, 2026-11-08; it was Arc's
+light blue `#a3cee0`). Next to it VivArcDi offers six palettes close to that
 blue, which the picker of [019](../019-space-theme-color/spec.md) shows as its first row of presets:
 
 | Palette | Space color | Active pill | Text |
@@ -103,7 +104,7 @@ changes.
 - **FR-6.** "+ New Tab" is a row at the top of today's tabs.
 - **FR-7.** The scroll bar of the tab bar is 6 px wide and shows only while scrolling.
 - **FR-8.** Veil, pill and text colors come from CSS variables: from the workspace color of 019 when set,
-  from the Sky palette otherwise; dark mode uses the dark values.
+  from the default palette (`arclight`, 029) otherwise; dark mode uses the dark values.
 - **FR-10.** The Favorites grid never shows more than three tiles per row.
 - **FR-11.** The six palettes of the table above are defined once, as tokens, and 019 offers them as its
   first presets.
@@ -127,10 +128,10 @@ changes.
 | AC-6 | WHEN the workspace color changes, THE veil, pill and text SHALL follow it. | manual |
 | AC-7 | THE stylesheet SHALL define the row height, gap, radius and veils as tokens. | auto: `sidebar look uses tokens` |
 | AC-8 | WHERE `sidebar-look.enabled` is false, THE stylesheet SHALL not be applied. | auto: `disabled sidebar look changes nothing` |
-| AC-9 | WHILE a workspace has no color of its own, THE tab bar SHALL use the Sky palette. | auto: `uses the sky palette without a workspace color` |
+| AC-9 | WHILE a workspace has no color of its own and no palette is configured, THE tab bar SHALL use the `arclight` palette. | auto: `uses the arclight palette by default` |
 | AC-10 | THE grid SHALL use at most three columns for any width and any number of tiles. | auto: `never lays out more than three columns` |
 | AC-11 | THE six palettes SHALL keep a text contrast of at least 4.5:1 on their space color and active pill. | auto: `palettes keep readable text` |
-| AC-12 | WHEN Tore installs VivArcDi and opens a workspace without a color, THE tab bar SHALL be light blue. | manual |
+| AC-12 | WHEN Tore installs VivArcDi and opens a workspace without a color, THE tab bar SHALL show the coral-to-aqua gradient. | manual |
 | AC-13 | WHILE Tore has four or more Favorites, THE grid SHALL show three tiles per row. | manual |
 
 ## Out of scope
