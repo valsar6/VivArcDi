@@ -92,8 +92,20 @@ colors are kept in the shared `chrome.storage.local` store, keyed by workspace i
 - [x] Does Vivaldi 8.2 tie a theme to a workspace natively? No. Probe on Vivaldi 8.2 macOS (Tore, 2026-11-08):
   editing a workspace offers only the name, a choice of icon or emoji (20 icons) and the Done button. The
   color is therefore kept entirely by VivArcDi (FR-3) and applied through CSS variables (FR-5).
-- [ ] Can VivArcDi read the colors of the active Vivaldi theme (`vivaldi.themes.*`), to pick the light or dark
-  variant in automatic mode? Probe in progress.
+- [x] Can VivArcDi read the colors of the active Vivaldi theme? Yes. Probe on Vivaldi 8.2 macOS (Tore,
+  2026-11-08): `vivaldi.themes.current` is the id of the active theme and `vivaldi.themes.user` is a list of
+  themes with `colorBg`, `colorFg`, `colorHighlightBg`, `colorAccentBg`, `colorWindowBg`, `alpha`, `blur`,
+  `contrast`, `radius`, `transparencyTabBar` and `transparencyTabs`. Themes are global, and
+  `vivaldi.workspaces.list` holds only the id, name and icon of a workspace. `vivaldi.prefs` offers `get`, `set`
+  and `onChanged`, so a mod can read and write both prefs.
+- [ ] How is the color applied? Two ways, to be decided after one more probe:
+  (a) override the interface CSS variables from VivArcDi: the probe read fixed values (`#ffffff`, `#000000`)
+  on `#browser` that did not change with the workspace, so the element where Vivaldi applies them is not
+  found yet; (b) keep a map workspace id to color, create a user theme per workspace derived from the active
+  theme, and set `vivaldi.themes.current` at each workspace change: it edits the user's theme list and may
+  flicker, which is not verified. FR-5 says (a); it changes if (b) is chosen.
+- [ ] Grain and the wave slider have no native equivalent in Vivaldi: they are drawn by VivArcDi as a noise
+  layer over the bar.
 
 ## References
 
