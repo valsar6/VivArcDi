@@ -140,6 +140,19 @@ class ShortcutsTest(unittest.TestCase):
         panel = self.read_preferences()["vivaldi"]["actions"][0]["COMMAND_MAIN_TOGGLE_PANEL_TOGGLE"]
         self.assertEqual(panel["shortcuts"], ["f4"])
 
+    def test_reserved_little_arc_key_is_removed_from_other_command(self):
+        actions = default_actions()
+        actions["COMMAND_NOTES_PANEL"] = {"shortcuts": ["alt+meta+n", "f6"]}
+        self.write_preferences(preferences_with(actions))
+        self.assertEqual(self.run_shortcuts("status"), 0)
+        self.assertIn("differs", self.output.getvalue())
+        self.assertEqual(self.run_shortcuts("apply"), 0)
+        result = self.read_preferences()["vivaldi"]["actions"][0]
+        self.assertEqual(result["COMMAND_NOTES_PANEL"]["shortcuts"], ["f6"])
+        holders = [name for name, entry in result.items() if "alt+meta+n" in entry.get("shortcuts", [])]
+        self.assertEqual(holders, [])
+        self.assertEqual(ShortcutTable.load("ctrl").reserved, ("alt+ctrl+n",))
+
     def test_command_d_is_left_to_vivarcdi(self):
         actions = default_actions()
         actions["COMMAND_PIN_TAB"] = {"shortcuts": ["meta+d"]}
