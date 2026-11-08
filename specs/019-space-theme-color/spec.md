@@ -37,8 +37,8 @@ Space. "Edit Theme Color…" opens a small panel beside the tab bar, with:
    sit at the bottom of the area.
 3. A row of nine preset swatches (white, pink, purple, red, orange, yellow, green, blue, indigo), with
    arrows for more.
-4. A slider drawn as a wave and a round dial with a notch, both at the bottom. They set how strong the
-   color is and how much grain it has; the video does not say which is which.
+4. A slider drawn as a wave and a round dial with a notch, both at the bottom. The slider sets the
+   intensity of the color and the dial sets the grain (Tore, 2026-11-08).
 
 Closing the panel (click outside) keeps the color. Each space keeps its own color: switching to
 another space shows its color at once. A space that never got a color keeps Vivaldi's theme.
@@ -87,8 +87,7 @@ colors are kept in the shared `chrome.storage.local` store, keyed by workspace i
 
 ## Open questions
 
-- [ ] What do the wave slider and the dial do exactly in Arc (color intensity and grain)? Proposal: slider
-  = intensity, dial = grain, both from 0 to 100.
+- [x] Wave slider = intensity, dial = grain, both from 0 to 100: yes (Tore, 2026-11-08).
 - [ ] Does the color also tint the page frame in Vivaldi 8.2, or only the tab bar? To check with the probe.
 - [ ] Does Vivaldi 8.2 tie a theme to a workspace natively? If yes, use it instead of CSS variables.
 
