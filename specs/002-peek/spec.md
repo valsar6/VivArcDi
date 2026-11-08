@@ -102,7 +102,7 @@ Every trigger and size is an option in `config.json`.
 ## Out of scope
 
 - AI summaries on hover.
-- Peek for links coming from other apps: that is Little Arc, [005](../005-little-arc-and-extras/spec.md).
+- Peek for links coming from other apps: that is Little Arc, [005](../005-little-arc/spec.md).
 - More than one Peek at a time.
 - Carrying the Peek's back and forward history into the expanded tab.
 - Back, forward, reload, copy link and translate buttons on the panel.
