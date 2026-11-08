@@ -66,3 +66,8 @@ test('the gradient shows behind the panel bar', () => {
 test('hides the flexible spacer of the tab bar', () => {
   assert.match(compiled(), /\.button-toolbar\.toolbar-spacer-flexible\)\s*\{\s*display: none !important;/);
 });
+
+test('tile icons are 20 px', () => {
+  const css = sass.compile(`${STYLES}favorites.scss`).css;
+  assert.match(css, /\[data-vivarcdi-tile\] > img \{\s*width: 20px;\s*height: 20px;/);
+});
