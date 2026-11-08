@@ -22,7 +22,10 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     background: var(--vivarcdi-gradient) !important;
 
     #{$tab-bar},
-    #{$tab-bar} #tabs-container {
+    #{$tab-bar} #tabs-container,
+    #panels-container,
+    #panels,
+    #switch {
       background-color: transparent !important;
     }
   }
