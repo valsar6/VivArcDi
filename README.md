@@ -14,6 +14,9 @@ It ships three things:
    Vivaldi update. It comes as a downloadable app (macOS) and package (Debian), or as a
    [command line installer](#advanced-command-line-installer).
 
+New here? Read the [user manual](docs/manual/README.md): what each feature does, with pictures, and
+which Arc features come next.
+
 ## Status
 
 Version 0.15.0 brings the downloadable app (macOS) and package (Debian): no terminal and no Python needed.
