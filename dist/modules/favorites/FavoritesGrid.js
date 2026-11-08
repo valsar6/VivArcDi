@@ -9,9 +9,9 @@ import { FavoriteTagger } from "./FavoriteTagger.js";
 import { GridLayout } from "./GridLayout.js";
 import { MiddleClickUnload } from "./MiddleClickUnload.js";
 import { PinnedFavorites } from "./PinnedFavorites.js";
-import { TileSourceChoice } from "./TileSource.js";
 import { UnloadedTabs } from "./UnloadedTabs.js";
 const NO_TABS = { has: () => false };
+const NOTHING_PLACED = { grid: null, count: 0 };
 class FavoritesGrid extends Module {
   static id = "favorites-grid";
   /**
@@ -33,6 +33,7 @@ class FavoritesGrid extends Module {
   #refresh = null;
   #tagger = null;
   #layout = null;
+  #pinnedLayout = null;
   #unloadedTabs = null;
   #middleClick = null;
   #fromBookmarks = null;
@@ -42,9 +43,10 @@ class FavoritesGrid extends Module {
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
    * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
-   * the same in every workspace, and each opens a pinned tab hidden from the list. While the
-   * folder is missing or has no links, the first pinned tabs of the workspace become the tiles,
-   * drawn the same way, and their slots are hidden from the list. Without `chrome.tabs`, the first
+   * the same in every workspace, and each opens a pinned tab hidden from the list. The other
+   * pinned tabs of the workspace become tiles under them, drawn the same way, or the only tiles
+   * while the folder is missing or has no links, and their slots are hidden from the list, so
+   * Vivaldi's own group of pinned tabs never shows. Without `chrome.tabs`, the first
    * pinned tabs are laid out as a grid in Vivaldi's own list. Tiles of unloaded tabs are dimmed,
    * and a middle click unloads a tile instead of closing it.
    *
@@ -57,6 +59,7 @@ class FavoritesGrid extends Module {
     this.#selectors = selectors;
     this.#refresh = new FrameTask(() => this.#update());
     this.#layout = new GridLayout(settings);
+    this.#pinnedLayout = new GridLayout(settings);
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
       this.#startMiddleClick(settings, tabs, logger);
@@ -90,6 +93,7 @@ class FavoritesGrid extends Module {
     this.#unloadedTabs?.stop();
     this.#stopBookmarks();
     this.#layout?.release();
+    this.#pinnedLayout?.release();
     this.#tagger?.clear();
     this.#observer = null;
     this.#middleClick = null;
@@ -162,13 +166,19 @@ class FavoritesGrid extends Module {
     }
     tagger.maxTiles = this.#fromPinned === null ? this.#settings.maxTiles : 0;
     const strip = tagger.apply(tabBar);
-    const sources = this.#sources();
-    const chosen = TileSourceChoice.of(sources);
-    const placed = sources.map((source) => source.place(source === chosen && strip !== null));
-    this.#layout?.follow(placed.find((grid) => grid !== null) ?? strip, chosen?.count ?? tagger.tileCount);
+    this.#layOut(strip, tagger.tileCount);
   }
-  #sources() {
-    return [this.#fromBookmarks, this.#fromPinned].filter((source) => source !== null);
+  #layOut(strip, stripTiles) {
+    const favorites = FavoritesGrid.#placed(this.#fromBookmarks, strip !== null);
+    const others = FavoritesGrid.#placed(this.#fromPinned, strip !== null);
+    const [main, below] = favorites === null ? [others, NOTHING_PLACED] : [favorites, others ?? NOTHING_PLACED];
+    const top = main ?? { grid: strip, count: stripTiles };
+    this.#layout?.follow(top.grid, top.count);
+    this.#pinnedLayout?.follow(below.grid, below.count);
+  }
+  static #placed(source, shown) {
+    const grid = source?.place(shown && source.count > 0) ?? null;
+    return source === null || grid === null ? null : { grid, count: source.count };
   }
   #tabBar() {
     if (this.#document === null || this.#selectors === null) {

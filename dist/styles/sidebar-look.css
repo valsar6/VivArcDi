@@ -15,7 +15,10 @@
   background: var(--vivarcdi-gradient) !important;
 }
 #browser[data-vivarcdi-look][data-vivarcdi-gradient] #tabs-tabbar-container:is(.left, .right),
-#browser[data-vivarcdi-look][data-vivarcdi-gradient] #tabs-tabbar-container:is(.left, .right) #tabs-container {
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #tabs-tabbar-container:is(.left, .right) #tabs-container,
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #panels-container,
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #panels,
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #switch {
   background-color: transparent !important;
 }
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
