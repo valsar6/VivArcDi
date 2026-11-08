@@ -59,6 +59,10 @@ test('a gradient paints the browser and clears the tab bar background', () => {
   assert.match(css, /\[data-vivarcdi-gradient\] #tabs-tabbar-container:is\(\.left, \.right\)[^{]*\{\s*background-color: transparent !important;/);
 });
 
+test('the gradient shows behind the panel bar', () => {
+  assert.match(compiled(), /\[data-vivarcdi-gradient\] #switch\s*\{\s*background-color: transparent !important;/);
+});
+
 test('hides the flexible spacer of the tab bar', () => {
   assert.match(compiled(), /\.button-toolbar\.toolbar-spacer-flexible\)\s*\{\s*display: none !important;/);
 });

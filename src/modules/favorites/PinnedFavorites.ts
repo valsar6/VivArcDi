@@ -16,6 +16,7 @@ import { UnloadedTabs } from './UnloadedTabs.js';
 
 export const TILE_SOURCE_ATTRIBUTE = 'data-vivarcdi-tile-source';
 const HIDDEN_OWNER = 'pinned-favorites';
+export const PINNED_GRID_ORDER = GRID_ORDER + 1;
 
 export type PinnedFavoritesTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'discard' | 'get' | 'onUpdated' | 'onActivated' | 'onRemoved' | 'onCreated'>;
 
@@ -46,9 +47,10 @@ export class PinnedFavorites implements TileSource {
   #detach: (() => void) | null = null;
 
   /**
-   * The Favorites drawn from the first pinned tabs of the active workspace, for when the
-   * Favorites bookmark folder is missing or has no links. Each pinned tab becomes a tile of the
-   * grid and its slot in Vivaldi's tab list is hidden; a click on a tile activates that tab.
+   * The pinned tabs of the active workspace that no Favorite of the bookmark folder stands for,
+   * drawn as tiles under the Favorites, or as the only tiles when the folder is missing or has no
+   * links. Each pinned tab becomes a tile and its slot in Vivaldi's tab list is hidden, so
+   * Vivaldi's own group of pinned tabs never shows; a click on a tile activates that tab.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -69,7 +71,8 @@ export class PinnedFavorites implements TileSource {
   }
 
   /**
-   * Picks the tabs that become tiles: the pinned tabs of the workspace of the active tab, by position.
+   * Picks the tabs that become tiles: the pinned tabs of the workspace of the active tab that are
+   * not linked to a Favorite of the bookmark folder, by position.
    *
    * @param windowTabs Every tab of the window.
    * @param maxTiles Most tiles shown.
@@ -80,6 +83,7 @@ export class PinnedFavorites implements TileSource {
     const workspace = active === undefined ? null : TabData.of(active);
     return windowTabs
       .filter((tab) => tab.id !== undefined && tab.pinned === true && TabData.of(tab) === workspace)
+      .filter((tab) => TabData.ownOf(tab).favoriteId === undefined)
       .sort((a, b) => a.index - b.index)
       .slice(0, maxTiles);
   }
@@ -113,7 +117,7 @@ export class PinnedFavorites implements TileSource {
   /**
    * Shows or hides the tiles above the tab list, and hides or shows their tabs in the list.
    *
-   * @param visible Whether the tiles are the chosen Favorites and the vertical tab bar is shown.
+   * @param visible Whether the vertical tab bar is shown and there are tiles.
    * @returns The grid element when it is in place, otherwise null.
    */
   public place(visible: boolean): HTMLElement | null {
@@ -124,7 +128,7 @@ export class PinnedFavorites implements TileSource {
       return null;
     }
     try {
-      this.#detach ??= this.#anchor.add(this.#view.element, GRID_ORDER);
+      this.#detach ??= this.#anchor.add(this.#view.element, PINNED_GRID_ORDER);
     } catch {
       return null;
     }

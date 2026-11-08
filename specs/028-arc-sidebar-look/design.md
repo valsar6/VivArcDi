@@ -32,7 +32,9 @@ Two parts of the spec are not style:
    folder is missing or empty, the first `maxTiles` pinned tabs become VivArcDi's own tiles, drawn by
    the same `FavoritesView` at anchor order 10, laid out by `GridLayout` (at most `maxColumns`, 3), and
    their slots in Vivaldi's list are hidden through `HiddenTabs`. Favorites from the bookmark folder
-   keep working as today when the folder has links.
+   keep working as today when the folder has links; the pinned tabs that no Favorite is linked to
+   become tiles in a second grid right under them (anchor order 11), so Vivaldi's group of pinned
+   tabs is always empty and collapsed (Tore, 2026-11-08: "NON DEVE ESSERCI").
 2. **"+ New Tab" row (FR-6).** `NewTabRow` of the incognito module (013) already draws such a row.
    It moves to `src/core` and `sidebar-look` adds one at the end of the anchor (order 30), so it sits
    right above today's tabs once the tiles are above. Vivaldi's own `+` at the end of the list is hidden
@@ -54,7 +56,7 @@ Rejected:
 | `src/modules/sidebarlook/ScrollMark.ts` | Sets `data-vivarcdi-scrolling` on the tab list while it scrolls and 800 ms after (FR-7) | Observer |
 | `src/modules/sidebarlook/Palettes.ts` | The six palettes as data (name, space, pill, ink), the default, and `contrast()` for AC-11; 019 reads it for its presets (FR-11) | Value object |
 | `src/core/NewTabRow.ts` | Moved from `incognito`; shared by 013 and 028 | – |
-| `src/modules/favorites/PinnedFavorites.ts` | Own tiles for the first pinned tabs when the Favorites folder is missing or empty; click activates the tab | Adapter, same interface as `BookmarkFavorites` |
+| `src/modules/favorites/PinnedFavorites.ts` | Own tiles for the pinned tabs no Favorite is linked to, under the Favorites or alone when the folder is missing or empty; click activates the tab | Adapter, same interface as `BookmarkFavorites` |
 | `src/modules/favorites/FavoritesGrid.ts` | Chooses the source: bookmark folder with links, otherwise pinned tabs | Strategy |
 | `src/styles/sidebar-look.scss` | All rules of the look, under `$look` | – |
 | `src/styles/_tokens.scss` | Row height 36, gap 2, radius 8, veil 22%, hover 35%, pill shadow, scroll bar 6, palette colors | – |
