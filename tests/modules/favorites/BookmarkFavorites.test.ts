@@ -109,7 +109,7 @@ test('hides linked tabs and mirrors their state on the tile', async () => {
   const strip = new FakeNode(['strip'], slots);
   const hidden = new HiddenTabs();
   hidden.set('favorites-grid', snapshot.linkedTabIds);
-  const stripDocument = { querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null) } as unknown as Document;
+  const stripDocument = { querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null), querySelectorAll: (): FakeNode[] => [] } as unknown as Document;
   new HiddenTabMarker(stripDocument, selectors, hidden).apply();
   assert.deepEqual(
     slots.map((node) => node.hasAttribute('data-vivarcdi-hidden')),
