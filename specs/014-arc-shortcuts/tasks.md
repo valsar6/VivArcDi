@@ -29,3 +29,5 @@ and is done when its check passes. Branch `features/arc-shortcuts`, next minor v
   removal to `shortcuts.py` and `status`. Satisfies AC-17. Done when
   `test_reserved_little_arc_key_is_removed_from_other_command` passes; add AC-18 to the manual
   checklist and bump the version.
+- [ ] **T9 (change request 2026-11-08, Approved).** Add the two workspace rows to `shortcuts.json`, extend the table and `status` tests, add AC-19 to the manual
+  checklist and bump the version. Done when `make check` passes.

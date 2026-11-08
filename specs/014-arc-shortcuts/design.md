@@ -83,6 +83,12 @@ Not touched: no selector, no `window.html` change. Profile folders:
 | macOS | `~/Library/Application Support/Vivaldi`, `.../Vivaldi Snapshot` | every folder with a `Preferences` file |
 | Debian | `~/.config/vivaldi`, `~/.config/vivaldi-snapshot` | the same |
 
+## Change of 2026-11-08: workspace rows
+
+Two rows are added to `shortcuts.json` `commands`: `COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER` = `["alt+{mod}+]"]` and
+`COMMAND_WORKSPACE_SWITCH_BACK_ORDER` = `["alt+{mod}+["]` (the form Vivaldi saved in Tore's probe, `alt+meta+]`). On Debian `{mod}` is
+`ctrl`. No code changes: the conflict rule already removes these keys from other commands. Tests: the table and `status` tests get the two rows (AC-19 is manual).
+
 ## Configuration
 
 None in `config.json`: the table is `shortcuts.json`, changed with a spec.
