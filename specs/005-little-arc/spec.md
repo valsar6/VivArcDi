@@ -138,31 +138,25 @@ questions.
 
 ## Open questions
 
-Each question has a proposal; unanswered proposals are what the design will assume.
+Answered by Tore on 2026-11-08, except the two that wait for the probe.
 
-- [ ] **Recognizing external links.** Can a mod tell that a new tab or window came from another app
-  (for example a new tab with no opener while Vivaldi is not the frontmost app)? Proposal: write a
-  probe script like the earlier ones, run by Tore, before the design; if it is unreliable,
+- [ ] **Recognizing external links.** Can a mod tell that a new tab or window came from another app?
+  Decided: reverse engineer it with a probe script run by Tore (`little-arc/diagnostica-link-esterni.md`
+  in the project folder). The result goes into the design; if recognition is unreliable,
   `externalLinks` ships off and this spec says so.
-- [ ] **Native window or own window.** Is Vivaldi's `popup` window type close enough to Little Arc
-  (compact bar, no tab bar)? Proposal: probe it together with the question above; fall back to a
-  normal window with the interface hidden by CSS.
-- [ ] **"From any app".** The reviews' main appeal is the shortcut working in other apps. A mod only
-  sees keys while Vivaldi has focus. Proposal: version 1 is the shortcut inside Vivaldi plus external
-  links, which covers the "links from other apps" story; a global shortcut becomes a follow-up that
-  the installer ([016](../016-plug-and-play-installer/spec.md)) sets up, opt-in, a macOS Service or
-  Shortcut and a Debian desktop entry.
-- [ ] **Default for `externalLinks`.** It changes how every link from other apps behaves, and Arc does
-  it by default. Proposal: on, with the option as the off switch.
-- [ ] **Destination workspace.** Most recent workspace always, or a picker? Proposal: most recent
-  by default and `askWorkspace` for the picker, as written.
-- [ ] **Six hours.** The idle close comes from the earlier draft, with no source. Keep it,
-  change it or drop it? Proposal: keep, as the option `idleCloseHours`.
-- [ ] **Window size.** One third of the screen wide by 60% high is a guess. Proposal: keep as default,
-  adjust after Tore sees it.
-- [ ] **Mini Player.** Make it a separate spec later, or drop it? Proposal: separate and later.
-- [ ] **Folder name.** The folder was renamed from `005-little-arc-and-extras` to `005-little-arc`,
-  since it no longer holds extras, and the two links to it were updated. OK?
+- [ ] **Native window or own window.** Is Vivaldi's `popup` window type close enough to Little Arc?
+  Decided for now: use the `popup` type and fall back to a normal window with the interface hidden by
+  CSS. The same probe checks it, and a later iteration may revisit it.
+- [x] **"From any app".** Decided: version 1 is the shortcut inside Vivaldi plus external links.
+  The global shortcut is a follow-up that uses an operating system hook set up by the installer
+  ([016](../016-plug-and-play-installer/spec.md)), opt-in and removed by `uninstall`.
+- [x] **Default for `externalLinks`.** On, with the option as the off switch.
+- [x] **Destination workspace.** Always the most recent workspace. The picker (`askWorkspace`) stays
+  as an option, off.
+- [x] **Six hours.** Kept, as the option `idleCloseHours`.
+- [x] **Window size.** Kept: a third of the screen wide by 60% high.
+- [x] **Mini Player.** A separate feature, with its own spec later.
+- [x] **Folder name.** `005-little-arc` accepted.
 
 ## References
 
