@@ -23,12 +23,12 @@ Ordered, small and independently reviewable.
   when the window fails` passes.
 - [ ] **T7.** External link flow: detector wired to the launcher, tab moved into the popup. Satisfies
   AC-5 and AC-6. Done when `little arc ignores external links when disabled` passes.
-- [ ] **T8.** `LittleArcBar` and `little-arc.scss`. Satisfies AC-2 and AC-3.
+- [ ] **T8.** `LittleArcBar` and `little-arc.scss`. Satisfies AC-2, AC-3 and AC-9.
 - [ ] **T9.** `WorkspaceAdopter`, destination picker, no-main-window case. Satisfies AC-7, AC-8 and
   AC-14. Done when `destination picker defaults to the most recent workspace` passes.
 - [ ] **T10.** `IdleTimer`. Satisfies AC-10 and AC-11. Done when `idle timer closes untouched
   windows` and `idle timer is off when set to zero` pass.
-- [ ] **T11.** Module wiring, `config.json`, stop and cleanup. Satisfies AC-9 and AC-13. Done when
+- [ ] **T11.** Module wiring, `config.json`, stop and cleanup. Satisfies AC-13. Done when
   `little arc module cleans up on stop` passes.
 - [ ] **T12.** Version bump (minor, feature) in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`; README section.

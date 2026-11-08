@@ -181,10 +181,10 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
 - [x] **Compact bar in the popup.** Yes: the mod runs in the popup's interface (see Probe results).
   The module adds the address field, back, reload and Move to workspace button there. The fallback
   of a normal window with the interface hidden stays for Vivaldi versions where this breaks.
-- [ ] **Flicker.** The tab shows in the main window for a moment before moving into Little Arc.
+- [x] **Flicker.** The tab shows in the main window for a moment before moving into Little Arc.
   Proposal: accept it in version 1 and measure it on the manual check; hiding it needs a
   different interception that this probe cannot show.
-- [ ] **Detector, minimized case.** Vivaldi minimized when the link arrives. Proposal: check it on
+- [x] **Detector, minimized case.** Vivaldi minimized when the link arrives. Proposal: check it on
   the manual verification of the implementation, with the detector logging what it saw.
 
 ## References
