@@ -83,8 +83,8 @@ questions.
   default search engine otherwise.
 - **FR-3.** WHERE `externalLinks` is on, a link opened from another app opens in a Little Arc window
   instead of a tab of the main window. The module recognizes it as a tab with no opener, active, with
-  an `http` or `https` address, created within 100 ms of the main window regaining focus after the
-  application was in the background (probe of 2026-11-08). The tab is moved into the new window, so
+  an `http` or `https` address, created within 100 ms after a window focus event that followed a "no window
+  focused" event, which means the application was in the background (probes of 2026-11-08). The tab is moved into the new window, so
   the page is not loaded twice.
 - **FR-4.** The window shows no tab bar, panels or workspace switcher, only the compact bar of
   Expected behavior. Vivaldi's `popup` window has no address field, so the module adds the compact
@@ -151,9 +151,13 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
   `active` true, an `http(s)` host, and a window focus event within a few milliseconds of the
   tab (first case: focus back from "no window" 40 ms before; second: 2 ms after). Links Tore
   opened from inside Vivaldi had the opener set and `active` false. So a detector is feasible
-  with those signals. Not yet proven: Vivaldi minimized, Vivaldi already in front, and telling
-  apart other tabs with no opener (new tab page, bookmarks, Quick Commands, link tabs of 009,
-  Expand of Peek), which the detector must reject by address and timing.
+  with those signals. A second run confirmed it with two more links (a tracking link and a
+  newsletter link): in both the application was in the background (focus on "no window"), then a
+  window got focus, and the tab appeared 2 to 41 ms later, in the main window even though a popup
+  was the last focused window. Not yet proven: Vivaldi minimized, and telling apart other tabs with
+  no opener (new tab page, bookmarks, Quick Commands, link tabs of 009, Expand of Peek), which the
+  detector must reject by address and by the missing background event. Vivaldi already in front
+  cannot happen for a link clicked in another app, because that app comes to the front first.
 - **Popup window.** `windows.create({ type: 'popup' })` made a window of the requested size with
   rounded corners, the traffic lights, the page title in the title bar, the extension icons row
   and the theme colour. It has **no address field, no back or reload, no tab bar**. It is minimal
@@ -174,14 +178,15 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
 - [x] **Folder name.** `005-little-arc` accepted.
 - [x] **Recognizing external links.** Feasible (see Probe results), with the detector of FR-3.
 - [ ] **Compact bar in the popup.** Does the mod run inside the popup's interface document, so it can
-  add the address field, back, reload and Move to workspace button? Proposal: a second probe
-  (`little-arc/diagnostica-popup.md`). If the mod does not run there, the fallback is a normal
+  add the address field, back, reload and Move to workspace button? The second probe inspected
+  `main.html` ("Vivaldi core") instead of the popup's `window.html`, so it proved nothing; a third,
+  shorter probe is needed (`little-arc/diagnostica-popup-2.md`). If the mod does not run there, the fallback is a normal
   window with tab bar and panels hidden by CSS.
 - [ ] **Flicker.** The tab shows in the main window for a moment before moving into Little Arc.
   Proposal: accept it in version 1 and measure it on the manual check; hiding it needs a
   different interception that this probe cannot show.
-- [ ] **Detector tests on the edge cases.** Vivaldi minimized and Vivaldi in front. Proposal: the
-  second probe repeats the external link step in those two states.
+- [ ] **Detector, minimized case.** Vivaldi minimized when the link arrives. Proposal: check it on
+  the manual verification of the implementation, with the detector logging what it saw.
 
 ## References
 
