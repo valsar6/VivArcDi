@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was approved on 2026-11-01 and the two probes Tore ran on 2026-11-08
