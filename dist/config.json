@@ -11,7 +11,8 @@
     "styles/pinned.css",
     "styles/space-header.css",
     "styles/today.css",
-    "styles/toast.css"
+    "styles/toast.css",
+    "styles/sidebar-look.css"
   ],
   "modules": {
     "activation-marker": {
@@ -25,8 +26,7 @@
       "tileMinWidth": 64,
       "tileHeight": 44,
       "gap": 8,
-      "unloadOnMiddleClick": true,
-      "emptyHint": "Drag a tab here to pin it"
+      "unloadOnMiddleClick": true
     },
     "peek": {
       "enabled": true,
@@ -80,6 +80,10 @@
       "idleCloseHours": 6,
       "widthPercent": 34,
       "heightPercent": 60
+    },
+    "sidebar-look": {
+      "enabled": true,
+      "palette": "sky"
     }
   }
 }

@@ -6,6 +6,7 @@ import { FavoriteStates } from "./FavoriteStates.js";
 import { FavoritesFolder } from "./FavoritesFolder.js";
 import { FavoritesView } from "./FavoritesView.js";
 import { LinkedTabs } from "./LinkedTabs.js";
+import { TabChanges } from "./TabChanges.js";
 const GRID_ORDER = 10;
 const HIDDEN_OWNER = "favorites-grid";
 class BookmarkFavorites {
@@ -16,7 +17,7 @@ class BookmarkFavorites {
   #detach = null;
   #folder;
   #favorites = null;
-  #unsubscribe = [];
+  #changes;
   #states;
   /**
    * The Favorites drawn from a bookmark folder: the same tiles in every workspace, each one
@@ -35,6 +36,7 @@ class BookmarkFavorites {
     });
     this.#anchor = TabBarAnchor.of(document, selectors.get("tabListHost"));
     this.#folder = new FavoritesFolder(bookmarks, folder, (favorites) => this.#receive(favorites));
+    this.#changes = new TabChanges(tabs, logger, () => this.#readStates());
     this.#states = new SerialTask(
       () => this.#applyStates(),
       (error) => logger.error("Could not read the Favorites tabs", error)
@@ -47,16 +49,16 @@ class BookmarkFavorites {
     return this.#favorites !== null;
   }
   /**
-   * @returns How many tiles are shown.
+   * @returns How many tiles are shown; 0 while the folder is missing.
    */
   get count() {
-    return this.#view.count;
+    return this.active ? this.#view.count : 0;
   }
   /**
    * Reads the folder and starts following bookmarks and tabs.
    */
   async start() {
-    this.#subscribeToTabs();
+    this.#changes.start();
     await this.#folder.start();
   }
   /**
@@ -64,8 +66,7 @@ class BookmarkFavorites {
    */
   stop() {
     this.#folder.stop();
-    this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
-    this.#unsubscribe = [];
+    this.#changes.stop();
     this.place(false);
     this.#view.destroy();
     this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
@@ -89,23 +90,6 @@ class BookmarkFavorites {
       return null;
     }
     return this.#view.element;
-  }
-  #subscribeToTabs() {
-    const { tabs, logger } = this.#deps;
-    const read = () => this.#readStates();
-    const events = [
-      () => tabs.onUpdated(read),
-      () => tabs.onActivated(read),
-      () => tabs.onRemoved(read),
-      () => tabs.onCreated(read)
-    ];
-    for (const subscribe of events) {
-      try {
-        this.#unsubscribe.push(subscribe());
-      } catch {
-        logger.warn("A tab event is missing: tiles may lag behind the tabs");
-      }
-    }
   }
   #receive(favorites) {
     const { logger, folder, maxTiles } = this.#deps;

@@ -1,14 +1,14 @@
+import { AddressField } from "../../core/AddressField.js";
 import { DomQuery } from "../../core/DomQuery.js";
 import { Module } from "../../core/Module.js";
+import { NewTabRow } from "../../core/NewTabRow.js";
 import { TabBarAnchor } from "../../core/TabBarAnchor.js";
-import { AddressField } from "./AddressField.js";
 import { BarButton } from "./BarButton.js";
 import { BottomBar } from "./BottomBar.js";
 import { CommandLauncher } from "./CommandLauncher.js";
 import { DownloadsButton } from "./DownloadsButton.js";
 import { HiddenButtons } from "./HiddenButtons.js";
 import { IncognitoHeader } from "./IncognitoHeader.js";
-import { NewTabRow } from "./NewTabRow.js";
 import { PrivateTabs } from "./PrivateTabs.js";
 const HEADER_ORDER = 10;
 const NEW_TAB_ORDER = 12;

@@ -1,7 +1,6 @@
+import { NewTabOpener } from "../../core/NewTabOpener.js";
 class CommandLauncher {
-  #tabs;
-  #runtime;
-  #address;
+  #opener;
   #downloads;
   /**
    * What the three buttons of a private window do. A mod cannot run Vivaldi commands or press
@@ -13,9 +12,7 @@ class CommandLauncher {
    * @param downloads Vivaldi's Downloads button.
    */
   constructor(tabs, runtime, address, downloads) {
-    this.#tabs = tabs;
-    this.#runtime = runtime;
-    this.#address = address;
+    this.#opener = new NewTabOpener(tabs, runtime, address);
     this.#downloads = downloads;
   }
   /**
@@ -25,9 +22,7 @@ class CommandLauncher {
    * @throws {Error} When the window or the tab cannot be reached.
    */
   async newTab() {
-    const windowId = await this.#runtime.currentWindowId();
-    await this.#tabs.create({ windowId });
-    this.#address.focus();
+    await this.#opener.open();
   }
   /**
    * Opens the Downloads panel.
