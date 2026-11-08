@@ -89,7 +89,11 @@ colors are kept in the shared `chrome.storage.local` store, keyed by workspace i
 
 - [x] Wave slider = intensity, dial = grain, both from 0 to 100: yes (Tore, 2026-11-08).
 - [ ] Does the color also tint the page frame in Vivaldi 8.2, or only the tab bar? To check with the probe.
-- [ ] Does Vivaldi 8.2 tie a theme to a workspace natively? If yes, use it instead of CSS variables.
+- [x] Does Vivaldi 8.2 tie a theme to a workspace natively? No. Probe on Vivaldi 8.2 macOS (Tore, 2026-11-08):
+  editing a workspace offers only the name, a choice of icon or emoji (20 icons) and the Done button. The
+  color is therefore kept entirely by VivArcDi (FR-3) and applied through CSS variables (FR-5).
+- [ ] Can VivArcDi read the colors of the active Vivaldi theme (`vivaldi.themes.*`), to pick the light or dark
+  variant in automatic mode? Probe in progress.
 
 ## References
 
