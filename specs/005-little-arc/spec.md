@@ -161,8 +161,9 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
 - **Popup window.** `windows.create({ type: 'popup' })` made a window of the requested size with
   rounded corners, the traffic lights, the page title in the title bar, the extension icons row
   and the theme colour. It has **no address field, no back or reload, no tab bar**. It is minimal
-  as Little Arc wants, but it cannot take a typed address by itself. The module therefore has to put
-  its compact bar into that window, which needs one more probe.
+  as Little Arc wants, but it cannot take a typed address by itself. The interface document of
+  the popup is a `window.html` of 700x500 with `#browser`, the VivArcDi styles loaded (11 links) and
+  one text field, so the module runs there and can add its compact bar.
 
 ## Open questions
 
@@ -177,11 +178,9 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
 - [x] **Mini Player.** A separate feature, with its own spec later.
 - [x] **Folder name.** `005-little-arc` accepted.
 - [x] **Recognizing external links.** Feasible (see Probe results), with the detector of FR-3.
-- [ ] **Compact bar in the popup.** Does the mod run inside the popup's interface document, so it can
-  add the address field, back, reload and Move to workspace button? The second probe inspected
-  `main.html` ("Vivaldi core") instead of the popup's `window.html`, so it proved nothing; a third,
-  shorter probe is needed (`little-arc/diagnostica-popup-2.md`). If the mod does not run there, the fallback is a normal
-  window with tab bar and panels hidden by CSS.
+- [x] **Compact bar in the popup.** Yes: the mod runs in the popup's interface (see Probe results).
+  The module adds the address field, back, reload and Move to workspace button there. The fallback
+  of a normal window with the interface hidden stays for Vivaldi versions where this breaks.
 - [ ] **Flicker.** The tab shows in the main window for a moment before moving into Little Arc.
   Proposal: accept it in version 1 and measure it on the manual check; hiding it needs a
   different interception that this probe cannot show.
