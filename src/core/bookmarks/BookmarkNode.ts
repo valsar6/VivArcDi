@@ -1,6 +1,8 @@
 /** A bookmark or a bookmark folder, as `chrome.bookmarks` reports it. */
 export interface BookmarkNode {
   id: string;
+  /** The folder that holds it; absent on the root. */
+  parentId?: string | undefined;
   title: string;
   /** Present on links, absent on folders. */
   url?: string | undefined;

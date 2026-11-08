@@ -202,6 +202,14 @@ export class WritableChrome implements WriterHost {
       addListener: (listener: () => void): void => void this.listeners.add(listener),
       removeListener: (listener: () => void): void => void this.listeners.delete(listener),
     };
+    const nodeAnswer = (call: string, id: string, callback: (value: BookmarkNode[]) => void, read: (node: BookmarkNode) => BookmarkNode): void =>
+      this.#answer(`${call} ${id}`, callback, () => {
+        const node = findNode(this.tree, id);
+        if (node === undefined) {
+          throw new Error(`no bookmark ${id}`);
+        }
+        return [read(structuredClone(node))];
+      });
     this.bookmarks = {
       onCreated: event,
       onRemoved: event,
@@ -222,6 +230,15 @@ export class WritableChrome implements WriterHost {
           const node = findNode(this.tree, id) as BookmarkNode;
           node.title = changes.title;
           return node;
+        }),
+      get: (id, callback): void => nodeAnswer('get', id, callback, (node) => ({ id: node.id, title: node.title, url: node.url, parentId: this.#parentOf(this.tree, node.id)?.id })),
+      getSubTree: (id, callback): void => nodeAnswer('getSubTree', id, callback, (node) => node),
+      removeTree: (id, callback): void =>
+        this.#answer(`removeTree ${id}`, callback, () => {
+          const parent = this.#parentOf(this.tree, id);
+          if (parent?.children !== undefined) {
+            parent.children = parent.children.filter((child) => child.id !== id);
+          }
         }),
       remove: (id, callback): void =>
         this.#answer(`remove ${id}`, callback, () => {

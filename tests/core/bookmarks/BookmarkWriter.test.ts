@@ -66,5 +66,23 @@ test('reading through BrowserBookmarks never writes', async () => {
   await bookmarks.getTree();
   bookmarks.onChange(() => undefined);
   assert.equal(calls.some((call) => ['create', 'update', 'move', 'remove', 'removeTree'].includes(call)), false);
-  assert.equal(['create', 'update', 'remove'].some((name) => name in BrowserBookmarks.prototype), false);
+  assert.equal(['create', 'update', 'remove', 'removeTree'].some((name) => name in BrowserBookmarks.prototype), false);
+});
+
+test('reads a bookmark and a whole subtree', async () => {
+  const chrome = new WritableChrome(bookmarkTree([folder('10', 'Music', [link('11', 'Radio', 'https://radio.example/'), folder('12', 'Jazz', [link('13', 'Blue', 'https://blue.example/')])])]));
+  const node = await chrome.writer.get('10');
+  assert.equal(node.title, 'Music');
+  assert.equal(node.children, undefined);
+  const tree = await chrome.writer.subTree('10');
+  assert.deepEqual(tree.children?.map((child) => child.title), ['Radio', 'Jazz']);
+  assert.deepEqual(tree.children?.[1]?.children?.map((child) => child.title), ['Blue']);
+  await assert.rejects(chrome.writer.subTree('99'), /no bookmark 99/);
+});
+
+test('removes a folder with everything in it', async () => {
+  const chrome = new WritableChrome(bookmarkTree([folder('10', 'Hobbies', [folder('11', 'Music', [link('12', 'Radio', 'https://radio.example/')])])]));
+  await chrome.writer.removeTree('11');
+  assert.deepEqual(titlesUnder(chrome, '10'), []);
+  assert.deepEqual(chrome.calls, ['removeTree 11']);
 });

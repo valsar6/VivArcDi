@@ -17,6 +17,9 @@ export interface WritableBookmarksApi {
   create: (details: NewBookmark, callback: (node: BookmarkNode) => void) => void;
   update: (id: string, changes: { title: string }, callback: (node: BookmarkNode) => void) => void;
   remove: (id: string, callback: () => void) => void;
+  removeTree: (id: string, callback: () => void) => void;
+  get: (id: string, callback: (nodes: BookmarkNode[]) => void) => void;
+  getSubTree: (id: string, callback: (nodes: BookmarkNode[]) => void) => void;
 }
 
 export interface WriterHost {
@@ -24,7 +27,7 @@ export interface WriterHost {
   runtime?: { lastError?: { message?: string } | undefined } | undefined;
 }
 
-const METHODS = ['getTree', 'getChildren', 'create', 'update', 'remove'] as const;
+const METHODS = ['getTree', 'getChildren', 'create', 'update', 'remove', 'removeTree', 'get', 'getSubTree'] as const;
 
 export class BookmarkWriter {
   #chrome: WriterHost | null;
@@ -70,6 +73,29 @@ export class BookmarkWriter {
    */
   public async remove(id: string): Promise<void> {
     await this.#call<void>((api, done) => api.remove(id, () => done()));
+  }
+
+  /**
+   * @param id A folder and everything in it.
+   */
+  public async removeTree(id: string): Promise<void> {
+    await this.#call<void>((api, done) => api.removeTree(id, () => done()));
+  }
+
+  /**
+   * @param id A bookmark or folder.
+   * @returns The bookmark, without its children.
+   */
+  public async get(id: string): Promise<BookmarkNode> {
+    return BookmarkWriter.#first(id, await this.#call<BookmarkNode[]>((api, done) => api.get(id, done)));
+  }
+
+  /**
+   * @param id A bookmark or folder.
+   * @returns It with all its descendants, in Vivaldi's order.
+   */
+  public async subTree(id: string): Promise<BookmarkNode> {
+    return BookmarkWriter.#first(id, await this.#call<BookmarkNode[]>((api, done) => api.getSubTree(id, done)));
   }
 
   /**
@@ -123,6 +149,14 @@ export class BookmarkWriter {
   async #folderIn(parentId: string | undefined, title: string): Promise<string> {
     const existing = parentId === undefined ? undefined : (await this.children(parentId)).find((child) => child.children !== undefined && child.title === title);
     return existing?.id ?? (await this.create({ parentId, title })).id;
+  }
+
+  static #first(id: string, nodes: BookmarkNode[]): BookmarkNode {
+    const node = nodes[0];
+    if (node === undefined) {
+      throw new Error(`bookmark ${id} was not found`);
+    }
+    return node;
   }
 
   #call<T>(run: (api: WritableBookmarksApi, done: (value: T) => void) => void): Promise<T> {

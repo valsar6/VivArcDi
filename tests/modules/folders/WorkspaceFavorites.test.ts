@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { DropPlace } from '../../../src/modules/folders/DropPlace.js';
 import { TabData } from '../../../src/core/TabData.js';
 import { CreatedLinks } from '../../../src/modules/folders/CreatedLinks.js';
 import { TabLinks } from '../../../src/modules/folders/TabLinks.js';
@@ -126,4 +127,58 @@ test('writes nothing when the workspace has no root', async () => {
   assert.equal(await favorites.add(await tabs.get(1)), 'ignored');
   assert.equal(await favorites.addFolder(), null);
   assert.deepEqual(chrome.calls, []);
+});
+
+const PANEL = folder('60', 'Panel', [folder('61', 'Music', [link('62', 'Radio', 'https://radio.example/')]), link('63', 'Chess', 'https://chess.com/')]);
+const CASETTA = [folder('32', 'Hobbies'), link('33', 'Mine', 'https://mine.example/')];
+const withPanel = (): ReturnType<typeof setup> => setup(bookmarkTree([PANEL, folder('30', 'VivArcDi', [folder('31', 'Casetta', CASETTA)])]));
+const places = new DropPlace((id): number | undefined => (id === null ? undefined : ['32', '33'].indexOf(id)));
+
+test('copies a dropped bookmark at the drop position', async () => {
+  const { chrome, favorites } = withPanel();
+  assert.equal(await favorites.copy(['63'], places.of({ kind: 'between', before: '33', rowId: '32', edge: 'after' })), 'copied');
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), ['Hobbies', 'Chess', 'Mine']);
+});
+
+test('copies a dropped bookmark into a folder', async () => {
+  const { chrome, favorites } = withPanel();
+  await favorites.copy(['63'], places.of({ kind: 'folder', id: '32' }));
+  await favorites.copy(['61'], places.of({ kind: 'folder', id: '32' }));
+  assert.deepEqual(childrenOf(chrome, 'Hobbies'), ['Chess', 'Music']);
+});
+
+test('copies a bookmark dropped on the header to the end of the root', async () => {
+  const { chrome, favorites } = withPanel();
+  await favorites.copy(['63'], places.of({ kind: 'header' }));
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), ['Hobbies', 'Mine', 'Chess']);
+});
+
+test('creates the workspace root on the first copy', async () => {
+  const { chrome, favorites } = setup(bookmarkTree([PANEL]));
+  assert.equal(await favorites.copy(['61'], places.of({ kind: 'header' })), 'copied');
+  assert.deepEqual(chrome.created.slice(0, 2), ['VivArcDi', 'Casetta']);
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), ['Music']);
+  assert.deepEqual(childrenOf(chrome, 'Panel'), ['Music', 'Chess']);
+});
+
+test('does not link copies to tabs or remember them as created links', async () => {
+  const { tabs, created, favorites } = withPanel();
+  await favorites.copy(['63'], {});
+  assert.equal(created.has('500'), false);
+  assert.deepEqual(tabs.calls, []);
+});
+
+test('logs a failed copy and leaves no partial folder', async () => {
+  const { logger, warnings } = recordingLogger();
+  const { chrome, favorites } = setup(bookmarkTree([PANEL, folder('30', 'VivArcDi', [folder('31', 'Casetta')])]), undefined, logger);
+  chrome.failing.add('create');
+  assert.equal(await favorites.copy(['61'], {}), 'failed');
+  assert.equal(warnings.length, 1);
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), []);
+});
+
+test('ignores a copy of a folder into itself', async () => {
+  const { chrome, favorites } = withPanel();
+  assert.equal(await favorites.copy(['61'], { parentId: '61' }), 'ignored');
+  assert.deepEqual(childrenOf(chrome, 'Music'), ['Radio']);
 });
