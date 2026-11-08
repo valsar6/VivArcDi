@@ -79,3 +79,29 @@ test('leaves the display of a slot it did not collapse alone', () => {
   markerOver(slots, new HiddenTabs()).apply();
   assert.equal(slots[0]?.properties.get('display'), 'contents');
 });
+
+const groupOf = (slots: FakeNode[]): FakeNode => new FakeNode(['group'], slots);
+
+test('collapses the group of pinned tabs when all its tabs are hidden', () => {
+  const pinned = [slot(1), slot(2)];
+  const group = groupOf(pinned);
+  const hidden = new HiddenTabs();
+  hidden.set('pinned-favorites', [1, 2]);
+  markerOver([group, slot(3)], hidden).apply();
+  assert.deepEqual(
+    [group, ...pinned].map((node) => node.properties.get('display')),
+    ['none', 'none', 'none'],
+  );
+});
+
+test('keeps the group of pinned tabs while one of its tabs is shown', () => {
+  const pinned = [slot(1), slot(2)];
+  const group = groupOf(pinned);
+  const hidden = new HiddenTabs();
+  hidden.set('pinned-favorites', [1]);
+  markerOver([group], hidden).apply();
+  assert.deepEqual(
+    [group, ...pinned].map((node) => node.properties.get('display')),
+    [undefined, 'none', undefined],
+  );
+});
