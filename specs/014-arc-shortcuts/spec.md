@@ -42,6 +42,11 @@ these settings:
 | Pin / Unpin Tab | no shortcut (Cmd+D belongs to the workspace favorites of [012](../012-editable-folders/spec.md)) |
 | Print | Cmd+P (Ctrl+P on Debian) |
 | Panel | loses Cmd+P (Ctrl+P), keeps its other shortcuts |
+| Little Arc key | Cmd+Opt+N (Ctrl+Alt+N on Debian) belongs to [Little Arc](../005-little-arc/spec.md); the command that holds it, in Vivaldi the Notes panel, loses it and keeps its other shortcuts |
+
+Change request of 2026-11-08, from Tore's check of Little Arc: Cmd+Opt+N opened Vivaldi's own Notes
+shortcut next to Little Arc. The key is reserved for VivArcDi in the data file (FR-11), so whichever
+command holds it is emptied of that key, without the installer having to know its name.
 
 Revised with Tore on 2026-11-01: Cmd+D, which this table gave to Pin / Unpin Tab, is taken by VivArcDi to
 add the page to the workspace favorites (012). Pin / Unpin Tab loses its shortcut here and stays in
@@ -69,6 +74,9 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 - **FR-6.** The command refuses to run while a Vivaldi process is running.
 - **FR-7.** Applying twice gives the same file as applying once.
 - **FR-8.** Settings not in the table stay as they are, byte-for-byte in meaning.
+- **FR-11.** The data file also lists the keys reserved for VivArcDi modules, with the same `meta` and
+  `ctrl` choice. `apply` removes each reserved key from every command that holds it and writes it to
+  no command; `status` reports a profile as different while a command still holds one.
 - **FR-10.** WHERE `uninstall --restore-shortcuts` is given, `uninstall` also runs `shortcuts restore`; without the option it leaves shortcuts alone.
 - **FR-9.** `shortcuts` runs as the user. On Debian it refuses `sudo`, because the profile belongs to
   the user.
@@ -97,9 +105,11 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 | AC-11 | THE installer SHALL find the profiles of stable and snapshot builds on both systems. | auto: `test_profiles_are_found_on_both_systems` |
 | AC-12 | WHEN `status` runs, THE installer SHALL report for each profile whether the table matches. | auto: `test_status_reports_match_per_profile` |
 | AC-16 | WHERE `uninstall --restore-shortcuts` is given, THE installer SHALL restore the saved `Preferences`; without it, THE installer SHALL leave shortcuts unchanged. | auto: `test_uninstall_restores_shortcuts_only_when_asked` |
+| AC-17 | WHEN a command other than the table's holds the Little Arc key, THE installer SHALL remove that key from it and leave its other shortcuts. | auto: `test_reserved_little_arc_key_is_removed_from_other_command` |
 | AC-13 | WHEN Vivaldi restarts after `apply`, THE keyboard SHALL follow the table and Settings > Keyboard SHALL show it. | manual |
 | AC-14 | WHEN Vivaldi restarts after `restore`, THE keyboard SHALL be as before `apply`. | manual |
 | AC-15 | WHEN Vivaldi restarts after `apply`, Quick Commands SHALL open links in a new tab. | manual |
+| AC-18 | WHEN Vivaldi restarts after `apply`, Cmd+Opt+N SHALL open Little Arc and not the Notes panel. | manual |
 
 ## Out of scope
 
