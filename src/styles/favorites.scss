@@ -164,8 +164,8 @@
   }
 
   > img {
-    width: $favicon-size;
-    height: $favicon-size;
+    width: $tile-icon-size;
+    height: $tile-icon-size;
   }
 
   > span:has(+ img) {
