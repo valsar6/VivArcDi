@@ -123,7 +123,8 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 ## Open questions
 
 - [ ] **Next and previous workspace (proposed 2026-11-08).** Arc switches space with Cmd+Opt+Left and
-  Right, and with a two-finger swipe. Does Vivaldi 8.2 have commands for them that the installer can
+  Right. (The two-finger swipe is dropped: no gesture event reaches the Vivaldi window, and the swipe
+  already goes back and forward, which Tore keeps, 2026-11-08.) Does Vivaldi 8.2 have commands for them that the installer can
   bind? Probe the command list first; if they exist, add two rows to the table.
 
 - [x] **Where do the settings live?** Confirmed by Tore's probe (2026-10-29, Vivaldi on macOS): `vivaldi.actions` is a list with one object; each command is a key `COMMAND_<NAME>` holding `{"shortcuts": [...]}`, with `gestures` kept beside it. The option is `vivaldi.quick_commands.open_url_in_new_tab` (boolean). Command ids: `COMMAND_NEW_TAB`, `COMMAND_SHOW_QUICK_COMMANDS`, `COMMAND_SAVE_PAGE`, `COMMAND_MAIN_TOGGLE_TAB_BAR`, `COMMAND_ADD_BOOKMARK`, `COMMAND_PIN_TAB`, `COMMAND_PRINT_PAGE`, `COMMAND_MAIN_TOGGLE_PANEL_TOGGLE`.
