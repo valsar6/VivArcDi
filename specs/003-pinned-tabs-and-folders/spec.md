@@ -113,7 +113,8 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 ## Out of scope
 
 - Adding a Favorite by dragging a tab onto the grid, and reordering tiles by dragging: Favorites are
-  managed in the Bookmarks panel for now.
+  managed in the Bookmarks panel for now. Dragging a tab onto the grid is a candidate for its own
+  spec (requested again in the Arc video review of 2026-11-08).
 - One tab shared by every workspace, which Vivaldi does not support.
 - Folders in the tab bar: [009](../009-bookmark-folders-in-tab-bar/spec.md).
 - A keyboard shortcut or menu item for the reset, and changing the "Close tab" item of the context

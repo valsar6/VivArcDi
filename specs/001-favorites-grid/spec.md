@@ -114,7 +114,8 @@ rows. The first-pinned-tabs rule above remains the fallback when the folder is m
   [003](../003-pinned-tabs-and-folders/spec.md) together with pinned tabs.
 - Notification badges read from the page title, and Cmd+1…9 on Favorites: candidates for a later
   revision of this spec.
-- Adding a Favorite by dragging a tab above the workspace title.
+- Adding a Favorite by dragging a tab above the workspace title. Reviewers of Arc ask for it again
+  (2026-11-08): a candidate for its own spec.
 - Favorites shared by every workspace: [003](../003-pinned-tabs-and-folders/spec.md).
 
 ## Open questions
