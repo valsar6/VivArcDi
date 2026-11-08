@@ -1,0 +1,57 @@
+$bar: '[data-vivarcdi-little-arc]';
+$bar-class: '.vivarcdi-little-arc-bar';
+$bar-height: 44px;
+$bar-layer: 70;
+$bar-gap: 8px;
+$bar-padding: 6px 12px;
+$control-height: 32px;
+$control-radius: 8px;
+$field-radius: 9px;
+
+#browser#{$bar} {
+  padding-top: $bar-height;
+  box-sizing: border-box;
+}
+
+#browser#{$bar} #{$bar-class} {
+  position: fixed;
+  z-index: $bar-layer;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  height: $bar-height;
+  box-sizing: border-box;
+  align-items: center;
+  padding: $bar-padding;
+  gap: $bar-gap;
+  background-color: var(--colorBg, #2a2a2e);
+  color: var(--colorFg, #fff);
+  -webkit-app-region: no-drag;
+
+  button,
+  input {
+    height: $control-height;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: $control-radius;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  button {
+    padding: 0 12px;
+    background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+    color: inherit;
+    cursor: pointer;
+  }
+
+  input {
+    min-width: 0;
+    flex: 1;
+    padding: 0 12px;
+    border-radius: $field-radius;
+    background-color: var(--colorBgIntense, #fff);
+    color: var(--colorFgIntense, #1d1d24);
+  }
+}

@@ -1,11 +1,9 @@
+import { WindowKeys } from '../../core/WindowKeys.js';
 import { commandFor } from './PeekKeyMap.js';
 import type { PeekCommand } from './PeekMessage.js';
 
 export class PeekKeys {
-  #document: Document;
-  #isOpen: () => boolean;
-  #onCommand: (command: PeekCommand) => void;
-  #listener = (event: Event): void => this.#handle(event as KeyboardEvent);
+  #keys: WindowKeys<PeekCommand>;
 
   /**
    * While a Peek is open, takes Esc, Cmd/Ctrl+W and Cmd/Ctrl+O away from Vivaldi's
@@ -16,32 +14,20 @@ export class PeekKeys {
    * @param onCommand Carries out the command.
    */
   constructor(document: Document, isOpen: () => boolean, onCommand: (command: PeekCommand) => void) {
-    this.#document = document;
-    this.#isOpen = isOpen;
-    this.#onCommand = onCommand;
+    this.#keys = new WindowKeys(document, (event) => (isOpen() ? commandFor(event) : null), onCommand);
   }
 
   /**
    * Starts listening.
    */
   public attach(): void {
-    this.#document.addEventListener('keydown', this.#listener, true);
+    this.#keys.attach();
   }
 
   /**
    * Stops listening.
    */
   public detach(): void {
-    this.#document.removeEventListener('keydown', this.#listener, true);
-  }
-
-  #handle(event: KeyboardEvent): void {
-    const command = this.#isOpen() ? commandFor(event) : null;
-    if (command === null) {
-      return;
-    }
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    this.#onCommand(command);
+    this.#keys.detach();
   }
 }

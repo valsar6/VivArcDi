@@ -48,6 +48,8 @@ class WriteLog {
       discard: record('discard'),
       reload: record('reload'),
       remove: record('remove'),
+      move: record('move'),
+      goBack: record('goBack'),
       onUpdated: event,
       onActivated: event,
       onCreated: event,

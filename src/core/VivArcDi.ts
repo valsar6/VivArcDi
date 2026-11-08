@@ -4,8 +4,10 @@ import { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import { BrowserPrefs } from './BrowserPrefs.js';
 import type { PrefsApi } from './BrowserPrefs.js';
 import { BrowserRuntime } from './BrowserRuntime.js';
+import { BrowserSearch } from './BrowserSearch.js';
 import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
+import { BrowserWindows } from './BrowserWindows.js';
 import { Logger } from './Logger.js';
 import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
 import { PersistentStorage } from './PersistentStorage.js';
@@ -34,6 +36,10 @@ export interface VivArcDiDependencies {
   bookmarkWriter?: BookmarkWriter;
   /** The runtime API given to modules. */
   runtime?: BrowserRuntime;
+  /** The windows API given to modules. */
+  windows?: BrowserWindows;
+  /** The web search given to modules. */
+  search?: BrowserSearch;
   /** Vivaldi's preferences given to modules. */
   prefs?: BrowserPrefs;
   /** The persistent storage given to modules. */
@@ -49,6 +55,8 @@ export class VivArcDi {
   #bookmarks: BrowserBookmarks;
   #bookmarkWriter: BookmarkWriter;
   #runtime: BrowserRuntime;
+  #windows: BrowserWindows | undefined;
+  #search: BrowserSearch | undefined;
   #prefs: BrowserPrefs;
   #storage: KeyValueStorage;
   #styles: StyleInjector;
@@ -69,6 +77,8 @@ export class VivArcDi {
     bookmarks = new BrowserBookmarks(undefined),
     bookmarkWriter = new BookmarkWriter(undefined),
     runtime = new BrowserRuntime(undefined),
+    windows,
+    search,
     prefs = new BrowserPrefs(undefined),
     storage = new PersistentStorage(new Map(), null, undefined, logger),
   }: VivArcDiDependencies) {
@@ -80,6 +90,8 @@ export class VivArcDi {
     this.#bookmarks = bookmarks;
     this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
+    this.#windows = windows;
+    this.#search = search;
     this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
@@ -105,6 +117,8 @@ export class VivArcDi {
       bookmarks: new BrowserBookmarks(chromeApi),
       bookmarkWriter: new BookmarkWriter(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
+      windows: new BrowserWindows(chromeApi),
+      search: new BrowserSearch(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger),
     });
@@ -198,6 +212,8 @@ export class VivArcDi {
         bookmarkWriter: this.#bookmarkWriter,
         modules,
         runtime: this.#runtime,
+        windows: this.#windows ?? new BrowserWindows(undefined),
+        search: this.#search ?? new BrowserSearch(undefined),
         prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader,
