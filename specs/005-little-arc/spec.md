@@ -53,7 +53,7 @@ as intentions to confirm with Tore, not as observed behavior.
 
 **Opening.** The shortcut Cmd+Opt+N (Ctrl+Alt+N on Debian) opens a Little Arc window with the address
 field focused. Typing a site name or a search and pressing Enter loads the page, like Arc's
-command bar. Links opened from another app open in the same kind of window, already loading.
+command bar. Links opened from another app open in the same kind of window, already loading. Vivaldi's Notes panel uses the same key on its own, so `shortcuts apply` of [014](../014-arc-shortcuts/spec.md) removes it from that command (checked by Tore on 2026-11-08).
 
 **The window.** It is small, about a third of a screen, and has no tab bar, no panels and no
 workspace switcher. It has one compact bar with back, reload, the address field and one button,
