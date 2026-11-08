@@ -9,14 +9,15 @@ import type { ModuleContext } from '../../core/Module.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { TabUnloader } from '../../core/TabUnloader.js';
-import { TabBarAnchor } from '../../core/TabBarAnchor.js';
 import { BookmarkFavorites } from './BookmarkFavorites.js';
-import { EmptyGridDrop } from './EmptyGridDrop.js';
 import { FavoriteTagger } from './FavoriteTagger.js';
 import type { UnloadedLookup } from './FavoriteTagger.js';
 import { GridLayout } from './GridLayout.js';
 import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
+import { PinnedFavorites } from './PinnedFavorites.js';
+import { TileSourceChoice } from './TileSource.js';
+import type { TileSource } from './TileSource.js';
 import { UnloadedTabs } from './UnloadedTabs.js';
 
 const NO_TABS: UnloadedLookup = { has: () => false };
@@ -28,8 +29,6 @@ export interface FavoritesGridSettings extends GridSettings {
   maxTiles: number;
   /** Whether a middle click unloads a tile instead of closing it. */
   unloadOnMiddleClick: boolean;
-  /** Hint of the placeholder that takes a dropped tab while the grid has no tiles. */
-  emptyHint: string;
 }
 
 export class FavoritesGrid extends Module {
@@ -46,7 +45,6 @@ export class FavoritesGrid extends Module {
     tileHeight: 44,
     gap: 8,
     unloadOnMiddleClick: true,
-    emptyHint: 'Drag a tab here to pin it',
   });
 
   #document: Document | null = null;
@@ -61,14 +59,16 @@ export class FavoritesGrid extends Module {
   #fromBookmarks: BookmarkFavorites | null = null;
   #hiddenTabs: HiddenTabs | null = null;
   #hiddenMarker: HiddenTabMarker | null = null;
-  #emptyDrop: EmptyGridDrop | null = null;
+  #fromPinned: PinnedFavorites | null = null;
 
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
    * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
-   * the same in every workspace, and each opens a pinned tab hidden from the list. Without them,
-   * or while the folder is missing, the first pinned tabs become the tiles. Tiles of unloaded
-   * tabs are dimmed, and a middle click unloads a tile instead of closing it.
+   * the same in every workspace, and each opens a pinned tab hidden from the list. While the
+   * folder is missing or has no links, the first pinned tabs of the workspace become the tiles,
+   * drawn the same way, and their slots are hidden from the list. Without `chrome.tabs`, the first
+   * pinned tabs are laid out as a grid in Vivaldi's own list. Tiles of unloaded tabs are dimmed,
+   * and a middle click unloads a tile instead of closing it.
    *
    * @param context What the module may use.
    */
@@ -83,7 +83,6 @@ export class FavoritesGrid extends Module {
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
       this.#startMiddleClick(settings, tabs, logger);
-      this.#startEmptyDrop(settings, tabs, logger);
     } else {
       logger.warn('chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs');
     }
@@ -99,8 +98,10 @@ export class FavoritesGrid extends Module {
       attributes: true,
       attributeFilter: ['class'],
     });
+    this.#fromPinned = this.#pinnedFavorites(tabs, logger);
     this.#update();
     await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
+    await this.#fromPinned?.start().catch((error: unknown) => logger.error('Could not read the pinned tabs', error));
     await this.#startBookmarks(tabs, bookmarks, logger);
   }
 
@@ -111,8 +112,6 @@ export class FavoritesGrid extends Module {
     this.#observer?.disconnect();
     this.#refresh?.cancel();
     this.#middleClick?.detach();
-    this.#emptyDrop?.stop();
-    this.#emptyDrop = null;
     this.#unloadedTabs?.stop();
     this.#stopBookmarks();
     this.#layout?.release();
@@ -124,8 +123,10 @@ export class FavoritesGrid extends Module {
 
   #stopBookmarks(): void {
     this.#fromBookmarks?.stop();
+    this.#fromPinned?.stop();
     this.#hiddenMarker?.stop();
     this.#fromBookmarks = null;
+    this.#fromPinned = null;
     this.#hiddenMarker = null;
     this.#hiddenTabs = null;
   }
@@ -143,19 +144,22 @@ export class FavoritesGrid extends Module {
     this.#middleClick.attach();
   }
 
-  #startEmptyDrop(settings: FavoritesGridSettings, tabs: BrowserTabs, logger: Logger): void {
-    if (this.#document === null || this.#selectors?.has('tabListHost') !== true) {
-      return;
+  #pinnedFavorites(tabs: BrowserTabs, logger: Logger): PinnedFavorites | null {
+    const document = this.#document;
+    const selectors = this.#selectors;
+    const hiddenTabs = this.#hiddenTabs;
+    if (!tabs.available || document === null || hiddenTabs === null || selectors?.has('tabListHost') !== true) {
+      return null;
     }
-    this.#emptyDrop = new EmptyGridDrop({
-      document: this.#document,
-      wrapperSelector: this.#selectors.get('tabWrapper'),
-      anchor: TabBarAnchor.of(this.#document, this.#selectors.get('tabListHost')),
+    return new PinnedFavorites({
+      document,
+      selectors,
       tabs,
-      hint: settings.emptyHint,
       logger,
+      maxTiles: this.#settings.maxTiles,
+      hiddenTabs,
+      onChange: (): void => this.#refresh?.request(),
     });
-    this.#emptyDrop.start();
   }
 
   async #startBookmarks(tabs: BrowserTabs, bookmarks: BrowserBookmarks | undefined, logger: Logger): Promise<void> {
@@ -186,20 +190,16 @@ export class FavoritesGrid extends Module {
     if (tagger === null || tabBar === undefined) {
       return;
     }
-    const fromBookmarks = this.#fromBookmarks?.active === true ? this.#fromBookmarks : null;
-    tagger.maxTiles = fromBookmarks === null ? this.#settings.maxTiles : 0;
+    tagger.maxTiles = this.#fromPinned === null ? this.#settings.maxTiles : 0;
     const strip = tagger.apply(tabBar);
-    const tiles = this.#layTiles(fromBookmarks, strip, tagger.tileCount);
-    this.#emptyDrop?.show(strip !== null && tiles === 0);
+    const sources = this.#sources();
+    const chosen = TileSourceChoice.of(sources);
+    const placed = sources.map((source) => source.place(source === chosen && strip !== null));
+    this.#layout?.follow(placed.find((grid) => grid !== null) ?? strip, chosen?.count ?? tagger.tileCount);
   }
 
-  #layTiles(fromBookmarks: BookmarkFavorites | null, strip: HTMLElement | null, pinnedTiles: number): number {
-    if (fromBookmarks === null) {
-      this.#showPinnedTiles(strip, pinnedTiles);
-      return pinnedTiles;
-    }
-    this.#layout?.follow(fromBookmarks.place(strip !== null), fromBookmarks.count);
-    return fromBookmarks.count;
+  #sources(): TileSource[] {
+    return [this.#fromBookmarks, this.#fromPinned].filter((source): source is BookmarkFavorites | PinnedFavorites => source !== null);
   }
 
   #tabBar(): Element | null | undefined {
@@ -207,10 +207,5 @@ export class FavoritesGrid extends Module {
       return undefined;
     }
     return this.#document.querySelector(this.#selectors.get('tabBar'));
-  }
-
-  #showPinnedTiles(strip: HTMLElement | null, count: number): void {
-    this.#fromBookmarks?.place(false);
-    this.#layout?.follow(strip, count);
   }
 }

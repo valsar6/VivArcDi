@@ -1,12 +1,11 @@
+import type { AddressField } from '../../core/AddressField.js';
 import type { BrowserRuntime } from '../../core/BrowserRuntime.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { AddressField } from './AddressField.js';
+import { NewTabOpener } from '../../core/NewTabOpener.js';
 import type { DownloadsButton } from './DownloadsButton.js';
 
 export class CommandLauncher {
-  #tabs: BrowserTabs;
-  #runtime: BrowserRuntime;
-  #address: AddressField;
+  #opener: NewTabOpener;
   #downloads: DownloadsButton;
 
   /**
@@ -19,9 +18,7 @@ export class CommandLauncher {
    * @param downloads Vivaldi's Downloads button.
    */
   constructor(tabs: BrowserTabs, runtime: BrowserRuntime, address: AddressField, downloads: DownloadsButton) {
-    this.#tabs = tabs;
-    this.#runtime = runtime;
-    this.#address = address;
+    this.#opener = new NewTabOpener(tabs, runtime, address);
     this.#downloads = downloads;
   }
 
@@ -32,9 +29,7 @@ export class CommandLauncher {
    * @throws {Error} When the window or the tab cannot be reached.
    */
   public async newTab(): Promise<void> {
-    const windowId = await this.#runtime.currentWindowId();
-    await this.#tabs.create({ windowId });
-    this.#address.focus();
+    await this.#opener.open();
   }
 
   /**

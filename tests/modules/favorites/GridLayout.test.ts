@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { FavoritesGrid } from '../../../src/modules/favorites/FavoritesGrid.js';
 import { GridLayout } from '../../../src/modules/favorites/GridLayout.js';
 import { asElement, FakeNode } from './fakes.js';
 
@@ -71,4 +72,15 @@ test('release removes the variables and stops observing', () => {
   layout.follow(null);
   assert.equal(strip.properties.size, 0);
   assert.deepEqual(observer?.observed, []);
+});
+
+test('never lays out more than three columns', () => {
+  const defaults = FavoritesGrid.defaults;
+  for (const width of [0, 100, 220, 400, 1000, 5000]) {
+    for (const tiles of [1, 3, 4, 12, 100]) {
+      assert.ok(GridLayout.columnsFor(width, tiles, defaults) <= 3, `${tiles} tiles in ${width}px`);
+    }
+  }
+  assert.equal(GridLayout.columnsFor(5000, 100, defaults), 3);
+  assert.equal(GridLayout.columnsFor(5000, 100, { ...defaults, maxColumns: 3, tileMinWidth: 1 }), 3);
 });

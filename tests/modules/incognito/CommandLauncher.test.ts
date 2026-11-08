@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { BrowserTabs } from '../../../src/core/BrowserTabs.js';
-import { AddressField } from '../../../src/modules/incognito/AddressField.js';
+import { AddressField } from '../../../src/core/AddressField.js';
 import { CommandLauncher } from '../../../src/modules/incognito/CommandLauncher.js';
 import { DownloadsButton } from '../../../src/modules/incognito/DownloadsButton.js';
 import { asDocument } from '../../core/dom.js';

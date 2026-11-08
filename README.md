@@ -289,15 +289,15 @@ the same in every workspace.
   updates the grid.
 - A click on a tile brings you to the Favorite's tab of the current workspace, or opens it as a
   pinned tab the first time. Each workspace has its own tab per Favorite, hidden from the tab list.
-- The tile of the current tab has a thin glowing border; tiles whose tab is unloaded, or not open
+- The tile of the current tab is the light pill, as the active tab; tiles whose tab is unloaded, or not open
   yet in this workspace, are dimmed.
 - A click on the current tile, after browsing away, brings the tab back to the bookmark's page.
 - Middle click, Cmd/Ctrl+W or the tab's close button unload the tab instead of closing it. The tile
   stays, and a click loads it again. If the tile was the active tab, the most recently used tab
   takes its place.
-- Three columns in a narrow tab bar, more as it gets wider. Hovering a tile shows its title.
+- At most three columns, whatever the width of the tab bar. Hovering a tile shows its title.
 
-If the folder is missing, the first pinned tabs of the current workspace become the tiles, as before
+If the folder is missing or has no links, the first pinned tabs of the current workspace become the tiles, drawn the same way, and a click on a tile activates that tab. Their slots in Vivaldi's tab list are hidden
 0.6.0, and the console says so. Removing a bookmark from the folder turns its tabs into ordinary
 pinned tabs.
 
@@ -312,7 +312,6 @@ Options of `favorites-grid` in `config.json`:
 | `tileHeight` | `44` | Tile height, in pixels |
 | `gap` | `8` | Space between tiles and between their rows, in pixels |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
-| `emptyHint` | `Drag a tab here to pin it` | Text of the placeholder shown while the grid has no tiles; dropping a tab on it pins the tab |
 
 ## Pinned tabs
 
@@ -580,6 +579,18 @@ A normal window open at the same time does not change.
 
 The module has only the `enabled` option. Set it to `false` and a private window looks like plain
 Vivaldi, with no VivArcDi section at all.
+
+## Sidebar look
+
+Gives the vertical tab bar Arc's look: rows without a background at rest, a light pill for the active
+tab, tiles on a light veil, a thin line above `+ New Tab`, a thin scroll bar that shows only while
+scrolling, and the space color as the background of the tab bar. The `+ New Tab` row opens a blank tab.
+Vivaldi's own `+` button in the tab bar is hidden.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `enabled` | `true` | Set to `false` and Vivaldi looks as it does without the module |
+| `palette` | `sky` | Colors of a workspace without a color of its own: `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon` |
 
 ## Roadmap
 
