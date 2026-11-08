@@ -97,6 +97,21 @@ recently used order, documented in [docs/native-settings.md](../../docs/native-s
 | AC-11 | WHEN the user presses Cmd/Ctrl+Shift+C, also with focus in the page, THE URL SHALL be on the clipboard and a toast SHALL appear. | manual |
 | AC-12 | WHERE `today-archive` is disabled, THE module SHALL close no tab. | auto: disabled module closes nothing |
 
+## Proposed revision (pending approval)
+
+Features seen in the Arc video review of 2026-11-08. They are not Approved: nothing below may be
+implemented until Tore accepts them on the pull request.
+
+- **FR-7.** Cmd/Ctrl+Shift+Alt+C copies the active tab as a Markdown link, `[title](url)`, and shows the
+  same "Copied" toast. In Arc the user presses it on a page and pastes the link into notes or chat.
+- **FR-8.** `config.json` documents the usual values of `archiveAfterHours`: 12 (the Arc default), 24,
+  168 (a week) and 720 (a month). Arc offers these four cadences in its settings.
+
+| ID | Criterion | Check |
+|---|---|---|
+| AC-13 | WHEN the user presses Cmd/Ctrl+Shift+Alt+C, THE clipboard SHALL hold `[title](url)` of the active tab and a toast SHALL appear. | auto: `copies the active tab as a markdown link` |
+| AC-14 | WHEN a title contains `[` or `]`, THE Markdown link SHALL escape them. | auto: `escapes brackets in markdown link titles` |
+
 ## Out of scope
 
 - Tidy Tabs and other AI features.
