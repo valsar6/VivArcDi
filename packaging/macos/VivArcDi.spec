@@ -32,6 +32,7 @@ def installer_files():
 DATAS = [
     (str(ROOT / "dist"), "dist"),
     (str(INSTALLER / "vivarcdi" / "shortcuts.json"), "vivarcdi"),
+    (str(INSTALLER / "vivarcdi" / "theme.json"), "vivarcdi"),
     *installer_files(),
 ]
 

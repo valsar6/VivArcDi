@@ -7,6 +7,7 @@ import { Palettes } from '../../src/modules/sidebarlook/Palettes.js';
 
 const STYLES = fileURLToPath(new URL('../../src/styles/', import.meta.url));
 const read = (name: string): string => readFileSync(`${STYLES}${name}`, 'utf8');
+const shortHex = (color: string): string => color.replace(/^#(\w)\1(\w)\2(\w)\3$/, '#$1$2$3');
 const compiled = (): string => sass.compile(`${STYLES}sidebar-look.scss`).css;
 
 const TOKENS: Array<[string, string]> = [
@@ -44,12 +45,18 @@ test('sidebar look rules all sit under the look mark', () => {
   }
 });
 
-test('the stylesheet falls back to the sky palette', () => {
-  const sky = Palettes.byName('sky');
+test('the stylesheet falls back to the arclight palette', () => {
+  const arclight = Palettes.byName('arclight');
   const css = compiled();
-  assert.ok(css.includes(`--vivarcdi-space: var(--vivarcdi-space-theme, ${sky.space})`));
-  assert.ok(css.includes(`--vivarcdi-pill: var(--vivarcdi-pill-theme, ${sky.pill})`));
-  assert.ok(css.includes(`--vivarcdi-ink: var(--vivarcdi-ink-theme, ${sky.ink})`));
+  assert.ok(css.includes(`--vivarcdi-space: var(--vivarcdi-space-theme, ${arclight.space})`));
+  assert.ok(css.includes(`--vivarcdi-pill: var(--vivarcdi-pill-theme, ${shortHex(arclight.pill)})`));
+  assert.ok(css.includes(`--vivarcdi-ink: var(--vivarcdi-ink-theme, ${arclight.ink})`));
+});
+
+test('a gradient paints the browser and clears the tab bar background', () => {
+  const css = compiled();
+  assert.match(css, /#browser\[data-vivarcdi-look\]\[data-vivarcdi-gradient\] \{\s*background: var\(--vivarcdi-gradient\) !important;/);
+  assert.match(css, /\[data-vivarcdi-gradient\] #tabs-tabbar-container:is\(\.left, \.right\)[^{]*\{\s*background-color: transparent !important;/);
 });
 
 test('hides the flexible spacer of the tab bar', () => {

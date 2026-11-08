@@ -1,8 +1,17 @@
+export interface Gradient {
+  /** Direction in degrees, as in CSS `linear-gradient`. */
+  angle: number;
+  /** Colors from the start to the end of the gradient. */
+  stops: readonly string[];
+}
+
 export interface Palette {
   /** Name used in `config.json`. */
   name: string;
   /** Color of the space: the background of the tab bar. */
   space: string;
+  /** Gradient painted behind the tab bar and around the page; the space color is the fallback without it. */
+  gradient?: Gradient;
   /** Color of the active pill. */
   pill: string;
   /** Color of the text. */
@@ -25,9 +34,17 @@ const CONTRAST_OFFSET = 0.05;
 
 export class Palettes {
   /**
-   * The six palettes close to Arc's light blue, the first presets of the space color.
+   * `arclight`, the coral-to-aqua gradient of Arc's light theme, followed by the six palettes close to
+   * Arc's light blue.
    */
   public static readonly all: readonly Palette[] = Object.freeze([
+    {
+      name: 'arclight',
+      space: '#d0c9c5',
+      gradient: { angle: 135, stops: ['#f3b8ac', '#d0c9c5', '#8ae3f2'] },
+      pill: '#ffffff',
+      ink: '#212121',
+    },
     { name: 'sky', space: '#a3cee0', pill: '#e9f3f7', ink: '#0f2129' },
     { name: 'ice', space: '#b8dbe8', pill: '#eef6f9', ink: '#0f2129' },
     { name: 'powder', space: '#9fc2dd', pill: '#e7eff6', ink: '#0f1f2c' },
@@ -39,7 +56,7 @@ export class Palettes {
   /**
    * Name of the palette a workspace without a color of its own uses.
    */
-  public static readonly defaultName = 'sky';
+  public static readonly defaultName = 'arclight';
 
   /**
    * @param name A palette name from `config.json`.
@@ -47,6 +64,14 @@ export class Palettes {
    */
   public static byName(name: unknown): Palette {
     return Palettes.all.find((palette) => palette.name === name) ?? Palettes.#named(Palettes.defaultName);
+  }
+
+  /**
+   * @param gradient A palette gradient.
+   * @returns The CSS `linear-gradient(...)` value for it.
+   */
+  public static css(gradient: Gradient): string {
+    return `linear-gradient(${gradient.angle}deg, ${gradient.stops.join(', ')})`;
   }
 
   /**
