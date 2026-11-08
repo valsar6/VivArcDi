@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif">
+<title>VivArcDi feature map</title>
+<rect width="960" height="600" fill="#f7f9fb"/>
+<text x="30" y="44" font-size="22" font-weight="700" fill="#1d2530">VivArcDi: Arc features in Vivaldi</text>
+<rect x="30" y="70" width="290" height="500" rx="14" fill="#e6f4ea"/>
+<text x="48" y="100" font-size="15" font-weight="700" fill="#2e7d4f">Available</text>
+<rect x="44" y="111" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="128" font-size="13" fill="#1d2530">Favorites grid</text>
+<rect x="44" y="140" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="157" font-size="13" fill="#1d2530">Pinned tabs that reset</text>
+<rect x="44" y="169" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="186" font-size="13" fill="#1d2530">Peek</text>
+<rect x="44" y="198" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="215" font-size="13" fill="#1d2530">Reopen instead of duplicate</text>
+<rect x="44" y="227" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="244" font-size="13" fill="#1d2530">Bookmark folders per space</text>
+<rect x="44" y="256" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="273" font-size="13" fill="#1d2530">Folder panel</text>
+<rect x="44" y="285" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="302" font-size="13" fill="#1d2530">Space header</text>
+<rect x="44" y="314" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="331" font-size="13" fill="#1d2530">Editable folders</text>
+<rect x="44" y="343" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="360" font-size="13" fill="#1d2530">Copy bookmarks into a space</text>
+<rect x="44" y="372" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="389" font-size="13" fill="#1d2530">Today archive</text>
+<rect x="44" y="401" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="418" font-size="13" fill="#1d2530">Copy URL</text>
+<rect x="44" y="430" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="447" font-size="13" fill="#1d2530">Little Arc</text>
+<rect x="44" y="459" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="476" font-size="13" fill="#1d2530">Incognito window</text>
+<rect x="44" y="488" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="505" font-size="13" fill="#1d2530">Arc keyboard shortcuts</text>
+<rect x="44" y="517" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="534" font-size="13" fill="#1d2530">App and package installer</text>
+<rect x="44" y="546" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="56" y="563" font-size="13" fill="#1d2530">Homebrew and apt</text>
+<rect x="335" y="70" width="290" height="500" rx="14" fill="#fff4e0"/>
+<text x="353" y="100" font-size="15" font-weight="700" fill="#a36a00">In progress / planned</text>
+<rect x="349" y="111" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="361" y="128" font-size="13" fill="#1d2530">Arc sidebar look (028)</text>
+<rect x="349" y="140" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="361" y="157" font-size="13" fill="#1d2530">Arc Light theme (029)</text>
+<rect x="640" y="70" width="290" height="500" rx="14" fill="#eef1f6"/>
+<text x="658" y="100" font-size="15" font-weight="700" fill="#4a5866">Proposed (draft specs)</text>
+<rect x="654" y="111" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="128" font-size="13" fill="#1d2530">Theme color per space (019)</text>
+<rect x="654" y="140" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="157" font-size="13" fill="#1d2530">Drag a tab into Favorites (020)</text>
+<rect x="654" y="169" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="186" font-size="13" fill="#1d2530">Auto-hide tab bar (021)</text>
+<rect x="654" y="198" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="215" font-size="13" fill="#1d2530">Split view by drag (022)</text>
+<rect x="654" y="227" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="244" font-size="13" fill="#1d2530">Command panel (023)</text>
+<rect x="654" y="256" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="273" font-size="13" fill="#1d2530">Boosts and Zap (024)</text>
+<rect x="654" y="285" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="302" font-size="13" fill="#1d2530">Annotated screenshots (025)</text>
+<rect x="654" y="314" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="331" font-size="13" fill="#1d2530">Live folders (026)</text>
+<rect x="654" y="343" width="262" height="25" rx="7" fill="#ffffff" stroke="#dde3e8"/>
+<text x="666" y="360" font-size="13" fill="#1d2530">Rename pinned tabs (027)</text>
+</svg>

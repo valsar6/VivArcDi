@@ -1,0 +1,260 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>VivArcDi mockup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:13px/1.3 -apple-system,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;background:#2b2f36;width:1000px;height:620px;overflow:hidden;color:#1d2530}
+.win{position:absolute;inset:0;background:linear-gradient(160deg,#cde4f0 0%,#bcd8e8 60%,#b3d1e3 100%);display:flex;padding:8px 8px 8px 0}
+.win.dark{background:linear-gradient(160deg,#2a2d33,#202227)}
+.side{width:236px;padding:6px 10px 0 12px;display:flex;flex-direction:column;position:relative}
+.lights{display:flex;gap:7px;padding:6px 2px 10px}
+.lights i{width:12px;height:12px;border-radius:50%;display:block}
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+.url{background:rgba(255,255,255,.45);border-radius:8px;padding:7px 10px;color:#4a5866;font-size:12px;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tile{height:44px;border-radius:10px;background:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center}
+.tile.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tile.dim .ic{opacity:.45}
+.ic{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;flex:none}
+.hdr{display:flex;align-items:center;gap:6px;padding:4px 6px;font-weight:600;color:#3c4b59;font-size:12px;margin-bottom:4px}
+.hdr .plus{margin-left:auto;opacity:.6;font-weight:400;font-size:15px}
+.row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;height:32px;white-space:nowrap;overflow:hidden;position:relative}
+.row .t{overflow:hidden;text-overflow:ellipsis}
+.row.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.row.dimmed{color:#6a7987}
+.row.hover{background:rgba(255,255,255,.4)}
+.row.child{padding-left:26px}
+.dot{width:5px;height:5px;border-radius:50%;background:#3c4b59;position:absolute;left:12px}
+.fold{width:16px;height:13px;flex:none;position:relative}
+.fold::before{content:"";position:absolute;inset:2px 0 0 0;border:1.6px solid #3c4b59;border-radius:2px}
+.fold::after{content:"";position:absolute;left:0;top:0;width:7px;height:4px;border:1.6px solid #3c4b59;border-bottom:none;border-radius:2px 2px 0 0}
+.sep{height:1px;background:rgba(40,60,80,.18);margin:8px 6px}
+.newtab{color:#4a5866}
+.bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 6px;color:#4a5866;font-size:16px}
+.page{flex:1;background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.12);position:relative;overflow:hidden}
+.article{padding:42px 70px;color:#2a3440}
+.article h1{font:700 30px/1.15 Georgia,serif;margin-bottom:14px}
+.article p{font-size:15px;line-height:1.6;margin-bottom:12px;color:#44505c}
+.article a{color:#1a5fd0;text-decoration:underline}
+.article a.hl{background:#e5efff;border-radius:3px}
+.bar{height:8px;border-radius:4px;background:#e8ecf0;margin:10px 0}
+.veil{position:absolute;inset:0;background:rgba(20,30,40,.35)}
+.peek{position:absolute;left:5%;top:3%;width:90%;height:94%;background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.35);overflow:hidden}
+.peek .art{padding:30px 46px}
+.peekbtns{position:absolute;right:-1px;top:3%;display:flex;flex-direction:column;gap:8px;transform:translateX(36px)}
+.pbtn{width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:13px;color:#333}
+.panel{position:absolute;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:10px;z-index:5}
+.search{border:1px solid #d9dfe5;border-radius:8px;padding:7px 10px;color:#8b97a3;margin-bottom:8px}
+.prow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px}
+.prow.sel{background:#e8f0fb}
+.prow .when{margin-left:auto;color:#8b97a3;font-size:11px}
+.prow .host{color:#8b97a3;font-size:11px}
+.day{font-size:11px;font-weight:600;color:#8b97a3;padding:8px 8px 4px;text-transform:uppercase;letter-spacing:.04em}
+.cursor{position:absolute;width:18px;height:24px;z-index:20;pointer-events:none}
+.badge{position:absolute;width:22px;height:22px;border-radius:50%;background:#e2564b;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:9;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.legend{position:absolute;left:40px;top:40px;right:40px}
+.legend h2{font-size:20px;margin-bottom:14px}
+.legend li{list-style:none;display:flex;gap:10px;align-items:flex-start;margin-bottom:11px;font-size:14px;line-height:1.35}
+.legend li b.n{flex:none;width:22px;height:22px;border-radius:50%;background:#e2564b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mark{position:absolute;right:12px;bottom:10px;font-size:10px;color:rgba(0,0,0,.35);letter-spacing:.08em;z-index:30}
+.toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#1f2833;color:#fff;border-radius:8px;padding:8px 14px;font-size:13px}
+.desk{position:absolute;inset:0;background:linear-gradient(135deg,#6a7fa8,#c49aa8 60%,#e7c3a1)}
+.little{position:absolute;left:300px;top:110px;width:420px;height:400px;background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.4);overflow:hidden}
+.lbar{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#eef3f7;border-bottom:1px solid #dde3e8;font-size:13px;color:#4a5866}
+.lbar .addr{flex:1;background:#fff;border-radius:6px;padding:5px 8px;border:1px solid #d9dfe5}
+.lbar .mv{background:#1d2530;color:#fff;border-radius:6px;padding:5px 8px;font-size:11px;white-space:nowrap}
+.dark .side{color:#dfe3e8}
+.dark .row.on{background:rgba(255,255,255,.14);box-shadow:none}
+.dark .bottom,.dark .newtab{color:#aab3bd}
+.inc-title{display:flex;justify-content:space-between;align-items:center;padding:8px 6px 12px;font-weight:600;font-size:14px}
+.inc-title span{font-weight:400;font-size:12px;color:#aab3bd}
+
+.insert{width:3px;border-radius:2px;background:#1d6fe0;height:44px;position:absolute}
+.ghost{position:absolute;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:.92;width:200px;z-index:15}
+.slot{height:32px;border-radius:8px;background:rgba(40,80,110,.16)}
+.split{position:absolute;inset:0;display:flex;gap:8px;background:transparent}
+.split>div{flex:1;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+.tip{position:absolute;background:#1f2833;color:#fff;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap;z-index:16}
+.menu{position:absolute;background:#f4f6f8;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:5px;width:200px;z-index:12;font-size:13px}
+.menu div{padding:5px 10px;border-radius:5px}
+.menu div.sel{background:#2f6fe4;color:#fff}
+.menu hr{border:none;height:1px;background:#d6dde3;margin:4px 6px}
+.picker{position:absolute;left:250px;top:120px;width:250px;background:#1f2328;border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.4);padding:12px;z-index:12;color:#cfd5db}
+.modes{display:flex;justify-content:center;gap:14px;font-size:14px;margin-bottom:10px}
+.modes span{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.modes span.on{background:#3a4048}
+.area{height:170px;border-radius:10px;position:relative;background:linear-gradient(to bottom,rgba(31,35,40,0),#1f2328),linear-gradient(to right,#e86f6f,#e8c06f,#7fd67f,#6fd6d0,#6f9be8,#b07fe8,#e86fb8)}
+.handle{position:absolute;width:24px;height:24px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);transform:translate(-50%,-50%)}
+.sw{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.sw i{width:16px;height:16px;border-radius:50%;display:block}
+.knobs{display:flex;align-items:center;gap:12px}
+.wave{flex:1;height:22px;position:relative}
+.dial{width:32px;height:32px;border-radius:50%;border:2px dashed #8a939c}
+</style></head>
+<body><div id="root"></div>
+<script>
+const S = JSON.parse(decodeURIComponent(location.hash.slice(1) || '{}'));
+const ic = (c, l) => `<span class="ic" style="background:${c}">${l}</span>`;
+const fav = [['#e2564b','M',0],['#3b82f6','C',1],['#ef4444','▶',0],['#24292f','G',0],['#f59e0b','N',2],['#22c55e','S',2]];
+const cursor = p => p ? `<svg class="cursor" style="left:${p[0]}px;top:${p[1]}px" viewBox="0 0 18 24"><path d="M1 1 L1 19 L6 14.5 L9.5 22 L12.5 20.7 L9 13.5 L16 13.5 Z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>` : '';
+const badge = (n, x, y) => `<div class="badge" style="left:${x}px;top:${y}px">${n}</div>`;
+
+function sidebar(o = {}) {
+  const tiles = fav.map(([c, l, st], i) => `<div class="tile ${o.favOn === i ? 'on' : ''} ${st === 2 ? 'dim' : ''}">${ic(c, l)}</div>`).join('');
+  const docsIcon = o.docsAway ? `<span class="ic" style="background:${o.docsHover ? '#dbe7f3' : 'transparent'};color:#3c4b59;font-size:15px">↩</span>` : ic('#2563eb', 'D');
+  const projects = o.projectsOpen
+    ? `<div class="row"><span class="fold"></span><span class="t">Projects</span></div>
+       <div class="row child"><span class="t">${ic('#8b5cf6','R')} Roadmap</span></div>
+       <div class="row child ${o.linkActive ? 'on' : ''}"><span class="t">${ic('#0ea5e9','B')} Bug tracker</span></div>`
+    : `<div class="row ${o.folderHover ? 'hover' : ''}"><span class="fold"></span><span class="t">Projects</span></div>
+       ${o.linkActive ? `<div class="row child on"><span class="dot"></span><span class="t" style="display:flex;gap:8px;align-items:center">${ic('#0ea5e9','B')} Bug tracker</span></div>` : ''}`;
+  return `<div class="side">
+    <div class="lights"><i></i><i></i><i></i></div>
+    <div class="url">${o.url || 'news.example.org/story'}</div>
+    <div class="grid">${tiles}</div>
+    <div class="hdr">🌿 Work <span style="opacity:.6">▾</span><span class="plus">${o.hdrPlus ? '+' : ''}</span></div>
+    ${projects}
+    <div class="row"><span class="fold"></span><span class="t">Reading</span></div>
+    <div class="row ${o.docsOn ? 'on' : ''}">${docsIcon}<span class="t">${o.docsAway ? 'Pricing – Docs' : 'Team docs'}</span></div>
+    <div class="row">${ic('#14b8a6','T')}<span class="t">Timesheet</span></div>
+    <div class="sep"></div>
+    <div class="row newtab"><span style="width:20px;text-align:center;font-size:16px">+</span><span class="t">New Tab</span></div>
+    <div class="row ${o.todayOn ? 'on' : ''}">${ic('#f97316','N')}<span class="t">Morning news – Example</span></div>
+    <div class="row">${ic('#64748b','W')}<span class="t">Weather this week</span></div>
+    <div class="row">${ic('#db2777','R')}<span class="t">Recipe: lemon pasta</span></div>
+    <div class="bottom"><span title="Archive">🗄</span><span>+</span></div>
+  </div>`;
+}
+const article = (o = {}) => `<div class="article"><h1>${o.title || 'The quiet return of the vertical tab bar'}</h1>
+  <p>Browsers have kept tabs on top for twenty years. A sidebar gives every tab a full title and leaves room for folders and pinned pages.</p>
+  <p>Read the <a class="${o.hl ? 'hl' : ''}">original announcement</a> or the follow-up interview for the details.</p>
+  <div class="bar" style="width:92%"></div><div class="bar" style="width:84%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:60%"></div>
+  <div class="bar" style="width:90%;margin-top:22px"></div><div class="bar" style="width:76%"></div></div>`;
+const peekPage = () => `<div class="art article"><h1 style="font-size:24px">Announcing the new sidebar</h1>
+  <p>Shown in Peek: a real page you can scroll, type in and click. The page behind stays where it was.</p>
+  <div class="bar" style="width:90%"></div><div class="bar" style="width:82%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:88%"></div></div>`;
+
+const scenes = {
+  anatomy() {
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ favOn: 1, docsOn: false, todayOn: true, linkActive: false })}
+      <div class="page"><div class="legend"><h2>The VivArcDi tab bar</h2><ul>
+      <li><b class="n">1</b><span><b>Favorites grid</b>: the sites you use everywhere, same in every workspace (spec 001)</span></li>
+      <li><b class="n">2</b><span><b>Space header</b>: icon and name of the workspace; click to collapse, + adds a folder (011, 012)</span></li>
+      <li><b class="n">3</b><span><b>Bookmark folders</b>: the folders of this workspace; open links stay visible (009, 010)</span></li>
+      <li><b class="n">4</b><span><b>Pinned tabs</b>: remember their own page and reset to it (003)</span></li>
+      <li><b class="n">5</b><span><b>+ New Tab</b> and the <b>Today tabs</b>, archived after 12 hours unused (004)</span></li>
+      <li><b class="n">6</b><span><b>Archive</b> button: closed Today tabs, searchable (004)</span></li>
+      </ul></div></div></div>
+      ${badge(1, 222, 92)}${badge(2, 222, 192)}${badge(3, 222, 228)}${badge(4, 222, 302)}${badge(5, 222, 390)}${badge(6, 42, 580)}`;
+  },
+  peek() {
+    const st = S.step || 0;
+    const overlay = st >= 2 ? `<div class="veil"></div><div class="peek" style="${st === 2 ? 'transform:scale(.92);opacity:.6' : ''}">${peekPage()}</div>
+      ${st >= 3 ? `<div class="peekbtns" style="right:5%"><div class="pbtn">✕</div><div class="pbtn">⤢</div><div class="pbtn">◫</div></div>` : ''}` : '';
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ hl: st >= 1, title: 'Team docs: weekly notes' })}${overlay}</div></div>
+      ${cursor(st === 0 ? [560, 230] : st < 4 ? [470, 213] : [985, 112])}
+      ${st >= 4 ? `<div class="panel" style="left:760px;top:96px;padding:6px 10px;font-size:12px">Expand: open as a tab</div>` : ''}`;
+  },
+  pinned() {
+    const st = S.step || 0;
+    const away = st === 1 || st === 2;
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ docsOn: true, docsAway: away, docsHover: st === 2, url: away ? 'docs.example.com/pricing' : 'docs.example.com/team' })}
+      <div class="page">${article({ title: away ? 'Pricing' : 'Team docs: weekly notes' })}</div></div>
+      ${cursor(st === 0 ? [520, 300] : st === 1 ? [430, 360] : st === 2 ? [32, 316] : [120, 330])}`;
+  },
+  folder() {
+    const st = S.step || 0;
+    const panel = st === 1 || st === 2 ? `<div class="panel" style="left:252px;top:200px;width:330px">
+      <div class="search">Search Projects…</div>
+      <div class="prow ${st === 2 ? 'sel' : ''}">${ic('#0ea5e9','B')}<span>Bug tracker</span><span class="when">23 min ago</span></div>
+      <div class="prow">${ic('#8b5cf6','R')}<span>Roadmap</span><span class="when">2 days ago</span></div>
+      <div class="prow">${ic('#16a34a','S')}<span>Sprint board</span><span class="when">last week</span></div>
+      <div class="prow">${ic('#a3a3a3','W')}<span>Wiki home</span><span class="when">never</span></div></div>` : '';
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ folderHover: st >= 1 && st <= 2, linkActive: st >= 3, todayOn: st < 3, url: st >= 3 ? 'bugs.example.com/board' : 'news.example.org/story' })}
+      <div class="page">${article({ title: st >= 3 ? 'Bug tracker' : undefined })}</div></div>${panel}
+      ${cursor(st === 0 ? [400, 300] : st === 1 ? [90, 222] : st === 2 ? [400, 262] : [600, 360])}`;
+  },
+  archive() {
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true })}<div class="page">${article()}</div></div>
+      <div class="panel" style="left:252px;top:250px;width:380px">
+      <div class="search">Search the archive…</div>
+      <div class="day">Today</div>
+      <div class="prow sel">${ic('#f97316','F')}<div><div>Flight check-in</div><div class="host">airline.example · 09:12</div></div></div>
+      <div class="prow">${ic('#64748b','P')}<div><div>Pull request #42</div><div class="host">code.example.com · 08:40</div></div></div>
+      <div class="day">Yesterday</div>
+      <div class="prow">${ic('#db2777','S')}<div><div>Shoes – size guide</div><div class="host">shop.example · 21:03</div></div></div>
+      <div class="prow">${ic('#0ea5e9','M')}<div><div>Map: Trieste centre</div><div class="host">maps.example · 18:27</div></div></div></div>
+      ${cursor([40, 588])}`;
+  },
+  littlearc() {
+    return `<div class="desk"></div>
+      <div class="little"><div class="lbar"><span>←</span><span>↻</span><span class="addr">news.example.org/story</span><span class="mv">Move to workspace</span></div>
+      <div class="article" style="padding:22px 26px"><h1 style="font-size:20px">A quick lookup</h1><p style="font-size:13px">A link opened from Mail or Slack lands here, not in your tab bar.</p>
+      <div class="bar" style="width:90%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:66%"></div></div></div>
+      ${cursor([690, 148])}`;
+  },
+  incognito() {
+    return `<div class="win dark"><div class="side">
+      <div class="lights"><i></i><i></i><i></i></div>
+      <div class="inc-title">Incognito Tabs <span>Clear</span></div>
+      <div class="row newtab"><span style="width:20px;text-align:center;font-size:16px">+</span><span class="t">New Tab</span></div>
+      <div class="row on">${ic('#6366f1','G')}<span class="t">Gift ideas</span></div>
+      <div class="row">${ic('#0ea5e9','T')}<span class="t">Train times</span></div>
+      <div class="bottom"><span>📚</span><span>+</span></div></div>
+      <div class="page" style="background:#1b1d21"><div class="article" style="color:#dfe3e8"><h1>Private window</h1><p style="color:#aab3bd">VivArcDi stores nothing here. No Favorites, folders or archive: only Peek and copy URL run.</p></div></div></div>`;
+  },
+
+  dragfav() {
+    const st = S.step || 0;
+    if (st >= 2) fav.splice(3, 0, ['#64748b', 'W', 0]);
+    const ghost = st === 1 ? `<div class="ghost" style="left:96px;top:106px">${ic('#64748b','W')}<span>Weather this week</span></div><div class="insert" style="left:156px;top:134px"></div>` : '';
+    const html = `<div class="win">${sidebar({ todayOn: true })}<div class="page">${article()}</div></div>${ghost}
+      ${cursor(st === 0 ? [120, 440] : st === 1 ? [160, 150] : [400, 380])}`;
+    return st === 1 ? html.replace(/<div class="row">(<span class="ic"[^>]*>W<\/span><span class="t">Weather this week<\/span>)<\/div>/, '<div class="slot"></div>') : html;
+  },
+  peeksplit() {
+    const st = S.step || 0;
+    if (st >= 3) {
+      return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page" style="background:transparent;box-shadow:none"><div class="split">
+        <div>${article({ title: 'Team docs: weekly notes' })}</div><div>${peekPage()}</div></div></div></div>${cursor([620, 360])}`;
+    }
+    const overlay = st >= 1 ? `<div class="veil"></div><div class="peek">${peekPage()}</div>
+      <div class="peekbtns" style="right:5%"><div class="pbtn">✕</div><div class="pbtn">⤢</div><div class="pbtn" style="${st === 2 ? 'background:#dbe7f3' : ''}">◫</div></div>` : '';
+    return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ hl: st === 0, title: 'Team docs: weekly notes' })}${overlay}</div></div>
+      ${st === 2 ? `<div class="tip" style="left:890px;top:106px">Split</div>` : ''}
+      ${cursor(st === 0 ? [470, 213] : st === 1 ? [600, 300] : [968, 106])}`;
+  },
+  look() {
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true, favOn: 1 })}<div class="page">${article()}</div></div>
+      ${S.label ? `<div class="tip" style="left:20px;top:560px;font-size:12px">${S.label}</div>` : ''}${cursor(S.cur)}`;
+  },
+  themecolor() {
+    const st = S.step || 0;
+    const menu = st === 0 ? `<div class="menu" style="left:70px;top:206px"><div>Change Space Icon…</div><div>Rename Space…</div><div class="sel">Edit Theme Color…</div><hr><div>New Folder</div><div>Live Folders</div></div>` : '';
+    const h = [[0,0],[150,40],[40,35],[95,50]][st] || [0,0];
+    const picker = st >= 1 ? `<div class="picker"><div class="modes"><span>✦</span><span class="on">☀</span><span>☾</span></div>
+      <div class="area"><div class="handle" style="left:${h[0] + 20}px;top:${h[1] + 20}px;background:${S.dot}"></div></div>
+      <div class="sw">${['#fff','#f2a6c4','#b39ddb','#ef6b6b','#f5a25d','#f2d16b','#7fd67f','#6fb7e8','#6f7fe8'].map(c => `<i style="background:${c}"></i>`).join('')}</div>
+      <div class="knobs"><svg class="wave" viewBox="0 0 150 22"><path d="M0 11 Q9 1 18 11 T36 11 T54 11 T72 11 T90 11 T108 11 T126 11 T144 11" stroke="#8a939c" stroke-width="2" fill="none"/><rect x="80" y="1" width="8" height="20" rx="4" fill="#fff"/></svg><div class="dial"></div></div></div>` : '';
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true, hdrPlus: false })}<div class="page">${article()}</div></div>${menu}${picker}
+      ${cursor(st === 0 ? [120, 262] : [h[0] + 290, h[1] + 196])}`;
+  },
+
+  menus() {
+    const st = S.step || 0;
+    const item = (t, i, sel) => `<div class="${i === sel ? 'sel' : ''}">${t}</div>`;
+    const pinned = ['Copy Link', 'Rename…', 'Change Icon…', 'Edit Pinned Page', '—', 'Add Split View', 'Duplicate', 'Move to', '—', 'Unpin'];
+    const space = ['Change Space Icon…', 'Rename Space…', 'Edit Theme Color…', '—', 'New Folder', 'Live Folders ›', '—', 'Manage Spaces…', 'Delete Space'];
+    const draw = (list, sel) => list.map((t, i) => t === '—' ? '<hr>' : item(t, i, sel)).join('');
+    const menu = st <= 2
+      ? `<div class="menu" style="left:150px;top:300px">${draw(pinned, [-1, 1, 2][st])}</div>`
+      : `<div class="menu" style="left:100px;top:206px">${draw(space, [-1, 2, 5][st - 3])}</div>`;
+    const cur = st <= 2 ? [[140, 300], [200, 344], [200, 370]][st] : [[90, 202], [150, 268], [150, 340]][st - 3];
+    return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ title: 'Team docs: weekly notes' })}</div></div>${menu}${cursor(cur)}`;
+  },
+  copyurl() {
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true })}<div class="page">${article()}<div class="toast">Copied</div></div></div>`;
+  },
+};
+document.getElementById('root').innerHTML = scenes[S.scene || 'anatomy']() + `<div class="mark">MOCKUP · NOT A SCREENSHOT</div>`;
+if (S.hover) document.querySelectorAll('.row').forEach(r => { if (r.textContent.includes(S.hover) && !r.classList.contains('on')) r.classList.add('hover'); });
+</script></body></html>
