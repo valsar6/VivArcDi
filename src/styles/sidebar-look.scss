@@ -18,7 +18,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     background-color: var(--vivarcdi-space) !important;
   }
 
-  #{$tab-bar} .button-toolbar.newtab {
+  #{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
     display: none !important;
   }
 

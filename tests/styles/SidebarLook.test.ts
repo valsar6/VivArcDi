@@ -51,3 +51,7 @@ test('the stylesheet falls back to the sky palette', () => {
   assert.ok(css.includes(`--vivarcdi-pill: var(--vivarcdi-pill-theme, ${sky.pill})`));
   assert.ok(css.includes(`--vivarcdi-ink: var(--vivarcdi-ink-theme, ${sky.ink})`));
 });
+
+test('hides the flexible spacer of the tab bar', () => {
+  assert.match(compiled(), /\.button-toolbar\.toolbar-spacer-flexible\)\s*\{\s*display: none !important;/);
+});

@@ -39,7 +39,7 @@ export class HiddenTabMarker {
    * Several markers may run at once, since each one writes the marks the shared set asks for.
    *
    * @param document The browser window document.
-   * @param selectors Needs `browser`, `tabStrip` and `tabWrapper`.
+   * @param selectors Needs `browser`, `tabStrip` and `tabWrapper`; with `pinnedGroup`, the slots inside Vivaldi's group of pinned tabs are marked too, and the group is collapsed when all of them are hidden.
    * @param hidden The tabs to hide.
    * @param options Replaceable watching and frame scheduling, for tests.
    */
@@ -80,13 +80,24 @@ export class HiddenTabMarker {
     if (strip === null) {
       return;
     }
-    const wrapper = this.#selectors.get('tabWrapper');
-    for (const slot of strip.children) {
-      const tabId = TabSlot.idOf(slot, wrapper);
-      const hidden = tabId !== null && this.#hidden.has(tabId);
-      slot.toggleAttribute(HIDDEN_ATTRIBUTE, hidden);
-      this.#collapse(slot as HTMLElement, hidden);
+    const group = this.#selectors.has('pinnedGroup') ? this.#selectors.get('pinnedGroup') : null;
+    for (const child of strip.children) {
+      if (group !== null && child.matches(group)) {
+        const slots = [...child.children];
+        const allHidden = slots.length > 0 && slots.map((slot) => this.#mark(slot)).every(Boolean);
+        this.#collapse(child as HTMLElement, allHidden);
+      } else {
+        this.#mark(child);
+      }
     }
+  }
+
+  #mark(slot: Element): boolean {
+    const tabId = TabSlot.idOf(slot, this.#selectors.get('tabWrapper'));
+    const hidden = tabId !== null && this.#hidden.has(tabId);
+    slot.toggleAttribute(HIDDEN_ATTRIBUTE, hidden);
+    this.#collapse(slot as HTMLElement, hidden);
+    return hidden;
   }
 
   #collapse(slot: HTMLElement, hidden: boolean): void {

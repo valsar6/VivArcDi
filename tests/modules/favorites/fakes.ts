@@ -8,6 +8,7 @@ export const selectors = new SelectorCatalog(
     verticalTabBar: 'vertical',
     tabStrip: 'strip',
     pinnedTab: 'pinned',
+    pinnedGroup: 'group',
     tabWrapper: 'wrapper',
   },
   'test',
