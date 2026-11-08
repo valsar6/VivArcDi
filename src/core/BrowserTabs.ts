@@ -2,7 +2,7 @@ import type { PrefsApi } from './BrowserPrefs.js';
 import type { StorageHost } from './PersistentStorage.js';
 import type { BookmarksHost } from './bookmarks/BrowserBookmarks.js';
 
-export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove';
+export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove' | 'move' | 'goBack';
 
 export type TabUpdateListener = (
   tabId: number,
@@ -41,9 +41,19 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
     | {
         lastError?: { message?: string } | undefined;
         onMessage?: ChromeEvent<RuntimeMessageListener> | undefined;
+        sendMessage?: ((...args: unknown[]) => void) | undefined;
       }
     | undefined;
-  windows?: { create: (...args: unknown[]) => void; getCurrent?: ((...args: unknown[]) => void) | undefined } | undefined;
+  windows?:
+    | {
+        create: (...args: unknown[]) => void;
+        getCurrent?: ((...args: unknown[]) => void) | undefined;
+        getLastFocused?: ((...args: unknown[]) => void) | undefined;
+        remove?: ((...args: unknown[]) => void) | undefined;
+        onFocusChanged?: ChromeEvent<(windowId: number) => void> | undefined;
+      }
+    | undefined;
+  search?: { query: (...args: unknown[]) => void } | undefined;
   vivaldiPrivate?: { prefs?: PrefsApi | undefined } | undefined;
 }
 
@@ -131,6 +141,26 @@ export class BrowserTabs {
    */
   public async reload(tabId: number): Promise<void> {
     await this.#call('reload', tabId);
+  }
+
+  /**
+   * Moves a tab to a place in a window.
+   *
+   * @param tabId Tab id.
+   * @param properties `windowId` and `index`, as accepted by `chrome.tabs.move`.
+   * @returns The moved tab.
+   */
+  public move(tabId: number, properties: chrome.tabs.MoveProperties): Promise<chrome.tabs.Tab> {
+    return this.#call('move', tabId, properties);
+  }
+
+  /**
+   * Goes back one page in the history of a tab.
+   *
+   * @param tabId Tab id.
+   */
+  public async goBack(tabId: number): Promise<void> {
+    await this.#call('goBack', tabId);
   }
 
   /**

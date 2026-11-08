@@ -2,7 +2,9 @@ import type { BookmarkWriter } from './bookmarks/BookmarkWriter.js';
 import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import type { BrowserPrefs } from './BrowserPrefs.js';
 import type { BrowserRuntime } from './BrowserRuntime.js';
+import type { BrowserSearch } from './BrowserSearch.js';
 import type { BrowserTabs } from './BrowserTabs.js';
+import type { BrowserWindows } from './BrowserWindows.js';
 import type { Logger } from './Logger.js';
 import type { KeyValueStorage } from './PersistentStorage.js';
 import type { PayloadSource } from './ResourceLoader.js';
@@ -28,6 +30,10 @@ export interface ModuleContext {
   modules: Readonly<Record<string, ModuleOptions>>;
   /** `chrome.runtime` messages and `chrome.windows`; check before use. */
   runtime: BrowserRuntime;
+  /** `chrome.windows`, for modules that open and watch windows; check `windows.available` first. */
+  windows: BrowserWindows;
+  /** Web search with Vivaldi's default engine; check `search.available` first. */
+  search: BrowserSearch;
   /** Vivaldi's preferences, read-only; check `prefs.available` first. */
   prefs: BrowserPrefs;
   /** Strings that survive a restart, shared by all modules. */
