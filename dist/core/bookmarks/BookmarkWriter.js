@@ -1,5 +1,5 @@
 import { BookmarkFolderFinder } from "./BookmarkFolderFinder.js";
-const METHODS = ["getTree", "getChildren", "create", "update", "remove"];
+const METHODS = ["getTree", "getChildren", "create", "update", "remove", "removeTree", "get", "getSubTree"];
 class BookmarkWriter {
   #chrome;
   #queue = Promise.resolve();
@@ -39,6 +39,26 @@ class BookmarkWriter {
    */
   async remove(id) {
     await this.#call((api, done) => api.remove(id, () => done()));
+  }
+  /**
+   * @param id A folder and everything in it.
+   */
+  async removeTree(id) {
+    await this.#call((api, done) => api.removeTree(id, () => done()));
+  }
+  /**
+   * @param id A bookmark or folder.
+   * @returns The bookmark, without its children.
+   */
+  async get(id) {
+    return BookmarkWriter.#first(id, await this.#call((api, done) => api.get(id, done)));
+  }
+  /**
+   * @param id A bookmark or folder.
+   * @returns It with all its descendants, in Vivaldi's order.
+   */
+  async subTree(id) {
+    return BookmarkWriter.#first(id, await this.#call((api, done) => api.getSubTree(id, done)));
   }
   /**
    * @param id A folder.
@@ -88,6 +108,13 @@ class BookmarkWriter {
   async #folderIn(parentId, title) {
     const existing = parentId === void 0 ? void 0 : (await this.children(parentId)).find((child) => child.children !== void 0 && child.title === title);
     return existing?.id ?? (await this.create({ parentId, title })).id;
+  }
+  static #first(id, nodes) {
+    const node = nodes[0];
+    if (node === void 0) {
+      throw new Error(`bookmark ${id} was not found`);
+    }
+    return node;
   }
   #call(run) {
     const host = this.#chrome;

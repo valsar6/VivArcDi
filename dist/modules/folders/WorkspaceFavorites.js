@@ -1,9 +1,11 @@
 import { AddressKey } from "../../core/AddressKey.js";
+import { BookmarkCopier } from "../../core/bookmarks/BookmarkCopier.js";
 import { KeptTab } from "../../core/KeptTab.js";
 import { TabData } from "../../core/TabData.js";
 const NEW_FOLDER_TITLE = "Untitled";
 class WorkspaceFavorites {
   #deps;
+  #copier;
   /**
    * Everything that writes to the workspace favorites, the folders section of the tab bar: it adds a
    * tab as a link of the workspace's root, takes it back, and makes a new folder. A write that fails
@@ -14,6 +16,7 @@ class WorkspaceFavorites {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
+    this.#copier = new BookmarkCopier(dependencies.writer);
   }
   /**
    * Makes a tab a link of the root of the active workspace: a bookmark with the title and the
@@ -56,6 +59,28 @@ class WorkspaceFavorites {
     } catch (error) {
       this.#deps.logger.warn("could not create the folder", error);
       return null;
+    }
+  }
+  /**
+   * Copies bookmarks or bookmark folders, with all their levels, into a folder of the workspace
+   * favorites or into the root of the active workspace, created if needed. The originals stay
+   * where they are and the copies are ordinary bookmarks, not links of any tab. A folder dropped
+   * into itself is ignored, and a write that fails removes what was copied and is logged.
+   *
+   * @param ids The bookmarks or folders to copy, in order.
+   * @param place A folder and a position; by default the end of the root.
+   * @returns What happened.
+   */
+  async copy(ids, { parentId, index } = {}) {
+    try {
+      const folderId = parentId ?? await this.#rootId();
+      if (folderId === null || ids.length === 0) {
+        return "ignored";
+      }
+      return (await this.#copier.copy(ids, folderId, index)).length > 0 ? "copied" : "ignored";
+    } catch (error) {
+      this.#deps.logger.warn("could not copy the bookmarks to the workspace favorites", error);
+      return "failed";
     }
   }
   /**

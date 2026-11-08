@@ -1,5 +1,7 @@
+import { DropPlace } from "./DropPlace.js";
 class TabDrops {
   #deps;
+  #place;
   /**
    * Turns a tab of today's list released over a target into a link: in a folder at its end, in the
    * root at the position of the drop, or at the end of the root for the header. A tab that is a
@@ -9,6 +11,7 @@ class TabDrops {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
+    this.#place = new DropPlace(dependencies.indexBefore);
   }
   /**
    * @param tabId The tab that was released.
@@ -19,16 +22,10 @@ class TabDrops {
       return;
     }
     try {
-      await this.#deps.favorites.add(await this.#deps.tabs.get(tabId), this.#placeOf(target));
+      await this.#deps.favorites.add(await this.#deps.tabs.get(tabId), this.#place.of(target));
     } catch (error) {
       this.#deps.logger.warn("could not add the dropped tab", error);
     }
-  }
-  #placeOf(target) {
-    if (target.kind === "folder") {
-      return { parentId: target.id };
-    }
-    return target.kind === "between" ? { index: this.#deps.indexBefore(target.before) } : {};
   }
 }
 export {
