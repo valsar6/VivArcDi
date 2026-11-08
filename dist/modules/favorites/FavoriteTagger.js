@@ -51,7 +51,7 @@ class FavoriteTagger {
    * Only touches what changed, so it can run after every mutation of the tab bar.
    *
    * @param tabBar Vivaldi's tab bar container.
-   * @returns The tab strip laid out as a grid, or null.
+   * @returns The tab strip of the vertical tab bar, or null; it is laid out as a grid only while it has tiles.
    */
   apply(tabBar) {
     const strip = this.#gridStripOf(tabBar);
@@ -62,7 +62,6 @@ class FavoriteTagger {
       return null;
     }
     this.#strip = strip;
-    strip.toggleAttribute(GRID_ATTRIBUTE, true);
     let tiles = 0;
     for (const slot of strip.children) {
       const isTile = tiles < this.#maxTiles && this.#isPinned(slot);
@@ -72,6 +71,7 @@ class FavoriteTagger {
       this.#mark(slot, isTile);
     }
     this.#tileCount = tiles;
+    strip.toggleAttribute(GRID_ATTRIBUTE, tiles > 0);
     return strip;
   }
   /**

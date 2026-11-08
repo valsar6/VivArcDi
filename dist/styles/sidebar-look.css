@@ -24,6 +24,9 @@
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
   display: none !important;
 }
+#browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) .tabbar-nested-buttons:not(:has(.button-toolbar:not(.toolbar-spacer, .toolbar-spacer-flexible))) {
+  display: none !important;
+}
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) #tabs-container ::-webkit-scrollbar {
   width: 6px;
 }
@@ -87,6 +90,7 @@
   color: var(--vivarcdi-ink);
   font-size: 14px;
   font-weight: 500;
+  padding-block: 0;
 }
 #browser[data-vivarcdi-look] [data-vivarcdi-folders] > [role] {
   height: 36px;
@@ -96,6 +100,7 @@
 #browser[data-vivarcdi-look] [data-vivarcdi-space-header] {
   --vivarcdi-space-hover: var(--vivarcdi-hover);
   height: 36px;
+  margin-block: 0 2px;
   border-radius: 8px;
   color: var(--vivarcdi-muted);
   font-size: 13px;
