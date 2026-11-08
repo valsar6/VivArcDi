@@ -1,0 +1,157 @@
+@use 'tokens' as *;
+
+$rows: '#{$strip} > :not(#{$tile}) .tab-wrapper';
+$row-tabs: '#{$strip} > :not(#{$tile}) .tab';
+$tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
+
+#{$look} {
+  --vivarcdi-space: var(--vivarcdi-space-theme, #{$sky-space});
+  --vivarcdi-pill: var(--vivarcdi-pill-theme, #{$sky-pill});
+  --vivarcdi-ink: var(--vivarcdi-ink-theme, #{$sky-ink});
+  --vivarcdi-veil: color-mix(in srgb, white #{$veil}, var(--vivarcdi-space));
+  --vivarcdi-hover: color-mix(in srgb, white #{$hover-veil}, var(--vivarcdi-space));
+  --vivarcdi-muted: color-mix(in srgb, var(--vivarcdi-ink) #{$muted-ink}, transparent);
+  --vivarcdi-line: color-mix(in srgb, var(--vivarcdi-ink) #{$separator-tint}, transparent);
+
+  #{$tab-bar},
+  #{$tab-bar} #tabs-container {
+    background-color: var(--vivarcdi-space) !important;
+  }
+
+  #{$tab-bar} .button-toolbar.newtab {
+    display: none !important;
+  }
+
+  #{$tab-bar} #tabs-container {
+    ::-webkit-scrollbar {
+      width: $scrollbar-width;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: $scrollbar-width;
+      background-color: transparent;
+    }
+
+    [data-vivarcdi-scrolling]::-webkit-scrollbar-thumb {
+      background-color: color-mix(in srgb, var(--vivarcdi-ink) #{$scrollbar-thumb}, transparent);
+    }
+  }
+
+  #{$rows} {
+    box-sizing: border-box;
+    height: $row-height !important;
+    margin-bottom: $row-gap !important;
+    border-radius: $row-radius;
+    background-color: transparent !important;
+    box-shadow: none;
+    transition: background-color var(--vivarcdi-transition);
+
+    &:hover {
+      background-color: var(--vivarcdi-hover) !important;
+    }
+
+    &:has(.tab.active) {
+      background-color: var(--vivarcdi-pill) !important;
+      box-shadow: $pill-shadow;
+    }
+  }
+
+  #{$row-tabs} {
+    height: $row-height !important;
+    background: transparent !important;
+  }
+
+  #{$rows} .title {
+    color: var(--vivarcdi-ink) !important;
+    font-size: $row-font-size;
+    font-weight: $row-font-weight;
+  }
+
+  #{$rows} .close {
+    color: var(--vivarcdi-ink);
+    opacity: 0;
+  }
+
+  #{$rows}:hover .close {
+    opacity: 1;
+  }
+
+  #{$tile-wrappers},
+  #{$own-tile} {
+    border-radius: $tile-radius;
+    color: var(--vivarcdi-ink);
+  }
+
+  #{$grid},
+  #{$tiles} {
+    --vivarcdi-tile-bg: var(--vivarcdi-veil);
+    --vivarcdi-tile-bg-hover: var(--vivarcdi-hover);
+    --vivarcdi-tile-bg-active: var(--vivarcdi-pill);
+  }
+
+  #{$tile-wrappers}:has(.tab.active),
+  #{$own-tile}#{$tile-current} {
+    background-color: var(--vivarcdi-pill) !important;
+    box-shadow: $pill-shadow;
+  }
+
+  #{$folders} {
+    --vivarcdi-folders-hover: var(--vivarcdi-hover);
+
+    color: var(--vivarcdi-ink);
+    font-size: $row-font-size;
+    font-weight: $row-font-weight;
+
+    > [role] {
+      height: $row-height;
+      margin-bottom: $row-gap;
+      border-radius: $row-radius;
+    }
+  }
+
+  #{$space-header} {
+    --vivarcdi-space-hover: var(--vivarcdi-hover);
+
+    height: $row-height;
+    border-radius: $row-radius;
+    color: var(--vivarcdi-muted);
+    font-size: $header-font-size;
+  }
+
+  #{$pinned-last} {
+    border-bottom: $line-width solid var(--vivarcdi-line);
+  }
+
+  #{$new-tab-row} {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    box-sizing: border-box;
+    width: calc(100% - #{$folders-padding * 2});
+    height: $row-height;
+    margin: $row-gap $folders-padding;
+    padding-inline: $gap;
+    border: 0;
+    border-radius: $row-radius;
+    background: transparent;
+    color: var(--vivarcdi-muted);
+    font: inherit;
+    font-size: $row-font-size;
+    font-weight: $row-font-weight;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--vivarcdi-transition);
+
+    &:hover {
+      background-color: var(--vivarcdi-hover);
+    }
+
+    .vivarcdi-new-tab-icon {
+      flex: none;
+      width: $folders-icon-size;
+      height: $folders-icon-size;
+      background-color: currentcolor;
+      mask: $plus-glyph center / contain no-repeat;
+    }
+  }
+}

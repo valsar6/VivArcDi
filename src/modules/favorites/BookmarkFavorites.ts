@@ -12,6 +12,8 @@ import { FavoritesFolder } from './FavoritesFolder.js';
 import type { Favorite } from './FavoritesFolder.js';
 import { FavoritesView } from './FavoritesView.js';
 import { LinkedTabs } from './LinkedTabs.js';
+import { TabChanges } from './TabChanges.js';
+import type { TileSource } from './TileSource.js';
 
 export const GRID_ORDER = 10;
 const HIDDEN_OWNER = 'favorites-grid';
@@ -37,7 +39,7 @@ export interface BookmarkFavoritesDependencies {
   onChange: () => void;
 }
 
-export class BookmarkFavorites {
+export class BookmarkFavorites implements TileSource {
   #deps: BookmarkFavoritesDependencies;
   #links: LinkedTabs;
   #view: FavoritesView;
@@ -45,7 +47,7 @@ export class BookmarkFavorites {
   #detach: (() => void) | null = null;
   #folder: FavoritesFolder;
   #favorites: Favorite[] | null = null;
-  #unsubscribe: Array<() => void> = [];
+  #changes: TabChanges;
   #states: SerialTask;
 
   /**
@@ -65,6 +67,7 @@ export class BookmarkFavorites {
     });
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#folder = new FavoritesFolder(bookmarks, folder, (favorites) => this.#receive(favorites));
+    this.#changes = new TabChanges(tabs, logger, () => this.#readStates());
     this.#states = new SerialTask(
       () => this.#applyStates(),
       (error) => logger.error('Could not read the Favorites tabs', error),
@@ -79,17 +82,17 @@ export class BookmarkFavorites {
   }
 
   /**
-   * @returns How many tiles are shown.
+   * @returns How many tiles are shown; 0 while the folder is missing.
    */
   public get count(): number {
-    return this.#view.count;
+    return this.active ? this.#view.count : 0;
   }
 
   /**
    * Reads the folder and starts following bookmarks and tabs.
    */
   public async start(): Promise<void> {
-    this.#subscribeToTabs();
+    this.#changes.start();
     await this.#folder.start();
   }
 
@@ -98,8 +101,7 @@ export class BookmarkFavorites {
    */
   public stop(): void {
     this.#folder.stop();
-    this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
-    this.#unsubscribe = [];
+    this.#changes.stop();
     this.place(false);
     this.#view.destroy();
     this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
@@ -124,24 +126,6 @@ export class BookmarkFavorites {
       return null;
     }
     return this.#view.element;
-  }
-
-  #subscribeToTabs(): void {
-    const { tabs, logger } = this.#deps;
-    const read = (): void => this.#readStates();
-    const events: Array<() => () => void> = [
-      (): (() => void) => tabs.onUpdated(read),
-      (): (() => void) => tabs.onActivated(read),
-      (): (() => void) => tabs.onRemoved(read),
-      (): (() => void) => tabs.onCreated(read),
-    ];
-    for (const subscribe of events) {
-      try {
-        this.#unsubscribe.push(subscribe());
-      } catch {
-        logger.warn('A tab event is missing: tiles may lag behind the tabs');
-      }
-    }
   }
 
   #receive(favorites: Favorite[] | null): void {

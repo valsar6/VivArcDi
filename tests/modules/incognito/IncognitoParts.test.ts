@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HiddenButtons } from '../../../src/modules/incognito/HiddenButtons.js';
 import { IncognitoHeader } from '../../../src/modules/incognito/IncognitoHeader.js';
-import { NewTabRow } from '../../../src/modules/incognito/NewTabRow.js';
+import { NewTabRow } from '../../../src/core/NewTabRow.js';
 import { asDocument } from '../../core/dom.js';
 import { immediateFrames } from '../folders/fakes.js';
 import { IncognitoDocument } from './fakes.js';

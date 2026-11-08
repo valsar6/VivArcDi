@@ -100,6 +100,10 @@ export class DomNode {
     this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]);
   }
 
+  public removeEventListener(type: string, listener: Listener): void {
+    this.listeners.set(type, (this.listeners.get(type) ?? []).filter((candidate) => candidate !== listener));
+  }
+
   public click(): void {
     this.bubble({ type: 'click', target: this } as unknown as Event);
   }
