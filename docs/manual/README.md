@@ -73,5 +73,4 @@ The developer view of the same picture is in [architecture.md](../architecture.m
 ## About the images
 
 The pictures marked **Mockup** are drawn to explain a feature. They are not screenshots of Vivaldi.
-One clip, marked **Arc reference**, was recorded in Arc. Real recordings of VivArcDi will replace the
-mockups: see [Images and GIFs](assets.md).
+Real recordings of VivArcDi will replace them: see [Images and GIFs](assets.md).

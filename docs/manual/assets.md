@@ -23,17 +23,14 @@ VivArcDi that still have to be made on a real Vivaldi.
 | `images/mockups/sidebar-look.gif` | Mockup | Row hover, then the palettes powder, lagoon and arclight | [Tab bar](tab-bar.md#the-arc-look) |
 | `images/mockups/drag-tab-to-favorites.gif` | Mockup | A Today tab dragged into the Favorites (spec 020) | [Roadmap](roadmap.md#drag-a-tab-into-the-favorites) |
 | `images/mockups/theme-color.gif` | Mockup | Edit Theme Color with three colors (spec 019) | [Roadmap](roadmap.md#theme-color-per-space) |
-| `images/arc/arc-pinned-and-space-menus.gif` | Arc reference | Pinned tab menu and space menu | [Roadmap](roadmap.md#rename-pinned-tabs) |
+| `images/mockups/pinned-and-space-menus.gif` | Mockup | Pinned tab menu and space header menu (specs 019, 026, 027) | [Roadmap](roadmap.md#rename-pinned-tabs) |
 
 **Mockups** are drawn in HTML and are not screenshots. Their source is
 [`images/mockups/source/mockups.html`](images/mockups/source/mockups.html): open it with a scene in
 the address, for example `mockups.html#{"scene":"peek","step":3}`, and take a 1000 × 620 screenshot.
 The scenes are `anatomy`, `peek` (steps 0 to 4), `peeksplit` (0 to 3), `pinned` (0 to 3), `folder`
 (0 to 3), `dragfav` (0 to 2), `themecolor` (0 to 3, with `bg` and `dot` colors), `look` (with `bg`,
-`hover` and `cur`), `archive`, `littlearc`, `incognito` and `copyurl`.
-
-The **Arc reference** clip is cut from Tore's screen recording of Arc of 2026-10-28, 800 px wide, 4
-frames per second.
+`hover` and `cur`), `menus` (0 to 5), `archive`, `littlearc`, `incognito` and `copyurl`.
 
 ## Recordings still to make
 

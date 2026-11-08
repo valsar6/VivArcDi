@@ -4,8 +4,7 @@
 
 These Arc features have a specification but are not in VivArcDi yet. **Planned** specs are approved
 and wait for their turn. **Proposed** specs are drafts: their behavior can still change, or they can be
-dropped. Each section links its spec. The pictures are mockups of how the feature is meant to look, and the
-last clip, marked **Arc reference**, was recorded in Arc.
+dropped. Each section links its spec. The pictures are mockups of how the feature is meant to look.
 
 ## Arc Light theme
 
@@ -91,7 +90,7 @@ Right click a pinned row or a Favorite tile and choose **Rename…** for a short
 icon…** for an emoji. **Reset** brings back the page title and icon. The name and icon stay with the
 bookmark.
 
-Arc reference: the menus of a pinned tab (Rename, Change Icon, Edit Pinned Page) and of a space
-(Edit Theme Color, Live Folders).
+The menus of a pinned tab (Rename, Change Icon, Edit Pinned Page) and of the space header (Edit Theme
+Color, New Folder, Live Folders), as specs 019, 026 and 027 propose them:
 
-![Arc reference: pinned tab and space menus](images/arc/arc-pinned-and-space-menus.gif)
+![Mockup: pinned tab menu, then space header menu](images/mockups/pinned-and-space-menus.gif)
