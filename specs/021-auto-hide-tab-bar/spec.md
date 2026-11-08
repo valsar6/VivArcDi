@@ -45,7 +45,7 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 | AC-3 | WHILE the bar is shown over the page, THE page SHALL not move. | manual |
 | AC-4 | WHEN the user runs the shortcut step, THE installer SHALL turn on auto-hide in `Preferences`. | auto: `test_auto_hide_is_turned_on` |
 | AC-5 | WHERE `auto-hide.enabled` is false, THE installer SHALL leave the setting unchanged. | auto: `test_auto_hide_is_left_alone_when_disabled` |
-| AC-6 | WHILE the tab bar is hidden and the pointer is away from the left edge, THE panel bar buttons SHALL not show. | manual |
+| AC-6 | WHEN the pointer reaches the left edge while the tab bar is hidden, THE panel bar buttons SHALL not appear before the tab bar. | manual |
 
 ## Out of scope
 
