@@ -6,6 +6,7 @@
     "styles/folders.css",
     "styles/hidden-tabs.css",
     "styles/incognito.css",
+    "styles/little-arc.css",
     "styles/peek.css",
     "styles/pinned.css",
     "styles/space-header.css",
@@ -71,6 +72,14 @@
     },
     "incognito": {
       "enabled": true
+    },
+    "little-arc": {
+      "enabled": true,
+      "externalLinks": true,
+      "askWorkspace": false,
+      "idleCloseHours": 6,
+      "widthPercent": 34,
+      "heightPercent": 60
     }
   }
 }

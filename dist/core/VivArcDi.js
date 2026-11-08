@@ -3,7 +3,9 @@ import { BookmarkWriter } from "./bookmarks/BookmarkWriter.js";
 import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
 import { BrowserPrefs } from "./BrowserPrefs.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
+import { BrowserSearch } from "./BrowserSearch.js";
 import { BrowserTabs } from "./BrowserTabs.js";
+import { BrowserWindows } from "./BrowserWindows.js";
 import { Logger } from "./Logger.js";
 import { PersistentStorage } from "./PersistentStorage.js";
 import { ResourceLoader } from "./ResourceLoader.js";
@@ -19,6 +21,8 @@ class VivArcDi {
   #bookmarks;
   #bookmarkWriter;
   #runtime;
+  #windows;
+  #search;
   #prefs;
   #storage;
   #styles;
@@ -38,6 +42,8 @@ class VivArcDi {
     bookmarks = new BrowserBookmarks(void 0),
     bookmarkWriter = new BookmarkWriter(void 0),
     runtime = new BrowserRuntime(void 0),
+    windows,
+    search,
     prefs = new BrowserPrefs(void 0),
     storage = new PersistentStorage(/* @__PURE__ */ new Map(), null, void 0, logger)
   }) {
@@ -49,6 +55,8 @@ class VivArcDi {
     this.#bookmarks = bookmarks;
     this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
+    this.#windows = windows;
+    this.#search = search;
     this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
@@ -73,6 +81,8 @@ class VivArcDi {
       bookmarks: new BrowserBookmarks(chromeApi),
       bookmarkWriter: new BookmarkWriter(chromeApi),
       runtime: new BrowserRuntime(chromeApi),
+      windows: new BrowserWindows(chromeApi),
+      search: new BrowserSearch(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger)
     });
@@ -155,6 +165,8 @@ class VivArcDi {
         bookmarkWriter: this.#bookmarkWriter,
         modules,
         runtime: this.#runtime,
+        windows: this.#windows ?? new BrowserWindows(void 0),
+        search: this.#search ?? new BrowserSearch(void 0),
         prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader

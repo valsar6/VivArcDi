@@ -34,6 +34,24 @@ class BrowserRuntime {
     return () => event.removeListener(listener);
   }
   /**
+   * Sends a message to the other documents of the extension, such as the interface of another window.
+   *
+   * @param message The message; it is not delivered to the sender.
+   * @returns Resolves once the message was handed over; rejects when `chrome.runtime.sendMessage` is missing.
+   */
+  sendMessage(message) {
+    const send = this.#chrome?.runtime?.sendMessage;
+    if (send === void 0) {
+      return Promise.reject(new Error("chrome.runtime.sendMessage is not available"));
+    }
+    return new Promise((resolve) => {
+      send.call(this.#chrome?.runtime, message, () => {
+        void this.#chrome?.runtime?.lastError;
+        resolve();
+      });
+    });
+  }
+  /**
    * Opens a URL in a new browser window.
    *
    * @param url Address to open.

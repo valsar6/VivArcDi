@@ -75,6 +75,24 @@ class BrowserTabs {
     await this.#call("reload", tabId);
   }
   /**
+   * Moves a tab to a place in a window.
+   *
+   * @param tabId Tab id.
+   * @param properties `windowId` and `index`, as accepted by `chrome.tabs.move`.
+   * @returns The moved tab.
+   */
+  move(tabId, properties) {
+    return this.#call("move", tabId, properties);
+  }
+  /**
+   * Goes back one page in the history of a tab.
+   *
+   * @param tabId Tab id.
+   */
+  async goBack(tabId) {
+    await this.#call("goBack", tabId);
+  }
+  /**
    * Closes a tab.
    *
    * @param tabId Tab id.

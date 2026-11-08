@@ -1,0 +1,44 @@
+#browser[data-vivarcdi-little-arc] {
+  padding-top: 44px;
+  box-sizing: border-box;
+}
+
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar {
+  position: fixed;
+  z-index: 70;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 6px 12px;
+  gap: 8px;
+  background-color: var(--colorBg, #2a2a2e);
+  color: var(--colorFg, #fff);
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar button,
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar input {
+  height: 32px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar button {
+  padding: 0 12px;
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+  color: inherit;
+  cursor: pointer;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar input {
+  min-width: 0;
+  flex: 1;
+  padding: 0 12px;
+  border-radius: 9px;
+  background-color: var(--colorBgIntense, #fff);
+  color: var(--colorFgIntense, #1d1d24);
+}

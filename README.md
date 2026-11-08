@@ -360,6 +360,33 @@ Options of `peek` in `config.json`:
 | `widthPercent` | `90` | Panel width, as a percentage of the page area (40 to 100) |
 | `heightPercent` | `94` | Panel height, as a percentage of the page area (40 to 100) |
 
+## Little Arc
+
+Little Arc is a small, minimal window for a quick lookup, like Arc's. It has no tab bar, no panels and
+no workspace switcher, only a compact bar with back, reload, an address field and **Move to workspace**.
+
+- **Cmd+Opt+N** (Ctrl+Alt+N on Debian) opens it with the address field ready. A site name opens the
+  site, any other text is a web search.
+- A **link opened from another app** (Mail, Slack, Notes) opens in Little Arc instead of a tab of the
+  main window. VivArcDi recognizes it as a new, active tab with no opener that appears just as Vivaldi
+  comes to the front.
+- **Move to workspace** or Cmd/Ctrl+O turns the page into a tab of the workspace you last used and
+  closes the small window. Esc in an empty address field and Cmd/Ctrl+W close it and forget the page.
+- A Little Arc window nobody touched for six hours closes by itself.
+
+Little Arc works while Vivaldi is open. A shortcut that works from other apps needs an operating
+system hook and is not part of this version ([spec 005](specs/005-little-arc/spec.md)).
+
+Options of `little-arc` in `config.json`:
+
+| Option | Default | Effect |
+|---|---|---|
+| `externalLinks` | `true` | Links opened from other apps open in Little Arc |
+| `askWorkspace` | `false` | Reserved: the choice of workspace is not available yet, the most recent one is used |
+| `idleCloseHours` | `6` | Closes an untouched window after this many hours; `0` never |
+| `widthPercent` | `34` | Window width, as a percentage of the screen (20 to 100) |
+| `heightPercent` | `60` | Window height, as a percentage of the screen (20 to 100) |
+
 ## Reopen pinned tabs
 
 Opening from a new tab (Cmd/Ctrl+T or "+") the address of a Favorite, a pinned tab (its current page or its own page) or a link of the
