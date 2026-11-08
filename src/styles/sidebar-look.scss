@@ -34,6 +34,10 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     display: none !important;
   }
 
+  #{$tab-bar} .tabbar-nested-buttons:not(:has(.button-toolbar:not(.toolbar-spacer, .toolbar-spacer-flexible))) {
+    display: none !important;
+  }
+
   #{$tab-bar} #tabs-container {
     ::-webkit-scrollbar {
       width: $scrollbar-width;
@@ -113,6 +117,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     color: var(--vivarcdi-ink);
     font-size: $row-font-size;
     font-weight: $row-font-weight;
+    padding-block: 0;
 
     > [role] {
       height: $row-height;
@@ -125,6 +130,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     --vivarcdi-space-hover: var(--vivarcdi-hover);
 
     height: $row-height;
+    margin-block: 0 $row-gap;
     border-radius: $row-radius;
     color: var(--vivarcdi-muted);
     font-size: $header-font-size;
