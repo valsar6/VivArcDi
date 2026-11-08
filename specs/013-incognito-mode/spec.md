@@ -127,7 +127,7 @@ Vivaldi; and Vivaldi's private window keeps its own dark theme instead of Arc's.
 ## Out of scope
 
 - A full Arc Library (captures, easels, spaces); only the Downloads panel is opened.
-- Arc's command bar. A command panel of VivArcDi (tabs, bookmarks, history) would be its own spec;
+- Arc's command bar. A command panel of VivArcDi (tabs, bookmarks, history) is [023](../023-command-panel/spec.md);
   Quick Commands stays on Cmd/Ctrl+T.
 - Restyling Vivaldi's private tab rows or theme like Arc's.
 - Turning a private tab into a normal one ("move to a normal window").

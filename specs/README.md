@@ -27,6 +27,15 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [016 Plug-and-play installer](016-plug-and-play-installer/spec.md) | 0 | Implemented |
 | [017 Package managers](017-package-managers/spec.md) | 0 | Approved |
 | [018 Copy bookmarks into a workspace](018-copy-bookmarks-to-workspace/spec.md) | 3 | Approved |
+| [019 Space theme color](019-space-theme-color/spec.md) | 3 | Draft |
+| [020 Drag a tab into the Favorites](020-drag-tab-to-favorites/spec.md) | 1 | Draft |
+| [021 Auto-hide tab bar](021-auto-hide-tab-bar/spec.md) | 3 | Draft |
+| [022 Split from a dragged tab](022-split-from-drag/spec.md) | 2 | Draft |
+| [023 Command panel with tab actions](023-command-panel/spec.md) | 5 | Draft |
+| [024 Site boosts and zap](024-site-boosts-and-zap/spec.md) | 5 | Draft |
+| [025 Annotated screenshots](025-annotated-screenshots/spec.md) | 5 | Draft |
+| [026 Live folders](026-live-folders/spec.md) | 3 | Draft |
+| [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Draft |
 
 ## Layout
 

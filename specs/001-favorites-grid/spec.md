@@ -115,7 +115,7 @@ rows. The first-pinned-tabs rule above remains the fallback when the folder is m
 - Notification badges read from the page title, and Cmd+1…9 on Favorites: candidates for a later
   revision of this spec.
 - Adding a Favorite by dragging a tab above the workspace title. Arc does it by dragging a tab
-  into the Favorites row (Arc video review, 2026-11-08): a candidate for its own spec.
+  into the Favorites row: [020](../020-drag-tab-to-favorites/spec.md).
 - Favorites shared by every workspace: [003](../003-pinned-tabs-and-folders/spec.md).
 
 ## Open questions
