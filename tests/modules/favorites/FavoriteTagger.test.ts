@@ -34,6 +34,14 @@ test('pinned tabs beyond the limit stay rows', () => {
   assert.equal(tagger.tileCount, 3);
 });
 
+test('a tab list without tiles keeps the layout of Vivaldi', () => {
+  const { bar, strip } = tabBar({ slots: [tabSlot(1, { pinned: true }), tabSlot(2)] });
+  const tagger = new FavoriteTagger(selectors, 0, none);
+  assert.equal(tagger.apply(asElement(bar)), asElement(strip));
+  assert.equal(strip.hasAttribute(GRID_ATTRIBUTE), false);
+  assert.deepEqual(tileIds(strip), []);
+});
+
 test('a horizontal tab bar gets no grid', () => {
   const { bar, strip } = tabBar({ vertical: false, slots: [tabSlot(1, { pinned: true })] });
   assert.equal(new FavoriteTagger(selectors, 12, none).apply(asElement(bar)), null);

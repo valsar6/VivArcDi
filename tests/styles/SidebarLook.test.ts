@@ -71,3 +71,13 @@ test('tile icons are 20 px', () => {
   const css = sass.compile(`${STYLES}favorites.scss`).css;
   assert.match(css, /\[data-vivarcdi-tile\] > img \{\s*width: 20px;\s*height: 20px;/);
 });
+
+test('hides the tab bar buttons that only hold spacers', () => {
+  assert.match(compiled(), /\.tabbar-nested-buttons:not\(:has\(\.button-toolbar:not\(\.toolbar-spacer, \.toolbar-spacer-flexible\)\)\)\s*\{\s*display: none !important;/);
+});
+
+test('the space name and the rows below keep the row spacing', () => {
+  const css = compiled();
+  assert.match(css, /\[data-vivarcdi-space-header\] \{[^}]*margin-block: 0 2px;/);
+  assert.match(css, /\[data-vivarcdi-folders\] \{[^}]*padding-block: 0;/);
+});
