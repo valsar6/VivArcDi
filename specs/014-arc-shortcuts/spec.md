@@ -42,6 +42,8 @@ these settings:
 | Pin / Unpin Tab | no shortcut (Cmd+D belongs to the workspace favorites of [012](../012-editable-folders/spec.md)) |
 | Print | Cmd+P (Ctrl+P on Debian) |
 | Panel | loses Cmd+P (Ctrl+P), keeps its other shortcuts |
+| Next Workspace (`COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER`) | Cmd+Opt+`]` (Ctrl+Alt+`]` on Debian) |
+| Previous Workspace (`COMMAND_WORKSPACE_SWITCH_BACK_ORDER`) | Cmd+Opt+`[` (Ctrl+Alt+`[` on Debian) |
 | Little Arc key | Cmd+Opt+N (Ctrl+Alt+N on Debian) belongs to [Little Arc](../005-little-arc/spec.md); the command that holds it, in Vivaldi the Notes panel, loses it and keeps its other shortcuts |
 
 Change request of 2026-11-08, from Tore's check of Little Arc: Cmd+Opt+N opened Vivaldi's own Notes
@@ -110,6 +112,7 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 | AC-14 | WHEN Vivaldi restarts after `restore`, THE keyboard SHALL be as before `apply`. | manual |
 | AC-15 | WHEN Vivaldi restarts after `apply`, Quick Commands SHALL open links in a new tab. | manual |
 | AC-18 | WHEN Vivaldi restarts after `apply`, Cmd+Opt+N SHALL open Little Arc and not the Notes panel. | manual |
+| AC-19 | WHEN Vivaldi restarts after `apply`, Cmd+Opt+`]` and Cmd+Opt+`[` SHALL switch to the next and the previous workspace. | manual |
 
 ## Out of scope
 
@@ -122,7 +125,7 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 
 ## Open questions
 
-- [ ] **Next and previous workspace (proposed 2026-11-08).** Probe on Vivaldi 8.2 macOS (Tore, 2026-11-08):
+- [x] **Next and previous workspace (approved by Tore, 2026-11-08).** Probe on Vivaldi 8.2 macOS (Tore, 2026-11-08):
   Vivaldi has the commands `COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER` and `COMMAND_WORKSPACE_SWITCH_BACK_ORDER`
   ("next" and "previous" workspace), with no shortcut by default. Tore assigned them to Cmd+Opt+`]` and
   Cmd+Opt+`[` and Vivaldi saved them as `{"shortcuts": ["alt+meta+]"]}` and `{"shortcuts": ["alt+meta+["]}`.

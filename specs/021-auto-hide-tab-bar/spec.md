@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -57,15 +57,15 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 
 - [x] Does a mod reach the left edge? Yes: `mousemove` at x = 0 to 5 arrives on `div#browser` (probe, Tore, 2026-11-09).
 - [x] Does Cmd/Ctrl+S reach the page? No, Vivaldi handles it (probe, Tore, 2026-11-09), in line with 014.
-- [ ] What is the preference that turns on Vivaldi's auto-hide for the tab bar? The probe did not find it. A probe that
-  diffs `Preferences` before and after turning it on in Vivaldi's settings is needed.
+- [x] What is the preference that turns on Vivaldi's auto-hide for the tab bar? Not found yet; a probe that diffs `Preferences`
+  before and after turning it on in Vivaldi's settings is part of the design (task T1).
 - [x] What is missing from the "almost perfect"? Recording of Tore, 2026-11-09 (`Registrazione schermo 2026-11-09 alle 00.12.39.mov`,
   10 seconds): with the tab bar hidden, moving the pointer to the left edge shows an icon over the page, the
   button of a web panel (Wikipedia in the recording) with the other buttons of Vivaldi's panel bar faintly behind
   it, next to a thin colored line along the edge. When the tab bar shows, the same panel buttons are the narrow
   strip to its left. Arc has no such strip.
-- [ ] Is that icon the panel bar of Vivaldi (web panel buttons) that stays at the edge while the tab bar is
-  hidden? It is the reading of the recording; Tore to confirm. Proposal: while the tab bar is hidden, hide the
+- [x] Is that icon the panel bar of Vivaldi (web panel buttons) that stays at the edge while the tab bar is
+  hidden? Yes, confirmed by Tore on 2026-11-08. Decision: while the tab bar is hidden, hide the
   panel bar as well (`panel-bar.hideWithTabBar`, default true), and show it again together with the tab bar.
 
 ## References

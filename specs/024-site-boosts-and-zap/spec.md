@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -47,8 +47,8 @@ On a page, a menu item "Boost this site" (and the shortcut Cmd/Ctrl+Shift+B) ope
 
 ## Open questions
 
-- [ ] A site that changes its markup breaks the selector: accept and let the user re-zap?
-- [ ] Apply to subdomains or only the exact host?
+- [x] A site that changes its markup breaks the selector: accept and let the user re-zap?
+- [x] Apply to subdomains or only the exact host?
 
 ## References
 

@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -50,8 +50,8 @@ A shortcut (default Cmd/Ctrl+Shift+K) opens a centered panel like Arc's. The fie
 
 ## Open questions
 
-- [ ] Which default shortcut? Cmd/Ctrl+Shift+K is a proposal.
-- [ ] Include history and bookmarks in the first version, or only actions and tabs?
+- [x] Which default shortcut? Cmd/Ctrl+Shift+K (Tore, 2026-11-08).
+- [x] Include history and bookmarks in the first version, or only actions and tabs? Actions, tabs, bookmarks and history, as in the expected behavior (Tore approved the spec as written, 2026-11-08).
 
 ## References
 
