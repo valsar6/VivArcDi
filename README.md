@@ -233,12 +233,15 @@ installer stops and tells you to download a release build or to run `make build`
 | `uninstall` | Removes the patch, the payload and the hook; keeps the backups |
 | `status` | Shows which builds are patched and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
+| `theme apply\|restore\|status` | Adds the "VivArcDi Light" theme to the Vivaldi profile and selects it, backs it up first; `restore` selects the previous theme again; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
 | `window` | Opens the VivArcDi window, the same one as in the app and the package |
 
-Add `--quiet` to print only warnings and errors. On Debian, every command but `status` and `shortcuts` needs `sudo`; `shortcuts` refuses it.
+Add `--quiet` to print only warnings and errors. On Debian, every command but `status`, `shortcuts` and `theme` needs `sudo`; `shortcuts` and `theme` refuse it.
 
 `--mode cli|app|deb` says who manages VivArcDi. The default is `cli`. The app and the package pass
 `app` and `deb` themselves, so you do not need it. `window` needs a desktop and Tkinter.
+
+At the end of `install` you are asked "Apply the VivArcDi Light theme? [Y/n]" (default yes; Vivaldi must be closed, otherwise run `theme apply` later). `install --yes` applies it without asking, `install --no-theme` skips it. The question is never asked by the update hook, the window or under `sudo`.
 
 `shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `shortcuts apply` also frees Cmd+Opt+N (Ctrl+Alt+N on Debian) for [Little Arc](#little-arc), taking it away from Vivaldi's Notes panel. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
 
@@ -590,7 +593,7 @@ Vivaldi's own `+` button in the tab bar is hidden.
 | Option | Default | Meaning |
 |---|---|---|
 | `enabled` | `true` | Set to `false` and Vivaldi looks as it does without the module |
-| `palette` | `sky` | Colors of a workspace without a color of its own: `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon` |
+| `palette` | `arclight` | Colors of a workspace without a color of its own: `arclight` (a coral-to-aqua gradient behind the tab bar and around the page, with white pill and dark text), `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon` |
 
 ## Roadmap
 

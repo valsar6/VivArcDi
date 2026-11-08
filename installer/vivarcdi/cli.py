@@ -5,7 +5,7 @@ from pathlib import Path
 
 from . import __version__
 from .backup import BackupStore
-from .commands import COMMANDS, Command, InstallerContext, ReapplyCommand, ShortcutsCommand, UninstallCommand, WindowCommand
+from .commands import COMMANDS, Command, InstallerContext, InstallCommand, ReapplyCommand, ShortcutsCommand, ThemeCommand, THEME_APPLY, THEME_ASK, THEME_NEVER, UninstallCommand, WindowCommand
 from .distribution import DIST_FOLDER, payload_root
 from .errors import VivArcDiError
 from .modes import MODES, CommandLineMode, InstallMode, mode_named
@@ -15,10 +15,12 @@ from .preferences_backup import PreferencesBackupStore
 from .payload import PayloadDeployer
 from .platforms import Platform, PlatformFactory, is_root
 from .profiles import ProfileLocator
+from .prompt import ConsolePrompt
 from .reporter import Reporter
 from .running import ProcessGuard
 from .shortcuts import ShortcutService
 from .system import CommandRunner
+from .theme import ThemeDefinition, ThemeService
 from .window_patch import WindowHtmlPatcher
 
 MODE_HELP = "who manages VivArcDi: the command line (cli), the macOS app (app) or the Debian package (deb)"
@@ -55,6 +57,13 @@ def build_context(
         ProcessGuard(platform.process_names(), runner),
         reporter,
     )
+    theme = ThemeService(
+        ProfileLocator(platform.profile_roots()),
+        ThemeDefinition.load(),
+        PreferencesBackupStore(data_dir / "preferences-backups"),
+        ProcessGuard(platform.process_names(), runner),
+        reporter,
+    )
     return InstallerContext(
         platform=platform,
         installations=installations,
@@ -64,6 +73,7 @@ def build_context(
         reporter=reporter,
         handoff=mode.reapply_handoff(platform, reapply),
         shortcuts=shortcuts,
+        theme=theme,
         mode=mode,
         data_dir=data_dir,
         ownership=mode.ownership(platform, data_dir),
@@ -93,10 +103,24 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
             subparser.add_argument(
                 "--needs-reapply", action="store_true", help="start with the message about a denied background reapply"
             )
+        if isinstance(command, InstallCommand):
+            subparser.add_argument("--yes", action="store_true", help="apply the VivArcDi Light theme without asking")
+            subparser.add_argument("--no-theme", action="store_true", help="do not offer the VivArcDi Light theme")
+        if isinstance(command, ThemeCommand):
+            subparser.add_argument("action", choices=command.actions, help="what to do with the theme")
+            subparser.add_argument("--dry-run", action="store_true", help="print the changes and write nothing")
+            subparser.add_argument("--keys", action="store_true", help="status: print the theme key names and ids")
         if isinstance(command, ShortcutsCommand):
             subparser.add_argument("action", choices=command.actions, help="what to do with the shortcuts")
             subparser.add_argument("--dry-run", action="store_true", help="print the differences and change nothing")
     return parser.parse_args(argv)
+
+
+def theme_choice(arguments: argparse.Namespace) -> str:
+    """What `install` does about the theme: never with --no-theme, apply with --yes, otherwise ask."""
+    if getattr(arguments, "no_theme", False):
+        return THEME_NEVER
+    return THEME_APPLY if getattr(arguments, "yes", False) else THEME_ASK
 
 
 def main(argv: list[str]) -> int:
@@ -123,6 +147,11 @@ def main(argv: list[str]) -> int:
             platform, reporter, background=getattr(arguments, "background", False), mode=mode
         )
         context.shortcut_action = getattr(arguments, "action", "status")
+        context.theme_action = context.shortcut_action
+        context.show_keys = getattr(arguments, "keys", False)
+        context.theme_choice = theme_choice(arguments)
+        context.profile_is_yours = not is_root()
+        context.prompt = ConsolePrompt()
         context.dry_run = getattr(arguments, "dry_run", False)
         context.restore_shortcuts = getattr(arguments, "restore_shortcuts", False)
         context.needs_reapply = getattr(arguments, "needs_reapply", False)

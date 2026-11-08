@@ -5,9 +5,9 @@ $row-tabs: '#{$strip} > :not(#{$tile}) .tab';
 $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
 
 #{$look} {
-  --vivarcdi-space: var(--vivarcdi-space-theme, #{$sky-space});
-  --vivarcdi-pill: var(--vivarcdi-pill-theme, #{$sky-pill});
-  --vivarcdi-ink: var(--vivarcdi-ink-theme, #{$sky-ink});
+  --vivarcdi-space: var(--vivarcdi-space-theme, #{$arclight-space});
+  --vivarcdi-pill: var(--vivarcdi-pill-theme, #{$arclight-pill});
+  --vivarcdi-ink: var(--vivarcdi-ink-theme, #{$arclight-ink});
   --vivarcdi-veil: color-mix(in srgb, white #{$veil}, var(--vivarcdi-space));
   --vivarcdi-hover: color-mix(in srgb, white #{$hover-veil}, var(--vivarcdi-space));
   --vivarcdi-muted: color-mix(in srgb, var(--vivarcdi-ink) #{$muted-ink}, transparent);
@@ -16,6 +16,15 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
   #{$tab-bar},
   #{$tab-bar} #tabs-container {
     background-color: var(--vivarcdi-space) !important;
+  }
+
+  &[data-vivarcdi-gradient] {
+    background: var(--vivarcdi-gradient) !important;
+
+    #{$tab-bar},
+    #{$tab-bar} #tabs-container {
+      background-color: transparent !important;
+    }
   }
 
   #{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {

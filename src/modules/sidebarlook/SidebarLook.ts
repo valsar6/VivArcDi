@@ -11,6 +11,8 @@ import { ScrollMark } from './ScrollMark.js';
 
 export const LOOK_ATTRIBUTE = 'data-vivarcdi-look';
 export const PALETTE_ATTRIBUTE = 'data-vivarcdi-palette';
+export const GRADIENT_ATTRIBUTE = 'data-vivarcdi-gradient';
+const GRADIENT_PROPERTY = '--vivarcdi-gradient';
 const NEW_TAB_ORDER = 30;
 
 export interface SidebarLookSettings {
@@ -76,10 +78,16 @@ export class SidebarLook extends Module {
     for (const [name, value] of Object.entries(colors)) {
       browser.style.setProperty(`--vivarcdi-${name}`, value);
     }
+    if (palette.gradient) {
+      browser.setAttribute(GRADIENT_ATTRIBUTE, '');
+      browser.style.setProperty(GRADIENT_PROPERTY, Palettes.css(palette.gradient));
+    }
     this.#stops.push(() => {
       browser.removeAttribute(LOOK_ATTRIBUTE);
       browser.removeAttribute(PALETTE_ATTRIBUTE);
+      browser.removeAttribute(GRADIENT_ATTRIBUTE);
       Object.keys(colors).forEach((name) => browser.style.removeProperty(`--vivarcdi-${name}`));
+      browser.style.removeProperty(GRADIENT_PROPERTY);
     });
   }
 }

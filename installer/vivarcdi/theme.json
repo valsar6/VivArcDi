@@ -1,0 +1,16 @@
+{
+  "id": "vivarcdi-light",
+  "name": "VivArcDi Light",
+  "version": 1,
+  "engineVersion": 1,
+  "colorBg": "#ffffff",
+  "colorFg": "#212121",
+  "colorAccentBg": "#ffffff",
+  "colorHighlightBg": "#4c7fd9",
+  "colorWindowBg": "#c9d8dc",
+  "radius": 14,
+  "transparencyTabBar": true,
+  "transparencyTabs": true,
+  "simpleScrollbar": true,
+  "accentFromPage": false
+}

@@ -49,7 +49,7 @@ class AppBundleTest(unittest.TestCase):
                 any(name == "Python" or name.startswith("libpython") for name in names),
                 "no Python runtime library in Contents/Frameworks or Contents/Resources",
             )
-        for relative in ("installer/__main__.py", "installer/vivarcdi/cli.py", "vivarcdi/shortcuts.json", "dist/loader.js", "dist/config.json"):
+        for relative in ("installer/__main__.py", "installer/vivarcdi/cli.py", "vivarcdi/shortcuts.json", "vivarcdi/theme.json", "dist/loader.js", "dist/config.json"):
             with self.subTest(relative):
                 self.assertIsNotNone(self.find(relative), f"{relative} is not in the bundle")
         with self.subTest("info plist"):

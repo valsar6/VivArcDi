@@ -5,7 +5,7 @@ import { Logger } from '../../../src/core/Logger.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import { createDefaultRegistry } from '../../../src/modules/index.js';
-import { LOOK_ATTRIBUTE, PALETTE_ATTRIBUTE, SidebarLook } from '../../../src/modules/sidebarlook/SidebarLook.js';
+import { GRADIENT_ATTRIBUTE, LOOK_ATTRIBUTE, PALETTE_ATTRIBUTE, SidebarLook } from '../../../src/modules/sidebarlook/SidebarLook.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { SilentSink } from '../../loader/fakes.js';
@@ -61,6 +61,7 @@ function setup(t: TestContext, options: Record<string, unknown> = { enabled: tru
 
 const rowsOf = (dom: LookDocument): DomNode[] => dom.parent.children[0]?.children ?? [];
 const COLORS = ['--vivarcdi-space', '--vivarcdi-pill', '--vivarcdi-ink'];
+const GRADIENT = 'linear-gradient(135deg, #f3b8ac, #d0c9c5, #8ae3f2)';
 
 test('disabled sidebar look changes nothing', (t) => {
   const { dom, browser } = setup(t, { enabled: false });
@@ -76,21 +77,30 @@ test('the registry starts the sidebar look when it is enabled', () => {
   assert.deepEqual(modules.map(({ id }) => id), ['sidebar-look']);
 });
 
-test('uses the sky palette without a workspace color', (t) => {
+test('uses the arclight palette by default', (t) => {
   const { browser, context } = setup(t);
   new SidebarLook().start(context);
   assert.ok(browser.hasAttribute(LOOK_ATTRIBUTE));
-  assert.equal(browser.getAttribute(PALETTE_ATTRIBUTE), 'sky');
-  assert.deepEqual(COLORS.map((name) => browser.properties.get(name)), ['#a3cee0', '#e9f3f7', '#0f2129']);
+  assert.equal(browser.getAttribute(PALETTE_ATTRIBUTE), 'arclight');
+  assert.deepEqual(COLORS.map((name) => browser.properties.get(name)), ['#d0c9c5', '#ffffff', '#212121']);
+  assert.ok(browser.hasAttribute(GRADIENT_ATTRIBUTE));
+  assert.equal(browser.properties.get('--vivarcdi-gradient'), GRADIENT);
 });
 
-test('uses the palette chosen in the options and falls back to sky for an unknown one', (t) => {
+test('a palette without a gradient leaves no gradient behind', (t) => {
+  const { browser, context } = setup(t, { enabled: true, palette: 'sky' });
+  new SidebarLook().start(context);
+  assert.equal(browser.hasAttribute(GRADIENT_ATTRIBUTE), false);
+  assert.equal(browser.properties.has('--vivarcdi-gradient'), false);
+});
+
+test('uses the palette chosen in the options and falls back to arclight for an unknown one', (t) => {
   const lagoon = setup(t, { enabled: true, palette: 'lagoon' });
   new SidebarLook().start(lagoon.context);
   assert.equal(lagoon.browser.properties.get('--vivarcdi-space'), '#8ec5cf');
   const unknown = setup(t, { enabled: true, palette: 'neon' });
   new SidebarLook().start(unknown.context);
-  assert.equal(unknown.browser.getAttribute(PALETTE_ATTRIBUTE), 'sky');
+  assert.equal(unknown.browser.getAttribute(PALETTE_ATTRIBUTE), 'arclight');
 });
 
 test('stop removes the marks, the colors and the row', (t) => {
@@ -99,7 +109,7 @@ test('stop removes the marks, the colors and the row', (t) => {
   look.start(context);
   assert.equal(rowsOf(dom).length, 1);
   look.stop();
-  assert.equal(browser.hasAttribute(LOOK_ATTRIBUTE) || browser.hasAttribute(PALETTE_ATTRIBUTE), false);
+  assert.equal(browser.hasAttribute(LOOK_ATTRIBUTE) || browser.hasAttribute(PALETTE_ATTRIBUTE) || browser.hasAttribute(GRADIENT_ATTRIBUTE), false);
   assert.equal(browser.properties.size, 0);
   assert.deepEqual(rowsOf(dom), []);
   assert.equal(dom.listeners.get('scroll')?.length, 0);
