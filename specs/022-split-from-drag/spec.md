@@ -27,7 +27,7 @@ The user drags a tab from the list onto the left or right edge of the page. A dr
 ### Functional
 
 - **FR-1.** Edge drop zones on the page area while a tab is dragged.
-- **FR-2.** A drop tiles the dragged tab with the active one through Vivaldi's tile command.
+- **FR-2.** A drop on the page edge creates a stack of the dragged tab and the active one and tiles it, as the menu item "Tile" does on a stack (Vivaldi tiles in two steps today, see the open questions).
 - **FR-3.** A tiled pair is one row in the list; "Pin split" stores both URLs and the layout.
 - **FR-4.** A pinned split reopens both pages and the layout.
 
@@ -47,7 +47,15 @@ The user drags a tab from the list onto the left or right edge of the page. A dr
 
 ## Open questions
 
-- [ ] Which Vivaldi command or API tiles two given tabs from a mod? Probe requested.
+- [x] How does Vivaldi tile today? Probe and recording on Vivaldi 8.2 macOS (Tore, 2026-11-09): in two
+  steps. (1) Dragging a tab onto another creates a stack and opens the "Edit stack" popup (name and nine colors).
+  (2) A right click on the stack and the menu item "Tile" splits the page into two pages, each with its own
+  title bar (`div.tiled.visible`). There is no drag to the edge of the page as in Arc, which is why it was hard
+  to get. The drag uses mouse events, not HTML5 drag (78 `mousedown` and `mouseup` pairs). APIs found:
+  `chrome.tabs.group`, `ungroup`, `SPLIT_VIEW_ID_NONE`, `vivaldi.tabsPrivate.getGroupExtId`,
+  `setGroupProperties` and `unstack`; no setting key mentions tile, stack or split.
+- [ ] How does code trigger "Tile" on a stack: an internal command or a field in the stack's `vivExtData`? A probe
+  must read the `vivExtData` of the tabs before and after "Tile". Without it, FR-2 cannot be designed.
 - [ ] Where is a pinned split shown: with the Favorites row or with pinned tabs?
 
 ## References
