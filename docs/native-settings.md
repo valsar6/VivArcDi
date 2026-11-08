@@ -40,7 +40,7 @@ every update. Labels refer to Vivaldi 8.1 and may differ slightly in other versi
 
 | Arc | Vivaldi setting |
 |---|---|
-| Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard, or run `python3 installer shortcuts apply`, which also turns on "Open Links In New Tab" and moves Tab Bar and Print to Cmd/Ctrl+S and P ([spec 014](../specs/014-arc-shortcuts/spec.md)) |
+| Command Bar (Cmd/Ctrl+T) | **Quick Commands**; bind it to Cmd/Ctrl+T in Settings > Keyboard, or run `python3 installer shortcuts apply`, which also turns on "Open Links In New Tab" and moves Tab Bar and Print to Cmd/Ctrl+S and P, and frees Cmd+Opt+N (Ctrl+Alt+N) for Little Arc by taking it from Vivaldi's Notes ([spec 014](../specs/014-arc-shortcuts/spec.md)) |
 | Ctrl+Tab in recent order | Settings > Tabs > Tab Cycling: **recently used order** |
 | Add the page to the workspace favorites (Cmd/Ctrl+D) | Ships with VivArcDi (`bookmark-folders`); `shortcuts apply` leaves Cmd/Ctrl+D unbound in Vivaldi, since a binding there swallows the key |
 | Copy URL (Cmd/Ctrl+Shift+C) | Ships with VivArcDi (`copy-url`); leave the shortcut unbound in Vivaldi |

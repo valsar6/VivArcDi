@@ -31,6 +31,7 @@ class ShortcutTable:
 
     options: dict[str, Any]
     commands: dict[str, list[str]]
+    reserved: tuple[str, ...] = ()
 
     @classmethod
     def load(cls, modifier: str, source: Path = TABLE_FILE) -> "ShortcutTable":
@@ -40,12 +41,14 @@ class ShortcutTable:
             name: [key.replace("{mod}", modifier) for key in keys]
             for name, keys in raw["commands"].items()
         }
-        return cls(raw["options"], commands)
+        reserved = tuple(key.replace("{mod}", modifier) for key in raw.get("reserved", []))
+        return cls(raw["options"], commands, reserved)
 
     @property
     def claimed_keys(self) -> set[str]:
-        """Every key the table assigns, which no other command may keep."""
-        return {key for keys in self.commands.values() for key in keys}
+        """Every key the table assigns or reserves for VivArcDi, which no other command may keep."""
+        assigned = {key for keys in self.commands.values() for key in keys}
+        return assigned | set(self.reserved)
 
 
 class PreferencesDocument:

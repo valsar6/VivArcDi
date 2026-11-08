@@ -240,7 +240,7 @@ Add `--quiet` to print only warnings and errors. On Debian, every command but `s
 `--mode cli|app|deb` says who manages VivArcDi. The default is `cli`. The app and the package pass
 `app` and `deb` themselves, so you do not need it. `window` needs a desktop and Tkinter.
 
-`shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
+`shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `shortcuts apply` also frees Cmd+Opt+N (Ctrl+Alt+N on Debian) for [Little Arc](#little-arc), taking it away from Vivaldi's Notes panel. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
 
 ### How updates are handled
 

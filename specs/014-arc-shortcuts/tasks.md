@@ -25,7 +25,7 @@ and is done when its check passes. Branch `features/arc-shortcuts`, next minor v
   `make check` passes.
 - [x] **T7.** Write the manual verification checklist for Tore from AC-13, AC-14 and AC-15, in
   Italian, with the read-only probe to compare before and after.
-- [ ] **T8 (change request 2026-11-08, Draft).** Add the reserved keys to `shortcuts.json` and the
+- [x] **T8 (change request 2026-11-08, Draft).** Add the reserved keys to `shortcuts.json` and the
   removal to `shortcuts.py` and `status`. Satisfies AC-17. Done when
   `test_reserved_little_arc_key_is_removed_from_other_command` passes; add AC-18 to the manual
   checklist and bump the version.
