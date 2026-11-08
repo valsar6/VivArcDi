@@ -114,7 +114,7 @@ Later specs, in Tore's priority order of 2026-10-28:
   already native in Vivaldi 8.2 (Tore, 2026-10-28).
 - Bar of space icons at the bottom of the tab bar, replacing Vivaldi's workspace switcher (B11). Low
   priority.
-- Color per space, chosen from a menu (B8, B11). Low priority.
+- Color per space, chosen from a menu (B8, B11): [019](../019-space-theme-color/spec.md).
 - Closing a pinned tab shows an empty page as in Arc instead of the last used tab (B2). Low priority,
   changes 003.
 - The `…` space menu, profiles, Live Folders, sharing and exporting a space.

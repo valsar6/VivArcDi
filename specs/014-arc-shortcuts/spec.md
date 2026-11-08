@@ -107,6 +107,8 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 - Changing shortcuts while Vivaldi runs, or from inside Vivaldi's interface.
 - Shortcuts that VivArcDi itself provides (copy URL), covered by spec 004.
 - Mouse gestures and Quick Commands search sources.
+- Showing the hidden tab bar when the pointer touches the left edge: [021](../021-auto-hide-tab-bar/spec.md).
+- An Arc-style command panel with tab actions: [023](../023-command-panel/spec.md).
 
 ## Open questions
 
