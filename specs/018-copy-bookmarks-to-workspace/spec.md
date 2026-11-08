@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-01 |
+| Approved | 2026-11-01; implemented in 0.19.0, verified by Tore on macOS 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

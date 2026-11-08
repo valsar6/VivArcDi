@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -20,6 +20,7 @@ and is done when its check passes. Branch `features/copy-bookmarks`, minor bump 
 - [x] **T5.** `PanelDragData` and `PanelBookmarkDrop`: accept only `vivaldi/x-bookmarks` over a
   target, mark it, copy on drop, clear on leave and end; wired in `FolderDragDrop`. AC-11.
 - [x] **T6.** Version bump, README note on dragging bookmarks from the panel, `make check`.
-- [ ] **T7.** Manual verification checklist for Tore from AC-12 to AC-15
+- [x] **T7.** Manual verification checklist for Tore from AC-12 to AC-15
   (`copy-bookmarks/verifica-copia-segnalibri.md` in the project files).
-- [ ] **T8.** Manual checks on macOS and Debian.
+- [x] **T8.** Manual checks on macOS and Debian. macOS: AC-12 to AC-15 OK (Tore, 2026-11-08); Debian
+  not checked yet.

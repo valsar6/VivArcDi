@@ -26,7 +26,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [015 Peek for new-tab links](015-peek-new-tab-links/spec.md) | 2 | Implemented |
 | [016 Plug-and-play installer](016-plug-and-play-installer/spec.md) | 0 | Implemented |
 | [017 Package managers](017-package-managers/spec.md) | 0 | Approved |
-| [018 Copy bookmarks into a workspace](018-copy-bookmarks-to-workspace/spec.md) | 3 | Approved |
+| [018 Copy bookmarks into a workspace](018-copy-bookmarks-to-workspace/spec.md) | 3 | Implemented |
 | [019 Space theme color](019-space-theme-color/spec.md) | 3 | Draft |
 | [020 Drag a tab into the Favorites](020-drag-tab-to-favorites/spec.md) | 1 | Draft |
 | [021 Auto-hide tab bar](021-auto-hide-tab-bar/spec.md) | 3 | Draft |
