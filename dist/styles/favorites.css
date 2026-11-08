@@ -136,8 +136,8 @@
   font-weight: 600;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-tile] > img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-tile] > span:has(+ img) {
   visibility: hidden;
