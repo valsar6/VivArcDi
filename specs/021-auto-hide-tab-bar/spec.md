@@ -33,6 +33,8 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 - **FR-1.** VivArcDi sets Vivaldi's auto-hide for the vertical tab bar as part of the Arc shortcuts (014), when the user runs the installer's shortcut step.
 - **FR-2.** A `tab-bar-tuning` stylesheet adjusts the overlay of the hidden bar, using the settings `width`, `hideDelayMs` and `shadow` in `config.json`.
 - **FR-3.** `auto-hide.enabled` false in `config.json` leaves Vivaldi's setting untouched.
+- **FR-4.** WHERE `panel-bar.hideWithTabBar` is true, the stylesheet hides the buttons of the panel bar while the
+  tab bar is hidden, so no icon shows at the left edge (proposed, see the open questions).
 
 ## Acceptance criteria
 
@@ -43,6 +45,7 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 | AC-3 | WHILE the bar is shown over the page, THE page SHALL not move. | manual |
 | AC-4 | WHEN the user runs the shortcut step, THE installer SHALL turn on auto-hide in `Preferences`. | auto: `test_auto_hide_is_turned_on` |
 | AC-5 | WHERE `auto-hide.enabled` is false, THE installer SHALL leave the setting unchanged. | auto: `test_auto_hide_is_left_alone_when_disabled` |
+| AC-6 | WHEN the pointer reaches the left edge while the tab bar is hidden, THE panel bar buttons SHALL not appear before the tab bar. | manual |
 
 ## Out of scope
 
@@ -56,7 +59,14 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 - [x] Does Cmd/Ctrl+S reach the page? No, Vivaldi handles it (probe, Tore, 2026-11-09), in line with 014.
 - [ ] What is the preference that turns on Vivaldi's auto-hide for the tab bar? The probe did not find it. A probe that
   diffs `Preferences` before and after turning it on in Vivaldi's settings is needed.
-- [ ] What is missing from the "almost perfect" of Tore's test: width, delay, shadow, or something else?
+- [x] What is missing from the "almost perfect"? Recording of Tore, 2026-11-09 (`Registrazione schermo 2026-11-09 alle 00.12.39.mov`,
+  10 seconds): with the tab bar hidden, moving the pointer to the left edge shows an icon over the page, the
+  button of a web panel (Wikipedia in the recording) with the other buttons of Vivaldi's panel bar faintly behind
+  it, next to a thin colored line along the edge. When the tab bar shows, the same panel buttons are the narrow
+  strip to its left. Arc has no such strip.
+- [ ] Is that icon the panel bar of Vivaldi (web panel buttons) that stays at the edge while the tab bar is
+  hidden? It is the reading of the recording; Tore to confirm. Proposal: while the tab bar is hidden, hide the
+  panel bar as well (`panel-bar.hideWithTabBar`, default true), and show it again together with the tab bar.
 
 ## References
 
