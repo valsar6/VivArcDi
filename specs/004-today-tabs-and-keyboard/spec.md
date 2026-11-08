@@ -99,22 +99,18 @@ recently used order, documented in [docs/native-settings.md](../../docs/native-s
 
 ## Proposed revision (pending approval)
 
-Raised by the Arc video review of 2026-11-08. These items are not Approved: nothing below may be
+Features seen in the Arc video review of 2026-11-08. They are not Approved: nothing below may be
 implemented until Tore accepts them on the pull request.
 
 - **FR-7.** Cmd/Ctrl+Shift+Alt+C copies the active tab as a Markdown link, `[title](url)`, and shows the
-  same "Copied" toast (Arc has this shortcut; three reviewers use it for notes).
-- **FR-8.** The first time VivArcDi archives tabs after an install or update, a toast says how many
-  tabs were archived and that Cmd/Ctrl+Shift+A opens the archive. Reviewers who did not know about the
-  12-hour cleanup found it surprising.
-- **FR-9.** `archiveAfterHours` stays a number; `config.json` documents the usual choices (12, 24, 168
-  for a week, 720 for a month) and the Arc defaults.
+  same "Copied" toast. In Arc the user presses it on a page and pastes the link into notes or chat.
+- **FR-8.** `config.json` documents the usual values of `archiveAfterHours`: 12 (the Arc default), 24,
+  168 (a week) and 720 (a month). Arc offers these four cadences in its settings.
 
 | ID | Criterion | Check |
 |---|---|---|
 | AC-13 | WHEN the user presses Cmd/Ctrl+Shift+Alt+C, THE clipboard SHALL hold `[title](url)` of the active tab and a toast SHALL appear. | auto: `copies the active tab as a markdown link` |
 | AC-14 | WHEN a title contains `[` or `]`, THE Markdown link SHALL escape them. | auto: `escapes brackets in markdown link titles` |
-| AC-15 | WHEN the module archives tabs for the first time, THE toast SHALL show the count and the shortcut, and SHALL not appear again. | manual |
 
 ## Out of scope
 
