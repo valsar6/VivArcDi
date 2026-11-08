@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -53,9 +53,12 @@ selects it:
 | Simple scrollbars | on |
 | Accent from page | off |
 
-`theme restore` puts back the saved theme selection; `theme apply --dry-run` lists the changes.
+`theme restore` puts back the saved theme selection; `theme apply --dry-run` lists the changes. At the
+end of `install`, the installer asks "Apply the VivArcDi Light theme? [Y/n]" and runs `theme apply` on
+yes (Tore, 2026-11-08); `install --yes` applies it without asking, `install --no-theme` skips it.
 
-**Gradient.** With the theme of 028 on and the new palette `arclight` chosen, the stylesheet paints
+**Gradient.** `arclight` becomes the default palette of 028 (Tore, 2026-11-08; change request to 028).
+With the theme of 028 on and the palette `arclight`, the stylesheet paints
 `#browser` with a linear gradient at 135 degrees from `#f3b8ac` (coral) through `#d0c9c5` to `#8ae3f2`
 (aqua), makes the tab bar transparent, and keeps rows, hover and active pill of 028 (pill `#ffffff`,
 text `#212121`). The page frame shows the gradient through Vivaldi's own frame of the native theme.
@@ -67,8 +70,8 @@ text `#212121`). The page frame shows the gradient through Vivaldi's own frame o
 - **FR-1.** `theme apply` adds the user theme "VivArcDi Light" with the values above to each profile's
   `Preferences`, selects it, and keeps one backup per run; `--dry-run` writes nothing.
 - **FR-2.** `theme restore` selects the theme that was current before the first `apply` and removes "VivArcDi Light".
-- **FR-3.** `install` never changes the theme unless asked.
-- **FR-4.** Palette `arclight` in `Palettes` (028) has a gradient (three stops, 135°), pill `#ffffff`, ink `#212121`.
+- **FR-3.** At the end of `install` the installer asks whether to apply the theme (default yes); `--yes` applies it, `--no-theme` skips it.
+- **FR-4.** Palette `arclight` in `Palettes` (028) has a gradient (three stops, 135°), pill `#ffffff`, ink `#212121`, and is the default palette.
 - **FR-5.** With `arclight`, the tab bar and the window behind the page show the gradient; rows keep 028's sizes and states.
 
 ### Non-functional
@@ -87,6 +90,8 @@ text `#212121`). The page frame shows the gradient through Vivaldi's own frame o
 | AC-4 | IF Vivaldi is running, THEN `theme apply` SHALL stop and say so. | auto: `refuses to change the theme while vivaldi runs` |
 | AC-5 | THE `arclight` palette SHALL keep ink contrast of at least 4.5:1 on every stop and on the pill. | auto: `arclight palette keeps readable text` |
 | AC-6 | WHEN Tore runs `theme apply` and restarts Vivaldi, menus, address field and panels SHALL be light with dark text. | manual |
+| AC-8 | WHEN `install` ends and the user answers yes, THE installer SHALL run `theme apply`; WITH `--no-theme` it SHALL not ask. | auto: `install offers the arc light theme` |
+| AC-9 | WHILE no palette is configured, THE sidebar look SHALL use `arclight`. | auto: `uses the arclight palette by default` |
 | AC-7 | WHILE the palette is `arclight`, THE tab bar and the window around the page SHALL show the coral-to-aqua gradient. | manual |
 
 ## Out of scope
@@ -97,9 +102,9 @@ text `#212121`). The page frame shows the gradient through Vivaldi's own frame o
 
 ## Open questions
 
-- [ ] Should `arclight` (gradient) replace `sky` (flat light blue) as the default palette of 028?
-- [ ] Should `install` offer to apply the theme at the end (asking yes or no), or only the separate `theme apply` command?
-- [ ] Highlight color: a blue (`#4c7fd9`, as proposed) or the purple of VivalArc's ArcLight (`#772eff`)?
+- [x] `arclight` replaces `sky` as the default palette (Tore, 2026-11-08).
+- [x] `install` asks at the end whether to apply the theme (Tore, 2026-11-08: "in generale sì").
+- [x] Highlight: the proposed blue `#4c7fd9` (Tore, 2026-11-08).
 
 ## References
 
