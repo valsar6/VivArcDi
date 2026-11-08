@@ -28,6 +28,6 @@ The buttons sit outside the panel, on its right:
 
 Switching tab also closes Peek.
 
-Arc reference: a link from a pinned tab opens in Peek, with Close, Expand and Split View on the right.
+A link from a pinned tab opens in Peek; Split puts both pages side by side:
 
-![Arc reference: Peek from a pinned tab](images/arc/arc-peek.gif)
+![Mockup: Peek from a pinned tab, then Split](images/mockups/peek-split.gif)

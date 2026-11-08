@@ -67,6 +67,28 @@ body{font:13px/1.3 -apple-system,"SF Pro Text","Inter","Helvetica Neue",Arial,sa
 .dark .bottom,.dark .newtab{color:#aab3bd}
 .inc-title{display:flex;justify-content:space-between;align-items:center;padding:8px 6px 12px;font-weight:600;font-size:14px}
 .inc-title span{font-weight:400;font-size:12px;color:#aab3bd}
+
+.insert{width:3px;border-radius:2px;background:#1d6fe0;height:44px;position:absolute}
+.ghost{position:absolute;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:.92;width:200px;z-index:15}
+.slot{height:32px;border-radius:8px;background:rgba(40,80,110,.16)}
+.split{position:absolute;inset:0;display:flex;gap:8px;background:transparent}
+.split>div{flex:1;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+.tip{position:absolute;background:#1f2833;color:#fff;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap;z-index:16}
+.menu{position:absolute;background:#f4f6f8;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:5px;width:200px;z-index:12;font-size:13px}
+.menu div{padding:5px 10px;border-radius:5px}
+.menu div.sel{background:#2f6fe4;color:#fff}
+.menu hr{border:none;height:1px;background:#d6dde3;margin:4px 6px}
+.picker{position:absolute;left:250px;top:120px;width:250px;background:#1f2328;border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.4);padding:12px;z-index:12;color:#cfd5db}
+.modes{display:flex;justify-content:center;gap:14px;font-size:14px;margin-bottom:10px}
+.modes span{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.modes span.on{background:#3a4048}
+.area{height:170px;border-radius:10px;position:relative;background:linear-gradient(to bottom,rgba(31,35,40,0),#1f2328),linear-gradient(to right,#e86f6f,#e8c06f,#7fd67f,#6fd6d0,#6f9be8,#b07fe8,#e86fb8)}
+.handle{position:absolute;width:24px;height:24px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);transform:translate(-50%,-50%)}
+.sw{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.sw i{width:16px;height:16px;border-radius:50%;display:block}
+.knobs{display:flex;align-items:center;gap:12px}
+.wave{flex:1;height:22px;position:relative}
+.dial{width:32px;height:32px;border-radius:50%;border:2px dashed #8a939c}
 </style></head>
 <body><div id="root"></div>
 <script>
@@ -113,7 +135,7 @@ const peekPage = () => `<div class="art article"><h1 style="font-size:24px">Anno
 
 const scenes = {
   anatomy() {
-    return `<div class="win">${sidebar({ favOn: 1, docsOn: false, todayOn: true, linkActive: false })}
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ favOn: 1, docsOn: false, todayOn: true, linkActive: false })}
       <div class="page"><div class="legend"><h2>The VivArcDi tab bar</h2><ul>
       <li><b class="n">1</b><span><b>Favorites grid</b>: the sites you use everywhere, same in every workspace (spec 001)</span></li>
       <li><b class="n">2</b><span><b>Space header</b>: icon and name of the workspace; click to collapse, + adds a folder (011, 012)</span></li>
@@ -128,14 +150,14 @@ const scenes = {
     const st = S.step || 0;
     const overlay = st >= 2 ? `<div class="veil"></div><div class="peek" style="${st === 2 ? 'transform:scale(.92);opacity:.6' : ''}">${peekPage()}</div>
       ${st >= 3 ? `<div class="peekbtns" style="right:5%"><div class="pbtn">✕</div><div class="pbtn">⤢</div><div class="pbtn">◫</div></div>` : ''}` : '';
-    return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ hl: st >= 1, title: 'Team docs: weekly notes' })}${overlay}</div></div>
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ hl: st >= 1, title: 'Team docs: weekly notes' })}${overlay}</div></div>
       ${cursor(st === 0 ? [560, 230] : st < 4 ? [470, 213] : [985, 112])}
       ${st >= 4 ? `<div class="panel" style="left:760px;top:96px;padding:6px 10px;font-size:12px">Expand: open as a tab</div>` : ''}`;
   },
   pinned() {
     const st = S.step || 0;
     const away = st === 1 || st === 2;
-    return `<div class="win">${sidebar({ docsOn: true, docsAway: away, docsHover: st === 2, url: away ? 'docs.example.com/pricing' : 'docs.example.com/team' })}
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ docsOn: true, docsAway: away, docsHover: st === 2, url: away ? 'docs.example.com/pricing' : 'docs.example.com/team' })}
       <div class="page">${article({ title: away ? 'Pricing' : 'Team docs: weekly notes' })}</div></div>
       ${cursor(st === 0 ? [520, 300] : st === 1 ? [430, 360] : st === 2 ? [32, 316] : [120, 330])}`;
   },
@@ -147,12 +169,12 @@ const scenes = {
       <div class="prow">${ic('#8b5cf6','R')}<span>Roadmap</span><span class="when">2 days ago</span></div>
       <div class="prow">${ic('#16a34a','S')}<span>Sprint board</span><span class="when">last week</span></div>
       <div class="prow">${ic('#a3a3a3','W')}<span>Wiki home</span><span class="when">never</span></div></div>` : '';
-    return `<div class="win">${sidebar({ folderHover: st >= 1 && st <= 2, linkActive: st >= 3, todayOn: st < 3, url: st >= 3 ? 'bugs.example.com/board' : 'news.example.org/story' })}
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ folderHover: st >= 1 && st <= 2, linkActive: st >= 3, todayOn: st < 3, url: st >= 3 ? 'bugs.example.com/board' : 'news.example.org/story' })}
       <div class="page">${article({ title: st >= 3 ? 'Bug tracker' : undefined })}</div></div>${panel}
       ${cursor(st === 0 ? [400, 300] : st === 1 ? [90, 222] : st === 2 ? [400, 262] : [600, 360])}`;
   },
   archive() {
-    return `<div class="win">${sidebar({ todayOn: true })}<div class="page">${article()}</div></div>
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true })}<div class="page">${article()}</div></div>
       <div class="panel" style="left:252px;top:250px;width:380px">
       <div class="search">Search the archive…</div>
       <div class="day">Today</div>
@@ -180,9 +202,46 @@ const scenes = {
       <div class="bottom"><span>📚</span><span>+</span></div></div>
       <div class="page" style="background:#1b1d21"><div class="article" style="color:#dfe3e8"><h1>Private window</h1><p style="color:#aab3bd">VivArcDi stores nothing here. No Favorites, folders or archive: only Peek and copy URL run.</p></div></div></div>`;
   },
+
+  dragfav() {
+    const st = S.step || 0;
+    if (st >= 2) fav.splice(3, 0, ['#64748b', 'W', 0]);
+    const ghost = st === 1 ? `<div class="ghost" style="left:96px;top:106px">${ic('#64748b','W')}<span>Weather this week</span></div><div class="insert" style="left:156px;top:134px"></div>` : '';
+    const html = `<div class="win">${sidebar({ todayOn: true })}<div class="page">${article()}</div></div>${ghost}
+      ${cursor(st === 0 ? [120, 440] : st === 1 ? [160, 150] : [400, 380])}`;
+    return st === 1 ? html.replace(/<div class="row">(<span class="ic"[^>]*>W<\/span><span class="t">Weather this week<\/span>)<\/div>/, '<div class="slot"></div>') : html;
+  },
+  peeksplit() {
+    const st = S.step || 0;
+    if (st >= 3) {
+      return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page" style="background:transparent;box-shadow:none"><div class="split">
+        <div>${article({ title: 'Team docs: weekly notes' })}</div><div>${peekPage()}</div></div></div></div>${cursor([620, 360])}`;
+    }
+    const overlay = st >= 1 ? `<div class="veil"></div><div class="peek">${peekPage()}</div>
+      <div class="peekbtns" style="right:5%"><div class="pbtn">✕</div><div class="pbtn">⤢</div><div class="pbtn" style="${st === 2 ? 'background:#dbe7f3' : ''}">◫</div></div>` : '';
+    return `<div class="win">${sidebar({ docsOn: true, url: 'docs.example.com/team' })}<div class="page">${article({ hl: st === 0, title: 'Team docs: weekly notes' })}${overlay}</div></div>
+      ${st === 2 ? `<div class="tip" style="left:890px;top:106px">Split</div>` : ''}
+      ${cursor(st === 0 ? [470, 213] : st === 1 ? [600, 300] : [968, 106])}`;
+  },
+  look() {
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true, favOn: 1 })}<div class="page">${article()}</div></div>
+      ${S.label ? `<div class="tip" style="left:20px;top:560px;font-size:12px">${S.label}</div>` : ''}${cursor(S.cur)}`;
+  },
+  themecolor() {
+    const st = S.step || 0;
+    const menu = st === 0 ? `<div class="menu" style="left:70px;top:206px"><div>Change Space Icon…</div><div>Rename Space…</div><div class="sel">Edit Theme Color…</div><hr><div>New Folder</div><div>Live Folders</div></div>` : '';
+    const h = [[0,0],[150,40],[40,35],[95,50]][st] || [0,0];
+    const picker = st >= 1 ? `<div class="picker"><div class="modes"><span>✦</span><span class="on">☀</span><span>☾</span></div>
+      <div class="area"><div class="handle" style="left:${h[0] + 20}px;top:${h[1] + 20}px;background:${S.dot}"></div></div>
+      <div class="sw">${['#fff','#f2a6c4','#b39ddb','#ef6b6b','#f5a25d','#f2d16b','#7fd67f','#6fb7e8','#6f7fe8'].map(c => `<i style="background:${c}"></i>`).join('')}</div>
+      <div class="knobs"><svg class="wave" viewBox="0 0 150 22"><path d="M0 11 Q9 1 18 11 T36 11 T54 11 T72 11 T90 11 T108 11 T126 11 T144 11" stroke="#8a939c" stroke-width="2" fill="none"/><rect x="80" y="1" width="8" height="20" rx="4" fill="#fff"/></svg><div class="dial"></div></div></div>` : '';
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true, hdrPlus: false })}<div class="page">${article()}</div></div>${menu}${picker}
+      ${cursor(st === 0 ? [120, 262] : [h[0] + 290, h[1] + 196])}`;
+  },
   copyurl() {
-    return `<div class="win">${sidebar({ todayOn: true })}<div class="page">${article()}<div class="toast">Copied</div></div></div>`;
+    return `<div class="win" style="${S.bg ? `background:${S.bg}` : ''}">${sidebar({ todayOn: true })}<div class="page">${article()}<div class="toast">Copied</div></div></div>`;
   },
 };
 document.getElementById('root').innerHTML = scenes[S.scene || 'anatomy']() + `<div class="mark">MOCKUP · NOT A SCREENSHOT</div>`;
+if (S.hover) document.querySelectorAll('.row').forEach(r => { if (r.textContent.includes(S.hover) && !r.classList.contains('on')) r.classList.add('hover'); });
 </script></body></html>

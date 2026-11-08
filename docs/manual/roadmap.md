@@ -4,8 +4,8 @@
 
 These Arc features have a specification but are not in VivArcDi yet. **Planned** specs are approved
 and wait for their turn. **Proposed** specs are drafts: their behavior can still change, or they can be
-dropped. Each section links its spec; the clips marked **Arc reference** were recorded in Arc and show
-what VivArcDi aims for.
+dropped. Each section links its spec. The pictures are mockups of how the feature is meant to look, and the
+last clip, marked **Arc reference**, was recorded in Arc.
 
 ## Arc Light theme
 
@@ -25,7 +25,7 @@ Color…** in the menu of the space header opens a picker like Arc's: light, dar
 color area with a handle that changes the colors live, nine preset swatches, an intensity slider and a
 grain dial. Switching workspace switches the color.
 
-![Arc reference: Edit Theme Color](images/arc/arc-theme-color.gif)
+![Mockup: Edit Theme Color in the space header menu, then three colors](images/mockups/theme-color.gif)
 
 ## Drag a tab into the Favorites
 
@@ -35,7 +35,7 @@ Drag a tab onto the Favorites grid to make it a Favorite, dropped between two ti
 place. Drag a tile out of the grid to remove the Favorite and keep the page as a Today tab. Tiles can be
 reordered by dragging.
 
-![Arc reference: a tab dragged into the Favorites](images/arc/arc-drag-tab-to-favorites.gif)
+![Mockup: a Today tab dragged between two tiles becomes a Favorite](images/mockups/drag-tab-to-favorites.gif)
 
 ## Auto-hide tab bar
 

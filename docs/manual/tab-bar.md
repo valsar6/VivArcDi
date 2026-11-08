@@ -104,6 +104,4 @@ that shows only while scrolling, and the workspace color behind the tab bar. Cho
 `palette` option. This work is in progress ([spec 028](../../specs/028-arc-sidebar-look/spec.md)), and
 the [Arc Light theme](roadmap.md#arc-light-theme) will extend it to the rest of Vivaldi.
 
-Arc reference: the sidebar this look follows.
-
-![Arc reference: the Arc sidebar with folders, pinned tabs and Today tabs](images/arc/arc-sidebar.gif)
+![Mockup: hover on rows, then the palettes powder, lagoon and arclight](images/mockups/sidebar-look.gif)

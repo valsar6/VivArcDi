@@ -19,20 +19,21 @@ VivArcDi that still have to be made on a real Vivaldi.
 | `images/mockups/copy-url.png` | Mockup | The "Copied" toast | [Today](today-and-keyboard.md#copy-url) |
 | `images/mockups/little-arc.png` | Mockup | A Little Arc window | [Little Arc](little-arc.md) |
 | `images/mockups/incognito.png` | Mockup | The incognito tab bar | [Incognito](incognito.md) |
-| `images/arc/arc-sidebar.gif` | Arc reference | Arc's sidebar: folders, pinned and Today tabs, command bar | [Tab bar](tab-bar.md#the-arc-look) |
-| `images/arc/arc-peek.gif` | Arc reference | Peek from a pinned tab | [Peek](peek.md) |
-| `images/arc/arc-theme-color.gif` | Arc reference | Edit Theme Color | [Roadmap](roadmap.md#theme-color-per-space) |
-| `images/arc/arc-drag-tab-to-favorites.gif` | Arc reference | A tab dragged into the Favorites | [Roadmap](roadmap.md#drag-a-tab-into-the-favorites) |
+| `images/mockups/peek-split.gif` | Mockup | Peek from a pinned tab, then Split | [Peek](peek.md) |
+| `images/mockups/sidebar-look.gif` | Mockup | Row hover, then the palettes powder, lagoon and arclight | [Tab bar](tab-bar.md#the-arc-look) |
+| `images/mockups/drag-tab-to-favorites.gif` | Mockup | A Today tab dragged into the Favorites (spec 020) | [Roadmap](roadmap.md#drag-a-tab-into-the-favorites) |
+| `images/mockups/theme-color.gif` | Mockup | Edit Theme Color with three colors (spec 019) | [Roadmap](roadmap.md#theme-color-per-space) |
 | `images/arc/arc-pinned-and-space-menus.gif` | Arc reference | Pinned tab menu and space menu | [Roadmap](roadmap.md#rename-pinned-tabs) |
 
 **Mockups** are drawn in HTML and are not screenshots. Their source is
 [`images/mockups/source/mockups.html`](images/mockups/source/mockups.html): open it with a scene in
 the address, for example `mockups.html#{"scene":"peek","step":3}`, and take a 1000 × 620 screenshot.
-The scenes are `anatomy`, `peek` (steps 0 to 4), `pinned` (0 to 3), `folder` (0 to 3), `archive`,
-`littlearc`, `incognito` and `copyurl`.
+The scenes are `anatomy`, `peek` (steps 0 to 4), `peeksplit` (0 to 3), `pinned` (0 to 3), `folder`
+(0 to 3), `dragfav` (0 to 2), `themecolor` (0 to 3, with `bg` and `dot` colors), `look` (with `bg`,
+`hover` and `cur`), `archive`, `littlearc`, `incognito` and `copyurl`.
 
-**Arc reference** clips are cut from Tore's screen recordings of Arc (2026-10-28 to 2026-11-08),
-800 px wide, 4 to 8 frames per second.
+The **Arc reference** clip is cut from Tore's screen recording of Arc of 2026-10-28, 800 px wide, 4
+frames per second.
 
 ## Recordings still to make
 
@@ -46,7 +47,7 @@ can be swapped for it.
 | 2 | `vivarcdi/favorites.gif` | Click three tiles, middle click one to unload it (it dims), click it again | new |
 | 3 | `vivarcdi/pinned-tab-reset.gif` | In a pinned tab follow a link on the same site, the icon becomes ↩, click it | `pinned-tab-reset.gif` |
 | 4 | `vivarcdi/peek.gif` | Shift+click a link, scroll inside Peek, click Expand | `peek.gif` |
-| 5 | `vivarcdi/peek-split.gif` | From a pinned tab click a link to another site, then Split | `arc-peek.gif` |
+| 5 | `vivarcdi/peek-split.gif` | From a pinned tab click a link to another site, then Split | `peek-split.gif` |
 | 6 | `vivarcdi/folders.gif` | Open a folder, open a link, close the folder: the link stays below it | new |
 | 7 | `vivarcdi/folder-panel.gif` | Rest on a closed folder, type in the search field, Enter | `folder-panel-and-peek-out.gif` |
 | 8 | `vivarcdi/edit-folders.gif` | `+` on the space header, type a name, drag a tab into the new folder | new |
@@ -58,7 +59,7 @@ can be swapped for it.
 | 14 | `vivarcdi/little-arc-external.gif` | Click a link in Mail or Notes: it opens in Little Arc | new |
 | 15 | `vivarcdi/incognito.gif` | Open a private window, New Tab, Clear | `incognito.png` |
 | 16 | `vivarcdi/installer.gif` | macOS: open VivArcDi.app, Install, tick the shortcuts box | new |
-| 17 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `arc-sidebar.gif` |
+| 17 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `sidebar-look.gif` |
 
 Tips for the recordings:
 
