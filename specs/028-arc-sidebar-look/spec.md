@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-08 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -63,8 +63,29 @@ an avatar, "VPN" and "Archive"; the scroll bar is wide and always visible.
 VivArcDi changes the look with its stylesheet only, on top of the variables of 019: rows of 36 px with
 2 px between them, radius 8 px, no background at rest, veil of white at 35% on hover (12% in dark mode),
 white at 88% with a 1 px shadow for the active tab (18% in dark mode), Favorites tiles on a 22% veil.
-Where the only way is a Vivaldi setting (panel bar, toolbar content), the installer guide tells the
-user which setting to change.
+Where the only way is a Vivaldi setting (toolbar content), the installer guide tells the user which
+setting to change. Vivaldi's panel bar stays as it is for now (Tore, 2026-11-08).
+
+**Favorites grid.** The tiles of the grid are Arc's small tiled tabs: at most three per row, as in Arc,
+whatever the width of the tab bar (Tore, 2026-11-08). In the screenshot four tiles sit in one row: this
+spec makes that impossible. The dashed "Drag a tab here to pin it" box is not part of Arc's tab bar and
+goes away (change request to [012](../012-editable-folders/spec.md) FR-15).
+
+**Default color.** Right after VivArcDi is installed, a workspace without a color of its own uses Arc's
+light blue (`#a3cee0`), not Vivaldi's theme colors. Next to it VivArcDi offers six palettes close to that
+blue, which the picker of [019](../019-space-theme-color/spec.md) shows as its first row of presets:
+
+| Palette | Space color | Active pill | Text |
+|---|---|---|---|
+| Sky (default) | `#a3cee0` | `#e9f3f7` | `#0f2129` |
+| Ice | `#b8dbe8` | `#eef6f9` | `#0f2129` |
+| Powder | `#9fc2dd` | `#e7eff6` | `#0f1f2c` |
+| Aqua | `#9fd6d2` | `#e8f5f4` | `#0e2423` |
+| Mist | `#b3c7d6` | `#edf2f6` | `#141f28` |
+| Lagoon | `#8ec5cf` | `#e4f1f4` | `#0c2126` |
+
+Veil and hover are white at 22% and 35% over the space color in every palette, so only the space color
+changes.
 
 ## Requirements
 
@@ -82,7 +103,10 @@ user which setting to change.
 - **FR-6.** "+ New Tab" is a row at the top of today's tabs.
 - **FR-7.** The scroll bar of the tab bar is 6 px wide and shows only while scrolling.
 - **FR-8.** Veil, pill and text colors come from CSS variables: from the workspace color of 019 when set,
-  from the Vivaldi theme otherwise; dark mode uses the dark values.
+  from the Sky palette otherwise; dark mode uses the dark values.
+- **FR-10.** The Favorites grid never shows more than three tiles per row.
+- **FR-11.** The six palettes of the table above are defined once, as tokens, and 019 offers them as its
+  first presets.
 - **FR-9.** All sizes and colors live in `_tokens.scss`.
 
 ### Non-functional
@@ -103,24 +127,30 @@ user which setting to change.
 | AC-6 | WHEN the workspace color changes, THE veil, pill and text SHALL follow it. | manual |
 | AC-7 | THE stylesheet SHALL define the row height, gap, radius and veils as tokens. | auto: `sidebar look uses tokens` |
 | AC-8 | WHERE `sidebar-look.enabled` is false, THE stylesheet SHALL not be applied. | auto: `disabled sidebar look changes nothing` |
+| AC-9 | WHILE a workspace has no color of its own, THE tab bar SHALL use the Sky palette. | auto: `uses the sky palette without a workspace color` |
+| AC-10 | THE grid SHALL use at most three columns for any width and any number of tiles. | auto: `never lays out more than three columns` |
+| AC-11 | THE six palettes SHALL keep a text contrast of at least 4.5:1 on their space color and active pill. | auto: `palettes keep readable text` |
+| AC-12 | WHEN Tore installs VivArcDi and opens a workspace without a color, THE tab bar SHALL be light blue. | manual |
+| AC-13 | WHILE Tore has four or more Favorites, THE grid SHALL show three tiles per row. | manual |
 
 ## Out of scope
 
-- The two-line address field: it needs a module of its own, see open questions.
+- The two-line address field (domain above, page title below): it needs a module of its own; a separate
+  spec if Tore wants it.
+- Hiding Vivaldi's panel bar (Tore, 2026-11-08: leave it for now).
 - The color picker and the page frame color: [019](../019-space-theme-color/spec.md).
 - Auto-hide of the tab bar: [021](../021-auto-hide-tab-bar/spec.md).
 - New behavior of Clear, Tidy or New Tab: [004](../004-today-tabs-and-keyboard/spec.md).
 
 ## Open questions
 
-- [ ] In the screenshot, the dashed "Drag a tab here to pin it" box is at the top and four tiles sit below
-      the folder "Untitled": is the dashed box the empty Favorites grid of the workspace and are the
-      four tiles Vivaldi's pinned tabs? The answer decides which grid moves to the top.
-- [ ] Panel bar: tell the user to hide it in Vivaldi's settings, or hide it with CSS?
-- [ ] Address field on two lines (domain and title) as in Arc: add it to this spec or write a new one?
-- [ ] Without a workspace color, keep Vivaldi's theme colors and change only shapes and sizes, or use
-      a light default as Arc does?
-- [ ] Drag slot: can Vivaldi 8.2 style the dragged tab's place? To check with a probe.
+- [x] The dashed "Drag a tab here to pin it" box is not a pinned tab and goes away; the four tiles are the
+      Favorites, at most three per row (Tore, 2026-11-08).
+- [x] Panel bar: leave it for now (Tore, 2026-11-08).
+- [x] Two-line address field: out of this spec.
+- [x] Without a workspace color: Arc's light blue by default, with six close palettes (Tore, 2026-11-08).
+- [x] Drag slot: whether Vivaldi 8.2 lets the dragged tab's place be styled is a risk for `design.md`,
+      checked with a probe; if it cannot, Vivaldi's own indicator stays.
 
 ## References
 
