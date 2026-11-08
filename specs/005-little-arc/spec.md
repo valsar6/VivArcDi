@@ -82,9 +82,13 @@ questions.
 - **FR-2.** Text typed in the address field is a URL when it looks like one and a search with the
   default search engine otherwise.
 - **FR-3.** WHERE `externalLinks` is on, a link opened from another app opens in a Little Arc window
-  instead of a tab of the main window.
+  instead of a tab of the main window. The module recognizes it as a tab with no opener, active, with
+  an `http` or `https` address, created within 100 ms of the main window regaining focus after the
+  application was in the background (probe of 2026-11-08). The tab is moved into the new window, so
+  the page is not loaded twice.
 - **FR-4.** The window shows no tab bar, panels or workspace switcher, only the compact bar of
-  Expected behavior.
+  Expected behavior. Vivaldi's `popup` window has no address field, so the module adds the compact
+  bar itself (see the probe results).
 - **FR-5.** Move to workspace and Cmd/Ctrl+O move the page to a new tab of the destination workspace
   of FR-6, activate it and close the Little Arc window.
 - **FR-6.** The destination is the most recently used workspace of the main window. WHERE
@@ -115,6 +119,8 @@ questions.
 | AC-3 | WHEN the user types a site name or a search and presses Enter, THE window SHALL load the matching page. | manual |
 | AC-4 | THE address resolver SHALL turn text that looks like a URL into a URL and any other text into a search. | auto: `address resolver tells URLs from searches` |
 | AC-5 | WHEN a link is opened from another app and `externalLinks` is on, THE link SHALL open in a Little Arc window. | manual |
+| AC-6a | THE external link detector SHALL accept an active tab with no opener and an `http(s)` address that appears as the app regains focus. | auto: `external link detector accepts a link that wakes the app` |
+| AC-6b | THE external link detector SHALL reject tabs with an opener, inactive tabs, new-tab pages and tabs created while the app was already in front. | auto: `external link detector rejects tabs that are not external links` |
 | AC-6 | WHERE `externalLinks` is off, THE module SHALL leave external links to Vivaldi. | auto: `little arc ignores external links when disabled` |
 | AC-7 | WHEN the user presses "Move to workspace" or Cmd/Ctrl+O, THE page SHALL become the active tab of the destination workspace and the window SHALL close. | manual |
 | AC-8 | THE destination picker SHALL choose the most recent workspace unless `askWorkspace` is on. | auto: `destination picker defaults to the most recent workspace` |
@@ -136,20 +142,29 @@ questions.
 - Several Little Arc windows merged into one, or a tab strip inside the window.
 - A global shortcut that works with Vivaldi closed or in the background (see open questions).
 
+## Probe results
+
+Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
+
+- **External links.** Two links opened from other apps, one from a news site and one from a bank
+  e-mail, produced no new window: each was a new tab in the last active window, `opener` empty,
+  `active` true, an `http(s)` host, and a window focus event within a few milliseconds of the
+  tab (first case: focus back from "no window" 40 ms before; second: 2 ms after). Links Tore
+  opened from inside Vivaldi had the opener set and `active` false. So a detector is feasible
+  with those signals. Not yet proven: Vivaldi minimized, Vivaldi already in front, and telling
+  apart other tabs with no opener (new tab page, bookmarks, Quick Commands, link tabs of 009,
+  Expand of Peek), which the detector must reject by address and timing.
+- **Popup window.** `windows.create({ type: 'popup' })` made a window of the requested size with
+  rounded corners, the traffic lights, the page title in the title bar, the extension icons row
+  and the theme colour. It has **no address field, no back or reload, no tab bar**. It is minimal
+  as Little Arc wants, but it cannot take a typed address by itself. The module therefore has to put
+  its compact bar into that window, which needs one more probe.
+
 ## Open questions
 
-Answered by Tore on 2026-11-08, except the two that wait for the probe.
-
-- [ ] **Recognizing external links.** Can a mod tell that a new tab or window came from another app?
-  Decided: reverse engineer it with a probe script run by Tore (`little-arc/diagnostica-link-esterni.md`
-  in the project folder). The result goes into the design; if recognition is unreliable,
-  `externalLinks` ships off and this spec says so.
-- [ ] **Native window or own window.** Is Vivaldi's `popup` window type close enough to Little Arc?
-  Decided for now: use the `popup` type and fall back to a normal window with the interface hidden by
-  CSS. The same probe checks it, and a later iteration may revisit it.
-- [x] **"From any app".** Decided: version 1 is the shortcut inside Vivaldi plus external links.
-  The global shortcut is a follow-up that uses an operating system hook set up by the installer
-  ([016](../016-plug-and-play-installer/spec.md)), opt-in and removed by `uninstall`.
+- [x] **"From any app".** Decided 2026-11-08: version 1 is the shortcut inside Vivaldi plus external
+  links. The global shortcut is a follow-up that uses an operating system hook set up by the
+  installer ([016](../016-plug-and-play-installer/spec.md)), opt-in and removed by `uninstall`.
 - [x] **Default for `externalLinks`.** On, with the option as the off switch.
 - [x] **Destination workspace.** Always the most recent workspace. The picker (`askWorkspace`) stays
   as an option, off.
@@ -157,6 +172,16 @@ Answered by Tore on 2026-11-08, except the two that wait for the probe.
 - [x] **Window size.** Kept: a third of the screen wide by 60% high.
 - [x] **Mini Player.** A separate feature, with its own spec later.
 - [x] **Folder name.** `005-little-arc` accepted.
+- [x] **Recognizing external links.** Feasible (see Probe results), with the detector of FR-3.
+- [ ] **Compact bar in the popup.** Does the mod run inside the popup's interface document, so it can
+  add the address field, back, reload and Move to workspace button? Proposal: a second probe
+  (`little-arc/diagnostica-popup.md`). If the mod does not run there, the fallback is a normal
+  window with tab bar and panels hidden by CSS.
+- [ ] **Flicker.** The tab shows in the main window for a moment before moving into Little Arc.
+  Proposal: accept it in version 1 and measure it on the manual check; hiding it needs a
+  different interception that this probe cannot show.
+- [ ] **Detector tests on the edge cases.** Vivaldi minimized and Vivaldi in front. Proposal: the
+  second probe repeats the external link step in those two states.
 
 ## References
 
