@@ -9,12 +9,20 @@ from .hooks import UpdateHook
 from .notifier import ReapplyOutcome, SilentOutcome
 from .patching import InstallationPatcher
 from .platforms import Platform
+from .prompt import NeverPrompt, Prompt
 from .reporter import Reporter
 from .shortcuts import ShortcutService
 from .modes import InstallMode
 from .ownership import Ownership
 from .staging import Stager
+from .theme import ThemeService
 from .takeover import LegacyTakeover
+
+
+THEME_ASK = "ask"
+THEME_APPLY = "apply"
+THEME_NEVER = "never"
+THEME_QUESTION = "Apply the VivArcDi Light theme?"
 
 
 @dataclass
@@ -29,6 +37,7 @@ class InstallerContext:
     reporter: Reporter
     handoff: ReapplyHandoff
     shortcuts: ShortcutService
+    theme: ThemeService
     mode: InstallMode
     data_dir: Path
     ownership: Ownership
@@ -38,6 +47,11 @@ class InstallerContext:
     shortcut_action: str = "status"
     dry_run: bool = False
     restore_shortcuts: bool = False
+    theme_action: str = "status"
+    show_keys: bool = False
+    theme_choice: str = THEME_NEVER
+    profile_is_yours: bool = True
+    prompt: Prompt = field(default_factory=NeverPrompt)
     needs_reapply: bool = False
 
 
@@ -79,8 +93,20 @@ class InstallCommand(Command):
         context.hook.install(context.reapply_command)
         context.ownership.claim()
         report.info(f"Registered {context.hook.describe()}")
+        self._offer_theme(context)
         report.info("Restart Vivaldi to load VivArcDi.")
         return 0
+
+    @staticmethod
+    def _offer_theme(context: InstallerContext) -> None:
+        if context.background or context.theme_choice == THEME_NEVER:
+            return
+        if not context.profile_is_yours:
+            context.reporter.info("To use the VivArcDi Light theme, run without sudo: python3 installer theme apply")
+            return
+        if context.theme_choice == THEME_APPLY or context.prompt.confirm(THEME_QUESTION):
+            if context.theme.apply() != 0:
+                context.reporter.warn("The theme was not applied: run python3 installer theme apply when Vivaldi is closed")
 
 
 class ReapplyCommand(Command):
@@ -192,6 +218,24 @@ class ShortcutsCommand(Command):
         return service.status()
 
 
+class ThemeCommand(Command):
+    """Adds and selects the VivArcDi Light theme in Vivaldi, or puts the previous theme back."""
+
+    name = "theme"
+    help = "apply, restore or check the VivArcDi Light theme"
+    needs_root = False
+    refuses_root = True
+    actions = ("apply", "restore", "status")
+
+    def execute(self, context: InstallerContext) -> int:
+        service = context.theme
+        if context.theme_action == "apply":
+            return service.apply(dry_run=context.dry_run)
+        if context.theme_action == "restore":
+            return service.restore()
+        return service.status(show_keys=context.show_keys)
+
+
 class WindowLauncher(Protocol):
     """Opens the window and returns when it is closed."""
 
@@ -229,5 +273,6 @@ COMMANDS: tuple[Command, ...] = (
     UninstallCommand(),
     StatusCommand(),
     ShortcutsCommand(),
+    ThemeCommand(),
     WindowCommand(),
 )

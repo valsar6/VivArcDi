@@ -1,7 +1,7 @@
 #browser[data-vivarcdi-look] {
-  --vivarcdi-space: var(--vivarcdi-space-theme, #a3cee0);
-  --vivarcdi-pill: var(--vivarcdi-pill-theme, #e9f3f7);
-  --vivarcdi-ink: var(--vivarcdi-ink-theme, #0f2129);
+  --vivarcdi-space: var(--vivarcdi-space-theme, #d0c9c5);
+  --vivarcdi-pill: var(--vivarcdi-pill-theme, #fff);
+  --vivarcdi-ink: var(--vivarcdi-ink-theme, #212121);
   --vivarcdi-veil: color-mix(in srgb, white 22%, var(--vivarcdi-space));
   --vivarcdi-hover: color-mix(in srgb, white 35%, var(--vivarcdi-space));
   --vivarcdi-muted: color-mix(in srgb, var(--vivarcdi-ink) 60%, transparent);
@@ -10,6 +10,13 @@
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right),
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) #tabs-container {
   background-color: var(--vivarcdi-space) !important;
+}
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] {
+  background: var(--vivarcdi-gradient) !important;
+}
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #tabs-tabbar-container:is(.left, .right),
+#browser[data-vivarcdi-look][data-vivarcdi-gradient] #tabs-tabbar-container:is(.left, .right) #tabs-container {
+  background-color: transparent !important;
 }
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
   display: none !important;

@@ -77,7 +77,7 @@ class PreferencesDocument:
         """Return what applying the table would change; empty when it already matches."""
         changes = []
         for dotted, wanted in table.options.items():
-            current = self._option(dotted)
+            current = self.value(dotted)
             if current != wanted:
                 changes.append(Change(dotted, current, wanted))
         commands = self._commands()
@@ -96,7 +96,7 @@ class PreferencesDocument:
     def apply(self, table: ShortcutTable) -> None:
         """Write the table into the document, leaving every other setting as it is."""
         for dotted, wanted in table.options.items():
-            self._set_option(dotted, wanted)
+            self.set_value(dotted, wanted)
         commands = self._commands()
         claimed = table.claimed_keys
         for name, entry in commands.items():
@@ -113,7 +113,8 @@ class PreferencesDocument:
     def _commands(self) -> dict[str, Any]:
         return self._data["vivaldi"]["actions"][0]
 
-    def _option(self, dotted: str) -> Any:
+    def value(self, dotted: str) -> Any:
+        """The setting at a dotted path such as `vivaldi.themes.current`, or None when it is absent."""
         node: Any = self._data
         for part in dotted.split("."):
             if not isinstance(node, dict) or part not in node:
@@ -121,12 +122,22 @@ class PreferencesDocument:
             node = node[part]
         return node
 
-    def _set_option(self, dotted: str, value: Any) -> None:
+    def set_value(self, dotted: str, value: Any) -> None:
+        """Write the setting at a dotted path, creating the missing levels."""
         parts = dotted.split(".")
         node = self._data
         for part in parts[:-1]:
             node = node.setdefault(part, {})
         node[parts[-1]] = value
+
+    def remove_value(self, dotted: str) -> None:
+        """Delete the setting at a dotted path when it exists."""
+        parts = dotted.split(".")
+        node: Any = self._data
+        for part in parts[:-1]:
+            node = node.get(part) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            node.pop(parts[-1], None)
 
 
 class AtomicFile:
