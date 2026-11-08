@@ -31,3 +31,5 @@ and is done when its check passes. Branch `features/editable-folders`, minor bum
 - [ ] **T11.** Manual checks on macOS and Debian.
 - [x] **T12.** Empty Favorites grid: placeholder with a hint and pointer drop that pins the tab (FR-15). AC-29,
   AC-30; manual AC-31 is added to the checklist.
+- [ ] **T13.** Remove the placeholder, `EmptyGridDrop`, its style, test and `emptyHint` (FR-15 removed,
+  Tore, 2026-11-08).

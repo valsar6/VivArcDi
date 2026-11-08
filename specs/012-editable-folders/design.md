@@ -108,7 +108,9 @@ Documented in the README next to `root` and `workspaces`.
 | Renaming a workspace in Vivaldi orphans `VivArcDi/<name>` | Accepted in the spec; the old folder stays in the Bookmarks panel |
 | The delayed single click feels slow | 250 ms is the system double-click time; only on folder rows |
 
-## Empty Favorites grid (added 2026-11-01)
+## Empty Favorites grid (added 2026-11-01, removed 2026-11-08)
+
+Removed with FR-15 (Tore, 2026-11-08): an empty grid draws nothing again. The text below is kept as history.
 
 With neither a `Favorites` bookmark folder nor pinned tabs, `FavoritesGrid` draws nothing (`tileCount`
 and the bookmark count are 0) and Vivaldi has no pinned strip to drop on. FR-15 adds
