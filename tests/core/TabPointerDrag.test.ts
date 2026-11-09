@@ -77,3 +77,18 @@ test('stops listening after detach', () => {
   drag.detach();
   assert.deepEqual([...dom.listeners.values()], [[], [], []]);
 });
+
+test('remembers the tab under the last press after the release, with a number for each press', () => {
+  const dom = new DomDocument();
+  const drag = new TabPointerDrag({ document: asDocument(dom), wrapperSelector: WRAPPER, onMove: (): void => undefined, onDrop: (): void => undefined, onEnd: (): void => undefined });
+  drag.attach();
+  assert.equal(drag.lastPress, null);
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: 1, clientY: 1, target: rowOf(7) });
+  dom.emit('mousemove', { buttons: 1, clientX: 1, clientY: 90 });
+  dom.emit('mouseup', { buttons: 0, clientX: 1, clientY: 90 });
+  assert.deepEqual(drag.lastPress, { tabId: 7, serial: 1 });
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: 1, clientY: 1, target: rowOf(8) });
+  assert.deepEqual(drag.lastPress, { tabId: 8, serial: 2 });
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: 1, clientY: 1, target: { closest: (): null => null } });
+  assert.equal(drag.lastPress, null);
+});
