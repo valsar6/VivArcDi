@@ -61,7 +61,19 @@ The page is never lost: it always ends in the Favorites, the folders or today's 
 
 ## Open questions
 
-- [x] Does Vivaldi's tab drag expose the dragged tab to a mod? Yes (probe of 2026-11-09): a tab dragged out of the list onto the grid fires an HTML5 `drop` on VivArcDi's tile with the types `vivaldi/x-tab-entries` and `text/uri-list`; today VivArcDi ignores it, so nothing happens. The tile seen in the 0.29.0 recording came from Vivaldi's own reordering: a tab moved among the pinned positions is pinned by Vivaldi in the current workspace only, which is why it was not shared and could get lost.
+- [x] Does Vivaldi's tab drag expose the dragged tab to a mod? Partly. Probe on Vivaldi 8.2 macOS (Tore, 2026-11-09):
+  dragging a tab of the list produces no HTML5 drag event (`dragstart`, `dragover`, `drop` stay at zero), but `mousemove`
+  events with the button down reach the Vivaldi window for the whole path, `document.elementFromPoint` returns the mod's
+  elements under the pointer (the tiles inside the Favorites grid included), and the final `mouseup` has the Favorites
+  tile as target. The drop on the grid is therefore detected by a hit test on the pointer, the way 012 does it; the tiles
+  and the grid do not yet carry the drop mark. The dragged tab is the one under the first `mousedown`.
+  A second probe of the same day (`pinned-regression/diagnostica-trascina-riquadro.md`) also saw, once, an HTML5 `drop` on
+  a VivArcDi tile with the types `vivaldi/x-tab-entries` and `text/uri-list`; the design treats it as a second way in and
+  relies on the hit test.
+- [x] What does Vivaldi itself do when a tab is released on the Favorites grid? Nothing (probe, Tore, 2026-11-09): the
+  tab was released over the area and stayed as it was, so the module does not have to stop a native action. The tile seen
+  in the 0.29.0 recording came from Vivaldi's own reordering: a tab moved among the pinned positions of the list is pinned
+  by Vivaldi in the current workspace only, so it was not shared and could get lost.
 - [x] Vivaldi stores Favorites as bookmarks; the folder is the `Favorites` folder of 003 (option `folder`).
 - [x] Dragging into the grid is how a tab becomes a tile, and the grid is shared by every workspace (Tore, 2026-11-09).
 - [x] Dragging a tile out: below the line a Today tab, onto the folders a link (Tore, 2026-11-09).
