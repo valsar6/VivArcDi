@@ -57,8 +57,11 @@ In VivArcDi: the installer or a module turns on Vivaldi's auto-hide for the tab 
 
 - [x] Does a mod reach the left edge? Yes: `mousemove` at x = 0 to 5 arrives on `div#browser` (probe, Tore, 2026-11-09).
 - [x] Does Cmd/Ctrl+S reach the page? No, Vivaldi handles it (probe, Tore, 2026-11-09), in line with 014.
-- [x] What is the preference that turns on Vivaldi's auto-hide for the tab bar? Not found yet; a probe that diffs `Preferences`
-  before and after turning it on in Vivaldi's settings is part of the design (task T1).
+- [x] What is the preference that turns on Vivaldi's auto-hide for the tab bar? `vivaldi.auto_hide.enabled`, a boolean
+  (probe, Tore, 2026-11-09: `vivaldi.prefs.onChanged` fired for it when he changed the setting; a diff of the `Preferences`
+  file missed it because Vivaldi writes the file late). The state also shows as the class `auto-hide-on` or `auto-hide-off`
+  on `div#browser`. The installer writes it with Vivaldi closed, like the shortcuts; the design may also set it from the
+  mod with `vivaldi.prefs.set`.
 - [x] What is missing from the "almost perfect"? Recording of Tore, 2026-11-09 (`Registrazione schermo 2026-11-09 alle 00.12.39.mov`,
   10 seconds): with the tab bar hidden, moving the pointer to the left edge shows an icon over the page, the
   button of a web panel (Wikipedia in the recording) with the other buttons of Vivaldi's panel bar faintly behind
