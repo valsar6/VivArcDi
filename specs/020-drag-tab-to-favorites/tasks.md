@@ -21,6 +21,6 @@ and is done when its check passes. Branch `features/drag-tab-to-favorites`, mino
   tabs of other workspaces closed; bookmark removed last. AC-5, AC-6.
 - [x] **T6.** Styles and tokens; version bump; manual and README updated (the roadmap entry moves to
   the tab bar page); `make check`.
-- [ ] **T7.** Manual verification checklist for Tore from AC-1, AC-3, AC-7 and AC-8
+- [x] **T7.** Manual verification checklist for Tore from AC-1, AC-3, AC-7 and AC-8
   (`pinned-regression/verifica-trascina-favorites.md` in the project files).
 - [ ] **T8.** Manual checks on macOS and Debian.
