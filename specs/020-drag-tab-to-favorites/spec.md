@@ -20,7 +20,14 @@ In Arc the user adds a Favorite by dragging a tab from the tab list into the Fav
 
 ## Expected behavior
 
-The user takes a tab from the tab list or a pinned row and releases it over the Favorites grid. A new tile appears at the drop position with the page's icon, and the tab stays open. Releasing it on an existing tile leaves the grid unchanged. Dragging a tile out of the grid and releasing it over the tab list removes the Favorite and keeps the page open as a Today tab. Tiles can be reordered by dragging, which 001 AC-14 already expects.
+The user takes a tab from the tab list or a pinned row and releases it over the Favorites grid. While the tab is over the grid, the tiles move apart to leave a gap where it will land. A new tile appears at the drop position with the page's icon, the same in every workspace, and the tab stays open as the tab of that Favorite. Releasing it on an existing tile leaves the grid unchanged. Tiles can be reordered by dragging, which 001 AC-14 already expects.
+
+Dragging a tile out of the grid removes the Favorite and keeps the page open, as in Arc. Where the tile lands decides what the page becomes:
+
+- below the separator line: a Today tab, at the drop position;
+- onto a folder, between the rows of the folders or onto the space header: a link of the workspace, as a tab dropped there in [012](../012-editable-folders/spec.md).
+
+The page is never lost: it always ends in the Favorites, the folders or today's tabs (Tore, 2026-11-09, after the 0.29.0 recording where a tile dragged onto the folders vanished with its tab).
 
 ## Requirements
 
@@ -29,7 +36,10 @@ The user takes a tab from the tab list or a pinned row and releases it over the 
 - **FR-1.** The grid accepts a dragged tab as a drop target and shows an insertion mark between tiles.
 - **FR-2.** A drop adds a Favorite bookmark in the Favorites folder at the drop position, with the tab's title, URL and icon.
 - **FR-3.** A drop of a page already in the Favorites moves no tile and shows no duplicate.
-- **FR-4.** Dragging a tile out of the grid onto the tab list removes the bookmark only.
+- **FR-4.** Dragging a tile out of the grid onto the tab list removes the Favorite bookmark and leaves the page open as a Today tab at the drop position.
+- **FR-5.** Dragging a tile onto a folder, between folder rows or onto the space header removes the Favorite bookmark and adds the page as a link of the workspace there, as 012 does for a dropped tab.
+- **FR-6.** While a tab is dragged over the grid, the tiles leave a gap at the drop position.
+- **FR-7.** A Favorite added by drag is shared by every workspace, like every Favorite of 003.
 
 ## Acceptance criteria
 
@@ -39,6 +49,10 @@ The user takes a tab from the tab list or a pinned row and releases it over the 
 | AC-2 | WHEN the page is already a Favorite, THE module SHALL add no second tile. | auto: `ignores a page that is already a favorite` |
 | AC-3 | WHEN a tile is released over the tab list, THE bookmark SHALL be removed and the page SHALL stay open. | manual |
 | AC-4 | THE new Favorite SHALL keep the tab's title and URL. | auto: `creates a favorite from a tab` |
+| AC-5 | WHEN a tile is released onto a folder, THE bookmark SHALL be removed and the page SHALL become a link of that folder. | auto: `moves a dropped tile into a folder` |
+| AC-6 | WHEN a tile is released anywhere out of the grid, THE page SHALL stay in the tab bar as a tile, a link or a Today tab. | auto: `never loses the page of a dragged tile` |
+| AC-7 | WHEN Tore drags a Today tab into the grid and switches workspace, THE new tile SHALL show in the other workspace too. | manual |
+| AC-8 | WHEN Tore drags a tile below the separator, THE page SHALL show as a Today tab and the tile SHALL be gone in every workspace. | manual |
 
 ## Out of scope
 
@@ -47,8 +61,10 @@ The user takes a tab from the tab list or a pinned row and releases it over the 
 
 ## Open questions
 
-- [ ] Does Vivaldi's tab drag expose the dragged tab to a mod, as the panel's drag does (018 probe)? Needs a probe before the design.
-- [ ] Vivaldi stores Favorites as bookmarks; confirm which folder 001 uses before the design.
+- [ ] Does Vivaldi's tab drag expose the dragged tab to a mod, as the panel's drag does (018 probe)? The 0.29.0 recording shows that a tab released over the grid is pinned by Vivaldi itself; the probe `pinned-regression/diagnostica-trascina-riquadro.md` logs what happens, needed before the design.
+- [x] Vivaldi stores Favorites as bookmarks; the folder is the `Favorites` folder of 003 (option `folder`).
+- [x] Dragging into the grid is how a tab becomes a tile, and the grid is shared by every workspace (Tore, 2026-11-09).
+- [x] Dragging a tile out: below the line a Today tab, onto the folders a link (Tore, 2026-11-09).
 
 ## References
 
