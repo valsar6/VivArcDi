@@ -14,5 +14,6 @@
   "tabFavicon": ".tab-header .favicon",
   "addressField": "input.UrlBar-UrlField",
   "newTabButton": ".button-toolbar.newtab",
-  "workspaceButton": ".tabbar-workspace-button"
+  "workspaceButton": ".tabbar-workspace-button",
+  "popupHeader": ".toolbar-extensions, .toolbar-addressbar, .toolbar-mainbar, .UrlBar"
 }

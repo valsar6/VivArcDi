@@ -1,8 +1,34 @@
 #browser[data-vivarcdi-little-arc] {
-  padding-top: 44px;
+  --little-arc-space: var(--vivarcdi-space, #d0c9c5);
+  --little-arc-pill: var(--vivarcdi-pill, #fff);
+  --little-arc-ink: var(--vivarcdi-ink, #212121);
+  --little-arc-veil: color-mix(in srgb, white 22%, var(--little-arc-space));
+  --little-arc-muted: color-mix(in srgb, var(--little-arc-ink) 60%, transparent);
   box-sizing: border-box;
+  padding-top: 40px;
+  background-color: var(--little-arc-space);
 }
-
+@media (prefers-color-scheme: dark) {
+  #browser[data-vivarcdi-little-arc] {
+    --little-arc-space: color-mix(in srgb, black 82%, var(--vivarcdi-space, #d0c9c5));
+    --little-arc-ink: #f2f2f2;
+    --little-arc-veil: color-mix(in srgb, white 12%, var(--little-arc-space));
+    --little-arc-pill: color-mix(in srgb, white 18%, var(--little-arc-space));
+  }
+}
+#browser[data-vivarcdi-little-arc] [data-vivarcdi-popup-header] {
+  display: none !important;
+}
+#browser[data-vivarcdi-little-arc] [data-vivarcdi-popup-page] {
+  box-sizing: border-box;
+  padding: 0 6px 6px;
+  background-color: var(--little-arc-space);
+}
+#browser[data-vivarcdi-little-arc] [data-vivarcdi-popup-page] > *,
+#browser[data-vivarcdi-little-arc] [data-vivarcdi-popup-page] [tab_id] {
+  overflow: hidden;
+  border-radius: 8px;
+}
 #browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar {
   position: fixed;
   z-index: 70;
@@ -10,35 +36,100 @@
   right: 0;
   left: 0;
   display: flex;
-  height: 44px;
+  height: 40px;
   box-sizing: border-box;
   align-items: center;
-  padding: 6px 12px;
-  gap: 8px;
-  background-color: var(--colorBg, #2a2a2e);
-  color: var(--colorFg, #fff);
-  -webkit-app-region: no-drag;
+  padding-right: 6px;
+  gap: 6px;
+  background-color: var(--little-arc-space);
+  color: var(--little-arc-ink);
+  font-size: 13px;
+  user-select: none;
+  -webkit-app-region: drag;
 }
 #browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar button,
-#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar input {
-  height: 32px;
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar label {
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-inset {
+  flex: none;
+  width: 0;
+}
+#browser[data-vivarcdi-little-arc][data-vivarcdi-little-arc-mac] .vivarcdi-little-arc-bar-inset {
+  width: 78px;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-back,
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-keep {
+  flex: none;
+  height: 28px;
   box-sizing: border-box;
   border: 0;
   border-radius: 8px;
-  font: inherit;
-  font-size: 13px;
-}
-#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar button {
-  padding: 0 12px;
-  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
   color: inherit;
   cursor: pointer;
+  font: inherit;
 }
-#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar input {
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-back {
+  display: flex;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-back:hover {
+  background-color: var(--little-arc-veil);
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-back[hidden] {
+  display: none;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-pill {
+  display: flex;
   min-width: 0;
+  height: 28px;
   flex: 1;
-  padding: 0 12px;
-  border-radius: 9px;
-  background-color: var(--colorBgIntense, #fff);
-  color: var(--colorFgIntense, #1d1d24);
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+  background-color: var(--little-arc-veil);
+  cursor: text;
+  gap: 6px;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-pill svg {
+  flex: none;
+  color: var(--little-arc-muted);
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-pill input {
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  text-align: start;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-pill input:not(:focus) {
+  font-weight: 500;
+  text-align: center;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-pill input::placeholder {
+  color: var(--little-arc-muted);
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-keep {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background-color: var(--little-arc-pill);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  gap: 6px;
+  white-space: nowrap;
+}
+#browser[data-vivarcdi-little-arc] .vivarcdi-little-arc-bar-keep kbd {
+  color: var(--little-arc-muted);
+  font: inherit;
+  font-size: 12px;
 }

@@ -1,9 +1,11 @@
 import { DomQuery } from "../../core/DomQuery.js";
 import { WindowKeys } from "../../core/WindowKeys.js";
+import { DestinationLookup } from "./DestinationLookup.js";
 import { IdleTimer } from "./IdleTimer.js";
 import { LittleArcBar } from "./LittleArcBar.js";
 import { commandFor } from "./LittleArcKeyMap.js";
 import { adoptMessage } from "./LittleArcMessage.js";
+import { PopupChrome } from "./PopupChrome.js";
 const REGISTRY_ATTEMPTS = 30;
 const REGISTRY_INTERVAL_MS = 100;
 const ADOPT_ANSWER_MS = 1e3;
@@ -43,16 +45,17 @@ class PopupWindowRole {
       return;
     }
     const tabId = tab.id;
-    const close = () => this.#close();
     const host = DomQuery.require(document, selectors.get("browser"));
-    const bar = new LittleArcBar({ document, host, tabs, search, tabId, onKeep: () => this.#keep(tabId), logger });
+    const platform = document.defaultView?.navigator.platform ?? "";
+    const address = tab.url ?? tab.pendingUrl ?? "";
+    const bar = new LittleArcBar({ document, host, tabs, search, tabId, address, platform, onKeep: () => this.#keep(tabId), logger });
     bar.mount();
     this.#cleanups.push(() => bar.unmount());
-    const commands = { close, keep: () => this.#keep(tabId), clear: () => bar.clear() };
-    const keys = new WindowKeys(document, (event) => commandFor(event, bar.isEmpty), (command) => commands[command]());
-    keys.attach();
-    this.#cleanups.push(() => keys.detach());
-    this.#watchIdle(tabId, close);
+    this.#frame(bar);
+    this.#listenToKeys(bar, tabId);
+    this.#watchIdle(tabId, () => this.#close());
+    const { runtime } = this.#context;
+    bar.setDestination(await new DestinationLookup(runtime, logger).ask());
   }
   /**
    * Removes the bar and every listener.
@@ -60,6 +63,22 @@ class PopupWindowRole {
   stop() {
     this.#cleanups.forEach((cleanup) => cleanup());
     this.#cleanups = [];
+  }
+  #frame(bar) {
+    const { document, selectors, tabs, logger } = this.#context;
+    const element = bar.element;
+    if (element === null) {
+      return;
+    }
+    const chrome = new PopupChrome(document, selectors, logger);
+    chrome.mark(element);
+    this.#cleanups.push(tabs.onUpdated(() => chrome.mark(element)), () => chrome.unmark());
+  }
+  #listenToKeys(bar, tabId) {
+    const commands = { close: () => this.#close(), keep: () => this.#keep(tabId), clear: () => bar.revert() };
+    const keys = new WindowKeys(this.#context.document, (event) => commandFor(event, bar.isEmpty), (command) => commands[command]());
+    keys.attach();
+    this.#cleanups.push(() => keys.detach());
   }
   async #waitForMark() {
     for (let attempt = 0; attempt < REGISTRY_ATTEMPTS; attempt += 1) {
