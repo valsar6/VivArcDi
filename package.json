@@ -1,6 +1,6 @@
 {
   "name": "vivarcdi",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "private": true,
   "description": "Make Vivaldi behave like Arc",
   "type": "module",
