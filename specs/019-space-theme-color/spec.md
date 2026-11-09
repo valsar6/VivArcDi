@@ -98,12 +98,18 @@ colors are kept in the shared `chrome.storage.local` store, keyed by workspace i
   `contrast`, `radius`, `transparencyTabBar` and `transparencyTabs`. Themes are global, and
   `vivaldi.workspaces.list` holds only the id, name and icon of a workspace. `vivaldi.prefs` offers `get`, `set`
   and `onChanged`, so a mod can read and write both prefs.
-- [ ] How is the color applied? Two ways, to be decided after one more probe:
-  (a) override the interface CSS variables from VivArcDi: the probe read fixed values (`#ffffff`, `#000000`)
-  on `#browser` that did not change with the workspace, so the element where Vivaldi applies them is not
-  found yet; (b) keep a map workspace id to color, create a user theme per workspace derived from the active
-  theme, and set `vivaldi.themes.current` at each workspace change: it edits the user's theme list and may
-  flicker, which is not verified. FR-5 says (a); it changes if (b) is chosen.
+- [x] How is the color applied? Option (a), override the interface CSS variables. Probe on Vivaldi 8.2 macOS
+  (Tore, 2026-11-09): Vivaldi writes the color variables (`--colorFg`, `--colorFgIntense`, `--colorFgFaded`,
+  `--colorFgFadedMore`, `--colorFgFadedMost`, `--colorBg`, `--colorBgDark`, `--colorBgLight`, `--colorHighlightBg`,
+  `--colorAccentBg`) as inline style on `div#browser`, inherited by `div#main` and everything below; they are empty on
+  `html`, `body` and `div#app`. The active theme is also a class of `#browser` (`theme-id-<id>`, `theme-light` or
+  `theme-dark`, `acc-dark`). Setting `--colorHighlightBg` on `#browser` from a mod changed the computed value, so an
+  override works. Design decision: the module sets a mark on `#browser` and ships a stylesheet whose rules for that
+  mark set the variables with `!important`, which wins over Vivaldi's inline values without rewriting them, so a
+  theme or workspace change by Vivaldi does not undo it and the module only changes the variable values of its own
+  rule. Option (b), a user theme per workspace, is dropped. Still to check in the design phase: that Vivaldi does not
+  rewrite the inline style in a way that defeats `!important` (it cannot, by CSS rules) and that the tab bar and the
+  page frame both follow the variables (see the first open question).
 - [ ] Grain and the wave slider have no native equivalent in Vivaldi: they are drawn by VivArcDi as a noise
   layer over the bar.
 
