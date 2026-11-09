@@ -9,7 +9,7 @@
 Ordered, small and independently reviewable. Each task names the acceptance criteria it satisfies
 and is done when its check passes. Branch `features/auto-hide-tab-bar`, next minor version.
 
-- [ ] **T1.** Probe for Tore: diff `Preferences` before and after turning on the tab bar auto-hide in Vivaldi; record the key
+- [ ] **T1.** Preference found: `vivaldi.auto_hide.tab_bar` (2026-11-09). Remaining probe for Tore: set only that key to true on the normal layout and check the edge behavior and Cmd+S. Earlier text: diff `Preferences` before and after turning on the tab bar auto-hide in Vivaldi; record the key
   in the spec. Done when the key is in the spec's open questions.
 - [ ] **T2.** Add the option to `shortcuts.json` and the `auto-hide.enabled` switch to `ShortcutTable`. Satisfies AC-4, AC-5. Done
   when `test_auto_hide_is_turned_on` and `test_auto_hide_is_left_alone_when_disabled` pass.
