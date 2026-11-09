@@ -38,6 +38,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Approved |
 | [028 Arc sidebar look](028-arc-sidebar-look/spec.md) | 3 | Approved |
 | [029 Arc Light theme](029-arc-light-theme/spec.md) | 3 | Approved |
+| [030 Workspace sync](030-workspace-sync/spec.md) | 3 | Draft |
 
 ## Layout
 
