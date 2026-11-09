@@ -32,6 +32,17 @@ every workspace.
   Favorite's page.
 - **Unload it.** Middle click, Cmd/Ctrl+W or the close button unload the tab instead of closing it.
   The tile stays, dimmed, and a click loads it again.
+- **Add one by dragging.** Take a tab from the list or from the pinned rows and release it over the
+  grid. The tiles move apart to leave a gap where it will land, and a new tile appears there with the
+  page's icon, the same in every workspace. The tab stays open as the tab of that Favorite. The
+  `Favorites` folder is created if it does not exist. A page that is already a Favorite stays as it
+  is.
+- **Take one out by dragging.** Drag a tile out of the grid and release it. Below the separator the
+  page becomes a Today tab at that place; on a folder, between folder rows or on the space header it
+  becomes a link of the workspace. The tile disappears from every workspace and the page is never
+  lost. Released over the grid or outside the tab bar, nothing changes.
+
+![Mockup: a Today tab dragged between two tiles becomes a Favorite](images/mockups/drag-tab-to-favorites.gif)
 
 The active tile is a light pill; dimmed tiles are unloaded or not open yet in this workspace.
 
