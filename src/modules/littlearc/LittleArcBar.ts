@@ -1,12 +1,19 @@
 import { BrowserSearch } from '../../core/BrowserSearch.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
+import { AddressDisplay } from './AddressDisplay.js';
 import { AddressResolver } from './AddressResolver.js';
+import { BackButtonState } from './BackButtonState.js';
+import { BarView } from './BarView.js';
+import { DestinationPalette } from './DestinationPalette.js';
+import { KeepLabel } from './KeepLabel.js';
+import type { DestinationAnswer } from './LittleArcMessage.js';
 
+export { BAR_CLASS } from './BarView.js';
 export const BAR_ATTRIBUTE = 'data-vivarcdi-little-arc';
-export const BAR_CLASS = 'vivarcdi-little-arc-bar';
+export const PLATFORM_ATTRIBUTE = 'data-vivarcdi-little-arc-mac';
 
-export type BarTabs = Pick<BrowserTabs, 'update' | 'reload' | 'goBack' | 'onUpdated'>;
+export type BarTabs = Pick<BrowserTabs, 'update' | 'goBack' | 'onUpdated'>;
 
 export interface BarOptions {
   document: Document;
@@ -14,19 +21,24 @@ export interface BarOptions {
   tabs: BarTabs;
   search: Pick<BrowserSearch, 'run'>;
   tabId: number;
+  address: string;
+  platform: string;
   onKeep: () => void;
   logger: Logger;
 }
 
 export class LittleArcBar {
   #options: BarOptions;
-  #root: HTMLElement | null = null;
-  #field: HTMLInputElement | null = null;
+  #view: BarView | null = null;
+  #back = new BackButtonState();
+  #address = '';
+  #selectOnRelease = false;
+  #painted = false;
   #unsubscribe: (() => void) | null = null;
 
   /**
-   * The compact bar of a Little Arc window: back, reload, the address field and the button that
-   * keeps the page. Vivaldi's popup window has no address field of its own.
+   * The bar of a Little Arc window: the space of the window buttons, back, the address pill and the
+   * button that keeps the page. Vivaldi's popup window has no address field of its own.
    *
    * @param options The window, its tab and what the bar calls.
    */
@@ -35,101 +47,153 @@ export class LittleArcBar {
   }
 
   /**
-   * Draws the bar at the top of the window and puts the cursor in the address field.
+   * Draws the bar at the top of the window. The cursor goes in the pill unless a page is loaded.
    */
   public mount(): void {
-    const { document, host, tabs, tabId } = this.#options;
-    const root = document.createElement('div');
-    root.className = BAR_CLASS;
-    const field = document.createElement('input');
-    field.type = 'text';
-    field.placeholder = 'Search or enter address';
-    field.setAttribute('aria-label', 'Search or type an address');
-    field.addEventListener('keydown', (event) => this.#submitOnEnter(event));
-    root.append(
-      this.#button('Back', '‹', () => void this.#run(() => tabs.goBack(tabId))),
-      this.#button('Reload', '↻', () => void this.#run(() => tabs.reload(tabId))),
-      field,
-      this.#button('Move to workspace', 'Move to workspace', () => this.#options.onKeep()),
-    );
+    const { document, host, tabs, platform, address } = this.#options;
+    const view = new BarView(document);
+    this.#view = view;
+    this.#address = address;
+    this.#back.record(address);
+    view.showLabel(KeepLabel.of(null, platform));
+    this.#listen(view);
+    if (KeepLabel.isMac(platform)) {
+      host.setAttribute(PLATFORM_ATTRIBUTE, '');
+    }
     host.setAttribute(BAR_ATTRIBUTE, '');
-    host.prepend(root);
-    this.#root = root;
-    this.#field = field;
+    host.prepend(view.root);
     this.#unsubscribe = tabs.onUpdated((id, change) => this.#follow(id, change));
-    field.focus();
-  }
-
-  /**
-   * Removes the bar.
-   */
-  public unmount(): void {
-    this.#unsubscribe?.();
-    this.#unsubscribe = null;
-    this.#root?.remove();
-    this.#options.host.removeAttribute(BAR_ATTRIBUTE);
-    this.#root = null;
-    this.#field = null;
-  }
-
-  /**
-   * @returns Whether the address field has no text.
-   */
-  public get isEmpty(): boolean {
-    return (this.#field?.value ?? '') === '';
-  }
-
-  /**
-   * Empties the address field.
-   */
-  public clear(): void {
-    if (this.#field !== null) {
-      this.#field.value = '';
+    this.#rest();
+    if (!AddressDisplay.isWeb(address)) {
+      view.field.focus();
     }
   }
 
-  #button(label: string, text: string, onClick: () => void): HTMLButtonElement {
-    const button = this.#options.document.createElement('button');
-    button.type = 'button';
-    button.textContent = text;
-    button.setAttribute('aria-label', label);
-    button.addEventListener('click', onClick);
-    return button;
+  /**
+   * Removes the bar and the colors it set.
+   */
+  public unmount(): void {
+    const { host } = this.#options;
+    this.#unsubscribe?.();
+    this.#unsubscribe = null;
+    this.#view?.root.remove();
+    this.#view = null;
+    host.removeAttribute(BAR_ATTRIBUTE);
+    host.removeAttribute(PLATFORM_ATTRIBUTE);
+    if (this.#painted) {
+      DestinationPalette.clear(host);
+    }
+  }
+
+  /**
+   * @returns The bar's element, or null while it is not mounted.
+   */
+  public get element(): HTMLElement | null {
+    return this.#view?.root ?? null;
+  }
+
+  /**
+   * @returns Whether the pill has no text, which is when Esc closes the window.
+   */
+  public get isEmpty(): boolean {
+    return (this.#view?.field.value ?? '') === '';
+  }
+
+  /**
+   * Puts the pill back at rest: it shows the host again, or nothing when no page is loaded.
+   */
+  public revert(): void {
+    this.#view?.field.blur();
+    this.#rest();
+  }
+
+  /**
+   * Shows the workspace that would receive the page and takes its colors.
+   *
+   * @param answer What the main window answered; null keeps "Open in workspace" and the default palette.
+   */
+  public setDestination(answer: DestinationAnswer | null): void {
+    if (answer === null || this.#view === null) {
+      return;
+    }
+    this.#view.showLabel(KeepLabel.of(answer.name, this.#options.platform));
+    if (answer.colors !== null) {
+      DestinationPalette.apply(this.#options.host, answer.colors);
+      this.#painted = true;
+    }
+  }
+
+  #listen(view: BarView): void {
+    const { tabs, tabId, onKeep, logger } = this.#options;
+    const { field } = view;
+    field.addEventListener('keydown', (event) => this.#submitOnEnter(event));
+    field.addEventListener('focus', () => this.#edit(field));
+    field.addEventListener('blur', () => this.#leave());
+    field.addEventListener('mouseup', (event) => this.#keepSelection(event));
+    view.back.addEventListener('click', () => void this.#run(() => tabs.goBack(tabId), logger));
+    view.keep.addEventListener('click', onKeep);
+  }
+
+  #edit(field: HTMLInputElement): void {
+    field.value = AddressDisplay.isWeb(this.#address) ? this.#address : '';
+    field.select();
+    this.#selectOnRelease = true;
+  }
+
+  #leave(): void {
+    this.#selectOnRelease = false;
+    this.#rest();
+  }
+
+  #keepSelection(event: MouseEvent): void {
+    if (this.#selectOnRelease) {
+      event.preventDefault();
+      this.#selectOnRelease = false;
+    }
+  }
+
+  #rest(): void {
+    if (this.#view !== null && this.#view.field !== this.#options.document.activeElement) {
+      this.#view.field.value = AddressDisplay.of(this.#address);
+    }
   }
 
   #submitOnEnter(event: KeyboardEvent): void {
-    if (event.key !== 'Enter') {
-      return;
-    }
-    const resolved = AddressResolver.resolve(this.#field?.value ?? '');
+    const field = this.#view?.field;
+    const resolved = event.key === 'Enter' ? AddressResolver.resolve(field?.value ?? '') : null;
     if (resolved === null) {
       return;
     }
     event.preventDefault();
-    const { tabs, tabId, search } = this.#options;
+    field?.blur();
+    const { tabs, tabId, search, logger } = this.#options;
     if (resolved.kind === 'url') {
-      void this.#run(() => tabs.update(tabId, { url: resolved.url }));
-    } else {
-      void this.#run(() => search.run(resolved.text, tabId)).then((done) => {
-        if (!done) {
-          void this.#run(() => tabs.update(tabId, { url: BrowserSearch.fallbackAddress(resolved.text) }));
-        }
-      });
+      void this.#run(() => tabs.update(tabId, { url: resolved.url }), logger);
+      return;
     }
+    void this.#run(() => search.run(resolved.text, tabId), logger).then((done) => {
+      if (!done) {
+        void this.#run(() => tabs.update(tabId, { url: BrowserSearch.fallbackAddress(resolved.text) }), logger);
+      }
+    });
   }
 
   #follow(tabId: number, change: chrome.tabs.OnUpdatedInfo): void {
-    if (tabId === this.#options.tabId && change.url !== undefined && this.#field !== null && this.#field !== this.#options.document.activeElement) {
-      this.#field.value = change.url;
+    if (tabId !== this.#options.tabId || change.url === undefined || this.#view === null) {
+      return;
     }
+    this.#address = change.url;
+    this.#back.record(change.url);
+    this.#view.back.hidden = !this.#back.visible;
+    this.#rest();
   }
 
-  async #run(action: () => Promise<unknown>): Promise<boolean> {
+  async #run(action: () => Promise<unknown>, logger: Logger): Promise<boolean> {
     try {
       await action();
       return true;
     } catch (error) {
-      this.#options.logger.warn('Little Arc bar action failed', error);
+      logger.warn('Little Arc bar action failed', error);
       return false;
     }
   }
