@@ -36,24 +36,23 @@ Ordered, small and independently reviewable.
   and Debian.
 - [ ] **T14.** Manual checks by Tore, including Vivaldi minimized and the flash of the tab.
 
-Change request of 2026-11-09, the look of the window (Draft, waits for Tore's approval of the spec and
-the design):
+Change request of 2026-11-09, the look of the window (Approved by Tore 2026-11-09):
 
 - [ ] **T15.** Probe, run by Tore in the popup's `window.html`: the selectors of Vivaldi's title and
   extension row, whether `display: none` hides them, where the window buttons sit (macOS and Debian),
   whether the `webviewContainer` selector matches and accepts a padding and a radius, and whether
   Cmd/Ctrl+R reloads. Done when the three new risk rows of the design are settled.
-- [ ] **T16.** `AddressDisplay`. Satisfies AC-18. Done when `address display shows the host of a
+- [x] **T16.** `AddressDisplay`. Satisfies AC-18. Done when `address display shows the host of a
   loaded page` passes.
-- [ ] **T17.** `BackButtonState`. Satisfies AC-20. Done when `back button appears after the first
+- [x] **T17.** `BackButtonState`. Satisfies AC-20. Done when `back button appears after the first
   navigation` passes.
-- [ ] **T18.** `KeepLabel` and the `little-arc:destination` question answered by `WorkspaceAdopter`.
+- [x] **T18.** `KeepLabel` and the `little-arc:destination` question answered by `WorkspaceAdopter`.
   Satisfies AC-21. Done when `keep label names the destination workspace` passes.
-- [ ] **T19.** `LittleArcBar` with the new parts, reload removed, pill behavior; tokens and
+- [x] **T19.** `LittleArcBar` with the new parts, reload removed, pill behavior; tokens and
   `little-arc.scss` for the bar, the hidden popup header, the frame and the colors. Satisfies AC-15,
   AC-16, AC-17, AC-19, AC-22, AC-23 and AC-24.
-- [ ] **T20.** Version bump (minor) in `package.json`, `package-lock.json` and
+- [x] **T20.** Version bump (minor) in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`; README section updated with the new look.
-- [ ] **T21.** Add AC-15 to AC-24 to the manual verification checklist for Tore, in Italian, macOS and
+- [x] **T21.** Add AC-15 to AC-24 to the manual verification checklist for Tore, in Italian, macOS and
   Debian, with the review frames of `little-arc/look/` to compare.
 - [ ] **T22.** Manual checks by Tore.

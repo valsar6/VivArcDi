@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Approved |
-| Change request | 2026-11-09, the look of the window (section Look): Draft |
+| Change request | 2026-11-09, the look of the window (section Look): Approved 2026-11-09 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach

@@ -6,7 +6,7 @@
 | Phase | 5 |
 | Owner | Tore |
 | Approved | 2026-11-08 |
-| Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Draft |
+| Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Approved 2026-11-09 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -265,19 +265,21 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
 
 ### Change request of 2026-11-09 (look)
 
-- [ ] **No reload button.** Arc's bar has none. Proposal: no button; Cmd/Ctrl+R reloads (AC-24).
-- [ ] **Colors.** Proposal: the destination workspace's colors (019), the default palette `arclight`
+- [x] **No reload button.** Arc's bar has none. Proposal: no button; Cmd/Ctrl+R reloads (AC-24).
+- [x] **Colors.** Proposal: the destination workspace's colors (019), the default palette `arclight`
   otherwise. Alternative: always the default palette.
-- [ ] **Arrow next to "Open in".** In Arc it seems to offer other Spaces (guess, not seen open).
+- [x] **Arrow next to "Open in".** In Arc it seems to offer other Spaces (guess, not seen open).
   Proposal: not in this change; the `askWorkspace` option stays the way to choose.
-- [ ] **Link icon and profile label in the pill.** Arc shows a link icon (probably copy link, not seen
+- [x] **Link icon and profile label in the pill.** Arc shows a link icon (probably copy link, not seen
   used) and, in one review, a profile label "Default". Proposal: not in this change.
-- [ ] **Command bar first.** Arc opens a floating command bar with suggestions and the window only after
+- [x] **Command bar first.** Arc opens a floating command bar with suggestions and the window only after
   Enter. Proposal: not in this change; the window opens at once with the cursor in the pill.
-- [ ] **Window size.** In the reviews the window looks larger than a third of the screen (guess, the
+- [x] **Window size.** In the reviews the window looks larger than a third of the screen (guess, the
   videos are zoomed). Proposal: keep `widthPercent` 34 and `heightPercent` 60.
-- [ ] **Source.** Tore's recording of 2026-11-09 does not show the Little Arc window. Proposal: the
+- [x] **Source.** Tore's recording of 2026-11-09 does not show the Little Arc window. Proposal: the
   review frames are enough; Tore compares with his Arc on the manual check.
+
+Tore approved every proposal on 2026-11-09.
 
 ## References
 
