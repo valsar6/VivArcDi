@@ -1,17 +1,20 @@
 import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
+import { WorkspaceNames } from '../../core/WorkspaceNames.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { ShortcutKeys } from '../../core/ShortcutKeys.js';
 import { WindowKeys } from '../../core/WindowKeys.js';
+import { DestinationPalette } from './DestinationPalette.js';
 import { DestinationPicker } from './DestinationPicker.js';
 import { ExternalLinkDetector } from './ExternalLinkDetector.js';
 import { DETECTION_DELAY_MS, ExternalLinkWatcher } from './ExternalLinkWatcher.js';
 import { FocusHistory } from './FocusHistory.js';
 import { LittleArcLauncher } from './LittleArcLauncher.js';
-import { parseAdoptMessage } from './LittleArcMessage.js';
+import { isDestinationQuestion, parseAdoptMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import type { LittleArcSettings } from './LittleArcSettings.js';
 import { screenOf } from './ScreenAreas.js';
 import { WorkspaceAdopter } from './WorkspaceAdopter.js';
+import type { DestinationSource } from './WorkspaceAdopter.js';
 
 export class MainWindowRole {
   #context: ModuleContext;
@@ -82,15 +85,34 @@ export class MainWindowRole {
     await workspace.start().catch((error: unknown) => logger.warn('cannot follow the workspace of this window', error));
     this.#cleanups.push(() => workspace.stop());
     const picker = new DestinationPicker(this.#settings.askWorkspace, () => Promise.resolve(null));
-    const adopter = new WorkspaceAdopter({ tabs, windows, windowId: this.#windowId, recentWorkspace: (): string | null => workspace.current, picker, logger });
-    this.#cleanups.push(
-      runtime.onMessage((message) => {
-        const request = parseAdoptMessage(message);
-        if (request !== null) {
-          void adopter.adopt(request);
-        }
-      }),
-    );
+    const destination = await this.#destinationSource();
+    const adopter = new WorkspaceAdopter({ tabs, windows, windowId: this.#windowId, recentWorkspace: (): string | null => workspace.current, picker, destination, logger });
+    this.#cleanups.push(runtime.onMessage((message) => this.#handle(adopter, message)));
+  }
+
+  async #destinationSource(): Promise<DestinationSource> {
+    const { prefs, document, selectors, logger } = this.#context;
+    const names = new WorkspaceNames(prefs, (): void => undefined, logger);
+    await names.start().catch((error: unknown) => logger.warn('cannot read the names of the workspaces', error));
+    this.#cleanups.push(() => names.stop());
+    const root = (): HTMLElement | null => document.querySelector<HTMLElement>(selectors.get('browser'));
+    return { nameOf: (workspace) => names.nameOf(workspace), colors: () => DestinationPalette.read(root()) };
+  }
+
+  #handle(adopter: WorkspaceAdopter, message: unknown): void {
+    const request = parseAdoptMessage(message);
+    if (request !== null) {
+      void adopter.adopt(request);
+    } else if (isDestinationQuestion(message)) {
+      void this.#answer(adopter);
+    }
+  }
+
+  async #answer(adopter: WorkspaceAdopter): Promise<void> {
+    const answer = await adopter.describeDestination();
+    if (answer !== null) {
+      await this.#context.runtime.sendMessage(answer).catch((error: unknown) => this.#context.logger.warn('could not answer the Little Arc bar', error));
+    }
   }
 
   #listenForExternalLinks(): void {

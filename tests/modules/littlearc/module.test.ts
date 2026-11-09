@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
 import { BrowserRuntime } from '../../../src/core/BrowserRuntime.js';
 import { BrowserSearch } from '../../../src/core/BrowserSearch.js';
 import type { ChromeApi, RuntimeMessageListener } from '../../../src/core/BrowserTabs.js';
@@ -12,7 +13,7 @@ import { WindowKeys } from '../../../src/core/WindowKeys.js';
 import { ExternalLinkWatcher } from '../../../src/modules/littlearc/ExternalLinkWatcher.js';
 import { LittleArc } from '../../../src/modules/littlearc/LittleArc.js';
 import { LittleArcLauncher } from '../../../src/modules/littlearc/LittleArcLauncher.js';
-import { adoptMessage } from '../../../src/modules/littlearc/LittleArcMessage.js';
+import { adoptMessage, destinationAnswer } from '../../../src/modules/littlearc/LittleArcMessage.js';
 import { WorkspaceAdopter } from '../../../src/modules/littlearc/WorkspaceAdopter.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FakeDocument, FakeEvent } from '../peek/fakes.js';
@@ -104,6 +105,23 @@ test('workspace adopter moves the page into the window that was in front', async
   assert.deepEqual(removed, [3]);
 });
 
+test('workspace adopter answers where the page would go', async () => {
+  const colors = { space: '#111111', pill: '#222222', ink: '#eeeeee' };
+  const make = (lastFocused: number): WorkspaceAdopter =>
+    new WorkspaceAdopter({
+      tabs: new AdopterTabs(),
+      windows: { lastFocused: async (): Promise<WindowDetails> => ({ id: lastFocused }), remove: async (): Promise<void> => undefined },
+      windowId: 1,
+      recentWorkspace: (): string | null => '7',
+      picker: { pick: async (workspace): Promise<string | null> => workspace },
+      destination: { nameOf: (id): string | null => (id === '7' ? 'Lavoro' : null), colors: (): typeof colors => colors },
+      logger,
+    });
+  assert.deepEqual(await make(1).describeDestination(), destinationAnswer('Lavoro', colors));
+  assert.equal(await make(2).describeDestination(), null);
+  assert.deepEqual(await adopterFor(1, '7').adopter.describeDestination(), destinationAnswer(null, null));
+});
+
 test('workspace adopter ignores requests when another window was in front', async () => {
   const { adopter, tabs, removed } = adopterFor(2, '1700000000000');
   assert.equal(await adopter.adopt(adoptMessage(8, 3)), false);
@@ -147,6 +165,8 @@ function contextOf(options: Record<string, unknown>, type: string): { context: M
     windows: new BrowserWindows(chromeApi),
     search: new BrowserSearch(chromeApi),
     runtime: new BrowserRuntime(chromeApi),
+    prefs: new BrowserPrefs(undefined),
+    selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
   } as unknown as ModuleContext;
   return { context, document, created, focus, messages };
