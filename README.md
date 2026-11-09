@@ -368,14 +368,28 @@ Options of `peek` in `config.json`:
 ## Little Arc
 
 Little Arc is a small, minimal window for a quick lookup, like Arc's. It has no tab bar, no panels and
-no workspace switcher, only a compact bar with back, reload, an address field and **Move to workspace**.
+no workspace switcher, and nothing above the page but one slim bar in the colors of your workspace
+(Vivaldi's own title and extension row of the window are hidden):
+
+- **The window buttons** stay at the left end of the bar, which keeps their space free.
+- **Back** (an arrow) shows only once the page has navigated inside the window. There is no reload
+  button: Cmd/Ctrl+R reloads.
+- **The address pill** takes the middle. At rest it shows the host of the page, for example
+  `weather.com`; a click shows the full address, selected, for editing. Enter loads what you typed, Esc
+  puts the host back. While the window is empty it shows "Search or Enter URL…".
+- **Open in *workspace*** on the right, with the shortcut (⌘O or Ctrl+O), keeps the page.
+- The page sits in a thin frame of the same color with rounded corners. The colors are the ones the
+  main window uses for the sidebar (the `sidebar-look` palette, `arclight` by default), light or dark
+  as Vivaldi is. Drag an empty part of the bar to move the window.
+
+What it does:
 
 - **Cmd+Opt+N** (Ctrl+Alt+N on Debian) opens it with the address field ready. A site name opens the
   site, any other text is a web search.
 - A **link opened from another app** (Mail, Slack, Notes) opens in Little Arc instead of a tab of the
   main window. VivArcDi recognizes it as a new, active tab with no opener that appears just as Vivaldi
   comes to the front.
-- **Move to workspace** or Cmd/Ctrl+O turns the page into a tab of the workspace you last used and
+- **Open in *workspace*** or Cmd/Ctrl+O turns the page into a tab of the workspace you last used and
   closes the small window. Esc in an empty address field and Cmd/Ctrl+W close it and forget the page.
 - A Little Arc window nobody touched for six hours closes by itself.
 
