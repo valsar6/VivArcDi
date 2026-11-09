@@ -13,10 +13,11 @@ Vivaldi already hides and shows the tab bar (probe of 2026-11-09), so VivArcDi t
 Two parts, kept apart: the installer sets the preference (FR-1, FR-3), a stylesheet tunes the overlay and
 the panel bar (FR-2, FR-4).
 
-1. **Preference.** Task T1 is a probe that diffs `Preferences` before and after Tore turns on "Auto-hide Tab Bar"
-   in Vivaldi's settings. The key found goes in the `options` object of `installer/vivarcdi/shortcuts.json`
-   (the same data file, the same atomic write, backup and refusal-while-running as 014), so `shortcuts apply`
-   covers it (AC-4). It is not a new command.
+1. **Preference.** The key is `vivaldi.auto_hide.tab_bar` (probe of 2026-11-09), written as `true` in the `options` object of
+   `installer/vivarcdi/shortcuts.json` (the same data file, atomic write, backup and refusal-while-running as 014), so
+   `shortcuts apply` covers it (AC-4). Only this key is written: choosing the "auto-hide" layout in Vivaldi rewrites about
+   twenty preferences, which VivArcDi does not want to own. Task T1 checks that the key alone gives the native behavior
+   and what Cmd/Ctrl+S does then; if it does not, the design falls back to `vivaldi.prefs.set` from the mod or to the full layout.
 2. **Disabled.** `auto-hide.enabled` false in `config.json` makes `ShortcutTable` drop the auto-hide option
    from the table, so the profile value stays (AC-5). The installer already reads `config.json` for module options.
 3. **Overlay tuning.** `styles/tab-bar-tuning.css` (from `tab-bar-tuning.scss`) styles
@@ -57,6 +58,6 @@ only the tuning is lost.
 
 | Risk | Mitigation |
 |---|---|
-| The preference name is not found or differs by build | T1 probe first; on a miss the spec goes back to Tore |
+| The key alone does not give the native behavior, or Cmd/Ctrl+S stops working | T1 probe first; on a miss the design returns to Tore |
 | The wrapper is hidden by another transform in a future Vivaldi | The watcher reads the bounding box, not a class; a miss leaves the panel bar visible |
 | Vivaldi Sync restores the old preference | Same note as 014 after `apply` |
