@@ -1,57 +1,155 @@
-$bar: '[data-vivarcdi-little-arc]';
-$bar-class: '.vivarcdi-little-arc-bar';
-$bar-height: 44px;
-$bar-layer: 70;
-$bar-gap: 8px;
-$bar-padding: 6px 12px;
-$control-height: 32px;
-$control-radius: 8px;
-$field-radius: 9px;
+@use 'tokens' as *;
 
-#browser#{$bar} {
-  padding-top: $bar-height;
+#browser#{$little-arc} {
+  --little-arc-space: var(--vivarcdi-space, #{$arclight-space});
+  --little-arc-pill: var(--vivarcdi-pill, #{$arclight-pill});
+  --little-arc-ink: var(--vivarcdi-ink, #{$arclight-ink});
+  --little-arc-veil: color-mix(in srgb, white #{$veil}, var(--little-arc-space));
+  --little-arc-muted: color-mix(in srgb, var(--little-arc-ink) #{$muted-ink}, transparent);
+
   box-sizing: border-box;
-}
+  padding-top: $little-arc-bar-height;
+  background-color: var(--little-arc-space);
 
-#browser#{$bar} #{$bar-class} {
-  position: fixed;
-  z-index: $bar-layer;
-  top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
-  height: $bar-height;
-  box-sizing: border-box;
-  align-items: center;
-  padding: $bar-padding;
-  gap: $bar-gap;
-  background-color: var(--colorBg, #2a2a2e);
-  color: var(--colorFg, #fff);
-  -webkit-app-region: no-drag;
+  @media (prefers-color-scheme: dark) {
+    --little-arc-space: color-mix(in srgb, black #{$little-arc-dark-shade}, var(--vivarcdi-space, #{$arclight-space}));
+    --little-arc-ink: #{$little-arc-dark-ink};
+    --little-arc-veil: color-mix(in srgb, white #{$little-arc-dark-veil}, var(--little-arc-space));
+    --little-arc-pill: color-mix(in srgb, white #{$little-arc-dark-pill}, var(--little-arc-space));
+  }
 
-  button,
-  input {
-    height: $control-height;
+  #{$little-arc-header} {
+    display: none !important;
+  }
+
+  #{$little-arc-page} {
+    box-sizing: border-box;
+    padding: 0 $little-arc-frame $little-arc-frame;
+    background-color: var(--little-arc-space);
+
+    > *,
+    [tab_id] {
+      overflow: hidden;
+      border-radius: $little-arc-page-radius;
+    }
+  }
+
+  #{$little-arc-bar-class} {
+    position: fixed;
+    z-index: $little-arc-bar-layer;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    height: $little-arc-bar-height;
+    box-sizing: border-box;
+    align-items: center;
+    padding-right: $little-arc-bar-gap;
+    gap: $little-arc-bar-gap;
+    background-color: var(--little-arc-space);
+    color: var(--little-arc-ink);
+    font-size: $little-arc-font-size;
+    user-select: none;
+    -webkit-app-region: drag;
+
+    button,
+    label {
+      -webkit-app-region: no-drag;
+    }
+  }
+
+  #{$little-arc-bar-class}-inset {
+    flex: none;
+    width: $little-arc-buttons-inset;
+  }
+
+  &#{$little-arc-mac} #{$little-arc-bar-class}-inset {
+    width: $little-arc-lights-inset;
+  }
+
+  #{$little-arc-bar-class}-back,
+  #{$little-arc-bar-class}-keep {
+    flex: none;
+    height: $little-arc-control-height;
     box-sizing: border-box;
     border: 0;
-    border-radius: $control-radius;
-    font: inherit;
-    font-size: 13px;
-  }
-
-  button {
-    padding: 0 12px;
-    background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+    border-radius: $little-arc-pill-radius;
     color: inherit;
     cursor: pointer;
+    font: inherit;
   }
 
-  input {
+  #{$little-arc-bar-class}-back {
+    display: flex;
+    width: $little-arc-control-height;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+
+    &:hover {
+      background-color: var(--little-arc-veil);
+    }
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  #{$little-arc-bar-class}-pill {
+    display: flex;
     min-width: 0;
+    height: $little-arc-control-height;
     flex: 1;
-    padding: 0 12px;
-    border-radius: $field-radius;
-    background-color: var(--colorBgIntense, #fff);
-    color: var(--colorFgIntense, #1d1d24);
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 $little-arc-pill-padding;
+    border-radius: $little-arc-pill-radius;
+    background-color: var(--little-arc-veil);
+    cursor: text;
+    gap: $little-arc-bar-gap;
+
+    svg {
+      flex: none;
+      color: var(--little-arc-muted);
+    }
+
+    input {
+      min-width: 0;
+      height: 100%;
+      flex: 1;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      outline: none;
+      text-align: start;
+
+      &:not(:focus) {
+        font-weight: 500;
+        text-align: center;
+      }
+
+      &::placeholder {
+        color: var(--little-arc-muted);
+      }
+    }
+  }
+
+  #{$little-arc-bar-class}-keep {
+    display: flex;
+    align-items: center;
+    padding: 0 $little-arc-pill-padding;
+    background-color: var(--little-arc-pill);
+    box-shadow: $little-arc-button-shadow;
+    gap: $little-arc-bar-gap;
+    white-space: nowrap;
+
+    kbd {
+      color: var(--little-arc-muted);
+      font: inherit;
+      font-size: $little-arc-kbd-size;
+    }
   }
 }

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Approved |
-| Change request | 2026-11-09, the look of the window (section Look): Draft |
+| Change request | 2026-11-09, the look of the window (section Look): Approved 2026-11-09 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -131,7 +131,7 @@ small difference accepted here. The reload button is removed; Cmd/Ctrl+R is Viva
 
 **Open in.** `KeepLabel.of(name, platform)` returns `{ prefix: 'Open in', name, shortcut }`, with
 `name` = `'workspace'` when it is empty or unknown and `shortcut` = `⌘O` on macOS, `Ctrl+O` otherwise.
-The name comes from the adopter: when the bar mounts it sends `{ type: 'little-arc:destination' }`;
+The name comes from the adopter: when the bar mounts it sends the existing `vivarcdi-little-arc` message with `action: 'destination'`, and the adopter replies with `action: 'destination-answer'`;
 the adopter of the most recently focused normal window answers with the name of the workspace that
 FR-6 would pick (from `WorkspaceNames`) and the colors of 019 for that workspace, if any. No answer
 within 1 s leaves "Open in workspace" and the default palette.
@@ -139,7 +139,7 @@ within 1 s leaves "Open in workspace" and the default palette.
 **Frame and colors.** In the popup `#browser[data-vivarcdi-little-arc]` gets the background
 `--vivarcdi-space`; the `webviewContainer` gets a padding of `$little-arc-frame` (6 px) on the left, right
 and bottom and the page gets `border-radius: $little-arc-page-radius` (8 px) with `overflow: hidden`.
-The bar sets `--vivarcdi-space-theme`, `--vivarcdi-pill-theme` and `--vivarcdi-ink-theme` on `#browser`
+The bar writes `--vivarcdi-space`, `--vivarcdi-pill` and `--vivarcdi-ink` on its own `#browser`, copied from the answer (the colors the sidebar look put on the main window's `#browser`)
 from the answer, so the same variables as 028 apply; without an answer they fall back to `arclight`. The
 pill uses `--vivarcdi-veil`, the Open in button `--vivarcdi-pill`, text `--vivarcdi-ink`. In dark mode the
 veil and the pill use the dark shares of 028 (white at 12% and 18%) over a dark shade of the space

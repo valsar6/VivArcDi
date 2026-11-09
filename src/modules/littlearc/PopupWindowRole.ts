@@ -1,6 +1,7 @@
 import { DomQuery } from '../../core/DomQuery.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { WindowKeys } from '../../core/WindowKeys.js';
+import { DestinationLookup } from './DestinationLookup.js';
 import { IdleTimer } from './IdleTimer.js';
 import { LittleArcBar } from './LittleArcBar.js';
 import { commandFor } from './LittleArcKeyMap.js';
@@ -8,6 +9,7 @@ import type { LittleArcCommand } from './LittleArcKeyMap.js';
 import { adoptMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import type { LittleArcSettings } from './LittleArcSettings.js';
+import { PopupChrome } from './PopupChrome.js';
 
 const REGISTRY_ATTEMPTS = 30;
 const REGISTRY_INTERVAL_MS = 100;
@@ -51,16 +53,17 @@ export class PopupWindowRole {
       return;
     }
     const tabId = tab.id;
-    const close = (): void => this.#close();
     const host = DomQuery.require(document, selectors.get('browser'));
-    const bar = new LittleArcBar({ document, host, tabs, search, tabId, onKeep: (): void => this.#keep(tabId), logger });
+    const platform = document.defaultView?.navigator.platform ?? '';
+    const address = tab.url ?? tab.pendingUrl ?? '';
+    const bar = new LittleArcBar({ document, host, tabs, search, tabId, address, platform, onKeep: (): void => this.#keep(tabId), logger });
     bar.mount();
     this.#cleanups.push(() => bar.unmount());
-    const commands: Record<LittleArcCommand, () => void> = { close, keep: () => this.#keep(tabId), clear: () => bar.clear() };
-    const keys = new WindowKeys(document, (event): LittleArcCommand | null => commandFor(event, bar.isEmpty), (command): void => commands[command]());
-    keys.attach();
-    this.#cleanups.push(() => keys.detach());
-    this.#watchIdle(tabId, close);
+    this.#frame(bar);
+    this.#listenToKeys(bar, tabId);
+    this.#watchIdle(tabId, (): void => this.#close());
+    const { runtime } = this.#context;
+    bar.setDestination(await new DestinationLookup(runtime, logger).ask());
   }
 
   /**
@@ -69,6 +72,24 @@ export class PopupWindowRole {
   public stop(): void {
     this.#cleanups.forEach((cleanup) => cleanup());
     this.#cleanups = [];
+  }
+
+  #frame(bar: LittleArcBar): void {
+    const { document, selectors, tabs, logger } = this.#context;
+    const element = bar.element;
+    if (element === null) {
+      return;
+    }
+    const chrome = new PopupChrome(document, selectors, logger);
+    chrome.mark(element);
+    this.#cleanups.push(tabs.onUpdated(() => chrome.mark(element)), () => chrome.unmark());
+  }
+
+  #listenToKeys(bar: LittleArcBar, tabId: number): void {
+    const commands: Record<LittleArcCommand, () => void> = { close: () => this.#close(), keep: () => this.#keep(tabId), clear: () => bar.revert() };
+    const keys = new WindowKeys(this.#context.document, (event): LittleArcCommand | null => commandFor(event, bar.isEmpty), (command): void => commands[command]());
+    keys.attach();
+    this.#cleanups.push(() => keys.detach());
   }
 
   async #waitForMark(): Promise<boolean> {
