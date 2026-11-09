@@ -53,9 +53,8 @@ The user takes a tab from the tab list or a pinned row and releases it over the 
   elements under the pointer (the tiles inside the Favorites grid included), and the final `mouseup` has the Favorites
   tile as target. The drop on the grid is therefore detected by a hit test on the pointer, the way 012 does it; the tiles
   and the grid do not yet carry the drop mark. The dragged tab is the one under the first `mousedown`.
-- [ ] What does Vivaldi itself do when a tab is released on the Favorites grid (pin it, move it, nothing), and does the
-  module have to stop that? Probe requested from Tore.
-- [ ] Vivaldi stores Favorites as bookmarks; confirm which folder 001 uses before the design.
+- [x] What does Vivaldi itself do when a tab is released on the Favorites grid? Nothing (probe, Tore, 2026-11-09): the
+  tab was released over the area and stayed as it was, so the module does not have to stop a native action.
 
 ## References
 
