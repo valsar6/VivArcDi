@@ -182,3 +182,29 @@ test('ignores a copy of a folder into itself', async () => {
   assert.equal(await favorites.copy(['61'], { parentId: '61' }), 'ignored');
   assert.deepEqual(childrenOf(chrome, 'Music'), ['Radio']);
 });
+
+test('adds a link without a tab at an index or into a folder', async () => {
+  const tree = bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', [folder('32', 'Hobbies'), link('33', 'Chess', 'https://chess.com/')])])]);
+  const { chrome, tabs, created, favorites } = setup(tree);
+  assert.equal(await favorites.addLink({ title: 'Page', url: PAGE }, { index: 1 }), 'added');
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), ['Hobbies', 'Page', 'Chess']);
+  assert.equal(await favorites.addLink({ title: '', url: 'https://two.example/' }, { parentId: '32' }), 'added');
+  assert.deepEqual(childrenOf(chrome, 'Hobbies'), ['https://two.example/']);
+  assert.equal((await ownOf(tabs, 1)).bookmarkId, undefined);
+  assert.equal(created.has('500'), false);
+});
+
+test('does not add a link for an address that is not a web page', async () => {
+  const { chrome, favorites } = setup();
+  assert.equal(await favorites.addLink({ title: 'Settings', url: 'vivaldi://settings' }), 'ignored');
+  assert.deepEqual(chrome.calls, []);
+});
+
+test('logs a failed link and leaves the bookmarks as they were', async () => {
+  const { logger, warnings } = recordingLogger();
+  const { chrome, favorites } = setup(bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta')])]), undefined, logger);
+  chrome.failing.add('create');
+  assert.equal(await favorites.addLink({ title: 'Page', url: PAGE }), 'failed');
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), []);
+  assert.equal(warnings.length, 1);
+});
