@@ -47,7 +47,14 @@ The user takes a tab from the tab list or a pinned row and releases it over the 
 
 ## Open questions
 
-- [ ] Does Vivaldi's tab drag expose the dragged tab to a mod, as the panel's drag does (018 probe)? Needs a probe before the design.
+- [x] Does Vivaldi's tab drag expose the dragged tab to a mod? Partly. Probe on Vivaldi 8.2 macOS (Tore, 2026-11-09):
+  dragging a tab of the list produces no HTML5 drag event (`dragstart`, `dragover`, `drop` stay at zero), but `mousemove`
+  events with the button down reach the Vivaldi window for the whole path, `document.elementFromPoint` returns the mod's
+  elements under the pointer (the tiles inside the Favorites grid included), and the final `mouseup` has the Favorites
+  tile as target. The drop on the grid is therefore detected by a hit test on the pointer, the way 012 does it; the tiles
+  and the grid do not yet carry the drop mark. The dragged tab is the one under the first `mousedown`.
+- [ ] What does Vivaldi itself do when a tab is released on the Favorites grid (pin it, move it, nothing), and does the
+  module have to stop that? Probe requested from Tore.
 - [ ] Vivaldi stores Favorites as bookmarks; confirm which folder 001 uses before the design.
 
 ## References
