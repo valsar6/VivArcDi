@@ -1,0 +1,26 @@
+# 020 Drag a tab into the Favorites: tasks
+
+| | |
+|---|---|
+| Status | Draft |
+| Spec | [spec.md](spec.md) |
+| Design | [design.md](design.md) |
+
+Ordered, small and independently reviewable. Each task names the acceptance criteria it satisfies
+and is done when its check passes. Branch `features/drag-tab-to-favorites`, minor bump of the version.
+
+- [x] **T1.** Probes for Tore on Vivaldi's tab drag (PR #118 and
+  `pinned-regression/diagnostica-trascina-riquadro.md`). Done 2026-11-09; results in the spec.
+- [ ] **T2.** `FavoriteDrop`: add before a tile or at the end, skip pages already in the folder,
+  create the folder when missing, link and pin the tab. AC-2, AC-4.
+- [ ] **T3.** `GridDropZone` and `TabToFavorite`: hit test, gap before the target tile, HTML5 path,
+  one release per press; wired in `FavoritesGrid`. FR-1, FR-6.
+- [ ] **T4.** `LinkDropZone` in `src/core`, registered by the folders section;
+  `WorkspaceFavorites.addLink`.
+- [ ] **T5.** `TileDrag` and `FavoriteRemoval`: release over the folders, the header or the tab list;
+  tabs of other workspaces closed; bookmark removed last. AC-5, AC-6.
+- [ ] **T6.** Styles and tokens; version bump; manual and README updated (the roadmap entry moves to
+  the tab bar page); `make check`.
+- [ ] **T7.** Manual verification checklist for Tore from AC-1, AC-3, AC-7 and AC-8
+  (`pinned-regression/verifica-trascina-favorites.md` in the project files).
+- [ ] **T8.** Manual checks on macOS and Debian.
