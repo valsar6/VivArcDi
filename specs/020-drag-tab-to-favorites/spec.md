@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Draft (no open questions, awaiting Tore's approval) |
 | Phase | 1 |
 | Owner | Tore |
 | Approved | – |
@@ -61,7 +61,7 @@ The page is never lost: it always ends in the Favorites, the folders or today's 
 
 ## Open questions
 
-- [ ] Does Vivaldi's tab drag expose the dragged tab to a mod, as the panel's drag does (018 probe)? The 0.29.0 recording shows that a tab released over the grid is pinned by Vivaldi itself; the probe `pinned-regression/diagnostica-trascina-riquadro.md` logs what happens, needed before the design.
+- [x] Does Vivaldi's tab drag expose the dragged tab to a mod? Yes (probe of 2026-11-09): a tab dragged out of the list onto the grid fires an HTML5 `drop` on VivArcDi's tile with the types `vivaldi/x-tab-entries` and `text/uri-list`; today VivArcDi ignores it, so nothing happens. The tile seen in the 0.29.0 recording came from Vivaldi's own reordering: a tab moved among the pinned positions is pinned by Vivaldi in the current workspace only, which is why it was not shared and could get lost.
 - [x] Vivaldi stores Favorites as bookmarks; the folder is the `Favorites` folder of 003 (option `folder`).
 - [x] Dragging into the grid is how a tab becomes a tile, and the grid is shared by every workspace (Tore, 2026-11-09).
 - [x] Dragging a tile out: below the line a Today tab, onto the folders a link (Tore, 2026-11-09).
