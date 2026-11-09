@@ -3,6 +3,7 @@
 | | |
 |---|---|
 | Status | Approved |
+| Change request | 2026-11-09, the look of the window (section Look): Draft |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -48,13 +49,16 @@ Rejected alternatives:
 | `src/modules/littlearc/LittleArcLauncher.ts` | Shortcut, creation of the popup, registration of the mark | |
 | `src/modules/littlearc/LittleArcRegistry.ts` | Marks window ids as Little Arc in the shared store (`chrome.storage.local`) | Repository |
 | `src/modules/littlearc/AddressResolver.ts` | Turns typed text into a URL or a search | |
-| `src/modules/littlearc/LittleArcBar.ts` | The compact bar: back, reload, address field, Move to workspace | |
+| `src/modules/littlearc/LittleArcBar.ts` | The compact bar: window-button space, back, address pill, Open in button | |
+| `src/modules/littlearc/AddressDisplay.ts` | The text of the pill at rest: the host without `www.`, or nothing | |
+| `src/modules/littlearc/BackButtonState.ts` | Counts navigations of the window's tab and says when back shows | State |
+| `src/modules/littlearc/KeepLabel.ts` | "Open in" text from the workspace name and the platform | |
 | `src/modules/littlearc/IdleTimer.ts` | Closes the window after `idleCloseHours` of no interaction | |
 | `src/modules/littlearc/WorkspaceAdopter.ts` | In the main window: receives the move request, picks the destination, moves the tab | Command |
 | `src/core/BrowserWindows.ts` | Promise wrapper for `chrome.windows`: `create` with `tabId` and `type`, `getLastFocused`, `onFocusChanged`, `getCurrent`, `remove`, `update` | Adapter |
 | `src/core/WindowKeys.ts` | Key interception shared with Peek | |
 | `src/core/ShortcutKeys.ts` | `isCommandOption(event, code)`: Cmd+Opt or Ctrl+Alt plus a physical key | |
-| `src/styles/little-arc.scss` | The bar, its fit in the popup | |
+| `src/styles/little-arc.scss` | The bar, the page frame, the hidden Vivaldi header of the popup | |
 | `src/config.json` | `little-arc` options | |
 
 ## Detection rule
@@ -94,6 +98,66 @@ that receives `tabs.onCreated` checks that `tab.windowId` is its own, so only on
 No new selectors are expected. The bar's mount point is the popup's `#browser`; it is added to
 `SelectorCatalog` as `littleArcMount`.
 
+## Look (change request 2026-11-09)
+
+The bar keeps its mount point and its role; only its content and its style change. Pure logic goes in
+three small classes so it can be tested by name, the rest is CSS.
+
+**Layout.** `vivarcdi-little-arc-bar` becomes a flex row of `$little-arc-bar-height` (40 px):
+
+| Part | Element | Notes |
+|---|---|---|
+| Window-button space | empty `<span>`, `$little-arc-lights-inset` wide (78 px on macOS) | On Debian its width and side follow where Vivaldi draws its buttons (T15) |
+| Back | `<button aria-label="Back">` with an inline SVG chevron | `hidden` until `BackButtonState.visible` |
+| Address pill | `<label>` with a search icon and the `<input>` | Flexes to fill; text centred at rest, left-aligned while focused |
+| Open in | `<button>` with "Open in", `<strong>` name, `<kbd>` shortcut | Text from `KeepLabel` |
+
+The bar has `-webkit-app-region: drag`; buttons and the pill have `no-drag`, so the empty parts move the
+window (AC-17). Vivaldi's own header of the popup (title and extension row) is hidden with
+`display: none` on the selectors T15 finds; they go in `SelectorCatalog` as `popupHeader`. If T15 shows
+that the header cannot be hidden, the bar sits under it and AC-15 is reported as not met.
+
+**Address pill.** At rest the input shows `AddressDisplay.of(url)`; on `focus` it switches to the full
+URL and selects it; on `blur` or Esc with text it goes back to the host (Esc with an empty field still
+closes, FR-7). The placeholder is "Search or Enter URL…". `AddressDisplay.of` returns the host for an
+`http(s)` URL with one leading `www.` removed, and `''` for anything else (`about:blank`, the new tab
+page, invalid text).
+
+**Back.** `BackButtonState` starts hidden, and counts `tabs.onUpdated` changes of `url` for the
+window's tab after the first one; from the second address on it is visible. A page that was moved in
+from the main window with history of its own shows back from its first navigation in the window, a
+small difference accepted here. The reload button is removed; Cmd/Ctrl+R is Vivaldi's own reload
+(checked in T15).
+
+**Open in.** `KeepLabel.of(name, platform)` returns `{ prefix: 'Open in', name, shortcut }`, with
+`name` = `'workspace'` when it is empty or unknown and `shortcut` = `⌘O` on macOS, `Ctrl+O` otherwise.
+The name comes from the adopter: when the bar mounts it sends `{ type: 'little-arc:destination' }`;
+the adopter of the most recently focused normal window answers with the name of the workspace that
+FR-6 would pick (from `WorkspaceNames`) and the colors of 019 for that workspace, if any. No answer
+within 1 s leaves "Open in workspace" and the default palette.
+
+**Frame and colors.** In the popup `#browser[data-vivarcdi-little-arc]` gets the background
+`--vivarcdi-space`; the `webviewContainer` gets a padding of `$little-arc-frame` (6 px) on the left, right
+and bottom and the page gets `border-radius: $little-arc-page-radius` (8 px) with `overflow: hidden`.
+The bar sets `--vivarcdi-space-theme`, `--vivarcdi-pill-theme` and `--vivarcdi-ink-theme` on `#browser`
+from the answer, so the same variables as 028 apply; without an answer they fall back to `arclight`. The
+pill uses `--vivarcdi-veil`, the Open in button `--vivarcdi-pill`, text `--vivarcdi-ink`. In dark mode the
+veil and the pill use the dark shares of 028 (white at 12% and 18%) over a dark shade of the space
+color, with light text, the same rule the tab bar follows.
+
+**Tokens** in `_tokens.scss`: `$little-arc-bar-height: 40px`, `$little-arc-lights-inset: 78px`,
+`$little-arc-control-height: 28px`, `$little-arc-pill-radius: 8px`, `$little-arc-frame: 6px`,
+`$little-arc-page-radius: 8px`.
+
+Not reproducible in a Vivaldi popup, and what replaces it:
+
+| Arc | VivArcDi |
+|---|---|
+| Floating command bar with suggestions before the window | The window opens at once with the cursor in the pill, no suggestions |
+| Window corners, shadow, opening animation | The system's, as for any Vivaldi window |
+| Traffic lights placed inside Arc's own bar | Native buttons where macOS puts them; the bar keeps their space free |
+| Link icon, Space picker arrow, profile label | Left out (spec, open questions) |
+
 ## Configuration
 
 ```json
@@ -120,6 +184,9 @@ Percentages are clamped to 20-100. `idleCloseHours` below 0 is read as 0.
 | A legitimate tab with no opener and an `http(s)` address appears right after the app regains focus (for example a bookmark clicked in the first 100 ms) | The user would get a Little Arc window instead; `externalLinks` turns it off |
 | A website popup opened with `window.open` gets the bar | The mark in the registry decides, not the window type alone |
 | Idle timer closes a page the user is reading | Any key, pointer move or scroll in the bar or the page resets it; six hours is the Tore-approved default |
+| The popup header of Vivaldi cannot be hidden by CSS | T15 finds out; the bar then sits under it and AC-15 is reported |
+| The traffic lights move with a Vivaldi or macOS update | The inset is one token; the manual check covers AC-16 |
+| The webview does not accept a radius or padding in the popup | T15 checks the `webviewContainer` selector in the popup; without it the frame is a border of the bar's color |
 
 ## Questions for Tore
 

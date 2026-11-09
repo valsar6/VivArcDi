@@ -6,6 +6,7 @@
 | Phase | 5 |
 | Owner | Tore |
 | Approved | 2026-11-08 |
+| Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Draft |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -33,6 +34,21 @@ What follows is split by origin, so that nobody mistakes a guess for a fact.
 | With Arc as the default browser, links opened from other apps (Obsidian, Zoom) open in Little Arc | `TffkMbgsE2E` 4:22, `aq13trnsgq4` 2:56 |
 | Handy while taking notes in another app | `TffkMbgsE2E` 4:18 |
 
+**Look of the window, from the reviews** (frames in the project folder `little-arc/look/`):
+
+| Claim | Review |
+|---|---|
+| Cmd+Opt+N first shows a dark floating command bar with suggestions; after Enter the window appears with a white page area, then the page loads | `VZKHS0gBLts` 9:46 to 9:49, `TffkMbgsE2E` 4:14 to 4:17 |
+| One bar above the page: window buttons, a wide address pill with a search icon and the domain in the middle, a link icon in the pill, and on the right a button "Open in *Space* ⌘O" with a small arrow | `VZKHS0gBLts` 9:49 and 9:53, `TffkMbgsE2E` 4:22 |
+| A back arrow "‹" between the window buttons and the pill once the page has navigated | `TffkMbgsE2E` 4:22 |
+| The bar takes the color of the Space: light pink with dark text in a light Space, dark grey with light text in a dark one | `VZKHS0gBLts` 9:53, `TffkMbgsE2E` 4:22 |
+| The page sits in a thin frame with rounded corners, inside a window with macOS corners and shadow | `VZKHS0gBLts` 9:49, `TffkMbgsE2E` 4:22 |
+
+Tore's recording `Registrazione schermo 2026-11-09 alle 00.58.54.mov` (32 seconds) shows Arc's main
+window only: the Little Arc window never appears in it, so it is not a source for the look. It does
+show the frame of Arc's main window: about 9 px of the Space color around the page, page corners of
+about 5 px.
+
 **From the earlier draft of this spec, not in any review**: moving the page to a workspace with a
 button or Cmd/Ctrl+O, and closing untouched windows after six hours.
 
@@ -56,11 +72,47 @@ field focused. Typing a site name or a search and pressing Enter loads the page,
 command bar. Links opened from another app open in the same kind of window, already loading. Vivaldi's Notes panel uses the same key on its own, so `shortcuts apply` of [014](../014-arc-shortcuts/spec.md) removes it from that command (checked by Tore on 2026-11-08).
 
 **The window.** It is small, about a third of a screen, and has no tab bar, no panels and no
-workspace switcher. It has one compact bar with back, reload, the address field and one button,
-**Move to workspace**. Navigation inside it stays in it. It is a real, fully working Vivaldi window,
+workspace switcher. It has one compact bar with back, the address field and one button,
+**Open in *workspace***, laid out as described in Look. Navigation inside it stays in it. It is a real, fully working Vivaldi window,
 so extensions, passwords and cookies behave as in any other.
 
-**Keeping the page.** **Move to workspace**, or Cmd/Ctrl+O as in [Peek](../002-peek/spec.md), moves
+### Look
+
+Little Arc looks like Arc's: one slim bar above the page, in the color of the workspace, and the page
+in a thin frame of the same color. Change request of 2026-11-09: Tore liked the behavior of version 1
+but not its look (white field, a plain button, the window buttons over Back and Reload).
+
+- **One bar.** A single bar of about 40 px sits at the top of the window. Nothing else is above the
+  page: Vivaldi's own title and extension row of the popup are hidden. The bar can be dragged to move
+  the window, like a title bar.
+- **Window buttons.** The macOS window buttons stay where macOS draws them, at the left end of the bar.
+  The bar keeps that space free, so no control lies under them. On Debian the bar keeps free the place
+  where Vivaldi draws its window buttons.
+- **Back.** A back arrow "‹" follows the window buttons once the page has navigated inside the window;
+  before that it is not shown. There is no reload button: Cmd/Ctrl+R reloads, as in any window.
+- **Address pill.** A wide rounded pill takes the middle of the bar, a shade lighter than the bar, with
+  a search icon on its left. When a page is loaded it shows the host of the page in the middle, without
+  `www.`, for example `weather.com`. A click selects the full address for editing; Enter loads what
+  was typed, Esc puts the host back (or closes the window, as before, when the field is empty). While
+  the window is empty the pill has the cursor and shows the placeholder "Search or Enter URL…".
+- **Open in *workspace*.** On the right, a rounded button reads "Open in" followed by the name of the
+  destination workspace in bold and the shortcut, "⌘O" on macOS and "Ctrl+O" on Debian. When the name
+  is unknown it reads "Open in workspace". It does what Move to workspace did.
+- **Page frame.** The page sits inside a frame of the bar's color, about 6 px on the left, right and
+  bottom, with corners of about 8 px. While a page loads, the page area shows the page's own
+  background (white in most cases) and the pill already shows the host.
+- **Colors.** The bar, the frame and the pill take the colors of the destination workspace
+  ([019](../019-space-theme-color/spec.md)), or the default palette `arclight`
+  ([029](../029-arc-light-theme/spec.md)) when it has none. In dark mode they use the dark values, with
+  light text, as the tab bar does ([028](../028-arc-sidebar-look/spec.md)).
+
+Where Arc and VivArcDi differ: Arc first shows a floating command bar with suggestions and only then the
+window; VivArcDi opens the window at once with the cursor in the pill and no suggestions. The window's
+corners, shadow and opening animation are the system's. The link icon, the arrow next to "Open in" and
+the profile label of Arc's bar are not part of this change (see open questions).
+
+**Keeping the page.** **Open in *workspace*** (called **Move to workspace** before the change
+request of 2026-11-09), or Cmd/Ctrl+O as in [Peek](../002-peek/spec.md), moves
 the page to a tab of a workspace in the main window and closes Little Arc. The destination is the
 most recent workspace, or one chosen from a short list (see open questions). The tab keeps its
 history and state, as a tab moved between windows does.
@@ -87,9 +139,9 @@ questions.
   focused" event, which means the application was in the background (probes of 2026-11-08). The tab is moved into the new window, so
   the page is not loaded twice.
 - **FR-4.** The window shows no tab bar, panels or workspace switcher, only the compact bar of
-  Expected behavior. Vivaldi's `popup` window has no address field, so the module adds the compact
+  Expected behavior and Look. Vivaldi's `popup` window has no address field, so the module adds the compact
   bar itself (see the probe results).
-- **FR-5.** Move to workspace and Cmd/Ctrl+O move the page to a new tab of the destination workspace
+- **FR-5.** The Open in button and Cmd/Ctrl+O move the page to a new tab of the destination workspace
   of FR-6, activate it and close the Little Arc window.
 - **FR-6.** The destination is the most recently used workspace of the main window. WHERE
   `askWorkspace` is on, a list of workspaces replaces the shortcut and the user picks one.
@@ -98,6 +150,20 @@ questions.
 - **FR-9.** If the main window is closed when the page is moved, the module opens one first.
 - **FR-10.** Options in `config.json`: `enabled` (true), `externalLinks` (true), `askWorkspace`
   (false), `idleCloseHours` (6), `widthPercent` (34), `heightPercent` (60) of the screen.
+
+- **FR-11.** The bar is one row of about 40 px at the top of the window, with, from left to right:
+  the free space for the window buttons, back, the address pill and the Open in button. Vivaldi's own
+  title and extension row of the popup are hidden. The empty parts of the bar move the window.
+- **FR-12.** No control of the bar lies under the window buttons of macOS or of Vivaldi on Debian.
+- **FR-13.** While the field does not have the focus, the pill shows the host of the page without a
+  leading `www.`; it shows the placeholder "Search or Enter URL…" when there is no `http(s)` page. With
+  the focus it shows the full address, selected.
+- **FR-14.** The back button shows only after the page has navigated inside the window.
+- **FR-15.** The Open in button reads "Open in" with the name of the destination workspace of FR-6 and
+  the shortcut of the platform, or "Open in workspace" when the name is unknown.
+- **FR-16.** The page sits in a frame of the bar's color, about 6 px wide, with corners of about 8 px.
+- **FR-17.** Bar, frame and pill use the colors of the destination workspace (019) or the default palette
+  (029), with dark values in dark mode; sizes and colors live in `_tokens.scss`.
 
 ### Non-functional
 
@@ -122,7 +188,7 @@ questions.
 | AC-6a | THE external link detector SHALL accept an active tab with no opener and an `http(s)` address that appears as the app regains focus. | auto: `external link detector accepts a link that wakes the app` |
 | AC-6b | THE external link detector SHALL reject tabs with an opener, inactive tabs, new-tab pages and tabs created while the app was already in front. | auto: `external link detector rejects tabs that are not external links` |
 | AC-6 | WHERE `externalLinks` is off, THE module SHALL leave external links to Vivaldi. | auto: `little arc ignores external links when disabled` |
-| AC-7 | WHEN the user presses "Move to workspace" or Cmd/Ctrl+O, THE page SHALL become the active tab of the destination workspace and the window SHALL close. | manual |
+| AC-7 | WHEN the user presses the Open in button or Cmd/Ctrl+O, THE page SHALL become the active tab of the destination workspace and the window SHALL close. | manual |
 | AC-8 | THE destination picker SHALL choose the most recent workspace unless `askWorkspace` is on. | auto: `destination picker defaults to the most recent workspace` |
 | AC-9 | WHEN the user presses Cmd/Ctrl+W, or Esc in an empty address field, THE window SHALL close and no tab SHALL be created. | manual |
 | AC-10 | WHEN a window has been untouched for `idleCloseHours`, THE module SHALL close it. | auto: `idle timer closes untouched windows` |
@@ -130,6 +196,16 @@ questions.
 | AC-12 | IF the window cannot be created, THEN THE link SHALL open as without VivArcDi. | auto: `little arc falls back to the default action when the window fails` |
 | AC-13 | WHEN the module stops, THE module SHALL remove its listeners and restore the default handling. | auto: `little arc module cleans up on stop` |
 | AC-14 | WHEN the main window is closed and the user moves a page, THE module SHALL open a main window and put the tab in it. | manual |
+| AC-15 | THE Little Arc window SHALL show one bar above the page and no other row: no Vivaldi title and no extension row. | manual |
+| AC-16 | THE window buttons SHALL not overlap any control of the bar, on macOS and on Debian. | manual |
+| AC-17 | WHEN the user drags an empty part of the bar, THE window SHALL move. | manual |
+| AC-18 | THE address display SHALL show the host of an `http(s)` page without a leading `www.`, and nothing for any other address. | auto: `address display shows the host of a loaded page` |
+| AC-19 | WHEN the user clicks the address pill, THE pill SHALL show the full address selected, and WHEN the user presses Esc with text in it, THE pill SHALL show the host again. | manual |
+| AC-20 | THE back button state SHALL be hidden until the page navigates inside the window, and shown after. | auto: `back button appears after the first navigation` |
+| AC-21 | THE keep label SHALL read "Open in" with the workspace name and the platform shortcut, or "Open in workspace" without a name. | auto: `keep label names the destination workspace` |
+| AC-22 | THE page SHALL sit in a frame of the bar's color of about 6 px with rounded corners, and the bar, frame and pill SHALL take the destination workspace's colors. | manual |
+| AC-23 | WHILE Vivaldi is in dark mode, THE bar SHALL use the dark values with light text, and the text SHALL stay readable in both modes. | manual |
+| AC-24 | WHEN the user presses Cmd/Ctrl+R in a Little Arc window, THE page SHALL reload. | manual |
 
 ## Out of scope
 
@@ -186,6 +262,22 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
   different interception that this probe cannot show.
 - [x] **Detector, minimized case.** Vivaldi minimized when the link arrives. Proposal: check it on
   the manual verification of the implementation, with the detector logging what it saw.
+
+### Change request of 2026-11-09 (look)
+
+- [ ] **No reload button.** Arc's bar has none. Proposal: no button; Cmd/Ctrl+R reloads (AC-24).
+- [ ] **Colors.** Proposal: the destination workspace's colors (019), the default palette `arclight`
+  otherwise. Alternative: always the default palette.
+- [ ] **Arrow next to "Open in".** In Arc it seems to offer other Spaces (guess, not seen open).
+  Proposal: not in this change; the `askWorkspace` option stays the way to choose.
+- [ ] **Link icon and profile label in the pill.** Arc shows a link icon (probably copy link, not seen
+  used) and, in one review, a profile label "Default". Proposal: not in this change.
+- [ ] **Command bar first.** Arc opens a floating command bar with suggestions and the window only after
+  Enter. Proposal: not in this change; the window opens at once with the cursor in the pill.
+- [ ] **Window size.** In the reviews the window looks larger than a third of the screen (guess, the
+  videos are zoomed). Proposal: keep `widthPercent` 34 and `heightPercent` 60.
+- [ ] **Source.** Tore's recording of 2026-11-09 does not show the Little Arc window. Proposal: the
+  review frames are enough; Tore compares with his Arc on the manual check.
 
 ## References
 
