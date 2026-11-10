@@ -3,7 +3,6 @@
 | | |
 |---|---|
 | Status | Implemented |
-| Change request | 2026-11-10, the Little Arc key follows the option `little-arc.shortcut` (T10): Draft |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -32,11 +31,3 @@ and is done when its check passes. Branch `features/arc-shortcuts`, next minor v
   checklist and bump the version.
 - [ ] **T9 (change request 2026-11-08, Approved).** Add the two workspace rows to `shortcuts.json`, extend the table and `status` tests, add AC-19 to the manual
   checklist and bump the version. Done when `make check` passes.
-- [ ] **T10 (change request 2026-11-10, Draft).** Replace the old reservation `alt+{mod}+n` of
-  `shortcuts.json` with the Little Arc option: `ShortcutTable.load` reads `modules.little-arc.shortcut`
-  from `dist/config.json`, converts it for the platform and compares keys as a set. Satisfies AC-17.
-  Done when `test_reserved_little_arc_key_is_removed_from_other_command`,
-  `test_reserved_key_follows_the_little_arc_option`, `test_reserved_key_matches_in_any_modifier_order`,
-  `test_old_little_arc_key_is_left_to_its_command` and `test_unreadable_little_arc_option_reserves_nothing`
-  pass; `apply` prints the note about Notes; AC-18 changes in the manual checklist; bump the version
-  with the Little Arc change (005 T32). Done together with 005 T25.

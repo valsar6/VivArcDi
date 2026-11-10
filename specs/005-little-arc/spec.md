@@ -7,7 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-08 |
 | Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Approved 2026-11-09 |
-| Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-34, AC-25 to AC-47) and the shortcut as an option (FR-1, FR-10, AC-1): Draft |
+| Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-33, AC-25 to AC-43): Draft |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -28,7 +28,7 @@ What follows is split by origin, so that nobody mistakes a guess for a fact.
 
 | Claim | Review |
 |---|---|
-| Opens with Cmd+Opt+N in Arc, from any app (Slack named as an example) | `1cQlDFwE-Z0` 1:19, `Kc5GuEeZBZk` 9:04, `VZKHS0gBLts` 9:40 |
+| Opens with Cmd+Opt+N, from any app (Slack named as an example) | `1cQlDFwE-Z0` 1:19, `Kc5GuEeZBZk` 9:04, `VZKHS0gBLts` 9:40 |
 | A smaller, simpler window for a quick search: open, research, close | `Kc5GuEeZBZk` 9:08, `TffkMbgsE2E` 4:08 |
 | You start typing a site name and get a mini browser with almost no UI | `VZKHS0gBLts` 9:47 |
 | It keeps unimportant tabs out of the main window ("prevents tab hoarding") | `VZKHS0gBLts` 9:40, `aq13trnsgq4` 2:56 |
@@ -39,7 +39,7 @@ What follows is split by origin, so that nobody mistakes a guess for a fact.
 
 | Claim | Review |
 |---|---|
-| Arc's Cmd+Opt+N first shows a dark floating command bar with suggestions; after Enter the window appears with a white page area, then the page loads | `VZKHS0gBLts` 9:46 to 9:49, `TffkMbgsE2E` 4:14 to 4:17 |
+| Cmd+Opt+N first shows a dark floating command bar with suggestions; after Enter the window appears with a white page area, then the page loads | `VZKHS0gBLts` 9:46 to 9:49, `TffkMbgsE2E` 4:14 to 4:17 |
 | One bar above the page: window buttons, a wide address pill with a search icon and the domain in the middle, a link icon in the pill, and on the right a button "Open in *Space* ⌘O" with a small arrow | `VZKHS0gBLts` 9:49 and 9:53, `TffkMbgsE2E` 4:22 |
 | A back arrow "‹" between the window buttons and the pill once the page has navigated | `TffkMbgsE2E` 4:22 |
 | The bar takes the color of the Space: light pink with dark text in a light Space, dark grey with light text in a dark one | `VZKHS0gBLts` 9:53, `TffkMbgsE2E` 4:22 |
@@ -56,11 +56,11 @@ follows Tore's):
 
 | What the screenshot shows | Used in |
 |---|---|
-| A floating card with rounded corners (about 20 pt) and a soft shadow, over the current content | FR-20, FR-31 |
-| First row: a search icon on the left, a large placeholder "Search or Enter URL…", a small rounded × button on the right | FR-20, FR-26 |
-| A thin divider, then a list of rows: favicon, title, and the domain in muted text after a dash | FR-22, FR-27 |
-| The selected row filled in indigo with white text, the domain in a lighter tint | FR-23, FR-31 |
-| Rows of sites (MahjongSoul, Amazon, eBay, Facebook) and a last row "Contact the Team", an action of Arc itself | FR-28, open questions |
+| A floating card with rounded corners (about 20 pt) and a soft shadow, over the current content | FR-19, FR-30 |
+| First row: a search icon on the left, a large placeholder "Search or Enter URL…", a small rounded × button on the right | FR-19, FR-25 |
+| A thin divider, then a list of rows: favicon, title, and the domain in muted text after a dash | FR-21, FR-26 |
+| The selected row filled in indigo with white text, the domain in a lighter tint | FR-22, FR-30 |
+| Rows of sites (MahjongSoul, Amazon, eBay, Facebook) and a last row "Contact the Team", an action of Arc itself | FR-27, open questions |
 
 **From the earlier draft of this spec, not in any review**: moving the page to a workspace with a
 button or Cmd/Ctrl+O, and closing untouched windows after six hours.
@@ -80,19 +80,10 @@ as intentions to confirm with Tore, not as observed behavior.
 
 ## Expected behavior
 
-**Opening.** The shortcut of the option `little-arc.shortcut` (default Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N
-on Debian; see the box below) opens Little Arc with a floating command bar, described in
-[Opening: the command bar](#opening-the-command-bar). Typing a site name or a search and pressing
-Enter opens a Little Arc window already loading the page, like Arc. Links opened from another app open
-in the same kind of window, already loading, without the bar.
-
-> **Default key, marked as the single value to change (change request 2026-11-10, Draft).**
-> `little-arc.shortcut` = **`mod+alt+shift+n`**, that is Cmd+Shift+Opt+N on macOS and
-> Ctrl+Shift+Alt+N on Debian. Tore chooses the final value; to change it, change this line and the
-> value of `little-arc.shortcut` in `src/config.json`, the only two places that state it (FR-18). Version 1 of this spec used Cmd+Opt+N, which
-> is Vivaldi's own shortcut for Notes: `shortcuts apply` of
-> [014](../014-arc-shortcuts/spec.md) used to take the key away from Notes, and with this change it
-> reserves the key of the option instead, so Notes keeps Cmd+Opt+N.
+**Opening.** The shortcut Cmd+Opt+N (Ctrl+Alt+N on Debian) opens Little Arc with a floating command bar,
+described in [Opening: the command bar](#opening-the-command-bar). Typing a site name or a search and
+pressing Enter opens a Little Arc window already loading the page, like Arc. Links opened from another
+app open in the same kind of window, already loading, without the bar. Vivaldi's Notes panel uses the same key on its own, so `shortcuts apply` of [014](../014-arc-shortcuts/spec.md) removes it from that command (checked by Tore on 2026-11-08).
 
 **The window.** It is small, about a third of a screen, and has no tab bar, no panels and no
 workspace switcher. It has one compact bar with back, the address field and one button,
@@ -216,10 +207,8 @@ questions.
 
 ### Functional
 
-- **FR-1.** A `little-arc` module opens Little Arc on the shortcut of the option `little-arc.shortcut`
-  (default `mod+alt+shift+n`: Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N on Debian; changed from Cmd+Opt+N on
-  2026-11-10, Draft): the command bar of FR-19, or, WHERE `commandBar` is off, a minimal window with the
-  address field focused.
+- **FR-1.** A `little-arc` module opens Little Arc on the shortcut `Cmd+Opt+N` / `Ctrl+Alt+N`: the
+  command bar of FR-18, or, WHERE `commandBar` is off, a minimal window with the address field focused.
 - **FR-2.** Text typed in the address field is a URL when it looks like one and a search with the
   default search engine otherwise.
 - **FR-3.** WHERE `externalLinks` is on, a link opened from another app opens in a Little Arc window
@@ -237,8 +226,8 @@ questions.
 - **FR-7.** Esc in an empty address field, and Cmd/Ctrl+W, close the window and the page with it.
 - **FR-8.** A Little Arc window left untouched for `idleCloseHours` hours is closed. `0` disables it.
 - **FR-9.** If the main window is closed when the page is moved, the module opens one first.
-- **FR-10.** Options in `config.json`: `enabled` (true), `shortcut` ("mod+alt+shift+n", FR-18),
-  `commandBar` (true, FR-19), `externalLinks` (true), `askWorkspace` (false), `idleCloseHours` (6),
+- **FR-10.** Options in `config.json`: `enabled` (true), `commandBar` (true, FR-18),
+  `externalLinks` (true), `askWorkspace` (false), `idleCloseHours` (6),
   `widthPercent` (34), `heightPercent` (60) of the screen.
 
 - **FR-11.** The bar is one row of about 40 px at the top of the window, with, from left to right:
@@ -255,63 +244,54 @@ questions.
 - **FR-17.** Bar, frame and pill use the colors of the destination workspace (019) or the default palette
   (029), with dark values in dark mode; sizes and colors live in `_tokens.scss`.
 
-Change request of 2026-11-10, the shortcut and the command bar (Draft):
+Change request of 2026-11-10, the command bar (Draft):
 
-- **FR-18.** The shortcut is one option, `little-arc.shortcut`, a string of modifiers and one key joined
-  by `+`, in lower case, in any order: the modifiers `meta` (Cmd), `ctrl`, `alt` (Option) and `shift`,
-  and `mod`, which stands for Cmd on macOS and Ctrl on Debian (the same word as `{mod}` in the
-  installer's `shortcuts.json`); the key is a letter, a digit or `f1` to `f12`. The press must have
-  exactly those modifiers. The letter and digit are matched by the physical key, because Option and
-  Shift change the character. At least one of `meta`, `ctrl`, `alt` and `mod` is required. IF the value
-  does not parse, THEN the module logs it and uses the default, which lives in `src/config.json` only
-  (the code reads it from there, it does not repeat it). The installer reads the same option to reserve
-  the key ([014](../014-arc-shortcuts/spec.md) FR-11).
-- **FR-19.** WHEN the shortcut is pressed in a normal window and `commandBar` is on, the module shows
+- **FR-18.** WHEN the shortcut is pressed in a normal window and `commandBar` is on, the module shows
   the command bar, and a second press hides it. In a Little Arc window the shortcut does nothing. IF
   the bar cannot be mounted, THEN the module opens the empty window as `commandBar` off does.
-- **FR-20.** The bar is a card in an overlay of the window's `window.html`, centered horizontally, with
+- **FR-19.** The bar is a card in an overlay of the window's `window.html`, centered horizontally, with
   its top in the upper third of the window, over a scrim that dims the page. From top to bottom: the
   field row (search icon, field with the placeholder "Search or Enter URL…", the × button), a divider,
   the list. It has rounded corners and a soft shadow. It covers no part of the window that the scrim
   does not also cover.
-- **FR-21.** The field takes the focus when the bar shows. Typing never reaches the page underneath.
+- **FR-20.** The field takes the focus when the bar shows. Typing never reaches the page underneath.
   When the bar closes the focus goes back to where it was.
-- **FR-22.** Each row, below the field row, shows a favicon, the title and, after a dash, the host
+- **FR-21.** Each row, below the field row, shows a favicon, the title and, after a dash, the host
   without `www.` in muted text. A title too long for the row is cut with an ellipsis, the host is not.
   The list has at most five rows, the first of which is the typed text row when the field has text.
-- **FR-23.** The selected row is shown in the selection color with white text. Up and Down move the
+- **FR-22.** The selected row is shown in the selection color with white text. Up and Down move the
   selection to the previous and the next row and wrap around at the ends; the pointer moving over a
   row selects it; the selection is reset to the first row when the list changes.
-- **FR-24.** WHEN Enter is pressed or a row is clicked, the module opens the selected row in a new
+- **FR-23.** WHEN Enter is pressed or a row is clicked, the module opens the selected row in a new
   Little Arc window created already loading it, then hides the bar. For the typed text row, the text is
   resolved by the address resolver of FR-2: a URL is opened by the window creation; a search is run
   with Vivaldi's default engine in the new window's tab, or with the fallback address when
   `chrome.search` is missing. IF the window cannot be created, THEN the bar closes, the error is
   logged and nothing is opened.
-- **FR-25.** IF the field is empty and the list is empty, THEN Enter does nothing.
-- **FR-26.** Esc, the × button, a click on the scrim and the shortcut again hide the bar and open
+- **FR-24.** IF the field is empty and the list is empty, THEN Enter does nothing.
+- **FR-25.** Esc, the × button, a click on the scrim and the shortcut again hide the bar and open
   nothing.
-- **FR-27.** For typed text the suggestions are the open tabs of normal windows, the bookmarks and
+- **FR-26.** For typed text the suggestions are the open tabs of normal windows, the bookmarks and
   the history, ranked by how well the title and the address match: a host or title that starts with the
   text first, then a word of the title, then any other containment, ignoring case and accents. Equal
   matches keep the order open tab, bookmark, history, then the most recent first. One row for each
   address, ignoring a trailing `/`, the fragment and a leading `www.`. Addresses that are not `http(s)`
   (`about:`, `chrome:`, `vivaldi:`, `file:`) are left out. Little Arc windows' tabs are left out.
-- **FR-28.** While the field is empty, the list shows the most visited sites (`chrome.topSites`) and,
+- **FR-27.** While the field is empty, the list shows the most visited sites (`chrome.topSites`) and,
   without them, the most recent history pages, and, without those, nothing.
-- **FR-29.** A source that is missing or fails is skipped; the failure is logged once.
-- **FR-30.** The module reads tabs, bookmarks and history in the window's own document, keeps no copy
+- **FR-28.** A source that is missing or fails is skipped; the failure is logged once.
+- **FR-29.** The module reads tabs, bookmarks and history in the window's own document, keeps no copy
   of them and sends nothing outside the browser. The module does not start in private windows (it
   never does), so the bar never reads or shows anything there.
-- **FR-31.** The bar uses a light palette: card `#f9f9f9`, selection indigo `#9095fb`, field and divider
+- **FR-30.** The bar uses a light palette: card `#f9f9f9`, selection indigo `#9095fb`, field and divider
   in neutral greys; in dark mode the dark values with light text. Sizes, colors and the scrim live in
   `_tokens.scss` (design). The selection color is the same in every workspace.
-- **FR-32.** WHEN a link from another app is opened (FR-3), or Cmd/Ctrl+W, Cmd/Ctrl+O, Esc or the Open
+- **FR-31.** WHEN a link from another app is opened (FR-3), or Cmd/Ctrl+W, Cmd/Ctrl+O, Esc or the Open
   in button is used in a Little Arc window, THE behavior SHALL be what version 1 and the look
   change describe, with no bar shown.
-- **FR-33.** The shortcut is handled in the capture phase of the window that has the focus, so Vivaldi
+- **FR-32.** The shortcut is handled in the capture phase of the window that has the focus, so Vivaldi
   does not also run a command with the same key.
-- **FR-34.** Turning the module off, or `commandBar` off, removes the bar's elements and listeners.
+- **FR-33.** Turning the module off, or `commandBar` off, removes the bar's elements and listeners.
 
 ### Non-functional
 
@@ -332,7 +312,7 @@ Change request of 2026-11-10, the shortcut and the command bar (Draft):
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHEN the user presses the shortcut of `little-arc.shortcut` (default Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N on Debian), THE module SHALL open Little Arc: the command bar, or, WHERE `commandBar` is off, a minimal window with the address field focused. Draft, 2026-11-10 | manual |
+| AC-1 | WHEN the user presses Cmd+Opt+N (Ctrl+Alt+N on Debian), THE module SHALL open Little Arc: the command bar, or, WHERE `commandBar` is off, a minimal window with the address field focused. | manual |
 | AC-2 | THE Little Arc window SHALL show no tab bar, no panels and no workspace switcher. | manual |
 | AC-3 | WHEN the user types a site name or a search and presses Enter, THE window SHALL load the matching page. | manual |
 | AC-4 | THE address resolver SHALL turn text that looks like a URL into a URL and any other text into a search. | auto: `address resolver tells URLs from searches` |
@@ -358,29 +338,25 @@ Change request of 2026-11-10, the shortcut and the command bar (Draft):
 | AC-22 | THE page SHALL sit in a frame of the bar's color of about 6 px with rounded corners, and the bar, frame and pill SHALL take the destination workspace's colors. | manual |
 | AC-23 | WHILE Vivaldi is in dark mode, THE bar SHALL use the dark values with light text, and the text SHALL stay readable in both modes. | manual |
 | AC-24 | WHEN the user presses Cmd/Ctrl+R in a Little Arc window, THE page SHALL reload. | manual |
-| AC-25 | THE shortcut option SHALL parse a string of modifiers and a key in any modifier order, with `mod` as Cmd on macOS and Ctrl on Debian, and SHALL reject an unknown word, a missing key, no modifier or two keys. | auto: `shortcut chord parses the option string` |
-| AC-26 | THE shortcut chord SHALL match a key press with exactly its modifiers and its physical key, and no other. | auto: `shortcut chord matches only its own modifiers and key` |
-| AC-27 | IF `little-arc.shortcut` is not valid, THEN THE module SHALL use the default of `config.json` and log the value. | auto: `little arc falls back to the default shortcut when the option is invalid` |
-| AC-28 | WHEN the user changes `little-arc.shortcut` in `config.json` and installs again, THE new key SHALL open Little Arc and the old one SHALL not. | manual |
-| AC-29 | WHEN the user presses the shortcut in a normal window, THE command bar SHALL appear over the page, centered horizontally in the upper third of the window, with the field focused, the placeholder "Search or Enter URL…", and a second press SHALL hide it. | manual |
-| AC-30 | THE command bar SHALL look like Arc's in the mockup `little-arc/look/barra-comandi.png`: rounded card with a soft shadow, search icon, large placeholder, rounded × button, divider, rows with favicon, title and muted host after a dash, the selected row in indigo with white text, over a dimmed page. | manual |
-| AC-31 | WHEN the user types, THE list SHALL update at every key and SHALL show at most five rows, the first being the typed text. | manual |
-| AC-32 | THE suggestion ranker SHALL put matches at the start of the host or title before matches of a word, and those before any other containment, ignoring case and accents. | auto: `suggestion ranker puts the best match first` |
-| AC-33 | THE suggestion ranker SHALL show one row for each address, ignoring a trailing slash, the fragment and `www.`, and SHALL prefer the open tab, then the bookmark, then the history entry. | auto: `suggestion ranker removes duplicate addresses` |
-| AC-34 | THE suggestion ranker SHALL leave out addresses that are not `http` or `https` and SHALL limit the list to the given number of rows. | auto: `suggestion ranker keeps web addresses and limits the list` |
-| AC-35 | WHILE the field is empty, THE list SHALL be the most visited sites, or the most recent history pages without them, or empty. | auto: `suggestion list for an empty field uses the most visited then the recent` |
-| AC-36 | THE selection cursor SHALL move up and down, wrap around at both ends, start on the first row and go back to it when the list changes. | auto: `selection cursor wraps around and resets with the list` |
-| AC-37 | WHEN the user presses Up or Down, THE selection SHALL move and the selected row SHALL show in indigo with white text; WHEN the pointer moves over a row, THAT row SHALL be selected. | manual |
-| AC-38 | WHEN Enter is pressed on the typed text row, THE controller SHALL ask the launcher to open the address that the resolver gives, or to search for the text, in a new Little Arc window. | auto: `command bar opens the typed text in little arc` |
-| AC-39 | WHEN Enter is pressed or a row is clicked on a suggestion, THE controller SHALL ask the launcher to open its address in a new Little Arc window. | auto: `command bar opens the selected suggestion in little arc` |
-| AC-40 | WHEN Esc, the × button, a click outside the card or the shortcut again closes the bar, THE controller SHALL open nothing. | auto: `command bar opens nothing when it is dismissed` |
-| AC-41 | WHEN the user presses Enter in the bar, THE Little Arc window SHALL appear already loading the page, with the bar of Look, and the command bar SHALL be gone. | manual |
-| AC-42 | WHEN the bar closes, THE page SHALL have the focus again and the dimmed scrim SHALL be gone. | manual |
-| AC-43 | IF a source of suggestions is missing or fails, THEN THE other sources SHALL still be shown and the failure SHALL be logged. | auto: `suggestion sources survive a failing source` |
-| AC-44 | IF the bar cannot be mounted or `commandBar` is off, THEN THE shortcut SHALL open the empty window as in version 1. | auto: `little arc opens the blank window when the command bar is off or cannot mount` |
-| AC-45 | WHEN a link is opened from another app, THE Little Arc window SHALL open directly, with no command bar. | manual |
-| AC-46 | WHEN the module stops, THE module SHALL remove the bar's elements and listeners. | auto: `command bar removes its elements and listeners on stop` |
-| AC-47 | THE command bar SHALL be readable in dark and light mode and SHALL not appear in a private window. | manual |
+| AC-25 | WHEN the user presses the shortcut in a normal window, THE command bar SHALL appear over the page, centered horizontally in the upper third of the window, with the field focused, the placeholder "Search or Enter URL…", and a second press SHALL hide it. | manual |
+| AC-26 | THE command bar SHALL look like Arc's in the mockup `little-arc/look/barra-comandi.png`: rounded card with a soft shadow, search icon, large placeholder, rounded × button, divider, rows with favicon, title and muted host after a dash, the selected row in indigo with white text, over a dimmed page. | manual |
+| AC-27 | WHEN the user types, THE list SHALL update at every key and SHALL show at most five rows, the first being the typed text. | manual |
+| AC-28 | THE suggestion ranker SHALL put matches at the start of the host or title before matches of a word, and those before any other containment, ignoring case and accents. | auto: `suggestion ranker puts the best match first` |
+| AC-29 | THE suggestion ranker SHALL show one row for each address, ignoring a trailing slash, the fragment and `www.`, and SHALL prefer the open tab, then the bookmark, then the history entry. | auto: `suggestion ranker removes duplicate addresses` |
+| AC-30 | THE suggestion ranker SHALL leave out addresses that are not `http` or `https` and SHALL limit the list to the given number of rows. | auto: `suggestion ranker keeps web addresses and limits the list` |
+| AC-31 | WHILE the field is empty, THE list SHALL be the most visited sites, or the most recent history pages without them, or empty. | auto: `suggestion list for an empty field uses the most visited then the recent` |
+| AC-32 | THE selection cursor SHALL move up and down, wrap around at both ends, start on the first row and go back to it when the list changes. | auto: `selection cursor wraps around and resets with the list` |
+| AC-33 | WHEN the user presses Up or Down, THE selection SHALL move and the selected row SHALL show in indigo with white text; WHEN the pointer moves over a row, THAT row SHALL be selected. | manual |
+| AC-34 | WHEN Enter is pressed on the typed text row, THE controller SHALL ask the launcher to open the address that the resolver gives, or to search for the text, in a new Little Arc window. | auto: `command bar opens the typed text in little arc` |
+| AC-35 | WHEN Enter is pressed or a row is clicked on a suggestion, THE controller SHALL ask the launcher to open its address in a new Little Arc window. | auto: `command bar opens the selected suggestion in little arc` |
+| AC-36 | WHEN Esc, the × button, a click outside the card or the shortcut again closes the bar, THE controller SHALL open nothing. | auto: `command bar opens nothing when it is dismissed` |
+| AC-37 | WHEN the user presses Enter in the bar, THE Little Arc window SHALL appear already loading the page, with the bar of Look, and the command bar SHALL be gone. | manual |
+| AC-38 | WHEN the bar closes, THE page SHALL have the focus again and the dimmed scrim SHALL be gone. | manual |
+| AC-39 | IF a source of suggestions is missing or fails, THEN THE other sources SHALL still be shown and the failure SHALL be logged. | auto: `suggestion sources survive a failing source` |
+| AC-40 | IF the bar cannot be mounted or `commandBar` is off, THEN THE shortcut SHALL open the empty window as in version 1. | auto: `little arc opens the blank window when the command bar is off or cannot mount` |
+| AC-41 | WHEN a link is opened from another app, THE Little Arc window SHALL open directly, with no command bar. | manual |
+| AC-42 | WHEN the module stops, THE module SHALL remove the bar's elements and listeners. | auto: `command bar removes its elements and listeners on stop` |
+| AC-43 | THE command bar SHALL be readable in dark and light mode and SHALL not appear in a private window. | manual |
 
 ## Out of scope
 
@@ -435,9 +411,6 @@ the probe.
 8. Does `chrome.windows.create({ url, type: 'popup' })` give a popup that loads the address at once,
    and does `chrome.search.query({ text, tabId })` work for the tab of a window the main window just
    created?
-9. In Settings > Keyboard, which command (if any) already holds Cmd+Shift+Opt+N (Ctrl+Shift+Alt+N on
-   Debian), and how does Vivaldi write a shortcut with Shift and Alt in `Preferences` (for example
-   `alt+meta+shift+n` or another order)?
 
 ## Open questions
 
@@ -480,18 +453,10 @@ the probe.
 
 Tore approved every proposal on 2026-11-09. The one on the command bar is replaced by the change request below.
 
-### Change request of 2026-11-10 (shortcut and command bar), Draft
+### Change request of 2026-11-10 (command bar), Draft
 
 Each question has a proposal; Tore approves or changes it. They block approval until ticked.
 
-- [ ] **Which key.** Cmd+Opt+N is Vivaldi's Notes shortcut. Proposal: the default
-  `mod+alt+shift+n` (Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N), one option, `little-arc.shortcut`. Tore
-  is choosing: the value is the one line marked in Expected behavior and in `src/config.json`.
-- [ ] **Notation of the option.** The code today has no notation: the key is written in
-  `MainWindowRole` as `isCommandOption(event, 'KeyN')`. Proposal: the string of FR-18, with `mod` for the
-  platform's command key and `meta`, `ctrl`, `alt`, `shift` for one exact key, parsed by a small
-  class `ShortcutChord`; Cmd and Ctrl are no longer both accepted on both systems (so that the
-  key the module handles is the key the installer frees).
 - [ ] **Sources of version 1.** Proposal: open tabs and bookmarks (available) plus history and most
   visited (if the probe says so), local only. Without a history API the bar still works with tabs and
   bookmarks.
@@ -511,7 +476,7 @@ Each question has a proposal; Tore approves or changes it. They block approval u
 - [ ] **Where the bar shows.** Proposal: only in normal windows; in a Little Arc window the shortcut does
   nothing (the window's own pill is already there).
 - [ ] **`commandBar` option.** Proposal: keep it, default true, as the way back to the empty window of
-  version 1 (and the fallback of FR-19).
+  version 1 (and the fallback of FR-18).
 - [ ] **Earlier decision.** The open question of 2026-11-09 "Command bar first: not in this change"
   is replaced by this change request.
 
@@ -520,7 +485,6 @@ Each question has a proposal; Tore approves or changes it. They block approval u
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr), sections "Little Arc" and
   "Altre feature distintive".
 - [Strategy and roadmap](https://claude.ai/artifact/4JHR28H3euKSPbQZPNhY38), phase 5.
-- [014 Arc shortcuts](../014-arc-shortcuts/spec.md): reserves the key of `little-arc.shortcut`.
 - Tore's screenshot of Arc's command bar (2026-11-10) and the mockup of ours: `little-arc/look/`.
 - [002 Peek](../002-peek/spec.md) and [015 Peek for new-tab links](../015-peek-new-tab-links/spec.md):
   keys, Expand and the page-to-tab move to reuse.

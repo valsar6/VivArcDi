@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Approved |
-| Change request | 2026-11-10, the shortcut option and the command bar (T23 to T36): Draft, nothing below starts before Tore approves the spec and the design |
+| Change request | 2026-11-10, the command bar (T23 to T34): Draft, nothing below starts before Tore approves the spec and the design |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -58,50 +58,42 @@ Change request of 2026-11-09, the look of the window (Approved by Tore 2026-11-0
   Debian, with the review frames of `little-arc/look/` to compare.
 - [ ] **T22.** Manual checks by Tore.
 
-Change request of 2026-11-10, the shortcut option and the command bar (Draft; the branch for the
+Change request of 2026-11-10, the command bar (Draft; the branch for the
 implementation is `features/little-arc-command-bar-code`, next minor version):
 
-- [ ] **T23.** Probe, run by Tore in a normal window's DevTools console, before any code: the nine
+- [ ] **T23.** Probe, run by Tore in a normal window's DevTools console, before any code: the eight
   unknowns of the spec's "Unknowns for the command bar probe" (history, topSites, bookmarks search,
   favicon in an overlay, backdrop blur over the page, focus and click in an overlay, popup created with an
-  address and search in its tab, which command holds Cmd+Shift+Opt+N and how Vivaldi writes Shift and
-  Alt in `Preferences`). Done when each answer is written in the spec's Probe results and the risk rows
-  of the design are settled. Tore also chooses the final key here.
-- [ ] **T24.** `ShortcutChord` and the `shortcut` option in `LittleArcSettings` and `config.json`,
-  `MainWindowRole` on it, `isCommandOption` no longer used. Satisfies FR-18, AC-1, AC-25, AC-26 and
-  AC-27. Done when `shortcut chord parses the option string`, `shortcut chord matches only its own
-  modifiers and key`, `little arc falls back to the default shortcut when the option is invalid` pass.
-- [ ] **T25.** Installer: reserve the key of `little-arc.shortcut` in `shortcuts apply` and `status`
-  (014 T10), `shortcuts.json` `reserved` emptied. Done when the 014 tests of T10 pass.
-- [ ] **T26.** `Suggestion`, `SuggestionSource`, `SuggestionRanker`. Satisfies AC-32, AC-33, AC-34 and
-  AC-35. Done when `suggestion ranker puts the best match first`, `suggestion ranker removes duplicate
+  address and search in its tab). Done when each answer is written in the spec's Probe results and the
+  risk rows of the design are settled.
+- [ ] **T24.** `Suggestion`, `SuggestionSource`, `SuggestionRanker`. Satisfies AC-28, AC-29, AC-30 and
+  AC-31. Done when `suggestion ranker puts the best match first`, `suggestion ranker removes duplicate
   addresses`, `suggestion ranker keeps web addresses and limits the list` and `suggestion list for an
   empty field uses the most visited then the recent` pass.
-- [ ] **T27.** `SelectionCursor`. Satisfies AC-36. Done when `selection cursor wraps around and resets
+- [ ] **T25.** `SelectionCursor`. Satisfies AC-32. Done when `selection cursor wraps around and resets
   with the list` passes.
-- [ ] **T28.** Sources: `TabSuggestions`, `BookmarkSuggestions`, `BrowserHistory` and
+- [ ] **T26.** Sources: `TabSuggestions`, `BookmarkSuggestions`, `BrowserHistory` and
   `HistorySuggestions`, `BrowserTopSites` and `TopSiteSuggestions` (the last two only where T23 says the
-  API exists), `SuggestionList` with failures skipped. Satisfies AC-43. Done when `suggestion sources
+  API exists), `SuggestionList` with failures skipped. Satisfies AC-39. Done when `suggestion sources
   survive a failing source` passes.
-- [ ] **T29.** `LittleArcLauncher.openAddress` and `openSearch`. Satisfies FR-24. Done when the launcher
+- [ ] **T27.** `LittleArcLauncher.openAddress` and `openSearch`. Satisfies FR-23. Done when the launcher
   tests pass with a fake `BrowserWindows`.
-- [ ] **T30.** `CommandBarController`. Satisfies AC-38, AC-39 and AC-40. Done when `command bar opens
+- [ ] **T28.** `CommandBarController`. Satisfies AC-34, AC-35 and AC-36. Done when `command bar opens
   the typed text in little arc`, `command bar opens the selected suggestion in little arc` and `command
   bar opens nothing when it is dismissed` pass.
-- [ ] **T31.** `CommandBarView`, `CommandBarMount`, the tokens in `_tokens.scss` and the overlay in
+- [ ] **T29.** `CommandBarView`, `CommandBarMount`, the tokens in `_tokens.scss` and the overlay in
   `little-arc.scss`, wired in `MainWindowRole` with the `commandBar` option and the fallback to the blank
-  window. Satisfies AC-29 to AC-31, AC-37, AC-41 to AC-45 and AC-47. Done when `little arc opens the
+  window. Satisfies AC-25 to AC-27, AC-33, AC-37 to AC-41 and AC-43. Done when `little arc opens the
   blank window when the command bar is off or cannot mount` and `command bar removes its elements and
   listeners on stop` pass.
-- [ ] **T32.** Version bump (minor) in `package.json`, `package-lock.json` and
+- [ ] **T30.** Version bump (minor) in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`.
-- [ ] **T33.** README (section Little Arc, the shortcut and its option, the 014 paragraph),
-  `docs/manual/little-arc.md`, `docs/manual/today-and-keyboard.md`, `docs/manual/assets.md` and
-  `docs/native-settings.md`: every mention of Cmd+Opt+N for Little Arc becomes the option's default, with
-  the mockup `little-arc/look/barra-comandi.png` in the manual. Done when no document names
-  Cmd+Opt+N for Little Arc.
-- [ ] **T34.** Add AC-28 to AC-31, AC-37, AC-41, AC-42, AC-45 and AC-47 to the manual verification
+- [ ] **T31.** README (section Little Arc: the opening with the command bar and the
+  `commandBar` option) and `docs/manual/little-arc.md`, with the mockup
+  `little-arc/look/barra-comandi.png` in the manual. The key stays Cmd+Opt+N. Done when both describe
+  the bar.
+- [ ] **T32.** Add AC-25 to AC-27, AC-33, AC-37, AC-38, AC-41 and AC-43 to the manual verification
   checklist for Tore, in Italian, macOS and Debian, with Tore's screenshot and the mockup to compare.
-- [ ] **T35.** `make check` passes.
-- [ ] **T36.** Manual checks by Tore, including the history of a real profile (speed), the focus
-  after closing, dark mode, and Notes keeping Cmd+Opt+N after `shortcuts apply`.
+- [ ] **T33.** `make check` passes.
+- [ ] **T34.** Manual checks by Tore, including the history of a real profile (speed), the focus
+  after closing, dark mode, and Cmd+Opt+N opening the bar and not Notes after `shortcuts apply`.
