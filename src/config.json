@@ -84,6 +84,10 @@
     "sidebar-look": {
       "enabled": true,
       "palette": "arclight"
+    },
+    "workspace-sync": {
+      "enabled": true,
+      "folder": "VivArcDi Sync"
     }
   }
 }

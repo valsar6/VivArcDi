@@ -23,6 +23,7 @@ const MODULE_IDS = [
   'today-archive',
   'copy-url',
   'incognito',
+  'workspace-sync',
 ];
 const WRITING_BOOKMARK_CALLS = ['create', 'update', 'move', 'remove', 'removeTree'];
 
