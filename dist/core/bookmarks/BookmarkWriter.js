@@ -35,6 +35,14 @@ class BookmarkWriter {
     return this.#call((api, done) => api.update(id, { title }, done));
   }
   /**
+   * @param id The bookmark or folder.
+   * @param description Its new free text, as Vivaldi keeps it.
+   * @returns The changed bookmark.
+   */
+  describe(id, description) {
+    return this.#call((api, done) => api.update(id, { description }, done));
+  }
+  /**
    * @param id The link, or the empty folder, to delete.
    */
   async remove(id) {

@@ -39,6 +39,13 @@ class BrowserWindows {
     return this.#call("getLastFocused", { windowTypes: types });
   }
   /**
+   * @returns The ids of the normal windows that are not private, in ascending order.
+   */
+  async normalIds() {
+    const windows = await this.#call("getAll", { windowTypes: ["normal"] });
+    return windows.filter((details) => details.incognito !== true).flatMap(({ id }) => id === void 0 ? [] : [id]).sort((left, right) => left - right);
+  }
+  /**
    * Closes a window with all its tabs.
    *
    * @param windowId Window id.

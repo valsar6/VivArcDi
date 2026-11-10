@@ -19,8 +19,9 @@ have the exact behavior.
 4. [Today tabs, archive and keyboard](today-and-keyboard.md): the daily cleanup, copy URL and Arc's shortcuts.
 5. [Little Arc](little-arc.md): a small window for a quick lookup.
 6. [Incognito](incognito.md): the private window.
-7. [What comes next](roadmap.md): the Arc features that are designed but not built yet.
-8. [Images and GIFs](assets.md): the graphic assets of this manual and the recordings still to make.
+7. [Sync between computers](sync.md): the pinned tabs of each workspace on every computer.
+8. [What comes next](roadmap.md): the Arc features that are designed but not built yet.
+9. [Images and GIFs](assets.md): the graphic assets of this manual and the recordings still to make.
 
 ## Arc features in VivArcDi
 
@@ -40,6 +41,7 @@ have the exact behavior.
 | Arc keyboard shortcuts | [Shortcuts](today-and-keyboard.md#arc-keyboard-shortcuts) | Available | [014](../../specs/014-arc-shortcuts/spec.md) |
 | Little Arc | [Little Arc](little-arc.md) | Available | [005](../../specs/005-little-arc/spec.md) |
 | Incognito window | [Incognito](incognito.md) | Available | [013](../../specs/013-incognito-mode/spec.md) |
+| Spaces and pinned tabs on every computer | [Sync](sync.md) | Available | [030](../../specs/030-workspace-sync/spec.md) |
 | One-click install, automatic re-apply | [Getting started](getting-started.md) | Available | [016](../../specs/016-plug-and-play-installer/spec.md), [017](../../specs/017-package-managers/spec.md) |
 | Arc's sidebar look | [Arc look](tab-bar.md#the-arc-look) | In progress | [028](../../specs/028-arc-sidebar-look/spec.md) |
 | Arc Light theme for all of Vivaldi | [What comes next](roadmap.md#arc-light-theme) | Planned | [029](../../specs/029-arc-light-theme/spec.md) |

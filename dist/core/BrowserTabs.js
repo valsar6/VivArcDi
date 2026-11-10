@@ -153,6 +153,20 @@ class BrowserTabs {
     onRemoved.addListener(listener);
     return () => onRemoved.removeListener(listener);
   }
+  /**
+   * Listens to `chrome.tabs.onMoved`.
+   *
+   * @param listener Called when a tab changes place inside its window.
+   * @returns A function that removes the listener.
+   */
+  onMoved(listener) {
+    const { onMoved } = this.#requireTabs();
+    if (onMoved === void 0) {
+      throw new Error("chrome.tabs.onMoved is not available");
+    }
+    onMoved.addListener(listener);
+    return () => onMoved.removeListener(listener);
+  }
   #call(method, ...args) {
     const chromeApi = this.#require();
     const tabs = this.#requireTabs();
