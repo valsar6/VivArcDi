@@ -6,6 +6,7 @@
 | Phase | 0 |
 | Owner | Tore |
 | Approved | 2026-10-29 |
+| Change request | 2026-11-10, the Little Arc key is the value of the Little Arc option `little-arc.shortcut` and no longer Cmd+Opt+N (table row, FR-11, AC-17, AC-18): Draft |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -44,7 +45,9 @@ these settings:
 | Panel | loses Cmd+P (Ctrl+P), keeps its other shortcuts |
 | Next Workspace (`COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER`) | Cmd+Opt+`]` (Ctrl+Alt+`]` on Debian) |
 | Previous Workspace (`COMMAND_WORKSPACE_SWITCH_BACK_ORDER`) | Cmd+Opt+`[` (Ctrl+Alt+`[` on Debian) |
-| Little Arc key | Cmd+Opt+N (Ctrl+Alt+N on Debian) belongs to [Little Arc](../005-little-arc/spec.md); the command that holds it, in Vivaldi the Notes panel, loses it and keeps its other shortcuts |
+| Little Arc key | The value of the option `little-arc.shortcut` of [Little Arc](../005-little-arc/spec.md), default Cmd+Shift+Opt+N (Ctrl+Shift+Alt+N on Debian); the command that holds it loses it and keeps its other shortcuts. Change request 2026-11-10, Draft: it was Cmd+Opt+N, which is Vivaldi's Notes shortcut |
+
+Change request of 2026-11-10 (Draft): Cmd+Opt+N is Vivaldi's own Notes shortcut, and VivArcDi took it from Notes for no good reason. The Little Arc key moves to the option `little-arc.shortcut` (default Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N), which the installer reads from `config.json` so that the key reserved is always the key the module handles. The old reservation `alt+{mod}+n`, already shipped in `installer/vivarcdi/shortcuts.json`, is replaced: `apply` stops removing Cmd+Opt+N from Notes. Anyone who applied the table before has Notes without its key; `apply` says so and Notes gets it back with one click in Settings > Keyboard (open questions).
 
 Change request of 2026-11-08, from Tore's check of Little Arc: Cmd+Opt+N opened Vivaldi's own Notes
 shortcut next to Little Arc. The key is reserved for VivArcDi in the data file (FR-11), so whichever
@@ -76,9 +79,14 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 - **FR-6.** The command refuses to run while a Vivaldi process is running.
 - **FR-7.** Applying twice gives the same file as applying once.
 - **FR-8.** Settings not in the table stay as they are, byte-for-byte in meaning.
-- **FR-11.** The data file also lists the keys reserved for VivArcDi modules, with the same `meta` and
-  `ctrl` choice. `apply` removes each reserved key from every command that holds it and writes it to
-  no command; `status` reports a profile as different while a command still holds one.
+- **FR-11.** The keys reserved for VivArcDi modules are removed by `apply` from every command that
+  holds them and written to no command; `status` reports a profile as different while a command still
+  holds one. Change request 2026-11-10 (Draft): the Little Arc key is not a literal of the data file
+  but the option `little-arc.shortcut` of the `config.json` that `install` copies (default
+  `mod+alt+shift+n`), turned into Vivaldi's notation with `mod` as `meta` on macOS and `ctrl` on Debian.
+  Keys are compared as a set of modifiers and a key, whatever their order. IF `config.json` cannot be
+  read or the option does not parse, THEN no Little Arc key is reserved and the command says so. The
+  reserved list of the data file stays for other modules and no longer holds `alt+{mod}+n`.
 - **FR-10.** WHERE `uninstall --restore-shortcuts` is given, `uninstall` also runs `shortcuts restore`; without the option it leaves shortcuts alone.
 - **FR-9.** `shortcuts` runs as the user. On Debian it refuses `sudo`, because the profile belongs to
   the user.
@@ -107,11 +115,11 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 | AC-11 | THE installer SHALL find the profiles of stable and snapshot builds on both systems. | auto: `test_profiles_are_found_on_both_systems` |
 | AC-12 | WHEN `status` runs, THE installer SHALL report for each profile whether the table matches. | auto: `test_status_reports_match_per_profile` |
 | AC-16 | WHERE `uninstall --restore-shortcuts` is given, THE installer SHALL restore the saved `Preferences`; without it, THE installer SHALL leave shortcuts unchanged. | auto: `test_uninstall_restores_shortcuts_only_when_asked` |
-| AC-17 | WHEN a command other than the table's holds the Little Arc key, THE installer SHALL remove that key from it and leave its other shortcuts. | auto: `test_reserved_little_arc_key_is_removed_from_other_command` |
+| AC-17 | WHEN a command other than the table's holds the Little Arc key, THE installer SHALL remove that key from it and leave its other shortcuts. Change request 2026-11-10, Draft: the key is the value of `little-arc.shortcut`, in any modifier order, and no other key is reserved for Little Arc; in particular Cmd+Opt+N stays with Notes. | auto: `test_reserved_little_arc_key_is_removed_from_other_command`, `test_reserved_key_follows_the_little_arc_option`, `test_reserved_key_matches_in_any_modifier_order`, `test_old_little_arc_key_is_left_to_its_command`, `test_unreadable_little_arc_option_reserves_nothing` |
 | AC-13 | WHEN Vivaldi restarts after `apply`, THE keyboard SHALL follow the table and Settings > Keyboard SHALL show it. | manual |
 | AC-14 | WHEN Vivaldi restarts after `restore`, THE keyboard SHALL be as before `apply`. | manual |
 | AC-15 | WHEN Vivaldi restarts after `apply`, Quick Commands SHALL open links in a new tab. | manual |
-| AC-18 | WHEN Vivaldi restarts after `apply`, Cmd+Opt+N SHALL open Little Arc and not the Notes panel. | manual |
+| AC-18 | WHEN Vivaldi restarts after `apply`, THE Little Arc key (the value of `little-arc.shortcut`, default Cmd+Shift+Opt+N, Ctrl+Shift+Alt+N on Debian) SHALL open Little Arc and nothing else, and Cmd+Opt+N SHALL still be Notes'. Change request 2026-11-10, Draft | manual |
 | AC-19 | WHEN Vivaldi restarts after `apply`, Cmd+Opt+`]` and Cmd+Opt+`[` SHALL switch to the next and the previous workspace. | manual |
 
 ## Out of scope
@@ -137,6 +145,8 @@ no key is bound twice. `install` never touches shortcuts unless asked.
 - [x] **Where do the settings live?** Confirmed by Tore's probe (2026-10-29, Vivaldi on macOS): `vivaldi.actions` is a list with one object; each command is a key `COMMAND_<NAME>` holding `{"shortcuts": [...]}`, with `gestures` kept beside it. The option is `vivaldi.quick_commands.open_url_in_new_tab` (boolean). Command ids: `COMMAND_NEW_TAB`, `COMMAND_SHOW_QUICK_COMMANDS`, `COMMAND_SAVE_PAGE`, `COMMAND_MAIN_TOGGLE_TAB_BAR`, `COMMAND_ADD_BOOKMARK`, `COMMAND_PIN_TAB`, `COMMAND_PRINT_PAGE`, `COMMAND_MAIN_TOGGLE_PANEL_TOGGLE`.
 - [x] **Does Vivaldi accept an edited file?** The file has no `protection` hash, so nothing signs the keys. Whether Vivaldi keeps an edit at startup is checked by AC-13; if it reverts, the spec drops back to a manual guide.
 - [x] **Removing a shortcut.** Agreed by Tore 2026-10-29. Tore's file shows a removed command as `{}` or without `shortcuts`, and an emptied one as `"shortcuts": []`. Proposal: write `"shortcuts": []`, keep `gestures`, and let AC-13 prove it.
+- [ ] **Notes after an earlier `apply` (change request 2026-11-10, Draft).** The profiles of people who ran `apply` before this change have Notes with an empty shortcut list. Proposal: `apply` prints a note naming the old key; Notes gets Cmd+Opt+N back by hand in Settings > Keyboard, or with `shortcuts restore` followed by `apply`. The installer does not guess which command it was (it does not know the Notes command id).
+- [ ] **Where the installer reads the key (2026-11-10, Draft).** Proposal: `dist/config.json` under `payload_root()`, the file `install` copies, so a user who edits `config.json` and runs `install` and `shortcuts apply` again stays consistent.
 - [x] **Print and Panel.** Decided by Tore 2026-10-29: Print gets Cmd+P, the Panel loses it.
 - [x] **Command names.** Decided by Tore 2026-10-29: "Tab Bar" is the command that shows the workspace area (the tab bar); Panel is not given a new key. The probe still confirms the exact command ids.
 - [x] **Conflicts.** Decided by Tore 2026-10-29: remove the old shortcuts that Cmd+T, Cmd+S, Cmd+D and Cmd+P would override, as listed in the table.

@@ -4,6 +4,7 @@
 |---|---|
 | Status | Approved |
 | Change request | 2026-11-09, the look of the window (section Look): Approved 2026-11-09 |
+| Change request | 2026-11-10, the command bar and the shortcut option (sections Opening: the command bar and The shortcut option): Draft, written for Tore to read with the spec; nothing here is built until the spec is approved |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -22,7 +23,8 @@ A window knows which role it has from the window type (`popup`) and from a mark 
 writes in the shared store before it creates the window, so a popup opened by a website with
 `window.open` is left alone.
 
-Opening from a shortcut creates an empty popup and focuses the bar's field. Opening from an
+Opening from the shortcut shows the command bar (change request of 2026-11-10, below); with
+`commandBar` off it creates an empty popup and focuses the bar's field, as in version 1. Opening from an
 external link takes the tab Vivaldi already created and moves it into a new popup with
 `chrome.windows.create({ tabId, type: 'popup' })`, so the page is loaded once and keeps its
 history. The tab shows in the main window for a moment first (spec, open questions).
@@ -46,7 +48,7 @@ Rejected alternatives:
 | `src/modules/littlearc/LittleArc.ts` | The module; starts the launcher or the bar by window type | Facade |
 | `src/modules/littlearc/ExternalLinkDetector.ts` | Decides whether a created tab is a link from another app, from the tab, the focus history and the time | Strategy: the rule is replaceable |
 | `src/modules/littlearc/FocusHistory.ts` | Remembers the last window focus events, with times, from `chrome.windows.onFocusChanged` | Observer |
-| `src/modules/littlearc/LittleArcLauncher.ts` | Shortcut, creation of the popup, registration of the mark | |
+| `src/modules/littlearc/LittleArcLauncher.ts` | Creation of the popup (empty, with an address, or with a tab), registration of the mark | |
 | `src/modules/littlearc/LittleArcRegistry.ts` | Marks window ids as Little Arc in the shared store (`chrome.storage.local`) | Repository |
 | `src/modules/littlearc/AddressResolver.ts` | Turns typed text into a URL or a search | |
 | `src/modules/littlearc/LittleArcBar.ts` | The compact bar: window-button space, back, address pill, Open in button | |
@@ -57,7 +59,7 @@ Rejected alternatives:
 | `src/modules/littlearc/WorkspaceAdopter.ts` | In the main window: receives the move request, picks the destination, moves the tab | Command |
 | `src/core/BrowserWindows.ts` | Promise wrapper for `chrome.windows`: `create` with `tabId` and `type`, `getLastFocused`, `onFocusChanged`, `getCurrent`, `remove`, `update` | Adapter |
 | `src/core/WindowKeys.ts` | Key interception shared with Peek | |
-| `src/core/ShortcutKeys.ts` | `isCommandOption(event, code)`: Cmd+Opt or Ctrl+Alt plus a physical key | |
+| `src/core/ShortcutKeys.ts` | `isCommandOption(event, code)`: Cmd+Opt or Ctrl+Alt plus a physical key; kept for other callers, no longer used by Little Arc | |
 | `src/styles/little-arc.scss` | The bar, the page frame, the hidden Vivaldi header of the popup | |
 | `src/config.json` | `little-arc` options | |
 
@@ -77,9 +79,10 @@ that receives `tabs.onCreated` checks that `tab.windowId` is its own, so only on
 
 ## Vivaldi interface
 
-- **Shortcut.** `keydown` on `Cmd+Opt+N` (`event.code === 'KeyN'`, because Option changes
-  `event.key` on macOS) or `Ctrl+Alt+N`, in the capture phase like `PeekKeys`, so Vivaldi does not
-  also handle it. Handled only by the window that has the focus.
+- **Shortcut.** `keydown` matched by the `ShortcutChord` of the option `little-arc.shortcut` (default
+  `mod+alt+shift+n`; the key is compared with `event.code`, because Option changes `event.key` on
+  macOS), in the capture phase like `PeekKeys`, so Vivaldi does not also handle it. Handled only by the
+  window that has the focus. Version 1 hard-coded `Cmd+Opt+N` in `MainWindowRole`.
 - **Popup.** `chrome.windows.create({ type: 'popup', width, height, left, top })`, sizes from
   `widthPercent` and `heightPercent` of `screen.availWidth` and `screen.availHeight`, centred.
 - **Bar.** A fixed element at the top of `#browser` in the popup, `vivarcdi-little-arc-bar`. The
@@ -153,12 +156,156 @@ Not reproducible in a Vivaldi popup, and what replaces it:
 
 | Arc | VivArcDi |
 |---|---|
-| Floating command bar with suggestions before the window | The window opens at once with the cursor in the pill, no suggestions |
+| Floating command bar with suggestions before the window | The command bar of the change request of 2026-11-10, over the Vivaldi window in front |
 | Window corners, shadow, opening animation | The system's, as for any Vivaldi window |
 | Traffic lights placed inside Arc's own bar | Native buttons where macOS puts them; the bar keeps their space free |
 | Link icon, Space picker arrow, profile label | Left out (spec, open questions) |
 
+
+## The shortcut option (change request 2026-11-10)
+
+Today the key is written in code (`ShortcutKeys.isCommandOption(event, 'KeyN')` in `MainWindowRole`);
+there is no notation to reuse, `LittleArcKeyMap` only maps Esc, Cmd/Ctrl+W and Cmd/Ctrl+O inside the
+popup and `LittleArcLauncher` does not read keys. The new notation is the one of the installer's
+`shortcuts.json` and of Vivaldi's own `Preferences` (`alt+meta+]`), in lower case.
+
+**Default, one marked place:** `src/config.json`, `modules.little-arc.shortcut` = `"mod+alt+shift+n"`
+(Tore's choice, the box of the spec). The code has no literal of its own if the build can import
+`config.json` (to check in the task); if it cannot, `LITTLE_ARC_DEFAULTS` mirrors the value, as it
+does for the other options, and the test `little arc default shortcut equals the one in config.json`
+(part of AC-27) fails when the two differ. If Tore picks another key, only that line and the line of
+the spec change.
+
+| Class | Role | Pattern |
+|---|---|---|
+| `src/modules/littlearc/ShortcutChord.ts` | `ShortcutChord.parse(text, platform)` gives a chord (`meta`, `ctrl`, `alt`, `shift` flags and a key code) or `null`; `matches(event)` is true for exactly those modifiers and the physical key | Value object |
+| `src/modules/littlearc/LittleArcSettings.ts` | `shortcut: ShortcutChord`: the option parsed, the default used and one warning logged when it does not parse | |
+| `src/modules/littlearc/MainWindowRole.ts` | Passes `settings.shortcut.matches` to `WindowKeys` instead of `isCommandOption` | |
+
+Parsing rules (FR-18): split on `+`, trim, lower case; words `meta`, `ctrl`, `alt`, `shift`, `mod` set a
+modifier (`mod` is `meta` when `platform` is macOS, `ctrl` otherwise); the last word is the key: one
+letter (`KeyA`..`KeyZ`), one digit (`Digit0`..`Digit9`) or `f1`..`f12`; any other word, a missing key,
+a repeated modifier, two keys, or no modifier among `meta`, `ctrl`, `alt` (Shift alone is not enough)
+gives `null`. The platform is read from `navigator.platform` as the module already does for the Open in
+label (`KeepLabel`).
+
+**The installer follows the option.** `ShortcutTable.load` gets the key from the same string: it reads
+`modules.little-arc.shortcut` from the `config.json` that `install` copies (`dist/config.json` under
+`payload_root()`), converts it to Vivaldi's notation for the platform (`mod` to `meta` or `ctrl`, same
+words, no order assumed) and uses it as the reserved key instead of the fixed `"alt+{mod}+n"` of
+`shortcuts.json`, whose `reserved` list becomes empty. A key is compared as a set of modifiers plus the
+key, so `alt+meta+shift+n` and `meta+alt+shift+n` are the same key, whichever order Vivaldi writes
+(question 9 of the probe). If `config.json` cannot be read or the option does not parse, the installer
+reserves nothing and says so, rather than guessing. Notes is no longer touched.
+
+## Opening: the command bar (change request 2026-11-10)
+
+The bar lives in the normal window's `window.html`, next to Peek's overlay. It is added by
+`MainWindowRole`, which keeps the launcher, and removed on stop. The pure logic is in small classes with
+`auto:` tests; the views are checked by hand.
+
+| Class or file | Role | Pattern |
+|---|---|---|
+| `src/modules/littlearc/commandbar/Suggestion.ts` | Type: `{ url, title, host, source }`, `source` one of `tab`, `bookmark`, `history`, `top` | Value object |
+| `.../SuggestionSource.ts` | Interface: `suggest(text, limit): Promise<Suggestion[]>`; `''` asks for the empty-field list | Strategy |
+| `.../TabSuggestions.ts` | Reads `chrome.tabs.query({})` through `BrowserTabs`, leaves out Little Arc windows' tabs (registry) | Adapter |
+| `.../BookmarkSuggestions.ts` | Reads `chrome.bookmarks` through `BrowserBookmarks` (tree walk, or `search` if T23 proves it) | Adapter |
+| `.../HistorySuggestions.ts` | `chrome.history.search({ text, maxResults })` through a new `src/core/BrowserHistory.ts` | Adapter |
+| `.../TopSiteSuggestions.ts` | `chrome.topSites.get` through a new `src/core/BrowserTopSites.ts` | Adapter |
+| `.../SuggestionRanker.ts` | Pure: merges the sources' lists, drops non-web addresses, removes duplicates by normalized address, scores matches, sorts, cuts to the limit (FR-27, AC-32 to AC-35) | Strategy |
+| `.../AddressKey.ts` use | Reuses `src/core/AddressKey.ts` for the normalized address if it fits; otherwise a small `normalizedAddress` function next to the ranker (DRY: one of the two) | |
+| `.../SelectionCursor.ts` | Pure: index, `up()`, `down()`, `reset()`, wraps around (AC-36) | State |
+| `.../SuggestionList.ts` | Collects the sources (failures skipped and logged once), calls the ranker, builds the rows: the typed text row first, then suggestions | Facade |
+| `.../CommandBarController.ts` | Pure of the DOM: open or closed, the text, the list, the cursor; `submit()` asks the launcher to open the typed text or the selected row; `dismiss()` opens nothing (AC-38 to AC-40) | State, Command |
+| `.../CommandBarView.ts` | The DOM: scrim, card, field row, divider, rows, × button; listens and calls the controller | Observer |
+| `.../CommandBarMount.ts` | Adds the view to `#browser` and removes it; reports failure to `MainWindowRole`, which then opens the blank window | |
+| `src/modules/littlearc/LittleArcLauncher.ts` | New `openAddress(url)` and `openSearch(text)`: `windows.create({ url, type: 'popup', ... })`, and for a search a blank popup then `BrowserSearch.run(text, tabId)` on its first tab, or `BrowserSearch.fallbackAddress` | |
+| `src/styles/little-arc.scss` | The overlay: scrim, card, rows, selection (new block next to the bar's) | |
+
+**Flow of Enter.** `CommandBarView` -> `CommandBarController.submit()` -> `AddressResolver.resolve`
+(typed text row) or the row's url -> `LittleArcLauncher.openAddress` / `openSearch` -> the popup role
+starts as for any Little Arc window. The controller closes the bar before it calls the launcher, so a
+slow window creation never leaves the bar up; an error is logged and the bar stays closed (FR-24).
+
+**Layout.** `#browser > .vivarcdi-command-bar-scrim` (fixed, covers the window, a click closes it) holds
+`.vivarcdi-command-bar` (the card). Card, from top: `-field` row (search icon, `<input>`, × button),
+a 1 px divider, a `role="listbox"` list of `role="option"` rows. The card is centered with
+`left: 50%; transform: translateX(-50%)` and `top: $command-bar-top` (18vh), which puts it in the upper
+third. The selected row has `aria-selected="true"`. The favicon is `chrome://favicon/size/16@2x/<url>`,
+as `LinkIcon` does, with a lettered tile when it fails. Rows with a title longer than the row use
+`text-overflow: ellipsis` on the title only, the host has `flex: none`.
+
+**Focus.** The view stores `document.activeElement` when it shows and focuses it back when it closes,
+or the active tab's webview if the stored element is gone (question 6 of the probe). The scrim handles
+`pointerdown` to close; `keydown` for Up, Down, Enter and Esc is handled on the field, with `stopPropagation`
+so the page and Vivaldi never see it. Keys are not given to `WindowKeys` while the bar is open, except
+the shortcut itself, which toggles.
+
+**Tokens** in `_tokens.scss`, sized from Tore's screenshot (a card of 980 by 656 px, scaled to 0.6):
+
+| Token | Value | From the screenshot |
+|---|---|---|
+| `$command-bar-width` | `580px` (max `90vw`) | card 980 px wide |
+| `$command-bar-top` | `18vh` | upper third |
+| `$command-bar-radius` | `24px` | about 40 px corner |
+| `$command-bar-row-height` | `54px` (pitch 60) | rows of 90 px, gap of 10 |
+| `$command-bar-row-radius` | `12px` | selected row's corner |
+| `$command-bar-inset` | `12px` | row inset from the card |
+| `$command-bar-field-height` | `98px` | field row above the divider |
+| `$command-bar-icon` | `24px` | favicon tile |
+| `$command-bar-close-size` | `28px`, radius `8px` | × button, about 48 px |
+| `$command-bar-field-font` | `20px` | placeholder |
+| `$command-bar-row-font` | `15px` | row text |
+| `$command-bar-card` | `#f9f9f9` | card |
+| `$command-bar-divider` | `#e0e0e0` | divider |
+| `$command-bar-close-fill` | `#e7e7e7` | × button |
+| `$command-bar-selected` | `#9095fb` | selected row (FR-31) |
+| `$command-bar-host` | `#a8a8a8`, and `rgba(255,255,255,.65)` on the selected row | host text |
+| `$command-bar-scrim` | `rgba(0,0,0,.18)`, `blur(6px)` if T23 allows | dimmed page |
+| `$command-bar-shadow` | `0 18px 50px rgba(0,0,0,.28)` | soft shadow |
+
+Dark mode uses a dark card, light text and the same indigo, written next to the light values with the
+same `prefers-color-scheme` rule the other overlays follow.
+
+**Configuration.**
+
+```json
+"little-arc": {
+  "enabled": true,
+  "shortcut": "mod+alt+shift+n",
+  "commandBar": true,
+  "externalLinks": true,
+  "askWorkspace": false,
+  "idleCloseHours": 6,
+  "widthPercent": 34,
+  "heightPercent": 60
+}
+```
+
+`shortcut` is the default key of the spec's box. `commandBar` is read like the other booleans (`=== true`).
+
+**Not reproducible, and what replaces it** (spec, "What cannot be reproduced"): Arc's bar floats over
+any app; ours exists only inside a Vivaldi window that is in front. The closest alternative is the
+follow-up global shortcut (an OS hook that raises Vivaldi, then this same bar).
+
+### Risks of the command bar
+
+| Risk | Mitigation |
+|---|---|
+| `chrome.history` or `chrome.topSites` is not defined in the interface document | T23 finds out; the source is skipped (FR-29) and the bar works with tabs and bookmarks |
+| The overlay cannot take the keyboard focus from the page, or cannot give it back | T23, questions 6 and 7; fallback is to focus the active tab through `chrome.tabs.update` on close |
+| A click on the scrim does not reach the document over a webview | The scrim sits in the window's DOM above the webview container; T23 question 7; fallback is Esc and × only, AC-29 is reported |
+| `backdrop-filter` does not blur the page | Dim only; the blur is optional |
+| The new default key is already bound in Vivaldi | T23 question 9; `shortcuts apply` frees it, and the capture-phase handler takes it first |
+| A history of tens of thousands of pages makes the list slow | At most 20 results per source (NFR-7), ranking over the merged list; measured in the manual check |
+| Favicons are slow or missing | A lettered tile; the list never waits for icons |
+| The popup created with an address flashes empty | Accepted as for the external-link flow; measured in the manual check |
+| The installer cannot read `config.json` | It reserves nothing and says so; AC-17 of 014 is tested with a fake file |
+| Users who applied the shortcuts before this change have Notes without its key | `apply` prints a note; one click in Settings > Keyboard puts it back (014, open questions) |
+
 ## Configuration
+
+Before the change request of 2026-11-10:
 
 ```json
 "little-arc": {
@@ -177,7 +324,7 @@ Percentages are clamped to 20-100. `idleCloseHours` below 0 is read as 0.
 
 | Risk | Mitigation |
 |---|---|
-| Cmd+Opt+N may already be a Vivaldi command | The capture-phase handler takes it first; the verification checks that the original command is gone only in the active window |
+| The shortcut may already be a Vivaldi command (Cmd+Opt+N was Notes) | The capture-phase handler takes it first; the default is now Cmd+Shift+Opt+N and `shortcuts apply` reserves the option's key |
 | `chrome.runtime.sendMessage` between two `window.html` documents may not arrive | Probe it in T1; fallback is a key in `chrome.storage.local` watched with `onChanged` |
 | `chrome.search` may be missing from the interface | `AddressResolver` asks Vivaldi's default engine when `chrome.search.query` exists; otherwise it uses the default engine address stored in Vivaldi's prefs; T1 finds out which |
 | The tab flashes in the main window before moving | Accepted in version 1, measured in the manual check |

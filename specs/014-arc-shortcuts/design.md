@@ -3,6 +3,7 @@
 | | |
 |---|---|
 | Status | Implemented |
+| Change request | 2026-11-10, the Little Arc key follows `little-arc.shortcut` (section Change of 2026-11-10): Draft |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -88,6 +89,19 @@ Not touched: no selector, no `window.html` change. Profile folders:
 Two rows are added to `shortcuts.json` `commands`: `COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER` = `["alt+{mod}+]"]` and
 `COMMAND_WORKSPACE_SWITCH_BACK_ORDER` = `["alt+{mod}+["]` (the form Vivaldi saved in Tore's probe, `alt+meta+]`). On Debian `{mod}` is
 `ctrl`. No code changes: the conflict rule already removes these keys from other commands. Tests: the table and `status` tests get the two rows (AC-19 is manual).
+
+## Change of 2026-11-10: the Little Arc key (Draft)
+
+`shortcuts.json` had `"reserved": ["alt+{mod}+n"]`, which took Cmd+Opt+N from Vivaldi's Notes. The list
+is emptied. `ShortcutTable.load` also reads `modules.little-arc.shortcut` from `dist/config.json`
+(`payload_root()`, the file `install` copies) and adds it to `reserved`: `mod` becomes the platform's
+modifier (`meta` or `ctrl`), the other words stay. `claimed_keys` and the conflict rule compare keys as
+`frozenset(modifiers) + key` instead of the raw string, so `alt+meta+shift+n` and `meta+alt+shift+n` are
+one key whichever order Vivaldi writes. A missing or unparsable option reserves nothing and `apply`
+and `status` print a line saying so. A small `Chord` value object in `preferences.py` does the parsing;
+the same rules as `ShortcutChord` of 005 (modifiers `meta`, `ctrl`, `alt`, `shift`, `mod`, one key),
+tested with the same cases so the two parsers agree. Nothing is written for the reserved key, only
+removed, so the order Vivaldi uses on disk does not matter for writing.
 
 ## Configuration
 
