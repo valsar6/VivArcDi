@@ -4,6 +4,8 @@ const PRIMARY_BUTTON = 0;
 class TabPointerDrag {
   #deps;
   #press = null;
+  #last = null;
+  #serial = 0;
   #onDown = (event) => this.#down(event);
   #onMove = (event) => this.#move(event);
   #onUp = (event) => this.#up(event);
@@ -35,11 +37,20 @@ class TabPointerDrag {
     this.#deps.document.removeEventListener("mouseup", this.#onUp, true);
     this.#end();
   }
+  /**
+   * @returns The tab under the last button press and the number of that press; null when the last press was not on a tab. It stays after the release, for drags that end without a mouse event.
+   */
+  get lastPress() {
+    return this.#last;
+  }
   #down(event) {
     this.#press = null;
+    this.#last = null;
     const target = event.target;
     const tabId = event.button === PRIMARY_BUTTON && target?.closest?.(this.#deps.wrapperSelector) != null ? TabSlot.idOf(target, this.#deps.wrapperSelector) : null;
     if (tabId !== null) {
+      this.#serial += 1;
+      this.#last = { tabId, serial: this.#serial };
       this.#press = { tabId, x: event.clientX, y: event.clientY, dragging: false };
     }
   }

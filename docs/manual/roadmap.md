@@ -26,16 +26,6 @@ grain dial. Switching workspace switches the color.
 
 ![Mockup: Edit Theme Color in the space header menu, then three colors](images/mockups/theme-color.gif)
 
-## Drag a tab into the Favorites
-
-Proposed, [spec 020](../../specs/020-drag-tab-to-favorites/spec.md).
-
-Drag a tab onto the Favorites grid to make it a Favorite, dropped between two tiles to choose its
-place. Drag a tile out of the grid to remove the Favorite and keep the page as a Today tab. Tiles can be
-reordered by dragging.
-
-![Mockup: a Today tab dragged between two tiles becomes a Favorite](images/mockups/drag-tab-to-favorites.gif)
-
 ## Auto-hide tab bar
 
 Proposed, [spec 021](../../specs/021-auto-hide-tab-bar/spec.md).

@@ -47,6 +47,31 @@ class WorkspaceFavorites {
     }
   }
   /**
+   * Adds a link of the root of the active workspace that no tab stands for: a bookmark with a
+   * title and an address, for a page that is not open. The base and workspace folders are created
+   * when they do not exist. An address that is not `http` or `https` is ignored.
+   *
+   * @param page The title and the address.
+   * @param place A folder and a position; by default the end of the root.
+   * @returns What happened.
+   */
+  async addLink({ title, url }, { parentId, index } = {}) {
+    if (AddressKey.from(url) === null) {
+      return "ignored";
+    }
+    try {
+      const folderId = parentId ?? await this.#rootId();
+      if (folderId === null) {
+        return "ignored";
+      }
+      await this.#deps.writer.create({ parentId: folderId, index, title: title === "" ? url : title, url });
+      return "added";
+    } catch (error) {
+      this.#deps.logger.warn("could not add the link to the workspace favorites", error);
+      return "failed";
+    }
+  }
+  /**
    * Creates a folder named `Untitled` at the end of the root of the active workspace, creating the
    * base and workspace folders first when they do not exist.
    *

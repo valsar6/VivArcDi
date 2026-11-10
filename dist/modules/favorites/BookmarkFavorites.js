@@ -55,6 +55,12 @@ class BookmarkFavorites {
     return this.active ? this.#view.count : 0;
   }
   /**
+   * @returns The element of the grid, whether or not it is in the window.
+   */
+  get element() {
+    return this.#view.element;
+  }
+  /**
    * Reads the folder and starts following bookmarks and tabs.
    */
   async start() {

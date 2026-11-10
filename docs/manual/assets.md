@@ -21,7 +21,7 @@ VivArcDi that still have to be made on a real Vivaldi.
 | `images/mockups/incognito.png` | Mockup | The incognito tab bar | [Incognito](incognito.md) |
 | `images/mockups/peek-split.gif` | Mockup | Peek from a pinned tab, then Split | [Peek](peek.md) |
 | `images/mockups/sidebar-look.gif` | Mockup | Row hover, then the palettes powder, lagoon and arclight | [Tab bar](tab-bar.md#the-arc-look) |
-| `images/mockups/drag-tab-to-favorites.gif` | Mockup | A Today tab dragged into the Favorites (spec 020) | [Roadmap](roadmap.md#drag-a-tab-into-the-favorites) |
+| `images/mockups/drag-tab-to-favorites.gif` | Mockup | A Today tab dragged into the Favorites (spec 020) | [Favorites](tab-bar.md#favorites) |
 | `images/mockups/theme-color.gif` | Mockup | Edit Theme Color with three colors (spec 019) | [Roadmap](roadmap.md#theme-color-per-space) |
 | `images/mockups/pinned-and-space-menus.gif` | Mockup | Pinned tab menu and space header menu (specs 019, 026, 027) | [Roadmap](roadmap.md#rename-pinned-tabs) |
 

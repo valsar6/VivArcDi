@@ -1,0 +1,115 @@
+import { TabData } from "../../core/TabData.js";
+import { TabDataWriter } from "../../core/TabDataWriter.js";
+class FavoriteRemoval {
+  #deps;
+  #writer;
+  /**
+   * Takes a Favorite out of the grid and keeps its page, as Arc does. Released over the folders or
+   * the space header, the page becomes a link of the workspace; released over the tab list, it
+   * becomes a Today tab at the row under the pointer. The tab of the Favorite in the active
+   * workspace is the page; without one the page is opened or linked from its address. Its tabs in
+   * other workspaces are closed so the tile is gone everywhere. The bookmark is removed last, so
+   * a failure leaves the Favorite where it was.
+   *
+   * @param dependencies Everything it collaborates with.
+   */
+  constructor(dependencies) {
+    this.#deps = dependencies;
+    this.#writer = TabDataWriter.of(dependencies.tabs);
+  }
+  /**
+   * Marks the place under the pointer while a tile is dragged.
+   *
+   * @param x Horizontal position of the pointer in the window.
+   * @param y Vertical position of the pointer in the window.
+   */
+  over(x, y) {
+    const { zone, today } = this.#deps;
+    const place = this.#placeAt(x, y);
+    zone.mark(place?.kind === "link" ? place.target : null);
+    if (place?.kind === "today") {
+      today.mark(x, y);
+    } else {
+      today.clear();
+    }
+  }
+  /**
+   * Removes the marks.
+   */
+  clear() {
+    this.#deps.zone.clear();
+    this.#deps.today.clear();
+  }
+  /**
+   * @param favoriteId The Favorite whose tile was released.
+   * @param x Horizontal position of the pointer in the window.
+   * @param y Vertical position of the pointer in the window.
+   */
+  async release(favoriteId, x, y) {
+    const place = this.#placeAt(x, y);
+    if (place === null) {
+      return;
+    }
+    try {
+      const { title, url } = await this.#deps.writer.get(favoriteId);
+      if (url === void 0) {
+        return;
+      }
+      const own = (await this.#deps.links.snapshot()).linked.get(favoriteId)?.id;
+      const others = await this.#otherTabs(favoriteId, own);
+      if (!await this.#keepPage(place, own, { title, url })) {
+        this.#deps.logger.warn(`could not keep the page of the Favorite "${title}": the Favorite stays`);
+        return;
+      }
+      await Promise.all(others.map((tabId) => this.#deps.tabs.remove(tabId)));
+      await this.#deps.writer.remove(favoriteId);
+    } catch (error) {
+      this.#deps.logger.warn("could not take the Favorite out of the grid", error);
+    }
+  }
+  #placeAt(x, y) {
+    const target = this.#deps.zone.at(x, y);
+    if (target !== null) {
+      return { kind: "link", target };
+    }
+    const today = this.#deps.today.at(x, y);
+    return today === null ? null : { kind: "today", target: today };
+  }
+  async #otherTabs(favoriteId, own) {
+    const tabs = await this.#deps.tabs.query({});
+    return tabs.flatMap((tab) => tab.id !== void 0 && tab.id !== own && TabData.ownOf(tab).favoriteId === favoriteId ? [tab.id] : []);
+  }
+  async #keepPage(place, own, page) {
+    if (own !== void 0) {
+      await this.#release(own);
+    }
+    if (place.kind === "link") {
+      return this.#deps.zone.drop(place.target, own === void 0 ? page : { tab: await this.#deps.tabs.get(own) });
+    }
+    if (own === void 0) {
+      return (await this.#deps.tabs.create({ url: page.url, active: false })).id !== void 0;
+    }
+    await this.#moveToRow(own, place.target.rowTabId);
+    return true;
+  }
+  async #release(tabId) {
+    await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { favoriteId: void 0, pinnedUrl: void 0 }));
+    await this.#deps.tabs.update(tabId, { pinned: false });
+  }
+  async #moveToRow(tabId, rowTabId) {
+    if (rowTabId === null) {
+      return;
+    }
+    try {
+      const row = await this.#deps.tabs.get(rowTabId);
+      if (row.pinned !== true && row.index !== void 0) {
+        await this.#deps.tabs.move(tabId, { index: row.index });
+      }
+    } catch (error) {
+      this.#deps.logger.warn("could not move the tab to the place of the drop", error);
+    }
+  }
+}
+export {
+  FavoriteRemoval
+};

@@ -60,6 +60,12 @@ class PinnedFavorites {
     return this.#view.count;
   }
   /**
+   * @returns The element of the grid, whether or not it is in the window.
+   */
+  get element() {
+    return this.#view.element;
+  }
+  /**
    * Reads the pinned tabs and starts following the tabs.
    */
   async start() {

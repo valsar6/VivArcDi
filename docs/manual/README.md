@@ -44,7 +44,7 @@ have the exact behavior.
 | Arc's sidebar look | [Arc look](tab-bar.md#the-arc-look) | In progress | [028](../../specs/028-arc-sidebar-look/spec.md) |
 | Arc Light theme for all of Vivaldi | [What comes next](roadmap.md#arc-light-theme) | Planned | [029](../../specs/029-arc-light-theme/spec.md) |
 | Theme color per space | [What comes next](roadmap.md#theme-color-per-space) | Proposed | [019](../../specs/019-space-theme-color/spec.md) |
-| Drag a tab into the Favorites | [What comes next](roadmap.md#drag-a-tab-into-the-favorites) | Proposed | [020](../../specs/020-drag-tab-to-favorites/spec.md) |
+| Drag a tab into the Favorites | [Favorites](tab-bar.md#favorites) | Available | [020](../../specs/020-drag-tab-to-favorites/spec.md) |
 | Sidebar that hides and shows at the edge | [What comes next](roadmap.md#auto-hide-tab-bar) | Proposed | [021](../../specs/021-auto-hide-tab-bar/spec.md) |
 | Split view by dragging a tab | [What comes next](roadmap.md#split-view-by-drag) | Proposed | [022](../../specs/022-split-from-drag/spec.md) |
 | Command Bar with tab actions | [What comes next](roadmap.md#command-panel) | Proposed | [023](../../specs/023-command-panel/spec.md) |

@@ -6,6 +6,7 @@ import { Module } from "../../core/Module.js";
 import { TabUnloader } from "../../core/TabUnloader.js";
 import { BookmarkFavorites } from "./BookmarkFavorites.js";
 import { FavoriteTagger } from "./FavoriteTagger.js";
+import { GridDragging } from "./GridDragging.js";
 import { GridLayout } from "./GridLayout.js";
 import { MiddleClickUnload } from "./MiddleClickUnload.js";
 import { PinnedFavorites } from "./PinnedFavorites.js";
@@ -40,6 +41,7 @@ class FavoritesGrid extends Module {
   #hiddenTabs = null;
   #hiddenMarker = null;
   #fromPinned = null;
+  #dragging = null;
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
    * With `chrome.bookmarks` and `chrome.tabs`, the Favorites are the links of a bookmark folder,
@@ -48,11 +50,13 @@ class FavoritesGrid extends Module {
    * while the folder is missing or has no links, and their slots are hidden from the list, so
    * Vivaldi's own group of pinned tabs never shows. Without `chrome.tabs`, the first
    * pinned tabs are laid out as a grid in Vivaldi's own list. Tiles of unloaded tabs are dimmed,
-   * and a middle click unloads a tile instead of closing it.
+   * and a middle click unloads a tile instead of closing it. A tab of the list released over
+   * the bookmark tiles becomes a Favorite, and a tile dragged out of them leaves the Favorites and
+   * keeps its page as a folder link or a Today tab.
    *
    * @param context What the module may use.
    */
-  async start({ document, selectors, logger, options, tabs, bookmarks }) {
+  async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter }) {
     const settings = { ...FavoritesGrid.defaults, ...options };
     this.#settings = settings;
     this.#document = document;
@@ -82,6 +86,7 @@ class FavoritesGrid extends Module {
     await this.#unloadedTabs?.start().catch((error) => logger.error("Could not read unloaded tabs", error));
     await this.#fromPinned?.start().catch((error) => logger.error("Could not read the pinned tabs", error));
     await this.#startBookmarks(tabs, bookmarks, logger);
+    this.#startDragging(tabs, bookmarkWriter, logger);
   }
   /**
    * Removes the grid and every listener, leaving Vivaldi's tab bar as it was.
@@ -100,6 +105,7 @@ class FavoritesGrid extends Module {
     this.#unloadedTabs = null;
   }
   #stopBookmarks() {
+    this.#dragging?.stop();
     this.#fromBookmarks?.stop();
     this.#fromPinned?.stop();
     this.#hiddenMarker?.stop();
@@ -157,6 +163,14 @@ class FavoritesGrid extends Module {
       onChange: () => this.#refresh?.request()
     });
     await this.#fromBookmarks.start().catch((error) => logger.error("Could not read the Favorites folder", error));
+  }
+  #startDragging(tabs, writer, logger) {
+    const favorites = this.#fromBookmarks;
+    if (favorites === null || !writer.available || this.#document === null || this.#selectors === null) {
+      return;
+    }
+    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, favorites, pinned: this.#fromPinned });
+    this.#dragging.start();
   }
   #update() {
     const tagger = this.#tagger;
