@@ -16,12 +16,7 @@ import { settle } from '../reopen/fakes.js';
 const catalog = new SelectorCatalog({ browser: '#browser', tabListHost: '.list' }, 'test');
 const inWorkspace = (id: number): string => JSON.stringify({ workspaceId: id });
 
-class PinnedTabs extends FolderTabs {
-  public async discard(tabId: number): Promise<chrome.tabs.Tab> {
-    this.calls.push(['discard', tabId]);
-    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
-  }
-}
+class PinnedTabs extends FolderTabs {}
 
 interface Setup {
   dom: DomDocument;

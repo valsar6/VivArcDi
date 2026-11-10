@@ -38,3 +38,23 @@ test('keeps the new tab when the workspace cannot be written', async () => {
   assert.equal(created.id, 100);
   assert.deepEqual(tabs.actions()[1], ['update', 100, { vivExtData: JSON.stringify({ workspaceId: 'work' }) }]);
 });
+
+test('opens a pinned tab in the background, in its workspace, and unloads it', async () => {
+  const tabs = new FolderTabs();
+  const created = await new WorkspaceTabs(tabs, silentLogger()).openPinned(URL, '7', { pinnedUrl: URL }, 3);
+  assert.equal(created.id, 100);
+  assert.deepEqual(tabs.actions(), [
+    ['create', { url: URL, active: false, pinned: true, windowId: 3 }],
+    ['update', 100, { vivExtData: JSON.stringify({ workspaceId: 7, vivarcdi: { pinnedUrl: URL } }) }],
+    ['discard', 100],
+  ]);
+});
+
+test('opens a pinned tab in the current window and keeps it when it cannot be written or unloaded', async () => {
+  const tabs = new FolderTabs();
+  tabs.failing.add('update');
+  const created = await new WorkspaceTabs(tabs, silentLogger()).openPinned(URL, 'work');
+  assert.equal(created.id, 100);
+  assert.deepEqual(tabs.actions()[0], ['create', { url: URL, active: false, pinned: true }]);
+  assert.deepEqual(tabs.actions()[2], ['discard', 100]);
+});
