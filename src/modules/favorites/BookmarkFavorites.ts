@@ -89,6 +89,13 @@ export class BookmarkFavorites implements TileSource {
   }
 
   /**
+   * @returns The element of the grid, whether or not it is in the window.
+   */
+  public get element(): HTMLElement {
+    return this.#view.element;
+  }
+
+  /**
    * Reads the folder and starts following bookmarks and tabs.
    */
   public async start(): Promise<void> {

@@ -45,6 +45,15 @@ $folder-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 $tiles: '[data-vivarcdi-tiles]';
 $own-tile: '[data-vivarcdi-tile]';
 $tile-current: '[data-vivarcdi-current]';
+$drop-gap: '[data-vivarcdi-drop-gap]';
+$dragging: '[data-vivarcdi-dragging]';
+$drop-today: '[data-vivarcdi-drop-today]';
+$dragging-opacity: 0.4;
+$gap-border-width: 1.5px;
+$gap-border-tint: 55%;
+$gap-tint: 10%;
+$today-outline-width: 2px;
+$today-outline-tint: 55%;
 $hidden-slot: '[data-vivarcdi-hidden]';
 $away: '[data-vivarcdi-away]';
 $pinned-last: '[data-vivarcdi-pinned-last]';

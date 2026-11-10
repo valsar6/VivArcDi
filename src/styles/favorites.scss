@@ -184,3 +184,26 @@
     filter: saturate($unloaded-saturation);
   }
 }
+
+#{$root} #{$tiles} > #{$drop-gap} {
+  box-sizing: border-box;
+  height: var(--vivarcdi-favorites-tile-height, #{$tile-height});
+  border: $gap-border-width dashed color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$gap-border-tint}, transparent);
+  border-radius: var(--vivarcdi-radius);
+  background-color: color-mix(in srgb, var(--colorFg, #fff) #{$gap-tint}, transparent);
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+}
+
+#{$root} #{$tiles} > #{$own-tile} {
+  -webkit-app-region: no-drag;
+}
+
+#{$root} #{$tiles} > #{$dragging} {
+  opacity: $dragging-opacity;
+}
+
+#{$root} #{$drop-today} {
+  outline: $today-outline-width solid color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$today-outline-tint}, transparent);
+  outline-offset: -$today-outline-width;
+}

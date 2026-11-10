@@ -20,6 +20,13 @@ interface Press {
   dragging: boolean;
 }
 
+export interface PressedTab {
+  /** The tab under the last press. */
+  tabId: number;
+  /** Counts the presses, so one press can be told from the next. */
+  serial: number;
+}
+
 export type PointerEventData = Pick<MouseEvent, 'button' | 'buttons' | 'clientX' | 'clientY' | 'target'>;
 
 const DRAG_DISTANCE_PX = 6;
@@ -28,6 +35,8 @@ const PRIMARY_BUTTON = 0;
 export class TabPointerDrag {
   #deps: PointerDragDependencies;
   #press: Press | null = null;
+  #last: PressedTab | null = null;
+  #serial = 0;
   #onDown = (event: Event): void => this.#down(event as MouseEvent);
   #onMove = (event: Event): void => this.#move(event as MouseEvent);
   #onUp = (event: Event): void => this.#up(event as MouseEvent);
@@ -63,11 +72,21 @@ export class TabPointerDrag {
     this.#end();
   }
 
+  /**
+   * @returns The tab under the last button press and the number of that press; null when the last press was not on a tab. It stays after the release, for drags that end without a mouse event.
+   */
+  public get lastPress(): PressedTab | null {
+    return this.#last;
+  }
+
   #down(event: PointerEventData): void {
     this.#press = null;
+    this.#last = null;
     const target = event.target as Element | null;
     const tabId = event.button === PRIMARY_BUTTON && target?.closest?.(this.#deps.wrapperSelector) != null ? TabSlot.idOf(target, this.#deps.wrapperSelector) : null;
     if (tabId !== null) {
+      this.#serial += 1;
+      this.#last = { tabId, serial: this.#serial };
       this.#press = { tabId, x: event.clientX, y: event.clientY, dragging: false };
     }
   }
