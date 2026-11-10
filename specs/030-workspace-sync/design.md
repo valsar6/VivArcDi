@@ -2,7 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
+| Approved | 2026-11-10 |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was approved on 2026-11-10. It says **how**; the spec says **what**.
