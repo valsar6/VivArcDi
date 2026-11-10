@@ -75,11 +75,19 @@ have no bookmark on the first computer, and address keys already match tabs in 0
 | `src/modules/workspacesync/WindowOwner.ts` | Tells whether this window is the owner | |
 | `src/modules/workspacesync/MissingSpaces.ts` | Names workspaces missing here, once | |
 | `src/modules/workspacesync/WorkspaceSettings.ts` | Per-workspace settings in the store | Repository |
+| `src/modules/workspacesync/SyncPass.ts` | One merge pass over every workspace | Template method |
+| `src/modules/workspacesync/SyncNames.ts` | Store folder name of a workspace, `Tabs` outside any | |
+| `src/modules/workspacesync/Debounce.ts` | The 500 ms trigger delay | |
 | `src/core/bookmarks/BookmarkWriter.ts` | Gains `describe(id, description)` | |
-| `src/core/WorkspaceTabs.ts` | Gains `openPinned` | |
+| `src/core/WorkspaceTabs.ts` | Gains `openPinned`, which writes the own page with the workspace in one write | |
+| `src/core/BrowserWindows.ts`, `BrowserTabs.ts`, `WorkspaceNames.ts` | Gain `normalIds`, `onMoved`, `idOf` | |
 
 `PinnedMerge` has no browser dependency, so AC-1 to AC-8 are mostly tested on it with plain lists;
 `PinnedApplier` and `SyncStore` are tested with the fake tabs and bookmarks the other modules use.
+
+Notes from the build: tabs linked to a Favorite are left out of the copy (the Favorites folder already
+syncs them); the base is saved only after the store and the tabs both changed, so a half-applied run
+is repeated, not read as a removal; a title change alone is not a change.
 
 ## Vivaldi interface
 
