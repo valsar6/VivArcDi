@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft (no open questions, awaiting Tore's approval) |
+| Status | Approved |
 | Phase | 1 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-09 (PR #119) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
