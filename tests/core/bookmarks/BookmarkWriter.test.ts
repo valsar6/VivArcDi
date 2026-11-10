@@ -43,6 +43,14 @@ test('creates, renames and removes a link', async () => {
   assert.equal((await chrome.writer.children('10')).length, 1);
 });
 
+test('describes a bookmark without changing its title', async () => {
+  const chrome = new WritableChrome(bookmarkTree([folder('10', 'Hobbies', [link('11', 'Old', 'https://a.example/')])]));
+  const described = await chrome.writer.describe('11', '{"themeColor":"#336699"}');
+  assert.equal(described.description, '{"themeColor":"#336699"}');
+  assert.equal(described.title, 'Old');
+  assert.equal((await chrome.writer.get('11')).title, 'Old');
+});
+
 test('rejects when Vivaldi reports an error and keeps working afterwards', async () => {
   const chrome = new WritableChrome(bookmarkTree([]));
   chrome.failing.add('create');

@@ -84,6 +84,14 @@ export class WorkspaceNames {
   }
 
   /**
+   * @param name The name of a workspace.
+   * @returns Its id as `TabData.of` returns it, or null when no workspace has that name; the first one in Vivaldi's order when several do.
+   */
+  public idOf(name: string): string | null {
+    return [...this.#workspaces].find(([, entry]) => entry.name === name)?.[0] ?? null;
+  }
+
+  /**
    * The format of the icon is not known: it is returned as Vivaldi stores it, and the caller
    * decides whether it can be shown.
    *

@@ -4,6 +4,8 @@ export interface BookmarkNode {
   /** The folder that holds it; absent on the root. */
   parentId?: string | undefined;
   title: string;
+  /** Vivaldi keeps a free text on every bookmark; absent when empty. */
+  description?: string | undefined;
   /** Present on links, absent on folders. */
   url?: string | undefined;
   /** Present on folders, in Vivaldi's order. */

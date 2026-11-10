@@ -11,11 +11,17 @@ export interface NewBookmark {
   url?: string | undefined;
 }
 
+export interface BookmarkChanges {
+  title?: string;
+  /** Vivaldi's free text of a bookmark. */
+  description?: string;
+}
+
 export interface WritableBookmarksApi {
   getTree: (callback: (tree: BookmarkNode[]) => void) => void;
   getChildren: (id: string, callback: (children: BookmarkNode[]) => void) => void;
   create: (details: NewBookmark, callback: (node: BookmarkNode) => void) => void;
-  update: (id: string, changes: { title: string }, callback: (node: BookmarkNode) => void) => void;
+  update: (id: string, changes: BookmarkChanges, callback: (node: BookmarkNode) => void) => void;
   remove: (id: string, callback: () => void) => void;
   removeTree: (id: string, callback: () => void) => void;
   get: (id: string, callback: (nodes: BookmarkNode[]) => void) => void;
@@ -66,6 +72,15 @@ export class BookmarkWriter {
    */
   public update(id: string, title: string): Promise<BookmarkNode> {
     return this.#call((api, done) => api.update(id, { title }, done));
+  }
+
+  /**
+   * @param id The bookmark or folder.
+   * @param description Its new free text, as Vivaldi keeps it.
+   * @returns The changed bookmark.
+   */
+  public describe(id: string, description: string): Promise<BookmarkNode> {
+    return this.#call((api, done) => api.update(id, { description }, done));
   }
 
   /**

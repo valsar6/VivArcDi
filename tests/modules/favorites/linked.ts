@@ -9,11 +9,6 @@ export const own = (data: Record<string, unknown>, favoriteId?: string, pinnedUr
 
 /** Folder tabs with `discard` and a parsed read of `vivExtData`. */
 export class LinkingTabs extends FolderTabs {
-  public async discard(tabId: number): Promise<chrome.tabs.Tab> {
-    this.calls.push(['discard', tabId]);
-    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
-  }
-
   public extData(tabId: number): Record<string, unknown> {
     return JSON.parse(this.tabs.get(tabId)?.vivExtData ?? '{}') as Record<string, unknown>;
   }

@@ -612,6 +612,29 @@ Vivaldi's own `+` button in the tab bar is hidden.
 | `enabled` | `true` | Set to `false` and Vivaldi looks as it does without the module |
 | `palette` | `arclight` | Colors of a workspace without a color of its own: `arclight` (a coral-to-aqua gradient behind the tab bar and around the page, with white pill and dark text), `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon` |
 
+## Workspace sync
+
+Keeps the pinned tabs of each workspace the same on every computer with the same Vivaldi account,
+through Vivaldi Sync alone ([spec 030](specs/030-workspace-sync/spec.md)). VivArcDi mirrors the pinned
+tabs of each workspace, in order, in the bookmark folder `VivArcDi Sync`, which Vivaldi Sync carries,
+and merges the mirror with the tabs after every change:
+
+- A tab pinned on one computer opens, not loaded, as a pinned tab of the workspace with the same name on
+  the other. A tab unpinned or closed on one computer is closed on the other, unless it is the active
+  tab or shows another page than its own: then it is only unpinned.
+- Workspaces are matched by name. VivArcDi does not create workspaces: when the other computer has one
+  this computer lacks, a message names it once.
+- The settings that VivArcDi keeps for a workspace are kept in the same folder.
+- Favorites and bookmark folders already sync as bookmarks. Today tabs, their archive and the view
+  states of the tab bar stay on each computer.
+- Only one window of the browser merges, so two windows never open the same tab twice. A private window
+  neither reads nor writes the folder.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `enabled` | `true` | Set to `false` and the module neither reads nor writes the sync folder |
+| `folder` | `VivArcDi Sync` | The title of the bookmark folder that carries the data |
+
 ## Roadmap
 
 | Phase | Content |

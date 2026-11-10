@@ -108,6 +108,11 @@ export class FolderTabs {
     return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
   }
 
+  public async discard(tabId: number): Promise<chrome.tabs.Tab> {
+    this.calls.push(['discard', tabId]);
+    return { ...this.tabs.get(tabId) } as chrome.tabs.Tab;
+  }
+
   public async reload(tabId: number): Promise<void> {
     this.calls.push(['reload', tabId]);
   }
@@ -228,7 +233,8 @@ export class WritableChrome implements WriterHost {
       update: (id, changes, callback): void =>
         this.#answer(`update ${id}`, callback, () => {
           const node = findNode(this.tree, id) as BookmarkNode;
-          node.title = changes.title;
+          node.title = changes.title ?? node.title;
+          node.description = changes.description ?? node.description;
           return node;
         }),
       get: (id, callback): void => nodeAnswer('get', id, callback, (node) => ({ id: node.id, title: node.title, url: node.url, parentId: this.#parentOf(this.tree, node.id)?.id })),
