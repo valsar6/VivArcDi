@@ -3,6 +3,7 @@ import type { ChromeApi } from './BrowserTabs.js';
 export interface WindowDetails {
   id?: number | undefined;
   type?: string | undefined;
+  incognito?: boolean | undefined;
 }
 
 export interface NewWindow {
@@ -65,6 +66,17 @@ export class BrowserWindows {
   }
 
   /**
+   * @returns The ids of the normal windows that are not private, in ascending order.
+   */
+  public async normalIds(): Promise<number[]> {
+    const windows = await this.#call<WindowDetails[]>('getAll', { windowTypes: ['normal'] });
+    return windows
+      .filter((details) => details.incognito !== true)
+      .flatMap(({ id }) => (id === undefined ? [] : [id]))
+      .sort((left, right) => left - right);
+  }
+
+  /**
    * Closes a window with all its tabs.
    *
    * @param windowId Window id.
@@ -89,7 +101,7 @@ export class BrowserWindows {
     return () => event.removeListener(listener);
   }
 
-  #call<T>(method: 'create' | 'getCurrent' | 'getLastFocused' | 'remove', ...args: unknown[]): Promise<T> {
+  #call<T>(method: 'create' | 'getAll' | 'getCurrent' | 'getLastFocused' | 'remove', ...args: unknown[]): Promise<T> {
     const windows = this.#windows;
     const call = windows?.[method];
     if (windows === null || call === undefined) {

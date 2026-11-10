@@ -21,6 +21,8 @@ export type TabCreatedListener = (tab: chrome.tabs.Tab) => void;
 
 export type TabRemovedListener = (tabId: number) => void;
 
+export type TabMovedListener = (tabId: number, info: chrome.tabs.OnMovedInfo) => void;
+
 export interface ChromeEvent<Listener> {
   addListener(listener: Listener): void;
   removeListener(listener: Listener): void;
@@ -31,6 +33,7 @@ export type TabsApi = Record<TabsMethod, (...args: unknown[]) => void> & {
   onActivated?: ChromeEvent<TabActivatedListener> | undefined;
   onCreated?: ChromeEvent<TabCreatedListener> | undefined;
   onRemoved?: ChromeEvent<TabRemovedListener> | undefined;
+  onMoved?: ChromeEvent<TabMovedListener> | undefined;
 };
 
 export type RuntimeMessageListener = (message: unknown) => void;
@@ -47,6 +50,7 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
   windows?:
     | {
         create: (...args: unknown[]) => void;
+        getAll?: ((...args: unknown[]) => void) | undefined;
         getCurrent?: ((...args: unknown[]) => void) | undefined;
         getLastFocused?: ((...args: unknown[]) => void) | undefined;
         remove?: ((...args: unknown[]) => void) | undefined;
@@ -227,6 +231,21 @@ export class BrowserTabs {
     }
     onRemoved.addListener(listener);
     return () => onRemoved.removeListener(listener);
+  }
+
+  /**
+   * Listens to `chrome.tabs.onMoved`.
+   *
+   * @param listener Called when a tab changes place inside its window.
+   * @returns A function that removes the listener.
+   */
+  public onMoved(listener: TabMovedListener): () => void {
+    const { onMoved } = this.#requireTabs();
+    if (onMoved === undefined) {
+      throw new Error('chrome.tabs.onMoved is not available');
+    }
+    onMoved.addListener(listener);
+    return () => onMoved.removeListener(listener);
   }
 
   #call<T>(method: TabsMethod, ...args: unknown[]): Promise<T> {

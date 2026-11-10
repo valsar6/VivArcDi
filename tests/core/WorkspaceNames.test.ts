@@ -89,3 +89,13 @@ test('answers the icon of a workspace as Vivaldi stores it', async () => {
   assert.equal(changes, 2);
   names.stop();
 });
+
+test('finds the id of a workspace from its name', async () => {
+  const api = new FakePrefsApi();
+  api.values.set(LIST, [CASETTA, WORK]);
+  const names = new WorkspaceNames(new BrowserPrefs(api), () => undefined, recordingLogger().logger);
+  await names.start();
+  assert.equal(names.idOf('Work'), String(WORK.id));
+  assert.equal(names.idOf('Missing'), null);
+  names.stop();
+});
