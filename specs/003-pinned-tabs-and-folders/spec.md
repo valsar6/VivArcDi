@@ -109,6 +109,8 @@ row stays, dimmed, and the last used tab becomes active, as the middle click of 
 | AC-17 | WHEN Tore presses Cmd/Ctrl+W on a Favorite or pinned tab or clicks its close button, THE tile or row SHALL stay, dimmed. | manual |
 | AC-18 | WHEN Vivaldi restarts, THE Favorites SHALL keep their tabs and the pinned tabs their own pages. | manual |
 | AC-19 | IF VivArcDi is uninstalled, THEN bookmarks, workspaces and pinned tabs SHALL remain usable in plain Vivaldi, with the Favorites' tabs as ordinary pinned tabs. | manual |
+| AC-20 | WHEN Vivaldi moves the tab list into a new container, THE sections drawn above it (Favorites grid, space header, folders) SHALL be put back above it. | auto: `puts the host back when Vivaldi moves the tab list to a new container` |
+| AC-21 | WHEN Tore changes the layout of the sidebar (auto-hide on and off, address field in the tab bar), THE Favorites grid, the space header and the folders SHALL stay above the tab list. | manual |
 
 ## Out of scope
 

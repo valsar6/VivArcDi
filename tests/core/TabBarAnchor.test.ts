@@ -4,15 +4,17 @@ import { TabBarAnchor } from '../../src/core/TabBarAnchor.js';
 import type { AnchorWatcher } from '../../src/core/TabBarAnchor.js';
 import { DomDocument, asDocument, asElement } from './dom.js';
 
-function setup(): { document: DomDocument; anchor: TabBarAnchor; changed: () => void } {
+function setup(): { document: DomDocument; anchor: TabBarAnchor; changed: () => void; watched: () => Node | null } {
   const document = new DomDocument();
   let notify = (): void => undefined;
-  const watch: AnchorWatcher = (_target, onChange) => {
+  let target: Node | null = null;
+  const watch: AnchorWatcher = (watchedTarget, onChange) => {
+    target = watchedTarget;
     notify = onChange;
     return () => undefined;
   };
   const anchor = new TabBarAnchor(asDocument(document), '.list', watch, { schedule: (run): void => run(), cancel: (): void => undefined });
-  return { document, anchor, changed: () => notify() };
+  return { document, anchor, changed: () => notify(), watched: () => target };
 }
 
 test('puts sections above the tab list in order, whatever the order they arrive in', () => {
@@ -37,6 +39,20 @@ test('puts the host back when Vivaldi removes it', () => {
   changed();
   assert.equal(document.parent.children[0]?.nextElementSibling, document.list);
   assert.equal(section.parentElement, document.parent.children[0]);
+});
+
+test('puts the host back when Vivaldi moves the tab list to a new container', () => {
+  const { document, anchor, changed, watched } = setup();
+  const section = document.createElement('div');
+  anchor.add(asElement(section), 10);
+  document.parent.remove();
+  const container = document.createElement('div');
+  container.append(document.list);
+  changed();
+  assert.equal(watched(), asDocument(document));
+  assert.equal(container.children[0]?.hasAttribute('data-vivarcdi-anchor'), true);
+  assert.equal(container.children[0]?.nextElementSibling, document.list);
+  assert.equal(section.parentElement, container.children[0]);
 });
 
 test('removes the host with its last section', () => {

@@ -129,7 +129,7 @@ Uninstalling VivArcDi leaves the linked tabs as ordinary pinned tabs and the `vi
 | Risk | Mitigation |
 |---|---|
 | A tab made with `chrome.tabs.create` lands outside the current workspace | Write the active tab's `workspaceId` into the new tab right away; manual check AC-15 |
-| Vivaldi removes the anchor on a redraw | `TabBarAnchor` puts it back; 009's probe saw it survive every tested redraw; manual check AC-14 |
+| Vivaldi removes the anchor on a redraw, or builds a new container for the tab list on a change of layout | `TabBarAnchor` watches the whole document, not only the list's parent, and puts the host back before the list wherever it is; AC-20, manual checks AC-14 and AC-21 |
 | Hiding a slot leaves a gap | The strip is already laid out by the 001 grid stylesheet, where a hidden slot takes no room |
 | `chrome://favicon/` is not served to the interface | Letter fallback; manual check AC-14 |
 | Pinning a new linked tab triggers `PinWatcher` before the link is written | `PinWatcher` skips tabs without a web address yet, and the opener writes `pinnedUrl` itself |
