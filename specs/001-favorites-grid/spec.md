@@ -5,7 +5,7 @@
 | Status | Implemented |
 | Phase | 1 |
 | Owner | Tore |
-| Approved | 2026-10-25, written after the fact from PR #4 and PR #5; revised 2026-10-25 at Tore's request (at most three columns, other tabs stay rows; refined tiles and row spacing) |
+| Approved | 2026-10-25, written after the fact from PR #4 and PR #5; revised 2026-10-25 at Tore's request (at most three columns, other tabs stay rows; refined tiles and row spacing); revised 2026-11-11 at Tore's request (four tiles make a square, AC-19; recording `Registrazione schermo 2026-11-11 alle 17.16.43.mov`) |
 
 ## Summary
 
@@ -29,8 +29,9 @@ the first pinned tabs of Vivaldi's vertical tab bar behave the same way.
 With the tab bar on the left or right, the first pinned tabs, up to twelve, become square tiles in a
 grid above the other tabs. A tile shows only the favicon, centered; the title appears in Vivaldi's
 own tooltip on hover. A row holds at most three tiles; with fewer than three tiles the row has as
-many columns as tiles, and a tab bar too narrow for three tiles gets fewer columns. Tiles stretch to
-fill the row. Every other tab stays a full-width row, one below the other, with its title, as
+many columns as tiles, and a tab bar too narrow for three tiles gets fewer columns. Four tiles make a
+square of two columns and two rows, as in Arc; from five on the rows hold three again, and a last row
+that is not full starts on the left with tiles of the same width. Tiles stretch to fill the row. Every other tab stays a full-width row, one below the other, with its title, as
 without VivArcDi.
 
 Rows of tiles are separated by the same gap as the tiles in a row, and the list of other tabs starts
@@ -66,7 +67,9 @@ rows. The first-pinned-tabs rule above remains the fallback when the folder is m
 - **FR-1.** The module `favorites-grid` turns the first `maxTiles` pinned tabs of a vertical tab bar
   into tiles. Other tabs are unchanged.
 - **FR-2.** Columns are `max(1, min(maxColumns, tiles, floor((width + gap) / (tileMinWidth + gap))))`,
-  recomputed when the tab strip is resized or the number of tiles changes.
+  recomputed when the tab strip is resized or the number of tiles changes; when `tiles` is
+  `maxColumns + 1` (four with the default), `tiles` counts as half of it, rounded up, so the tiles
+  make two even rows.
 - **FR-3.** Tiles show the favicon only, centered, with title, close button, stack counter,
   selection outline and loading bar hidden; a notification badge moves to the top right corner.
 - **FR-4.** The active tile and tiles of unloaded tabs are styled differently from the others.
@@ -107,6 +110,8 @@ rows. The first-pinned-tabs rule above remains the fallback when the folder is m
 | AC-16 | WHILE a tile plays audio, THE audio icon SHALL appear small in its bottom right corner. | manual |
 | AC-17 | WHILE the grid is shown, every tab that is not a tile SHALL keep a full-width row with its title, one row below the other. | manual |
 | AC-18 | THE rows of tiles SHALL be separated by `gap`, the other tabs SHALL start one `gap` below the grid, and each tile SHALL show its 24 px favicon centered both ways, with no loading bar and the notification badge in the tile's top right corner, clear of the icon. | manual |
+| AC-19 | WHEN the grid holds four tiles, THE grid SHALL have two columns; with five to seven, three. | auto: `four tiles make a square of two columns` |
+| AC-20 | WHEN Tore adds tiles one by one from one to seven, THE grid SHALL go 1, 2, 3, 2+2, 3+2, 3+3, 3+3+1, as in Arc. | manual |
 
 ## Out of scope
 

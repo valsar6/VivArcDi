@@ -31,7 +31,8 @@ export class GridLayout {
 
   /**
    * Computes the columns of a row, as in Arc: up to `maxColumns`, fewer when there are fewer
-   * tiles so they stretch to fill the row, and fewer when the tab bar is too narrow for them.
+   * tiles so they stretch to fill the row, half when one tile more than a row would be left alone
+   * (four tiles make a square), and fewer when the tab bar is too narrow for them.
    *
    * @param width Inner width of the tab strip, in pixels; 0 when not measured yet.
    * @param tiles How many tiles the grid holds.
@@ -44,7 +45,8 @@ export class GridLayout {
     { maxColumns, tileMinWidth, gap }: Pick<GridSettings, 'maxColumns' | 'tileMinWidth' | 'gap'>,
   ): number {
     const fitting = width > 0 ? Math.floor((width + gap) / (tileMinWidth + gap)) : maxColumns;
-    return Math.max(1, Math.min(maxColumns, tiles, fitting));
+    const wanted = tiles === maxColumns + 1 ? Math.ceil(tiles / 2) : tiles;
+    return Math.max(1, Math.min(maxColumns, wanted, fitting));
   }
 
   /**

@@ -44,6 +44,13 @@ test('fewer tiles than columns stretch to fill the row', () => {
   assert.equal(GridLayout.columnsFor(600, 0, settings), 1);
 });
 
+test('four tiles make a square of two columns', () => {
+  assert.equal(GridLayout.columnsFor(600, 4, settings), 2);
+  assert.equal(GridLayout.columnsFor(600, 5, settings), 3);
+  assert.equal(GridLayout.columnsFor(600, 6, settings), 3);
+  assert.equal(GridLayout.columnsFor(600, 7, settings), 3);
+});
+
 test('a tab bar too narrow for three tiles gets fewer columns', () => {
   assert.equal(GridLayout.columnsFor(150, 12, settings), 2);
   assert.equal(GridLayout.columnsFor(60, 12, settings), 1);
