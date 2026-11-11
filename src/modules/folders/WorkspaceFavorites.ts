@@ -8,7 +8,7 @@ import { TabData } from '../../core/TabData.js';
 import type { CreatedLinks } from './CreatedLinks.js';
 import type { TabLinks } from './TabLinks.js';
 
-export type FavoritesWriter = Pick<BookmarkWriter, 'create' | 'remove' | 'ensurePath' | 'get' | 'subTree' | 'removeTree'>;
+export type FavoritesWriter = Pick<BookmarkWriter, 'create' | 'remove' | 'ensurePath' | 'get' | 'subTree' | 'removeTree' | 'contains'>;
 export type FavoritesLinks = Pick<TabLinks, 'link' | 'unlink'>;
 
 export interface FavoritesDependencies {
@@ -20,6 +20,8 @@ export interface FavoritesDependencies {
   created: Pick<CreatedLinks, 'has' | 'add' | 'remove'>;
   /** The path of the root folder of the active workspace; empty when it has none. */
   root: () => string[];
+  /** The path of VivArcDi's own folder of workspaces; every link inside it is VivArcDi's. When missing, only the recorded links are. */
+  base?: () => string[];
   logger: Logger;
 }
 
@@ -157,7 +159,8 @@ export class WorkspaceFavorites {
 
   /**
    * Takes a link back out of the workspace favorites. The bookmark is removed only when VivArcDi
-   * created it; any other bookmark stays and keeps its link and its tab. Given a tab, it is
+   * created it or it lies inside VivArcDi's own folder of workspaces; any other bookmark stays and
+   * keeps its link and its tab. Given a tab, it is
    * unlinked together with the removal of the bookmark.
    *
    * @param target The tab that may be the tab of a link, or the id of a link that has no tab to unlink.
@@ -173,10 +176,10 @@ export class WorkspaceFavorites {
   }
 
   async #takeLink(bookmarkId: string, tabId: number | null): Promise<TakeResult> {
-    if (!this.#deps.created.has(bookmarkId)) {
-      return 'kept';
-    }
     try {
+      if (!(await this.#owns(bookmarkId))) {
+        return 'kept';
+      }
       if (tabId !== null) {
         await this.#deps.links.unlink(tabId);
       }
@@ -187,6 +190,11 @@ export class WorkspaceFavorites {
       this.#deps.logger.warn('could not take the tab back from the workspace favorites', error);
       return 'failed';
     }
+  }
+
+  async #owns(bookmarkId: string): Promise<boolean> {
+    const base = this.#deps.base?.() ?? [];
+    return this.#deps.created.has(bookmarkId) || (base.length > 0 && (await this.#deps.writer.contains(base, bookmarkId)));
   }
 
   async #rootId(): Promise<string | null> {

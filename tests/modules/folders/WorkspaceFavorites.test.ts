@@ -120,6 +120,17 @@ test('keeps a bookmark that VivArcDi did not create', async () => {
   assert.equal((await ownOf(tabs, 1)).bookmarkId, '33');
 });
 
+test('removes a link inside the VivArcDi folder that VivArcDi did not record', async () => {
+  const chrome = new WritableChrome(bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', [link('33', 'Old', PAGE)])]), folder('40', 'Mine', [link('41', 'Kept', PAGE)])]));
+  const tabs = new FolderTabs([{ id: 1, url: PAGE }]);
+  const created = new CreatedLinks(new MemoryStorage());
+  const favorites = new WorkspaceFavorites({ writer: chrome.writer, links: new TabLinks(tabs), created, root: (): string[] => ROOT, base: (): string[] => ['VivArcDi'], logger: silentLogger() });
+  assert.equal(await favorites.take('33'), 'taken');
+  assert.equal(await favorites.take('41'), 'kept');
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), []);
+  assert.deepEqual(childrenOf(chrome, 'Mine'), ['Kept']);
+});
+
 test('writes nothing when the workspace has no root', async () => {
   const chrome = new WritableChrome(bookmarkTree([]));
   const tabs = new FolderTabs([{ id: 1, url: PAGE }]);
