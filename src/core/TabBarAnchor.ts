@@ -10,9 +10,9 @@ interface Entry {
 
 const ANCHOR_ATTRIBUTE = 'data-vivarcdi-anchor';
 
-const watchChildren: AnchorWatcher = (target, onChange) => {
+const watchTree: AnchorWatcher = (target, onChange) => {
   const observer = new MutationObserver(onChange);
-  observer.observe(target, { childList: true });
+  observer.observe(target, { childList: true, subtree: true });
   return () => observer.disconnect();
 };
 
@@ -34,10 +34,12 @@ export class TabBarAnchor {
    *
    * @param document The browser window document.
    * @param selector Selector of the tab list's container, the element the host is put before.
-   * @param watch Reports changes among the children of the tab list's parent, replaceable in tests.
+   * @param watch Reports added and removed nodes anywhere in the document, replaceable in tests. The
+   *   whole document is watched because a change of layout makes Vivaldi build a new container for
+   *   the tab list, and a watcher on the old one would never fire again.
    * @param timing Frame scheduling for the repairs, replaceable in tests.
    */
-  constructor(document: Document, selector: string, watch: AnchorWatcher = watchChildren, timing: FrameTiming = {}) {
+  constructor(document: Document, selector: string, watch: AnchorWatcher = watchTree, timing: FrameTiming = {}) {
     this.#document = document;
     this.#selector = selector;
     this.#watch = watch;
@@ -101,7 +103,7 @@ export class TabBarAnchor {
     if (wanted.some((element, position) => host.children[position] !== element)) {
       host.append(...wanted);
     }
-    this.#watchParent(list.parentElement);
+    this.#watchDocument();
   }
 
   #hostBefore(list: HTMLElement): HTMLElement {
@@ -114,8 +116,8 @@ export class TabBarAnchor {
     return host;
   }
 
-  #watchParent(parent: Node): void {
-    this.#unwatch ??= this.#watch(parent, () => this.#task.request());
+  #watchDocument(): void {
+    this.#unwatch ??= this.#watch(this.#document, () => this.#task.request());
   }
 
   #dispose(): void {

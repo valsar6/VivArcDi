@@ -25,3 +25,10 @@
   tile rule; manual checklist for AC-14 to AC-19 with the setup of the `Favorites` folder
   (`phase-3/verifica-favorites-pinned.md` in the project files).
 - [ ] **T12.** Manual checks AC-14 to AC-19 on macOS and Debian.
+
+Fix of 2026-11-11 (sections gone after a change of the sidebar's layout). Branch
+`fix/sidebar-sections-after-layout-change`, patch bump to 0.40.1.
+
+- [x] **T13.** `TabBarAnchor` watches the whole document, so that a new container of the tab list gets
+  the host back. AC-20.
+- [ ] **T14.** Manual check AC-21 on macOS and Debian.
