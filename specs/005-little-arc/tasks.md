@@ -66,34 +66,34 @@ implementation is `features/little-arc-command-bar-code`, next minor version):
   blur, outside click, popup with an address and `chrome.search.query` answered (spec, "Probe of the
   command bar"). `chrome.topSites` works but is not used. Favicon in the card and keyboard focus in the
   card stay for the manual check (T34).
-- [ ] **T24.** `Suggestion`, `SuggestionSource`, `SuggestionRanker`. Satisfies AC-28, AC-29, AC-30, AC-31 and
+- [x] **T24.** `Suggestion`, `SuggestionSource`, `SuggestionRanker`. Satisfies AC-28, AC-29, AC-30, AC-31 and
   AC-45. Done when `suggestion ranker puts the best match first`, `suggestion ranker removes duplicate
   addresses`, `suggestion ranker keeps web addresses and limits the list`, `suggestion list for an
   empty field shows the most recent pages` and `middle ellipsis keeps the start and the end of a long
   host` (`MiddleEllipsis`, AC-45) pass.
-- [ ] **T25.** `SelectionCursor`. Satisfies AC-32. Done when `selection cursor wraps around and resets
+- [x] **T25.** `SelectionCursor`. Satisfies AC-32. Done when `selection cursor wraps around and resets
   with the list` passes.
-- [ ] **T26.** Sources: `TabSuggestions`, `BookmarkSuggestions`, `BrowserHistory` and
+- [x] **T26.** Sources: `TabSuggestions`, `BookmarkSuggestions`, `BrowserHistory` and
   `HistorySuggestions` (with the empty-text recent list), `SuggestionList` with failures skipped. Satisfies AC-39. Done when `suggestion sources
   survive a failing source` passes.
-- [ ] **T27.** `LittleArcLauncher.openAddress`; a search opens `BrowserSearch.fallbackAddress(text)`. Satisfies FR-23. Done when the launcher
+- [x] **T27.** `LittleArcLauncher.openAddress`; a search opens `BrowserSearch.fallbackAddress(text)`. Satisfies FR-23. Done when the launcher
   tests pass with a fake `BrowserWindows`.
-- [ ] **T28.** `CommandBarController`. Satisfies AC-34, AC-35 and AC-36. Done when `command bar opens
+- [x] **T28.** `CommandBarController`. Satisfies AC-34, AC-35 and AC-36. Done when `command bar opens
   the typed text in little arc`, `command bar opens the selected suggestion in little arc` and `command
   bar opens nothing when it is dismissed` pass.
-- [ ] **T29.** `CommandBarView`, `CommandBarMount`, the tokens in `_tokens.scss` and the overlay in
+- [x] **T29.** `CommandBarView`, `CommandBarMount`, the tokens in `_tokens.scss` and the overlay in
   `little-arc.scss`, wired in `MainWindowRole` with the `commandBar` option and the fallback to the blank
   window. The invisible click-catching layer swallows outside clicks. Satisfies AC-25 to AC-27, AC-33, AC-37 to AC-41, AC-43 and AC-44. Done when `little arc opens the
   blank window when the command bar is off or cannot mount` and `command bar removes its elements and
   listeners on stop` pass.
-- [ ] **T30.** Version bump (minor) in `package.json`, `package-lock.json` and
+- [x] **T30.** Version bump (minor) in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`.
-- [ ] **T31.** README (section Little Arc: the opening with the command bar and the
+- [x] **T31.** README (section Little Arc: the opening with the command bar and the
   `commandBar` option) and `docs/manual/little-arc.md`, with the mockup
   `little-arc/look/barra-comandi.png` in the manual. The key stays Cmd+Opt+N. Done when both describe
   the bar.
-- [ ] **T32.** Add AC-25 to AC-27, AC-33, AC-37, AC-38, AC-41, AC-43 and AC-44 to the manual verification
+- [x] **T32.** Add AC-25 to AC-27, AC-33, AC-37, AC-38, AC-41, AC-43 and AC-44 to the manual verification
   checklist for Tore, in Italian, macOS and Debian, with Tore's screenshot and the mockup to compare.
-- [ ] **T33.** `make check` passes.
+- [x] **T33.** `make check` passes.
 - [ ] **T34.** Manual checks by Tore, including the history of a real profile (speed), the favicon in the card, the keyboard focus into the card and back, an outside click that must not close a Vivaldi panel, the focus
   after closing, dark mode, and Cmd+Opt+N opening the bar and not Notes after `shortcuts apply`.
