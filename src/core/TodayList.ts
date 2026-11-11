@@ -1,3 +1,5 @@
+import { HIDDEN_ATTRIBUTE } from './HiddenTabMarker.js';
+import type { SelectorCatalog } from './SelectorCatalog.js';
 import { TabSlot } from './TabSlot.js';
 
 export const TODAY_ATTRIBUTE = 'data-vivarcdi-drop-today';
@@ -8,11 +10,13 @@ export interface TodayTarget {
 }
 
 export interface TodayListDependencies {
-  document: Pick<Document, 'elementFromPoint'>;
+  document: Pick<Document, 'elementFromPoint' | 'querySelectorAll'>;
   /** Selector of Vivaldi's tab list. */
   stripSelector: string;
   /** Selector of Vivaldi's tab wrapper. */
   wrapperSelector: string;
+  /** Selector of the slots that are not today's tabs: hidden, pinned or in a group of pinned tabs. */
+  skipSelector: string;
 }
 
 export class TodayList {
@@ -27,6 +31,26 @@ export class TodayList {
    */
   constructor(dependencies: TodayListDependencies) {
     this.#deps = dependencies;
+  }
+
+  /**
+   * @param selectors Gives `pinnedTab` and `pinnedGroup`, when the catalog has them.
+   * @returns The selector of the slots that are not today's tabs.
+   */
+  public static skippedBy(selectors: Pick<SelectorCatalog, 'get' | 'has'>): string {
+    const pinned = ['pinnedTab', 'pinnedGroup'].filter((name) => selectors.has(name)).map((name) => selectors.get(name));
+    return [`[${HIDDEN_ATTRIBUTE}]`, ...pinned].join(', ');
+  }
+
+  /**
+   * @returns The place at the top of today's tabs: the row of the first tab that is not hidden or
+   * pinned, or the list with no row when there is none, which leaves the tab where it is.
+   */
+  public first(): TodayTarget {
+    const { document, stripSelector, wrapperSelector, skipSelector } = this.#deps;
+    const rows = Array.from(document.querySelectorAll(`${stripSelector} ${wrapperSelector}`));
+    const row = rows.find((candidate) => candidate.closest(skipSelector) === null);
+    return { rowTabId: row === undefined ? null : TabSlot.idOf(row, wrapperSelector) };
   }
 
   /**

@@ -1,4 +1,6 @@
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
+import { ContextMenu } from '../../core/ContextMenu.js';
+import { DragPill } from '../../core/DragPill.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { FavoriteDropZone } from '../../core/FavoriteDropZone.js';
 import { LinkDropZone } from '../../core/LinkDropZone.js';
@@ -12,6 +14,7 @@ import { TILE_ATTRIBUTE } from './FavoritesView.js';
 import { GridDropZone } from './GridDropZone.js';
 import { GridFavoriteTargets } from './GridFavoriteTargets.js';
 import { LinkedTabs } from './LinkedTabs.js';
+import { TileMenu } from './TileMenu.js';
 import { TabToFavorite } from './TabToFavorite.js';
 
 export interface GridDraggingDependencies {
@@ -35,6 +38,7 @@ const inWindow = (element: HTMLElement | undefined): HTMLElement | null => (elem
 export class GridDragging {
   #toFavorite: TabToFavorite;
   #tileDrag: RowDrag;
+  #tileMenu: TileMenu;
   #zone: FavoriteDropZone;
   #targets: GridFavoriteTargets;
   #unregister: (() => void) | null = null;
@@ -44,6 +48,8 @@ export class GridDragging {
    * becomes a Favorite, and a tile dragged out of the grid takes the Favorite out and keeps the
    * page, as a link of a folder or as a Today tab. The grid is also offered to the folders
    * through `FavoriteDropZone`, as the place where a link dragged out of them becomes a Favorite.
+   * A pill with the icon and the title follows what is dragged, and the right-click menu of a tile
+   * offers Untile tab and Pin tab, which do the same moves without dragging.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -55,7 +61,8 @@ export class GridDragging {
     const links = new LinkedTabs(tabs);
     const zone = new GridDropZone({ document, grid, below });
     const drop = new FavoriteDrop({ tabs, writer, links, folder, logger });
-    this.#toFavorite = new TabToFavorite({ document, wrapperSelector, zone, drop });
+    const pill = DragPill.of(document, selectors);
+    this.#toFavorite = new TabToFavorite({ document, wrapperSelector, zone, drop, tabs, pill, logger });
     this.#zone = FavoriteDropZone.of(document);
     this.#targets = new GridFavoriteTargets({ zone, drop });
     const removal = new FavoriteRemoval({
@@ -63,7 +70,7 @@ export class GridDragging {
       writer,
       links,
       zone: LinkDropZone.of(document),
-      today: new TodayList({ document, stripSelector, wrapperSelector }),
+      today: new TodayList({ document, stripSelector, wrapperSelector, skipSelector: TodayList.skippedBy(selectors) }),
       logger,
     });
     this.#tileDrag = new RowDrag({
@@ -74,7 +81,10 @@ export class GridDragging {
       onMove: (_favoriteId, x, y): void => removal.over(x, y),
       onDrop: (favoriteId, x, y): void => void removal.release(favoriteId, x, y),
       onEnd: (): void => removal.clear(),
+      pill,
     });
+    const menu = new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body });
+    this.#tileMenu = new TileMenu({ document, grid, menu, removal });
   }
 
   /**
@@ -83,6 +93,7 @@ export class GridDragging {
   public start(): void {
     this.#toFavorite.start();
     this.#tileDrag.attach();
+    this.#tileMenu.attach();
     this.#unregister = this.#zone.register(this.#targets);
   }
 
@@ -92,6 +103,7 @@ export class GridDragging {
   public stop(): void {
     this.#toFavorite.stop();
     this.#tileDrag.detach();
+    this.#tileMenu.detach();
     this.#unregister?.();
     this.#unregister = null;
   }

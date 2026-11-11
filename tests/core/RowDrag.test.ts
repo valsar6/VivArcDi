@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { DRAG_PILL_ATTRIBUTE, DragPill } from '../../src/core/DragPill.js';
 import { DRAGGING_ATTRIBUTE, RowDrag } from '../../src/core/RowDrag.js';
 import { asDocument, asElement, DomDocument } from './dom.js';
 import type { DomNode } from './dom.js';
@@ -119,4 +120,63 @@ test('stops listening on detach', () => {
   detached.attach();
   detached.detach();
   assert.equal([...dom.listeners.values()].flat().length, 0);
+});
+
+function withPill(): { dom: DomDocument; tile: DomNode; pill: () => DomNode | undefined; drag: (x: number, y: number) => void; release: (x: number, y: number) => void } {
+  const dom = new DomDocument();
+  dom.list.rect = { left: 0, right: 300, top: 0, bottom: 600 };
+  const grid = dom.createElement('div');
+  const tile = dom.createElement('div');
+  tile.setAttribute(ROW_ATTRIBUTE, 'f1');
+  tile.setAttribute('title', 'Example');
+  grid.append(tile);
+  const frames: Array<() => void> = [];
+  const pill = new DragPill({ document: asDocument(dom), parentSelector: '#browser', tabBarSelector: '#bar', timing: { schedule: (run): number => frames.push(run) } });
+  new RowDrag({
+    document: asDocument(dom),
+    container: (): HTMLElement => asElement(grid),
+    selector: `[${ROW_ATTRIBUTE}]`,
+    idAttribute: ROW_ATTRIBUTE,
+    onMove: (): void => undefined,
+    onDrop: (): void => undefined,
+    onEnd: (): void => undefined,
+    pill,
+  }).attach();
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: 10, clientY: 10, target: tile });
+  return {
+    dom,
+    tile,
+    pill: (): DomNode | undefined => dom.created.findLast((node) => node.hasAttribute(DRAG_PILL_ATTRIBUTE)),
+    drag: (x, y): void => {
+      dom.emit('mousemove', { buttons: 1, clientX: x, clientY: y });
+      frames.splice(0).forEach((run) => run());
+    },
+    release: (x, y): void => dom.emit('mouseup', { buttons: 0, clientX: x, clientY: y }),
+  };
+}
+
+test('shows a drag pill for a dragged row', () => {
+  const { tile, pill, drag } = withPill();
+  drag(13, 12);
+  assert.equal(pill(), undefined);
+  drag(10, 40);
+  assert.equal(pill()?.parentElement === null, false);
+  assert.equal(pill()?.descendants().find((node) => node.tagName === 'SPAN')?.textContent, 'Example');
+  assert.equal(pill()?.properties.get('transform'), 'translate(22px, 52px)');
+  assert.equal(tile.hasAttribute(DRAGGING_ATTRIBUTE), true);
+});
+
+test('removes the drag pill when the drag ends', () => {
+  const { tile, pill, drag, release } = withPill();
+  drag(10, 40);
+  release(10, 40);
+  assert.equal(pill()?.parentElement, null);
+  assert.equal(tile.hasAttribute(DRAGGING_ATTRIBUTE), false);
+});
+
+test('removes the drag pill when the button was released outside the window', () => {
+  const { dom, pill, drag } = withPill();
+  drag(10, 40);
+  dom.emit('mousemove', { buttons: 0, clientX: 20, clientY: 50 });
+  assert.equal(pill()?.parentElement, null);
 });

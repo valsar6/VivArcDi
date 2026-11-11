@@ -41,6 +41,11 @@ every workspace.
   page becomes a Today tab at that place; on a folder, between folder rows or on the space header it
   becomes a link of the workspace. The tile disappears from every workspace and the page is never
   lost. Released over the grid or outside the tab bar, nothing changes.
+- **See what you drag.** While a tab, a link row or a tile is dragged over the tab bar, a white pill
+  with its icon and title follows the pointer and the place it came from fades.
+- **Untile or pin from the menu.** Right-click a tile: **Untile tab** puts the page back as the first
+  tab of today and removes the tile from every workspace; **Pin tab** makes it a link of the
+  workspace's folder.
 
 ![Mockup: a Today tab dragged between two tiles becomes a Favorite](images/mockups/drag-tab-to-favorites.gif)
 
@@ -77,6 +82,10 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Rename a folder | Double click it |
 | Move a tab into a folder | Drag the tab onto the folder row, onto the space header, or between two rows |
 | Take a link out | Drag its row below the separator to make it a tab of today, or onto the Favorites grid to make it a Favorite |
+| Pin a tab of today | Right-click it and choose **Pin tab** in Vivaldi's menu |
+| Make a tab of today a tile | Right-click it and choose **Tile tab** |
+| Put a link back among today's tabs | Right-click its row and choose **Remove pin** |
+| Make a link a tile | Right-click its row and choose **Tile tab** |
 | Keep the current page | Cmd/Ctrl+D adds it at the end of the workspace's folder; press it again to undo |
 | Copy bookmarks in | Drag a bookmark or a whole folder from Vivaldi's Bookmarks panel onto the folders |
 
