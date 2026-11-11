@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-11 (merge of PR #128) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -51,7 +51,7 @@ Outside the tab bar the pill goes away and Vivaldi's own drag image, if any, is 
 Remove pin and Untile tab keep the bookmark rule of 012: a bookmark that VivArcDi did not create stays,
 and a toast says so. A link row that has no open tab, taken out with Remove pin, opens its page as a tab
 of today, so the page is never lost. In Arc, Remove Pin and Remove Favorite close the page; VivArcDi
-keeps it open, because Tore asked for the exact opposite of Pin tab and Tile tab (open question 1).
+keeps it open, because Tore asked for the exact opposite of Pin tab and Tile tab (question 1).
 
 The menu of a link row and of a tile is VivArcDi's own, since those rows are VivArcDi's elements; it is
 the menu where [027](../027-rename-pinned-tabs/spec.md) will add Rename and Change icon. The menu of a
@@ -111,12 +111,12 @@ tab of today is Vivaldi's own: the two commands are added to it, and Vivaldi's i
 
 ## Open questions
 
-- [ ] **1. Remove pin and Untile tab: keep the page or close it?** Arc closes the page (both
-  recordings). Proposed: keep it as the first tab of today, the exact opposite of Pin tab and Tile tab
-  and the "never lost" rule of 012 and 020.
-- [ ] **2. Can Vivaldi's tab menu be extended?** Vivaldi 8 builds its menus in the interface and shows
-  them as native menus; the design needs a read-only probe before choosing how to add the two items
-  (NFR-2 is the fallback).
+- [x] **1. Remove pin and Untile tab: keep the page or close it?** Arc closes the page (both
+  recordings). Keep it as the first tab of today, the exact opposite of Pin tab and Tile tab and the
+  "never lost" rule of 012 and 020 (Tore, merge of PR #128, 2026-11-11).
+- [x] **2. Can Vivaldi's tab menu be extended?** Vivaldi 8 builds its menus in the interface and shows
+  them as native menus. The design adds the two items through Vivaldi's menu API and checks it with the
+  read-only probe of task T1 before the code; NFR-2 is the fallback (merge of PR #128, 2026-11-11).
 
 ## References
 
