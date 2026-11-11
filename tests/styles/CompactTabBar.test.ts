@@ -14,7 +14,6 @@ const TOKENS: Array<[string, string]> = [
   ['$narrow-tab-bar', "'#tabs-tabbar-container.narrow'"],
   ['$chevron-size', '10px'],
   ['$chevron-gap', '2px'],
-  ['$archive-icon-size', '18px'],
 ];
 
 test('compact rules apply only to the narrow tab bar', () => {
@@ -53,10 +52,24 @@ test('compact tab bar uses tokens', () => {
     assert.ok(tokens.includes(`${name}: ${value};`), `${name} is defined as ${value}`);
     assert.ok(source.includes(name), `${name} is used`);
   }
-  for (const glyph of ['$chevron-glyph', '$archive-glyph']) {
+  assert.ok(tokens.includes('$archive-icon-size: 18px;'), '$archive-icon-size is defined as 18px');
+  assert.ok(read('today.scss').includes('$archive-icon-size'), '$archive-icon-size is used');
+  const users: Array<[string, string]> = [['$chevron-glyph', source], ['$archive-glyph', read('today.scss')]];
+  for (const [glyph, user] of users) {
     assert.ok(tokens.includes(`${glyph}: url("data:image/svg+xml,`), `${glyph} is a token`);
-    assert.ok(source.includes(glyph), `${glyph} is used`);
+    assert.ok(user.includes(glyph), `${glyph} is used`);
   }
   assert.equal(source.includes('data:image'), false, 'no glyph is inlined in the stylesheet');
   assert.equal(source.includes('px'), false, 'no size is inlined in the stylesheet');
+});
+
+test('archive footer shows the archive icon beside its label', () => {
+  const css = sass.compile(`${STYLES}today.scss`).css;
+  const rule = /#browser\[data-vivarcdi-active\] \[data-vivarcdi-archive-footer\] button::before \{([^}]*)\}/.exec(css);
+  assert.ok(rule, 'the footer button has an icon before its label');
+  assert.match(rule[1] ?? '', /mask: url\("data:image\/svg\+xml,/);
+  assert.match(rule[1] ?? '', /width: 18px/);
+  assert.match(css, /\[data-vivarcdi-archive-footer\] button \{[^}]*display: flex;/);
+  const compact = compiled();
+  assert.match(compact, /\[data-vivarcdi-archive-footer\] button \{[^}]*font-size: 0;/);
 });

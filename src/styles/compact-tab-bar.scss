@@ -43,18 +43,10 @@
     padding-inline: 0;
 
     button {
-      display: grid;
-      place-items: center;
+      justify-content: center;
+      gap: 0;
       padding-inline: 0;
       font-size: 0;
-
-      &::before {
-        content: '';
-        width: $archive-icon-size;
-        height: $archive-icon-size;
-        background-color: currentcolor;
-        mask: $archive-glyph center / contain no-repeat;
-      }
     }
   }
 }

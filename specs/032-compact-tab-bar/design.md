@@ -2,8 +2,9 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
+| Approved | Tore, 2026-11-11 (PR #136) |
 
 ## Approach
 
@@ -28,7 +29,7 @@ The three rows already exist and keep their elements, tooltips, `aria-*` attribu
 |---|---|
 | Space header | `justify-content: center`; `.vivarcdi-space-arrow`, `.vivarcdi-space-name` and `.vivarcdi-space-add` are `display: none`; a `::after` draws the chevron with `mask: $chevron-glyph`, turned 180 degrees while `[data-vivarcdi-collapsed]` is set, so it points up while the space is expanded and down while collapsed (AC-4). The space icon stays as it is. |
 | New Tab | `justify-content: center`; padding 0; the label `span` keeps its text for screen readers but with `font-size: 0`; `.vivarcdi-new-tab-icon` stays, it already draws `$plus-glyph`. |
-| Archive footer | The `button` keeps its text for screen readers but with `font-size: 0`; a `::before` of `$archive-icon-size` draws `$archive-glyph` with `mask`, centered. |
+| Archive footer | The `button` keeps its text for screen readers but with `font-size: 0` and no gap, so the archive glyph of `today.scss` sits alone, centered. |
 
 The archive glyph is a new 16 x 16 line drawing made for VivArcDi: an open box with a slot handle and
 two sheets of paper rising from it, stroke 1.5 like the other glyphs. Tore's example image is a
@@ -52,6 +53,7 @@ Rejected:
 |---|---|
 | `src/styles/_tokens.scss` | `$narrow-tab-bar` selector, `$chevron-glyph`, `$archive-glyph`, `$archive-icon-size`, `$chevron-size` (FR-7, AC-5) |
 | `src/styles/compact-tab-bar.scss` | The compact rules of the table above, all under `#{$root}:has(#{$narrow-tab-bar})` |
+| `src/styles/today.scss` | The archive footer button is a flex row whose `::before` draws `$archive-glyph` at `$archive-icon-size` before the label, at any width (FR-8) |
 | `src/config.json` | Adds `styles/compact-tab-bar.css` to `styles`, last |
 | `src/core/NewTabRow.ts` | Sets `title="New Tab"` on the row, which has no tooltip today, so the bare `+` explains itself (FR-5) |
 | `tests/styles/CompactTabBar.test.ts` | AC-1, AC-2, AC-4, AC-5 on the compiled CSS |
