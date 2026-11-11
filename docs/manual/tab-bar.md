@@ -37,6 +37,11 @@ every workspace.
   page's icon, the same in every workspace. The tab stays open as the tab of that Favorite. The
   `Favorites` folder is created if it does not exist. A page that is already a Favorite stays as it
   is.
+- **Add the first one.** While there are no tiles, drag a tab of today or a link row just above the
+  space header. An invisible strip there opens to the height of a tile; release the tab on it and the
+  page becomes the first tile. Once a tile exists, the strip is gone and you drop on the grid.
+
+  ![Mockup: a Today tab dragged above the space header becomes the first tile](images/mockups/first-tile.gif)
 - **Take one out by dragging.** Drag a tile out of the grid and release it. Below the separator the
   page becomes a Today tab at that place; on a folder, between folder rows or on the space header it
   becomes a link of the workspace. The tile disappears from every workspace and the page is never
