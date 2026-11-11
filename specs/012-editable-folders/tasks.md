@@ -43,7 +43,7 @@ Revision of 2026-11-11 (drag and drop of tabs). Branch `fix/drag-tabs-workspace-
   moved onto them with their tests unchanged. AC-33, AC-34.
 - [x] **T16.** `FolderDragDrop` on `TabDragRelease`: the HTML5 drop over the area adds the link at the
   drop position. AC-32.
-- [ ] **T17.** `RowDrag` in `src/core` from `TileDrag`; `TodayList` moved to `src/core`;
+- [x] **T17.** `RowDrag` in `src/core` from `TileDrag`; `TodayList` moved to `src/core`;
   `FavoriteDropZone` and `FavoriteDrop.addPage`. AC-38.
 - [ ] **T18.** `LinkRemoval`, `WorkspaceFavorites.take` by bookmark id, copies of 018 in
   `CreatedLinks`, dimmed row style. AC-35, AC-36, AC-37.
