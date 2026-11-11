@@ -139,6 +139,7 @@ export class FolderSection {
   #createEditing(): FolderEditing {
     return new FolderEditing(this.#context, this.#view, {
       root: (): string[] => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
+      base: (): string[] => this.#roots.base,
       childIds: (): readonly string[] => this.#source.childIds,
       redraw: (): void => this.#redraw.request(),
       tabLinks: this.#tabLinks,

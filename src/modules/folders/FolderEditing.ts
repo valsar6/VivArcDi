@@ -18,6 +18,8 @@ import { WorkspaceFavorites } from './WorkspaceFavorites.js';
 export interface EditingSources {
   /** The path of the root folder of the active workspace; empty when it has none. */
   root: () => string[];
+  /** The path of VivArcDi's own folder of workspaces. */
+  base: () => string[];
   /** The ids of the children of the root, in order. */
   childIds: () => readonly string[];
   /** Draws the section again from the bookmarks. */
@@ -56,6 +58,7 @@ export class FolderEditing {
       links: sources.tabLinks,
       created: new CreatedLinks(context.storage),
       root: sources.root,
+      base: sources.base,
       logger: context.logger,
     });
   }

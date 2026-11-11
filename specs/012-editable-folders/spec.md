@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed), 2026-11-11 (FR-14, FR-16, FR-17, AC-32 to AC-40; PR #125) |
+| Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed), 2026-11-11 (FR-14, FR-16, FR-17, AC-32 to AC-40; PR #125), 2026-11-11 (FR-18, AC-41, AC-42; Tore's decision card on old links) |
 
 ## Summary
 
@@ -150,6 +150,9 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - **FR-12.** Cmd/Ctrl+D on a web page adds a bookmark with its title and address at the end of the
   workspace's root and links the tab to it; on the tab of such a link it takes the tab back to today's
   list and removes the bookmark when VivArcDi created it.
+- **FR-18.** A bookmark counts as created by VivArcDi when VivArcDi recorded it, or when it lies inside
+  the `workspacesBase` folder (`VivArcDi`), which VivArcDi makes and manages; so a link made before
+  VivArcDi recorded its links is removed too. Bookmarks outside that folder keep the rule of FR-12.
 - **FR-13.** A drop of a tab of today's list between two rows of the area adds the bookmark at that
   position of the root; a drop on a folder keeps FR-6.
 - **FR-14.** Drop targets are found by the pointer position, on mouse release or on an HTML5 `drop`
@@ -204,6 +207,8 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 | AC-38 | WHEN a link row is released anywhere else, THE area SHALL stay as it was and THE link SHALL not open. | auto: `leaves the link in place when it is released elsewhere` |
 | AC-39 | WHEN Tore drags a tab of today between two rows of the area, THE line SHALL follow the pointer and, on release, THE tab SHALL show there at once and leave today's list, without vanishing for seconds. | manual |
 | AC-40 | WHEN Tore drags a link row below the separator and then onto the Favorites grid, THE page SHALL show as a tab of today, then as a tile, and never be lost. | manual |
+| AC-41 | WHEN a link inside the `VivArcDi` folder that VivArcDi did not record is taken out, THE bookmark SHALL be removed; a bookmark outside that folder SHALL stay. | auto: `removes a link inside the VivArcDi folder that VivArcDi did not record` |
+| AC-42 | WHEN Tore uses Remove pin on an old link of his workspace, THE row SHALL disappear and the page SHALL show as the first tab of today. | manual |
 | AC-27 | WHEN Tore presses Cmd/Ctrl+D on a page, THE tab SHALL move to the end of the workspace favorites; WHEN he presses it again, THE tab SHALL go back to the open tabs. | manual |
 | AC-28 | WHEN Tore drags a tab of today into the area and releases it between two rows, THE tab SHALL stay there. | manual |
 | AC-13 | WHEN Tore clicks `+` in a workspace he never configured, types a name and presses Enter, THE folder SHALL appear in that workspace only. | manual |
