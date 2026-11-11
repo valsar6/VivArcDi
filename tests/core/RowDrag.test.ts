@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TILE_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
-import { DRAGGING_ATTRIBUTE, TileDrag } from '../../../src/modules/favorites/TileDrag.js';
-import { asDocument, asElement, DomDocument } from '../../core/dom.js';
-import type { DomNode } from '../../core/dom.js';
+import { DRAGGING_ATTRIBUTE, RowDrag } from '../../src/core/RowDrag.js';
+import { asDocument, asElement, DomDocument } from './dom.js';
+import type { DomNode } from './dom.js';
+
+const ROW_ATTRIBUTE = 'data-test-row';
 
 interface Setup {
   dom: DomDocument;
@@ -19,12 +20,14 @@ function setup(): Setup {
   const dom = new DomDocument();
   const grid = dom.createElement('div');
   const tile = dom.createElement('div');
-  tile.setAttribute(TILE_ATTRIBUTE, 'f1');
+  tile.setAttribute(ROW_ATTRIBUTE, 'f1');
   grid.append(tile);
   const events: string[] = [];
-  new TileDrag({
+  new RowDrag({
     document: asDocument(dom),
-    grid: (): HTMLElement => asElement(grid),
+    container: (): HTMLElement => asElement(grid),
+    selector: `[${ROW_ATTRIBUTE}]`,
+    idAttribute: ROW_ATTRIBUTE,
     onMove: (id, x, y): void => void events.push(`move ${id} ${x},${y}`),
     onDrop: (id, x, y): void => void events.push(`drop ${id} ${x},${y}`),
     onEnd: (): void => void events.push('end'),
@@ -91,7 +94,7 @@ test('follows only the primary button on a tile of the grid', () => {
   move(10, 40);
   up(10, 40);
   const outside = dom.createElement('div');
-  outside.setAttribute(TILE_ATTRIBUTE, 'x');
+  outside.setAttribute(ROW_ATTRIBUTE, 'x');
   down(outside);
   move(10, 40);
   up(10, 40);
@@ -112,7 +115,7 @@ test('ends the drag when the button was released outside the window', () => {
 
 test('stops listening on detach', () => {
   const dom = new DomDocument();
-  const detached = new TileDrag({ document: asDocument(dom), grid: (): null => null, onMove: (): void => undefined, onDrop: (): void => undefined, onEnd: (): void => undefined });
+  const detached = new RowDrag({ document: asDocument(dom), container: (): null => null, selector: `[${ROW_ATTRIBUTE}]`, idAttribute: ROW_ATTRIBUTE, onMove: (): void => undefined, onDrop: (): void => undefined, onEnd: (): void => undefined });
   detached.attach();
   detached.detach();
   assert.equal([...dom.listeners.values()].flat().length, 0);

@@ -475,6 +475,10 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   of the workspace's folder, and released between two rows it goes there. A Favorite, a pinned tab, a
   tab that is already a link and a page that is not `http` or `https` are left alone. Dropping a tab on
   the Favorites grid pins it, as Vivaldi does.
+- **Take a link out by dragging.** Drag a link row out of the section. Released below the separator, its
+  page becomes a tab of today at that place; released on the Favorites grid, a Favorite there. The
+  bookmark is removed when VivArcDi made it; a bookmark that existed before stays, and a toast says so.
+  Released anywhere else, nothing changes and the link does not open.
 - **Copy from the Bookmarks panel.** Drag a bookmark or a folder from Vivaldi's Bookmarks panel onto the
   workspace's folders and release: a folder is copied with all its levels, a link is added as a link.
   The drop targets are the same as for tabs. The originals stay in the panel, separators are not

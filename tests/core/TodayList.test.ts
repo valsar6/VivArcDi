@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TODAY_ATTRIBUTE, TodayList } from '../../../src/modules/favorites/TodayList.js';
+import { TODAY_ATTRIBUTE, TodayList } from '../../src/core/TodayList.js';
 
 const WRAPPER = '.wrapper';
 const STRIP = '.strip';

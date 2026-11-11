@@ -76,6 +76,7 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Add a folder | Rest the pointer on the space header and click `+`, then type the name |
 | Rename a folder | Double click it |
 | Move a tab into a folder | Drag the tab onto the folder row, onto the space header, or between two rows |
+| Take a link out | Drag its row below the separator to make it a tab of today, or onto the Favorites grid to make it a Favorite |
 | Keep the current page | Cmd/Ctrl+D adds it at the end of the workspace's folder; press it again to undo |
 | Copy bookmarks in | Drag a bookmark or a whole folder from Vivaldi's Bookmarks panel onto the folders |
 

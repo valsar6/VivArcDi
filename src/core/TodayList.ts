@@ -1,4 +1,4 @@
-import { TabSlot } from '../../core/TabSlot.js';
+import { TabSlot } from './TabSlot.js';
 
 export const TODAY_ATTRIBUTE = 'data-vivarcdi-drop-today';
 

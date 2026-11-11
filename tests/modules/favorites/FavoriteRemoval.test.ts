@@ -5,7 +5,7 @@ import { LinkDropZone } from '../../../src/core/LinkDropZone.js';
 import { TabData } from '../../../src/core/TabData.js';
 import { FavoriteRemoval } from '../../../src/modules/favorites/FavoriteRemoval.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
-import type { TodayTarget } from '../../../src/modules/favorites/TodayList.js';
+import type { TodayTarget } from '../../../src/core/TodayList.js';
 import { CreatedLinks } from '../../../src/modules/folders/CreatedLinks.js';
 import { DropPlace } from '../../../src/modules/folders/DropPlace.js';
 import type { DropTarget } from '../../../src/modules/folders/DropTargets.js';

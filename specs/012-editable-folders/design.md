@@ -187,6 +187,8 @@ The rows are VivArcDi's own elements, so their drag follows the mouse as `TileDr
 | `src/core/TodayList.ts` | Moved from the Favorites | Adapter |
 | `src/core/FavoriteDropZone.ts` | Shared per window: the Favorites register the grid, the folders ask | Mediator |
 | `src/modules/folders/LinkRemoval.ts` | Places the page of a released link, then takes the link out | Command |
+| `src/core/TabRowMove.ts` | Moves a tab to the index of the row under the pointer, shared by `FavoriteRemoval` and `LinkRemoval` | - |
+| `src/modules/favorites/GridFavoriteTargets.ts` | The grid's places registered in `FavoriteDropZone` | Adapter |
 | `src/modules/folders/FolderDragDrop.ts` | Wires `TabDragRelease`, `RowDrag` and `LinkRemoval` | - |
 | `src/modules/favorites/TabToFavorite.ts`, `GridDropZone.ts` | Use `TabDragRelease`; HTML5 code removed | - |
 | `src/modules/favorites/FavoriteDrop.ts` | `addPage`; registered in `FavoriteDropZone` by `GridDragging` | - |

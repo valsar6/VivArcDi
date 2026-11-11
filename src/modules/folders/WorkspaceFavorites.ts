@@ -1,5 +1,6 @@
 import { AddressKey } from '../../core/AddressKey.js';
 import { BookmarkCopier } from '../../core/bookmarks/BookmarkCopier.js';
+import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import { KeptTab } from '../../core/KeptTab.js';
 import type { Logger } from '../../core/Logger.js';
@@ -131,7 +132,8 @@ export class WorkspaceFavorites {
   /**
    * Copies bookmarks or bookmark folders, with all their levels, into a folder of the workspace
    * favorites or into the root of the active workspace, created if needed. The originals stay
-   * where they are and the copies are ordinary bookmarks, not links of any tab. A folder dropped
+   * where they are and the copies are bookmarks that VivArcDi made, so they are removed when their
+   * link is taken out, and are not links of any tab. A folder dropped
    * into itself is ignored, and a write that fails removes what was copied and is logged.
    *
    * @param ids The bookmarks or folders to copy, in order.
@@ -144,7 +146,9 @@ export class WorkspaceFavorites {
       if (folderId === null || ids.length === 0) {
         return 'ignored';
       }
-      return (await this.#copier.copy(ids, folderId, index)).length > 0 ? 'copied' : 'ignored';
+      const copies = await this.#copier.copy(ids, folderId, index);
+      await this.#remember(copies);
+      return copies.length > 0 ? 'copied' : 'ignored';
     } catch (error) {
       this.#deps.logger.warn('could not copy the bookmarks to the workspace favorites', error);
       return 'failed';
@@ -152,22 +156,30 @@ export class WorkspaceFavorites {
   }
 
   /**
-   * Takes a tab back to the list of open tabs. The bookmark is removed only when VivArcDi created
-   * it; any other bookmark keeps its link and its tab.
+   * Takes a link back out of the workspace favorites. The bookmark is removed only when VivArcDi
+   * created it; any other bookmark stays and keeps its link and its tab. Given a tab, it is
+   * unlinked together with the removal of the bookmark.
    *
-   * @param tab The tab that may be the tab of a link.
+   * @param target The tab that may be the tab of a link, or the id of a link that has no tab to unlink.
    * @returns What happened.
    */
-  public async take(tab: chrome.tabs.Tab): Promise<TakeResult> {
+  public async take(target: chrome.tabs.Tab | string): Promise<TakeResult> {
+    return typeof target === 'string' ? this.#takeLink(target, null) : this.#takeTab(target);
+  }
+
+  async #takeTab(tab: chrome.tabs.Tab): Promise<TakeResult> {
     const { bookmarkId } = TabData.ownOf(tab);
-    if (tab.id === undefined || bookmarkId === undefined) {
-      return 'none';
-    }
+    return tab.id === undefined || bookmarkId === undefined ? 'none' : this.#takeLink(bookmarkId, tab.id);
+  }
+
+  async #takeLink(bookmarkId: string, tabId: number | null): Promise<TakeResult> {
     if (!this.#deps.created.has(bookmarkId)) {
       return 'kept';
     }
     try {
-      await this.#deps.links.unlink(tab.id);
+      if (tabId !== null) {
+        await this.#deps.links.unlink(tabId);
+      }
       await this.#deps.writer.remove(bookmarkId);
       this.#deps.created.remove(bookmarkId);
       return 'taken';
@@ -180,6 +192,19 @@ export class WorkspaceFavorites {
   async #rootId(): Promise<string | null> {
     const path = this.#deps.root();
     return path.length === 0 ? null : this.#deps.writer.ensurePath(path);
+  }
+
+  async #remember(ids: string[]): Promise<void> {
+    for (const id of ids) {
+      this.#rememberLinks(await this.#deps.writer.subTree(id));
+    }
+  }
+
+  #rememberLinks(node: BookmarkNode): void {
+    if (node.url !== undefined) {
+      this.#deps.created.add(node.id);
+    }
+    node.children?.forEach((child) => this.#rememberLinks(child));
   }
 
   async #link(tabId: number, bookmarkId: string): Promise<void> {

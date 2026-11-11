@@ -77,3 +77,18 @@ test('removes the new bookmark when the tab cannot be pinned', async () => {
   assert.equal(await drop.add(1, null), 'failed');
   assert.deepEqual(titlesIn(chrome, '30'), ['First', 'Second']);
 });
+
+test('adds a page that no tab stands for as a favorite before a tile', async () => {
+  const { chrome, tabs, drop } = setup([]);
+  assert.equal(await drop.addPage({ title: 'A page', url: PAGE }, '32'), 'added');
+  assert.deepEqual(titlesIn(chrome, '30'), ['First', 'A page', 'Second']);
+  assert.equal(find(chrome.tree, '500')?.url, PAGE);
+  assert.deepEqual(tabs.calls, []);
+});
+
+test('ignores a page that is not a web page or already a favorite when adding by address', async () => {
+  const { chrome, drop } = setup([]);
+  assert.equal(await drop.addPage({ title: 'Settings', url: 'vivaldi://settings' }, null), 'ignored');
+  assert.equal(await drop.addPage({ title: 'First', url: 'https://first.example/' }, null), 'ignored');
+  assert.deepEqual(titlesIn(chrome, '30'), ['First', 'Second']);
+});

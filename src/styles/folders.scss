@@ -28,10 +28,15 @@
     border-radius: var(--vivarcdi-radius);
     cursor: default;
     transition: background-color var(--vivarcdi-transition);
+    -webkit-app-region: no-drag;
 
     &:hover {
       background-color: var(--vivarcdi-folders-hover);
     }
+  }
+
+  > #{$dragging} {
+    opacity: $dragging-opacity;
   }
 
   > [data-vivarcdi-drop='into'] {

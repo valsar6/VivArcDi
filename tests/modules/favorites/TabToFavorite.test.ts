@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { GAP_ATTRIBUTE, GridDropZone, TAB_ENTRIES_TYPE } from '../../../src/modules/favorites/GridDropZone.js';
+import { TAB_ENTRIES_TYPE } from '../../../src/core/TabEntries.js';
+import { GAP_ATTRIBUTE, GridDropZone } from '../../../src/modules/favorites/GridDropZone.js';
 import { TabToFavorite } from '../../../src/modules/favorites/TabToFavorite.js';
 import { TILE_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
 import { asDocument, asElement, DomDocument } from '../../core/dom.js';
