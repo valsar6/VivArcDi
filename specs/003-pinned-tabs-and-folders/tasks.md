@@ -31,4 +31,5 @@ Fix of 2026-11-11 (sections gone after a change of the sidebar's layout). Branch
 
 - [x] **T13.** `TabBarAnchor` watches the whole document, so that a new container of the tab list gets
   the host back. AC-20.
-- [ ] **T14.** Manual check AC-21 on macOS and Debian.
+- [ ] **T14.** Manual check AC-21 on macOS and Debian. macOS passed (Tore, 2026-11-11); Debian not
+  checked yet. Record: [incident of 2026-11-11](../../docs/incidents/2026-11-11-sidebar-sections-lost.md).

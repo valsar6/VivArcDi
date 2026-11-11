@@ -62,6 +62,12 @@ Vivaldi re-renders its interface often and rewrites the `class` attribute when i
 unknown data attributes alone. Modules that follow the interface observe it with a
 `MutationObserver` and redraw through `FrameTask`, at most once per animation frame.
 
+Vivaldi can also replace its containers, for example when the layout of the sidebar changes. An
+observer attached to such a container stays on the detached node and never fires again. Elements that
+VivArcDi keeps in the interface are therefore watched from a node that outlives the layout (the
+document or `#browser`), and their place is looked up again on every check: see `KeptElement` and
+`TabBarAnchor`, and the [incident of 2026-11-11](incidents/2026-11-11-sidebar-sections-lost.md).
+
 Modules are registered in `src/modules/index.ts` and enabled in `config.json` under their id.
 
 | Module | Role |
