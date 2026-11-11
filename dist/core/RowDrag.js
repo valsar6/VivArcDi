@@ -1,3 +1,4 @@
+import { DragPill } from "./DragPill.js";
 const DRAGGING_ATTRIBUTE = "data-vivarcdi-dragging";
 const DRAG_DISTANCE_PX = 6;
 const PRIMARY_BUTTON = 0;
@@ -11,7 +12,7 @@ class RowDrag {
   /**
    * Follows a row or a tile of VivArcDi being moved with the mouse: the button goes down on it,
    * the pointer moves more than a few pixels, and the button goes up somewhere. The element is
-   * dimmed while it is dragged, and the click that follows the release is swallowed so it does not
+   * dimmed while it is dragged, a pill with its icon and title follows the pointer, and the click that follows the release is swallowed so it does not
    * open.
    *
    * @param dependencies Everything it collaborates with.
@@ -60,8 +61,10 @@ class RowDrag {
     if (!press.dragging && Math.hypot(event.clientX - press.x, event.clientY - press.y) > DRAG_DISTANCE_PX) {
       press.dragging = true;
       press.element.setAttribute(DRAGGING_ATTRIBUTE, "");
+      this.#deps.pill?.show(DragPill.contentOf(press.element), event.clientX, event.clientY);
     }
     if (press.dragging) {
+      this.#deps.pill?.move(event.clientX, event.clientY);
       this.#deps.onMove(press.id, event.clientX, event.clientY);
     }
   }
@@ -78,6 +81,7 @@ class RowDrag {
     this.#press = null;
     press?.element.removeAttribute(DRAGGING_ATTRIBUTE);
     if (press?.dragging === true) {
+      this.#deps.pill?.hide();
       this.#deps.onEnd();
     }
   }

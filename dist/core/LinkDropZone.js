@@ -56,6 +56,12 @@ class LinkDropZone {
     this.#targets?.clear();
   }
   /**
+   * @returns The place at the end of the workspace favorites, or null when nothing is registered.
+   */
+  end() {
+    return this.#targets?.end() ?? null;
+  }
+  /**
    * @param target A place given by `at`.
    * @param page The page to add there.
    * @returns Whether a link was added; false when nothing is registered.

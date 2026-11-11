@@ -1,3 +1,4 @@
+import { HIDDEN_ATTRIBUTE } from "./HiddenTabMarker.js";
 import { TabSlot } from "./TabSlot.js";
 const TODAY_ATTRIBUTE = "data-vivarcdi-drop-today";
 class TodayList {
@@ -11,6 +12,24 @@ class TodayList {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
+  }
+  /**
+   * @param selectors Gives `pinnedTab` and `pinnedGroup`, when the catalog has them.
+   * @returns The selector of the slots that are not today's tabs.
+   */
+  static skippedBy(selectors) {
+    const pinned = ["pinnedTab", "pinnedGroup"].filter((name) => selectors.has(name)).map((name) => selectors.get(name));
+    return [`[${HIDDEN_ATTRIBUTE}]`, ...pinned].join(", ");
+  }
+  /**
+   * @returns The place at the top of today's tabs: the row of the first tab that is not hidden or
+   * pinned, or the list with no row when there is none, which leaves the tab where it is.
+   */
+  first() {
+    const { document, stripSelector, wrapperSelector, skipSelector } = this.#deps;
+    const rows = Array.from(document.querySelectorAll(`${stripSelector} ${wrapperSelector}`));
+    const row = rows.find((candidate) => candidate.closest(skipSelector) === null);
+    return { rowTabId: row === void 0 ? null : TabSlot.idOf(row, wrapperSelector) };
   }
   /**
    * @param x Horizontal position of the pointer in the window.

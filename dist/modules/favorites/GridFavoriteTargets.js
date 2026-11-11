@@ -30,6 +30,12 @@ class GridFavoriteTargets {
     this.#deps.zone.clear();
   }
   /**
+   * @returns The end of the grid.
+   */
+  end() {
+    return { beforeId: null };
+  }
+  /**
    * @param target A place given by `at`.
    * @param page The tab or the title and address to add.
    * @returns Whether a Favorite was added.

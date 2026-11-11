@@ -1,8 +1,14 @@
+import { ContextMenu } from "../../core/ContextMenu.js";
+import { DragPill } from "../../core/DragPill.js";
+import { FavoriteDropZone } from "../../core/FavoriteDropZone.js";
 import { FolderCommands } from "../../core/FolderCommands.js";
+import { TabMenuItems } from "../../core/TabMenuItems.js";
 import { Toast } from "../../core/Toast.js";
+import { TodayList } from "../../core/TodayList.js";
 import { CreatedLinks } from "./CreatedLinks.js";
 import { FavoriteShortcut } from "./FavoriteShortcut.js";
 import { FolderDragDrop } from "./FolderDragDrop.js";
+import { TabCommands } from "./TabCommands.js";
 import { WorkspaceFavorites } from "./WorkspaceFavorites.js";
 const TOAST_MS = 2e3;
 const HEADER_SELECTOR = "[data-vivarcdi-space-header]";
@@ -14,9 +20,10 @@ class FolderEditing {
   #stops = [];
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
-   * for a folder, Cmd/Ctrl+D, and a tab released over the section or the header, and a link row dragged out of the section. Each of them
-   * writes to the bookmarks through `WorkspaceFavorites` and the section follows the bookmark
-   * events. Without a way to write bookmarks it does nothing.
+   * for a folder, Cmd/Ctrl+D, a tab released over the section or the header, a link row dragged out
+   * of the section, and Pin tab and Tile tab in Vivaldi's menu of a tab. Each of them writes to the
+   * bookmarks through `WorkspaceFavorites` and the section follows the bookmark events. Without a
+   * way to write bookmarks it does nothing.
    *
    * @param context What the module may use.
    * @param view The section, which edits names.
@@ -47,7 +54,8 @@ class FolderEditing {
       () => toast.remove(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
-      this.#startDrops((text) => toast.show(text))
+      this.#startDrops((text) => toast.show(text)),
+      this.#startTabMenu((text) => toast.show(text))
     );
   }
   /**
@@ -99,6 +107,9 @@ class FolderEditing {
       document,
       wrapperSelector: selectors.get("tabWrapper"),
       stripSelector: selectors.get("tabStrip"),
+      skipSelector: TodayList.skippedBy(selectors),
+      pill: DragPill.of(document, selectors),
+      menu: new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body }),
       section: () => this.#view.element,
       header: () => document.querySelector(HEADER_SELECTOR),
       tabs,
@@ -111,6 +122,21 @@ class FolderEditing {
     });
     drops.start();
     return () => drops.stop();
+  }
+  #startTabMenu(notify) {
+    const { document, selectors, tabs, logger } = this.#context;
+    const commands = new TabCommands({ favorites: this.#favorites, grid: FavoriteDropZone.of(document), notify });
+    const menu = new TabMenuItems({
+      document,
+      contextMenu: globalThis.vivaldi?.contextMenu,
+      wrapperSelector: selectors.get("tabWrapper"),
+      tabs,
+      commands: commands.commands,
+      appliesTo: (tab) => TabCommands.appliesTo(tab),
+      logger
+    });
+    menu.start();
+    return () => menu.stop();
   }
   #indexBefore(bookmarkId) {
     const index = bookmarkId === null ? -1 : this.#sources.childIds().indexOf(bookmarkId);

@@ -16,3 +16,67 @@
 #browser[data-vivarcdi-active] :is([data-vivarcdi-anchor], [data-vivarcdi-preview]) {
   -webkit-app-region: no-drag;
 }
+
+#browser[data-vivarcdi-active] [data-vivarcdi-drag-pill] {
+  position: fixed;
+  z-index: 80;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  max-width: 240px;
+  height: 32px;
+  padding-inline: 12px;
+  border-radius: 32px;
+  background-color: var(--vivarcdi-pill, #fff);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  color: var(--vivarcdi-ink, #212121);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-drag-pill][hidden] {
+  display: none;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-drag-pill] img {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-drag-pill] span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#browser[data-vivarcdi-active] #tabs-container .tab-strip [data-vivarcdi-dragging] {
+  opacity: 0.4;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-menu] {
+  position: fixed;
+  z-index: 75;
+  box-sizing: border-box;
+  min-width: 160px;
+  padding: 4px;
+  border-radius: 8px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--colorFg, #fff);
+  font-size: 14px;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=menuitem] {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  cursor: default;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=menuitem]:hover {
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+}

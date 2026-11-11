@@ -30,6 +30,12 @@ class FolderLinkTargets {
     this.#deps.targets.clear();
   }
   /**
+   * @returns The end of the root of the workspace, which is the place of the space header.
+   */
+  end() {
+    return { kind: "header" };
+  }
+  /**
    * @param target A place given by `at`.
    * @param page The tab or the title and address to add.
    * @returns Whether a link was added.

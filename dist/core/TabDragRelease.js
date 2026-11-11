@@ -7,12 +7,13 @@ class TabDragRelease {
   #onDragOver = (event) => this.#over(event);
   #onDrop = (event) => this.#drop(event);
   #onLeave = () => this.#deps.place.clear();
+  #onDragEnd = () => this.#finish();
   /**
    * Lets a tab of Vivaldi's list be released over a place. The tab is followed with the mouse, and
    * when Vivaldi turns the drag into an HTML5 one, which carries `vivaldi/x-tab-entries` and sends
    * no mouse events, the `dragover` and `drop` over a target are accepted so the drag is not
    * cancelled. Both ways end in `release`, at most once for each press of the mouse. Drags that
-   * carry no tab are left alone.
+   * carry no tab are left alone. `onDrag` and `onEnd` follow either kind of drag, for the pill.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -22,9 +23,9 @@ class TabDragRelease {
     this.#drag = new TabPointerDrag({
       document,
       wrapperSelector,
-      onMove: (x, y) => place.mark(place.at(x, y)),
+      onMove: (x, y) => this.#moved(x, y),
       onDrop: (_tabId, x, y) => this.#release(place.at(x, y)),
-      onEnd: () => place.clear()
+      onEnd: () => this.#finish()
     });
   }
   /**
@@ -36,7 +37,7 @@ class TabDragRelease {
     document.addEventListener("dragover", this.#onDragOver, true);
     document.addEventListener("drop", this.#onDrop, true);
     document.addEventListener("dragleave", this.#onLeave, true);
-    document.addEventListener("dragend", this.#onLeave, true);
+    document.addEventListener("dragend", this.#onDragEnd, true);
   }
   /**
    * Stops following the mouse and the drag events, and removes the marks.
@@ -47,13 +48,28 @@ class TabDragRelease {
     document.removeEventListener("dragover", this.#onDragOver, true);
     document.removeEventListener("drop", this.#onDrop, true);
     document.removeEventListener("dragleave", this.#onLeave, true);
-    document.removeEventListener("dragend", this.#onLeave, true);
+    document.removeEventListener("dragend", this.#onDragEnd, true);
     place.clear();
+  }
+  #moved(x, y) {
+    this.#deps.place.mark(this.#deps.place.at(x, y));
+    this.#feed(x, y);
+  }
+  #feed(x, y) {
+    const press = this.#drag.lastPress;
+    if (press !== null) {
+      this.#deps.onDrag?.(press.tabId, x, y);
+    }
+  }
+  #finish() {
+    this.#deps.place.clear();
+    this.#deps.onEnd?.();
   }
   #over(event) {
     if (!TabEntries.carriedBy(event.dataTransfer)) {
       return;
     }
+    this.#feed(event.clientX, event.clientY);
     const target = this.#targetOf(event);
     if (target === null) {
       this.#deps.place.clear();
@@ -67,7 +83,7 @@ class TabDragRelease {
   }
   #drop(event) {
     const target = this.#targetOf(event);
-    this.#deps.place.clear();
+    this.#finish();
     if (target !== null) {
       event.preventDefault();
       this.#release(target);

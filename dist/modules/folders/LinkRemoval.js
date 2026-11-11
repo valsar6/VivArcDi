@@ -11,7 +11,9 @@ class LinkRemoval {
    * link in the active workspace is the page; without one the page is opened or added from its
    * address. The page is placed first, and only then is the link taken out by the rule of
    * Cmd/Ctrl+D: the bookmark is removed when VivArcDi created it, otherwise it stays and a toast
-   * says so. A failure leaves the link where it was. Released anywhere else, nothing changes.
+   * says so. A failure leaves the link where it was. Released anywhere else, nothing changes. The
+   * menu commands use the same move with a fixed place: the top of today's tabs, or the end of the
+   * grid.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -27,7 +29,7 @@ class LinkRemoval {
    */
   over(x, y) {
     const { grid, today } = this.#deps;
-    const place = this.#placeAt(x, y);
+    const place = this.placeAt(x, y);
     grid.mark(place?.kind === "grid" ? place.target : null);
     if (place?.kind === "today") {
       today.mark(x, y);
@@ -43,15 +45,55 @@ class LinkRemoval {
     this.#deps.today.clear();
   }
   /**
+   * @param x Horizontal position of the pointer in the window.
+   * @param y Vertical position of the pointer in the window.
+   * @returns The place under the point, or null when it is neither the grid nor the tab list.
+   */
+  placeAt(x, y) {
+    const target = this.#deps.grid.at(x, y);
+    if (target !== null) {
+      return { kind: "grid", target };
+    }
+    const today = this.#deps.today.at(x, y);
+    return today === null ? null : { kind: "today", target: today };
+  }
+  /**
    * @param linkId The bookmark of the link row that was released.
    * @param x Horizontal position of the pointer in the window.
    * @param y Vertical position of the pointer in the window.
    */
   async release(linkId, x, y) {
-    const place = this.#placeAt(x, y);
-    if (place === null) {
-      return;
+    const place = this.placeAt(x, y);
+    if (place !== null) {
+      await this.moveTo(linkId, place);
     }
+  }
+  /**
+   * Remove pin: the page of the link becomes the first tab of today.
+   *
+   * @param linkId The bookmark of the link.
+   */
+  async removePin(linkId) {
+    await this.moveTo(linkId, { kind: "today", target: this.#deps.today.first() });
+  }
+  /**
+   * Tile tab: the page of the link becomes a Favorite at the end of the grid.
+   *
+   * @param linkId The bookmark of the link.
+   */
+  async tile(linkId) {
+    const target = this.#deps.grid.end();
+    if (target !== null) {
+      await this.moveTo(linkId, { kind: "grid", target });
+    }
+  }
+  /**
+   * Keeps the page of a link at a place and takes the link out.
+   *
+   * @param linkId The bookmark of the link.
+   * @param place Where the page goes.
+   */
+  async moveTo(linkId, place) {
     try {
       const { title, url } = await this.#deps.writer.get(linkId);
       if (url === void 0) {
@@ -66,14 +108,6 @@ class LinkRemoval {
       this.#deps.logger.warn("could not take the link out of the folders", error);
       this.#deps.notify(FAILED_TEXT);
     }
-  }
-  #placeAt(x, y) {
-    const target = this.#deps.grid.at(x, y);
-    if (target !== null) {
-      return { kind: "grid", target };
-    }
-    const today = this.#deps.today.at(x, y);
-    return today === null ? null : { kind: "today", target: today };
   }
   async #tabOf(linkId) {
     const tabs = await this.#deps.tabs.query({ currentWindow: true });
