@@ -63,3 +63,10 @@ test('removes the marks and stops listening on stop', () => {
   assert.deepEqual(log, ['clear']);
   assert.equal([...dom.listeners.values()].flat().length, 0);
 });
+
+test('leaves the marks of a drag that carries no tab', () => {
+  const { dom, log } = setup();
+  dom.emit('dragover', { clientX: 50, clientY: 0, dataTransfer: { types: ['text/plain'] }, preventDefault: (): void => undefined });
+  dom.emit('dragover', { clientX: 300, clientY: 0, dataTransfer: { types: ['text/plain'] }, preventDefault: (): void => undefined });
+  assert.deepEqual(log, []);
+});

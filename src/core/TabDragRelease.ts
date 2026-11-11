@@ -78,6 +78,9 @@ export class TabDragRelease<Target> {
   }
 
   #over(event: DragEvent): void {
+    if (!TabEntries.carriedBy(event.dataTransfer)) {
+      return;
+    }
     const target = this.#targetOf(event);
     if (target === null) {
       this.#deps.place.clear();

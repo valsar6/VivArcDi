@@ -47,5 +47,5 @@ Revision of 2026-11-11 (drag and drop of tabs). Branch `fix/drag-tabs-workspace-
   `FavoriteDropZone` and `FavoriteDrop.addPage`. AC-38.
 - [x] **T18.** `LinkRemoval`, `WorkspaceFavorites.take` by bookmark id, copies of 018 in
   `CreatedLinks`, dimmed row style. AC-35, AC-36, AC-37.
-- [ ] **T19.** Manual verification checklist for Tore from AC-39 and AC-40
+- [x] **T19.** Manual verification checklist for Tore from AC-39 and AC-40
   (`tab-drag/verifica-trascina-schede.md` in the project files).
