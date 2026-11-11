@@ -7,6 +7,7 @@ interface BookmarkEvent {
 
 export interface BookmarksApi {
   getTree: (callback: (tree: BookmarkNode[]) => void) => void;
+  search?: ((query: string, callback: (nodes: BookmarkNode[]) => void) => void) | undefined;
   onCreated?: BookmarkEvent | undefined;
   onRemoved?: BookmarkEvent | undefined;
   onChanged?: BookmarkEvent | undefined;
@@ -52,6 +53,31 @@ export class BrowserBookmarks {
           reject(new Error(error.message));
         } else {
           resolve(tree);
+        }
+      });
+    });
+  }
+
+  /**
+   * Looks for bookmarks whose title or address contains the text.
+   *
+   * @param text The text to look for.
+   * @returns The matching bookmarks and folders, in the order Vivaldi gives.
+   * @throws {Error} When `chrome.bookmarks.search` is missing.
+   */
+  public search(text: string): Promise<BookmarkNode[]> {
+    const { api, host } = this.#require();
+    const search = api.search;
+    if (search === undefined) {
+      return Promise.reject(new Error('chrome.bookmarks.search is not available'));
+    }
+    return new Promise((resolve, reject) => {
+      search.call(api, text, (nodes) => {
+        const error = host.runtime?.lastError;
+        if (error) {
+          reject(new Error(error.message));
+        } else {
+          resolve(nodes);
         }
       });
     });

@@ -13,6 +13,8 @@ import { isDestinationQuestion, parseAdoptMessage } from './LittleArcMessage.js'
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import type { LittleArcSettings } from './LittleArcSettings.js';
 import { screenOf } from './ScreenAreas.js';
+import { assembleCommandBar } from './commandbar/CommandBarAssembly.js';
+import type { CommandBarMount } from './commandbar/CommandBarMount.js';
 import { WorkspaceAdopter } from './WorkspaceAdopter.js';
 import type { DestinationSource } from './WorkspaceAdopter.js';
 
@@ -51,10 +53,11 @@ export class MainWindowRole {
    * Starts listening for the shortcut, for moved pages and, when enabled, for links from other apps.
    */
   public async start(): Promise<void> {
+    const bar = this.#commandBar();
     const keys = new WindowKeys(
       this.#context.document,
       (event): 'open' | null => (ShortcutKeys.isCommandOption(event, 'KeyN') ? 'open' : null),
-      () => void this.#launcher.openBlank(),
+      () => this.#open(bar),
     );
     keys.attach();
     this.#cleanups.push(() => keys.detach());
@@ -73,6 +76,26 @@ export class MainWindowRole {
   public stop(): void {
     this.#cleanups.forEach((cleanup) => cleanup());
     this.#cleanups = [];
+  }
+
+  #commandBar(): CommandBarMount | null {
+    if (!this.#settings.commandBar) {
+      return null;
+    }
+    try {
+      const bar = assembleCommandBar(this.#context, this.#launcher, this.#registry, this.#windowId);
+      this.#cleanups.push(() => bar.stop());
+      return bar;
+    } catch (error) {
+      this.#context.logger.warn('cannot set up the command bar: the shortcut opens the blank window', error);
+      return null;
+    }
+  }
+
+  #open(bar: CommandBarMount | null): void {
+    if (bar?.toggle() !== true) {
+      void this.#launcher.openBlank();
+    }
   }
 
   async #listenForPages(): Promise<void> {

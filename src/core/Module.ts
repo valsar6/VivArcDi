@@ -1,5 +1,6 @@
 import type { BookmarkWriter } from './bookmarks/BookmarkWriter.js';
 import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
+import type { BrowserHistory } from './BrowserHistory.js';
 import type { BrowserPrefs } from './BrowserPrefs.js';
 import type { BrowserRuntime } from './BrowserRuntime.js';
 import type { BrowserSearch } from './BrowserSearch.js';
@@ -34,6 +35,8 @@ export interface ModuleContext {
   windows: BrowserWindows;
   /** Web search with Vivaldi's default engine; check `search.available` first. */
   search: BrowserSearch;
+  /** Visited pages, read-only; check `history.available` first. */
+  history: BrowserHistory;
   /** Vivaldi's preferences, read-only; check `prefs.available` first. */
   prefs: BrowserPrefs;
   /** Strings that survive a restart, shared by all modules. */

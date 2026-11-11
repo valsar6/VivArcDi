@@ -4,7 +4,8 @@
 |---|---|
 | Status | Approved |
 | Change request | 2026-11-09, the look of the window (section Look): Approved 2026-11-09 |
-| Change request | 2026-11-10, the command bar (section Opening: the command bar): Draft, written for Tore to read with the spec; nothing here is built until the spec is approved |
+| Change request | 2026-11-10, the command bar (section Opening: the command bar): Approved 2026-11-11 |
+| Change request | 2026-11-11, no dimming or blur, recent history for the empty field, swallowed outside clicks, searches through the fallback address (sections Opening: the command bar and its risks): Approved 2026-11-11 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -169,28 +170,28 @@ The bar lives in the normal window's `window.html`, next to Peek's overlay. It i
 
 | Class or file | Role | Pattern |
 |---|---|---|
-| `src/modules/littlearc/commandbar/Suggestion.ts` | Type: `{ url, title, host, source }`, `source` one of `tab`, `bookmark`, `history`, `top` | Value object |
+| `src/modules/littlearc/commandbar/Suggestion.ts` | Type: `{ url, title, host, source }`, `source` one of `tab`, `bookmark`, `history` | Value object |
 | `.../SuggestionSource.ts` | Interface: `suggest(text, limit): Promise<Suggestion[]>`; `''` asks for the empty-field list | Strategy |
 | `.../TabSuggestions.ts` | Reads `chrome.tabs.query({})` through `BrowserTabs`, leaves out Little Arc windows' tabs (registry) | Adapter |
-| `.../BookmarkSuggestions.ts` | Reads `chrome.bookmarks` through `BrowserBookmarks` (tree walk, or `search` if T23 proves it) | Adapter |
-| `.../HistorySuggestions.ts` | `chrome.history.search({ text, maxResults })` through a new `src/core/BrowserHistory.ts` | Adapter |
-| `.../TopSiteSuggestions.ts` | `chrome.topSites.get` through a new `src/core/BrowserTopSites.ts` | Adapter |
-| `.../SuggestionRanker.ts` | Pure: merges the sources' lists, drops non-web addresses, removes duplicates by normalized address, scores matches, sorts, cuts to the limit (FR-26, AC-28 to AC-31) | Strategy |
+| `.../BookmarkSuggestions.ts` | Reads `chrome.bookmarks` through `BrowserBookmarks` (`chrome.bookmarks.search`, proven by T23) | Adapter |
+| `.../HistorySuggestions.ts` | `chrome.history.search({ text, maxResults })` through a new `src/core/BrowserHistory.ts`; with empty text it returns the most recent pages, newest first | Adapter |
+| `.../SuggestionRanker.ts` | Pure: merges the sources' lists, drops non-web addresses, removes duplicates by normalized address, scores matches, sorts, cuts to the limit; for the empty field it takes the history list newest first, drops non-web addresses, deduplicates and cuts to five (FR-26, FR-27, AC-28 to AC-31) | Strategy |
 | `.../AddressKey.ts` use | Reuses `src/core/AddressKey.ts` for the normalized address if it fits; otherwise a small `normalizedAddress` function next to the ranker (DRY: one of the two) | |
+| `.../MiddleEllipsis.ts` | Pure: `of(host, maxChars)` keeps the start and the end of a long host with `…` between (`membersh…platform.com`); a short host is returned as it is. The view calls it with the number of characters that fit | |
 | `.../SelectionCursor.ts` | Pure: index, `up()`, `down()`, `reset()`, wraps around (AC-32) | State |
 | `.../SuggestionList.ts` | Collects the sources (failures skipped and logged once), calls the ranker, builds the rows: the typed text row first, then suggestions | Facade |
 | `.../CommandBarController.ts` | Pure of the DOM: open or closed, the text, the list, the cursor; `submit()` asks the launcher to open the typed text or the selected row; `dismiss()` opens nothing (AC-34 to AC-36) | State, Command |
-| `.../CommandBarView.ts` | The DOM: scrim, card, field row, divider, rows, × button; listens and calls the controller | Observer |
+| `.../CommandBarView.ts` | The DOM: the click-catching layer, card, field row, divider, rows, × button; listens and calls the controller | Observer |
 | `.../CommandBarMount.ts` | Adds the view to `#browser` and removes it; reports failure to `MainWindowRole`, which then opens the blank window | |
-| `src/modules/littlearc/LittleArcLauncher.ts` | New `openAddress(url)` and `openSearch(text)`: `windows.create({ url, type: 'popup', ... })`, and for a search a blank popup then `BrowserSearch.run(text, tabId)` on its first tab, or `BrowserSearch.fallbackAddress` | |
-| `src/styles/little-arc.scss` | The overlay: scrim, card, rows, selection (new block next to the bar's) | |
+| `src/modules/littlearc/LittleArcLauncher.ts` | New `openAddress(url)`: `windows.create({ url, type: 'popup', ... })`; a search is `openAddress(BrowserSearch.fallbackAddress(text))`, because `chrome.search.query` is not defined in the main window (probe of 2026-11-11) | |
+| `src/styles/little-arc.scss` | The overlay: click-catching layer, card, rows, selection (new block next to the bar's) | |
 
 **Flow of Enter.** `CommandBarView` -> `CommandBarController.submit()` -> `AddressResolver.resolve`
-(typed text row) or the row's url -> `LittleArcLauncher.openAddress` / `openSearch` -> the popup role
+(typed text row) or the row's url -> `LittleArcLauncher.openAddress` -> the popup role
 starts as for any Little Arc window. The controller closes the bar before it calls the launcher, so a
 slow window creation never leaves the bar up; an error is logged and the bar stays closed (FR-23).
 
-**Layout.** `#browser > .vivarcdi-command-bar-scrim` (fixed, covers the window, a click closes it) holds
+**Layout.** `#browser > .vivarcdi-command-bar-catcher` (fixed, covers the window, fully transparent, no filter, it only catches outside clicks) holds
 `.vivarcdi-command-bar` (the card). Card, from top: `-field` row (search icon, `<input>`, × button),
 a 1 px divider, a `role="listbox"` list of `role="option"` rows. The card is centered with
 `left: 50%; transform: translateX(-50%)` and `top: $command-bar-top` (18vh), which puts it in the upper
@@ -199,8 +200,8 @@ as `LinkIcon` does, with a lettered tile when it fails. Rows with a title longer
 `text-overflow: ellipsis` on the title only, the host has `flex: none`.
 
 **Focus.** The view stores `document.activeElement` when it shows and focuses it back when it closes,
-or the active tab's webview if the stored element is gone (question 6 of the probe). The scrim handles
-`pointerdown` to close; `keydown` for Up, Down, Enter and Esc is handled on the field, with `stopPropagation`
+or the active tab's webview if the stored element is gone (question 6 of the probe). The catcher handles
+`pointerdown`, `mousedown` and `click` in the capture phase with `preventDefault` and `stopPropagation`, and `pointerdown` closes the bar, so a Vivaldi panel under it does not close (probe 2026-11-11); `keydown` for Up, Down, Enter and Esc is handled on the field, with `stopPropagation`
 so the page and Vivaldi never see it. Keys are not given to `WindowKeys` while the bar is open, except
 the shortcut itself, which toggles.
 
@@ -224,8 +225,8 @@ the shortcut itself, which toggles.
 | `$command-bar-close-fill` | `#e7e7e7` | × button |
 | `$command-bar-selected` | `#9095fb` | selected row (FR-30) |
 | `$command-bar-host` | `#a8a8a8`, and `rgba(255,255,255,.65)` on the selected row | host text |
-| `$command-bar-scrim` | `rgba(0,0,0,.18)`, `blur(6px)` if T23 allows | dimmed page |
 | `$command-bar-shadow` | `0 18px 50px rgba(0,0,0,.28)` | soft shadow |
+| `$command-bar-host-max` | `22ch` | host cut in the middle beyond this |
 
 Dark mode uses a dark card, light text and the same indigo, written next to the light values with the
 same `prefers-color-scheme` rule the other overlays follow.
@@ -254,10 +255,9 @@ follow-up global shortcut (an OS hook that raises Vivaldi, then this same bar).
 
 | Risk | Mitigation |
 |---|---|
-| `chrome.history` or `chrome.topSites` is not defined in the interface document | T23 finds out; the source is skipped (FR-28) and the bar works with tabs and bookmarks |
-| The overlay cannot take the keyboard focus from the page, or cannot give it back | T23, questions 6 and 7; fallback is to focus the active tab through `chrome.tabs.update` on close |
-| A click on the scrim does not reach the document over a webview | The scrim sits in the window's DOM above the webview container; T23 question 7; fallback is Esc and × only, AC-25 is reported |
-| `backdrop-filter` does not blur the page | Dim only; the blur is optional |
+| `chrome.history` is missing in some Vivaldi version | Present on 8.2 (T23); if missing the source is skipped (FR-28) and the empty field shows nothing |
+| The overlay cannot take the keyboard focus from the page, or cannot give it back | Probe question 6, left to the manual check; fallback is to focus the active tab through `chrome.tabs.update` on close |
+| An outside click also reaches Vivaldi under the card (seen in the probe: it closed a panel) | Settled by design: the catcher swallows `pointerdown`, `mousedown` and `click` in the capture phase (FR-25, AC-44); checked in the manual check |
 | A history of tens of thousands of pages makes the list slow | At most 20 results per source (NFR-7), ranking over the merged list; measured in the manual check |
 | Favicons are slow or missing | A lettered tile; the list never waits for icons |
 | The popup created with an address flashes empty | Accepted as for the external-link flow; measured in the manual check |
@@ -285,7 +285,7 @@ Percentages are clamped to 20-100. `idleCloseHours` below 0 is read as 0.
 |---|---|
 | Cmd+Opt+N may already be a Vivaldi command | The capture-phase handler takes it first; the verification checks that the original command is gone only in the active window |
 | `chrome.runtime.sendMessage` between two `window.html` documents may not arrive | Probe it in T1; fallback is a key in `chrome.storage.local` watched with `onChanged` |
-| `chrome.search` may be missing from the interface | `AddressResolver` asks Vivaldi's default engine when `chrome.search.query` exists; otherwise it uses the default engine address stored in Vivaldi's prefs; T1 finds out which |
+| `chrome.search` may be missing from the interface | Settled for the main window on 2026-11-11: `chrome.search.query` is not defined there, so the command bar opens the fallback address (DuckDuckGo). `AddressResolver` asks Vivaldi's default engine when `chrome.search.query` exists; otherwise it uses the default engine address stored in Vivaldi's prefs; T1 finds out which |
 | The tab flashes in the main window before moving | Accepted in version 1, measured in the manual check |
 | A legitimate tab with no opener and an `http(s)` address appears right after the app regains focus (for example a bookmark clicked in the first 100 ms) | The user would get a Little Arc window instead; `externalLinks` turns it off |
 | A website popup opened with `window.open` gets the bar | The mark in the registry decides, not the window type alone |

@@ -1,4 +1,5 @@
 export interface LittleArcSettings {
+  commandBar: boolean;
   externalLinks: boolean;
   askWorkspace: boolean;
   idleCloseHours: number;
@@ -10,6 +11,7 @@ const MIN_PERCENT = 20;
 const MAX_PERCENT = 100;
 
 export const LITTLE_ARC_DEFAULTS: Readonly<LittleArcSettings> = Object.freeze({
+  commandBar: true,
   externalLinks: true,
   askWorkspace: false,
   idleCloseHours: 6,
@@ -27,6 +29,7 @@ export function settingsFrom(options: Record<string, unknown>): LittleArcSetting
   const merged = { ...LITTLE_ARC_DEFAULTS, ...options };
   const clamp = (value: number): number => Math.min(MAX_PERCENT, Math.max(MIN_PERCENT, Number(value) || MAX_PERCENT));
   return {
+    commandBar: merged.commandBar === true,
     externalLinks: merged.externalLinks === true,
     askWorkspace: merged.askWorkspace === true,
     idleCloseHours: Math.max(0, Number(merged.idleCloseHours) || 0),

@@ -384,8 +384,16 @@ no workspace switcher, and nothing above the page but one slim bar in the colors
 
 What it does:
 
-- **Cmd+Opt+N** (Ctrl+Alt+N on Debian) opens it with the address field ready. A site name opens the
-  site, any other text is a web search.
+- **Cmd+Opt+N** (Ctrl+Alt+N on Debian) shows the **command bar** over the window in front: a light
+  card with a search field and a list of up to five rows, with the page left as it is (no dimming, no
+  blur). With the field empty the list shows the pages you visited most recently; with text it shows
+  what you typed first ("Search for ..." or "Open site"), then the best matches among your open tabs,
+  bookmarks and history. Up and Down move the selection, Enter opens it in a Little Arc window that
+  starts loading at once, and a text that is not an address is searched on DuckDuckGo. Esc, the x button,
+  a click outside the card (which reaches nothing under it) or the shortcut again close the bar and
+  open nothing. Long titles are cut at the end and long hosts in the middle (`membersh…platform.com`).
+  With `commandBar` off, or if the bar cannot be shown, the shortcut opens an empty Little Arc window
+  with the address field ready, as before.
 - A **link opened from another app** (Mail, Slack, Notes) opens in Little Arc instead of a tab of the
   main window. VivArcDi recognizes it as a new, active tab with no opener that appears just as Vivaldi
   comes to the front.
@@ -400,6 +408,7 @@ Options of `little-arc` in `config.json`:
 
 | Option | Default | Effect |
 |---|---|---|
+| `commandBar` | `true` | The shortcut shows the command bar; `false` opens an empty window with the address field ready |
 | `externalLinks` | `true` | Links opened from other apps open in Little Arc |
 | `askWorkspace` | `false` | Reserved: the choice of workspace is not available yet, the most recent one is used |
 | `idleCloseHours` | `6` | Closes an untouched window after this many hours; `0` never |
