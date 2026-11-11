@@ -39,9 +39,9 @@ Revision of 2026-11-11 (drag and drop of tabs). Branch `fix/drag-tabs-workspace-
 - [ ] **T14.** Read-only probe for Tore: the events of a tab of today dragged over the rows, onto a
   folder, and of a link row dragged below the separator (`tab-drag/diagnostica-trascina-schede.md`
   in the project files). Confirms the risk of the HTML5 way.
-- [ ] **T15.** `TabEntries` and `TabDragRelease` in `src/core`; `TabToFavorite` and `GridDropZone`
+- [x] **T15.** `TabEntries` and `TabDragRelease` in `src/core`; `TabToFavorite` and `GridDropZone`
   moved onto them with their tests unchanged. AC-33, AC-34.
-- [ ] **T16.** `FolderDragDrop` on `TabDragRelease`: the HTML5 drop over the area adds the link at the
+- [x] **T16.** `FolderDragDrop` on `TabDragRelease`: the HTML5 drop over the area adds the link at the
   drop position. AC-32.
 - [ ] **T17.** `RowDrag` in `src/core` from `TileDrag`; `TodayList` moved to `src/core`;
   `FavoriteDropZone` and `FavoriteDrop.addPage`. AC-38.
