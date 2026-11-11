@@ -4,6 +4,7 @@ import type { LinkDropTarget, LinkDropZone } from '../../core/LinkDropZone.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
 import { TabDataWriter } from '../../core/TabDataWriter.js';
+import { TabRowMove } from '../../core/TabRowMove.js';
 import type { LinkedTabs } from './LinkedTabs.js';
 import type { TodayList, TodayTarget } from '../../core/TodayList.js';
 
@@ -23,6 +24,7 @@ type Place = { kind: 'link'; target: LinkDropTarget } | { kind: 'today'; target:
 export class FavoriteRemoval {
   #deps: FavoriteRemovalDependencies;
   #writer: TabDataWriter;
+  #rows: TabRowMove;
 
   /**
    * Takes a Favorite out of the grid and keeps its page, as Arc does. Released over the folders or
@@ -37,6 +39,7 @@ export class FavoriteRemoval {
   constructor(dependencies: FavoriteRemovalDependencies) {
     this.#deps = dependencies;
     this.#writer = TabDataWriter.of(dependencies.tabs);
+    this.#rows = new TabRowMove({ tabs: dependencies.tabs, logger: dependencies.logger });
   }
 
   /**
@@ -116,26 +119,12 @@ export class FavoriteRemoval {
     if (own === undefined) {
       return (await this.#deps.tabs.create({ url: page.url, active: false })).id !== undefined;
     }
-    await this.#moveToRow(own, place.target.rowTabId);
+    await this.#rows.to(own, place.target.rowTabId);
     return true;
   }
 
   async #release(tabId: number): Promise<void> {
     await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { favoriteId: undefined, pinnedUrl: undefined }));
     await this.#deps.tabs.update(tabId, { pinned: false });
-  }
-
-  async #moveToRow(tabId: number, rowTabId: number | null): Promise<void> {
-    if (rowTabId === null) {
-      return;
-    }
-    try {
-      const row = await this.#deps.tabs.get(rowTabId);
-      if (row.pinned !== true && row.index !== undefined) {
-        await this.#deps.tabs.move(tabId, { index: row.index });
-      }
-    } catch (error) {
-      this.#deps.logger.warn('could not move the tab to the place of the drop', error);
-    }
   }
 }

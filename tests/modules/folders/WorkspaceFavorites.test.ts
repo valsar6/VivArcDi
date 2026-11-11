@@ -161,11 +161,20 @@ test('creates the workspace root on the first copy', async () => {
   assert.deepEqual(childrenOf(chrome, 'Panel'), ['Music', 'Chess']);
 });
 
-test('does not link copies to tabs or remember them as created links', async () => {
+test('does not link copies to tabs and remembers them as created links', async () => {
   const { tabs, created, favorites } = withPanel();
-  await favorites.copy(['63'], {});
-  assert.equal(created.has('500'), false);
+  await favorites.copy(['63', '61'], {});
+  assert.deepEqual(['500', '501', '502'].map((id) => created.has(id)), [true, false, true]);
   assert.deepEqual(tabs.calls, []);
+});
+
+test('takes a link out by its bookmark id only when VivArcDi created it', async () => {
+  const { chrome, created, favorites } = withPanel();
+  await favorites.copy(['63'], {});
+  assert.equal(await favorites.take('500'), 'taken');
+  assert.equal(created.has('500'), false);
+  assert.equal(await favorites.take('33'), 'kept');
+  assert.deepEqual(childrenOf(chrome, 'Casetta'), ['Hobbies', 'Mine']);
 });
 
 test('logs a failed copy and leaves no partial folder', async () => {

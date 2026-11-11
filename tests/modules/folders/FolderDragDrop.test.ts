@@ -1,9 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
+import { DRAGGING_ATTRIBUTE } from '../../../src/core/RowDrag.js';
 import { TAB_ENTRIES_TYPE } from '../../../src/core/TabEntries.js';
 import { FolderDragDrop } from '../../../src/modules/folders/FolderDragDrop.js';
 import type { AddPlace } from '../../../src/modules/folders/WorkspaceFavorites.js';
 import { asDocument, asElement, DomDocument } from '../../core/dom.js';
+import type { DomNode } from '../../core/dom.js';
 import { silentLogger } from '../reopen/fakes.js';
 
 const WRAPPER = '.wrapper';
@@ -16,6 +19,8 @@ const rowOf = (tabId: number): unknown => {
 
 interface Setup {
   dom: DomDocument;
+  row: DomNode;
+  calls: string[];
   added: Array<[number | undefined, AddPlace]>;
   press: (tabId: number) => void;
   html5: (type: 'dragover' | 'drop', types: string[], x: number, y: number) => { prevented: number; effect: string };
@@ -25,12 +30,15 @@ function setup(): Setup {
   const dom = new DomDocument();
   const section = dom.createElement('div');
   section.rect = { left: 0, right: 200, top: 0, bottom: 80 };
-  ['33', '34'].forEach((id, index) => {
+  const rows = ['33', '34'].map((id, index) => {
     const row = dom.createElement('div');
     row.setAttribute('data-vivarcdi-link-id', id);
     row.rect = { left: 0, right: 200, top: index * 40, bottom: index * 40 + 40 };
     section.append(row);
+    return row;
   });
+  (dom as unknown as { elementFromPoint: () => null }).elementFromPoint = (): null => null;
+  const calls: string[] = [];
   dom.parent.append(section);
   const added: Setup['added'] = [];
   const ids = ['33', '34'];
@@ -39,8 +47,18 @@ function setup(): Setup {
     wrapperSelector: WRAPPER,
     section: (): HTMLElement => asElement(section),
     header: (): null => null,
-    tabs: { get: async (id): Promise<chrome.tabs.Tab> => ({ id, url: PAGE }) as chrome.tabs.Tab },
+    stripSelector: '.strip',
+    tabs: {
+      get: async (id): Promise<chrome.tabs.Tab> => ({ id, url: PAGE }) as chrome.tabs.Tab,
+      query: async (): Promise<chrome.tabs.Tab[]> => (calls.push('query'), []),
+      create: async (): Promise<chrome.tabs.Tab> => (calls.push('create'), { id: 1 } as chrome.tabs.Tab),
+      move: async (): Promise<chrome.tabs.Tab> => (calls.push('move'), { id: 1 } as chrome.tabs.Tab),
+    },
+    writer: { get: async (id): Promise<BookmarkNode> => (calls.push('get'), { id, title: '', url: PAGE }) },
+    tabLinks: { link: async (): Promise<void> => void calls.push('link'), unlink: async (): Promise<void> => void calls.push('unlink') },
+    notify: (): void => undefined,
     favorites: {
+      take: async (): Promise<'none'> => (calls.push('take'), 'none'),
       add: async (tab, place = {}): Promise<'added'> => (added.push([tab.id, place]), 'added'),
       addLink: async (): Promise<'added'> => 'added',
       copy: async (): Promise<'copied'> => 'copied',
@@ -50,6 +68,8 @@ function setup(): Setup {
   }).start();
   return {
     dom,
+    row: rows[0] as DomNode,
+    calls,
     added,
     press: (tabId): void => dom.emit('mousedown', { button: 0, buttons: 1, clientX: 500, clientY: 500, target: rowOf(tabId) }),
     html5: (type, types, x, y): ReturnType<Setup['html5']> => {
@@ -101,4 +121,20 @@ test('adds one link per drag', async () => {
   html5('drop', [TAB_ENTRIES_TYPE], 10, 50);
   await settle();
   assert.deepEqual(added, [[7, { index: 1 }]]);
+});
+
+test('leaves the link in place when it is released elsewhere', async () => {
+  const { dom, row, calls, added } = setup();
+  dom.emit('mousedown', { button: 0, buttons: 1, clientX: 10, clientY: 10, target: row });
+  dom.emit('mousemove', { buttons: 1, clientX: 10, clientY: 60 });
+  dom.emit('mousemove', { buttons: 1, clientX: 400, clientY: 400 });
+  assert.equal(row.hasAttribute(DRAGGING_ATTRIBUTE), true);
+  dom.emit('mouseup', { buttons: 0, clientX: 400, clientY: 400 });
+  let stopped = 0;
+  dom.emit('click', { preventDefault: (): void => undefined, stopPropagation: (): number => (stopped += 1) });
+  await settle();
+  assert.equal(row.hasAttribute(DRAGGING_ATTRIBUTE), false);
+  assert.equal(stopped, 1);
+  assert.deepEqual(calls, []);
+  assert.deepEqual(added, []);
 });

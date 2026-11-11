@@ -15,7 +15,7 @@ interface RowBox {
 export const DROP_ATTRIBUTE = 'data-vivarcdi-drop';
 
 const FOLDER_ATTRIBUTE = 'data-vivarcdi-folder-id';
-const LINK_ATTRIBUTE = 'data-vivarcdi-link-id';
+export const LINK_ATTRIBUTE = 'data-vivarcdi-link-id';
 const DEPTH_ATTRIBUTE = 'data-vivarcdi-depth';
 const FOLDER_EDGE_SHARE = 0.25;
 const LINK_EDGE_SHARE = 0.5;

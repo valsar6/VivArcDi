@@ -45,7 +45,7 @@ Revision of 2026-11-11 (drag and drop of tabs). Branch `fix/drag-tabs-workspace-
   drop position. AC-32.
 - [x] **T17.** `RowDrag` in `src/core` from `TileDrag`; `TodayList` moved to `src/core`;
   `FavoriteDropZone` and `FavoriteDrop.addPage`. AC-38.
-- [ ] **T18.** `LinkRemoval`, `WorkspaceFavorites.take` by bookmark id, copies of 018 in
+- [x] **T18.** `LinkRemoval`, `WorkspaceFavorites.take` by bookmark id, copies of 018 in
   `CreatedLinks`, dimmed row style. AC-35, AC-36, AC-37.
 - [ ] **T19.** Manual verification checklist for Tore from AC-39 and AC-40
   (`tab-drag/verifica-trascina-schede.md` in the project files).
