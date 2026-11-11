@@ -33,6 +33,30 @@ class BrowserBookmarks {
     });
   }
   /**
+   * Looks for bookmarks whose title or address contains the text.
+   *
+   * @param text The text to look for.
+   * @returns The matching bookmarks and folders, in the order Vivaldi gives.
+   * @throws {Error} When `chrome.bookmarks.search` is missing.
+   */
+  search(text) {
+    const { api, host } = this.#require();
+    const search = api.search;
+    if (search === void 0) {
+      return Promise.reject(new Error("chrome.bookmarks.search is not available"));
+    }
+    return new Promise((resolve, reject) => {
+      search.call(api, text, (nodes) => {
+        const error = host.runtime?.lastError;
+        if (error) {
+          reject(new Error(error.message));
+        } else {
+          resolve(nodes);
+        }
+      });
+    });
+  }
+  /**
    * Listens to the four events that change the tree: created, removed, changed and moved.
    *
    * @param listener Called after each of them.

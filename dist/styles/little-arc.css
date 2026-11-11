@@ -133,3 +133,143 @@
   font: inherit;
   font-size: 12px;
 }
+
+#browser .vivarcdi-command-bar-catcher {
+  --command-bar-card: #f9f9f9;
+  --command-bar-text: var(--vivarcdi-ink, #2a2a2a);
+  --command-bar-placeholder: #7d7d7d;
+  --command-bar-divider: #e0e0e0;
+  --command-bar-close-fill: #e7e7e7;
+  --command-bar-close-ink: #555;
+  --command-bar-host: #a8a8a8;
+  position: fixed;
+  z-index: 90;
+  background: transparent;
+  inset: 0;
+}
+@media (prefers-color-scheme: dark) {
+  #browser .vivarcdi-command-bar-catcher {
+    --command-bar-card: #2a2a2c;
+    --command-bar-text: #f2f2f2;
+    --command-bar-placeholder: #9a9a9e;
+    --command-bar-divider: #3d3d40;
+    --command-bar-close-fill: #3a3a3d;
+    --command-bar-close-ink: #c8c8cc;
+    --command-bar-host: #8c8c90;
+  }
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar {
+  position: absolute;
+  top: 18vh;
+  left: 50%;
+  width: 580px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  padding-bottom: 12px;
+  border-radius: 24px;
+  background-color: var(--command-bar-card);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+  color: var(--command-bar-text);
+  font-size: 15px;
+  transform: translateX(-50%);
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar[data-empty] {
+  padding-bottom: 0;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-field {
+  display: flex;
+  height: 98px;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0 12px;
+  gap: 14px;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-field svg {
+  flex: none;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-input {
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 20px;
+  outline: none;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-input::placeholder {
+  color: var(--command-bar-placeholder);
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-close {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--command-bar-close-fill);
+  color: var(--command-bar-close-ink);
+  cursor: pointer;
+  place-items: center;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-divider {
+  height: 1px;
+  margin: 0 12px;
+  background-color: var(--command-bar-divider);
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar[data-empty] .vivarcdi-command-bar-divider,
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar[data-empty] .vivarcdi-command-bar-list {
+  display: none;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-list {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 0;
+  gap: 6px;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-row {
+  display: flex;
+  height: 54px;
+  flex: none;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 12px;
+  cursor: default;
+  gap: 14px;
+  white-space: nowrap;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-row[aria-selected=true] {
+  background-color: #9095fb;
+  color: #fff;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-row[aria-selected=true] .vivarcdi-command-bar-host {
+  color: rgba(255, 255, 255, 0.65);
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-icon,
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-letter {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: contain;
+  place-items: center;
+}
+#browser .vivarcdi-command-bar-catcher span.vivarcdi-command-bar-icon,
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-letter {
+  background-color: var(--command-bar-close-fill);
+  color: var(--command-bar-close-ink);
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+#browser .vivarcdi-command-bar-catcher .vivarcdi-command-bar-host {
+  flex: none;
+  color: var(--command-bar-host);
+}

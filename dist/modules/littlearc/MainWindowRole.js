@@ -10,6 +10,7 @@ import { FocusHistory } from "./FocusHistory.js";
 import { LittleArcLauncher } from "./LittleArcLauncher.js";
 import { isDestinationQuestion, parseAdoptMessage } from "./LittleArcMessage.js";
 import { screenOf } from "./ScreenAreas.js";
+import { assembleCommandBar } from "./commandbar/CommandBarAssembly.js";
 import { WorkspaceAdopter } from "./WorkspaceAdopter.js";
 class MainWindowRole {
   #context;
@@ -44,10 +45,11 @@ class MainWindowRole {
    * Starts listening for the shortcut, for moved pages and, when enabled, for links from other apps.
    */
   async start() {
+    const bar = this.#commandBar();
     const keys = new WindowKeys(
       this.#context.document,
       (event) => ShortcutKeys.isCommandOption(event, "KeyN") ? "open" : null,
-      () => void this.#launcher.openBlank()
+      () => this.#open(bar)
     );
     keys.attach();
     this.#cleanups.push(() => keys.detach());
@@ -65,6 +67,24 @@ class MainWindowRole {
   stop() {
     this.#cleanups.forEach((cleanup) => cleanup());
     this.#cleanups = [];
+  }
+  #commandBar() {
+    if (!this.#settings.commandBar) {
+      return null;
+    }
+    try {
+      const bar = assembleCommandBar(this.#context, this.#launcher, this.#registry, this.#windowId);
+      this.#cleanups.push(() => bar.stop());
+      return bar;
+    } catch (error) {
+      this.#context.logger.warn("cannot set up the command bar: the shortcut opens the blank window", error);
+      return null;
+    }
+  }
+  #open(bar) {
+    if (bar?.toggle() !== true) {
+      void this.#launcher.openBlank();
+    }
   }
   async #listenForPages() {
     const { tabs, windows, runtime, logger } = this.#context;

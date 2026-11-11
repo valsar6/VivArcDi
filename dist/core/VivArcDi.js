@@ -3,6 +3,7 @@ import { BookmarkWriter } from "./bookmarks/BookmarkWriter.js";
 import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
 import { BrowserPrefs } from "./BrowserPrefs.js";
 import { BrowserRuntime } from "./BrowserRuntime.js";
+import { BrowserHistory } from "./BrowserHistory.js";
 import { BrowserSearch } from "./BrowserSearch.js";
 import { BrowserTabs } from "./BrowserTabs.js";
 import { BrowserWindows } from "./BrowserWindows.js";
@@ -23,6 +24,7 @@ class VivArcDi {
   #runtime;
   #windows;
   #search;
+  #history;
   #prefs;
   #storage;
   #styles;
@@ -44,6 +46,7 @@ class VivArcDi {
     runtime = new BrowserRuntime(void 0),
     windows,
     search,
+    history = new BrowserHistory(void 0),
     prefs = new BrowserPrefs(void 0),
     storage = new PersistentStorage(/* @__PURE__ */ new Map(), null, void 0, logger)
   }) {
@@ -57,6 +60,7 @@ class VivArcDi {
     this.#runtime = runtime;
     this.#windows = windows;
     this.#search = search;
+    this.#history = history;
     this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
@@ -83,6 +87,7 @@ class VivArcDi {
       runtime: new BrowserRuntime(chromeApi),
       windows: new BrowserWindows(chromeApi),
       search: new BrowserSearch(chromeApi),
+      history: new BrowserHistory(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger)
     });
@@ -167,6 +172,7 @@ class VivArcDi {
         runtime: this.#runtime,
         windows: this.#windows ?? new BrowserWindows(void 0),
         search: this.#search ?? new BrowserSearch(void 0),
+        history: this.#history,
         prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader

@@ -28,6 +28,16 @@ class LittleArcLauncher {
     return this.#open({ url: BLANK_PAGE });
   }
   /**
+   * Opens a Little Arc window that starts loading an address. A search is opened through the fallback
+   * search address by the caller, because `chrome.search.query` is missing in the main window.
+   *
+   * @param url The address to load.
+   * @returns Whether the window was opened.
+   */
+  openAddress(url) {
+    return this.#open({ url });
+  }
+  /**
    * Moves a tab that Vivaldi opened in the main window into a new Little Arc window, so that the
    * page is not loaded twice. When the window cannot be created the tab stays where Vivaldi put it.
    *
