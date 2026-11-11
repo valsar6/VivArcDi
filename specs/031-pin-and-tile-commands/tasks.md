@@ -18,3 +18,13 @@ Branch `features/pin-tile-commands`, minor bump of the version.
 - [ ] **T6.** README and `docs/manual/tab-bar.md`; manual verification checklist for Tore from AC-10
   to AC-12 (`pin-tile/verifica-pin-tile.md` in the project files).
 - [ ] **T7.** Manual checks on macOS and Debian.
+
+Revision of 2026-11-11 (first tile), branch `features/first-tile-area`, minor bump of the version:
+
+- [ ] **T8.** `FirstTileArea` and its style; placed by `FavoritesGrid.#layOut` while no tile is shown.
+  AC-13.
+- [ ] **T9.** `GridDropZone` treats the area as the end of the grid and opens it as the mark. AC-14,
+  AC-15.
+- [ ] **T10.** `docs/manual/tab-bar.md`; manual checklist for Tore from AC-16
+  (`pin-tile/verifica-prima-tile.md` in the project files).
+- [ ] **T11.** Manual checks on macOS and Debian.
