@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-11 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -105,12 +105,11 @@ is a reference for the shape only and is not copied.
 
 ## Open questions
 
-- [ ] Chevron direction: up while the space is expanded (a click will close it), down while it is
-      collapsed? Proposed: yes, as described above.
+- [x] Chevron direction: up while the space is expanded, down while it is collapsed (Tore, 2026-11-11).
 - [x] How to detect the compact state: Vivaldi's own `narrow` class on `#tabs-tabbar-container`, CSS
       only (probe, Tore, 2026-11-11).
-- [ ] While the bar is narrow the space header has no "New folder" `+`: folders are created from the
-      widened bar. Proposed: yes.
+- [x] While the bar is narrow the space header has no "New folder" `+`: folders are created from the
+      widened bar (Tore, 2026-11-11).
 
 ## References
 
