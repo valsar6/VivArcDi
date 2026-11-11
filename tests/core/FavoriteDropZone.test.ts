@@ -11,6 +11,11 @@ class RecordingTargets implements FavoriteTargets {
     return { place: 'here' };
   }
 
+  public end(): FavoriteDropTarget | null {
+    this.calls.push('end');
+    return { place: 'end' };
+  }
+
   public mark(target: FavoriteDropTarget | null): void {
     this.calls.push(target === null ? 'unmark' : 'mark');
   }
@@ -35,6 +40,7 @@ test('has no place and drops nothing until the Favorites register', async () => 
   const zone = FavoriteDropZone.of({});
   assert.equal(zone.available, false);
   assert.equal(zone.at(1, 2), null);
+  assert.equal(zone.end(), null);
   assert.equal(await zone.drop({}, { title: 'A', url: 'https://a.example/' }), false);
   zone.mark(null);
   zone.clear();
@@ -49,8 +55,9 @@ test('forwards to the registered places and forgets them when unregistered', asy
   zone.mark(target);
   zone.mark(null);
   zone.clear();
+  assert.deepEqual(zone.end(), { place: 'end' });
   assert.equal(await zone.drop(target as FavoriteDropTarget, { title: 'A', url: 'https://a.example/' }), true);
-  assert.deepEqual(targets.calls, ['at 3,4', 'mark', 'unmark', 'clear', 'drop https://a.example/']);
+  assert.deepEqual(targets.calls, ['at 3,4', 'mark', 'unmark', 'clear', 'end', 'drop https://a.example/']);
   unregister();
   assert.equal(zone.available, false);
   assert.equal(zone.at(3, 4), null);

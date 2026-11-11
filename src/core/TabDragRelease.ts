@@ -19,6 +19,10 @@ export interface TabDragReleaseDependencies<Target> {
   /** Selector of Vivaldi's tab wrapper, which carries `data-id="tab-<id>"`. */
   wrapperSelector: string;
   place: TabDragPlace<Target>;
+  /** Called while a tab is dragged, with the point of the pointer, by the mouse and by the HTML5 drag. */
+  onDrag?: (tabId: number, x: number, y: number) => void;
+  /** Called when the drag ends, released or not. */
+  onEnd?: () => void;
 }
 
 type DragHandler = (event: Event) => void;
@@ -30,13 +34,14 @@ export class TabDragRelease<Target> {
   #onDragOver: DragHandler = (event) => this.#over(event as DragEvent);
   #onDrop: DragHandler = (event) => this.#drop(event as DragEvent);
   #onLeave: DragHandler = () => this.#deps.place.clear();
+  #onDragEnd: DragHandler = () => this.#finish();
 
   /**
    * Lets a tab of Vivaldi's list be released over a place. The tab is followed with the mouse, and
    * when Vivaldi turns the drag into an HTML5 one, which carries `vivaldi/x-tab-entries` and sends
    * no mouse events, the `dragover` and `drop` over a target are accepted so the drag is not
    * cancelled. Both ways end in `release`, at most once for each press of the mouse. Drags that
-   * carry no tab are left alone.
+   * carry no tab are left alone. `onDrag` and `onEnd` follow either kind of drag, for the pill.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -46,9 +51,9 @@ export class TabDragRelease<Target> {
     this.#drag = new TabPointerDrag({
       document,
       wrapperSelector,
-      onMove: (x, y): void => place.mark(place.at(x, y)),
+      onMove: (x, y): void => this.#moved(x, y),
       onDrop: (_tabId, x, y): void => this.#release(place.at(x, y)),
-      onEnd: (): void => place.clear(),
+      onEnd: (): void => this.#finish(),
     });
   }
 
@@ -61,7 +66,7 @@ export class TabDragRelease<Target> {
     document.addEventListener('dragover', this.#onDragOver, true);
     document.addEventListener('drop', this.#onDrop, true);
     document.addEventListener('dragleave', this.#onLeave, true);
-    document.addEventListener('dragend', this.#onLeave, true);
+    document.addEventListener('dragend', this.#onDragEnd, true);
   }
 
   /**
@@ -73,14 +78,32 @@ export class TabDragRelease<Target> {
     document.removeEventListener('dragover', this.#onDragOver, true);
     document.removeEventListener('drop', this.#onDrop, true);
     document.removeEventListener('dragleave', this.#onLeave, true);
-    document.removeEventListener('dragend', this.#onLeave, true);
+    document.removeEventListener('dragend', this.#onDragEnd, true);
     place.clear();
+  }
+
+  #moved(x: number, y: number): void {
+    this.#deps.place.mark(this.#deps.place.at(x, y));
+    this.#feed(x, y);
+  }
+
+  #feed(x: number, y: number): void {
+    const press = this.#drag.lastPress;
+    if (press !== null) {
+      this.#deps.onDrag?.(press.tabId, x, y);
+    }
+  }
+
+  #finish(): void {
+    this.#deps.place.clear();
+    this.#deps.onEnd?.();
   }
 
   #over(event: DragEvent): void {
     if (!TabEntries.carriedBy(event.dataTransfer)) {
       return;
     }
+    this.#feed(event.clientX, event.clientY);
     const target = this.#targetOf(event);
     if (target === null) {
       this.#deps.place.clear();
@@ -95,7 +118,7 @@ export class TabDragRelease<Target> {
 
   #drop(event: DragEvent): void {
     const target = this.#targetOf(event);
-    this.#deps.place.clear();
+    this.#finish();
     if (target !== null) {
       event.preventDefault();
       this.#release(target);

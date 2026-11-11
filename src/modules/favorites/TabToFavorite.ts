@@ -1,3 +1,7 @@
+import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { DragPill } from '../../core/DragPill.js';
+import type { Logger } from '../../core/Logger.js';
+import { TabDragPill } from '../../core/TabDragPill.js';
 import { TabDragRelease } from '../../core/TabDragRelease.js';
 import type { FavoriteDrop } from './FavoriteDrop.js';
 import type { GridDropZone, GridTarget } from './GridDropZone.js';
@@ -9,6 +13,10 @@ export interface TabToFavoriteDependencies {
   wrapperSelector: string;
   zone: Pick<GridDropZone, 'at' | 'mark' | 'clear'>;
   drop: Pick<FavoriteDrop, 'add'>;
+  tabs: Pick<BrowserTabs, 'get'>;
+  /** The pill that follows the pointer while a tab is dragged. */
+  pill: Pick<DragPill, 'show' | 'move' | 'hide'>;
+  logger: Logger;
 }
 
 export class TabToFavorite {
@@ -16,12 +24,12 @@ export class TabToFavorite {
 
   /**
    * Lets a tab of Vivaldi's list be released over the Favorites grid to become a Favorite. It
-   * shows the gap under the pointer while the tab is dragged. The release comes either as a mouse
+   * shows the gap under the pointer and the pill of the tab while it is dragged. The release comes either as a mouse
    * event or as an HTML5 drop, which `TabDragRelease` handles once for each press.
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, wrapperSelector, zone, drop }: TabToFavoriteDependencies) {
+  constructor({ document, wrapperSelector, zone, drop, tabs, pill, logger }: TabToFavoriteDependencies) {
     this.#release = new TabDragRelease<GridTarget>({
       document,
       wrapperSelector,
@@ -31,6 +39,7 @@ export class TabToFavorite {
         clear: (): void => zone.clear(),
         release: (tabId, target): void => void drop.add(tabId, target.beforeId),
       },
+      ...new TabDragPill({ document, wrapperSelector, tabs, pill, logger }).hooks(),
     });
   }
 

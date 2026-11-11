@@ -4,6 +4,7 @@ import { TODAY_ATTRIBUTE, TodayList } from '../../src/core/TodayList.js';
 
 const WRAPPER = '.wrapper';
 const STRIP = '.strip';
+const SKIP = '.skip';
 
 class Element {
   public attributes = new Set<string>();
@@ -41,7 +42,7 @@ function setup(): { list: TodayList; strip: Element; row: Element; empty: Elemen
   const empty = new Element(strip);
   const outside = new Element(null);
   const pointer: { over: Element | null } = { over: null };
-  const list = new TodayList({ document: { elementFromPoint: (): globalThis.Element | null => pointer.over as unknown as globalThis.Element | null }, stripSelector: STRIP, wrapperSelector: WRAPPER });
+  const list = new TodayList({ document: { elementFromPoint: (): globalThis.Element | null => pointer.over as unknown as globalThis.Element | null, querySelectorAll: ((): unknown[] => []) as unknown as Document['querySelectorAll'] }, stripSelector: STRIP, wrapperSelector: WRAPPER, skipSelector: SKIP });
   return { list, strip, row, empty, outside, pointer };
 }
 
@@ -78,4 +79,34 @@ test('marks the tab list while the pointer is over it and clears the mark', () =
   list.mark(1, 1);
   list.clear();
   assert.equal(strip.attributes.has(TODAY_ATTRIBUTE), false);
+});
+
+const rowWith = (id: number, skipped: boolean): unknown => {
+  const wrapper = { dataset: { id: `tab-${id}` }, closest: (selector: string): unknown => (selector === WRAPPER ? wrapper : null), querySelector: (): null => null };
+  return { ...wrapper, closest: (selector: string): unknown => (selector === SKIP ? (skipped ? wrapper : null) : wrapper) };
+};
+
+const listOf = (rows: unknown[]): TodayList =>
+  new TodayList({
+    document: { elementFromPoint: (): null => null, querySelectorAll: ((): unknown[] => rows) as unknown as Document['querySelectorAll'] },
+    stripSelector: STRIP,
+    wrapperSelector: WRAPPER,
+    skipSelector: SKIP,
+  });
+
+test('finds the first row that is not hidden or pinned', () => {
+  assert.deepEqual(listOf([rowWith(3, true), rowWith(5, false), rowWith(6, false)]).first(), { rowTabId: 5 });
+});
+
+test('finds no row at the top of an empty list', () => {
+  assert.deepEqual(listOf([rowWith(3, true)]).first(), { rowTabId: null });
+  assert.deepEqual(listOf([]).first(), { rowTabId: null });
+});
+
+test('names the slots that are not today tabs', () => {
+  assert.equal(TodayList.skippedBy({ get: (name) => `.${name}`, has: () => true }), '[data-vivarcdi-hidden], .pinnedTab, .pinnedGroup');
+});
+
+test('names only the hidden slots when the catalog has no pinned selectors', () => {
+  assert.equal(TodayList.skippedBy({ get: (name) => `.${name}`, has: () => false }), '[data-vivarcdi-hidden]');
 });

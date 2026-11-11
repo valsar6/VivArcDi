@@ -1,6 +1,9 @@
+import { ContextMenu } from '../../core/ContextMenu.js';
+import { DragPill } from '../../core/DragPill.js';
 import { FolderCommands } from '../../core/FolderCommands.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { Toast } from '../../core/Toast.js';
+import { TodayList } from '../../core/TodayList.js';
 import { CreatedLinks } from './CreatedLinks.js';
 import { FavoriteShortcut } from './FavoriteShortcut.js';
 import { FolderDragDrop } from './FolderDragDrop.js';
@@ -31,9 +34,9 @@ export class FolderEditing {
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
-   * for a folder, Cmd/Ctrl+D, and a tab released over the section or the header, and a link row dragged out of the section. Each of them
-   * writes to the bookmarks through `WorkspaceFavorites` and the section follows the bookmark
-   * events. Without a way to write bookmarks it does nothing.
+   * for a folder, Cmd/Ctrl+D, a tab released over the section or the header, and a link row dragged out of
+   * the section. Each of them writes to the bookmarks through `WorkspaceFavorites` and the section
+   * follows the bookmark events. Without a way to write bookmarks it does nothing.
    *
    * @param context What the module may use.
    * @param view The section, which edits names.
@@ -123,6 +126,9 @@ export class FolderEditing {
       document,
       wrapperSelector: selectors.get('tabWrapper'),
       stripSelector: selectors.get('tabStrip'),
+      skipSelector: TodayList.skippedBy(selectors),
+      pill: DragPill.of(document, selectors),
+      menu: new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
       section: (): HTMLElement => this.#view.element,
       header: (): HTMLElement | null => document.querySelector<HTMLElement>(HEADER_SELECTOR),
       tabs,

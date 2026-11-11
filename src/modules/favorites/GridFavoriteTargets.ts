@@ -44,6 +44,13 @@ export class GridFavoriteTargets implements FavoriteTargets {
   }
 
   /**
+   * @returns The end of the grid.
+   */
+  public end(): FavoriteDropTarget {
+    return { beforeId: null } satisfies GridTarget;
+  }
+
+  /**
    * @param target A place given by `at`.
    * @param page The tab or the title and address to add.
    * @returns Whether a Favorite was added.

@@ -70,3 +70,36 @@ test('leaves the marks of a drag that carries no tab', () => {
   dom.emit('dragover', { clientX: 300, clientY: 0, dataTransfer: { types: ['text/plain'] }, preventDefault: (): void => undefined });
   assert.deepEqual(log, []);
 });
+
+test('feeds the drag hooks from the mouse and from the html5 drag', () => {
+  const dom = new DomDocument();
+  const seen: string[] = [];
+  const release = new TabDragRelease<string>({
+    document: asDocument(dom),
+    wrapperSelector: WRAPPER,
+    place: { at: (): null => null, mark: (): void => undefined, clear: (): void => undefined, release: (): void => undefined },
+    onDrag: (tabId, x, y): void => void seen.push(`drag ${tabId} ${x},${y}`),
+    onEnd: (): void => void seen.push('end'),
+  });
+  release.start();
+  press(dom, 3);
+  dom.emit('mousemove', { buttons: 1, clientX: 50, clientY: 20 });
+  html5(dom, 'dragover', 60);
+  html5(dom, 'dragend', 60);
+  assert.deepEqual(seen, ['drag 3 50,20', 'drag 3 60,0', 'end']);
+});
+
+test('ends the drag hooks when the mouse is released', () => {
+  const dom = new DomDocument();
+  const seen: string[] = [];
+  new TabDragRelease<string>({
+    document: asDocument(dom),
+    wrapperSelector: WRAPPER,
+    place: { at: (): null => null, mark: (): void => undefined, clear: (): void => undefined, release: (): void => undefined },
+    onEnd: (): void => void seen.push('end'),
+  }).start();
+  press(dom, 3);
+  dom.emit('mousemove', { buttons: 1, clientX: 50, clientY: 20 });
+  dom.emit('mouseup', { buttons: 0, clientX: 50, clientY: 20 });
+  assert.deepEqual(seen, ['end']);
+});

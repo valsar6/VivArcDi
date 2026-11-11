@@ -14,12 +14,13 @@ export interface FavoriteRemovalDependencies {
   tabs: RemovalTabs;
   writer: Pick<BookmarkWriter, 'get' | 'remove'>;
   links: Pick<LinkedTabs, 'snapshot'>;
-  zone: Pick<LinkDropZone, 'at' | 'mark' | 'clear' | 'drop'>;
-  today: Pick<TodayList, 'at' | 'mark' | 'clear'>;
+  zone: Pick<LinkDropZone, 'at' | 'mark' | 'clear' | 'drop' | 'end'>;
+  today: Pick<TodayList, 'at' | 'mark' | 'clear' | 'first'>;
   logger: Logger;
 }
 
-type Place = { kind: 'link'; target: LinkDropTarget } | { kind: 'today'; target: TodayTarget };
+/** Where a Favorite goes: the folders section, or the tab list under the separator. */
+export type FavoriteRemovalPlace = { kind: 'link'; target: LinkDropTarget } | { kind: 'today'; target: TodayTarget };
 
 export class FavoriteRemoval {
   #deps: FavoriteRemovalDependencies;
@@ -32,7 +33,8 @@ export class FavoriteRemoval {
    * becomes a Today tab at the row under the pointer. The tab of the Favorite in the active
    * workspace is the page; without one the page is opened or linked from its address. Its tabs in
    * other workspaces are closed so the tile is gone everywhere. The bookmark is removed last, so
-   * a failure leaves the Favorite where it was.
+   * a failure leaves the Favorite where it was. The menu commands use the same move with a fixed
+   * place: the top of today's tabs, or the end of the workspace favorites.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -50,7 +52,7 @@ export class FavoriteRemoval {
    */
   public over(x: number, y: number): void {
     const { zone, today } = this.#deps;
-    const place = this.#placeAt(x, y);
+    const place = this.placeAt(x, y);
     zone.mark(place?.kind === 'link' ? place.target : null);
     if (place?.kind === 'today') {
       today.mark(x, y);
@@ -68,15 +70,59 @@ export class FavoriteRemoval {
   }
 
   /**
+   * @param x Horizontal position of the pointer in the window.
+   * @param y Vertical position of the pointer in the window.
+   * @returns The place under the point, or null when it is neither the folders nor the tab list.
+   */
+  public placeAt(x: number, y: number): FavoriteRemovalPlace | null {
+    const target = this.#deps.zone.at(x, y);
+    if (target !== null) {
+      return { kind: 'link', target };
+    }
+    const today = this.#deps.today.at(x, y);
+    return today === null ? null : { kind: 'today', target: today };
+  }
+
+  /**
    * @param favoriteId The Favorite whose tile was released.
    * @param x Horizontal position of the pointer in the window.
    * @param y Vertical position of the pointer in the window.
    */
   public async release(favoriteId: string, x: number, y: number): Promise<void> {
-    const place = this.#placeAt(x, y);
-    if (place === null) {
-      return;
+    const place = this.placeAt(x, y);
+    if (place !== null) {
+      await this.moveTo(favoriteId, place);
     }
+  }
+
+  /**
+   * Untile tab: the page of the Favorite becomes the first tab of today.
+   *
+   * @param favoriteId The Favorite.
+   */
+  public async untile(favoriteId: string): Promise<void> {
+    await this.moveTo(favoriteId, { kind: 'today', target: this.#deps.today.first() });
+  }
+
+  /**
+   * Pin tab: the page of the Favorite becomes a link at the end of the workspace favorites.
+   *
+   * @param favoriteId The Favorite.
+   */
+  public async pin(favoriteId: string): Promise<void> {
+    const target = this.#deps.zone.end();
+    if (target !== null) {
+      await this.moveTo(favoriteId, { kind: 'link', target });
+    }
+  }
+
+  /**
+   * Keeps the page of a Favorite at a place and takes the Favorite out of the grid.
+   *
+   * @param favoriteId The Favorite.
+   * @param place Where the page goes.
+   */
+  public async moveTo(favoriteId: string, place: FavoriteRemovalPlace): Promise<void> {
     try {
       const { title, url } = await this.#deps.writer.get(favoriteId);
       if (url === undefined) {
@@ -95,21 +141,12 @@ export class FavoriteRemoval {
     }
   }
 
-  #placeAt(x: number, y: number): Place | null {
-    const target = this.#deps.zone.at(x, y);
-    if (target !== null) {
-      return { kind: 'link', target };
-    }
-    const today = this.#deps.today.at(x, y);
-    return today === null ? null : { kind: 'today', target: today };
-  }
-
   async #otherTabs(favoriteId: string, own: number | undefined): Promise<number[]> {
     const tabs = await this.#deps.tabs.query({});
     return tabs.flatMap((tab) => (tab.id !== undefined && tab.id !== own && TabData.ownOf(tab).favoriteId === favoriteId ? [tab.id] : []));
   }
 
-  async #keepPage(place: Place, own: number | undefined, page: { title: string; url: string }): Promise<boolean> {
+  async #keepPage(place: FavoriteRemovalPlace, own: number | undefined, page: { title: string; url: string }): Promise<boolean> {
     if (own !== undefined) {
       await this.#release(own);
     }
