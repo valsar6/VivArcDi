@@ -42,7 +42,7 @@ function setup(): Setup {
   below.rect = { left: 0, right: 300, top: 100, bottom: 160 };
   dom.parent.append(below);
   const added: Array<[number, string | null]> = [];
-  const zone = new GridDropZone({ document: asDocument(dom), grid: (): HTMLElement => asElement(grid), below: (): HTMLElement => asElement(below) });
+  const zone = new GridDropZone({ document: asDocument(dom), grid: (): HTMLElement => asElement(grid), below: (): HTMLElement => asElement(below), empty: (): null => null });
   new TabToFavorite({
     document: asDocument(dom),
     wrapperSelector: WRAPPER,

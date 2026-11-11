@@ -1,3 +1,4 @@
+import { OPEN_ATTRIBUTE } from './FirstTileArea.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
 
 export const GAP_ATTRIBUTE = 'data-vivarcdi-drop-gap';
@@ -13,6 +14,8 @@ export interface GridDropZoneDependencies {
   grid: () => HTMLElement | null;
   /** The grid of the pinned tiles right under it, when it is in the window; it counts as the end of the first, which is created by the drop when the folder is missing. */
   below: () => HTMLElement | null;
+  /** The area of the first tile, when it is in the window because no tile is shown. */
+  empty: () => HTMLElement | null;
 }
 
 export class GridDropZone {
@@ -35,7 +38,7 @@ export class GridDropZone {
    * @returns The place under the point, or null when the point is outside the grid.
    */
   public at(x: number, y: number): GridTarget | null {
-    if (GridDropZone.#inside(this.#deps.below(), x, y)) {
+    if (GridDropZone.#inside(this.#deps.below(), x, y) || GridDropZone.#inside(this.#deps.empty(), x, y)) {
       return { beforeId: null };
     }
     const grid = this.#deps.grid();
@@ -53,6 +56,11 @@ export class GridDropZone {
    */
   public mark(target: GridTarget | null): void {
     const grid = this.#deps.grid();
+    const empty = this.#deps.empty();
+    if (target !== null && grid === null && empty !== null) {
+      empty.setAttribute(OPEN_ATTRIBUTE, '');
+      return;
+    }
     if (target === null || grid === null) {
       this.clear();
       return;
@@ -66,6 +74,7 @@ export class GridDropZone {
    */
   public clear(): void {
     this.#gap?.remove();
+    this.#deps.empty()?.removeAttribute(OPEN_ATTRIBUTE);
   }
 
   #place(gap: HTMLElement, grid: HTMLElement, before: HTMLElement | null): void {
