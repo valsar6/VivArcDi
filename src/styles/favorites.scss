@@ -195,6 +195,21 @@
   -webkit-app-region: no-drag;
 }
 
+#{$root} #{$first-tile} {
+  box-sizing: border-box;
+  height: $first-tile-closed-height;
+  margin: 0 var(--vivarcdi-favorites-gap, #{$gap});
+  border-radius: var(--vivarcdi-radius);
+  -webkit-app-region: no-drag;
+}
+
+#{$root} #{$first-tile}#{$first-tile-open} {
+  height: var(--vivarcdi-favorites-tile-height, #{$tile-height});
+  margin: var(--vivarcdi-favorites-gap, #{$gap});
+  border: $gap-border-width dashed color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$gap-border-tint}, transparent);
+  background-color: color-mix(in srgb, var(--colorFg, #fff) #{$gap-tint}, transparent);
+}
+
 #{$root} #{$tiles} > #{$own-tile} {
   -webkit-app-region: no-drag;
 }
