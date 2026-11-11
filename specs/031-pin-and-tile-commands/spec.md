@@ -6,6 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-11 (merge of PR #128) |
+| Revision | Draft, 2026-11-11: drop area for the first tile (FR-8, FR-9, AC-13 to AC-16) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -19,6 +20,11 @@ adds the look of a dragged tab and four menu commands that do by click what the 
 [012](../012-editable-folders/spec.md) and [020](../020-drag-tab-to-favorites/spec.md) do: **Pin tab**,
 **Remove pin**, **Tile tab** and **Untile tab**.
 
+**Revision of 2026-11-11 (first tile).** Tore, after tiling the page of PR #131: when there are no
+tiles yet, the grid draws nothing (012 FR-15 removed the placeholder on 2026-11-08), so a tab cannot be
+dragged into it and Tile tab is the only way to make the first tile. He asks for a small invisible area
+above the space header that takes a dragged tab and makes it a tile, as the drop between rows pins it.
+
 ## User stories
 
 - **US-1.** As a user, I want to see the tab I am dragging follow the pointer, so that I know what I
@@ -27,6 +33,8 @@ adds the look of a dragged tab and four menu commands that do by click what the 
   with **Remove pin**, without dragging.
 - **US-3.** As a user, I want to make a tab a tile shared by every workspace from its menu, and to take
   it back with **Untile tab**.
+- **US-4.** As a user, I want to drag a tab above the space header to make the first tile, when the
+  grid is still empty.
 
 ## Expected behavior
 
@@ -57,6 +65,14 @@ The menu of a link row and of a tile is VivArcDi's own, since those rows are Viv
 the menu where [027](../027-rename-pinned-tabs/spec.md) will add Rename and Change icon. The menu of a
 tab of today is Vivaldi's own: the two commands are added to it, and Vivaldi's items stay as they are.
 
+**The first tile.** While the grid has no tiles, a thin strip above the space header takes the place
+of the grid. It draws nothing and takes no room that can be seen. When a tab of today or a link row is
+dragged over it, the strip opens to the height of one tile and shows the gap of 020 FR-6, so the user
+sees where the tile will land; released there, the page becomes the first tile, the same in every
+workspace, under the rules of 020 FR-2 and, for a link row, 012 FR-16. Released elsewhere, or with the
+pointer moved away, the strip closes again. Once a tile exists, the grid itself is the target and the
+strip is gone.
+
 ## Requirements
 
 ### Functional
@@ -75,6 +91,12 @@ tab of today is Vivaldi's own: the two commands are added to it, and Vivaldi's i
   tab, and remove the bookmark under the rule of 012 FR-12.
 - **FR-7.** VivArcDi's menu closes on Escape, on a click elsewhere and after a command, and stays
   inside the window.
+- **FR-8.** While the Favorites grid has no tiles, an invisible drop area sits above the space header.
+  It accepts the drag of a tab of today and of a link row, by the mouse path and the HTML5 path of 012
+  FR-14; while such a drag is over it, it opens to one tile height and shows the gap of 020 FR-6.
+- **FR-9.** A drop on the area adds the page as the first tile, as a drop on the grid does (020 FR-2,
+  012 FR-16 for a link row). When the grid has tiles, the area is not drawn; when the last tile leaves,
+  it comes back.
 
 ### Non-functional
 
@@ -101,6 +123,10 @@ tab of today is Vivaldi's own: the two commands are added to it, and Vivaldi's i
 | AC-10 | WHEN Tore drags a tab of today, a link row and a tile, THE pill SHALL follow the pointer and show what he is moving. | manual |
 | AC-11 | WHEN Tore right-clicks a tab of today, THE menu SHALL show Pin tab and Tile tab next to Vivaldi's items, and both SHALL work. | manual |
 | AC-12 | WHEN Tore uses Remove pin, Tile tab, Untile tab and Pin tab on rows and tiles, THE page SHALL move as in the table and never be lost. | manual |
+| AC-13 | WHILE the grid has no tiles, THE module SHALL keep an invisible drop area above the space header, and none while tiles exist. | auto: `keeps a tile drop area above the space header only while the grid is empty` |
+| AC-14 | WHEN a tab of today is dragged over the area, THE area SHALL open to one tile height, and close when the drag leaves or ends. | auto: `opens the tile drop area while a tab is over it` |
+| AC-15 | WHEN a tab of today or a link row is dropped on the area, THE page SHALL become the first tile. | auto: `makes the first tile from a tab dropped above the space header` |
+| AC-16 | WHEN Tore drags a tab of today above the space header of a workspace with no tiles, THE area SHALL open, and on release the page SHALL show as a tile in every workspace. | manual |
 
 ## Out of scope
 
@@ -117,6 +143,12 @@ tab of today is Vivaldi's own: the two commands are added to it, and Vivaldi's i
 - [x] **2. Can Vivaldi's tab menu be extended?** Vivaldi 8 builds its menus in the interface and shows
   them as native menus. The design adds the two items through Vivaldi's menu API and checks it with the
   read-only probe of task T1 before the code; NFR-2 is the fallback (merge of PR #128, 2026-11-11).
+
+- [ ] **3. How tall is the closed area, and does it show anything?** Proposed: 8 pixels, with no
+  color, border or text, so nothing changes in the tab bar until a drag reaches it; it then opens to one
+  tile height with the gap of 020 FR-6. A visible box was removed on 2026-11-08 (012 FR-15).
+- [ ] **4. Which drags does it take?** Proposed: a tab of today and a link row, the same ones the grid
+  takes. A tile cannot be dragged while there are none.
 
 ## References
 
