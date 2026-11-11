@@ -12,6 +12,8 @@ export interface FavoriteTargets {
   mark(target: FavoriteDropTarget | null): void;
   /** Removes every mark. */
   clear(): void;
+  /** The place at the end of the grid. */
+  end(): FavoriteDropTarget | null;
   /** Adds the page as a Favorite at the place; resolves to whether a Favorite was added. */
   drop(target: FavoriteDropTarget, page: FavoritePage): Promise<boolean>;
 }
@@ -80,6 +82,13 @@ export class FavoriteDropZone implements FavoriteTargets {
    */
   public clear(): void {
     this.#targets?.clear();
+  }
+
+  /**
+   * @returns The place at the end of the grid, or null when nothing is registered.
+   */
+  public end(): FavoriteDropTarget | null {
+    return this.#targets?.end() ?? null;
   }
 
   /**

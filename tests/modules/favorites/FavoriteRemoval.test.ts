@@ -69,7 +69,7 @@ function setup(tabs: FolderTab[]): Setup {
     writer: chrome.writer,
     links: new LinkedTabs(folderTabs),
     zone,
-    today: { at: (): TodayTarget | null => where.today, mark: (): void => void marks.push('today'), clear: (): void => void marks.push('clear-today') },
+    today: { at: (): TodayTarget | null => where.today, mark: (): void => void marks.push('today'), clear: (): void => void marks.push('clear-today'), first: (): TodayTarget => ({ rowTabId: 4 }) },
     logger: silentLogger,
   });
   return { chrome, tabs: folderTabs, removal, where, marks };
@@ -193,4 +193,25 @@ test('marks the place under the pointer and clears the marks', () => {
   removal.over(1, 1);
   removal.clear();
   assert.deepEqual(marks, ['mark', 'clear-today', 'unmark', 'today', 'clear', 'clear-today']);
+});
+
+test('untiles a favorite from the menu', async () => {
+  const { chrome, tabs, removal } = setup([favoriteTab(1, 1), favoriteTab(2, 2), { id: 4, url: OTHER, index: 7 }]);
+  await removal.untile('f1');
+  const tab = await tabs.get(1);
+  assert.equal(tab.pinned, false);
+  assert.deepEqual(TabData.ownOf(tab), {});
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'move'), [['move', 1, { index: 7 }]]);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), [['remove', 2]]);
+  assert.deepEqual(childTitles(chrome, '30'), []);
+});
+
+test('moves a page between the grid and the workspace favorites from the menu', async () => {
+  const { chrome, tabs, removal } = setup([favoriteTab(1, 1)]);
+  await removal.pin('f1');
+  assert.deepEqual(childTitles(chrome, '30'), []);
+  assert.deepEqual(urlsIn(chrome, '31'), [undefined, PAGE]);
+  const tab = await tabs.get(1);
+  assert.equal(tab.pinned, false);
+  assert.deepEqual(TabData.ownOf(tab), { bookmarkId: '500' });
 });

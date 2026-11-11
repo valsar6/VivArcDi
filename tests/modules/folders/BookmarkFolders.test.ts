@@ -37,7 +37,7 @@ function setup(
   const dom = new DomDocument();
   const context = {
     document: asDocument(dom),
-    selectors: new SelectorCatalog({ tabListHost: '.list', browser: '#browser', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
+    selectors: new SelectorCatalog({ tabListHost: '.list', browser: '#browser', tabStrip: '.strip', tabWrapper: '.wrapper', tabBar: '.bar' }, 'test'),
     logger,
     options,
     tabs,

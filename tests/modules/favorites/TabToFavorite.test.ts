@@ -6,6 +6,7 @@ import { TabToFavorite } from '../../../src/modules/favorites/TabToFavorite.js';
 import { TILE_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
 import { asDocument, asElement, DomDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
+import { silentLogger } from '../reopen/fakes.js';
 
 const WRAPPER = '.wrapper';
 
@@ -47,6 +48,9 @@ function setup(): Setup {
     wrapperSelector: WRAPPER,
     zone,
     drop: { add: async (tabId, beforeId): Promise<'added'> => (added.push([tabId, beforeId]), 'added') },
+    tabs: { get: async (id): Promise<chrome.tabs.Tab> => ({ id, title: 'Page' }) as chrome.tabs.Tab },
+    pill: { show: (): void => undefined, move: (): void => undefined, hide: (): void => undefined },
+    logger: silentLogger(),
   }).start();
   return {
     dom,

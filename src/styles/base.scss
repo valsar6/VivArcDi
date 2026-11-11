@@ -18,3 +18,72 @@
 #{$root} :is(#{$anchor}, #{$preview}) {
   -webkit-app-region: no-drag;
 }
+
+#{$root} #{$drag-pill} {
+  position: fixed;
+  z-index: $drag-pill-layer;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: $gap;
+  box-sizing: border-box;
+  max-width: $drag-pill-max-width;
+  height: $drag-pill-height;
+  padding-inline: $drag-pill-padding;
+  border-radius: $drag-pill-height;
+  background-color: var(--vivarcdi-pill, #{$arclight-pill});
+  box-shadow: $drag-pill-shadow;
+  color: var(--vivarcdi-ink, #{$arclight-ink});
+  font-size: $row-font-size;
+  font-weight: $row-font-weight;
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+
+  &[hidden] {
+    display: none;
+  }
+
+  img {
+    flex: none;
+    width: $drag-pill-icon-size;
+    height: $drag-pill-icon-size;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+#{$root} #{$strip} #{$dragging} {
+  opacity: $dragging-opacity;
+}
+
+#{$root} #{$menu} {
+  position: fixed;
+  z-index: $menu-layer;
+  box-sizing: border-box;
+  min-width: $menu-min-width;
+  padding: $menu-padding;
+  border-radius: $menu-radius;
+  background-color: var(--colorBg, #222);
+  box-shadow: $menu-shadow;
+  color: var(--colorFg, #fff);
+  font-size: $row-font-size;
+  -webkit-app-region: no-drag;
+
+  > [role='menuitem'] {
+    display: flex;
+    align-items: center;
+    height: $menu-row-height;
+    padding-inline: $gap;
+    border-radius: $menu-radius - $menu-padding;
+    cursor: default;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
+    }
+  }
+}

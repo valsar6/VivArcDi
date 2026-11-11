@@ -60,7 +60,7 @@ function setup(tabs: FolderTab[], createdByVivArcDi: boolean): Setup {
     links: tabLinks,
     favorites,
     grid: zone,
-    today: { at: (): TodayTarget | null => where.today, mark: (): void => undefined, clear: (): void => undefined },
+    today: { at: (): TodayTarget | null => where.today, mark: (): void => undefined, clear: (): void => undefined, first: (): TodayTarget => ({ rowTabId: 4 }) },
     notify: (text): void => void notes.push(text),
     logger: silentLogger,
   });
@@ -136,4 +136,31 @@ test('uses the tab of the link in the active workspace', async () => {
   await removal.release('33', 5, 5);
   assert.deepEqual(TabData.ownOf(await tabs.get(1)), {});
   assert.deepEqual(TabData.ownOf(await tabs.get(2)), { bookmarkId: '33' });
+});
+
+test('removes the pin of a link from the menu', async () => {
+  const { chrome, tabs, notes, removal } = setup([linkTab(1), { id: 4, url: OTHER, index: 7 }], true);
+  await removal.removePin('33');
+  assert.deepEqual(TabData.ownOf(await tabs.get(1)), {});
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'move'), [['move', 1, { index: 7 }]]);
+  assert.deepEqual(titlesIn(chrome, '31'), []);
+  assert.deepEqual(notes, []);
+});
+
+test('moves a page between the grid and the workspace favorites from the menu', async () => {
+  const { chrome, tabs, removal } = setup([linkTab(1)], true);
+  await removal.tile('33');
+  assert.deepEqual(titlesIn(chrome, '30'), ['Mine']);
+  assert.deepEqual(titlesIn(chrome, '31'), []);
+  const tab = await tabs.get(1);
+  assert.equal(tab.pinned, true);
+  assert.deepEqual(TabData.ownOf(tab), { favoriteId: '500', pinnedUrl: PAGE });
+});
+
+test('keeps a bookmark that existed before on remove pin', async () => {
+  const { chrome, tabs, notes, removal } = setup([linkTab(1), { id: 4, url: OTHER, index: 7 }], false);
+  await removal.removePin('33');
+  assert.deepEqual(titlesIn(chrome, '31'), ['Mine']);
+  assert.deepEqual(TabData.ownOf(await tabs.get(1)), {});
+  assert.deepEqual(notes, [KEPT_TEXT]);
 });

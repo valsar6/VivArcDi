@@ -479,6 +479,16 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   page becomes a tab of today at that place; released on the Favorites grid, a Favorite there. The
   bookmark is removed when VivArcDi made it; a bookmark that existed before stays, and a toast says so.
   Released anywhere else, nothing changes and the link does not open.
+- **The dragged tab.** While a tab of the list, a link row or a tile is dragged over the tab bar, a white
+  pill with its icon and title follows the pointer and the row it came from fades; the pill goes away
+  when the drag ends or leaves the tab bar.
+- **Pin and tile commands.** Right-click a tab of today, and Vivaldi's menu gains **Pin tab** (a link at
+  the end of the workspace's folder, as Cmd/Ctrl+D does) and **Tile tab** (a tile at the end of the
+  Favorites grid) for web pages that are not yet a link or a Favorite. Right-click a link row for
+  **Remove pin** (the page becomes the first tab of today) and **Tile tab**; right-click a tile for
+  **Untile tab** (the page becomes the first tab of today, and the tile leaves every workspace) and
+  **Pin tab**. The page is never lost, and the bookmark rule above applies to Remove pin and Untile tab.
+  If Vivaldi's menu of a tab cannot be extended, the reason is logged and Cmd/Ctrl+D and the drags remain.
 - **Copy from the Bookmarks panel.** Drag a bookmark or a folder from Vivaldi's Bookmarks panel onto the
   workspace's folders and release: a folder is copied with all its levels, a link is added as a link.
   The drop targets are the same as for tabs. The originals stay in the panel, separators are not

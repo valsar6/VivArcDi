@@ -48,6 +48,9 @@ function setup(): Setup {
     section: (): HTMLElement => asElement(section),
     header: (): null => null,
     stripSelector: '.strip',
+    skipSelector: '.skip',
+    pill: { show: (): void => undefined, move: (): void => undefined, hide: (): void => undefined },
+    menu: { open: (): void => undefined, close: (): void => undefined },
     tabs: {
       get: async (id): Promise<chrome.tabs.Tab> => ({ id, url: PAGE }) as chrome.tabs.Tab,
       query: async (): Promise<chrome.tabs.Tab[]> => (calls.push('query'), []),

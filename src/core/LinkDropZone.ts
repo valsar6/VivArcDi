@@ -10,6 +10,8 @@ export interface LinkTargets {
   mark(target: LinkDropTarget | null): void;
   /** Removes every mark. */
   clear(): void;
+  /** The place at the end of the root of the workspace. */
+  end(): LinkDropTarget | null;
   /** Adds the page as a link at the place; resolves to whether a link was added. */
   drop(target: LinkDropTarget, page: LinkPage): Promise<boolean>;
 }
@@ -77,6 +79,13 @@ export class LinkDropZone implements LinkTargets {
    */
   public clear(): void {
     this.#targets?.clear();
+  }
+
+  /**
+   * @returns The place at the end of the workspace favorites, or null when nothing is registered.
+   */
+  public end(): LinkDropTarget | null {
+    return this.#targets?.end() ?? null;
   }
 
   /**
