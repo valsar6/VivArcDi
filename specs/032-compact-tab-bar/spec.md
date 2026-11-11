@@ -46,6 +46,14 @@ While the tab bar is at its minimum width:
 When the bar widens on hover, the three rows go back to their full form at once, and they shrink again
 when it narrows. With the setting off, nothing changes.
 
+What a probe on Tore's Vivaldi 8.2 macOS saw (2026-11-11): the setting is the preference
+`vivaldi.tabs.bar.expand_on_hover`; the narrow bar is 42 px wide; Vivaldi marks the container
+`#tabs-tabbar-container` with the class `narrow` while it is narrow and removes it as soon as the bar
+grows past about 100 px on hover, and puts it back when the bar shrinks (`tabs-hover-expand`,
+`tabs-hover-expanded` and `tabs-hover-collapsed` mark the hover feature and its phase). The compact
+forms therefore follow Vivaldi's own `narrow` class, with CSS only: no observer, no measurement, and a
+container rebuilt by a layout change carries the class by itself.
+
 The icon is drawn by VivArcDi as a line glyph in the same style as its other icons; the example image
 is a reference for the shape only and is not copied.
 
@@ -53,22 +61,22 @@ is a reference for the shape only and is not copied.
 
 ### Functional
 
-- **FR-1.** VivArcDi detects that the tab bar is at its minimum width, whatever setting or drag caused it,
-  and marks the compact state so that the stylesheet can switch the three rows.
+- **FR-1.** The compact state is the state in which Vivaldi marks the tab bar container `narrow`,
+  whatever setting or drag caused it; the stylesheet switches the three rows on that class only.
 - **FR-2.** In the compact state the space header shows the space icon and a chevron, centered; up when
   the space is expanded, down when it is collapsed; the name and the `+` are hidden.
 - **FR-3.** In the compact state the New Tab row shows only the `+` glyph, centered.
 - **FR-4.** In the compact state the archive footer shows the archive glyph, centered, instead of its label.
 - **FR-5.** Tooltips, accessible names (`aria-label`, `aria-expanded`) and click actions are the same in
   both states.
-- **FR-6.** The compact state follows the width live, also after a sidebar layout change, which makes
+- **FR-6.** The compact state follows the bar live, also after a sidebar layout change, which makes
   Vivaldi build a new tab bar container (see [003](../003-pinned-tabs-and-folders/spec.md) AC-20 and
   AC-21).
-- **FR-7.** The chevron and archive glyphs and the compact width threshold live in `_tokens.scss`.
+- **FR-7.** The chevron and archive glyphs and the selector of the narrow bar live in `_tokens.scss`.
 
 ### Non-functional
 
-- **NFR-1.** No extra work while the width does not change: no polling.
+- **NFR-1.** No script work for the compact state: no polling, no observer.
 - **NFR-2.** Same behavior on macOS and Debian.
 - **NFR-3.** With the setting off or the tab bar at a normal width, the tab bar looks exactly as today.
 
@@ -76,11 +84,11 @@ is a reference for the shape only and is not copied.
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHILE the tab bar is narrower than the compact threshold, THE tab bar SHALL be marked compact. | auto: `marks the tab bar compact below the threshold` |
-| AC-2 | WHEN the tab bar becomes wider than the threshold, THE compact mark SHALL be removed. | auto: `removes the compact mark when the tab bar widens` |
-| AC-3 | WHEN Vivaldi replaces the tab bar container, THE compact mark SHALL follow the new container. | auto: `follows a replaced tab bar container` |
+| AC-1 | THE compact rules of the stylesheet SHALL apply only under the narrow tab bar selector. | auto: `compact rules apply only to the narrow tab bar` |
+| AC-2 | WHILE the tab bar is not narrow, THE stylesheet SHALL leave the three rows as they are. | auto: `wide tab bar keeps the full rows` |
+| AC-3 | WHEN Tore changes the sidebar layout and back, THE compact rows SHALL still follow the narrow bar. | manual |
 | AC-4 | WHILE the space is expanded, THE compact header SHALL show the up chevron, and the down chevron while it is collapsed. | auto: `compact header chevron follows the collapsed state` |
-| AC-5 | THE stylesheet SHALL define the chevron and archive glyphs and the threshold as tokens. | auto: `compact tab bar uses tokens` |
+| AC-5 | THE stylesheet SHALL define the chevron and archive glyphs and the narrow selector as tokens. | auto: `compact tab bar uses tokens` |
 | AC-6 | WHEN Tore turns on "Expand Tab Bar on hover", THE space header SHALL show the space icon with a chevron, centered. | manual |
 | AC-7 | WHEN Tore clicks the compact space header, THE space SHALL collapse or expand and the chevron SHALL turn. | manual |
 | AC-8 | WHILE the bar is narrow, THE New Tab row SHALL show only `+`, and a click SHALL open a new tab. | manual |
@@ -99,9 +107,8 @@ is a reference for the shape only and is not copied.
 
 - [ ] Chevron direction: up while the space is expanded (a click will close it), down while it is
       collapsed? Proposed: yes, as described above.
-- [ ] How to detect the compact state: by the tab bar width (below a threshold of about 80 px) instead of
-      reading Vivaldi's setting, so it works for every way the bar becomes narrow. Proposed: width, with a
-      probe on Tore's Vivaldi to read the real minimum width and whether Vivaldi marks the state itself.
+- [x] How to detect the compact state: Vivaldi's own `narrow` class on `#tabs-tabbar-container`, CSS
+      only (probe, Tore, 2026-11-11).
 - [ ] While the bar is narrow the space header has no "New folder" `+`: folders are created from the
       widened bar. Proposed: yes.
 
