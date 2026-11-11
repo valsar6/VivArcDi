@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Draft (revision of 2026-11-11, see Open questions) |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed) |
@@ -29,6 +29,8 @@ editable, writing to Vivaldi's bookmarks, as Tore accepted on 2026-10-28 (gaps B
 - **US-4.** As a user, I want to rename a folder with a double click, as in Arc.
 - **US-5.** As a user, I want a workspace I never configured to get its own folders as soon as I
   create the first one.
+- **US-8.** As a user, I want to drag a link of my workspace below the separator or onto the Favorites
+  grid, so that it becomes a tab of today or a Favorite, as in Arc (Tore, 2026-11-11).
 - **US-7.** As a user, I want Cmd/Ctrl+D to add the page I am on to the favorites area of my workspace,
   and the same keys again to take it back to my open tabs, as in Arc (Tore, 2026-11-01).
 
@@ -63,9 +65,31 @@ to the Favorites grid is done by drag, as in Arc.
 the end (Arc, recording). Rows already in the area are not reordered: moving a link stays in the
 Bookmarks panel.
 
-**Mouse, not drag events.** The probe of 2026-10-31 saw no drag events in `window.html`: Vivaldi moves
-tabs with the mouse. Drop targets are found by the pointer position when the button is released over
-the area, not by `dragover` and `drop`.
+**Mouse and drag events.** The probe of 2026-10-31 saw no drag events in `window.html`: inside its
+list Vivaldi moves tabs with the mouse. Once the tab leaves the list, Vivaldi 8.2 turns the move into
+an HTML5 drag that carries `vivaldi/x-tab-entries` (seen on the Favorites grid by the 020 probe of
+2026-11-09), and the window gets no more mouse events until it ends. Tore's recording of 2026-11-11
+(0.35.0) shows the result: a tab of today dragged between two rows of the area vanished from today's
+list, the drop mark froze on the first row, nothing was added, and the tab came back below the
+separator a few seconds later, when the cancelled drag slid back. So the area takes a tab both ways:
+the release of the mouse, and an HTML5 `dragover` and `drop` that carry a tab. In both cases the target
+is found by the pointer position, the mark follows the pointer, and the tab under the first press is
+the dropped tab. One drag adds one link, whichever way the release arrives.
+
+**Drag a link out of the area** (Tore's recording of Arc, 2026-11-11). A link row of the area, at the
+top level or inside an open folder, can be taken with the mouse like a tab, and is dimmed while it
+moves. Where it is released decides what the page becomes, and the page is never lost:
+
+- below the separator line: the link leaves the area and its page stays open as a tab of today at the
+  drop position (opened there if the link had no tab); a line marks the position while it moves;
+- on the Favorites grid: the link leaves the area and becomes a Favorite at the drop position, as a
+  tab dropped there in [020](../020-drag-tab-to-favorites/spec.md);
+- anywhere else, or on the area itself: nothing changes.
+
+The link leaves the area by removing its bookmark when VivArcDi created it (with Cmd/Ctrl+D, a drop or
+a copy of [018](../018-copy-bookmarks-to-workspace/spec.md)). A link that existed before, in a folder
+Tore made himself, keeps its bookmark and its row, and a toast says so, as Cmd/Ctrl+D does; its tab
+still goes where it was dropped.
 
 **New folder.** The space header of 011 shows a `+` button on hover (the `…` menu of Arc is a later
 spec). A click adds a folder named `Untitled` at the end of the workspace's root, as a real bookmark
@@ -128,7 +152,15 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
   list and removes the bookmark when VivArcDi created it.
 - **FR-13.** A drop of a tab of today's list between two rows of the area adds the bookmark at that
   position of the root; a drop on a folder keeps FR-6.
-- **FR-14.** Drop targets are found by the pointer position on mouse release.
+- **FR-14.** Drop targets are found by the pointer position, on mouse release or on an HTML5 `drop`
+  that carries `vivaldi/x-tab-entries`; while such a drag is over the area its `dragover` is accepted
+  and the target under the pointer is marked. One drag adds at most one link.
+- **FR-16.** A link row can be dragged with the mouse. Released below the separator, its page becomes
+  a tab of today at the drop position; released on the Favorites grid, a Favorite at the drop position
+  (020 FR-2). In both cases the link leaves the area under the rule of FR-12: its bookmark is removed
+  when VivArcDi created it, otherwise it stays and a toast says so.
+- **FR-17.** Released anywhere else, a dragged link row changes nothing; a click that follows the
+  release does not open the link.
 - **FR-15.** Removed (Tore, 2026-11-08): the dashed "Drag a tab here to pin it" placeholder is not part of
   Arc's tab bar and showed even next to existing tiles. An empty grid draws nothing; a tab is pinned with
   Vivaldi's own drag or context menu (FR-8).
@@ -163,6 +195,15 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 | AC-24 | WHEN Cmd/Ctrl+D is pressed on the tab of a link that VivArcDi created, THE module SHALL remove the bookmark and show the tab in today's list. | auto: `takes the tab back on a second press` |
 | AC-25 | WHEN Cmd/Ctrl+D is pressed on the tab of a link that existed before, THE module SHALL keep the bookmark and the link. | auto: `keeps an existing bookmark on a second press` |
 | AC-26 | WHEN a tab is released between two rows of the area, THE module SHALL add its bookmark at that position. | auto: `adds a dropped tab at the position of the drop` |
+| AC-32 | WHEN a tab is dropped on the area with an HTML5 drag that carries a tab, THE module SHALL add its bookmark at the position of the drop. | auto: `adds a tab dropped with an html5 drag at the position of the drop` |
+| AC-33 | WHEN an HTML5 drag carries no tab, THE module SHALL leave it to Vivaldi. | auto: `ignores html5 drags that carry no tab` |
+| AC-34 | WHEN one drag ends with both a mouse release and an HTML5 drop, THE module SHALL add one link. | auto: `adds one link per drag` |
+| AC-35 | WHEN a link row is released below the separator, THE page SHALL become a tab of today at the drop position and THE link SHALL leave the area. | auto: `turns a link dragged below the separator into a today tab` |
+| AC-36 | WHEN a link row is released on the Favorites grid, THE page SHALL become a Favorite at the drop position and THE link SHALL leave the area. | auto: `turns a link dragged onto the grid into a favorite` |
+| AC-37 | WHEN a link that existed before is dragged out, THE bookmark SHALL stay and a toast SHALL say so. | auto: `keeps a bookmark that existed before when its link is dragged out` |
+| AC-38 | WHEN a link row is released anywhere else, THE area SHALL stay as it was and THE link SHALL not open. | auto: `leaves the link in place when it is released elsewhere` |
+| AC-39 | WHEN Tore drags a tab of today between two rows of the area, THE line SHALL follow the pointer and, on release, THE tab SHALL show there at once and leave today's list, without vanishing for seconds. | manual |
+| AC-40 | WHEN Tore drags a link row below the separator and then onto the Favorites grid, THE page SHALL show as a tab of today, then as a tile, and never be lost. | manual |
 | AC-27 | WHEN Tore presses Cmd/Ctrl+D on a page, THE tab SHALL move to the end of the workspace favorites; WHEN he presses it again, THE tab SHALL go back to the open tabs. | manual |
 | AC-28 | WHEN Tore drags a tab of today into the area and releases it between two rows, THE tab SHALL stay there. | manual |
 | AC-13 | WHEN Tore clicks `+` in a workspace he never configured, types a name and presses Enter, THE folder SHALL appear in that workspace only. | manual |
@@ -174,9 +215,8 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 
 ## Out of scope
 
-- Deleting and moving folders and links from the tab bar, reordering by drag: the Bookmarks panel
+- Deleting and moving folders, and reordering links inside the area by drag: the Bookmarks panel
   keeps doing it.
-- Dragging a link row out of its folder back to today's tabs.
 - The `…` space menu of Arc (rename, icon, color, delete): later spec.
 - Subfolders created from the tab bar: a new folder is always at the top level of the root.
 
@@ -196,6 +236,10 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - [x] **Empty grid (2026-11-01).** AC-11/15 failed on Vivaldi 8.2: with no Favorites folder and no pinned tab the grid is not drawn, so there is nowhere to drag. FR-15 adds a placeholder; Tore approved on a decision card (2026-11-01).
 - [x] **Placeholder removed (2026-11-08).** Tore: the dashed box is not a pinned tab and must go; FR-15 and
   AC-29 to AC-31 are removed. See [028](../028-arc-sidebar-look/spec.md).
+- [ ] **Revision of 2026-11-11 (drag and drop of tabs, AC-32 to AC-40).** Tore's recordings of
+  VivArcDi 0.35.0 and Arc. To approve: the HTML5 way in (FR-14), dragging a link out (FR-16, FR-17)
+  and the rule for links that existed before (AC-37). The probe `tab-drag/diagnostica-trascina-schede.md`
+  confirms the events before the design.
 - [x] **FR-8 and AC-11.** Pinning a tab dragged onto the Favorites grid is left to Vivaldi and
   checked in the manual steps (Tore, 2026-11-01).
 - [x] **What does "drag the Favorites folders into the workspaces" mean?** First approved reading (Tore, 2026-10-28):
