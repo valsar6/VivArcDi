@@ -4,6 +4,7 @@ import { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
 import { BrowserPrefs } from './BrowserPrefs.js';
 import type { PrefsApi } from './BrowserPrefs.js';
 import { BrowserRuntime } from './BrowserRuntime.js';
+import { BrowserHistory } from './BrowserHistory.js';
 import { BrowserSearch } from './BrowserSearch.js';
 import { BrowserTabs } from './BrowserTabs.js';
 import type { ChromeApi } from './BrowserTabs.js';
@@ -40,6 +41,8 @@ export interface VivArcDiDependencies {
   windows?: BrowserWindows;
   /** The web search given to modules. */
   search?: BrowserSearch;
+  /** The history given to modules. */
+  history?: BrowserHistory;
   /** Vivaldi's preferences given to modules. */
   prefs?: BrowserPrefs;
   /** The persistent storage given to modules. */
@@ -57,6 +60,7 @@ export class VivArcDi {
   #runtime: BrowserRuntime;
   #windows: BrowserWindows | undefined;
   #search: BrowserSearch | undefined;
+  #history: BrowserHistory;
   #prefs: BrowserPrefs;
   #storage: KeyValueStorage;
   #styles: StyleInjector;
@@ -79,6 +83,7 @@ export class VivArcDi {
     runtime = new BrowserRuntime(undefined),
     windows,
     search,
+    history = new BrowserHistory(undefined),
     prefs = new BrowserPrefs(undefined),
     storage = new PersistentStorage(new Map(), null, undefined, logger),
   }: VivArcDiDependencies) {
@@ -92,6 +97,7 @@ export class VivArcDi {
     this.#runtime = runtime;
     this.#windows = windows;
     this.#search = search;
+    this.#history = history;
     this.#prefs = prefs;
     this.#storage = storage;
     this.#styles = new StyleInjector(document, loader);
@@ -119,6 +125,7 @@ export class VivArcDi {
       runtime: new BrowserRuntime(chromeApi),
       windows: new BrowserWindows(chromeApi),
       search: new BrowserSearch(chromeApi),
+      history: new BrowserHistory(chromeApi),
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger),
     });
@@ -214,6 +221,7 @@ export class VivArcDi {
         runtime: this.#runtime,
         windows: this.#windows ?? new BrowserWindows(undefined),
         search: this.#search ?? new BrowserSearch(undefined),
+        history: this.#history,
         prefs: this.#prefs,
         storage: this.#storage,
         payload: this.#loader,

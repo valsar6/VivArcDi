@@ -75,6 +75,7 @@
     },
     "little-arc": {
       "enabled": true,
+      "commandBar": true,
       "externalLinks": true,
       "askWorkspace": false,
       "idleCloseHours": 6,

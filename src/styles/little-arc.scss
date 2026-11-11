@@ -153,3 +153,160 @@
     }
   }
 }
+
+#browser #{$command-bar-class}-catcher {
+  --command-bar-card: #{$command-bar-card};
+  --command-bar-text: var(--vivarcdi-ink, #{$command-bar-text});
+  --command-bar-placeholder: #{$command-bar-placeholder};
+  --command-bar-divider: #{$command-bar-divider};
+  --command-bar-close-fill: #{$command-bar-close-fill};
+  --command-bar-close-ink: #{$command-bar-close-ink};
+  --command-bar-host: #{$command-bar-host};
+
+  position: fixed;
+  z-index: $command-bar-layer;
+  background: transparent;
+  inset: 0;
+
+  @media (prefers-color-scheme: dark) {
+    --command-bar-card: #{$command-bar-card-dark};
+    --command-bar-text: #{$command-bar-text-dark};
+    --command-bar-placeholder: #{$command-bar-placeholder-dark};
+    --command-bar-divider: #{$command-bar-divider-dark};
+    --command-bar-close-fill: #{$command-bar-close-fill-dark};
+    --command-bar-close-ink: #{$command-bar-close-ink-dark};
+    --command-bar-host: #{$command-bar-host-dark};
+  }
+
+  #{$command-bar-class} {
+    position: absolute;
+    top: $command-bar-top;
+    left: 50%;
+    width: $command-bar-width;
+    max-width: $command-bar-max-width;
+    box-sizing: border-box;
+    padding-bottom: $command-bar-inset;
+    border-radius: $command-bar-radius;
+    background-color: var(--command-bar-card);
+    box-shadow: $command-bar-shadow;
+    color: var(--command-bar-text);
+    font-size: $command-bar-row-font;
+    transform: translateX(-50%);
+
+    &[data-empty] {
+      padding-bottom: 0;
+    }
+  }
+
+  #{$command-bar-class}-field {
+    display: flex;
+    height: $command-bar-field-height;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 $command-bar-inset;
+    gap: $command-bar-gap;
+
+    svg {
+      flex: none;
+    }
+  }
+
+  #{$command-bar-class}-input {
+    min-width: 0;
+    flex: 1;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: $command-bar-field-font;
+    outline: none;
+
+    &::placeholder {
+      color: var(--command-bar-placeholder);
+    }
+  }
+
+  #{$command-bar-class}-close {
+    display: grid;
+    width: $command-bar-close-size;
+    height: $command-bar-close-size;
+    flex: none;
+    padding: 0;
+    border: 0;
+    border-radius: $command-bar-close-radius;
+    background-color: var(--command-bar-close-fill);
+    color: var(--command-bar-close-ink);
+    cursor: pointer;
+    place-items: center;
+  }
+
+  #{$command-bar-class}-divider {
+    height: $line-width;
+    margin: 0 $command-bar-inset;
+    background-color: var(--command-bar-divider);
+  }
+
+  #{$command-bar-class}[data-empty] #{$command-bar-class}-divider,
+  #{$command-bar-class}[data-empty] #{$command-bar-class}-list {
+    display: none;
+  }
+
+  #{$command-bar-class}-list {
+    display: flex;
+    flex-direction: column;
+    padding: $command-bar-inset $command-bar-inset 0;
+    gap: $command-bar-row-gap;
+  }
+
+  #{$command-bar-class}-row {
+    display: flex;
+    height: $command-bar-row-height;
+    flex: none;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 $command-bar-inset;
+    border-radius: $command-bar-row-radius;
+    cursor: default;
+    gap: $command-bar-gap;
+    white-space: nowrap;
+
+    &[aria-selected='true'] {
+      background-color: $command-bar-selected;
+      color: $command-bar-selected-ink;
+
+      #{$command-bar-class}-host {
+        color: $command-bar-host-selected;
+      }
+    }
+  }
+
+  #{$command-bar-class}-icon,
+  #{$command-bar-class}-letter {
+    display: grid;
+    width: $command-bar-icon;
+    height: $command-bar-icon;
+    flex: none;
+    border-radius: $command-bar-icon-radius;
+    object-fit: contain;
+    place-items: center;
+  }
+
+  span#{$command-bar-class}-icon,
+  #{$command-bar-class}-letter {
+    background-color: var(--command-bar-close-fill);
+    color: var(--command-bar-close-ink);
+  }
+
+  #{$command-bar-class}-title {
+    min-width: 0;
+    overflow: hidden;
+    font-weight: $command-bar-title-weight;
+    text-overflow: ellipsis;
+  }
+
+  #{$command-bar-class}-host {
+    flex: none;
+    color: var(--command-bar-host);
+  }
+}

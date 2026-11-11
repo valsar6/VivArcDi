@@ -58,6 +58,7 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
       }
     | undefined;
   search?: { query: (...args: unknown[]) => void } | undefined;
+  history?: { search: (...args: unknown[]) => void } | undefined;
   vivaldiPrivate?: { prefs?: PrefsApi | undefined } | undefined;
 }
 

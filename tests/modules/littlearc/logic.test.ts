@@ -165,7 +165,7 @@ test('registry remembers the marked windows and forgets the oldest', () => {
 test('settings are read with defaults and clamped sizes', () => {
   assert.deepEqual(settingsFrom({}), LITTLE_ARC_DEFAULTS);
   const custom = settingsFrom({ externalLinks: false, askWorkspace: true, idleCloseHours: -3, widthPercent: 5, heightPercent: 500 });
-  assert.deepEqual(custom, { externalLinks: false, askWorkspace: true, idleCloseHours: 0, widthPercent: 20, heightPercent: 100 });
+  assert.deepEqual(custom, { commandBar: true, externalLinks: false, askWorkspace: true, idleCloseHours: 0, widthPercent: 20, heightPercent: 100 });
 });
 
 test('window bounds centre a share of the screen', () => {
