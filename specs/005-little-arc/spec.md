@@ -469,7 +469,7 @@ Results in a normal window's `window.html` on Vivaldi for macOS:
 
 Tore approved every proposal on 2026-11-09. The one on the command bar is replaced by the change request below.
 
-### Change request of 2026-11-10 (command bar), Draft
+### Change request of 2026-11-10 (command bar), Approved 2026-11-11
 
 Each question has a proposal; Tore approves or changes it. They block approval until ticked.
 
