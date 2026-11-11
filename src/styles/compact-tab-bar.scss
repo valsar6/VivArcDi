@@ -1,0 +1,52 @@
+@use 'tokens' as *;
+
+#{$root}:has(#{$narrow-tab-bar}) {
+  #{$space-header} {
+    justify-content: center;
+    gap: $chevron-gap;
+    margin-inline: 0;
+    padding-inline: 0;
+
+    .vivarcdi-space-arrow,
+    .vivarcdi-space-name,
+    .vivarcdi-space-add {
+      display: none;
+    }
+
+    &::after {
+      content: '';
+      flex: none;
+      width: $chevron-size;
+      height: $chevron-size;
+      background-color: currentcolor;
+      opacity: 0.7;
+      mask: $chevron-glyph center / contain no-repeat;
+      transition: transform var(--vivarcdi-transition);
+    }
+
+    &[data-vivarcdi-collapsed]::after {
+      transform: rotate(180deg);
+    }
+  }
+
+  #{$new-tab-row} {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+
+    span:not(.vivarcdi-new-tab-icon) {
+      font-size: 0;
+    }
+  }
+
+  #{$archive-footer} {
+    padding-inline: 0;
+
+    button {
+      justify-content: center;
+      gap: 0;
+      padding-inline: 0;
+      font-size: 0;
+    }
+  }
+}

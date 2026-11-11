@@ -43,6 +43,9 @@ While the tab bar is at its minimum width:
    two sheets of paper sticking out, drawn in line style like Tore's example image. The tooltip stays
    "Archive (Cmd/Ctrl+Shift+A)" and a click opens the archive as today.
 
+In the full form too, the archive footer shows the same icon to the left of the word "Archive" (Tore,
+2026-11-11, after seeing the preview).
+
 When the bar widens on hover, the three rows go back to their full form at once, and they shrink again
 when it narrows. With the setting off, nothing changes.
 
@@ -73,12 +76,14 @@ is a reference for the shape only and is not copied.
   Vivaldi build a new tab bar container (see [003](../003-pinned-tabs-and-folders/spec.md) AC-20 and
   AC-21).
 - **FR-7.** The chevron and archive glyphs and the selector of the narrow bar live in `_tokens.scss`.
+- **FR-8.** At any width the archive footer shows the archive glyph; in the full form it sits to the
+  left of the label.
 
 ### Non-functional
 
 - **NFR-1.** No script work for the compact state: no polling, no observer.
 - **NFR-2.** Same behavior on macOS and Debian.
-- **NFR-3.** With the setting off or the tab bar at a normal width, the tab bar looks exactly as today.
+- **NFR-3.** With the setting off or the tab bar at a normal width, the tab bar looks as today, except for the archive icon of FR-8.
 
 ## Acceptance criteria
 
@@ -94,7 +99,8 @@ is a reference for the shape only and is not copied.
 | AC-8 | WHILE the bar is narrow, THE New Tab row SHALL show only `+`, and a click SHALL open a new tab. | manual |
 | AC-9 | WHILE the bar is narrow, THE archive footer SHALL show the archive icon, and a click SHALL open the archive. | manual |
 | AC-10 | WHEN the pointer is over the narrow bar and it widens, THE three rows SHALL show their full form. | manual |
-| AC-11 | WHEN Tore turns the setting off, THE three rows SHALL look as before. | manual |
+| AC-11 | WHEN Tore turns the setting off, THE space header and New Tab rows SHALL look as before and the archive footer SHALL show the icon beside "Archive". | manual |
+| AC-12 | THE archive footer SHALL draw the archive glyph before its label at any width. | auto: `archive footer shows the archive icon beside its label` |
 
 ## Out of scope
 

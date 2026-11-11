@@ -1,7 +1,6 @@
 @use 'tokens' as *;
 
 $archive: '[data-vivarcdi-archive]';
-$archive-footer: '[data-vivarcdi-archive-footer]';
 $clear: '[data-vivarcdi-clear]';
 $archive-width: 340px;
 $archive-max-height: 70vh;
@@ -171,6 +170,9 @@ $clear-height: $separator-gap * 2 + 1px;
   padding: $gap * 0.5 $gap;
 
   button {
+    display: flex;
+    align-items: center;
+    gap: $gap;
     box-sizing: border-box;
     width: 100%;
     padding: 4px $gap;
@@ -184,6 +186,15 @@ $clear-height: $separator-gap * 2 + 1px;
     opacity: 0.7;
     cursor: pointer;
     transition: background-color var(--vivarcdi-transition), opacity var(--vivarcdi-transition);
+
+    &::before {
+      content: '';
+      flex: none;
+      width: $archive-icon-size;
+      height: $archive-icon-size;
+      background-color: currentcolor;
+      mask: $archive-glyph center / contain no-repeat;
+    }
 
     &:hover {
       background-color: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);

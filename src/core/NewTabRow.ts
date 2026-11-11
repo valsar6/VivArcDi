@@ -17,6 +17,7 @@ export class NewTabRow {
     this.#element = document.createElement('button');
     this.#element.setAttribute('type', 'button');
     this.#element.setAttribute(NEW_TAB_ROW_ATTRIBUTE, '');
+    this.#element.setAttribute('title', 'New Tab');
     this.#element.style.setProperty('-webkit-app-region', 'no-drag');
     this.#element.append(icon, label);
     this.#element.addEventListener('click', () => onOpen());

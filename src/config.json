@@ -12,7 +12,8 @@
     "styles/space-header.css",
     "styles/today.css",
     "styles/toast.css",
-    "styles/sidebar-look.css"
+    "styles/sidebar-look.css",
+    "styles/compact-tab-bar.css"
   ],
   "modules": {
     "activation-marker": {
