@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Approved | Tore, 2026-11-11 (PR #136) |
 
