@@ -8,6 +8,7 @@
 | Approved | 2026-11-08 |
 | Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Approved 2026-11-09 |
 | Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-33, AC-25 to AC-43): Draft |
+| Change request | 2026-11-11, the bar as Arc draws it: no dimming and no blur, recent sites for an empty field, outside clicks swallowed, searches through the fallback address (sections Opening: the command bar and Probe results, FR-19, FR-21, FR-23, FR-25, FR-27, AC-26, AC-31, AC-38, AC-44, AC-45): Draft |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -56,11 +57,12 @@ follows Tore's):
 
 | What the screenshot shows | Used in |
 |---|---|
-| A floating card with rounded corners (about 20 pt) and a soft shadow, over the current content | FR-19, FR-30 |
+| A floating card with rounded corners (about 20 pt) and a soft shadow, over the current content, which is neither dimmed nor blurred (second screenshot of Tore's Arc, 2026-11-11) | FR-19, FR-30 |
 | First row: a search icon on the left, a large placeholder "Search or Enter URL…", a small rounded × button on the right | FR-19, FR-25 |
 | A thin divider, then a list of rows: favicon, title, and the domain in muted text after a dash | FR-21, FR-26 |
 | The selected row filled in indigo with white text, the domain in a lighter tint | FR-22, FR-30 |
-| Rows of sites (MahjongSoul, Amazon, eBay, Facebook) and a last row "Contact the Team", an action of Arc itself | FR-27, open questions |
+| Rows of sites (MahjongSoul, Amazon, eBay, Facebook; in the second screenshot the pages visited last, newest first) and a last row "Contact the Team", an action of Arc itself | FR-27, open questions |
+| A long host is cut in the middle (`membersh…platform.com`), a long title at its end | FR-21 |
 
 **From the earlier draft of this spec, not in any review**: moving the page to a workspace with a
 button or Cmd/Ctrl+O, and closing untouched windows after six hours.
@@ -134,9 +136,10 @@ only after Enter. This replaces the decision of 2026-11-09 "Command bar first: n
 **The flow.**
 
 1. In a normal Vivaldi window the user presses the shortcut. A card appears over the page, centered
-   horizontally in the upper third of the window, on a dimmed page. The field has the focus and shows
+   horizontally in the upper third of the window, over the page, which stays as it is: no dimming and
+   no blur, as in Arc. The field has the focus and shows
    "Search or Enter URL…". Pressing the shortcut again closes it.
-2. The list under the field shows suggestions: with the field empty, the sites the user visits most;
+2. The list under the field shows suggestions: with the field empty, the pages visited most recently, newest first;
    with text, the best matches among open tabs, bookmarks and history (see Where the suggestions come
    from). The first row is selected.
 3. Typing filters the list at every key. Up and Down move the selection and wrap around; the mouse
@@ -148,7 +151,9 @@ only after Enter. This replaces the decision of 2026-11-09 "Command bar first: n
    the address, or with a search started in its tab), with Cmd/Ctrl+W, Cmd/Ctrl+O, Esc, back and
    the bar of Look working as before.
 6. Esc, the × button on the right of the field, a click outside the card, and the shortcut again
-   close the bar and open nothing. The focus goes back to the page.
+   close the bar and open nothing. The focus goes back to the page. A click outside is caught by an
+   invisible layer over the window and goes no further: it does not reach the page or any Vivaldi
+   panel under it.
 
 **The row of the typed text.** When the field has text, the first row is the text itself: with the
 search icon and "Search for *text*" or, when it looks like a web address, the globe icon and "Open
@@ -156,7 +161,7 @@ search icon and "Search for *text*" or, when it looks like a web address, the gl
 suggestions follow it, up to five rows in all.
 
 **A suggestion row** is a favicon, the title and, after a dash, the host in muted text, like Arc's
-(`MahjongSoul — mahjongsoul.com`). A long title is cut with an ellipsis before the host. The selected row is
+(`MahjongSoul — mahjongsoul.com`). A long title is cut with an ellipsis before the host; a long host is cut in the middle, keeping its start and its end (`membersh…platform.com`). The selected row is
 filled in indigo with white text and a lighter host.
 
 **Where the suggestions come from.** Only what Vivaldi's interface document can read, with nothing sent
@@ -165,9 +170,8 @@ anywhere. Version 1 asks for:
 | Source | Used for | Status |
 |---|---|---|
 | Open tabs of the normal windows (`chrome.tabs.query`) | Typed text; the tab's title, address and favicon | Available: the repository already wraps it (`BrowserTabs`) |
-| Bookmarks (`chrome.bookmarks`, read-only) | Typed text | Available in the interface: the repository already reads it (`BrowserBookmarks`) |
-| History (`chrome.history.search`) | Typed text; most recent pages | To be proven by the probe (T23) |
-| Most visited sites (`chrome.topSites.get`) | The list while the field is empty | To be proven by the probe (T23) |
+| Bookmarks (`chrome.bookmarks`, read-only) | Typed text | Available in the interface: the repository already reads it (`BrowserBookmarks`); `chrome.bookmarks.search` also works (probe of 2026-11-11) |
+| History (`chrome.history.search`) | Typed text; and, with the field empty, the most recent pages, newest first | Works in a normal window (probe of 2026-11-11) |
 
 A source that is not available is left out and the others still work. When no source gives anything for
 an empty field, the list is empty and only the field shows. Not in version 1: the search engine's own
@@ -187,7 +191,8 @@ empty window with the cursor in the pill, as in version 1.
 | The bar floats over any app, even with Arc in the background | The bar exists only while a Vivaldi window is in front, because it is a piece of Vivaldi's interface. Closest alternative: the opt-in global shortcut of the earlier decision (operating system hook of [016](../016-plug-and-play-installer/spec.md)), a follow-up, would bring Vivaldi to the front and then show the bar |
 | Rows that are Arc actions ("Contact the Team") | No action rows in version 1; the list has only addresses. The closest equivalent is the command panel of [023](../023-command-panel/spec.md) |
 | Suggestions from Arc's search service as you type | Local suggestions only (tabs, bookmarks, history); the typed text row searches with Vivaldi's default engine |
-| The bar's shadow and blur are drawn by Arc's own window | A CSS shadow and a dimmed page; a blur of the page only if the backdrop filter works over the page (T23) |
+| The bar's shadow and blur are drawn by Arc's own window | A CSS shadow; the page is not dimmed or blurred, as in Arc |
+| Searches use Vivaldi's default engine | `chrome.search.query` is not defined in the main window (probe of 2026-11-11), so a search opens the fallback address, DuckDuckGo, as the window's address; using Vivaldi's own default engine is a later question |
 
 **Keeping the page.** **Open in *workspace*** (called **Move to workspace** before the change
 request of 2026-11-09), or Cmd/Ctrl+O as in [Peek](../002-peek/spec.md), moves
@@ -250,41 +255,46 @@ Change request of 2026-11-10, the command bar (Draft):
   the command bar, and a second press hides it. In a Little Arc window the shortcut does nothing. IF
   the bar cannot be mounted, THEN the module opens the empty window as `commandBar` off does.
 - **FR-19.** The bar is a card in an overlay of the window's `window.html`, centered horizontally, with
-  its top in the upper third of the window, over a scrim that dims the page. From top to bottom: the
+  its top in the upper third of the window, over the page, which is not dimmed or blurred. From top to bottom: the
   field row (search icon, field with the placeholder "Search or Enter URL…", the × button), a divider,
-  the list. It has rounded corners and a soft shadow. It covers no part of the window that the scrim
-  does not also cover.
+  the list. It has rounded corners and a soft shadow. An invisible layer covers the whole window under
+  the card, only to catch clicks outside it (FR-25).
 - **FR-20.** The field takes the focus when the bar shows. Typing never reaches the page underneath.
   When the bar closes the focus goes back to where it was.
 - **FR-21.** Each row, below the field row, shows a favicon, the title and, after a dash, the host
-  without `www.` in muted text. A title too long for the row is cut with an ellipsis, the host is not.
+  without `www.` in muted text. A title too long for the row is cut with an ellipsis at its end; a host
+  too long is cut in the middle, keeping its start and its end.
   The list has at most five rows, the first of which is the typed text row when the field has text.
 - **FR-22.** The selected row is shown in the selection color with white text. Up and Down move the
   selection to the previous and the next row and wrap around at the ends; the pointer moving over a
   row selects it; the selection is reset to the first row when the list changes.
 - **FR-23.** WHEN Enter is pressed or a row is clicked, the module opens the selected row in a new
   Little Arc window created already loading it, then hides the bar. For the typed text row, the text is
-  resolved by the address resolver of FR-2: a URL is opened by the window creation; a search is run
-  with Vivaldi's default engine in the new window's tab, or with the fallback address when
-  `chrome.search` is missing. IF the window cannot be created, THEN the bar closes, the error is
+  resolved by the address resolver of FR-2: a URL is opened by the window creation; a search opens the
+  fallback search address (DuckDuckGo) with the text, because `chrome.search.query` is not defined in
+  the main window (probe of 2026-11-11). IF the window cannot be created, THEN the bar closes, the error is
   logged and nothing is opened.
 - **FR-24.** IF the field is empty and the list is empty, THEN Enter does nothing.
-- **FR-25.** Esc, the × button, a click on the scrim and the shortcut again hide the bar and open
-  nothing.
+- **FR-25.** Esc, the × button, a click outside the card and the shortcut again hide the bar and open
+  nothing. The click outside is swallowed: the catching layer handles `pointerdown`, `mousedown` and
+  `click` in the capture phase with `preventDefault` and `stopPropagation`, and only closes the bar,
+  so nothing under it (a Vivaldi panel, a link) reacts.
 - **FR-26.** For typed text the suggestions are the open tabs of normal windows, the bookmarks and
   the history, ranked by how well the title and the address match: a host or title that starts with the
   text first, then a word of the title, then any other containment, ignoring case and accents. Equal
   matches keep the order open tab, bookmark, history, then the most recent first. One row for each
   address, ignoring a trailing `/`, the fragment and a leading `www.`. Addresses that are not `http(s)`
   (`about:`, `chrome:`, `vivaldi:`, `file:`) are left out. Little Arc windows' tabs are left out.
-- **FR-27.** While the field is empty, the list shows the most visited sites (`chrome.topSites`) and,
-  without them, the most recent history pages, and, without those, nothing.
+- **FR-27.** While the field is empty, the list shows the most recent pages of the history
+  (`chrome.history.search` with empty text), newest first, web addresses only, one row for each address
+  (as in FR-26), five rows. Without history it shows nothing. The most visited sites
+  (`chrome.topSites`) are not used.
 - **FR-28.** A source that is missing or fails is skipped; the failure is logged once.
 - **FR-29.** The module reads tabs, bookmarks and history in the window's own document, keeps no copy
   of them and sends nothing outside the browser. The module does not start in private windows (it
   never does), so the bar never reads or shows anything there.
 - **FR-30.** The bar uses a light palette: card `#f9f9f9`, selection indigo `#9095fb`, field and divider
-  in neutral greys; in dark mode the dark values with light text. Sizes, colors and the scrim live in
+  in neutral greys; in dark mode the dark values with light text. Sizes and colors live in
   `_tokens.scss` (design). The selection color is the same in every workspace.
 - **FR-31.** WHEN a link from another app is opened (FR-3), or Cmd/Ctrl+W, Cmd/Ctrl+O, Esc or the Open
   in button is used in a Little Arc window, THE behavior SHALL be what version 1 and the look
@@ -339,24 +349,26 @@ Change request of 2026-11-10, the command bar (Draft):
 | AC-23 | WHILE Vivaldi is in dark mode, THE bar SHALL use the dark values with light text, and the text SHALL stay readable in both modes. | manual |
 | AC-24 | WHEN the user presses Cmd/Ctrl+R in a Little Arc window, THE page SHALL reload. | manual |
 | AC-25 | WHEN the user presses the shortcut in a normal window, THE command bar SHALL appear over the page, centered horizontally in the upper third of the window, with the field focused, the placeholder "Search or Enter URL…", and a second press SHALL hide it. | manual |
-| AC-26 | THE command bar SHALL look like Arc's in the mockup `little-arc/look/barra-comandi.png`: rounded card with a soft shadow, search icon, large placeholder, rounded × button, divider, rows with favicon, title and muted host after a dash, the selected row in indigo with white text, over a dimmed page. | manual |
+| AC-26 | THE command bar SHALL look like Arc's in the mockup `little-arc/look/barra-comandi.png`: rounded card with a soft shadow, search icon, large placeholder, rounded × button, divider, rows with favicon, title and muted host after a dash, the selected row in indigo with white text, over the page with no dimming and no blur. | manual |
 | AC-27 | WHEN the user types, THE list SHALL update at every key and SHALL show at most five rows, the first being the typed text. | manual |
 | AC-28 | THE suggestion ranker SHALL put matches at the start of the host or title before matches of a word, and those before any other containment, ignoring case and accents. | auto: `suggestion ranker puts the best match first` |
 | AC-29 | THE suggestion ranker SHALL show one row for each address, ignoring a trailing slash, the fragment and `www.`, and SHALL prefer the open tab, then the bookmark, then the history entry. | auto: `suggestion ranker removes duplicate addresses` |
 | AC-30 | THE suggestion ranker SHALL leave out addresses that are not `http` or `https` and SHALL limit the list to the given number of rows. | auto: `suggestion ranker keeps web addresses and limits the list` |
-| AC-31 | WHILE the field is empty, THE list SHALL be the most visited sites, or the most recent history pages without them, or empty. | auto: `suggestion list for an empty field uses the most visited then the recent` |
+| AC-31 | WHILE the field is empty, THE list SHALL be the most recent history pages, newest first, web addresses only, one row for each address, at most five, or empty without history. | auto: `suggestion list for an empty field shows the most recent pages` |
 | AC-32 | THE selection cursor SHALL move up and down, wrap around at both ends, start on the first row and go back to it when the list changes. | auto: `selection cursor wraps around and resets with the list` |
 | AC-33 | WHEN the user presses Up or Down, THE selection SHALL move and the selected row SHALL show in indigo with white text; WHEN the pointer moves over a row, THAT row SHALL be selected. | manual |
 | AC-34 | WHEN Enter is pressed on the typed text row, THE controller SHALL ask the launcher to open the address that the resolver gives, or to search for the text, in a new Little Arc window. | auto: `command bar opens the typed text in little arc` |
 | AC-35 | WHEN Enter is pressed or a row is clicked on a suggestion, THE controller SHALL ask the launcher to open its address in a new Little Arc window. | auto: `command bar opens the selected suggestion in little arc` |
 | AC-36 | WHEN Esc, the × button, a click outside the card or the shortcut again closes the bar, THE controller SHALL open nothing. | auto: `command bar opens nothing when it is dismissed` |
 | AC-37 | WHEN the user presses Enter in the bar, THE Little Arc window SHALL appear already loading the page, with the bar of Look, and the command bar SHALL be gone. | manual |
-| AC-38 | WHEN the bar closes, THE page SHALL have the focus again and the dimmed scrim SHALL be gone. | manual |
+| AC-38 | WHEN the bar closes, THE page SHALL have the focus again and nothing of the bar SHALL remain over the window. | manual |
 | AC-39 | IF a source of suggestions is missing or fails, THEN THE other sources SHALL still be shown and the failure SHALL be logged. | auto: `suggestion sources survive a failing source` |
 | AC-40 | IF the bar cannot be mounted or `commandBar` is off, THEN THE shortcut SHALL open the empty window as in version 1. | auto: `little arc opens the blank window when the command bar is off or cannot mount` |
 | AC-41 | WHEN a link is opened from another app, THE Little Arc window SHALL open directly, with no command bar. | manual |
 | AC-42 | WHEN the module stops, THE module SHALL remove the bar's elements and listeners. | auto: `command bar removes its elements and listeners on stop` |
 | AC-43 | THE command bar SHALL be readable in dark and light mode and SHALL not appear in a private window. | manual |
+| AC-44 | WHEN the user clicks outside the card, THE bar SHALL close and the click SHALL reach nothing under it: no Vivaldi panel closes, no link or button of the page is activated. | manual |
+| AC-45 | THE middle ellipsis SHALL keep the start and the end of a host longer than the room allows and SHALL leave a short host as it is. | auto: `middle ellipsis keeps the start and the end of a long host` |
 
 ## Out of scope
 
@@ -394,23 +406,27 @@ Tore ran the probe on Vivaldi 8.2 for macOS on 2026-11-08.
   the popup is a `window.html` of 700x500 with `#browser`, the VivArcDi styles loaded (11 links) and
   one text field, so the module runs there and can add its compact bar.
 
-### Unknowns for the command bar probe (T23, run by Tore)
+### Probe of the command bar (T23, run by Tore on 2026-11-11)
 
-Nobody has run these in Vivaldi's interface. The design takes the safe answer for each until Tore runs
-the probe.
+Results in a normal window's `window.html` on Vivaldi for macOS:
 
-1. Is `chrome.history.search` defined and does it return results in a normal window's `window.html`?
-2. Is `chrome.topSites.get` defined and does it return the sites?
-3. Does `chrome.bookmarks.search` work for text (the repository only reads the tree today)?
-4. Does `chrome://favicon/size/16@2x/<url>` (used by the folders) draw in an overlay card?
-5. Does `backdrop-filter: blur()` on a full-window scrim show over the page area (a webview)? If not,
-   the scrim only dims.
-6. Does an `<input>` in an overlay of `window.html` take the keyboard focus from the page, and does
-   `webview.focus()` (or the tab) give it back on close?
-7. Does a click on the scrim reach `window.html`'s document with a page loaded under it?
-8. Does `chrome.windows.create({ url, type: 'popup' })` give a popup that loads the address at once,
-   and does `chrome.search.query({ text, tabId })` work for the tab of a window the main window just
-   created?
+1. `chrome.history.search` works and returns recent pages: used for typed text and for the empty field.
+2. `chrome.topSites.get` works, but it is not used: Arc's own bar lists the most recent pages (second
+   screenshot), so the empty field uses the history.
+3. `chrome.bookmarks.search` works for text.
+4. Not yet checked: does `chrome://favicon/size/16@2x/<url>` draw in the card? Left to the manual
+   check (T34); the lettered tile is the fallback.
+5. `backdrop-filter: blur()` works technically, but Arc's bar neither blurs nor dims the page, so ours
+   does not either: settled.
+6. Not yet checked: does an `<input>` in the card take the keyboard focus from the page and give it
+   back on close? Left to the manual check (T34).
+7. A click on a full-window layer reaches the document, but the same click also closed a Vivaldi panel
+   under the overlay. So the outside click is swallowed in the capture phase (FR-25, AC-44).
+8. A popup created with `chrome.windows.create({ url, type: 'popup' })` loads the address at once.
+   `chrome.search.query` is **not defined** in the main window, so a search cannot be run in the new
+   window's tab from there: it opens the fallback search address (DuckDuckGo, `BrowserSearch.fallbackAddress`)
+   as the window's address, as the spec of version 1 already planned. Using the default engine of the
+   profile (Tore's is Qwant) is a later question.
 
 ## Open questions
 
@@ -457,9 +473,8 @@ Tore approved every proposal on 2026-11-09. The one on the command bar is replac
 
 Each question has a proposal; Tore approves or changes it. They block approval until ticked.
 
-- [ ] **Sources of version 1.** Proposal: open tabs and bookmarks (available) plus history and most
-  visited (if the probe says so), local only. Without a history API the bar still works with tabs and
-  bookmarks.
+- [ ] **Sources of version 1.** Proposal: open tabs, bookmarks and history (all three proven by the
+  probe of 2026-11-11), local only; the empty field lists the most recent history pages.
 - [ ] **Search engine suggestions.** Proposal: not in version 1, because they need a request per key to
   the search site; the typed text row searches with the default engine.
 - [ ] **Row of the typed text.** Proposal: it is the first row and the selected one after typing, so
@@ -471,12 +486,16 @@ Each question has a proposal; Tore approves or changes it. They block approval u
   workspace. Alternative: the destination workspace's color.
 - [ ] **Open tab suggestions.** Proposal: opening an open tab's row opens its address in a Little Arc
   window (a second copy of the page); it does not switch to the tab. Alternative: switch to it.
-- [ ] **Blur.** Proposal: dim the page, and blur only if the probe shows `backdrop-filter` works over the
-  page.
+- [x] **Blur and dimming.** Settled 2026-11-11: none, as in Arc.
+- [ ] **Search engine of the typed text row.** Proposal: the fallback address (DuckDuckGo) in version 1,
+  because `chrome.search.query` is missing in the main window. Later: read the default engine of the
+  profile (Qwant on Tore's) from Vivaldi's preferences, which needs its own probe.
 - [ ] **Where the bar shows.** Proposal: only in normal windows; in a Little Arc window the shortcut does
   nothing (the window's own pill is already there).
 - [ ] **`commandBar` option.** Proposal: keep it, default true, as the way back to the empty window of
   version 1 (and the fallback of FR-18).
+- [ ] **Empty field.** Settled by Tore's observation of 2026-11-11: most recent history pages, newest first
+  (not most visited). Tick to confirm.
 - [ ] **Earlier decision.** The open question of 2026-11-09 "Command bar first: not in this change"
   is replaced by this change request.
 
