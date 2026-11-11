@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-11 (merge of PR #128) |
-| Revision | Draft, 2026-11-11: drop area for the first tile (FR-8, FR-9, AC-13 to AC-16) |
+| Revision | Approved, Tore 2026-11-11 ("vai" on the mock, PR #139): drop area for the first tile (FR-8, FR-9, AC-13 to AC-16) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -144,11 +144,11 @@ strip is gone.
   them as native menus. The design adds the two items through Vivaldi's menu API and checks it with the
   read-only probe of task T1 before the code; NFR-2 is the fallback (merge of PR #128, 2026-11-11).
 
-- [ ] **3. How tall is the closed area, and does it show anything?** Proposed: 8 pixels, with no
+- [x] **3. How tall is the closed area, and does it show anything?** Proposed: 8 pixels, with no
   color, border or text, so nothing changes in the tab bar until a drag reaches it; it then opens to one
-  tile height with the gap of 020 FR-6. A visible box was removed on 2026-11-08 (012 FR-15).
-- [ ] **4. Which drags does it take?** Proposed: a tab of today and a link row, the same ones the grid
-  takes. A tile cannot be dragged while there are none.
+  tile height with the gap of 020 FR-6. A visible box was removed on 2026-11-08 (012 FR-15). Accepted by Tore, 2026-11-11.
+- [x] **4. Which drags does it take?** Proposed: a tab of today and a link row, the same ones the grid
+  takes. A tile cannot be dragged while there are none. Accepted by Tore, 2026-11-11.
 
 ## References
 

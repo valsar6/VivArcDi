@@ -77,6 +77,30 @@ The exact shape of the parameters and of the activation event is checked by the 
 THEN nothing is wrapped, the reason is logged, and Pin tab stays on Cmd/Ctrl+D and the drags (NFR-2).
 The wrapper is restored when the module stops.
 
+### The first tile (FR-8, FR-9; revision of 2026-11-11)
+
+The grid is put in the tab bar through `TabBarAnchor` at `GRID_ORDER` (10), above the space header
+(15), and only while it has tiles. The drop area takes its place while it has none:
+
+- **`FirstTileArea`** in the Favorites module draws one element, `data-vivarcdi-first-tile`, and has
+  `place(visible)`, `open()` and `close()`. It is added to the anchor at `GRID_ORDER`, so it sits where
+  the grid will appear. Closed it is 8 px tall, transparent and without border; open
+  (`data-vivarcdi-open`) it is one tile tall and looks like the gap of 020 (`$drop-gap` style). It is
+  outside the window drag region (NFR-1 of this spec, issue #30).
+- **`FavoritesGrid.#layOut`** already knows how many tiles each source shows. It places the area when
+  the bookmark Favorites, the pinned tiles and the tiles of Vivaldi's strip are all empty, and removes
+  it otherwise (FR-9), on every refresh.
+- **`GridDropZone`** gains an `empty` dependency that returns the area when it is in the window. `at`
+  treats a point inside it as the end of the grid (`beforeId: null`), as it already does for the
+  pinned tiles below; `mark` opens the area instead of drawing a gap when there is no grid, and
+  `clear` closes it.
+
+Nothing changes in who drags. A tab of today reaches `GridDropZone` through `TabToFavorite` and
+`TabDragRelease` (mouse and HTML5 paths of 012 FR-14); a link row reaches it through
+`FavoriteDropZone`, which the folders already ask when a row is released (012 FR-16). The drop goes to
+`FavoriteDrop.add`, which creates the Favorites folder when it is missing, so the first tile is made
+by the same code as every other.
+
 ## Components
 
 | Class or file | Responsibility | Pattern |
@@ -91,12 +115,15 @@ The wrapper is restored when the module stops.
 | `src/modules/favorites/TileMenu.ts` | Menu of a tile: Untile tab, Pin tab | - |
 | `src/modules/folders/TabCommands.ts` | Pin tab and Tile tab of a tab of today, registered in `TabMenuItems` | Command |
 | `src/styles/_tokens.scss`, `base.scss` | Pill and menu look; faded Vivaldi slot | - |
+| `src/modules/favorites/FirstTileArea.ts` | The drop area above the space header while there are no tiles | - |
+| `src/modules/favorites/FavoritesGrid.ts`, `GridDropZone.ts` | Place the area; treat it as the end of the grid | - |
 
 ## Vivaldi interface
 
 - `vivaldi.contextMenu.show` and its activation callback or event (probe T1).
 - New marks: `data-vivarcdi-drag-pill`, `data-vivarcdi-menu`, `data-vivarcdi-dragging` also on
-  Vivaldi's tab slot while it is dragged.
+  Vivaldi's tab slot while it is dragged; `data-vivarcdi-first-tile` and `data-vivarcdi-open` for the
+  first tile area.
 
 ## Configuration
 
@@ -110,3 +137,5 @@ None.
 | The wrapped `show` breaks other menus | Items are appended only after a `contextmenu` on a tab of today in the same frame; any other call goes through unchanged; tests cover both |
 | The HTML5 drag gives no `dragover` while the pointer is over Vivaldi's own list | The pill then shows only over VivArcDi's rows and the grid; manual check AC-10 |
 | The pill lags behind the pointer | It moves with `transform` in one `requestAnimationFrame` per frame |
+| An 8 px area is hard to reach, and opening it moves the header under the pointer | The area grows downward from where the pointer entered, so the pointer stays inside it; manual check AC-16 |
+| No `dragover` reaches the area while Vivaldi drags inside its own list | The area is outside Vivaldi's list, where 0.36.3 already receives the HTML5 drag (012 FR-14) |
