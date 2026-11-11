@@ -1,4 +1,4 @@
-import { TabPointerDrag } from '../../core/TabPointerDrag.js';
+import { TabDragRelease } from '../../core/TabDragRelease.js';
 import type { FavoriteDrop } from './FavoriteDrop.js';
 import type { GridDropZone, GridTarget } from './GridDropZone.js';
 
@@ -7,32 +7,30 @@ export interface TabToFavoriteDependencies {
   document: Document;
   /** Selector of Vivaldi's tab wrapper. */
   wrapperSelector: string;
-  zone: Pick<GridDropZone, 'at' | 'showGap' | 'clearGap' | 'listen' | 'unlisten'>;
+  zone: Pick<GridDropZone, 'at' | 'mark' | 'clear'>;
   drop: Pick<FavoriteDrop, 'add'>;
 }
 
 export class TabToFavorite {
-  #drag: TabPointerDrag;
-  #zone: TabToFavoriteDependencies['zone'];
-  #drop: Pick<FavoriteDrop, 'add'>;
-  #handled: number | null = null;
+  #release: TabDragRelease<GridTarget>;
 
   /**
    * Lets a tab of Vivaldi's list be released over the Favorites grid to become a Favorite. It
    * shows the gap under the pointer while the tab is dragged. The release comes either as a mouse
-   * event or as an HTML5 drop; one press is handled once, whichever comes first.
+   * event or as an HTML5 drop, which `TabDragRelease` handles once for each press.
    *
    * @param dependencies Everything it collaborates with.
    */
   constructor({ document, wrapperSelector, zone, drop }: TabToFavoriteDependencies) {
-    this.#zone = zone;
-    this.#drop = drop;
-    this.#drag = new TabPointerDrag({
+    this.#release = new TabDragRelease<GridTarget>({
       document,
       wrapperSelector,
-      onMove: (x, y): void => zone.showGap(zone.at(x, y)),
-      onDrop: (_tabId, x, y): void => this.#release(zone.at(x, y)),
-      onEnd: (): void => zone.clearGap(),
+      place: {
+        at: (x, y): GridTarget | null => zone.at(x, y),
+        mark: (target): void => zone.mark(target),
+        clear: (): void => zone.clear(),
+        release: (tabId, target): void => void drop.add(tabId, target.beforeId),
+      },
     });
   }
 
@@ -40,24 +38,13 @@ export class TabToFavorite {
    * Starts following the mouse and the drag events.
    */
   public start(): void {
-    this.#drag.attach();
-    this.#zone.listen((target) => this.#release(target));
+    this.#release.start();
   }
 
   /**
    * Stops following the mouse and the drag events, and removes the gap.
    */
   public stop(): void {
-    this.#drag.detach();
-    this.#zone.unlisten();
-  }
-
-  #release(target: GridTarget | null): void {
-    const press = this.#drag.lastPress;
-    if (target === null || press === null || press.serial === this.#handled) {
-      return;
-    }
-    this.#handled = press.serial;
-    void this.#drop.add(press.tabId, target.beforeId);
+    this.#release.stop();
   }
 }
