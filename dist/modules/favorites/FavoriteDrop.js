@@ -21,33 +21,55 @@ class FavoriteDrop {
    * @returns What happened.
    */
   async add(tabId, beforeId) {
-    try {
+    return this.#attempt(async () => {
       const tab = await this.#deps.tabs.get(tabId);
       const url = FavoriteDrop.#newPage(tab);
-      if (url === null) {
+      const bookmark = url === null ? null : await this.#create({ title: FavoriteDrop.#titleOf(tab.title, url), url }, beforeId);
+      if (bookmark === null) {
         return "ignored";
       }
-      const folderId = await this.#deps.writer.ensurePath(this.#path);
-      const children = await this.#deps.writer.children(folderId);
-      if (children.some((child) => child.url === url)) {
-        return "ignored";
-      }
-      const index = beforeId === null ? -1 : children.findIndex((child) => child.id === beforeId);
-      const title = FavoriteDrop.#titleOf(tab, url);
-      const bookmark = await this.#deps.writer.create({ parentId: folderId, index: index < 0 ? void 0 : index, title, url });
-      await this.#pin(tabId, { id: bookmark.id, title, url });
+      await this.#pin(tabId, bookmark);
       return "added";
-    } catch (error) {
-      this.#deps.logger.warn("could not add the tab to the Favorites", error);
-      return "failed";
+    });
+  }
+  /**
+   * Adds a Favorite for a page that no tab stands for, so it is a tile that opens the page when
+   * clicked.
+   *
+   * @param page The title and the address.
+   * @param beforeId The Favorite whose tile is under the pointer, so the new one goes before it; null for the end.
+   * @returns What happened; `ignored` for an address that is not `http` or `https` or is already a Favorite.
+   */
+  async addPage({ title, url }, beforeId) {
+    if (AddressKey.from(url) === null) {
+      return "ignored";
     }
+    return this.#attempt(async () => await this.#create({ title: FavoriteDrop.#titleOf(title, url), url }, beforeId) === null ? "ignored" : "added");
   }
   static #newPage(tab) {
     const { url } = tab;
     return url !== void 0 && AddressKey.from(url) !== null && TabData.ownOf(tab).favoriteId === void 0 ? url : null;
   }
-  static #titleOf(tab, url) {
-    return tab.title !== void 0 && tab.title !== "" ? tab.title : url;
+  static #titleOf(title, url) {
+    return title !== void 0 && title !== "" ? title : url;
+  }
+  async #attempt(run) {
+    try {
+      return await run();
+    } catch (error) {
+      this.#deps.logger.warn("could not add the page to the Favorites", error);
+      return "failed";
+    }
+  }
+  async #create(page, beforeId) {
+    const folderId = await this.#deps.writer.ensurePath(this.#path);
+    const children = await this.#deps.writer.children(folderId);
+    if (children.some((child) => child.url === page.url)) {
+      return null;
+    }
+    const index = beforeId === null ? -1 : children.findIndex((child) => child.id === beforeId);
+    const bookmark = await this.#deps.writer.create({ parentId: folderId, index: index < 0 ? void 0 : index, ...page });
+    return { id: bookmark.id, ...page };
   }
   async #pin(tabId, favorite) {
     try {

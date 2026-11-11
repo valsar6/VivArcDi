@@ -14,7 +14,7 @@ class FolderEditing {
   #stops = [];
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
-   * for a folder, Cmd/Ctrl+D, and a tab released over the section or the header. Each of them
+   * for a folder, Cmd/Ctrl+D, and a tab released over the section or the header, and a link row dragged out of the section. Each of them
    * writes to the bookmarks through `WorkspaceFavorites` and the section follows the bookmark
    * events. Without a way to write bookmarks it does nothing.
    *
@@ -42,7 +42,13 @@ class FolderEditing {
       this.#context.logger.warn("chrome.bookmarks cannot write: the folders cannot be edited from the tab bar");
       return;
     }
-    this.#stops.push(FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()), this.#startShortcut(), this.#startDrops());
+    const toast = this.#createToast();
+    this.#stops.push(
+      () => toast.remove(),
+      FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
+      this.#startShortcut((text) => toast.show(text)),
+      this.#startDrops((text) => toast.show(text))
+    );
   }
   /**
    * Stops listening.
@@ -71,31 +77,35 @@ class FolderEditing {
       this.#view.edit(id);
     }
   }
-  #startShortcut() {
-    const { document, selectors, tabs, logger } = this.#context;
-    const toast = new Toast({ document, parent: document.querySelector(selectors.get("browser")) ?? document.body, durationMs: TOAST_MS });
+  #createToast() {
+    const { document, selectors } = this.#context;
+    return new Toast({ document, parent: document.querySelector(selectors.get("browser")) ?? document.body, durationMs: TOAST_MS });
+  }
+  #startShortcut(notify) {
+    const { document, tabs, logger } = this.#context;
     const shortcut = new FavoriteShortcut({
       document,
       activeTab: async () => (await tabs.query({ active: true, currentWindow: true }))[0],
       favorites: this.#favorites,
-      notify: (text) => toast.show(text),
+      notify,
       logger
     });
     shortcut.attach();
-    return () => {
-      shortcut.detach();
-      toast.remove();
-    };
+    return () => shortcut.detach();
   }
-  #startDrops() {
-    const { document, selectors, tabs, logger } = this.#context;
+  #startDrops(notify) {
+    const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
     const drops = new FolderDragDrop({
       document,
       wrapperSelector: selectors.get("tabWrapper"),
+      stripSelector: selectors.get("tabStrip"),
       section: () => this.#view.element,
       header: () => document.querySelector(HEADER_SELECTOR),
       tabs,
+      writer: bookmarkWriter,
+      tabLinks: this.#sources.tabLinks,
       favorites: this.#favorites,
+      notify,
       indexBefore: (bookmarkId) => this.#indexBefore(bookmarkId),
       logger
     });

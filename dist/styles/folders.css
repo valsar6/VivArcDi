@@ -24,9 +24,13 @@
   border-radius: var(--vivarcdi-radius);
   cursor: default;
   transition: background-color var(--vivarcdi-transition);
+  -webkit-app-region: no-drag;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [role]:hover {
   background-color: var(--vivarcdi-folders-hover);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-dragging] {
+  opacity: 0.4;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-drop=into] {
   background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);

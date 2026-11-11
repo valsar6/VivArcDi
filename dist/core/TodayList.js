@@ -1,4 +1,4 @@
-import { TabSlot } from "../../core/TabSlot.js";
+import { TabSlot } from "./TabSlot.js";
 const TODAY_ATTRIBUTE = "data-vivarcdi-drop-today";
 class TodayList {
   #deps;

@@ -1,8 +1,7 @@
-import { TILE_ATTRIBUTE } from "./FavoritesView.js";
 const DRAGGING_ATTRIBUTE = "data-vivarcdi-dragging";
 const DRAG_DISTANCE_PX = 6;
 const PRIMARY_BUTTON = 0;
-class TileDrag {
+class RowDrag {
   #deps;
   #press = null;
   #onDown = (event) => this.#down(event);
@@ -10,10 +9,10 @@ class TileDrag {
   #onUp = (event) => this.#up(event);
   #onClick = (event) => this.#swallow(event);
   /**
-   * Follows a tile of the Favorites grid being moved with the mouse: the button goes down on the
-   * tile, the pointer moves more than a few pixels, and the button goes up somewhere. The tile is
-   * dimmed while it is dragged, and the click that follows the release is swallowed so the tile
-   * does not open.
+   * Follows a row or a tile of VivArcDi being moved with the mouse: the button goes down on it,
+   * the pointer moves more than a few pixels, and the button goes up somewhere. The element is
+   * dimmed while it is dragged, and the click that follows the release is swallowed so it does not
+   * open.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -43,10 +42,10 @@ class TileDrag {
   #down(event) {
     this.#deps.document.removeEventListener("click", this.#onClick, true);
     this.#press = null;
-    const tile = event.button === PRIMARY_BUTTON ? this.#tileOf(event.target) : null;
-    const favoriteId = tile?.getAttribute(TILE_ATTRIBUTE) ?? null;
-    if (tile !== null && favoriteId !== null) {
-      this.#press = { tile, favoriteId, x: event.clientX, y: event.clientY, dragging: false };
+    const element = event.button === PRIMARY_BUTTON ? this.#elementOf(event.target) : null;
+    const id = element?.getAttribute(this.#deps.idAttribute) ?? null;
+    if (element !== null && id !== null) {
+      this.#press = { element, id, x: event.clientX, y: event.clientY, dragging: false };
     }
   }
   #move(event) {
@@ -60,24 +59,24 @@ class TileDrag {
     }
     if (!press.dragging && Math.hypot(event.clientX - press.x, event.clientY - press.y) > DRAG_DISTANCE_PX) {
       press.dragging = true;
-      press.tile.setAttribute(DRAGGING_ATTRIBUTE, "");
+      press.element.setAttribute(DRAGGING_ATTRIBUTE, "");
     }
     if (press.dragging) {
-      this.#deps.onMove(press.favoriteId, event.clientX, event.clientY);
+      this.#deps.onMove(press.id, event.clientX, event.clientY);
     }
   }
   #up(event) {
     const press = this.#press;
     if (press?.dragging === true) {
       this.#deps.document.addEventListener("click", this.#onClick, true);
-      this.#deps.onDrop(press.favoriteId, event.clientX, event.clientY);
+      this.#deps.onDrop(press.id, event.clientX, event.clientY);
     }
     this.#end();
   }
   #end() {
     const press = this.#press;
     this.#press = null;
-    press?.tile.removeAttribute(DRAGGING_ATTRIBUTE);
+    press?.element.removeAttribute(DRAGGING_ATTRIBUTE);
     if (press?.dragging === true) {
       this.#deps.onEnd();
     }
@@ -87,13 +86,13 @@ class TileDrag {
     event.preventDefault();
     event.stopPropagation();
   }
-  #tileOf(target) {
-    const tile = target?.closest?.(`[${TILE_ATTRIBUTE}]`);
-    const grid = this.#deps.grid();
-    return tile != null && grid !== null && tile.parentElement === grid ? tile : null;
+  #elementOf(target) {
+    const element = target?.closest?.(this.#deps.selector);
+    const container = this.#deps.container();
+    return element != null && container !== null && element.parentElement === container ? element : null;
   }
 }
 export {
   DRAGGING_ATTRIBUTE,
-  TileDrag
+  RowDrag
 };

@@ -1,8 +1,10 @@
 import { TabData } from "../../core/TabData.js";
 import { TabDataWriter } from "../../core/TabDataWriter.js";
+import { TabRowMove } from "../../core/TabRowMove.js";
 class FavoriteRemoval {
   #deps;
   #writer;
+  #rows;
   /**
    * Takes a Favorite out of the grid and keeps its page, as Arc does. Released over the folders or
    * the space header, the page becomes a link of the workspace; released over the tab list, it
@@ -16,6 +18,7 @@ class FavoriteRemoval {
   constructor(dependencies) {
     this.#deps = dependencies;
     this.#writer = TabDataWriter.of(dependencies.tabs);
+    this.#rows = new TabRowMove({ tabs: dependencies.tabs, logger: dependencies.logger });
   }
   /**
    * Marks the place under the pointer while a tile is dragged.
@@ -89,25 +92,12 @@ class FavoriteRemoval {
     if (own === void 0) {
       return (await this.#deps.tabs.create({ url: page.url, active: false })).id !== void 0;
     }
-    await this.#moveToRow(own, place.target.rowTabId);
+    await this.#rows.to(own, place.target.rowTabId);
     return true;
   }
   async #release(tabId) {
     await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, { favoriteId: void 0, pinnedUrl: void 0 }));
     await this.#deps.tabs.update(tabId, { pinned: false });
-  }
-  async #moveToRow(tabId, rowTabId) {
-    if (rowTabId === null) {
-      return;
-    }
-    try {
-      const row = await this.#deps.tabs.get(rowTabId);
-      if (row.pinned !== true && row.index !== void 0) {
-        await this.#deps.tabs.move(tabId, { index: row.index });
-      }
-    } catch (error) {
-      this.#deps.logger.warn("could not move the tab to the place of the drop", error);
-    }
   }
 }
 export {

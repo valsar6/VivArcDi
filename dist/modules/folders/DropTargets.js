@@ -129,5 +129,6 @@ class DropTargets {
 }
 export {
   DROP_ATTRIBUTE,
-  DropTargets
+  DropTargets,
+  LINK_ATTRIBUTE
 };
