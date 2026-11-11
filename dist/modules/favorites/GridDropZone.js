@@ -1,3 +1,4 @@
+import { OPEN_ATTRIBUTE } from "./FirstTileArea.js";
 import { TILE_ATTRIBUTE } from "./FavoritesView.js";
 const GAP_ATTRIBUTE = "data-vivarcdi-drop-gap";
 class GridDropZone {
@@ -18,7 +19,7 @@ class GridDropZone {
    * @returns The place under the point, or null when the point is outside the grid.
    */
   at(x, y) {
-    if (GridDropZone.#inside(this.#deps.below(), x, y)) {
+    if (GridDropZone.#inside(this.#deps.below(), x, y) || GridDropZone.#inside(this.#deps.empty(), x, y)) {
       return { beforeId: null };
     }
     const grid = this.#deps.grid();
@@ -35,6 +36,11 @@ class GridDropZone {
    */
   mark(target) {
     const grid = this.#deps.grid();
+    const empty = this.#deps.empty();
+    if (target !== null && grid === null && empty !== null) {
+      empty.setAttribute(OPEN_ATTRIBUTE, "");
+      return;
+    }
     if (target === null || grid === null) {
       this.clear();
       return;
@@ -47,6 +53,7 @@ class GridDropZone {
    */
   clear() {
     this.#gap?.remove();
+    this.#deps.empty()?.removeAttribute(OPEN_ATTRIBUTE);
   }
   #place(gap, grid, before) {
     if (gap.parentElement === grid && gap.nextElementSibling === before) {

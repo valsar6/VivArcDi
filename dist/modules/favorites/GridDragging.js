@@ -7,6 +7,7 @@ import { TodayList } from "../../core/TodayList.js";
 import { FavoriteDrop } from "./FavoriteDrop.js";
 import { FavoriteRemoval } from "./FavoriteRemoval.js";
 import { TILE_ATTRIBUTE } from "./FavoritesView.js";
+import { FirstTileArea } from "./FirstTileArea.js";
 import { GridDropZone } from "./GridDropZone.js";
 import { GridFavoriteTargets } from "./GridFavoriteTargets.js";
 import { LinkedTabs } from "./LinkedTabs.js";
@@ -20,6 +21,7 @@ class GridDragging {
   #zone;
   #targets;
   #unregister = null;
+  #firstTile;
   /**
    * Both directions of dragging on the Favorites grid: a tab of the list released over the grid
    * becomes a Favorite, and a tile dragged out of the grid takes the Favorite out and keeps the
@@ -36,7 +38,9 @@ class GridDragging {
     const grid = () => favorites.active ? inWindow(favorites.element) : null;
     const below = () => inWindow(pinned?.element);
     const links = new LinkedTabs(tabs);
-    const zone = new GridDropZone({ document, grid, below });
+    const firstTile = new FirstTileArea({ document, hostSelector: selectors.get("tabListHost") });
+    this.#firstTile = firstTile;
+    const zone = new GridDropZone({ document, grid, below, empty: () => firstTile.element });
     const drop = new FavoriteDrop({ tabs, writer, links, folder, logger });
     const pill = DragPill.of(document, selectors);
     this.#toFavorite = new TabToFavorite({ document, wrapperSelector, zone, drop, tabs, pill, logger });
@@ -81,6 +85,15 @@ class GridDragging {
     this.#tileMenu.detach();
     this.#unregister?.();
     this.#unregister = null;
+    this.#firstTile.destroy();
+  }
+  /**
+   * Shows the area of the first tile above the space header, or removes it.
+   *
+   * @param visible Whether the tab bar is shown and no tile is in it.
+   */
+  placeFirstTile(visible) {
+    this.#firstTile.place(visible);
   }
 }
 export {

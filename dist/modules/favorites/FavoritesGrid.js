@@ -165,11 +165,10 @@ class FavoritesGrid extends Module {
     await this.#fromBookmarks.start().catch((error) => logger.error("Could not read the Favorites folder", error));
   }
   #startDragging(tabs, writer, logger) {
-    const favorites = this.#fromBookmarks;
-    if (favorites === null || !writer.available || this.#document === null || this.#selectors === null) {
+    if (this.#fromBookmarks === null || !writer.available || this.#document === null || this.#selectors === null) {
       return;
     }
-    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, favorites, pinned: this.#fromPinned });
+    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, favorites: this.#fromBookmarks, pinned: this.#fromPinned });
     this.#dragging.start();
   }
   #update() {
@@ -180,7 +179,7 @@ class FavoritesGrid extends Module {
     }
     tagger.maxTiles = this.#fromPinned === null ? this.#settings.maxTiles : 0;
     const strip = tagger.apply(tabBar);
-    this.#layOut(strip, tagger.tileCount);
+    this.#dragging?.placeFirstTile(this.#layOut(strip, tagger.tileCount));
   }
   #layOut(strip, stripTiles) {
     const favorites = FavoritesGrid.#placed(this.#fromBookmarks, strip !== null);
@@ -189,6 +188,7 @@ class FavoritesGrid extends Module {
     const top = main ?? { grid: strip, count: stripTiles };
     this.#layout?.follow(top.grid, top.count);
     this.#pinnedLayout?.follow(below.grid, below.count);
+    return strip !== null && top.count + below.count === 0;
   }
   static #placed(source, shown) {
     const grid = source?.place(shown && source.count > 0) ?? null;
