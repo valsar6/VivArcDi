@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft (revision of 2026-11-11, see Open questions) |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed) |
+| Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed), 2026-11-11 (FR-14, FR-16, FR-17, AC-32 to AC-40; PR #125) |
 
 ## Summary
 
@@ -236,10 +236,9 @@ Removing and moving folders and links stay in the Bookmarks panel for now.
 - [x] **Empty grid (2026-11-01).** AC-11/15 failed on Vivaldi 8.2: with no Favorites folder and no pinned tab the grid is not drawn, so there is nowhere to drag. FR-15 adds a placeholder; Tore approved on a decision card (2026-11-01).
 - [x] **Placeholder removed (2026-11-08).** Tore: the dashed box is not a pinned tab and must go; FR-15 and
   AC-29 to AC-31 are removed. See [028](../028-arc-sidebar-look/spec.md).
-- [ ] **Revision of 2026-11-11 (drag and drop of tabs, AC-32 to AC-40).** Tore's recordings of
-  VivArcDi 0.35.0 and Arc. To approve: the HTML5 way in (FR-14), dragging a link out (FR-16, FR-17)
-  and the rule for links that existed before (AC-37). The probe `tab-drag/diagnostica-trascina-schede.md`
-  confirms the events before the design.
+- [x] **Revision of 2026-11-11 (drag and drop of tabs, AC-32 to AC-40).** Tore's recordings of
+  VivArcDi 0.35.0 and Arc. Approved by Tore with the merge of PR #125 (2026-11-11): the HTML5 way in
+  (FR-14), dragging a link out (FR-16, FR-17) and the rule for links that existed before (AC-37).
 - [x] **FR-8 and AC-11.** Pinning a tab dragged onto the Favorites grid is left to Vivaldi and
   checked in the manual steps (Tore, 2026-11-01).
 - [x] **What does "drag the Favorites folders into the workspaces" mean?** First approved reading (Tore, 2026-10-28):
