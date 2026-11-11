@@ -7,8 +7,8 @@
 | Owner | Tore |
 | Approved | 2026-11-08 |
 | Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Approved 2026-11-09 |
-| Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-33, AC-25 to AC-43): Draft |
-| Change request | 2026-11-11, the bar as Arc draws it: no dimming and no blur, recent sites for an empty field, outside clicks swallowed, searches through the fallback address (sections Opening: the command bar and Probe results, FR-19, FR-21, FR-23, FR-25, FR-27, AC-26, AC-31, AC-38, AC-44, AC-45): Draft |
+| Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-33, AC-25 to AC-43): Approved 2026-11-11 |
+| Change request | 2026-11-11, the bar as Arc draws it: no dimming and no blur, recent sites for an empty field, outside clicks swallowed, searches through the fallback address (sections Opening: the command bar and Probe results, FR-19, FR-21, FR-23, FR-25, FR-27, AC-26, AC-31, AC-38, AC-44, AC-45): Approved 2026-11-11 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -129,7 +129,7 @@ the profile label of Arc's bar are not part of this change (see open questions).
 
 ### Opening: the command bar
 
-Change request of 2026-11-10 (Draft). Tore wants the opening to look like the original Arc's, seen in
+Change request of 2026-11-10 (Approved 2026-11-11). Tore wants the opening to look like the original Arc's, seen in
 his own screenshot: a light floating bar with a search field and a list of suggestions, and the window
 only after Enter. This replaces the decision of 2026-11-09 "Command bar first: not in this change".
 
@@ -249,7 +249,7 @@ questions.
 - **FR-17.** Bar, frame and pill use the colors of the destination workspace (019) or the default palette
   (029), with dark values in dark mode; sizes and colors live in `_tokens.scss`.
 
-Change request of 2026-11-10, the command bar (Draft):
+Change request of 2026-11-10, the command bar (Approved 2026-11-11):
 
 - **FR-18.** WHEN the shortcut is pressed in a normal window and `commandBar` is on, the module shows
   the command bar, and a second press hides it. In a Little Arc window the shortcut does nothing. IF

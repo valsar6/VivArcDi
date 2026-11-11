@@ -4,8 +4,8 @@
 |---|---|
 | Status | Approved |
 | Change request | 2026-11-09, the look of the window (section Look): Approved 2026-11-09 |
-| Change request | 2026-11-10, the command bar (section Opening: the command bar): Draft, written for Tore to read with the spec; nothing here is built until the spec is approved |
-| Change request | 2026-11-11, no dimming or blur, recent history for the empty field, swallowed outside clicks, searches through the fallback address (sections Opening: the command bar and its risks): Draft |
+| Change request | 2026-11-10, the command bar (section Opening: the command bar): Approved 2026-11-11 |
+| Change request | 2026-11-11, no dimming or blur, recent history for the empty field, swallowed outside clicks, searches through the fallback address (sections Opening: the command bar and its risks): Approved 2026-11-11 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach

@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Status | Approved |
-| Change request | 2026-11-10, the command bar (T23 to T34): Draft, nothing below starts before Tore approves the spec and the design |
-| Change request | 2026-11-11, bar as Arc draws it: no dimming or blur, recent history, swallowed outside clicks, fallback search address (T23 to T29, T32, T34): Draft |
+| Change request | 2026-11-10, the command bar (T23 to T34): Approved 2026-11-11 |
+| Change request | 2026-11-11, bar as Arc draws it: no dimming or blur, recent history, swallowed outside clicks, fallback search address (T23 to T29, T32, T34): Approved 2026-11-11 |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -59,7 +59,7 @@ Change request of 2026-11-09, the look of the window (Approved by Tore 2026-11-0
   Debian, with the review frames of `little-arc/look/` to compare.
 - [ ] **T22.** Manual checks by Tore.
 
-Change request of 2026-11-10, the command bar (Draft; the branch for the
+Change request of 2026-11-10, the command bar (Approved 2026-11-11; the branch for the
 implementation is `features/little-arc-command-bar-code`, next minor version):
 
 - [x] **T23.** Probe, run by Tore on 2026-11-11 in a normal window: history, bookmarks search, backdrop
