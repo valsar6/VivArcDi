@@ -146,11 +146,22 @@ test('passes the menu through when the right click was a while ago', async () =>
   assert.deepEqual(idsOf(api.shown[0]), ['new-tab', 'separator', 'close-tab']);
 });
 
-test('leaves the menu of a tab the commands do not apply to as it is', async () => {
-  const { api, rightClick } = setup({ pinned: true });
+test('runs no command on a tab the commands do not apply to', async () => {
+  const { api, rightClick, ran, warnings } = setup({ pinned: true });
   rightClick(5);
-  await (api.show as (...args: unknown[]) => Promise<unknown>)({ items: ITEMS });
-  assert.deepEqual(idsOf(api.shown[0]), ['new-tab', 'separator', 'close-tab']);
+  (api.show as (...args: unknown[]) => unknown)({ items: ITEMS });
+  api.shown[0]?.callback?.('vivarcdi-pin-tab');
+  [...api.listeners].forEach((listener) => listener(1, { id: 'vivarcdi-pin-tab' }));
+  await settle();
+  assert.deepEqual(ran, []);
+  assert.equal(warnings.length, 1);
+});
+
+test('shows the menu of a tab without waiting', () => {
+  const { api, rightClick } = setup();
+  rightClick(5);
+  assert.equal((api.show as (...args: unknown[]) => unknown)({ items: ITEMS }), 'shown');
+  assert.equal(api.shown.length, 1);
 });
 
 test('adds nothing and logs once when the items are not as expected', async () => {

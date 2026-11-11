@@ -39,7 +39,7 @@ export interface TabMenuItemsDependencies {
 }
 
 interface Pressed {
-  tab: Promise<chrome.tabs.Tab | null>;
+  tabId: number;
   at: number;
 }
 
@@ -50,7 +50,7 @@ export class TabMenuItems {
   #original: Show | null = null;
   #wrapper: Show | null = null;
   #pressed: Pressed | null = null;
-  #pending: chrome.tabs.Tab | null = null;
+  #pending: number | null = null;
   #warned = false;
   #onContext = (event: Event): void => this.#context(event);
   #onActivated: Listener = (...values) => void this.#activated(values);
@@ -58,11 +58,11 @@ export class TabMenuItems {
   /**
    * Adds commands to Vivaldi's menu of a tab. Vivaldi builds that menu itself and shows it with
    * `vivaldi.contextMenu.show`, so the call is wrapped: a right click on a tab slot is remembered,
-   * and the `show` that follows for a tab the commands apply to gets a separator and the commands
-   * after its own items, in the shape of its own items. When the activation reports one of the
-   * ids, the command runs with that tab; any other id goes to Vivaldi as before. Every other call
-   * of `show` passes through unchanged. Where the API or the shape of its items is not as
-   * expected, nothing is added and the reason is logged once.
+   * and the `show` that follows gets a separator and the commands after its own items, in the
+   * shape of its own items, without delaying the call. When the activation reports one of the ids,
+   * the tab is read and the command runs if it applies to it; any other id goes to Vivaldi as
+   * before. Every other call of `show` passes through unchanged. Where the API or the shape of its
+   * items is not as expected, nothing is added and the reason is logged once.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -118,14 +118,7 @@ export class TabMenuItems {
   #context(event: Event): void {
     const target = event.target as Element | null;
     const tabId = target?.closest?.(this.#deps.wrapperSelector) == null ? null : TabSlot.idOf(target, this.#deps.wrapperSelector);
-    this.#pressed = tabId === null ? null : { tab: this.#read(tabId), at: (this.#deps.now ?? Date.now)() };
-  }
-
-  #read(tabId: number): Promise<chrome.tabs.Tab | null> {
-    return this.#deps.tabs.get(tabId).catch((error: unknown) => {
-      this.#deps.logger.warn('could not read the tab of the menu', error);
-      return null;
-    });
+    this.#pressed = tabId === null ? null : { tabId, at: (this.#deps.now ?? Date.now)() };
   }
 
   #show(original: Show, host: ContextMenuApi, args: unknown[]): unknown {
@@ -134,10 +127,10 @@ export class TabMenuItems {
     if (pressed === null || (this.#deps.now ?? Date.now)() - pressed.at > MAX_AGE_MS) {
       return original.apply(host, args);
     }
-    return pressed.tab.then((tab) => original.apply(host, tab !== null && this.#deps.appliesTo(tab) ? this.#extend(args, tab) : args));
+    return original.apply(host, this.#extend(args, pressed.tabId));
   }
 
-  #extend(args: unknown[], tab: chrome.tabs.Tab): unknown[] {
+  #extend(args: unknown[], tabId: number): unknown[] {
     const [params, ...rest] = args;
     const found = (params as { items?: unknown } | null | undefined)?.items;
     const items: unknown[] = Array.isArray(found) ? found : [];
@@ -148,7 +141,7 @@ export class TabMenuItems {
     }
     const separator = shape.separator();
     const added = this.#deps.commands.map(({ id, label }) => shape.command(id, label));
-    this.#pending = tab;
+    this.#pending = tabId;
     return [{ ...(params as object), items: [...items, ...(separator === null ? [] : [separator]), ...added] }, ...rest.map((arg) => this.#follow(arg))];
   }
 
@@ -162,15 +155,24 @@ export class TabMenuItems {
   #activated(values: unknown[]): boolean {
     const ids = values.map((value) => MenuItemShape.idIn(value));
     const command = this.#deps.commands.find((candidate) => ids.includes(candidate.id));
-    const tab = this.#pending;
+    const tabId = this.#pending;
     if (command === undefined) {
       return false;
     }
     this.#pending = null;
-    if (tab !== null) {
-      Promise.resolve(command.run(tab)).catch((error: unknown) => this.#deps.logger.warn(`could not run "${command.label}" from the menu of a tab`, error));
+    if (tabId !== null) {
+      this.#run(command, tabId).catch((error: unknown) => this.#deps.logger.warn(`could not run "${command.label}" from the menu of a tab`, error));
     }
     return true;
+  }
+
+  async #run(command: TabMenuCommand, tabId: number): Promise<void> {
+    const tab = await this.#deps.tabs.get(tabId);
+    if (this.#deps.appliesTo(tab)) {
+      await command.run(tab);
+    } else {
+      this.#deps.logger.warn(`"${command.label}" does not apply to this tab`);
+    }
   }
 
   #warnOnce(message: string): void {
