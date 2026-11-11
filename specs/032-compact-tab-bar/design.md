@@ -27,7 +27,7 @@ The three rows already exist and keep their elements, tooltips, `aria-*` attribu
 | Row | Compact rule |
 |---|---|
 | Space header | `justify-content: center`; `.vivarcdi-space-arrow`, `.vivarcdi-space-name` and `.vivarcdi-space-add` are `display: none`; a `::after` draws the chevron with `mask: $chevron-glyph`, turned 180 degrees while `[data-vivarcdi-collapsed]` is set, so it points up while the space is expanded and down while collapsed (AC-4). The space icon stays as it is. |
-| New Tab | `justify-content: center`; padding 0; the label `span` without a class is `display: none`; `.vivarcdi-new-tab-icon` stays, it already draws `$plus-glyph`. |
+| New Tab | `justify-content: center`; padding 0; the label `span` keeps its text for screen readers but with `font-size: 0`; `.vivarcdi-new-tab-icon` stays, it already draws `$plus-glyph`. |
 | Archive footer | The `button` keeps its text for screen readers but with `font-size: 0`; a `::before` of `$archive-icon-size` draws `$archive-glyph` with `mask`, centered. |
 
 The archive glyph is a new 16 x 16 line drawing made for VivArcDi: an open box with a slot handle and
@@ -53,9 +53,10 @@ Rejected:
 | `src/styles/_tokens.scss` | `$narrow-tab-bar` selector, `$chevron-glyph`, `$archive-glyph`, `$archive-icon-size`, `$chevron-size` (FR-7, AC-5) |
 | `src/styles/compact-tab-bar.scss` | The compact rules of the table above, all under `#{$root}:has(#{$narrow-tab-bar})` |
 | `src/config.json` | Adds `styles/compact-tab-bar.css` to `styles`, last |
+| `src/core/NewTabRow.ts` | Sets `title="New Tab"` on the row, which has no tooltip today, so the bare `+` explains itself (FR-5) |
 | `tests/styles/CompactTabBar.test.ts` | AC-1, AC-2, AC-4, AC-5 on the compiled CSS |
 
-No TypeScript module changes.
+The only TypeScript change is the tooltip of `NewTabRow`.
 
 ## Tests
 
