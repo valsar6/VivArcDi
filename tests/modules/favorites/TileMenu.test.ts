@@ -40,7 +40,11 @@ test('opens the menu of a tile with Untile tab and Pin tab', () => {
   const { dom, tile, opened, items, calls } = setup();
   assert.equal(rightClick(dom, tile), 1);
   assert.deepEqual(opened, [['Untile tab', 'Pin tab']]);
-  items().forEach((item) => item.run());
+  items().forEach((item) => {
+    if ('run' in item) {
+      item.run();
+    }
+  });
   assert.deepEqual(calls, ['untile f1', 'pin f1']);
 });
 

@@ -20,8 +20,9 @@ have the exact behavior.
 5. [Little Arc](little-arc.md): a small window for a quick lookup.
 6. [Incognito](incognito.md): the private window.
 7. [Sync between computers](sync.md): the pinned tabs of each workspace on every computer.
-8. [What comes next](roadmap.md): the Arc features that are designed but not built yet.
-9. [Images and GIFs](assets.md): the graphic assets of this manual and the recordings still to make.
+8. [Live folders](live-folders.md): folders that fill themselves with your GitHub pull requests.
+9. [What comes next](roadmap.md): the Arc features that are designed but not built yet.
+10. [Images and GIFs](assets.md): the graphic assets of this manual and the recordings still to make.
 
 ## Arc features in VivArcDi
 
@@ -52,7 +53,7 @@ have the exact behavior.
 | Command Bar with tab actions | [What comes next](roadmap.md#command-panel) | Proposed | [023](../../specs/023-command-panel/spec.md) |
 | Boosts and Zap | [What comes next](roadmap.md#boosts-and-zap) | Proposed | [024](../../specs/024-site-boosts-and-zap/spec.md) |
 | Annotated screenshots | [What comes next](roadmap.md#annotated-screenshots) | Proposed | [025](../../specs/025-annotated-screenshots/spec.md) |
-| Live folders | [What comes next](roadmap.md#live-folders) | Proposed | [026](../../specs/026-live-folders/spec.md) |
+| Live folders | [Live folders](live-folders.md) | Available | [026](../../specs/026-live-folders/spec.md) |
 | Rename and re-icon pinned tabs | [What comes next](roadmap.md#rename-pinned-tabs) | Proposed | [027](../../specs/027-rename-pinned-tabs/spec.md) |
 
 Status meanings: **Available** ships in a release. **In progress** is approved and partly built.

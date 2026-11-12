@@ -164,3 +164,16 @@ test('keeps a bookmark that existed before on remove pin', async () => {
   assert.deepEqual(TabData.ownOf(await tabs.get(1)), {});
   assert.deepEqual(notes, [KEPT_TEXT]);
 });
+
+test('leaves a row of a live folder alone, as it is not a bookmark', async () => {
+  const { chrome, tabs, notes, where, removal } = setup([linkTab(1, { vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: 'live:f1:7' } }) }), { id: 4, url: OTHER, index: 7 }], true);
+  where.today = { rowTabId: 4 };
+  where.grid = { beforeId: null };
+  await removal.release('live:f1:7', 5, 5);
+  await removal.removePin('live:f1:7');
+  await removal.tile('live:f1:7');
+  assert.deepEqual(TabData.ownOf(await tabs.get(1)), { bookmarkId: 'live:f1:7' });
+  assert.deepEqual(tabs.calls.filter(([name]) => name !== 'query' && name !== 'get'), []);
+  assert.deepEqual(chrome.calls, []);
+  assert.deepEqual(notes, []);
+});

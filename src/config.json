@@ -4,6 +4,7 @@
     "styles/favorites.css",
     "styles/folder-preview.css",
     "styles/folders.css",
+    "styles/live-folders.css",
     "styles/hidden-tabs.css",
     "styles/incognito.css",
     "styles/little-arc.css",
@@ -49,6 +50,10 @@
       "workspacesBase": "VivArcDi",
       "maxDepth": 3,
       "maxHeightPercent": 60
+    },
+    "live-folders": {
+      "enabled": true,
+      "refreshMinutes": 5
     },
     "folder-preview": {
       "enabled": true,

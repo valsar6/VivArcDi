@@ -8,6 +8,10 @@ export interface FolderRow {
   title: string;
   depth: number;
   open: boolean;
+  /** Set on a live folder. */
+  live?: true;
+  /** Why the last refresh of a live folder failed. */
+  warning?: string;
 }
 
 export interface LinkRow {
@@ -19,6 +23,8 @@ export interface LinkRow {
   depth: number;
   /** The tab that shows the link, if any. */
   tab: OpenTab | undefined;
+  /** A second line under the title. */
+  subtitle?: string;
 }
 
 export type Row = FolderRow | LinkRow;
@@ -56,7 +62,15 @@ export class FolderRows {
 
   static #folder(folder: FolderEntry, sources: RowSources): Row[] {
     const open = sources.isOpen(folder.id);
-    const own: FolderRow = { kind: 'folder', id: folder.id, title: folder.title, depth: folder.depth, open };
+    const own: FolderRow = {
+      kind: 'folder',
+      id: folder.id,
+      title: folder.title,
+      depth: folder.depth,
+      open,
+      ...(folder.live === undefined ? {} : { live: folder.live }),
+      ...(folder.warning === undefined ? {} : { warning: folder.warning }),
+    };
     if (open) {
       return [own, ...FolderRows.build(folder.children, sources)];
     }
@@ -71,6 +85,7 @@ export class FolderRows {
   static #link(link: LinkEntry, depth: number, sources: RowSources): LinkRow {
     const tab = sources.tabFor(link);
     const otherTitle = tab !== undefined && tab.key !== link.key ? tab.title : undefined;
-    return { kind: 'link', id: link.id, title: otherTitle !== undefined && otherTitle !== '' ? otherTitle : link.title, url: link.url, key: link.key, depth, tab };
+    const title = otherTitle !== undefined && otherTitle !== '' ? otherTitle : link.title;
+    return { kind: 'link', id: link.id, title, url: link.url, key: link.key, depth, tab, ...(link.subtitle === undefined ? {} : { subtitle: link.subtitle }) };
   }
 }

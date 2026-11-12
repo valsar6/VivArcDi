@@ -74,3 +74,108 @@ test('stops listening once it is closed', () => {
   menu.close();
   assert.equal([...dom.listeners.values()].flat().length, 0);
 });
+
+function nested(): Setup {
+  const dom = new DomDocument();
+  dom.defaultView = { innerWidth: 400, innerHeight: 300 };
+  const ran: string[] = [];
+  const menu = new ContextMenu({ document: asDocument(dom), parent: (): Element => dom.parent as unknown as Element });
+  menu.open(
+    [
+      { label: 'Plain', run: (): void => void ran.push('plain') },
+      {
+        label: 'Filters',
+        items: [
+          { label: 'On', checked: true, run: (): void => void ran.push('on') },
+          { label: 'Off', checked: false, run: (): void => void ran.push('off') },
+        ],
+      },
+    ],
+    50,
+    60,
+  );
+  const open = (): DomNode[] => dom.created.filter((node) => node.hasAttribute(MENU_ATTRIBUTE) && node.parentElement !== null);
+  const element = (): DomNode | undefined => open().at(-1);
+  return { dom, menu, ran, element, rows: (): DomNode[] => open()[0]?.children ?? [] };
+}
+
+const menusOpen = (dom: DomDocument): number => dom.created.filter((node) => node.hasAttribute(MENU_ATTRIBUTE) && node.parentElement !== null).length;
+
+const checkItems = (): { on: DomNode | undefined; off: DomNode | undefined } => {
+  const { dom, rows } = nested();
+  rows()[1]?.bubble({ type: 'mouseenter', target: rows()[1] } as unknown as Event);
+  const [on, off] = dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE))?.children ?? [];
+  return { on, off };
+};
+
+test('draws a check mark on a check item that is on', () => {
+  const { on } = checkItems();
+  assert.equal(on?.getAttribute('role'), 'menuitemcheckbox');
+  assert.equal(on?.getAttribute('aria-checked'), 'true');
+  assert.equal(on?.hasAttribute('data-vivarcdi-checked'), true);
+});
+
+test('draws no check mark on a check item that is off', () => {
+  const { off } = checkItems();
+  assert.equal(off?.getAttribute('role'), 'menuitemcheckbox');
+  assert.equal(off?.getAttribute('aria-checked'), 'false');
+  assert.equal(off?.hasAttribute('data-vivarcdi-checked'), false);
+});
+
+test('a plain item has no check mark', () => {
+  const { rows } = nested();
+  assert.equal(rows()[0]?.getAttribute('role'), 'menuitem');
+  assert.equal(rows()[0]?.hasAttribute('data-vivarcdi-checked'), false);
+});
+
+test('opens a submenu beside its row on hover and closes it on another row', () => {
+  const { dom, rows } = nested();
+  assert.equal(rows()[1]?.getAttribute('aria-haspopup'), 'menu');
+  rows()[1]?.bubble({ type: 'mouseenter', target: rows()[1] } as unknown as Event);
+  assert.equal(menusOpen(dom), 2);
+  rows()[0]?.bubble({ type: 'mouseenter', target: rows()[0] } as unknown as Event);
+  assert.equal(menusOpen(dom), 1);
+});
+
+test('opens a submenu on a click, once', () => {
+  const { dom, rows } = nested();
+  rows()[1]?.click();
+  rows()[1]?.click();
+  assert.equal(menusOpen(dom), 2);
+});
+
+test('runs an item of a submenu and closes every level', () => {
+  const { dom, rows, ran } = nested();
+  rows()[1]?.click();
+  const submenu = dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE));
+  submenu?.children[1]?.click();
+  assert.deepEqual(ran, ['off']);
+  assert.equal(menusOpen(dom), 0);
+});
+
+test('a click inside a submenu does not close the menu', () => {
+  const { dom, rows } = nested();
+  rows()[1]?.click();
+  const submenu = dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE));
+  press(dom, submenu?.children[0]);
+  assert.equal(menusOpen(dom), 2);
+  press(dom, dom.createElement('div'));
+  assert.equal(menusOpen(dom), 0);
+});
+
+test('closes the submenu with the menu on Escape', () => {
+  const { dom, rows } = nested();
+  rows()[1]?.click();
+  dom.emit('keydown', { key: 'Escape', preventDefault: (): void => undefined, stopPropagation: (): void => undefined });
+  assert.equal(menusOpen(dom), 0);
+});
+
+test('places a submenu at the right of its row, level with it', () => {
+  const { dom, rows } = nested();
+  const row = rows()[1] as DomNode;
+  row.rect = { left: 60, right: 160, top: 80, bottom: 108 };
+  row.click();
+  const submenu = dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE));
+  assert.equal(submenu?.properties.get('left'), '160px');
+  assert.equal(submenu?.properties.get('top'), '80px');
+});

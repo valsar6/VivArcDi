@@ -72,3 +72,29 @@ test('marks the target under the pointer and removes the mark', () => {
   targets.clear();
   assert.equal(header.hasAttribute('data-vivarcdi-drop'), false);
 });
+
+test('gives no target over the folders and rows of a live folder, and ignores them between the others', () => {
+  const dom = new DomDocument();
+  const section = dom.createElement('div');
+  const header = dom.createElement('div');
+  header.rect = { left: 0, right: 200, top: -40, bottom: -10 };
+  row(dom, section, ['folder', 'a', 0]);
+  row(dom, section, ['link', 'b', 0]);
+  row(dom, section, ['folder', 'live:f1', 0]);
+  row(dom, section, ['link', 'live:f1:7', 1]);
+  section.rect = { left: 0, right: 200, top: 0, bottom: 4 * ROW_HEIGHT + 10 };
+  const targets = new DropTargets(() => asElement(section), () => asElement(header));
+  assert.deepEqual(targets.at(50, 15), { kind: 'folder', id: 'a' });
+  assert.deepEqual(targets.at(50, 2 * ROW_HEIGHT - 5), { kind: 'between', before: null, rowId: 'b', edge: 'after' });
+  assert.equal(targets.at(50, 2 * ROW_HEIGHT + 15), null);
+  assert.equal(targets.at(50, 3 * ROW_HEIGHT + 15), null);
+  assert.equal(targets.at(50, 3 * ROW_HEIGHT + 2), null);
+});
+
+test('gives no target when only live folders are in the section', () => {
+  const dom = new DomDocument();
+  const section = dom.createElement('div');
+  row(dom, section, ['folder', 'live:f1', 0]);
+  section.rect = { left: 0, right: 200, top: 0, bottom: ROW_HEIGHT + 10 };
+  assert.equal(new DropTargets(() => asElement(section), () => null).at(50, ROW_HEIGHT + 5), null);
+});

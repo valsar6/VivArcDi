@@ -180,3 +180,31 @@ test('removes the drag pill when the button was released outside the window', ()
   dom.emit('mousemove', { buttons: 0, clientX: 20, clientY: 50 });
   assert.equal(pill()?.parentElement, null);
 });
+
+test('does not start a drag on an element that accepts refuses', () => {
+  const dom = new DomDocument();
+  const grid = dom.createElement('div');
+  const refused = dom.createElement('div');
+  refused.setAttribute(ROW_ATTRIBUTE, 'live:f1');
+  const allowed = dom.createElement('div');
+  allowed.setAttribute(ROW_ATTRIBUTE, '11');
+  grid.append(refused, allowed);
+  const events: string[] = [];
+  new RowDrag({
+    document: asDocument(dom),
+    container: (): HTMLElement => asElement(grid),
+    selector: `[${ROW_ATTRIBUTE}]`,
+    idAttribute: ROW_ATTRIBUTE,
+    accepts: (id): boolean => !id.startsWith('live:'),
+    onMove: (id): void => void events.push(`move ${id}`),
+    onDrop: (id): void => void events.push(`drop ${id}`),
+    onEnd: (): void => void events.push('end'),
+  }).attach();
+  for (const target of [refused, allowed]) {
+    dom.emit('mousedown', { button: 0, buttons: 1, clientX: 10, clientY: 10, target });
+    dom.emit('mousemove', { buttons: 1, clientX: 10, clientY: 40 });
+    dom.emit('mouseup', { buttons: 0, clientX: 10, clientY: 40 });
+  }
+  assert.deepEqual(events, ['move 11', 'drop 11', 'end']);
+  assert.equal(refused.hasAttribute(DRAGGING_ATTRIBUTE), false);
+});

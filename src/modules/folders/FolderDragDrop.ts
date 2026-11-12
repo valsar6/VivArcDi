@@ -2,6 +2,7 @@ import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import type { ContextMenu } from '../../core/ContextMenu.js';
 import type { DragPill } from '../../core/DragPill.js';
 import { FavoriteDropZone } from '../../core/FavoriteDropZone.js';
+import { LinkId } from '../../core/LinkId.js';
 import { LinkDropZone } from '../../core/LinkDropZone.js';
 import type { Logger } from '../../core/Logger.js';
 import { RowDrag } from '../../core/RowDrag.js';
@@ -63,7 +64,8 @@ export class FolderDragDrop {
    * the space header to become a link there, with the mouse or with an HTML5 drop, and a bookmark
    * or folder of the Bookmarks panel be dropped there to be copied. A link row can be dragged out
    * of the section onto today's list or the Favorites grid, through `LinkRemoval`, which its
-   * right-click menu also offers as Remove pin and Tile tab. A pill with the icon and the title
+   * right-click menu also offers as Remove pin and Tile tab; the rows of a live folder are not
+   * bookmarks and stay where they are. A pill with the icon and the title
    * follows what is dragged. It marks the target under the pointer while either is dragged, and
    * offers the same places to the other modules through `LinkDropZone`.
    *
@@ -98,6 +100,7 @@ export class FolderDragDrop {
       container: section,
       selector: `[${LINK_ATTRIBUTE}]`,
       idAttribute: LINK_ATTRIBUTE,
+      accepts: (linkId): boolean => !LinkId.isVirtual(linkId),
       onMove: (_linkId, x, y): void => removal.over(x, y),
       onDrop: (linkId, x, y): void => void removal.release(linkId, x, y),
       onEnd: (): void => removal.clear(),

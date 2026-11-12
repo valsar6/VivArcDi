@@ -1,0 +1,95 @@
+@use 'tokens' as *;
+
+#{$root} #{$folders} {
+  .vivarcdi-folders-live-icon {
+    flex: none;
+    width: $folders-icon-size;
+    height: $folders-icon-size;
+    background-color: currentcolor;
+    opacity: 0.7;
+    mask: $pull-request-glyph center / contain no-repeat;
+  }
+
+  #{$live-folder}[data-vivarcdi-open] .vivarcdi-folders-live-icon {
+    opacity: 1;
+  }
+
+  .vivarcdi-folders-live-warning {
+    flex: none;
+    width: $folders-icon-size;
+    height: $folders-icon-size;
+    background-color: var(--colorWarningBg, #e5a000);
+    mask: $warning-glyph center / contain no-repeat;
+  }
+
+  > [data-vivarcdi-link-subtitle] {
+    height: auto;
+    min-height: $two-line-row-height;
+    padding-block: 3px;
+  }
+
+  .vivarcdi-folders-lines {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .vivarcdi-folders-subtitle {
+    overflow: hidden;
+    font-size: $subtitle-font-size;
+    opacity: $subtitle-opacity;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+#{$root} #{$repository-editor} {
+  position: fixed;
+  z-index: $repository-editor-layer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+  box-sizing: border-box;
+  width: $repository-editor-width;
+  padding: $gap;
+  border-radius: $menu-radius;
+  background-color: var(--colorBg, #222);
+  box-shadow: $menu-shadow;
+  color: var(--colorFg, #fff);
+  font-size: $row-font-size;
+  -webkit-app-region: no-drag;
+
+  > div {
+    flex: 1 0 100%;
+    font-size: $subtitle-font-size;
+    opacity: $subtitle-opacity;
+  }
+
+  > textarea {
+    flex: 1 0 100%;
+    box-sizing: border-box;
+    min-height: calc(#{$repository-editor-rows} * 1.25em);
+    padding: 4px;
+    border: 1px solid var(--colorHighlightBg, currentcolor);
+    border-radius: 3px;
+    outline: none;
+    color: inherit;
+    font: inherit;
+    background-color: transparent;
+    resize: vertical;
+    user-select: text;
+  }
+
+  > button {
+    flex: 1;
+    height: $menu-row-height;
+    border: 0;
+    border-radius: $menu-radius - $menu-padding;
+    color: inherit;
+    font: inherit;
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
+    cursor: default;
+  }
+}

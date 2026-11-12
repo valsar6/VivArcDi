@@ -11,6 +11,8 @@ import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { FolderCommands } from '../../../src/core/FolderCommands.js';
+import type { TreeEntry } from '../../../src/core/FolderEntries.js';
+import { VirtualFolders } from '../../../src/core/VirtualFolders.js';
 import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
@@ -434,5 +436,170 @@ test('adds a dropped tab at the end when it is released under the last row', asy
   dragFromList(dom, { x: 500, y: 300 }, { x: 50, y: 55 });
   await untilTitles(dom, ['First', 'Second', 'Dropped']);
   assert.deepEqual(titles(dom), ['First', 'Second', 'Dropped']);
+  module.stop();
+});
+
+const LIVE_PATH = 'github.com/acme/web/pull/7';
+const liveFolder = (warning?: string): TreeEntry => ({
+  kind: 'folder',
+  id: 'live:f1',
+  title: 'Pull Requests',
+  depth: 0,
+  live: true,
+  ...(warning === undefined ? {} : { warning }),
+  children: [{ kind: 'link', id: 'live:f1:7', title: 'Fix the tab bar', url: `https://${LIVE_PATH}`, key: LIVE_PATH, depth: 1, subtitle: 'ada · acme/web' }],
+});
+const casetta = String(CASETTA.id);
+const linkOf = (tabs: FolderTabs, tabId: number): string | undefined => (JSON.parse(tabs.tabs.get(tabId)?.vivExtData ?? '{}') as { vivarcdi?: { bookmarkId?: string } }).vivarcdi?.bookmarkId;
+const handlersOf = (seen: string[]): Parameters<VirtualFolders['handle']>[0] => ({
+  rename: (id, name): void => void seen.push(`rename ${id} ${name}`),
+  open: (id): void => void seen.push(`open ${id}`),
+  menu: (id, x, y): void => void seen.push(`menu ${id} ${x} ${y}`),
+});
+
+test('draws the live folders after the bookmark folders of their workspace', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  const virtual = VirtualFolders.of(context.document);
+  virtual.set(casetta, [liveFolder()]);
+  virtual.set(String(WORK.id), [{ ...liveFolder(), id: 'live:other', title: 'Elsewhere' }]);
+  await module.start(context);
+  await frame();
+  assert.deepEqual(titles(dom), ['Jira', 'Pull Requests']);
+  assert.equal(rows(dom)[1]?.hasAttribute('data-vivarcdi-live-folder'), true);
+  assert.equal(rows(dom)[0]?.hasAttribute('data-vivarcdi-live-folder'), false);
+  module.stop();
+});
+
+test('shows the rows of a live folder once it is open, with the subtitle under the title', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  VirtualFolders.of(context.document).set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  rows(dom)[1]?.click();
+  await toggleDelay();
+  await frame();
+  assert.equal(rows(dom).length, 3);
+  const row = rows(dom)[2];
+  assert.equal(row?.hasAttribute('data-vivarcdi-link-subtitle'), true);
+  assert.deepEqual(row?.descendants().filter((node) => node.className === 'vivarcdi-folders-subtitle').map((node) => node.textContent), ['ada · acme/web']);
+  module.stop();
+});
+
+test('reveals a live folder that was just created, open', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  const virtual = VirtualFolders.of(context.document);
+  virtual.set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  virtual.reveal('live:f1');
+  await frame();
+  assert.equal(rows(dom).length, 3);
+  assert.equal(rows(dom)[1]?.hasAttribute('data-vivarcdi-open'), true);
+  module.stop();
+});
+
+test('shows the section when only live folders are in the workspace', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup({ ...WORKSPACE_OPTIONS, workspaces: { Casetta: `${BAR}/Work`, Work: '' } });
+  VirtualFolders.of(context.document).set(String(WORK.id), [liveFolder()]);
+  await module.start(context);
+  await frame();
+  activate(tabs, 2);
+  await frame();
+  assert.equal(sectionOf(dom)?.hasAttribute('data-vivarcdi-empty'), false);
+  assert.deepEqual(titles(dom), ['Pull Requests']);
+  module.stop();
+});
+
+test('reports a live folder when it is opened, not when it is closed', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  const seen: string[] = [];
+  const virtual = VirtualFolders.of(context.document);
+  virtual.handle(handlersOf(seen));
+  virtual.set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  rows(dom)[1]?.click();
+  await toggleDelay();
+  await frame();
+  rows(dom)[1]?.click();
+  await toggleDelay();
+  await frame();
+  rows(dom)[0]?.click();
+  await toggleDelay();
+  assert.deepEqual(seen, ['open live:f1']);
+  module.stop();
+});
+
+test('hands the right click on a live folder to its source and leaves bookmark folders to Vivaldi', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  const seen: string[] = [];
+  const virtual = VirtualFolders.of(context.document);
+  virtual.handle(handlersOf(seen));
+  virtual.set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  let prevented = 0;
+  const click = (row: DomNode | undefined): void =>
+    sectionOf(dom)?.bubble({ type: 'contextmenu', target: row, clientX: 4, clientY: 9, preventDefault: (): number => (prevented += 1), stopPropagation: (): void => undefined } as unknown as Event);
+  click(rows(dom)[1]);
+  click(rows(dom)[0]);
+  assert.deepEqual(seen, ['menu live:f1 4 9']);
+  assert.equal(prevented, 1);
+  module.stop();
+});
+
+test('hands the new name of a live folder to its source and writes no bookmark', async (t) => {
+  installFrames(t);
+  const chrome = new WritableChrome(WORKSPACE_TREE);
+  const { dom, module, context } = workspaceSetup(EDITABLE, chrome);
+  const seen: string[] = [];
+  const virtual = VirtualFolders.of(context.document);
+  virtual.handle(handlersOf(seen));
+  virtual.set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  rows(dom)[1]?.bubble({ type: 'dblclick', target: rows(dom)[1] } as unknown as Event);
+  const field = rows(dom)[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
+  assert.ok(field);
+  field.value = 'Reviews';
+  keyOn(field, 'Enter');
+  await frame();
+  assert.deepEqual(seen, ['rename live:f1 Reviews']);
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('update')), []);
+  module.stop();
+});
+
+test('keeps the tab of a live row, then unlinks it when its row is gone', async (t) => {
+  installFrames(t);
+  const { tabs, module, context } = workspaceSetup();
+  tabs.tabs.set(4, { id: 4, windowId: 1, url: `https://${LIVE_PATH}`, vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: 'live:f1:7' } }) });
+  const virtual = VirtualFolders.of(context.document);
+  await module.start(context);
+  await frame();
+  assert.equal(linkOf(tabs, 4), 'live:f1:7');
+  virtual.set(casetta, [liveFolder()]);
+  virtual.markReady();
+  await frame();
+  assert.equal(linkOf(tabs, 4), 'live:f1:7');
+  virtual.set(casetta, []);
+  await frame();
+  assert.equal(linkOf(tabs, 4), undefined);
+  module.stop();
+});
+
+test('shows a warning mark with the reason on a live folder', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  VirtualFolders.of(context.document).set(casetta, [liveFolder('The token was refused')]);
+  await module.start(context);
+  await frame();
+  const mark = rows(dom)[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-live-warning'));
+  assert.equal(mark?.getAttribute('title'), 'The token was refused');
   module.stop();
 });

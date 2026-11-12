@@ -3,7 +3,7 @@ type VivaldiTab = chrome.tabs.Tab & { vivExtData?: string };
 export interface OwnTabData {
   /** Id of the Favorites bookmark the tab is linked to. */
   favoriteId?: string;
-  /** Id of the bookmark whose link row the tab stands for in the folders of the tab bar. */
+  /** Id of the link row the tab stands for in the folders of the tab bar: a bookmark, or a row of a live folder. */
   bookmarkId?: string;
   /** Address of the page the pinned tab goes back to on reset. */
   pinnedUrl?: string;

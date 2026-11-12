@@ -81,3 +81,22 @@ test('keeps folder states for the session when storage fails', () => {
   folders.toggle('10');
   assert.equal(folders.has('10'), true);
 });
+
+test('carries the live mark, the warning and the subtitle to the rows', () => {
+  const live = {
+    kind: 'folder' as const,
+    id: 'live:f1',
+    title: 'Pull Requests',
+    depth: 0,
+    live: true as const,
+    warning: 'GitHub cannot be reached',
+    children: [{ kind: 'link' as const, id: 'live:f1:7', title: 'Fix', url: 'https://github.com/a/b/pull/7', key: 'github.com/a/b/pull/7', depth: 1, subtitle: 'ada · a/b' }],
+  };
+  const closed = FolderRows.build([live], { isOpen: (): boolean => false, tabFor: (): undefined => undefined });
+  assert.deepEqual(closed.map((row) => [row.kind, row.title]), [['folder', 'Pull Requests']]);
+  assert.deepEqual([closed[0]?.kind === 'folder' ? closed[0].live : null, closed[0]?.kind === 'folder' ? closed[0].warning : null], [true, 'GitHub cannot be reached']);
+  const open = FolderRows.build([live], { isOpen: (): boolean => true, tabFor: (): undefined => undefined });
+  assert.equal(open[1]?.kind === 'link' ? open[1].subtitle : null, 'ada · a/b');
+  const plain = FolderRows.build(entries, { isOpen: (): boolean => false, tabFor: (): undefined => undefined });
+  assert.equal(Object.keys(plain[0] ?? {}).includes('live'), false);
+});

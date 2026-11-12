@@ -22,3 +22,14 @@ test('unlinks the tab of a removed bookmark and leaves the others linked', async
   assert.deepEqual(tabs.extData(3), { workspaceId: 7, group: 'g', vivarcdi: { bookmarkId: '13', lastActive: 5 } });
   assert.deepEqual(tabs.actions().filter(([name]) => name === 'update').map(([, id]) => id), [2]);
 });
+
+test('keeps the tabs of the links that the caller says to keep', async () => {
+  const tabs = new LinkingTabs([
+    { id: 2, vivExtData: linkedTo('live:f1:7') },
+    { id: 3, vivExtData: linkedTo('live:f1:8') },
+    { id: 4, vivExtData: linkedTo('11') },
+  ]);
+  await new TabLinks(tabs).unlinkExcept(new Set(), (id) => id === 'live:f1:7');
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'update').map(([, id]) => id), [3, 4]);
+  assert.deepEqual(tabs.extData(2), { workspaceId: 7, group: 'g', vivarcdi: { bookmarkId: 'live:f1:7', lastActive: 5 } });
+});
