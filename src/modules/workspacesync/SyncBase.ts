@@ -40,6 +40,19 @@ export class SyncBase {
     }
   }
 
+  /**
+   * Moves the list of a workspace to its new name.
+   *
+   * @param from The old name.
+   * @param to The new name.
+   */
+  public rename(from: string, to: string): void {
+    const keys = this.get(from);
+    if (keys !== null && this.get(to) === null) {
+      this.set(to, keys);
+    }
+  }
+
   static #key(workspaceName: string | null): string {
     return `${KEY_PREFIX}${SyncNames.folderOf(workspaceName)}`;
   }

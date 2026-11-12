@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-10 |
+| Approved | 2026-11-10, revision 2026-11-12 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -162,6 +162,75 @@ only (the Debian was on another Vivaldi account); Tore asked to treat Debian as 
 - [x] **Q-4. Should sync be on by default?** Yes; `enabled` false turns it off.
 - [x] **Q-5. Which computer wins when both change the same workspace before syncing?** The change that
   reaches the sync store last wins, as for bookmarks.
+
+## Revision (approved 2026-11-12)
+
+Tore's first test on two computers (2026-11-12) showed that Vivaldi Sync does **not** carry the
+workspaces: the receiving computer kept its own list, so the pinned tabs had nowhere to go. Tore's
+request: the workspaces must be available on the new computer at once, without creating them by
+hand, with their pinned tabs and folders. This revision replaces FR-7, AC-15 and AC-16 and answers
+Q-1 again. Tore approved it on 2026-11-12 with the proposed answers to Q-7 to Q-10.
+
+### Expected behavior
+
+- **Workspaces travel.** The sync store keeps the list of workspaces: name, icon and order. When a
+  computer lacks a workspace of the list, VivArcDi creates it there through Vivaldi's own menu, with
+  the same name (icon: Q-10), at the end of the list, and its pinned tabs arrive in it as in FR-2. Nothing is asked of the user.
+- **Folders come with them.** The folders of a workspace are bookmarks under
+  `VivArcDi/<workspace name>` (010), which Vivaldi Sync already carries; a workspace created with
+  the same name shows them at once. The Favorites grid is the same in every workspace (003) and
+  already syncs.
+- **Renames follow.** VivArcDi gives each workspace a sync id, kept in its `Settings` entry and
+  linked on each computer to Vivaldi's own id. Renaming a workspace on one computer renames it on the
+  other, and its store folder with it.
+- **Deleting is never automatic** (Q-7): a workspace deleted on one computer is only removed from the
+  store; the other computer keeps it, with its tabs, until the user deletes it there.
+- If the menu cannot be driven (a future Vivaldi changes it), the approved behavior stays: the
+  missing workspaces are named in a message.
+
+### Requirements
+
+- **FR-7 (revised).** WHEN the sync store lists a workspace that this computer lacks, VivArcDi creates
+  it through Vivaldi's workspace menu with the stored name, then applies its pinned tabs.
+- **FR-9.** VivArcDi keeps the list of workspaces (sync id, name, icon, order) in the sync store and
+  updates it within 2 seconds of a change on this computer.
+- **FR-10.** A workspace renamed on one computer is renamed on the other, matched by its sync id.
+- **FR-11.** VivArcDi never deletes a workspace or its tabs because another computer deleted it.
+
+### Acceptance criteria
+
+| ID | Criterion | Check |
+|---|---|---|
+| AC-15 (revised) | WHEN Tore creates a workspace on one computer, THE other computer SHALL show it, with its icon and pinned tabs, after Vivaldi Sync runs, without any step by Tore. | manual |
+| AC-16 (revised) | WHEN the sync store lists a workspace this computer lacks, THE module SHALL create it through Vivaldi's workspace menu with the stored name. | auto: `creates a workspace missing here` |
+| AC-17 | WHEN a workspace is created, renamed, re-iconed or moved, THE module SHALL update the list in the sync store. | auto: `stores the list of workspaces` |
+| AC-18 | WHEN a workspace is renamed on another computer, THE module SHALL rename the matching workspace here. | auto: `follows a rename from another computer` |
+| AC-19 | WHEN a workspace is deleted on another computer, THE module SHALL keep it here. | auto: `keeps a workspace deleted elsewhere` |
+| AC-20 | IF Vivaldi refuses to create a workspace, THEN THE module SHALL name it once, as in the approved FR-7. | auto: `names a workspace it cannot create` |
+| AC-21 | WHEN Tore renames a workspace on one computer, THE other computer SHALL show the new name after Vivaldi Sync runs. | manual |
+
+### Open questions
+
+- [x] **Q-6. Can VivArcDi create a workspace?** Yes, through Vivaldi's own menu (probes of
+  2026-11-12). Writing `vivaldi.workspaces.list` with `vivaldi.prefs.set` changes the preference but
+  Vivaldi neither shows the entry nor keeps it after a restart: the interface owns the list and writes
+  it back. There is no API to create a workspace. Driving the menu works: a full pointer sequence
+  (pointer and mouse down, up, click) on `button[data-name="WorkspaceButton"]` opens
+  `.WorkspacePopup`; the same on its "New workspace" button (`.actions button[aria-label]`) opens the
+  inline editor `form.Workspace-Editor` with `input[name="workspace-title"]`; writing the name
+  through the native value setter plus an `input` event and pressing `.actions input.primary`
+  ("Create") adds the workspace to Vivaldi's list. A plain `click()` does nothing. VivArcDi creates
+  the missing workspaces this way, one at a time, closing the menu after each.
+- [x] **Q-10. The icon of a created workspace.** The editor has an icon and an emoji picker. Proposed
+  answer: the first version sets only the name, so a created workspace has Vivaldi's default icon;
+  the stored icon is applied in a later step after a probe of the picker.
+- [x] **Q-7. Should a workspace deleted on one computer be deleted on the other?** Proposed answer:
+  no, to never lose tabs; it is only dropped from the store.
+- [x] **Q-8. What about the workspaces each computer already has?** Proposed answer: on the first run
+  they are merged by name; the ones with different names are added to the other computer, so both end
+  up with the union (on Tore's computers: Riposino, Ramino, Casettona, Prova).
+- [x] **Q-9. Do the folder roots set by hand in `config.json` (`bookmark-folders.workspaces`) need to
+  travel too?** Proposed answer: no; the default roots `VivArcDi/<name>` already follow the name.
 
 ## References
 

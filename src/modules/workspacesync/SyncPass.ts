@@ -2,10 +2,10 @@ import type { Logger } from '../../core/Logger.js';
 import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
 import { LocalPinned } from './LocalPinned.js';
 import type { PinnedGroups } from './LocalPinned.js';
-import type { MissingSpaces } from './MissingSpaces.js';
 import type { PinnedApplier } from './PinnedApplier.js';
 import { PinnedMerge } from './PinnedMerge.js';
 import type { SyncBase } from './SyncBase.js';
+import type { SpaceSync } from './SpaceSync.js';
 import { SyncNames } from './SyncNames.js';
 import type { PinnedEntry, StoredSpace, SyncStore } from './SyncStore.js';
 import type { WindowOwner } from './WindowOwner.js';
@@ -17,7 +17,7 @@ export interface SyncPassParts {
   base: Pick<SyncBase, 'get' | 'set'>;
   local: Pick<LocalPinned, 'read'>;
   applier: Pick<PinnedApplier, 'apply'>;
-  missing: Pick<MissingSpaces, 'announce'>;
+  spaces: Pick<SpaceSync, 'run'>;
   logger: Logger;
 }
 
@@ -26,7 +26,8 @@ export class SyncPass {
   #warned = false;
 
   /**
-   * One run of the sync: in the owner window, merges the pinned tabs of every workspace with the
+   * One run of the sync: in the owner window, first merges the list of workspaces (creating the
+   * ones this computer lacks), then merges the pinned tabs of every workspace with the
    * sync store, writes what changed here to the store, applies what changed elsewhere to the tabs
    * and remembers the result as the new base. Applying a result makes the tabs, the store and the
    * base equal, so the next run finds nothing to do and a change is never copied back. When the
@@ -54,12 +55,11 @@ export class SyncPass {
   }
 
   async #sync(windowId: number): Promise<void> {
-    const { names, store, local, missing } = this.#parts;
+    const { names, store, local, spaces: list } = this.#parts;
+    await list.run();
     const spaces = await store.spaces();
     const groups = await local.read(windowId);
     const workspaces = [...new Set(names.names)];
-    const known = SyncNames.known(workspaces);
-    missing.announce([...spaces.keys()].filter((folder) => !known.has(folder)));
     for (const name of [null, ...workspaces]) {
       await this.#syncWorkspace(windowId, name, spaces.get(SyncNames.folderOf(name)), groups);
     }

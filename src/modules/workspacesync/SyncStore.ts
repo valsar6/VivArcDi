@@ -99,6 +99,20 @@ export class SyncStore {
     await this.#writer.describe(id, text);
   }
 
+  /**
+   * Gives the folder of a workspace its new name, unless there is no such folder or the new name is taken.
+   *
+   * @param from The old name of the workspace.
+   * @param to The new name.
+   */
+  public async renameSpace(from: string, to: string): Promise<void> {
+    const tree = await this.#reader.getTree();
+    const old = BookmarkFolderFinder.find(tree, [this.#folder, from]);
+    if (old !== null && BookmarkFolderFinder.find(tree, [this.#folder, to]) === null) {
+      await this.#writer.update(old.id, to);
+    }
+  }
+
   static #spaceOf(node: BookmarkNode): StoredSpace | null {
     const children = node.children ?? [];
     const pinned = children.find((child) => child.title === PINNED && child.children !== undefined);

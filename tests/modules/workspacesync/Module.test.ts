@@ -78,6 +78,6 @@ test('uses the folder named in the options', async () => {
   const module = new WorkspaceSync();
   await module.start(moduleContext);
   await pause(SYNC_DELAY_MS + 100);
-  assert.deepEqual(setup.chrome.created.slice(0, 3), ['Mine', 'Casetta', 'Pinned']);
+  assert.deepEqual(setup.chrome.created.slice(0, 2), ['Mine', 'Spaces']);
   module.stop();
 });
