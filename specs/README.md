@@ -42,6 +42,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [031 Pin and tile commands](031-pin-and-tile-commands/spec.md) | 3 | Approved |
 | [032 Compact tab bar](032-compact-tab-bar/spec.md) | 3 | Implemented |
 | [033 Folder menu](033-folder-menu/spec.md) | 3 | Approved |
+| [034 Module boundaries](034-module-boundaries/spec.md) | 0 | Approved |
 
 ## Layout
 
