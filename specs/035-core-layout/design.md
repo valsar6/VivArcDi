@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -85,7 +85,7 @@ The folders differ from the spec's proposal in two ways:
 | New path | Only user |
 |---|---|
 | `modules/folders/favoritelinks/TabMenuItems.ts`, `MenuItemShape.ts` | `FolderEditing`, `TabCommands` |
-| `modules/folders/favoritelinks/BookmarkCopier.ts` | `WorkspaceFavorites` |
+| `modules/folders/editing/BookmarkCopier.ts` | `WorkspaceFavorites`, and `FolderDuplication` from step 2 of 033 |
 | `modules/folders/editing/BookmarkTrash.ts` | `FolderEditing`, `FolderDeletion` |
 | `modules/workspacesync/ElementGestures.ts` | `WorkspaceSync`, `WorkspaceMenu` |
 | `modules/reopen/LinkKeyIndex.ts` | `ReopenPinned`, `LinkedTabFinder` |
@@ -116,7 +116,8 @@ directly or through shared files. `VivArcDi.ts` counts as used because `src/load
 - `docs/architecture.md`: the core folders, the three layers and their import rules, and the core
   paths it cites, such as `src/core/boot/Module.ts`.
 - The paths of the files above in earlier specs stay as they are, since they record history. Spec
-  033's design names `src/core/bookmarks/BookmarkTrash.ts`; step 2 of 033 follows the new path.
+  033's design names `src/core/bookmarks/BookmarkTrash.ts` and `BookmarkCopier.ts`; code that step 2
+  of 033 adds follows the new paths when this branch takes main.
 
 ## Vivaldi interface
 
