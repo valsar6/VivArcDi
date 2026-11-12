@@ -10,7 +10,7 @@ git-ignored:
 
 | Step | Tool | Result |
 |---|---|---|
-| Scripts | esbuild, one output file per `.ts`, no bundling | `dist/loader.js`, `dist/core/*.js`, `dist/modules/**/*.js` |
+| Scripts | esbuild, one output file per `.ts`, no bundling | `dist/loader.js`, `dist/core/**/*.js`, `dist/shared/**/*.js`, `dist/modules/**/*.js` |
 | Page scripts | esbuild, one IIFE bundle per `src/page/*.ts`, helpers in `src/page/lib/` | `dist/page/*.js` |
 | Styles | Sass, partials (`_*.scss`) skipped | `dist/styles/*.css` |
 | Static files | copied as they are | `dist/config.json`, `dist/selectors/*.json` |
@@ -70,11 +70,52 @@ document or `#browser`), and their place is looked up again on every check: see 
 
 Modules are registered in `src/modules/index.ts` and enabled in `config.json` under their id.
 
-| Module | Role |
+| Module | Folder | Role | Spec |
+|---|---|---|---|
+| `activation-marker` | `ActivationMarker.ts` | Marks `#browser` with `data-vivarcdi-active`, so stylesheets apply only when VivArcDi runs | [000](../specs/000-foundations/spec.md) |
+| `favorites-grid` | `favorites/` | Favorites grid of the workspace, tile drag, unloading | [001](../specs/001-favorites-grid/spec.md), [020](../specs/020-drag-tab-to-favorites/spec.md) |
+| `peek` | `peek/` | Opens links in a floating panel and turns it into a tab | [002](../specs/002-peek/spec.md), [015](../specs/015-peek-new-tab-links/spec.md) |
+| `pinned-tabs` | `pinned/` | Pinned tabs: reset button, unloading on close, tab bar marks | [003](../specs/003-pinned-tabs-and-folders/spec.md) |
+| `reopen-pinned` | `reopen/` | Reopens a pinned tab on its own page and dates its last opening | [007](../specs/007-reopen-pinned-tabs/spec.md) |
+| `bookmark-folders` | `folders/` | Bookmark folders of the workspace in the tab bar, editable | [009](../specs/009-bookmark-folders-in-tab-bar/spec.md), [010](../specs/010-folders-per-workspace/spec.md), [012](../specs/012-editable-folders/spec.md) |
+| `live-folders` | `livefolders/` | Folders filled from GitHub | [026](../specs/026-live-folders/spec.md) |
+| `folder-preview` | `folderpreview/` | Preview of a folder's links on hover | [008](../specs/008-folder-hover-preview/spec.md) |
+| `today-archive` | `today/` | Today tabs, archiving after a delay, the archive panel | [004](../specs/004-today-tabs-and-keyboard/spec.md) |
+| `copy-url` | `copyurl/` | Copies the address of the active tab | [014](../specs/014-arc-shortcuts/spec.md) |
+| `space-header` | `spaceheader/` | Header of the space: icon, name, collapse | [011](../specs/011-space-header/spec.md) |
+| `incognito` | `incognito/` | Arc-like private windows | [013](../specs/013-incognito-mode/spec.md) |
+| `little-arc` | `littlearc/` | Small window for quick links and the command bar | [005](../specs/005-little-arc/spec.md), [023](../specs/023-command-panel/spec.md) |
+| `sidebar-look` | `sidebarlook/` | Arc look and palettes of the sidebar | [028](../specs/028-arc-sidebar-look/spec.md), [029](../specs/029-arc-light-theme/spec.md) |
+| `workspace-sync` | `workspacesync/` | Syncs workspaces and their pinned tabs between computers | [030](../specs/030-workspace-sync/spec.md) |
+
+### Module boundaries
+
+Modules never import each other ([spec 034](../specs/034-module-boundaries/spec.md)). A module imports
+from `src/core/`, from `src/shared/` and from its own folder only; `src/modules/index.ts`, the
+registry, is the one file that sees every module.
+
+| Folder | Holds | May import |
+|---|---|---|
+| `src/core/` | Services that `ModuleContext` injects and infrastructure: browser API wrappers, DOM helpers, logger | `src/core/` |
+| `src/shared/` | Building blocks that two or more modules use, grouped by topic: `links/`, `tabs/`, `clipboard/` | `src/core/`, `src/shared/` |
+| `src/modules/<name>/` | One module | `src/core/`, `src/shared/`, its own folder |
+
+A file moves to `src/shared/` when a second module needs it, and back into its module when only one
+module still uses it. The local ESLint rule `local/module-boundaries` (`tools/eslint/`) fails the
+lint on an import that crosses these lines, and `tests/structure/ModuleBoundaries.test.ts` checks
+the real tree. Tests are not bound by the rule: an integration test may drive two modules together.
+
+A large module splits its folder by responsibility. `folders/` keeps the module
+(`BookmarkFolders.ts`) and the composition root of a section (`FolderSection.ts`) at its top level:
+
+| Folder | Responsibility |
 |---|---|
-| `activation-marker` | Marks `#browser` with `data-vivarcdi-active`, so stylesheets apply only when VivArcDi runs |
-| `favorites-grid` | Favorites grid: `FavoriteTagger` marks tiles, `GridLayout` picks the columns, `UnloadedTabs` and `TileUnloader` handle unloading |
-| `peek` | Peek: `PageScriptInjector` puts the click script in tab pages, `PeekController` holds the open `PeekPanel`, `LinkOpener` and `TabTiler` turn it into a tab |
+| `tree/` | Which folder each workspace shows, its bookmark tree, and the folders left open |
+| `links/` | The link between a bookmark row and the tab that shows it |
+| `favoritelinks/` | Adding tabs to a workspace's favorites and taking them back |
+| `dragdrop/` | Where a drop lands and what a drop of a tab, a row or a panel bookmark does |
+| `editing/` | Menus of the rows, renaming, and wiring of the editing parts |
+| `view/` | Turning the tree into rows and drawing them |
 
 ### Selectors
 
