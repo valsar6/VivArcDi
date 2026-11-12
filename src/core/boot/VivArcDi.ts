@@ -1,4 +1,3 @@
-import { createDefaultRegistry } from '../../modules/index.js';
 import { BookmarkWriter } from '../browser/bookmarks/BookmarkWriter.js';
 import { BrowserBookmarks } from '../browser/bookmarks/BrowserBookmarks.js';
 import { BrowserPrefs } from '../browser/BrowserPrefs.js';
@@ -108,15 +107,20 @@ export class VivArcDi {
    * Startup errors are logged, never thrown, so Vivaldi keeps working.
    *
    * @param baseUrl URL of the payload folder, ending with a slash.
+   * @param registry The modules the payload knows, built by the loader.
    * @param document The browser window document.
    * @returns The application, started or failed.
    */
-  public static async boot(baseUrl: string | URL, document: Document = globalThis.document): Promise<VivArcDi> {
+  public static async boot(
+    baseUrl: string | URL,
+    registry: ModuleRegistry,
+    document: Document = globalThis.document,
+  ): Promise<VivArcDi> {
     const chromeApi = globalThis.chrome as unknown as ChromeApi | undefined;
     const logger = new Logger();
     const app = new VivArcDi({
       loader: new ResourceLoader(baseUrl),
-      registry: createDefaultRegistry(),
+      registry,
       logger,
       document,
       tabs: new BrowserTabs(chromeApi),
