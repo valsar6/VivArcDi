@@ -10,11 +10,13 @@ import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import { TodayList } from '../../core/TodayList.js';
 import { FavoriteDrop } from './FavoriteDrop.js';
 import { FavoriteRemoval } from './FavoriteRemoval.js';
+import { FavoriteReorder } from './FavoriteReorder.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
 import { FirstTileArea } from './FirstTileArea.js';
 import { GridDropZone } from './GridDropZone.js';
 import { GridFavoriteTargets } from './GridFavoriteTargets.js';
 import { LinkedTabs } from './LinkedTabs.js';
+import { TileDrag } from './TileDrag.js';
 import { TileMenu } from './TileMenu.js';
 import { TabToFavorite } from './TabToFavorite.js';
 
@@ -48,7 +50,8 @@ export class GridDragging {
   /**
    * Both directions of dragging on the Favorites grid: a tab of the list released over the grid
    * becomes a Favorite, and a tile dragged out of the grid takes the Favorite out and keeps the
-   * page, as a link of a folder or as a Today tab. The grid is also offered to the folders
+   * page, as a link of a folder or as a Today tab, while a tile released on the grid changes the
+   * order of the Favorites. The grid is also offered to the folders
    * through `FavoriteDropZone`, as the place where a link dragged out of them becomes a Favorite.
    * A pill with the icon and the title follows what is dragged, and the right-click menu of a tile
    * offers Untile tab and Pin tab, which do the same moves without dragging.
@@ -77,14 +80,15 @@ export class GridDragging {
       today: new TodayList({ document, stripSelector, wrapperSelector, skipSelector: TodayList.skippedBy(selectors) }),
       logger,
     });
+    const tileDrag = new TileDrag({ grid, zone, removal, reorder: new FavoriteReorder({ writer, logger }) });
     this.#tileDrag = new RowDrag({
       document,
       container: grid,
       selector: `[${TILE_ATTRIBUTE}]`,
       idAttribute: TILE_ATTRIBUTE,
-      onMove: (_favoriteId, x, y): void => removal.over(x, y),
-      onDrop: (favoriteId, x, y): void => void removal.release(favoriteId, x, y),
-      onEnd: (): void => removal.clear(),
+      onMove: (favoriteId, x, y): void => tileDrag.over(favoriteId, x, y),
+      onDrop: (favoriteId, x, y): void => void tileDrag.release(favoriteId, x, y),
+      onEnd: (): void => tileDrag.clear(),
       pill,
     });
     const menu = new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body });

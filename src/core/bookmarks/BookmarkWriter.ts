@@ -17,6 +17,12 @@ export interface BookmarkChanges {
   description?: string;
 }
 
+/** Where a bookmark goes: a folder and a position counted before the bookmark leaves its place. */
+export interface BookmarkDestination {
+  parentId: string;
+  index: number;
+}
+
 export interface WritableBookmarksApi {
   getTree: (callback: (tree: BookmarkNode[]) => void) => void;
   getChildren: (id: string, callback: (children: BookmarkNode[]) => void) => void;
@@ -26,6 +32,7 @@ export interface WritableBookmarksApi {
   removeTree: (id: string, callback: () => void) => void;
   get: (id: string, callback: (nodes: BookmarkNode[]) => void) => void;
   getSubTree: (id: string, callback: (nodes: BookmarkNode[]) => void) => void;
+  move: (id: string, destination: BookmarkDestination, callback: (node: BookmarkNode) => void) => void;
 }
 
 export interface WriterHost {
@@ -33,7 +40,7 @@ export interface WriterHost {
   runtime?: { lastError?: { message?: string } | undefined } | undefined;
 }
 
-const METHODS = ['getTree', 'getChildren', 'create', 'update', 'remove', 'removeTree', 'get', 'getSubTree'] as const;
+const METHODS = ['getTree', 'getChildren', 'create', 'update', 'remove', 'removeTree', 'get', 'getSubTree', 'move'] as const;
 
 export class BookmarkWriter {
   #chrome: WriterHost | null;
@@ -84,6 +91,15 @@ export class BookmarkWriter {
   }
 
   /**
+   * @param id The bookmark or folder.
+   * @param destination The folder and the position it goes to.
+   * @returns The moved bookmark.
+   */
+  public move(id: string, destination: BookmarkDestination): Promise<BookmarkNode> {
+    return this.#call((api, done) => api.move(id, destination, done));
+  }
+
+  /**
    * @param id The link, or the empty folder, to delete.
    */
   public async remove(id: string): Promise<void> {
@@ -122,16 +138,6 @@ export class BookmarkWriter {
   }
 
   /**
-   * Finds the folder at the end of a path of titles and creates the missing ones, one level at a
-   * time, so `VivArcDi/Casetta` makes both when neither exists. The part of the path that exists
-   * is found like the section finds a root, anywhere in the tree; the first missing folder goes
-   * to Vivaldi's default folder. Calls run one after the other, so two writes never create the
-   * same folder twice.
-   *
-   * @param path Titles from the outer folder to the wanted one; not empty.
-   * @returns The id of the last folder.
-   */
-  /**
    * @param path The titles of a folder, from the top.
    * @param id A bookmark or folder.
    * @returns Whether the folder exists and holds it, at any depth.
@@ -143,6 +149,16 @@ export class BookmarkWriter {
     return folder !== null && holds(folder.children ?? []);
   }
 
+  /**
+   * Finds the folder at the end of a path of titles and creates the missing ones, one level at a
+   * time, so `VivArcDi/Casetta` makes both when neither exists. The part of the path that exists
+   * is found like the section finds a root, anywhere in the tree; the first missing folder goes
+   * to Vivaldi's default folder. Calls run one after the other, so two writes never create the
+   * same folder twice.
+   *
+   * @param path Titles from the outer folder to the wanted one; not empty.
+   * @returns The id of the last folder.
+   */
   public ensurePath(path: string[]): Promise<string> {
     const run = this.#queue.then(() => this.#ensure(path));
     this.#queue = run.catch(() => undefined);
