@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Approved |
-| Approved | 2026-11-10 |
+| Approved | 2026-11-10, revision 2026-11-12 (with the spec revision) |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was approved on 2026-11-10. It says **how**; the spec says **what**.
@@ -108,6 +108,49 @@ No new selectors. APIs: `chrome.bookmarks` (with Vivaldi's `description`, probe 
 
 `privateWindows` stays `never`: a private window neither reads nor writes the store.
 
+## Revision of 2026-11-12: workspaces travel
+
+Approved with the spec revision. It replaces step 6 (missing workspaces).
+
+1. **Workspace list in the store.** `VivArcDi Sync/Spaces` is one bookmark per workspace, in Vivaldi's
+   order: title = name, address `https://vivarcdi.invalid/space/<sync id>`, `description` = JSON
+   `{ "icon": <Vivaldi icon text>, "iconId": <number> }`. The sync id is a random UUID made by VivArcDi
+   the first time it sees a workspace; each computer keeps the link from Vivaldi's id to the sync id
+   in `vivarcdi.sync.spaceIds` (persistent storage). The per-workspace store folder (pinned tabs,
+   settings) keeps the workspace name, renamed with it.
+2. **Merge of the list.** Same three-way rule as the pinned tabs, on sync ids, with the base in
+   `vivarcdi.sync.base.spaces`: a workspace added on one side is added to the other; a workspace
+   deleted here is removed from the store; a workspace removed from the store is **kept** here
+   (FR-11, Q-7), and its link is forgotten so it is added back to the store as new only if the user
+   changes it. First run without a base: union by name (Q-8); a name already present here is linked
+   to the stored sync id instead of creating a second workspace.
+3. **Renames (FR-10).** When the stored name of a linked sync id differs from the name here and the
+   base shows the store changed, VivArcDi renames the workspace here through Vivaldi's own inline
+   editor, opened on the workspace row (gesture found by probe T9: double click or the row's context
+   menu). If T9 finds no gesture that a script can drive, renames from the other computer are only
+   logged once and the workspace keeps its name. When the name changed here, the store entry and the
+   store folder are renamed.
+4. **Creating a workspace (FR-7 revised, Q-6).** `WorkspaceCreator` drives Vivaldi's menu:
+   full pointer sequence on `button[data-name="WorkspaceButton"]`, then on
+   `.WorkspacePopup .actions button[aria-label]` ("New workspace"); writes the name into
+   `form.Workspace-Editor input[name="workspace-title"]` with the native value setter and an `input`
+   event; presses `.WorkspacePopup .actions input.primary`; waits until `WorkspaceNames` lists the
+   name (timeout 3 s), then closes the popup with Escape. Workspaces are created one at a time, only
+   in the owner window, only while the window is focused and no text field has the focus, so the
+   user's typing is never interrupted; pending ones wait for the next quiet moment. Selectors go into
+   the selector catalog (`workspaceButton`, `workspacePopup`, `workspaceCreate`, `workspaceTitle`,
+   `workspaceSave`). On any failed step the popup is closed, the remaining names are shown with the
+   approved message (AC-20), and creation is not retried until the next start.
+5. **Icon (Q-10).** Not set in this version; the stored icon is kept for the later step.
+
+| Class or file | Responsibility | Pattern |
+|---|---|---|
+| `src/modules/workspacesync/SpaceList.ts` | Reads and writes `VivArcDi Sync/Spaces` | Repository |
+| `src/modules/workspacesync/SpaceIds.ts` | Link from Vivaldi ids to sync ids | Repository |
+| `src/modules/workspacesync/SpaceMerge.ts` | Three-way merge of the workspace list, renames, kept deletions | Strategy |
+| `src/modules/workspacesync/WorkspaceCreator.ts` | Creates a workspace through Vivaldi's menu | Command |
+| `src/modules/workspacesync/QuietMoment.ts` | Tells when the window is focused and idle | |
+
 ## Risks
 
 | Risk | Mitigation |
@@ -118,4 +161,6 @@ No new selectors. APIs: `chrome.bookmarks` (with Vivaldi's `description`, probe 
 | The user edits the store by hand | Treated like a change from another computer; malformed `Settings` JSON is ignored and logged once |
 | Many pinned tabs open at once on a new computer | Opened unloaded, one at a time through `SerialTask` |
 | The owner window is closed during a run | The run finishes; the next window becomes owner and its first run repairs any gap |
-| A workspace renamed on one computer | Appears as a new store entry and in the missing-spaces message on the other, as the spec says |
+| A workspace renamed on one computer | Followed through the sync id (revision step 3) |
+| A future Vivaldi changes the workspace menu | Creation stops at the failed step, the popup closes, the names are shown in the message |
+| The menu flashes open while the user works | Only at a quiet moment, one workspace at a time, closed at once |

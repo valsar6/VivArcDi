@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft (revision 2026-11-12) |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-10 |
+| Approved | 2026-11-10, revision 2026-11-12 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -163,13 +163,13 @@ only (the Debian was on another Vivaldi account); Tore asked to treat Debian as 
 - [x] **Q-5. Which computer wins when both change the same workspace before syncing?** The change that
   reaches the sync store last wins, as for bookmarks.
 
-## Proposed revision (2026-11-12)
+## Revision (approved 2026-11-12)
 
 Tore's first test on two computers (2026-11-12) showed that Vivaldi Sync does **not** carry the
 workspaces: the receiving computer kept its own list, so the pinned tabs had nowhere to go. Tore's
 request: the workspaces must be available on the new computer at once, without creating them by
 hand, with their pinned tabs and folders. This revision replaces FR-7, AC-15 and AC-16 and answers
-Q-1 again. Until Tore approves it, the approved text above stays in force.
+Q-1 again. Tore approved it on 2026-11-12 with the proposed answers to Q-7 to Q-10.
 
 ### Expected behavior
 
@@ -221,15 +221,15 @@ Q-1 again. Until Tore approves it, the approved text above stays in force.
   through the native value setter plus an `input` event and pressing `.actions input.primary`
   ("Create") adds the workspace to Vivaldi's list. A plain `click()` does nothing. VivArcDi creates
   the missing workspaces this way, one at a time, closing the menu after each.
-- [ ] **Q-10. The icon of a created workspace.** The editor has an icon and an emoji picker. Proposed
+- [x] **Q-10. The icon of a created workspace.** The editor has an icon and an emoji picker. Proposed
   answer: the first version sets only the name, so a created workspace has Vivaldi's default icon;
   the stored icon is applied in a later step after a probe of the picker.
-- [ ] **Q-7. Should a workspace deleted on one computer be deleted on the other?** Proposed answer:
+- [x] **Q-7. Should a workspace deleted on one computer be deleted on the other?** Proposed answer:
   no, to never lose tabs; it is only dropped from the store.
-- [ ] **Q-8. What about the workspaces each computer already has?** Proposed answer: on the first run
+- [x] **Q-8. What about the workspaces each computer already has?** Proposed answer: on the first run
   they are merged by name; the ones with different names are added to the other computer, so both end
   up with the union (on Tore's computers: Riposino, Ramino, Casettona, Prova).
-- [ ] **Q-9. Do the folder roots set by hand in `config.json` (`bookmark-folders.workspaces`) need to
+- [x] **Q-9. Do the folder roots set by hand in `config.json` (`bookmark-folders.workspaces`) need to
   travel too?** Proposed answer: no; the default roots `VivArcDi/<name>` already follow the name.
 
 ## References
