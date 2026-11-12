@@ -676,8 +676,10 @@ and merges the mirror with the tabs after every change:
 - A tab pinned on one computer opens, not loaded, as a pinned tab of the workspace with the same name on
   the other. A tab unpinned or closed on one computer is closed on the other, unless it is the active
   tab or shows another page than its own: then it is only unpinned.
-- Workspaces are matched by name. VivArcDi does not create workspaces: when the other computer has one
-  this computer lacks, a message names it once.
+- Workspaces travel too: the list (name and order) is kept in `VivArcDi Sync/Spaces`, and a workspace
+  this computer lacks is created through Vivaldi's own workspace menu, at a quiet moment, with its pinned
+  tabs and folders. Renames follow. The icon is not synced yet, and a workspace deleted on one computer
+  is never deleted on the other. If the menu cannot be driven, the missing names are shown once.
 - The settings that VivArcDi keeps for a workspace are kept in the same folder.
 - Favorites and bookmark folders already sync as bookmarks. Today tabs, their archive and the view
   states of the tab bar stay on each computer.
@@ -688,6 +690,7 @@ and merges the mirror with the tabs after every change:
 |---|---|---|
 | `enabled` | `true` | Set to `false` and the module neither reads nor writes the sync folder |
 | `folder` | `VivArcDi Sync` | The title of the bookmark folder that carries the data |
+| `renameFromOtherComputers` | `true` | Set to `false` and a workspace renamed elsewhere keeps its name here |
 
 ## Roadmap
 

@@ -34,15 +34,15 @@ Revision of 2026-11-12 (workspaces travel). Branch `features/workspace-sync-crea
 
 - [ ] **T9.** Probe for Tore: double click on a workspace row opens the inline editor for renaming;
   record the result in the design. Done when the gesture is confirmed or renames are dropped.
-- [ ] **T10.** `SpaceIds` and `SpaceList`: sync ids, the `Spaces` folder with JSON descriptions. Satisfies
+- [x] **T10.** `SpaceIds` and `SpaceList`: sync ids, the `Spaces` folder with JSON descriptions. Satisfies
   AC-17. Done when `stores the list of workspaces` passes.
-- [ ] **T11.** `SpaceMerge`: three-way merge on sync ids, first run union by name, kept deletions,
+- [x] **T11.** `SpaceMerge`: three-way merge on sync ids, first run union by name, kept deletions,
   renames. Satisfies AC-18, AC-19. Done when `follows a rename from another computer` and `keeps a
   workspace deleted elsewhere` pass.
-- [ ] **T12.** Selectors, `QuietMoment` and `WorkspaceCreator` with a fake popup in the tests. Satisfies
+- [x] **T12.** Selectors, `QuietMoment` and `WorkspaceCreator` with a fake popup in the tests. Satisfies
   AC-16, AC-20. Done when `creates a workspace missing here` and `names a workspace it cannot create`
   pass.
-- [ ] **T13.** Wire the list sync into `SyncPass` before the pinned tabs, rename store folders with
+- [x] **T13.** Wire the list sync into `SyncPass` before the pinned tabs, rename store folders with
   their workspace; replace `MissingSpaces` as the first choice. Done when `make check` passes.
-- [ ] **T14.** Manual page `docs/manual/sync.md`, README. Done when `make check` passes.
+- [x] **T14.** Manual page `docs/manual/sync.md`, README. Done when `make check` passes.
 - [ ] **T15.** Italian checklist for Tore from AC-15 (revised), AC-21 and the earlier AC-12, AC-13.
