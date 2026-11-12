@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import type { ModuleContext } from '../../../src/core/Module.js';
 import type { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
-import { LAST_OPENED_STORAGE_KEY } from '../../../src/modules/reopen/LastOpenedStore.js';
+import { LAST_OPENED_STORAGE_KEY } from '../../../src/shared/links/LastOpenedStore.js';
 import { bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
 

@@ -12,7 +12,7 @@ import type { Favorite } from './FavoritesFolder.js';
 import { FavoritesView } from './FavoritesView.js';
 import { TabChanges } from './TabChanges.js';
 import type { TileSource } from './TileSource.js';
-import { UnloadedTabs } from './UnloadedTabs.js';
+import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 export const TILE_SOURCE_ATTRIBUTE = 'data-vivarcdi-tile-source';
 const HIDDEN_OWNER = 'pinned-favorites';

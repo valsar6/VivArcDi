@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ActivationRecorder } from '../../../src/modules/reopen/ActivationRecorder.js';
-import { LAST_OPENED_STORAGE_KEY, LastOpenedStore } from '../../../src/modules/reopen/LastOpenedStore.js';
+import { LAST_OPENED_STORAGE_KEY, LastOpenedStore } from '../../../src/shared/links/LastOpenedStore.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
 
 const now = new Date('2026-10-26T10:00:00Z');

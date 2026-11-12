@@ -1,6 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import { UnloadedTabs } from '../favorites/UnloadedTabs.js';
+import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 export type SwitcherTabsApi = Pick<BrowserTabs, 'activate' | 'reload' | 'remove'>;
 

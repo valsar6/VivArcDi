@@ -2,7 +2,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { AddressKey } from '../../core/AddressKey.js';
 import { OwnPage } from '../../core/OwnPage.js';
-import type { LastOpenedStore } from './LastOpenedStore.js';
+import type { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
 
 export interface RecorderOptions {
   /** Clock. */

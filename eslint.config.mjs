@@ -1,7 +1,10 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import moduleBoundaries from './tools/eslint/module-boundaries.mjs';
 import noLineComments from './tools/eslint/no-line-comments.mjs';
+
+const local = { rules: { ...noLineComments.rules, ...moduleBoundaries.rules } };
 
 const sourceRules = {
   'local/no-line-comments': 'error',
@@ -29,7 +32,7 @@ export default tseslint.config(
   {
     files: ['**/*.mjs'],
     languageOptions: { globals: globals.node },
-    plugins: { local: noLineComments },
+    plugins: { local },
     rules: {
       'local/no-line-comments': 'error',
       complexity: ['error', 8],
@@ -43,8 +46,12 @@ export default tseslint.config(
       globals: { ...globals.browser },
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
-    plugins: { local: noLineComments },
+    plugins: { local },
     rules: sourceRules,
+  },
+  {
+    files: ['src/**/*.ts'],
+    rules: { 'local/module-boundaries': 'error' },
   },
   {
     files: ['scripts/**/*.ts'],

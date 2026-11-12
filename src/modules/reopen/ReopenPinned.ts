@@ -3,7 +3,7 @@ import { LinkKeyIndex } from '../../core/bookmarks/LinkKeyIndex.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { ActivationRecorder } from './ActivationRecorder.js';
-import { LastOpenedStore } from './LastOpenedStore.js';
+import { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
 import { NewTabWatcher } from './NewTabWatcher.js';
 import type { NewTabNavigation } from './NewTabWatcher.js';
 import { LinkedTabFinder } from './LinkedTabFinder.js';

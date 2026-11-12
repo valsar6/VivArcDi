@@ -131,9 +131,9 @@ bookmarks change.
 | `src/modules/folders/FolderDeletion.ts` | New: tabs, move to Trash, close, toast. |
 | `src/modules/folders/OpenFolders.ts` | `forget(id)`. |
 | `src/modules/folders/FolderDragDrop.ts`, `FolderEditing.ts`, `FolderSection.ts` | Wiring and the `keep` set. |
-| `src/modules/folders/FolderLinkTabs.ts` | Step 2. New: link ids and tab ids of a folder, taken out of `FolderDeletion`. |
-| `src/modules/folders/FolderDuplication.ts` | Step 2. New: `Duplicate`. |
-| `src/modules/folders/FolderRelocation.ts` | Step 2. New: `Move to ▸` and its submenu. |
+| `src/modules/folders/editing/FolderLinkTabs.ts` | Step 2. New: link ids and tab ids of a folder, taken out of `FolderDeletion`. |
+| `src/modules/folders/editing/FolderDuplication.ts` | Step 2. New: `Duplicate`. |
+| `src/modules/folders/editing/FolderRelocation.ts` | Step 2. New: `Move to ▸` and its submenu. |
 
 ## Risks
 

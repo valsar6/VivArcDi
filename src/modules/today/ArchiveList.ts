@@ -1,4 +1,4 @@
-import { LinkIcon } from '../folders/LinkIcon.js';
+import { LinkIcon } from '../../shared/links/LinkIcon.js';
 import { ArchiveGroups } from './ArchiveGroups.js';
 import type { ArchiveSession } from './ArchiveSession.js';
 import type { ArchiveEntry } from './ArchiveStore.js';
