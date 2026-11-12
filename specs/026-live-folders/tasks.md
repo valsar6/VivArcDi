@@ -2,9 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Superseded |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
+
+**Superseded on 2026-11-12.** These tasks belong to the first version of the spec. The revision of 2026-11-12 (space menu, filters, the user's pull requests) changes them; they will be rewritten after Tore approves it. Nothing here may be implemented.
 
 Branch `features/live-folders`, next minor version.
 
