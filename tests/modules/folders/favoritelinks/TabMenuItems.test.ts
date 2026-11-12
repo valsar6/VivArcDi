@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabMenuItems } from '../../src/core/TabMenuItems.js';
-import type { ContextMenuApi, TabMenuCommand } from '../../src/core/TabMenuItems.js';
-import { Logger } from '../../src/core/Logger.js';
-import { asDocument, DomDocument } from './dom.js';
+import { TabMenuItems } from '../../../../src/modules/folders/favoritelinks/TabMenuItems.js';
+import type { ContextMenuApi, TabMenuCommand } from '../../../../src/modules/folders/favoritelinks/TabMenuItems.js';
+import { Logger } from '../../../../src/core/Logger.js';
+import { asDocument, DomDocument } from '../../../core/dom.js';
 
 const ITEMS = [
   { type: 'command', id: 'new-tab', label: 'New Tab', enabled: true, checked: false },

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MenuItemShape } from '../../src/core/MenuItemShape.js';
+import { MenuItemShape } from '../../../../src/modules/folders/favoritelinks/MenuItemShape.js';
 
 test('learns the keys of the id and the label from a plain item', () => {
   const shape = MenuItemShape.from([{ name: 'Copy', command: 'copy', shortcut: 'Ctrl+C', width: 4 }]);

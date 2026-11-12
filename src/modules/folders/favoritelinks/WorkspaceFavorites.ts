@@ -1,5 +1,5 @@
 import { AddressKey } from '../../../core/AddressKey.js';
-import { BookmarkCopier } from '../../../core/bookmarks/BookmarkCopier.js';
+import { BookmarkCopier } from '../editing/BookmarkCopier.js';
 import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
 import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
 import { KeptTab } from '../../../core/KeptTab.js';

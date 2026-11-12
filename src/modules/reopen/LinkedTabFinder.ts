@@ -1,5 +1,5 @@
 import { AddressKey } from '../../core/AddressKey.js';
-import type { LinkKeyIndex } from '../../core/bookmarks/LinkKeyIndex.js';
+import type { LinkKeyIndex } from './LinkKeyIndex.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { TabData } from '../../core/TabData.js';
 import type { TabFinder } from './TabTargets.js';

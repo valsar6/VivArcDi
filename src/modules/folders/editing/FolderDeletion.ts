@@ -1,6 +1,6 @@
 import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
 import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
-import type { BookmarkTrash } from '../../../core/bookmarks/BookmarkTrash.js';
+import type { BookmarkTrash } from './BookmarkTrash.js';
 import type { BrowserTabs } from '../../../core/BrowserTabs.js';
 import type { Logger } from '../../../core/Logger.js';
 import { TabData } from '../../../core/TabData.js';

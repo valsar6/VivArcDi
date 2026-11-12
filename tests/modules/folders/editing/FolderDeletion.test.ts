@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
-import { BookmarkTrash } from '../../../../src/core/bookmarks/BookmarkTrash.js';
+import { BookmarkTrash } from '../../../../src/modules/folders/editing/BookmarkTrash.js';
 import type { ToastKind } from '../../../../src/core/Toast.js';
 import { ClosingLinks } from '../../../../src/modules/folders/editing/ClosingLinks.js';
 import { FolderDeletion } from '../../../../src/modules/folders/editing/FolderDeletion.js';

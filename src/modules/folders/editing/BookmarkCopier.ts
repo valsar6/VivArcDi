@@ -1,5 +1,5 @@
-import type { BookmarkNode } from './BookmarkNode.js';
-import type { BookmarkWriter, NewBookmark } from './BookmarkWriter.js';
+import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
+import type { BookmarkWriter, NewBookmark } from '../../../core/bookmarks/BookmarkWriter.js';
 
 export type CopierWriter = Pick<BookmarkWriter, 'create' | 'get' | 'subTree' | 'removeTree'>;
 

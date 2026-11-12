@@ -1,4 +1,4 @@
-import { ElementGestures } from '../../core/ElementGestures.js';
+import { ElementGestures } from './ElementGestures.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { SerialTask } from '../../core/SerialTask.js';

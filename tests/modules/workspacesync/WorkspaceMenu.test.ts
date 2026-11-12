@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ElementGestures } from '../../../src/core/ElementGestures.js';
-import type { ViewWindow } from '../../../src/core/ElementGestures.js';
+import { ElementGestures } from '../../../src/modules/workspacesync/ElementGestures.js';
+import type { ViewWindow } from '../../../src/modules/workspacesync/ElementGestures.js';
 import { Logger } from '../../../src/core/Logger.js';
 import { ReactEditorOpener } from '../../../src/modules/workspacesync/EditorOpener.js';
 import type { MenuParts } from '../../../src/modules/workspacesync/MenuCommand.js';

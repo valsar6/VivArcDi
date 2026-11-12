@@ -1,8 +1,8 @@
-import { AddressKey } from '../AddressKey.js';
-import type { Logger } from '../Logger.js';
-import { BookmarkFolderFinder } from './BookmarkFolderFinder.js';
-import type { BookmarkNode } from './BookmarkNode.js';
-import type { BrowserBookmarks } from './BrowserBookmarks.js';
+import { AddressKey } from '../../core/AddressKey.js';
+import type { Logger } from '../../core/Logger.js';
+import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
+import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
+import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
 
 type IndexBookmarks = Pick<BrowserBookmarks, 'getTree' | 'onChange'>;
 

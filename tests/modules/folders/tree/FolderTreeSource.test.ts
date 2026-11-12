@@ -5,7 +5,7 @@ import { BookmarkFolderFinder } from '../../../../src/core/bookmarks/BookmarkFol
 import { silentLogger, settle } from '../../reopen/fakes.js';
 import { FakeBookmarks, ROOT_PATH, bookmarkTree, folder, immediateFrames, link, recordingChrome } from '../fakes.js';
 import { Logger } from '../../../../src/core/Logger.js';
-import { LinkKeyIndex } from '../../../../src/core/bookmarks/LinkKeyIndex.js';
+import { LinkKeyIndex } from '../../../../src/modules/reopen/LinkKeyIndex.js';
 
 function source(bookmarks: FakeBookmarks, onChange: () => void = (): void => undefined): FolderTreeSource {
   return new FolderTreeSource(bookmarks, { path: ROOT_PATH, maxDepth: 3, onChange, logger: silentLogger(), timing: immediateFrames });

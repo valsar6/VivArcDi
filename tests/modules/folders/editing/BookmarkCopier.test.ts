@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BookmarkCopier } from '../../../src/core/bookmarks/BookmarkCopier.js';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import type { NewBookmark } from '../../../src/core/bookmarks/BookmarkWriter.js';
-import { WritableChrome, bookmarkTree, folder, link } from '../../modules/folders/fakes.js';
+import { BookmarkCopier } from '../../../../src/modules/folders/editing/BookmarkCopier.js';
+import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
+import type { NewBookmark } from '../../../../src/core/bookmarks/BookmarkWriter.js';
+import { WritableChrome, bookmarkTree, folder, link } from '../fakes.js';
 
 const separator = (id: string): BookmarkNode => ({ id, title: '', url: 'https://separator.example/', separator: true });
 

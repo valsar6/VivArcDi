@@ -2,7 +2,7 @@ import { AddressKey } from '../../../core/AddressKey.js';
 import { PIN_TAB_LABEL, TILE_TAB_LABEL } from '../../../core/CommandLabels.js';
 import type { FavoriteDropZone } from '../../../core/FavoriteDropZone.js';
 import { KeptTab } from '../../../core/KeptTab.js';
-import type { TabMenuCommand } from '../../../core/TabMenuItems.js';
+import type { TabMenuCommand } from './TabMenuItems.js';
 import { FAILED_TEXT } from './FavoriteShortcut.js';
 import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
 

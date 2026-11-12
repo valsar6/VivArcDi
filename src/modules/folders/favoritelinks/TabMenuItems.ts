@@ -1,7 +1,7 @@
-import type { BrowserTabs } from './BrowserTabs.js';
-import type { Logger } from './Logger.js';
+import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import type { Logger } from '../../../core/Logger.js';
 import { MenuItemShape } from './MenuItemShape.js';
-import { TabSlot } from './TabSlot.js';
+import { TabSlot } from '../../../core/TabSlot.js';
 
 /** A command added to Vivaldi's menu of a tab. */
 export interface TabMenuCommand {
