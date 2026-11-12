@@ -16,6 +16,9 @@ import { FolderLinkTargets } from './FolderLinkTargets.js';
 import { LinkRemoval } from '../favoritelinks/LinkRemoval.js';
 import type { LinkRemovalTabs } from '../favoritelinks/LinkRemoval.js';
 import { PanelBookmarkDrop } from './PanelBookmarkDrop.js';
+import { FolderMenu } from '../editing/FolderMenu.js';
+import { FolderMenuItems } from '../editing/FolderMenuItems.js';
+import type { FolderActions } from '../editing/FolderMenuItems.js';
 import { RowMenu } from '../editing/RowMenu.js';
 import { TabDrops } from './TabDrops.js';
 import type { TabLinks } from '../links/TabLinks.js';
@@ -32,12 +35,14 @@ export interface FolderDragDropDependencies {
   skipSelector: string;
   /** The pill that follows the pointer while something is dragged. */
   pill: Pick<DragPill, 'show' | 'move' | 'hide'>;
-  /** The menu of a link row. */
+  /** The menu of a link row and of a folder row. */
   menu: Pick<ContextMenu, 'open' | 'close'>;
   /** Gives the element of the folders section. */
   section: () => HTMLElement;
   /** Gives the element of the space header, if there is one. */
   header: () => HTMLElement | null;
+  /** What the items of the folder menu do. */
+  folderActions: FolderActions;
   tabs: LinkRemovalTabs;
   writer: Pick<BookmarkWriter, 'get'>;
   /** Writes the link between a tab and a bookmark. */
@@ -53,7 +58,7 @@ export interface FolderDragDropDependencies {
 export class FolderDragDrop {
   #release: TabDragRelease<DropTarget>;
   #rowDrag: RowDrag;
-  #rowMenu: RowMenu;
+  #menus: Array<Pick<RowMenu | FolderMenu, 'attach' | 'detach'>>;
   #panelDrop: PanelBookmarkDrop;
   #zone: LinkDropZone;
   #linkTargets: FolderLinkTargets;
@@ -64,14 +69,14 @@ export class FolderDragDrop {
    * the space header to become a link there, with the mouse or with an HTML5 drop, and a bookmark
    * or folder of the Bookmarks panel be dropped there to be copied. A link row can be dragged out
    * of the section onto today's list or the Favorites grid, through `LinkRemoval`, which its
-   * right-click menu also offers as Remove pin and Tile tab; the rows of a live folder are not
+   * right-click menu also offers as Remove pin and Tile tab, and a folder row has its own right-click menu; the rows of a live folder are not
    * bookmarks and stay where they are. A pill with the icon and the title
    * follows what is dragged. It marks the target under the pointer while either is dragged, and
    * offers the same places to the other modules through `LinkDropZone`.
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }: FolderDragDropDependencies) {
+  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }: FolderDragDropDependencies) {
     const targets = new DropTargets(section, header);
     const drops = new TabDrops({ tabs, favorites, indexBefore, logger });
     this.#release = new TabDragRelease<DropTarget>({
@@ -106,7 +111,7 @@ export class FolderDragDrop {
       onEnd: (): void => removal.clear(),
       pill,
     });
-    this.#rowMenu = new RowMenu({ document, menu, removal });
+    this.#menus = [new RowMenu({ document, menu, removal }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
     this.#zone = LinkDropZone.of(document);
     this.#linkTargets = new FolderLinkTargets({ targets, place: new DropPlace(indexBefore), favorites, logger });
     this.#panelDrop = new PanelBookmarkDrop({ document, targets, place: new DropPlace(indexBefore), favorites });
@@ -118,7 +123,7 @@ export class FolderDragDrop {
   public start(): void {
     this.#release.start();
     this.#rowDrag.attach();
-    this.#rowMenu.attach();
+    this.#menus.forEach((menu) => menu.attach());
     this.#panelDrop.attach();
     this.#unregister = this.#zone.register(this.#linkTargets);
   }
@@ -129,7 +134,7 @@ export class FolderDragDrop {
   public stop(): void {
     this.#release.stop();
     this.#rowDrag.detach();
-    this.#rowMenu.detach();
+    this.#menus.forEach((menu) => menu.detach());
     this.#panelDrop.detach();
     this.#unregister?.();
     this.#unregister = null;

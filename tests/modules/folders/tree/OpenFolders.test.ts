@@ -43,3 +43,14 @@ test('starts with every folder closed in a workspace with nothing saved or a bro
   folders.useWorkspace('9');
   assert.equal(folders.has('1'), false);
 });
+
+test('forgets a folder and saves, so a restored folder comes back closed', () => {
+  const storage = new MemoryStorage();
+  const folders = new OpenFolders(storage, silentLogger());
+  folders.useWorkspace(null);
+  folders.toggle('10');
+  folders.toggle('11');
+  folders.forget('10');
+  assert.equal(folders.has('10'), false);
+  assert.equal(storage.getItem(OPEN_FOLDERS_STORAGE_KEY), '["11"]');
+});

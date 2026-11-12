@@ -1,4 +1,5 @@
 import { ContextMenu } from '../../../core/ContextMenu.js';
+import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
 import { DragPill } from '../../../core/DragPill.js';
 import { FavoriteDropZone } from '../../../core/FavoriteDropZone.js';
 import { FolderCommands } from '../../../core/FolderCommands.js';
@@ -6,13 +7,18 @@ import { LinkId } from '../../../core/LinkId.js';
 import type { ModuleContext } from '../../../core/Module.js';
 import { TabMenuItems } from '../../../core/TabMenuItems.js';
 import type { ContextMenuApi } from '../../../core/TabMenuItems.js';
+import { BookmarkTrash } from '../../../core/bookmarks/BookmarkTrash.js';
 import { Toast } from '../../../core/Toast.js';
+import type { ToastKind } from '../../../core/Toast.js';
 import { TodayList } from '../../../core/TodayList.js';
 import { VirtualFolders } from '../../../core/VirtualFolders.js';
+import type { ClosingLinks } from './ClosingLinks.js';
 import { CreatedLinks } from '../favoritelinks/CreatedLinks.js';
 import { FavoriteShortcut } from '../favoritelinks/FavoriteShortcut.js';
+import { FolderDeletion } from './FolderDeletion.js';
 import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
+import type { OpenFolders } from '../tree/OpenFolders.js';
 import { TabCommands } from '../favoritelinks/TabCommands.js';
 import type { TabLinks } from '../links/TabLinks.js';
 import { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
@@ -28,6 +34,10 @@ export interface EditingSources {
   redraw: () => void;
   /** Writes the link between a tab and a bookmark. */
   tabLinks: TabLinks;
+  /** The folders the user left open. */
+  openFolders: OpenFolders;
+  /** The links whose tabs are about to close. */
+  closing: ClosingLinks;
 }
 
 const TOAST_MS = 2000;
@@ -78,7 +88,7 @@ export class FolderEditing {
       () => toast.remove(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
-      this.#startDrops((text) => toast.show(text)),
+      this.#startDrops((text, kind) => toast.show(text, kind)),
       this.#startTabMenu((text) => toast.show(text)),
     );
   }
@@ -136,8 +146,18 @@ export class FolderEditing {
     return () => shortcut.detach();
   }
 
-  #startDrops(notify: (text: string) => void): () => void {
+  #startDrops(notify: (text: string, kind?: ToastKind) => void): () => void {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
+    const deletion = new FolderDeletion({
+      writer: bookmarkWriter,
+      trash: new BookmarkTrash({ tree: (): Promise<BookmarkNode[]> => bookmarkWriter.tree() }),
+      tabs,
+      openFolders: this.#sources.openFolders,
+      closing: this.#sources.closing,
+      redraw: this.#sources.redraw,
+      notify,
+      logger,
+    });
     const drops = new FolderDragDrop({
       document,
       wrapperSelector: selectors.get('tabWrapper'),
@@ -147,6 +167,7 @@ export class FolderEditing {
       menu: new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
       section: (): HTMLElement => this.#view.element,
       header: (): HTMLElement | null => document.querySelector<HTMLElement>(HEADER_SELECTOR),
+      folderActions: { rename: (folderId): void => this.#view.edit(folderId), remove: (folderId): void => void deletion.delete(folderId) },
       tabs,
       writer: bookmarkWriter,
       tabLinks: this.#sources.tabLinks,

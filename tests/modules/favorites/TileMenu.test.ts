@@ -21,7 +21,7 @@ function setup(): { dom: DomDocument; grid: DomNode; tile: DomNode; opened: stri
     menu: {
       open: (items): void => {
         last = items;
-        opened.push(items.map((item) => item.label));
+        opened.push(items.map((item) => item.label ?? ''));
       },
       close: (): void => undefined,
     },

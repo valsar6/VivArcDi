@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-12 (PR #160 merged; proposals of Q-2 to Q-7 accepted) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -173,19 +173,19 @@ One menu, delivered in steps, each a `features/` pull request with its own tasks
 
 - [x] **Q-1. Trash or erase?** Move to Vivaldi's bookmark Trash (FR-2). The probe of 2026-11-12 found it
   through the bookmarks API: top-level node id `4`, `trash: true`, title `Cestino`.
-- [ ] **Q-2. What happens to the open tabs of a deleted folder?** Proposed: they close, as in Arc
+- [x] **Q-2. What happens to the open tabs of a deleted folder?** Proposed: they close, as in Arc
   (FR-3). Alternative: they go back to today's list, so no open page is lost.
-- [ ] **Q-3. Confirmation before Delete?** Proposed: none, as in Arc, since the Trash keeps the folder.
+- [x] **Q-3. Confirmation before Delete?** Proposed: none, as in Arc, since the Trash keeps the folder.
   Alternative: ask when the folder holds links.
-- [ ] **Q-4. Steps.** Proposed: the four steps of Delivery, one pull request each, Delete first.
+- [x] **Q-4. Steps.** Proposed: the four steps of Delivery, one pull request each, Delete first.
   Alternative: another order, or drop some items.
-- [ ] **Q-5. Where is a folder icon stored?** Proposed: in the bookmark folder itself, in a field that
+- [x] **Q-5. Where is a folder icon stored?** Proposed: in the bookmark folder itself, in a field that
   Vivaldi Sync carries and the panel does not show, so the icon follows the folder to the other
   computer; a probe before the step-3 design finds the field (the folder nodes have `description`,
   `nickname`, `themeColor`). Alternative: VivArcDi's local storage, on this computer only.
-- [ ] **Q-6. `New Space…` in `Move to`?** Proposed: not now; `Turn into Space` covers making a space
+- [x] **Q-6. `New Space…` in `Move to`?** Proposed: not now; `Turn into Space` covers making a space
   from a folder. Alternative: create an empty workspace and move the folder into it.
-- [ ] **Q-7. `Share Folder…`?** Proposed: leave it out. Alternative: `Copy Links`, which copies the
+- [x] **Q-7. `Share Folder…`?** Proposed: leave it out. Alternative: `Copy Links`, which copies the
   folder's links as a Markdown list.
 
 ## References
