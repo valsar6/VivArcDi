@@ -1,8 +1,6 @@
 import type { Logger } from '../../core/Logger.js';
 import type { KeyValueStorage } from '../../core/PersistentStorage.js';
 
-export type { KeyValueStorage };
-
 export const LAST_OPENED_STORAGE_KEY = 'vivarcdi.lastOpened';
 
 const ONE_YEAR_MS = 31_536_000_000;

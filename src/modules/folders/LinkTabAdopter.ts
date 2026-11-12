@@ -3,7 +3,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { KeptTab } from '../../core/KeptTab.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
-import type { LinkEntry } from '../../shared/links/FolderTree.js';
+import type { LinkEntry } from '../../core/FolderEntries.js';
 import type { TabLinks } from './TabLinks.js';
 
 export type AdopterTabs = Pick<BrowserTabs, 'query' | 'get' | 'onCreated' | 'onUpdated' | 'onRemoved'>;

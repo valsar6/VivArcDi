@@ -1,8 +1,6 @@
 import { AddressKey } from '../../core/AddressKey.js';
 import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import type { FolderEntry, LinkEntry, TreeEntry } from '../../core/FolderEntries.js';
-
-export type { FolderEntry, LinkEntry, TreeEntry };
+import type { LinkEntry, TreeEntry } from '../../core/FolderEntries.js';
 
 export class FolderTree {
   /**

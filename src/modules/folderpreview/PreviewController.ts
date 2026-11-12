@@ -3,7 +3,7 @@ import type { Logger } from '../../core/Logger.js';
 import type { LinkActivator } from '../../shared/links/LinkActivator.js';
 import type { OpenLinks } from '../../shared/links/OpenLinks.js';
 import { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
-import type { KeyValueStorage } from '../../shared/links/LastOpenedStore.js';
+import type { KeyValueStorage } from '../../core/PersistentStorage.js';
 import { FolderHover } from './FolderHover.js';
 import { FolderLinks } from './FolderLinks.js';
 import { PreviewPanelView } from './PreviewPanelView.js';

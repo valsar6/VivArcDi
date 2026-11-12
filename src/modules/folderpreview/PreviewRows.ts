@@ -1,4 +1,4 @@
-import type { LinkEntry } from '../../shared/links/FolderTree.js';
+import type { LinkEntry } from '../../core/FolderEntries.js';
 
 export interface PreviewRow {
   link: LinkEntry;

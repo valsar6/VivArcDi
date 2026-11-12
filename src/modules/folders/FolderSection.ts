@@ -12,7 +12,7 @@ import { FolderEditing } from './FolderEditing.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
 import { FolderTree } from '../../shared/links/FolderTree.js';
-import type { LinkEntry, TreeEntry } from '../../shared/links/FolderTree.js';
+import type { LinkEntry, TreeEntry } from '../../core/FolderEntries.js';
 import { FolderTreeSource } from './FolderTreeSource.js';
 import { LinkActivator } from '../../shared/links/LinkActivator.js';
 import { LinkTabAdopter } from './LinkTabAdopter.js';
