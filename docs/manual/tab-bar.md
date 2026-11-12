@@ -42,10 +42,14 @@ every workspace.
   page becomes the first tile. Once a tile exists, the strip is gone and you drop on the grid.
 
   ![Mockup: a Today tab dragged above the space header becomes the first tile](images/mockups/first-tile.gif)
+- **Reorder by dragging.** Drag a tile and keep it over the grid: its place closes and the tiles
+  open a gap where it will land. Release it there and the order stays in every workspace, after a
+  restart and on the devices that sync the bookmarks, because it is the order of the `Favorites`
+  folder.
 - **Take one out by dragging.** Drag a tile out of the grid and release it. Below the separator the
   page becomes a Today tab at that place; on a folder, between folder rows or on the space header it
   becomes a link of the workspace. The tile disappears from every workspace and the page is never
-  lost. Released over the grid or outside the tab bar, nothing changes.
+  lost. Released outside the tab bar, nothing changes.
 - **See what you drag.** While a tab, a link row or a tile is dragged over the tab bar, a white pill
   with its icon and title follows the pointer and the place it came from fades.
 - **Untile or pin from the menu.** Right-click a tile: **Untile tab** puts the page back as the first

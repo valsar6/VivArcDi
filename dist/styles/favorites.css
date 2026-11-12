@@ -184,6 +184,10 @@
   opacity: 0.4;
 }
 
+#browser[data-vivarcdi-active] [data-vivarcdi-tiles] > [data-vivarcdi-moving] {
+  display: none;
+}
+
 #browser[data-vivarcdi-active] [data-vivarcdi-drop-today] {
   outline: 2px solid color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) 55%, transparent);
   outline-offset: -2px;

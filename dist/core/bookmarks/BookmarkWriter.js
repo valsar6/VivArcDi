@@ -1,5 +1,5 @@
 import { BookmarkFolderFinder } from "./BookmarkFolderFinder.js";
-const METHODS = ["getTree", "getChildren", "create", "update", "remove", "removeTree", "get", "getSubTree"];
+const METHODS = ["getTree", "getChildren", "create", "update", "remove", "removeTree", "get", "getSubTree", "move"];
 class BookmarkWriter {
   #chrome;
   #queue = Promise.resolve();
@@ -43,6 +43,14 @@ class BookmarkWriter {
     return this.#call((api, done) => api.update(id, { description }, done));
   }
   /**
+   * @param id The bookmark or folder.
+   * @param destination The folder and the position it goes to.
+   * @returns The moved bookmark.
+   */
+  move(id, destination) {
+    return this.#call((api, done) => api.move(id, destination, done));
+  }
+  /**
    * @param id The link, or the empty folder, to delete.
    */
   async remove(id) {
@@ -76,16 +84,6 @@ class BookmarkWriter {
     return this.#call((api, done) => api.getChildren(id, done));
   }
   /**
-   * Finds the folder at the end of a path of titles and creates the missing ones, one level at a
-   * time, so `VivArcDi/Casetta` makes both when neither exists. The part of the path that exists
-   * is found like the section finds a root, anywhere in the tree; the first missing folder goes
-   * to Vivaldi's default folder. Calls run one after the other, so two writes never create the
-   * same folder twice.
-   *
-   * @param path Titles from the outer folder to the wanted one; not empty.
-   * @returns The id of the last folder.
-   */
-  /**
    * @param path The titles of a folder, from the top.
    * @param id A bookmark or folder.
    * @returns Whether the folder exists and holds it, at any depth.
@@ -96,6 +94,16 @@ class BookmarkWriter {
     const holds = (nodes) => nodes.some((node) => node.id === id || holds(node.children ?? []));
     return folder !== null && holds(folder.children ?? []);
   }
+  /**
+   * Finds the folder at the end of a path of titles and creates the missing ones, one level at a
+   * time, so `VivArcDi/Casetta` makes both when neither exists. The part of the path that exists
+   * is found like the section finds a root, anywhere in the tree; the first missing folder goes
+   * to Vivaldi's default folder. Calls run one after the other, so two writes never create the
+   * same folder twice.
+   *
+   * @param path Titles from the outer folder to the wanted one; not empty.
+   * @returns The id of the last folder.
+   */
   ensurePath(path) {
     const run = this.#queue.then(() => this.#ensure(path));
     this.#queue = run.catch(() => void 0);
