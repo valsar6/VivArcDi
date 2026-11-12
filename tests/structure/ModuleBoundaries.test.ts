@@ -9,6 +9,7 @@ const SRC = join(ROOT, 'src');
 const MODULES = join(SRC, 'modules');
 const SHARED = join(SRC, 'shared');
 const CORE = join(SRC, 'core');
+const LOADER = join(SRC, 'loader.ts');
 const SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(\s*)['"](\.[^'"]*)['"]/g;
 
 interface Edge {
@@ -92,4 +93,31 @@ test('folders keeps only the module and the section at its top level', () => {
     .map((entry) => entry.name)
     .sort();
   assert.deepEqual(top, ['BookmarkFolders.ts', 'FolderSection.ts']);
+});
+
+test('core imports only core', () => {
+  const offending = allEdges()
+    .filter((edge) => inside(edge.from, CORE) && !inside(edge.to, CORE))
+    .map((edge) => `${shown(edge.from)} -> ${shown(edge.to)}`);
+  assert.deepEqual(offending, []);
+});
+
+test('every core file is used by core or by two modules', () => {
+  const edges = allEdges();
+  const usedByCore = new Set(
+    edges.filter((edge) => inside(edge.from, CORE) || edge.from === LOADER).map((edge) => edge.to),
+  );
+  const offending = typescriptFiles(CORE)
+    .filter((file) => !usedByCore.has(file))
+    .map((file) => ({ file, users: usersOf(file, edges, new Set()) }))
+    .filter(({ users }) => users.size < 2)
+    .map(({ file, users }) => `${shown(file)} is used by ${[...users].join(', ') || 'no module'}`);
+  assert.deepEqual(offending, []);
+});
+
+test('core keeps no file at its top level', () => {
+  const top = readdirSync(CORE, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
+  assert.deepEqual(top, []);
 });
