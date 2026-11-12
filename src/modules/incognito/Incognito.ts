@@ -1,9 +1,9 @@
-import { AddressField } from '../../core/AddressField.js';
+import { AddressField } from '../../shared/newtab/AddressField.js';
 import type { FrameTiming } from '../../core/FrameTask.js';
 import { DomQuery } from '../../core/DomQuery.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
-import { NewTabRow } from '../../core/NewTabRow.js';
+import { NewTabRow } from '../../shared/newtab/NewTabRow.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
 import { BarButton } from './BarButton.js';
 import { BottomBar } from './BottomBar.js';

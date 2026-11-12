@@ -1,6 +1,6 @@
 import { HIDDEN_ATTRIBUTE } from './HiddenTabMarker.js';
-import type { SelectorCatalog } from './SelectorCatalog.js';
-import { TabSlot } from './TabSlot.js';
+import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import { TabSlot } from '../../core/TabSlot.js';
 
 export const TODAY_ATTRIBUTE = 'data-vivarcdi-drop-today';
 

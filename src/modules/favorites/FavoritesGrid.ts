@@ -1,8 +1,8 @@
 import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
 import { DomQuery } from '../../core/DomQuery.js';
 import { FrameTask } from '../../core/FrameTask.js';
-import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
-import { HiddenTabs } from '../../core/HiddenTabs.js';
+import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
+import { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';

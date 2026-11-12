@@ -1,4 +1,4 @@
-import { TabData } from './TabData.js';
+import { TabData } from '../../core/TabData.js';
 
 export class KeptTab {
   /**

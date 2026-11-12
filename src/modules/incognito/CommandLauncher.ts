@@ -1,7 +1,7 @@
-import type { AddressField } from '../../core/AddressField.js';
+import type { AddressField } from '../../shared/newtab/AddressField.js';
 import type { BrowserRuntime } from '../../core/BrowserRuntime.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { NewTabOpener } from '../../core/NewTabOpener.js';
+import { NewTabOpener } from '../../shared/newtab/NewTabOpener.js';
 import type { DownloadsButton } from './DownloadsButton.js';
 
 export class CommandLauncher {

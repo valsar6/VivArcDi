@@ -1,6 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import { OwnPage } from '../../core/OwnPage.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import type { TabUnloader } from '../../core/TabUnloader.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { LinkedTabs } from './LinkedTabs.js';

@@ -1,5 +1,5 @@
-import type { BrowserTabs } from './BrowserTabs.js';
-import type { Logger } from './Logger.js';
+import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { Logger } from '../../core/Logger.js';
 
 export interface TabRowMoveDependencies {
   tabs: Pick<BrowserTabs, 'get' | 'move'>;

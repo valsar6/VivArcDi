@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SpaceCollapse } from '../../src/core/SpaceCollapse.js';
+import { SpaceCollapse } from '../../../src/shared/spaces/SpaceCollapse.js';
 
 test('shares one state per scope', () => {
   const scope = {};

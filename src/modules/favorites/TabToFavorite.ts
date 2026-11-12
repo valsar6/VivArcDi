@@ -1,8 +1,8 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { DragPill } from '../../core/DragPill.js';
+import type { DragPill } from '../../shared/dragdrop/DragPill.js';
 import type { Logger } from '../../core/Logger.js';
-import { TabDragPill } from '../../core/TabDragPill.js';
-import { TabDragRelease } from '../../core/TabDragRelease.js';
+import { TabDragPill } from '../../shared/dragdrop/TabDragPill.js';
+import { TabDragRelease } from '../../shared/dragdrop/TabDragRelease.js';
 import type { FavoriteDrop } from './FavoriteDrop.js';
 import type { GridDropZone, GridTarget } from './GridDropZone.js';
 

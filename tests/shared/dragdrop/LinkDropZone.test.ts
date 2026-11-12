@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LinkDropZone } from '../../src/core/LinkDropZone.js';
-import type { LinkDropTarget, LinkPage, LinkTargets } from '../../src/core/LinkDropZone.js';
+import { LinkDropZone } from '../../../src/shared/dragdrop/LinkDropZone.js';
+import type { LinkDropTarget, LinkPage, LinkTargets } from '../../../src/shared/dragdrop/LinkDropZone.js';
 
 class RecordingTargets implements LinkTargets {
   public calls: string[] = [];

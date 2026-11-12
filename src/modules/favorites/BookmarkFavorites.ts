@@ -1,6 +1,6 @@
 import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { HiddenTabs } from '../../core/HiddenTabs.js';
+import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';

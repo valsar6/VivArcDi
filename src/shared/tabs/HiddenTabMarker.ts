@@ -1,9 +1,9 @@
-import { DomQuery } from './DomQuery.js';
-import { FrameTask } from './FrameTask.js';
-import type { FrameTiming } from './FrameTask.js';
+import { DomQuery } from '../../core/DomQuery.js';
+import { FrameTask } from '../../core/FrameTask.js';
+import type { FrameTiming } from '../../core/FrameTask.js';
 import type { HiddenTabs } from './HiddenTabs.js';
-import type { SelectorCatalog } from './SelectorCatalog.js';
-import { TabSlot } from './TabSlot.js';
+import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import { TabSlot } from '../../core/TabSlot.js';
 
 export type StripWatcher = (target: Node, onChange: () => void) => () => void;
 

@@ -1,7 +1,7 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { AddressKey } from '../../core/AddressKey.js';
-import { OwnPage } from '../../core/OwnPage.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import type { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
 
 export interface RecorderOptions {

@@ -1,12 +1,12 @@
 import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
 import { ContextMenu } from '../../core/ContextMenu.js';
 import type { MenuItem } from '../../core/ContextMenu.js';
-import { LinkId } from '../../core/LinkId.js';
+import { LinkId } from '../../shared/links/LinkId.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
-import { SpaceMenuItems } from '../../core/SpaceMenuItems.js';
+import { SpaceMenuItems } from '../../shared/spaces/SpaceMenuItems.js';
 import { Toast } from '../../core/Toast.js';
-import { VirtualFolders } from '../../core/VirtualFolders.js';
+import { VirtualFolders } from '../../shared/links/VirtualFolders.js';
 import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
 import { TextCopier } from '../../shared/clipboard/TextCopier.js';
 import { GithubConnect } from './GithubConnect.js';

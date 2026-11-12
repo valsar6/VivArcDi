@@ -1,4 +1,4 @@
-import { KeptTab } from '../../core/KeptTab.js';
+import { KeptTab } from '../../shared/tabs/KeptTab.js';
 import { TabData } from '../../core/TabData.js';
 
 const ARCHIVABLE_PROTOCOLS = new Set(['http:', 'https:', 'file:']);

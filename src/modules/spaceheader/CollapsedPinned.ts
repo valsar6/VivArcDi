@@ -1,7 +1,7 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { HiddenTabs } from '../../core/HiddenTabs.js';
+import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import type { SpaceCollapse } from '../../core/SpaceCollapse.js';
+import type { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
 import { TabData } from '../../core/TabData.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 

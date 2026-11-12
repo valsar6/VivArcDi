@@ -1,13 +1,13 @@
 import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
-import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
+import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
 import { ContextMenu } from '../../core/ContextMenu.js';
 import type { MenuItem } from '../../core/ContextMenu.js';
-import { FolderCommands } from '../../core/FolderCommands.js';
-import { HiddenTabs } from '../../core/HiddenTabs.js';
+import { FolderCommands } from '../../shared/links/FolderCommands.js';
+import { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext } from '../../core/Module.js';
-import { SpaceCollapse } from '../../core/SpaceCollapse.js';
-import { SpaceMenuItems } from '../../core/SpaceMenuItems.js';
+import { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
+import { SpaceMenuItems } from '../../shared/spaces/SpaceMenuItems.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
 import { WorkspaceNames } from '../../core/WorkspaceNames.js';
 import { CollapsedPinned } from './CollapsedPinned.js';

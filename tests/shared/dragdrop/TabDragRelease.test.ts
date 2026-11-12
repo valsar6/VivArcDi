@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabDragRelease } from '../../src/core/TabDragRelease.js';
-import { TAB_ENTRIES_TYPE } from '../../src/core/TabEntries.js';
-import { DomDocument, asDocument } from './dom.js';
+import { TabDragRelease } from '../../../src/shared/dragdrop/TabDragRelease.js';
+import { TAB_ENTRIES_TYPE } from '../../../src/shared/dragdrop/TabEntries.js';
+import { DomDocument, asDocument } from '../../core/dom.js';
 
 const WRAPPER = '.wrapper';
 

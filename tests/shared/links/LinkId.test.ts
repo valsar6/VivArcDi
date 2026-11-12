@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LinkId } from '../../src/core/LinkId.js';
+import { LinkId } from '../../../src/shared/links/LinkId.js';
 
 test('tells virtual ids from bookmark ids', () => {
   assert.equal(LinkId.isVirtual('live:abc'), true);

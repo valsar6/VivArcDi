@@ -1,5 +1,5 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { OwnPage } from '../../core/OwnPage.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import { TabData } from '../../core/TabData.js';
 
 export interface TabMarks {

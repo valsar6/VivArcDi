@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRAG_PILL_ATTRIBUTE, DragPill } from '../../src/core/DragPill.js';
-import { asDocument, DomDocument } from './dom.js';
-import type { DomNode } from './dom.js';
+import { DRAG_PILL_ATTRIBUTE, DragPill } from '../../../src/shared/dragdrop/DragPill.js';
+import { asDocument, DomDocument } from '../../core/dom.js';
+import type { DomNode } from '../../core/dom.js';
 
 interface Setup {
   dom: DomDocument;

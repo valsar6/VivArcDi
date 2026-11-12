@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import { LinkDropZone } from '../../../src/core/LinkDropZone.js';
+import { LinkDropZone } from '../../../src/shared/dragdrop/LinkDropZone.js';
 import { TabData } from '../../../src/core/TabData.js';
 import { FavoriteRemoval } from '../../../src/modules/favorites/FavoriteRemoval.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
-import type { TodayTarget } from '../../../src/core/TodayList.js';
+import type { TodayTarget } from '../../../src/shared/tabs/TodayList.js';
 import { CreatedLinks } from '../../../src/modules/folders/favoritelinks/CreatedLinks.js';
 import { DropPlace } from '../../../src/modules/folders/dragdrop/DropPlace.js';
 import type { DropTarget } from '../../../src/modules/folders/dragdrop/DropTargets.js';

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { FavoriteDropZone } from '../../src/core/FavoriteDropZone.js';
-import type { FavoriteDropTarget, FavoritePage, FavoriteTargets } from '../../src/core/FavoriteDropZone.js';
+import { FavoriteDropZone } from '../../../src/shared/dragdrop/FavoriteDropZone.js';
+import type { FavoriteDropTarget, FavoritePage, FavoriteTargets } from '../../../src/shared/dragdrop/FavoriteDropZone.js';
 
 class RecordingTargets implements FavoriteTargets {
   public calls: string[] = [];

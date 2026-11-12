@@ -1,5 +1,5 @@
 import type { ContextMenu } from '../../core/ContextMenu.js';
-import { LinkId } from '../../core/LinkId.js';
+import { LinkId } from '../../shared/links/LinkId.js';
 import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 import type { LiveFolderStore } from './LiveFolderStore.js';
 

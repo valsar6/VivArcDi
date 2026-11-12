@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HiddenTabMarker } from '../../src/core/HiddenTabMarker.js';
-import { HiddenTabs } from '../../src/core/HiddenTabs.js';
-import { FakeNode, selectors } from '../modules/favorites/fakes.js';
+import { HiddenTabMarker } from '../../../src/shared/tabs/HiddenTabMarker.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import { FakeNode, selectors } from '../../modules/favorites/fakes.js';
 
 const slot = (id: number): FakeNode => {
   const wrapper = new FakeNode(['wrapper']);

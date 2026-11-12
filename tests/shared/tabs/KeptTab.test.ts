@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { KeptTab } from '../../src/core/KeptTab.js';
+import { KeptTab } from '../../../src/shared/tabs/KeptTab.js';
 
 const tabWith = (fields: Record<string, unknown>): chrome.tabs.Tab => fields as unknown as chrome.tabs.Tab;
 const ownData = (own: Record<string, unknown>): string => JSON.stringify({ workspaceId: 7, vivarcdi: own });

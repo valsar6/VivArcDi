@@ -1,6 +1,6 @@
 import { AddressKey } from '../../core/AddressKey.js';
-import type { FolderEntry, LinkEntry } from '../../core/FolderEntries.js';
-import { LinkId } from '../../core/LinkId.js';
+import type { FolderEntry, LinkEntry } from '../../shared/links/FolderEntries.js';
+import { LinkId } from '../../shared/links/LinkId.js';
 import type { PullRequestRow } from './GithubPullRequests.js';
 import type { LiveFolder } from './LiveFolderStore.js';
 

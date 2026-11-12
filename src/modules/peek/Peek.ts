@@ -1,6 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import { DomQuery } from '../../core/DomQuery.js';
-import { KeptTab } from '../../core/KeptTab.js';
+import { KeptTab } from '../../shared/tabs/KeptTab.js';
 import { Module } from '../../core/Module.js';
 import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';

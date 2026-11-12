@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabPointerDrag } from '../../src/core/TabPointerDrag.js';
-import { DomDocument, asDocument } from './dom.js';
+import { TabPointerDrag } from '../../../src/shared/dragdrop/TabPointerDrag.js';
+import { DomDocument, asDocument } from '../../core/dom.js';
 
 const WRAPPER = '.wrapper';
 

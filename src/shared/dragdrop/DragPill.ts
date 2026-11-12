@@ -1,6 +1,6 @@
-import { FrameTask } from './FrameTask.js';
-import type { FrameTiming } from './FrameTask.js';
-import type { SelectorCatalog } from './SelectorCatalog.js';
+import { FrameTask } from '../../core/FrameTask.js';
+import type { FrameTiming } from '../../core/FrameTask.js';
+import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 
 export const DRAG_PILL_ATTRIBUTE = 'data-vivarcdi-drag-pill';
 

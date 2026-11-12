@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HiddenTabMarker, HIDDEN_ATTRIBUTE } from '../../src/core/HiddenTabMarker.js';
-import { HiddenTabs } from '../../src/core/HiddenTabs.js';
-import { FakeNode, selectors, tabSlot } from '../modules/favorites/fakes.js';
+import { HiddenTabMarker, HIDDEN_ATTRIBUTE } from '../../../src/shared/tabs/HiddenTabMarker.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import { FakeNode, selectors, tabSlot } from '../../modules/favorites/fakes.js';
 
 const immediate = { schedule: (run: () => void): void => run(), cancel: (): void => undefined };
 

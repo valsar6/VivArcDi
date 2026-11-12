@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRAG_PILL_ATTRIBUTE, DragPill } from '../../src/core/DragPill.js';
-import { DRAGGING_ATTRIBUTE, RowDrag } from '../../src/core/RowDrag.js';
-import { asDocument, asElement, DomDocument } from './dom.js';
-import type { DomNode } from './dom.js';
+import { DRAG_PILL_ATTRIBUTE, DragPill } from '../../../src/shared/dragdrop/DragPill.js';
+import { DRAGGING_ATTRIBUTE, RowDrag } from '../../../src/shared/dragdrop/RowDrag.js';
+import { asDocument, asElement, DomDocument } from '../../core/dom.js';
+import type { DomNode } from '../../core/dom.js';
 
 const ROW_ATTRIBUTE = 'data-test-row';
 

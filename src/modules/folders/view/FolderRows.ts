@@ -1,4 +1,4 @@
-import type { FolderEntry, LinkEntry, TreeEntry } from '../../../core/FolderEntries.js';
+import type { FolderEntry, LinkEntry, TreeEntry } from '../../../shared/links/FolderEntries.js';
 import { FolderTree } from '../../../shared/links/FolderTree.js';
 import type { LinkRef, OpenTab } from '../../../shared/links/OpenLinks.js';
 

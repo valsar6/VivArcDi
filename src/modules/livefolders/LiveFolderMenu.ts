@@ -1,5 +1,5 @@
 import type { CommandItem, ContextMenu, MenuItem } from '../../core/ContextMenu.js';
-import { LinkId } from '../../core/LinkId.js';
+import { LinkId } from '../../shared/links/LinkId.js';
 import { PullRequestFilters } from './PullRequestFilters.js';
 import type { ToggleName } from './PullRequestFilters.js';
 import type { LiveFolderStore } from './LiveFolderStore.js';

@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRAGGING_ATTRIBUTE } from '../../src/core/RowDrag.js';
-import { TabDragPill } from '../../src/core/TabDragPill.js';
-import type { PillContent } from '../../src/core/DragPill.js';
-import { silentLogger } from '../modules/reopen/fakes.js';
-import { asDocument, DomDocument } from './dom.js';
-import type { DomNode } from './dom.js';
+import { DRAGGING_ATTRIBUTE } from '../../../src/shared/dragdrop/RowDrag.js';
+import { TabDragPill } from '../../../src/shared/dragdrop/TabDragPill.js';
+import type { PillContent } from '../../../src/shared/dragdrop/DragPill.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { asDocument, DomDocument } from '../../core/dom.js';
+import type { DomNode } from '../../core/dom.js';
 
 interface Setup {
   slot: DomNode;

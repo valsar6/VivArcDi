@@ -1,12 +1,12 @@
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { LinkDropTarget, LinkDropZone } from '../../core/LinkDropZone.js';
+import type { LinkDropTarget, LinkDropZone } from '../../shared/dragdrop/LinkDropZone.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
 import { TabDataWriter } from '../../core/TabDataWriter.js';
-import { TabRowMove } from '../../core/TabRowMove.js';
+import { TabRowMove } from '../../shared/dragdrop/TabRowMove.js';
 import type { LinkedTabs } from './LinkedTabs.js';
-import type { TodayList, TodayTarget } from '../../core/TodayList.js';
+import type { TodayList, TodayTarget } from '../../shared/tabs/TodayList.js';
 
 export type RemovalTabs = Pick<BrowserTabs, 'get' | 'query' | 'update' | 'move' | 'create' | 'remove'>;
 

@@ -1,4 +1,4 @@
-import type { FavoriteDropTarget, FavoritePage, FavoriteTargets } from '../../core/FavoriteDropZone.js';
+import type { FavoriteDropTarget, FavoritePage, FavoriteTargets } from '../../shared/dragdrop/FavoriteDropZone.js';
 import type { FavoriteDrop } from './FavoriteDrop.js';
 import type { GridDropZone, GridTarget } from './GridDropZone.js';
 

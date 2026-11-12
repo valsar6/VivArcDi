@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { TreeEntry } from '../../src/core/FolderEntries.js';
-import { VirtualFolders } from '../../src/core/VirtualFolders.js';
+import type { TreeEntry } from '../../../src/shared/links/FolderEntries.js';
+import { VirtualFolders } from '../../../src/shared/links/VirtualFolders.js';
 
 const live = (id: string, rows: string[] = []): TreeEntry => ({
   kind: 'folder',

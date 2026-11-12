@@ -1,5 +1,5 @@
 import { AddressKey } from '../../../core/AddressKey.js';
-import { KeptTab } from '../../../core/KeptTab.js';
+import { KeptTab } from '../../../shared/tabs/KeptTab.js';
 import type { Logger } from '../../../core/Logger.js';
 import { TabData } from '../../../core/TabData.js';
 import type { WorkspaceFavorites } from './WorkspaceFavorites.js';

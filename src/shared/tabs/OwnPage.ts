@@ -1,5 +1,5 @@
-import { AddressKey } from './AddressKey.js';
-import { TabData } from './TabData.js';
+import { AddressKey } from '../../core/AddressKey.js';
+import { TabData } from '../../core/TabData.js';
 
 export class OwnPage {
   /**

@@ -3,7 +3,7 @@ import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
 import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
-import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
 import { TabData } from '../../../src/core/TabData.js';

@@ -1,6 +1,6 @@
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import { OwnPage } from '../../core/OwnPage.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import { TabData } from '../../core/TabData.js';
 import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
 import type { PinnedEntry } from './SyncStore.js';

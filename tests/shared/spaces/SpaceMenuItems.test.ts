@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SpaceMenuItems } from '../../src/core/SpaceMenuItems.js';
+import { SpaceMenuItems } from '../../../src/shared/spaces/SpaceMenuItems.js';
 
 test('shares one registry per scope', () => {
   const scope = {};

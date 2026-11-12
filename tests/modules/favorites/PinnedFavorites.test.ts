@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { Logger } from '../../../src/core/Logger.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import { PinnedFavorites, TILE_SOURCE_ATTRIBUTE } from '../../../src/modules/favorites/PinnedFavorites.js';

@@ -1,4 +1,4 @@
-import type { LinkDropTarget, LinkPage, LinkTargets } from '../../../core/LinkDropZone.js';
+import type { LinkDropTarget, LinkPage, LinkTargets } from '../../../shared/dragdrop/LinkDropZone.js';
 import type { Logger } from '../../../core/Logger.js';
 import type { DropPlace } from './DropPlace.js';
 import type { DropTarget, DropTargets } from './DropTargets.js';
