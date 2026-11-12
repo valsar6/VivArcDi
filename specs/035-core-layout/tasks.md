@@ -18,7 +18,8 @@ test names as before.
 - [ ] **T4.** Core folders: move the 39 remaining files into `boot/`, `browser/`, `tabs/`,
   `workspaces/`, `dom/` and `support/`, together with their tests; update the importers and
   `src/loader.ts`.
-- [ ] **T5.** Message `coreToOuter` in `tools/eslint/module-boundaries.mjs`, and its cases in
+- [ ] **T5.** [Composition root](design.md#composition-root): `VivArcDi.boot` takes the registry from
+  `src/loader.ts`. FR-8. Message `coreToOuter` in `tools/eslint/module-boundaries.mjs`, and its cases in
   `tests/tooling/ModuleBoundariesRule.test.ts`. AC-4, AC-5.
 - [ ] **T6.** The checks of AC-1, AC-2 and AC-3 in `tests/structure/ModuleBoundaries.test.ts`.
 - [ ] **T7.** `docs/architecture.md`: the core folders, the three layers and the core paths it cites.

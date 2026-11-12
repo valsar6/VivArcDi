@@ -59,6 +59,18 @@ The folders differ from the spec's proposal in two ways:
 
 `src/loader.ts` imports `./core/boot/VivArcDi.js`. Nothing outside `src/` names a core path.
 
+### Composition root
+
+Today `VivArcDi.boot` calls `createDefaultRegistry()` from `src/modules/index.ts`, so core imports
+the modules. `src/loader.ts` becomes the composition root ([FR-8](spec.md#functional)):
+
+- `VivArcDi.boot(baseUrl, registry, document)` takes the registry as its second parameter, before the
+  `document` that keeps its default.
+- `src/loader.ts` calls `VivArcDi.boot(new URL('./', import.meta.url), createDefaultRegistry())`.
+
+The same registry is built at the same moment of the boot, so nothing changes at runtime. These are
+the only lines of this branch that change something other than an import path.
+
 ### Out to shared
 
 | New path | Used by |
@@ -134,4 +146,4 @@ None. `config.json` does not change.
 | A wrong path is found only at runtime in Vivaldi, since `dist/` is not bundled | `tsc` resolves every import; `make check` builds `dist/`; after each pass a one-off script checks that every relative import of `dist/**/*.js` points to a file |
 | Step 2 of spec 033 is implemented in parallel and imports core files that move, such as `BookmarkTrash` | The branch takes main with a merge, never a rebase, and fixes the new imports in the merge commit, as 034 did |
 | A file is put in the wrong layer, since a test cannot tell a generic helper from a feature | The tables above are the reference for review; a change to them goes through this design |
-| A large diff hides a change of behavior | Moves are `git mv` commits of their own, apart from the commits that edit import lines; no other edit in this branch |
+| A large diff hides a change of behavior | Moves are `git mv` commits of their own, apart from the commits that edit import lines; the only other edit is the composition root, in a commit of its own |
