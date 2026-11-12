@@ -18,7 +18,7 @@ import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
 import { PinnedFavorites } from './PinnedFavorites.js';
 import type { TileSource } from './TileSource.js';
-import { UnloadedTabs } from './UnloadedTabs.js';
+import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 const NO_TABS: UnloadedLookup = { has: () => false };
 const NOTHING_PLACED: Readonly<PlacedGrid> = { grid: null, count: 0 };

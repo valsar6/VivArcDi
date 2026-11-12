@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { TabUnloader } from '../../../src/core/TabUnloader.js';
-import { UnloadedTabs } from '../../../src/modules/favorites/UnloadedTabs.js';
+import { UnloadedTabs } from '../../../src/shared/tabs/UnloadedTabs.js';
 import { FakeTabs } from './fakes.js';
 
 test('UnloadedTabs reads the pinned tabs that are already unloaded', async () => {

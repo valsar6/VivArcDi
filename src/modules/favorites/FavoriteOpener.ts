@@ -4,7 +4,7 @@ import { OwnPage } from '../../core/OwnPage.js';
 import type { TabUnloader } from '../../core/TabUnloader.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { LinkedTabs } from './LinkedTabs.js';
-import { UnloadedTabs } from './UnloadedTabs.js';
+import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 export type OpenerTabs = Pick<BrowserTabs, 'activate' | 'reload' | 'create' | 'update'>;
 
