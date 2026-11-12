@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | First version 2026-11-08, never implemented; this revision of 2026-11-12 is pending approval |
+| Approved | First version 2026-11-08, never implemented; revision approved by Tore on 2026-11-12 (PR #148 merged with the proposed answers) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -136,18 +136,18 @@ touched, because a live folder is not a bookmark folder.
 
 ## Open questions
 
-Each has a proposed answer; the spec stays Draft until Tore answers.
+Answered on 2026-11-12: Tore merged PR #148, which accepts every proposed answer.
 
-- [ ] **"My team".** Arc lists the pull requests of the user and of their team. GitHub has no single
+- [x] **"My team".** Arc lists the pull requests of the user and of their team. GitHub has no single
   "team" query; the proposal is "created by me" plus "review requested from me", which covers the
   pull requests the team asks the user to look at. Alternative: add `Involves Me` (also mentions,
   comments and assignments).
-- [ ] **Token.** Proposal: installer command and a file with mode 600, as the approved design of the
+- [x] **Token.** Proposal: installer command and a file with mode 600, as the approved design of the
   first version decided (a mod cannot read the macOS Keychain). Alternative: paste the token into a
   field of the folder menu, kept in browser storage (simpler, less safe; would change FR-5 and AC-16).
-- [ ] **Where the menu opens.** Proposal: right click on the space header, since VivArcDi has no space
+- [x] **Where the menu opens.** Proposal: right click on the space header, since VivArcDi has no space
   menu yet. Alternative: also on the empty area below the folders.
-- [ ] **Order.** Proposal: newest update first, as GitHub's pull request list.
+- [x] **Order.** Proposal: newest update first, as GitHub's pull request list.
 
 ## References
 
