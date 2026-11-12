@@ -1,9 +1,9 @@
 import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
 import { TabSlot } from '../../core/TabSlot.js';
+import { PINNED_LAST_ATTRIBUTE } from '../../shared/tabs/TabBarMarks.js';
 import type { TabMarks } from './AwayTabs.js';
 
 export const AWAY_ATTRIBUTE = 'data-vivarcdi-away';
-export const PINNED_LAST_ATTRIBUTE = 'data-vivarcdi-pinned-last';
 
 export class TabBarMarker {
   #selectors: SelectorCatalog;

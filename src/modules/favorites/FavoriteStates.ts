@@ -1,7 +1,7 @@
 import { OwnPage } from '../../core/OwnPage.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { LinkSnapshot } from './LinkedTabs.js';
-import { UnloadedTabs } from './UnloadedTabs.js';
+import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 export interface TileState {
   /** The user is on this Favorite's tab. */

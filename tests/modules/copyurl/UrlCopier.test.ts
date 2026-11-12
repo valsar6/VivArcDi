@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TextCopier, UrlCopier } from '../../../src/modules/copyurl/UrlCopier.js';
+import { UrlCopier } from '../../../src/modules/copyurl/UrlCopier.js';
 import { FakeTabs } from '../favorites/fakes.js';
 import type { FakeTab } from '../favorites/fakes.js';
 import { asDocument, CopyDocument, FakeClipboard } from './fakes.js';
@@ -54,14 +54,4 @@ test('copy fails when the active tab has no address', async () => {
   const tabs = new FakeTabs([inCurrentWindow(3, true, '')]);
   await assert.rejects(UrlCopier.for(tabs, asDocument(new CopyDocument({}, clipboard)), clipboard).copyActive(), /no address/);
   assert.deepEqual(clipboard.written, []);
-});
-
-test('a text copier writes any text and falls back to a hidden field', async () => {
-  const clipboard = new FakeClipboard();
-  const document = new CopyDocument({}, clipboard);
-  await TextCopier.for(asDocument(document), clipboard).write('WDJB-MJHT');
-  assert.deepEqual(clipboard.written, ['WDJB-MJHT']);
-  clipboard.refuse = true;
-  await TextCopier.for(asDocument(document), clipboard).write('https://github.com/a/b/pull/1');
-  assert.deepEqual(document.copiedFromField, ['https://github.com/a/b/pull/1']);
 });

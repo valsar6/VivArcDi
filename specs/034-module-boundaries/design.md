@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -64,10 +64,10 @@ Details:
 | `links/` | `TabLinks.ts`, `LinkTabAdopter.ts` | The link between a bookmark row and the tab that shows it, kept in the tab's `vivExtData` |
 | `favoritelinks/` | `WorkspaceFavorites.ts`, `CreatedLinks.ts`, `FavoriteShortcut.ts`, `TabCommands.ts`, `LinkRemoval.ts` | Adding tabs to a workspace's favorites and taking them back |
 | `dragdrop/` | `FolderDragDrop.ts`, `DropTargets.ts`, `DropPlace.ts`, `FolderLinkTargets.ts`, `TabDrops.ts`, `PanelBookmarkDrop.ts`, `PanelDragData.ts` | Where a drop lands and what a drop of a tab, a row or a panel bookmark does |
-| `editing/` | `FolderEditing.ts`, `RowMenu.ts`, `FolderNameEditor.ts` | Menus of the rows, renaming, and wiring of the editing parts |
+| `editing/` | `FolderEditing.ts`, `RowMenu.ts`, `FolderNameEditor.ts`, and from 033 `FolderMenu.ts`, `FolderMenuItems.ts`, `FolderDeletion.ts`, `ClosingLinks.ts` | Menus of the rows, renaming, deleting a folder, and wiring of the editing parts |
 | `view/` | `FolderSectionView.ts`, `FolderRowElement.ts`, `FolderRows.ts`, `RowTransition.ts` | Turning the tree into rows and drawing them |
 
-Spec [033](../033-folder-menu/spec.md) adds the folder menu; its classes go in `editing/`.
+Spec [033](../033-folder-menu/spec.md) added the folder menu on main while this work was open; the merge of main put its classes in `editing/`.
 
 ### Guard
 

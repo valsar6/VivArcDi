@@ -1,4 +1,4 @@
-import { LinkIcon } from '../../folders/LinkIcon.js';
+import { LinkIcon } from '../../../shared/links/LinkIcon.js';
 import { ClickCatcher } from './ClickCatcher.js';
 import { CommandBarFactory } from './CommandBarElements.js';
 import type { CommandBarElements } from './CommandBarElements.js';
