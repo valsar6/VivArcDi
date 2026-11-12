@@ -1,14 +1,16 @@
 const MENU_ATTRIBUTE = "data-vivarcdi-menu";
+const CHECKED_ATTRIBUTE = "data-vivarcdi-checked";
 const EDGE_PX = 4;
 class ContextMenu {
   #deps;
-  #element = null;
+  #levels = [];
   #onKey = (event) => this.#key(event);
   #onPress = (event) => this.#press(event);
   /**
    * VivArcDi's own menu, drawn at the pointer for the rows and tiles that VivArcDi owns. It stays
    * inside the window, and closes on Escape, on a click elsewhere and after a command. It is
-   * outside the window drag region.
+   * outside the window drag region. An item can show a check mark, and an item with items opens
+   * a submenu to its side while the pointer is on it.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -25,13 +27,7 @@ class ContextMenu {
   open(items, x, y) {
     this.close();
     const { document } = this.#deps;
-    const element = document.createElement("div");
-    element.setAttribute(MENU_ATTRIBUTE, "");
-    element.setAttribute("role", "menu");
-    items.forEach((item) => element.append(this.#row(item)));
-    this.#deps.parent().append(element);
-    this.#element = element;
-    this.#place(element, x, y);
+    this.#show(items, 0, { x, y });
     document.addEventListener("keydown", this.#onKey, true);
     document.addEventListener("mousedown", this.#onPress, true);
   }
@@ -42,23 +38,60 @@ class ContextMenu {
     const { document } = this.#deps;
     document.removeEventListener("keydown", this.#onKey, true);
     document.removeEventListener("mousedown", this.#onPress, true);
-    this.#element?.remove();
-    this.#element = null;
+    this.#closeAbove(-1);
   }
-  #row(item) {
+  #show(items, level, at) {
+    const element = this.#deps.document.createElement("div");
+    element.setAttribute(MENU_ATTRIBUTE, "");
+    element.setAttribute("role", "menu");
+    items.forEach((item) => element.append(this.#row(item, level)));
+    this.#deps.parent().append(element);
+    this.#levels.push(element);
+    this.#place(element, at);
+  }
+  #closeAbove(level) {
+    this.#levels.splice(level + 1).forEach((element) => element.remove());
+  }
+  #row(item, level) {
     const row = this.#deps.document.createElement("div");
     row.setAttribute("role", "menuitem");
     row.textContent = item.label;
+    if ("items" in item) {
+      this.#submenuRow(row, item, level);
+    } else {
+      this.#commandRow(row, item, level);
+    }
+    return row;
+  }
+  #commandRow(row, item, level) {
+    if (item.checked !== void 0) {
+      row.setAttribute("role", "menuitemcheckbox");
+      row.setAttribute("aria-checked", String(item.checked));
+      row.toggleAttribute(CHECKED_ATTRIBUTE, item.checked);
+    }
+    row.addEventListener("mouseenter", () => this.#closeAbove(level));
     row.addEventListener("click", () => {
       this.close();
       item.run();
     });
-    return row;
   }
-  #place(element, x, y) {
+  #submenuRow(row, { items }, level) {
+    row.setAttribute("aria-haspopup", "menu");
+    const open = () => {
+      this.#closeAbove(level);
+      const rect = row.getBoundingClientRect();
+      this.#show(items, level + 1, { x: rect.right, y: rect.top, side: rect });
+    };
+    row.addEventListener("mouseenter", open);
+    row.addEventListener("click", open);
+  }
+  #place(element, { x, y, side }) {
     const { innerWidth = 0, innerHeight = 0 } = this.#deps.document.defaultView ?? {};
     const { left, right, top, bottom } = element.getBoundingClientRect();
-    const left0 = Math.min(x, innerWidth - (right - left) - EDGE_PX);
+    const width = right - left;
+    const fitsRight = x + width <= innerWidth - EDGE_PX;
+    const beside = side !== void 0 && !fitsRight ? side.left - width : x;
+    const left0 = Math.min(beside, innerWidth - width - EDGE_PX);
     const top0 = Math.min(y, innerHeight - (bottom - top) - EDGE_PX);
     element.style.setProperty("left", `${Math.max(EDGE_PX, left0)}px`);
     element.style.setProperty("top", `${Math.max(EDGE_PX, top0)}px`);
@@ -77,6 +110,7 @@ class ContextMenu {
   }
 }
 export {
+  CHECKED_ATTRIBUTE,
   ContextMenu,
   MENU_ATTRIBUTE
 };

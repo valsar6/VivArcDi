@@ -31,15 +31,16 @@ class TabLinks {
     await this.#write(tabId, void 0);
   }
   /**
-   * Unlinks every tab whose bookmark is no longer among the given ones, so that it comes back to
+   * Unlinks every tab whose link is no longer among the given ones, so that it comes back to
    * the tab list.
    *
    * @param bookmarkIds The bookmarks that still exist as links.
+   * @param keep Tells whether a link that is not a bookmark, such as a row of a live folder, stays.
    */
-  async unlinkExcept(bookmarkIds) {
+  async unlinkExcept(bookmarkIds, keep = () => false) {
     for (const tab of await this.#tabs.query({})) {
       const { bookmarkId } = TabData.ownOf(tab);
-      if (tab.id !== void 0 && bookmarkId !== void 0 && !bookmarkIds.has(bookmarkId)) {
+      if (tab.id !== void 0 && bookmarkId !== void 0 && !bookmarkIds.has(bookmarkId) && !keep(bookmarkId)) {
         await this.#write(tab.id, void 0);
       }
     }

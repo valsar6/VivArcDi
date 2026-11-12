@@ -63,6 +63,8 @@ A row between the Favorites and the folders shows the icon and name of the activ
 - Click it to collapse the workspace: the folders show only the links that have an open tab, and
   unloaded pinned tabs hide. Click again to open it. Each workspace remembers its state.
 - Rest the pointer on it to show `+`, which adds a folder.
+- Right click it for a menu with **New Folder**, the same as `+`, and **Live Folders** › **GitHub**,
+  which adds a [live folder](live-folders.md) of your pull requests.
 - Rename the workspace and change its icon from Vivaldi's workspace menu; the row follows.
 
 ## Folders

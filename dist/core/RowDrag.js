@@ -12,7 +12,7 @@ class RowDrag {
   /**
    * Follows a row or a tile of VivArcDi being moved with the mouse: the button goes down on it,
    * the pointer moves more than a few pixels, and the button goes up somewhere. The element is
-   * dimmed while it is dragged, a pill with its icon and title follows the pointer, and the click that follows the release is swallowed so it does not
+   * dimmed while it is dragged (unless `accepts` refuses its id), a pill with its icon and title follows the pointer, and the click that follows the release is swallowed so it does not
    * open.
    *
    * @param dependencies Everything it collaborates with.
@@ -42,12 +42,13 @@ class RowDrag {
   }
   #down(event) {
     this.#deps.document.removeEventListener("click", this.#onClick, true);
-    this.#press = null;
-    const element = event.button === PRIMARY_BUTTON ? this.#elementOf(event.target) : null;
+    this.#press = event.button === PRIMARY_BUTTON ? this.#pressOn(event) : null;
+  }
+  #pressOn(event) {
+    const element = this.#elementOf(event.target);
     const id = element?.getAttribute(this.#deps.idAttribute) ?? null;
-    if (element !== null && id !== null) {
-      this.#press = { element, id, x: event.clientX, y: event.clientY, dragging: false };
-    }
+    const accepted = element !== null && id !== null && (this.#deps.accepts?.(id) ?? true);
+    return accepted ? { element, id, x: event.clientX, y: event.clientY, dragging: false } : null;
   }
   #move(event) {
     const press = this.#press;

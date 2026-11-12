@@ -1,0 +1,83 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-live-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: currentcolor;
+  opacity: 0.7;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 3.250a2.250 2.250 0 1 1 3 2.120v5.260a2.250 2.250 0 1 1-1.500 0V5.370A2.250 2.250 0 0 1 1.500 3.250zM11.500 2.500h-1.250l1.500-1.500v1.250c1.800.2 3.250 1.730 3.250 3.600v4.780a2.250 2.250 0 1 1-1.500 0V5.850c0-1.100-.7-2.100-2-2.350zM3.750 13a.75.75 0 1 0 0 1.500.75.75 0 0 0 0-1.500zm0-10.500a.75.75 0 1 0 0 1.500.75.75 0 0 0 0-1.500zm8.500 10.500a.75.75 0 1 0 0 1.500.75.75 0 0 0 0-1.500z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-live-folder][data-vivarcdi-open] .vivarcdi-folders-live-icon {
+  opacity: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-live-warning {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: var(--colorWarningBg, #e5a000);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.500 15 14H1zM7.250 6h1.500v4h-1.500zM7.250 11h1.500v1.500h-1.500z' fill-rule='evenodd'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-link-subtitle] {
+  height: auto;
+  min-height: 40px;
+  padding-block: 3px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-subtitle {
+  overflow: hidden;
+  font-size: 11px;
+  opacity: 0.65;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-repository-editor] {
+  position: fixed;
+  z-index: 76;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 260px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--colorFg, #fff);
+  font-size: 14px;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-repository-editor] > div {
+  flex: 1 0 100%;
+  font-size: 11px;
+  opacity: 0.65;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-repository-editor] > textarea {
+  flex: 1 0 100%;
+  box-sizing: border-box;
+  min-height: calc(6 * 1.25em);
+  padding: 4px;
+  border: 1px solid var(--colorHighlightBg, currentcolor);
+  border-radius: 3px;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  background-color: transparent;
+  resize: vertical;
+  user-select: text;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-repository-editor] > button {
+  flex: 1;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  color: inherit;
+  font: inherit;
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+  cursor: default;
+}

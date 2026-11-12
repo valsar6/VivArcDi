@@ -1,3 +1,4 @@
+import { LinkId } from "../../core/LinkId.js";
 const DROP_ATTRIBUTE = "data-vivarcdi-drop";
 const FOLDER_ATTRIBUTE = "data-vivarcdi-folder-id";
 const LINK_ATTRIBUTE = "data-vivarcdi-link-id";
@@ -14,7 +15,8 @@ class DropTargets {
    * rectangles of the rows, since Vivaldi moves tabs with the mouse and sends no drag events. On a
    * folder row the upper and lower quarters are the gaps next to it and the rest is the folder; on
    * a link row the upper and lower halves are the gaps. A row inside a folder stands for that
-   * folder: a tab released over it goes to the end of the folder.
+   * folder: a tab released over it goes to the end of the folder. The folders and rows of a
+   * live folder are not drop targets: over them there is no target.
    *
    * @param section Gives the element of the folders section.
    * @param header Gives the element of the space header, if it is in the window.
@@ -36,12 +38,16 @@ class DropTargets {
     if (section.hasAttribute("hidden") || !DropTargets.#inside(section, x, y)) {
       return null;
     }
-    const rows = DropTargets.#rows(section);
+    const all = DropTargets.#rows(section);
+    const holds = (row) => y >= row.top && y < row.top + row.height;
+    return all.find(holds)?.virtual === true ? null : DropTargets.#among(all.filter((row) => !row.virtual), y, holds);
+  }
+  static #among(rows, y, holds) {
     const first = rows[0];
     if (first === void 0) {
       return null;
     }
-    const index = rows.findIndex((row) => y >= row.top && y < row.top + row.height);
+    const index = rows.findIndex(holds);
     if (index >= 0) {
       return DropTargets.#onRow(rows, index, y);
     }
@@ -116,7 +122,7 @@ class DropTargets {
       const element = child;
       const id = element.getAttribute(FOLDER_ATTRIBUTE) ?? element.getAttribute(LINK_ATTRIBUTE);
       const { top, height } = element.getBoundingClientRect();
-      return id === null ? [] : [{ element, id, isFolder: element.hasAttribute(FOLDER_ATTRIBUTE), depth: Number(element.getAttribute(DEPTH_ATTRIBUTE) ?? 0), top, height }];
+      return id === null ? [] : [{ element, id, isFolder: element.hasAttribute(FOLDER_ATTRIBUTE), virtual: LinkId.isVirtual(id), depth: Number(element.getAttribute(DEPTH_ATTRIBUTE) ?? 0), top, height }];
     });
   }
   static #inside(element, x, y) {

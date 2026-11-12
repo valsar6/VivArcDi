@@ -237,6 +237,7 @@ installer stops and tells you to download a release build or to run `make build`
 | `status` | Shows which builds are patched and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
 | `theme apply\|restore\|status` | Adds the "VivArcDi Light" theme to the Vivaldi profile and selects it, backs it up first; `restore` selects the previous theme again; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
+| `live-folders token [--remove]` | Asks for a GitHub token without echo and stores it for the [live folders](#live-folders), in a file only you can read; `--remove` deletes it. `uninstall` deletes it too |
 | `window` | Opens the VivArcDi window, the same one as in the app and the package |
 
 Add `--quiet` to print only warnings and errors. On Debian, every command but `status`, `shortcuts` and `theme` needs `sudo`; `shortcuts` and `theme` refuse it.
@@ -442,8 +443,10 @@ points to the side and:
   active one stay. Opening a hidden pinned tab or link another way shows it at once.
 
 Each workspace remembers if you left it collapsed, also after a restart. Outside any workspace the
-row is named `Tabs`, with no icon. The row has no menu: renaming, changing the icon and deleting a
-workspace stay in Vivaldi's workspace menu, and a rename shows in the row.
+row is named `Tabs`, with no icon. A right click on the row opens a menu with `New Folder`, the same
+as the `+` button, and `Live Folders` › `GitHub`, which adds a [live folder](#live-folders).
+Renaming, changing the icon and deleting a workspace stay in Vivaldi's workspace menu, and a rename
+shows in the row.
 
 Vivaldi's `icon` field of a workspace has no documented format. The row shows it as text when it is
 a short emoji or symbol (at most two characters), and otherwise draws the first letter of the name
@@ -550,6 +553,32 @@ merges options from an older install.
 
 If no folder matches the root of the active workspace, the section stays hidden and the console says
 so once for that path.
+
+## Live folders
+
+A live folder in the tab bar fills itself, like the Live Folders of Arc
+([spec 026](specs/026-live-folders/spec.md), [manual](docs/manual/live-folders.md)). The only source is
+GitHub: the folder lists the open pull requests that you created or whose review is requested from
+you, newest update first, each with its title and, under it, `author · owner/repo`. A click opens the
+pull request as a link tab of the workspace; a pull request that closes leaves the folder.
+
+- Right click the space header, then `Live Folders` › `GitHub`, to add a folder named `Pull Requests`.
+  Several are allowed in one workspace, each with its own filters, and a double click renames one.
+- Right click the folder: `Pull Requests` › `Created By Me`, `Review Requests` and `Drafts` (all on by
+  default) and `Repositories…` (one `owner/repo` per line; empty means every repository), then
+  `Refresh` and `Delete Live Folder`. Folders, filters and the last rows are kept per workspace, and
+  the rows are not bookmarks: no bookmark is written or removed.
+- It refreshes every `refreshMinutes`, when the folder is opened and after a filter change. If a
+  refresh fails the folder keeps its rows and shows a warning mark that says why.
+- It needs a GitHub token that can read pull requests. Run `vivarcdi live-folders token` (or
+  `python3 installer live-folders token`); until then the folder shows one row, `Connect GitHub`. The
+  token lives in a file only you can read, next to the installer's data and the deployed payload, and
+  is never written to the browser's storage or to the console.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `enabled` | `true` | Set to `false` and no live folder is drawn or refreshed |
+| `refreshMinutes` | `5` | Minutes between two refreshes of every live folder (1 or more) |
 
 ## Folder panel
 

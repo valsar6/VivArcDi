@@ -25,7 +25,15 @@ class FolderRows {
   }
   static #folder(folder, sources) {
     const open = sources.isOpen(folder.id);
-    const own = { kind: "folder", id: folder.id, title: folder.title, depth: folder.depth, open };
+    const own = {
+      kind: "folder",
+      id: folder.id,
+      title: folder.title,
+      depth: folder.depth,
+      open,
+      ...folder.live === void 0 ? {} : { live: folder.live },
+      ...folder.warning === void 0 ? {} : { warning: folder.warning }
+    };
     if (open) {
       return [own, ...FolderRows.build(folder.children, sources)];
     }
@@ -38,7 +46,8 @@ class FolderRows {
   static #link(link, depth, sources) {
     const tab = sources.tabFor(link);
     const otherTitle = tab !== void 0 && tab.key !== link.key ? tab.title : void 0;
-    return { kind: "link", id: link.id, title: otherTitle !== void 0 && otherTitle !== "" ? otherTitle : link.title, url: link.url, key: link.key, depth, tab };
+    const title = otherTitle !== void 0 && otherTitle !== "" ? otherTitle : link.title;
+    return { kind: "link", id: link.id, title, url: link.url, key: link.key, depth, tab, ...link.subtitle === void 0 ? {} : { subtitle: link.subtitle } };
   }
 }
 export {

@@ -1,9 +1,11 @@
 import { ActiveWorkspace } from "../../core/ActiveWorkspace.js";
 import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
+import { ContextMenu } from "../../core/ContextMenu.js";
 import { FolderCommands } from "../../core/FolderCommands.js";
 import { HiddenTabs } from "../../core/HiddenTabs.js";
 import { Module } from "../../core/Module.js";
 import { SpaceCollapse } from "../../core/SpaceCollapse.js";
+import { SpaceMenuItems } from "../../core/SpaceMenuItems.js";
 import { TabBarAnchor } from "../../core/TabBarAnchor.js";
 import { WorkspaceNames } from "../../core/WorkspaceNames.js";
 import { CollapsedPinned } from "./CollapsedPinned.js";
@@ -12,6 +14,7 @@ import { SpaceHeaderView } from "./SpaceHeaderView.js";
 import { SpaceIcon } from "./SpaceIcon.js";
 const ANCHOR_ORDER = 15;
 const DEFAULT_NAME = "Tabs";
+const NEW_FOLDER_LABEL = "New Folder";
 class SpaceHeader extends Module {
   static id = "space-header";
   #stops = [];
@@ -21,8 +24,9 @@ class SpaceHeader extends Module {
    * workspace, as the space header of Arc. A click collapses the workspace: the folders section
    * shows only the links that are open, and the pinned tabs that are unloaded are hidden. Each
    * workspace remembers its state after a restart. Outside any workspace, or when the list of
-   * workspaces cannot be read, the row is named `Tabs`. Without `chrome.tabs` or the tab bar it
-   * stays off.
+   * workspaces cannot be read, the row is named `Tabs`. A right click on the row opens a menu with
+   * New Folder, the same as the `+`, and the items that other modules add. Without `chrome.tabs`
+   * or the tab bar it stays off.
    *
    * @param context What the module may use.
    */
@@ -54,17 +58,32 @@ class SpaceHeader extends Module {
     const hidden = HiddenTabs.of(document);
     const active = new ActiveWorkspace(tabs, (workspace) => void this.#show(workspace), logger);
     return {
+      document,
       collapse,
       spaces: new CollapsedSpaces(storage, logger),
-      view: new SpaceHeaderView(document, () => this.#toggle(), () => FolderCommands.of(document).requestNewFolder()),
+      view: new SpaceHeaderView(
+        document,
+        () => this.#toggle(),
+        () => FolderCommands.of(document).requestNewFolder(),
+        (x, y) => this.#openMenu(x, y)
+      ),
       names: new WorkspaceNames(prefs, () => this.#render(), logger),
       active,
       marker: new HiddenTabMarker(document, selectors, hidden),
-      pinned: new CollapsedPinned(tabs, { collapse, hidden, workspace: () => active.current }, logger)
+      pinned: new CollapsedPinned(tabs, { collapse, hidden, workspace: () => active.current }, logger),
+      menu: new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body })
     };
   }
-  async #run({ document, selectors }, { collapse, view, names, active, marker, pinned }) {
+  #openMenu(x, y) {
+    if (this.#parts !== null) {
+      const { document } = this.#parts;
+      const items = [{ label: NEW_FOLDER_LABEL, run: () => FolderCommands.of(document).requestNewFolder() }, ...SpaceMenuItems.of(document).items()];
+      this.#parts.menu.open(items, x, y);
+    }
+  }
+  async #run({ document, selectors }, { collapse, view, names, active, marker, pinned, menu }) {
     this.#stops.push(
+      () => menu.close(),
       () => collapse.set(false),
       () => names.stop(),
       () => active.stop(),

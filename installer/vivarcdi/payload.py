@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import json
 import shutil
@@ -5,6 +7,7 @@ from pathlib import Path
 
 from .distribution import require_dist
 from .installation import VivaldiInstallation
+from .live_token import TokenVault
 
 BUILD_FILE = "build.json"
 IGNORED_NAMES = {"__pycache__", ".DS_Store"}
@@ -14,12 +17,14 @@ class PayloadDeployer:
     """Copies the built VivArcDi payload (the dist folder) next to window.html.
 
     It also writes build.json, which tells the loader which VivArcDi and
-    Vivaldi versions it runs on, and which payload files were deployed.
+    Vivaldi versions it runs on, and which payload files were deployed. The GitHub token of the
+    live folders, when one is stored, is copied into every fresh payload.
     """
 
-    def __init__(self, source_dir: Path, vivarcdi_version: str):
+    def __init__(self, source_dir: Path, vivarcdi_version: str, vault: TokenVault | None = None):
         self._source_dir = source_dir
         self._vivarcdi_version = vivarcdi_version
+        self._vault = vault
 
     def deploy(self, installation: VivaldiInstallation) -> None:
         """Replace the payload of an installation with a fresh copy.
@@ -33,6 +38,8 @@ class PayloadDeployer:
             installation.payload_dir,
             ignore=shutil.ignore_patterns(*IGNORED_NAMES),
         )
+        if self._vault is not None:
+            self._vault.copy_to(installation.payload_dir)
         build = self._build_info(installation)
         (installation.payload_dir / BUILD_FILE).write_text(json.dumps(build, indent=2) + "\n")
 

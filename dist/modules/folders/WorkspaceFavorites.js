@@ -1,6 +1,7 @@
 import { AddressKey } from "../../core/AddressKey.js";
 import { BookmarkCopier } from "../../core/bookmarks/BookmarkCopier.js";
 import { KeptTab } from "../../core/KeptTab.js";
+import { LinkId } from "../../core/LinkId.js";
 import { TabData } from "../../core/TabData.js";
 const NEW_FOLDER_TITLE = "Untitled";
 class WorkspaceFavorites {
@@ -128,6 +129,9 @@ class WorkspaceFavorites {
     return tab.id === void 0 || bookmarkId === void 0 ? "none" : this.#takeLink(bookmarkId, tab.id);
   }
   async #takeLink(bookmarkId, tabId) {
+    if (LinkId.isVirtual(bookmarkId)) {
+      return "none";
+    }
     try {
       if (!await this.#owns(bookmarkId)) {
         return "kept";

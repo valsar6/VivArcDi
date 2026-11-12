@@ -1,11 +1,9 @@
 import { EDIT_ATTRIBUTE, FolderNameEditor } from "./FolderNameEditor.js";
+import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from "./FolderRowElement.js";
 import { LinkIcon } from "./LinkIcon.js";
 import { LEAVING_ATTRIBUTE, RowTransition } from "./RowTransition.js";
-const ICON_CLASS = "vivarcdi-folders-icon";
-const LETTER_CLASS = "vivarcdi-folders-icon vivarcdi-folders-letter";
+const LETTER_CLASS = `${ICON_CLASS} vivarcdi-folders-letter`;
 const ROW_ATTRIBUTES = ["data-vivarcdi-folder-id", "data-vivarcdi-link-id"];
-const CLOSE_ATTRIBUTE = "data-vivarcdi-link-close";
-const CLOSE_LABEL = "Close tab";
 const CLICK_DELAY_MS = 250;
 const LEAVE_MS = 220;
 const defaultTimers = {
@@ -13,12 +11,12 @@ const defaultTimers = {
   clear: (handle) => clearTimeout(handle)
 };
 class FolderSectionView {
-  #document;
   #handlers;
   #element;
   #links = /* @__PURE__ */ new Map();
   #timers;
   #editor;
+  #elements;
   #rows = [];
   #toggle = null;
   #toggled = false;
@@ -27,23 +25,26 @@ class FolderSectionView {
    * Draws the rows of the section with plain DOM calls and handles every click with one listener.
    * It reads nothing from the bookmarks and changes none: a new name is only reported. The name of
    * a folder row can be edited in place. A single click on a folder row waits for the double click
-   * time, so that a double click edits the name and does not toggle the folder.
+   * time, so that a double click edits the name and does not toggle the folder. A live folder
+   * row has its own icon and a warning mark, a right click on it reports the point for its menu,
+   * and a link row with a subtitle shows it under the title.
    *
    * @param document The browser window document.
-   * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, and what a new name does.
+   * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, what a new name does, and what a right click on a live folder does.
    * @param maxHeightPercent The most the section may take of the window's height before it scrolls.
    * @param timers Timers, replaceable in tests.
    */
   constructor(document, handlers, maxHeightPercent, timers = defaultTimers) {
-    this.#document = document;
     this.#handlers = handlers;
     this.#timers = timers;
     this.#editor = new FolderNameEditor(document, timers, (id, name) => this.#finished(id, name));
+    this.#elements = new FolderRowElement(document, this.#editor);
     this.#element = document.createElement("div");
     this.#element.setAttribute("data-vivarcdi-folders", "");
     this.#element.style.setProperty("--vivarcdi-folders-max-height", String(maxHeightPercent));
     this.#element.addEventListener("click", (event) => this.#click(event));
     this.#element.addEventListener("dblclick", (event) => this.#doubleClick(event));
+    this.#element.addEventListener("contextmenu", (event) => this.#contextMenu(event), true);
     this.#element.addEventListener("error", (event) => LinkIcon.fallback(event, LETTER_CLASS), true);
   }
   /**
@@ -113,44 +114,10 @@ class FolderSectionView {
     }
   }
   #row(row) {
-    const element = this.#document.createElement("div");
-    element.setAttribute("role", row.kind === "folder" ? "treeitem" : "link");
-    element.setAttribute("title", row.title);
-    element.style.setProperty("--vivarcdi-depth", String(row.depth));
-    element.setAttribute("data-vivarcdi-depth", String(row.depth));
-    const label = this.#document.createElement("span");
-    label.className = "vivarcdi-folders-title";
-    label.textContent = row.title;
-    if (row.kind === "folder") {
-      element.setAttribute("data-vivarcdi-folder-id", row.id);
-      element.toggleAttribute("data-vivarcdi-open", row.open);
-      element.setAttribute("aria-expanded", String(row.open));
-      element.append(this.#folderIcon(), this.#editor.isEditing(row.id) ? this.#editor.field() : label);
-    } else {
+    if (row.kind === "link") {
       this.#links.set(row.id, { target: { id: row.id, url: row.url, key: row.key }, tabId: row.tab?.tabId });
-      element.setAttribute("data-vivarcdi-link-id", row.id);
-      element.toggleAttribute("data-vivarcdi-link-open", row.tab !== void 0);
-      element.toggleAttribute("data-vivarcdi-link-active", row.tab?.active === true);
-      element.toggleAttribute("data-vivarcdi-link-unloaded", row.tab?.unloaded === true);
-      element.append(this.#linkIcon(row), label, ...row.tab === void 0 ? [] : [this.#closeButton()]);
     }
-    return element;
-  }
-  #folderIcon() {
-    const icon = this.#document.createElement("span");
-    icon.className = "vivarcdi-folders-folder-icon";
-    return icon;
-  }
-  #linkIcon(row) {
-    return LinkIcon.create(this.#document, row, ICON_CLASS, row.tab?.favIconUrl);
-  }
-  #closeButton() {
-    const button = this.#document.createElement("span");
-    button.className = "vivarcdi-folders-close";
-    button.setAttribute("role", "button");
-    button.setAttribute("aria-label", CLOSE_LABEL);
-    button.setAttribute(CLOSE_ATTRIBUTE, "");
-    return button;
+    return this.#elements.create(row);
   }
   #click(event) {
     const target = event.target;
@@ -169,6 +136,15 @@ class FolderSectionView {
     const folderId = FolderSectionView.#rowOf(target)?.getAttribute("data-vivarcdi-folder-id") ?? null;
     if (folderId !== null && target?.closest(`[${EDIT_ATTRIBUTE}]`) == null) {
       this.edit(folderId);
+    }
+  }
+  #contextMenu(event) {
+    const row = FolderSectionView.#rowOf(event.target);
+    const folderId = row?.hasAttribute(LIVE_FOLDER_ATTRIBUTE) === true ? row.getAttribute("data-vivarcdi-folder-id") : null;
+    if (folderId !== null) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.#handlers.onMenu(folderId, event.clientX, event.clientY);
     }
   }
   #finished(folderId, name) {

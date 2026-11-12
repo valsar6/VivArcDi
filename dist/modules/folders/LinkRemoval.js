@@ -1,3 +1,4 @@
+import { LinkId } from "../../core/LinkId.js";
 import { TabData } from "../../core/TabData.js";
 import { TabRowMove } from "../../core/TabRowMove.js";
 import { FAILED_TEXT, KEPT_TEXT } from "./FavoriteShortcut.js";
@@ -88,12 +89,16 @@ class LinkRemoval {
     }
   }
   /**
-   * Keeps the page of a link at a place and takes the link out.
+   * Keeps the page of a link at a place and takes the link out. A row of a live folder is not a
+   * bookmark and is left alone.
    *
    * @param linkId The bookmark of the link.
    * @param place Where the page goes.
    */
   async moveTo(linkId, place) {
+    if (LinkId.isVirtual(linkId)) {
+      return;
+    }
     try {
       const { title, url } = await this.#deps.writer.get(linkId);
       if (url === void 0) {

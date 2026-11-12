@@ -9,13 +9,15 @@ class SpaceHeaderView {
   /**
    * The row above the folders: an arrow, the icon and the name of the workspace, and a `+` button
    * that shows on hover. A click anywhere on the row calls the first handler, except on the
-   * button, which calls the second one; the view keeps no state of its own.
+   * button, which calls the second one. A right click on the row cancels Vivaldi's menu and
+   * reports the point, so that VivArcDi's own menu opens there; the view keeps no state of its own.
    *
    * @param document The browser window document.
    * @param onToggle Called when the row is clicked.
    * @param onNewFolder Called when the `+` button is clicked.
+   * @param onMenu Called with the pointer position when the row is right-clicked.
    */
-  constructor(document, onToggle, onNewFolder) {
+  constructor(document, onToggle, onNewFolder, onMenu) {
     this.#document = document;
     this.#add = SpaceHeaderView.#addButton(document, onNewFolder);
     this.#element = document.createElement("div");
@@ -26,6 +28,11 @@ class SpaceHeaderView {
       if (event.target?.closest(`[${ADD_ATTRIBUTE}]`) == null) {
         onToggle();
       }
+    });
+    this.#element.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onMenu(event.clientX, event.clientY);
     });
   }
   /**
