@@ -6,8 +6,9 @@
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was approved on 2026-11-12 (PR #160). It says **how**; the spec says **what**.
-This version designs **step 1** of the Delivery (`Delete`, `Rename…`) in full, and only sketches steps
-2 to 4, which get their own design revision before their code.
+Step 1 of the Delivery (`Delete`, `Rename…`) is designed in full and shipped in 0.57.0; step 2
+(`Duplicate`, `Move to ▸`) is designed below; steps 3 and 4 are sketched and get their own revision
+before their code.
 
 ## Approach
 
@@ -65,15 +66,58 @@ which would bring the tabs of the deleted links back to today's list for a momen
 them. `FolderDeletion` therefore registers the tab ids it is about to close in a short-lived set that
 `unlinkExcept`'s `keep` callback honours, so those tabs stay hidden until they are closed.
 
-### Steps 2 to 4 (sketch)
+### Step 2: Duplicate and Move to (FR-6, FR-7)
+
+Revision of 2026-11-12, after step 1 shipped in 0.57.0 (PR #164).
+
+**Items.** `FolderMenuItems` fills its middle group with `Duplicate` and `Move to ▸`, in this order,
+after the group of `Rename…` (AC-1). `Move to ▸` is a `SubmenuItem` of the shared `ContextMenu`, whose
+items are built when the menu opens.
+
+**Duplicate (AC-8).** A new `FolderDuplication` in `src/modules/folders`:
+
+1. `BookmarkWriter.get(folderId)` gives the parent and the index of the folder.
+2. `BookmarkCopier.copy([folderId], parentId, index + 1)` (018) copies the folder with all its
+   subfolders and links right below it, with the same names; the copier already skips separators and
+   rolls back a half-made copy.
+3. The copy is closed (its new id is not in `OpenFolders`) and has no tabs, since tabs are linked to
+   bookmark ids and the copy has new ones.
+
+A failure keeps the original as it was and shows `Could not duplicate "<name>"` (AC-6).
+
+**Move to ▸ (AC-9, AC-10).** A new `FolderRelocation` in `src/modules/folders`:
+
+- **Submenu.** One item per entry of `WorkspaceNames.entries`, in Vivaldi's order, labelled with the
+  workspace name; the current workspace (`ActiveWorkspace.current`) has `checked: true` and does
+  nothing when chosen. Outside any workspace no item is checked.
+- **Target root.** `WorkspaceRoots.rootFor(name)` gives the path of the target workspace's root (its
+  entry in `workspaces`, a non-empty `root`, or `VivArcDi/<name>`); `BookmarkWriter.ensurePath` creates
+  it on the first write, as 012 FR-5 does.
+- **Same root.** IF the target root is the same folder as the current one (both workspaces use one
+  non-empty `root`), THEN nothing moves and a toast says `"<name>" is already there`.
+- **Order of the writes.** The tabs of the folder's links (any depth, found as in step 1) are read
+  first. Then `BookmarkWriter.move(folderId, { parentId: targetRootId })` puts the folder at the end of
+  the target root. Only after that, each of those tabs gets the target `workspaceId` with
+  `TabDataWriter` and `TabData.withWorkspace`, so it shows under the folder in the other workspace and
+  leaves this one. `OpenFolders` forgets the folder in this workspace.
+- **Toast.** `Moved "<name>" to <workspace>`.
+
+A failure of the bookmark move leaves the folder and the tabs where they were and shows `Could not move
+"<name>"`; a failure on one tab is logged and the other tabs still move.
+
+**Shared pieces.** Finding the link ids and the tab ids of a folder is now needed by `Delete` and
+`Move to`, so it moves out of `FolderDeletion` into `FolderLinkTabs` (`linkIds(folder)`,
+`tabsOf(linkIds)`), used by both.
+`ClosingLinks` is used by the move as well, so the moving tabs do not flash in today's list while the
+bookmarks change.
+
+### Steps 3 and 4 (sketch)
 
 | Step | Items | Plan |
 |---|---|---|
-| 2 | `Duplicate` | `BookmarkCopier` of 018, target = parent of the folder, index + 1. |
-| 2 | `Move to ▸` | Submenu from `WorkspaceNames`; `WorkspaceRoots` + `ensurePath` for the target root, `BookmarkWriter.move`, then the open tabs get the target `workspaceId` in `vivExtData`. |
 | 3 | `New Nested Folder…` | `WorkspaceFavorites.addFolder(parentId)`, `OpenFolders` opens the parent, `view.edit(newId)`. |
 | 3 | `Change Icon…` | Popover with 24 inline SVG symbols; storage field chosen by a probe (Q-5). |
-| 4 | `Turn into Space` | `WorkspaceCreator` of 030, then step-2 move of the content and the tabs, then switch. |
+| 4 | `Turn into Space` | `WorkspaceCreator` of 030, then the step-2 move of the content and the tabs, then switch. |
 
 ## Files
 
@@ -87,6 +131,9 @@ them. `FolderDeletion` therefore registers the tab ids it is about to close in a
 | `src/modules/folders/FolderDeletion.ts` | New: tabs, move to Trash, close, toast. |
 | `src/modules/folders/OpenFolders.ts` | `forget(id)`. |
 | `src/modules/folders/FolderDragDrop.ts`, `FolderEditing.ts`, `FolderSection.ts` | Wiring and the `keep` set. |
+| `src/modules/folders/FolderLinkTabs.ts` | Step 2. New: link ids and tab ids of a folder, taken out of `FolderDeletion`. |
+| `src/modules/folders/FolderDuplication.ts` | Step 2. New: `Duplicate`. |
+| `src/modules/folders/FolderRelocation.ts` | Step 2. New: `Move to ▸` and its submenu. |
 
 ## Risks
 
