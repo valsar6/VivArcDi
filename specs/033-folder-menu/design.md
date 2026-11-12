@@ -90,10 +90,9 @@ them. `FolderDeletion` therefore registers the tab ids it is about to close in a
 
 ## Risks
 
-- **Moving into the Trash through `chrome.bookmarks.move`.** The probe found the node but did not
-  write. Vivaldi might refuse a move into it. T1 is a probe that moves a throw-away folder there; if it
-  fails, the design is revised before the code (for example with `vivaldi.bookmarksPrivate`), never by
-  erasing.
+- **Moving into the Trash through `chrome.bookmarks.move`.** Checked by the T1 probe (2026-11-12):
+  Vivaldi accepted the move of a folder with a link into node `4`, kept its content, and the Bookmarks
+  panel showed it in the Trash.
 - **The Trash is synced and emptied by Vivaldi.** A deleted folder lives as long as Vivaldi keeps the
   Trash, as for a delete from the Bookmarks panel.
 - **A tab of a deleted link in another window.** `tabs.query({})` covers every window, so it is closed

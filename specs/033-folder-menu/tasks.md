@@ -12,9 +12,9 @@ the version; steps 2 to 4 get their own tasks with their design revision.
 
 ## Step 1: Delete and Rename…
 
-- [ ] **T1.** Probe for Tore that creates a throw-away folder `VivArcDi probe 033`, moves it into the
+- [x] **T1.** Probe for Tore that creates a throw-away folder `VivArcDi probe 033`, moves it into the
   Trash with `chrome.bookmarks.move` and reports the result (`folder-delete/sonda-sposta-nel-cestino`
-  in the project files). Decides the risk of the design.
+  in the project files). Done 2026-11-12: Tore's Vivaldi moved the folder into the Trash (node `4`) with its link, and the panel showed it there.
 - [ ] **T2.** `ContextMenu` separator item; `BookmarkNode.trash`; `BookmarkTrash` with tests on a fake
   tree (found, cached, missing).
 - [ ] **T3.** `FolderMenuItems` and `FolderMenu`, wired in `FolderDragDrop`. AC-1, AC-2, AC-7.
