@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) pending approval |
+| Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) approved 2026-11-12 (PR #146 merged by Tore) |
 
 ## Summary
 

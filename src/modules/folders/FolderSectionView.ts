@@ -1,6 +1,7 @@
 import { EDIT_ATTRIBUTE, FolderNameEditor } from './FolderNameEditor.js';
 import type { Row } from './FolderRows.js';
 import { LinkIcon } from './LinkIcon.js';
+import { LEAVING_ATTRIBUTE, RowTransition } from './RowTransition.js';
 
 export interface SectionHandlers {
   onFolder: (folderId: string) => void;
@@ -26,6 +27,7 @@ const ROW_ATTRIBUTES = ['data-vivarcdi-folder-id', 'data-vivarcdi-link-id'] as c
 const CLOSE_ATTRIBUTE = 'data-vivarcdi-link-close';
 const CLOSE_LABEL = 'Close tab';
 const CLICK_DELAY_MS = 250;
+const LEAVE_MS = 220;
 
 const defaultTimers: ViewTimers = {
   set: (run, delayMs) => setTimeout(run, delayMs),
@@ -41,6 +43,8 @@ export class FolderSectionView {
   #editor: FolderNameEditor;
   #rows: Row[] = [];
   #toggle: unknown = null;
+  #toggled = false;
+  #leaving: unknown = null;
 
   /**
    * Draws the rows of the section with plain DOM calls and handles every click with one listener.
@@ -80,10 +84,17 @@ export class FolderSectionView {
    * @param rows What to show.
    */
   public render(rows: Row[]): void {
-    this.#rows = rows;
+    this.#cancelLeave();
     this.#editor.prepare(rows);
     this.#links.clear();
-    this.#element.replaceChildren(...rows.map((row) => this.#row(row)));
+    const drawn = this.#toggled ? RowTransition.merge(this.#rows, rows) : rows.map((row) => ({ row, state: 'steady' as const }));
+    this.#rows = rows;
+    this.#toggled = false;
+    const elements = drawn.map(({ row, state }) => RowTransition.mark(this.#row(row), state));
+    this.#element.replaceChildren(...elements);
+    if (drawn.some(({ state }) => state === 'leaving')) {
+      this.#leaving = this.#timers.set(() => elements.filter((node) => node.hasAttribute(LEAVING_ATTRIBUTE)).forEach((node) => node.remove()), LEAVE_MS);
+    }
     this.#element.toggleAttribute('hidden', rows.length === 0);
     this.#editor.focus();
   }
@@ -119,8 +130,16 @@ export class FolderSectionView {
    */
   public remove(): void {
     this.#cancelToggle();
+    this.#cancelLeave();
     this.#editor.dispose();
     this.#element.remove();
+  }
+
+  #cancelLeave(): void {
+    if (this.#leaving !== null) {
+      this.#timers.clear(this.#leaving);
+      this.#leaving = null;
+    }
   }
 
   #row(row: Row): HTMLElement {
@@ -219,6 +238,7 @@ export class FolderSectionView {
     }
     this.#toggle = this.#timers.set(() => {
       this.#toggle = null;
+      this.#toggled = true;
       this.#handlers.onFolder(folderId);
     }, CLICK_DELAY_MS);
   }

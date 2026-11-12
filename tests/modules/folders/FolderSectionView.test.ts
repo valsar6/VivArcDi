@@ -190,3 +190,40 @@ test('edits a folder that is drawn after the request, but not one that never com
   view.render([folderRow('30', 'Late')]);
   assert.equal(inputOf(view), undefined);
 });
+
+const openFolder = (open: boolean): Row => ({ kind: 'folder', id: '5', title: 'Music', depth: 0, open });
+const childRow: Row = { kind: 'link', id: '12', title: 'Guitar', url: MAHJONG, key: KEY, depth: 1, tab: undefined };
+const childrenOf = (view: FolderSectionView): DomNode[] => (view.element as unknown as DomNode).children;
+
+test('marks the folder row open and closed for its icon', async () => {
+  const { view } = await setup(new FolderTabs());
+  view.render([openFolder(false)]);
+  assert.equal(rowOf(view).hasAttribute('data-vivarcdi-open'), false);
+  view.render([openFolder(true)]);
+  assert.equal(rowOf(view).hasAttribute('data-vivarcdi-open'), true);
+});
+
+test('animates the rows of a folder opened and closed by a click', async () => {
+  const { view, timers } = await setup(new FolderTabs());
+  view.render([openFolder(false)]);
+  rowOf(view).click();
+  timers.fire();
+  view.render([openFolder(true), childRow]);
+  assert.equal(childrenOf(view)[1]?.hasAttribute('data-vivarcdi-entering'), true);
+  childrenOf(view)[0]?.click();
+  timers.fire();
+  view.render([openFolder(false)]);
+  assert.equal(childrenOf(view).length, 2);
+  assert.equal(childrenOf(view)[1]?.hasAttribute('data-vivarcdi-leaving'), true);
+  timers.fire();
+  assert.equal(childrenOf(view).length, 1);
+});
+
+test('draws rows at once when no folder was clicked', async () => {
+  const { view } = await setup(new FolderTabs());
+  view.render([openFolder(false)]);
+  view.render([openFolder(true), childRow]);
+  assert.equal(childrenOf(view)[1]?.hasAttribute('data-vivarcdi-entering'), false);
+  view.render([openFolder(false)]);
+  assert.equal(childrenOf(view).length, 1);
+});
