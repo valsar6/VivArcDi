@@ -174,8 +174,8 @@ Q-1 again. Until Tore approves it, the approved text above stays in force.
 ### Expected behavior
 
 - **Workspaces travel.** The sync store keeps the list of workspaces: name, icon and order. When a
-  computer lacks a workspace of the list, VivArcDi creates it there, with the same name and icon, in
-  the same position, and its pinned tabs arrive in it as in FR-2. Nothing is asked of the user.
+  computer lacks a workspace of the list, VivArcDi creates it there through Vivaldi's own menu, with
+  the same name (icon: Q-10), at the end of the list, and its pinned tabs arrive in it as in FR-2. Nothing is asked of the user.
 - **Folders come with them.** The folders of a workspace are bookmarks under
   `VivArcDi/<workspace name>` (010), which Vivaldi Sync already carries; a workspace created with
   the same name shows them at once. The Favorites grid is the same in every workspace (003) and
@@ -185,13 +185,13 @@ Q-1 again. Until Tore approves it, the approved text above stays in force.
   other, and its store folder with it.
 - **Deleting is never automatic** (Q-7): a workspace deleted on one computer is only removed from the
   store; the other computer keeps it, with its tabs, until the user deletes it there.
-- If Vivaldi does not let VivArcDi create workspaces (Q-6), the approved behavior stays: the missing
-  workspaces are named in a message.
+- If the menu cannot be driven (a future Vivaldi changes it), the approved behavior stays: the
+  missing workspaces are named in a message.
 
 ### Requirements
 
 - **FR-7 (revised).** WHEN the sync store lists a workspace that this computer lacks, VivArcDi creates
-  it with the stored name, icon and position, then applies its pinned tabs.
+  it through Vivaldi's workspace menu with the stored name, then applies its pinned tabs.
 - **FR-9.** VivArcDi keeps the list of workspaces (sync id, name, icon, order) in the sync store and
   updates it within 2 seconds of a change on this computer.
 - **FR-10.** A workspace renamed on one computer is renamed on the other, matched by its sync id.
@@ -202,7 +202,7 @@ Q-1 again. Until Tore approves it, the approved text above stays in force.
 | ID | Criterion | Check |
 |---|---|---|
 | AC-15 (revised) | WHEN Tore creates a workspace on one computer, THE other computer SHALL show it, with its icon and pinned tabs, after Vivaldi Sync runs, without any step by Tore. | manual |
-| AC-16 (revised) | WHEN the sync store lists a workspace this computer lacks, THE module SHALL create it with the stored name, icon and position. | auto: `creates a workspace missing here` |
+| AC-16 (revised) | WHEN the sync store lists a workspace this computer lacks, THE module SHALL create it through Vivaldi's workspace menu with the stored name. | auto: `creates a workspace missing here` |
 | AC-17 | WHEN a workspace is created, renamed, re-iconed or moved, THE module SHALL update the list in the sync store. | auto: `stores the list of workspaces` |
 | AC-18 | WHEN a workspace is renamed on another computer, THE module SHALL rename the matching workspace here. | auto: `follows a rename from another computer` |
 | AC-19 | WHEN a workspace is deleted on another computer, THE module SHALL keep it here. | auto: `keeps a workspace deleted elsewhere` |
@@ -211,11 +211,19 @@ Q-1 again. Until Tore approves it, the approved text above stays in force.
 
 ### Open questions
 
-- [ ] **Q-6. Can VivArcDi create a workspace?** To be probed
-  (`workspace-sync/sonda-crea-spazio.md`): add an entry to `vivaldi.workspaces.list` with
-  `vivaldi.prefs.set` and check that Vivaldi shows it at once and that it works. Proposed answer: if
-  it works, use it; if it needs a restart, create the workspaces at start-up; if Vivaldi refuses,
-  keep the message.
+- [x] **Q-6. Can VivArcDi create a workspace?** Yes, through Vivaldi's own menu (probes of
+  2026-11-12). Writing `vivaldi.workspaces.list` with `vivaldi.prefs.set` changes the preference but
+  Vivaldi neither shows the entry nor keeps it after a restart: the interface owns the list and writes
+  it back. There is no API to create a workspace. Driving the menu works: a full pointer sequence
+  (pointer and mouse down, up, click) on `button[data-name="WorkspaceButton"]` opens
+  `.WorkspacePopup`; the same on its "New workspace" button (`.actions button[aria-label]`) opens the
+  inline editor `form.Workspace-Editor` with `input[name="workspace-title"]`; writing the name
+  through the native value setter plus an `input` event and pressing `.actions input.primary`
+  ("Create") adds the workspace to Vivaldi's list. A plain `click()` does nothing. VivArcDi creates
+  the missing workspaces this way, one at a time, closing the menu after each.
+- [ ] **Q-10. The icon of a created workspace.** The editor has an icon and an emoji picker. Proposed
+  answer: the first version sets only the name, so a created workspace has Vivaldi's default icon;
+  the stored icon is applied in a later step after a probe of the picker.
 - [ ] **Q-7. Should a workspace deleted on one computer be deleted on the other?** Proposed answer:
   no, to never lose tabs; it is only dropped from the store.
 - [ ] **Q-8. What about the workspaces each computer already has?** Proposed answer: on the first run
