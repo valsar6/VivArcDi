@@ -15,5 +15,12 @@
   "addressField": "input.UrlBar-UrlField",
   "newTabButton": ".button-toolbar.newtab",
   "workspaceButton": ".tabbar-workspace-button",
+  "workspaceMenuButton": "button[data-name=\"WorkspaceButton\"]",
+  "workspacePopup": ".WorkspacePopup",
+  "workspaceCreate": ".WorkspacePopup .actions button[aria-label]",
+  "workspaceTitle": ".WorkspacePopup form.Workspace-Editor input[name=\"workspace-title\"]",
+  "workspaceForm": ".WorkspacePopup form.Workspace-Editor",
+  "workspaceSave": ".WorkspacePopup .actions input.primary",
+  "workspaceRow": ".WorkspacePopup button.workspace-item-wrapper",
   "popupHeader": ".toolbar-extensions, .toolbar-addressbar, .toolbar-mainbar, .UrlBar"
 }
