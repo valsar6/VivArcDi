@@ -78,7 +78,7 @@ class FolderSection {
       document,
       {
         onFolder: (id) => this.#toggle(id),
-        onLink: (link) => void activator.activate(link),
+        onLink: (link) => LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? void 0 : void activator.activate(link),
         onClose: (tabId) => void activator.close(tabId),
         onRename: (id, name) => void this.#editing.rename(id, name),
         onMenu: (id, x, y) => this.#virtual.openMenu(id, x, y)

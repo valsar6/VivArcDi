@@ -237,7 +237,6 @@ installer stops and tells you to download a release build or to run `make build`
 | `status` | Shows which builds are patched and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
 | `theme apply\|restore\|status` | Adds the "VivArcDi Light" theme to the Vivaldi profile and selects it, backs it up first; `restore` selects the previous theme again; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
-| `live-folders token [--remove]` | Asks for a GitHub token without echo and stores it for the [live folders](#live-folders), in a file only you can read; `--remove` deletes it. `uninstall` deletes it too |
 | `window` | Opens the VivArcDi window, the same one as in the app and the package |
 
 Add `--quiet` to print only warnings and errors. On Debian, every command but `status`, `shortcuts` and `theme` needs `sudo`; `shortcuts` and `theme` refuse it.
@@ -566,19 +565,22 @@ pull request as a link tab of the workspace; a pull request that closes leaves t
   Several are allowed in one workspace, each with its own filters, and a double click renames one.
 - Right click the folder: `Pull Requests` › `Created By Me`, `Review Requests` and `Drafts` (all on by
   default) and `Repositories…` (one `owner/repo` per line; empty means every repository), then
-  `Refresh` and `Delete Live Folder`. Folders, filters and the last rows are kept per workspace, and
-  the rows are not bookmarks: no bookmark is written or removed.
+  `Refresh`, `Disconnect GitHub` and `Delete Live Folder`. Right click a pull request: `Copy Link` and
+  `Archive Pull Request`, which hides it until it is updated on GitHub. Folders, filters and the last
+  rows are kept per workspace, and the rows are not bookmarks: no bookmark is written or removed.
 - It refreshes every `refreshMinutes`, when the folder is opened and after a filter change. If a
   refresh fails the folder keeps its rows and shows a warning mark that says why.
-- It needs a GitHub token that can read pull requests. Run `vivarcdi live-folders token` (or
-  `python3 installer live-folders token`); until then the folder shows one row, `Connect GitHub`. The
-  token lives in a file only you can read, next to the installer's data and the deployed payload, and
-  is never written to the browser's storage or to the console.
+- You connect GitHub from the browser, with no terminal. Until then the folder shows one row,
+  `Connect GitHub`: a click shows a code, `Copy code and open GitHub` copies it and opens GitHub's
+  sign-in page, and you press `Authorize`. The token stays in the browser profile's storage of
+  VivArcDi, is sent only to `api.github.com`, and is never written to the console. `Disconnect GitHub`
+  forgets it.
 
 | Option | Default | Meaning |
 |---|---|---|
 | `enabled` | `true` | Set to `false` and no live folder is drawn or refreshed |
 | `refreshMinutes` | `5` | Minutes between two refreshes of every live folder (1 or more) |
+| `githubClientId` | `""` | The client id of the `VivArcDi` OAuth App on GitHub; empty, and the folder says GitHub is not set up |
 
 ## Folder panel
 

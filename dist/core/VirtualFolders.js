@@ -98,7 +98,14 @@ class VirtualFolders {
     this.#handlers?.open(id);
   }
   /**
-   * @param id A virtual folder.
+   * @param id A virtual row the user clicked.
+   * @returns Whether the source took the click as one of its own actions, such as `Connect GitHub`.
+   */
+  activate(id) {
+    return this.#handlers?.activate(id) ?? false;
+  }
+  /**
+   * @param id A virtual folder or row.
    * @param x Horizontal position of the pointer in the window.
    * @param y Vertical position of the pointer in the window.
    */

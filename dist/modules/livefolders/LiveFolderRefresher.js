@@ -1,5 +1,6 @@
 import { SerialTask } from "../../core/SerialTask.js";
 import { GithubFailure, UNREACHABLE_REASON } from "./GithubPullRequests.js";
+import { ArchivedPullRequests } from "./ArchivedPullRequests.js";
 const defaultTicker = {
   every: (run, intervalMs) => {
     const handle = setInterval(run, intervalMs);
@@ -15,9 +16,10 @@ class LiveFolderRefresher {
   /**
    * Decides when the live folders refresh: at the start, every interval, and when the module asks
    * for one folder because the user opened it or changed its filters. Refreshes run one at a time,
-   * so a timer and a click never race. Without a token a folder gets the `Connect GitHub` row and
-   * no request is sent. A failed refresh keeps the rows and sets the warning to the reason, which
-   * is logged without any header.
+   * so a timer and a click never race. Without a connection a folder is emptied and no request is
+   * sent. A failed refresh keeps the rows and sets the warning to the reason, which is logged
+   * without any header; when GitHub refused the token the folder is marked to offer
+   * `Reconnect GitHub`. Pull requests the user archived stay hidden until GitHub says they changed.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -76,25 +78,30 @@ class LiveFolderRefresher {
     }
   }
   async #refreshOne(id) {
-    const { store, github, token, changed, logger, now = Date.now } = this.#deps;
+    const { store, connection, changed } = this.#deps;
     const folder = store.find(id);
     if (folder === void 0) {
       return;
     }
-    const secret = await token.read();
+    const secret = connection.token;
     if (secret === null) {
-      store.update(id, { rows: [], warning: null, needsToken: true });
+      store.update(id, { rows: [], warning: null, needsReconnect: false, archived: {} });
     } else {
-      try {
-        const rows = await github.list(folder.filters, secret);
-        store.update(id, { rows, warning: null, needsToken: false, refreshedAt: now() });
-      } catch (error) {
-        const reason = LiveFolderRefresher.#reasonOf(error);
-        store.update(id, { warning: reason });
-        logger.warn("could not refresh a live folder", reason);
-      }
+      await this.#load(folder, secret);
     }
     changed();
+  }
+  async #load({ id, filters }, secret) {
+    const { store, github, logger, now = Date.now } = this.#deps;
+    try {
+      const found = await github.list(filters, secret);
+      const { rows, archived } = ArchivedPullRequests.apply(found, store.find(id)?.archived ?? {});
+      store.update(id, { rows, archived, warning: null, needsReconnect: false, refreshedAt: now() });
+    } catch (error) {
+      const reason = LiveFolderRefresher.#reasonOf(error);
+      store.update(id, { warning: reason, needsReconnect: error instanceof GithubFailure && error.refused });
+      logger.warn("could not refresh a live folder", reason);
+    }
   }
   static #reasonOf(error) {
     return error instanceof GithubFailure ? error.message : UNREACHABLE_REASON;

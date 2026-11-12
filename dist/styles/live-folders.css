@@ -81,3 +81,40 @@
   background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
   cursor: default;
 }
+
+#browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] {
+  position: fixed;
+  z-index: 76;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 260px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--colorFg, #fff);
+  font-size: 14px;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] > div {
+  flex: 1 0 100%;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] > [data-vivarcdi-connect-code] {
+  font-family: monospace;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  user-select: text;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] > button {
+  flex: 1;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  color: inherit;
+  font: inherit;
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
+  cursor: default;
+}

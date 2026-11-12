@@ -8,12 +8,14 @@ const FILTER_LABELS = [
 const PULL_REQUESTS_LABEL = "Pull Requests";
 const REPOSITORIES_LABEL = "Repositories\u2026";
 const REFRESH_LABEL = "Refresh";
+const DISCONNECT_LABEL = "Disconnect GitHub";
 const DELETE_LABEL = "Delete Live Folder";
 class LiveFolderMenu {
   #deps;
   /**
    * The menu of a live folder: `Pull Requests` with the three filters as check items and
-   * `Repositories…`, then `Refresh` and `Delete Live Folder`. A filter change is stored and the
+   * `Repositories…`, then `Refresh`, `Disconnect GitHub` while GitHub is connected, and
+   * `Delete Live Folder`. A filter change is stored and the
    * folder refreshes at once.
    *
    * @param dependencies Everything it collaborates with.
@@ -36,9 +38,11 @@ class LiveFolderMenu {
     }
     const filters = FILTER_LABELS.map(([name, label]) => ({ label, checked: folder.filters[name], run: () => this.#toggle(folderId, name) }));
     const repositories = { label: REPOSITORIES_LABEL, run: () => this.#editRepositories(folderId, linkId, { x, y }) };
+    const disconnect = this.#deps.connected() ? [{ label: DISCONNECT_LABEL, run: () => this.#deps.disconnect() }] : [];
     const items = [
       { label: PULL_REQUESTS_LABEL, items: [...filters, repositories] },
       { label: REFRESH_LABEL, run: () => this.#deps.refresh(folderId) },
+      ...disconnect,
       { label: DELETE_LABEL, run: () => this.#deps.remove(folderId) }
     ];
     this.#deps.menu.open(items, x, y);
@@ -67,5 +71,6 @@ class LiveFolderMenu {
   }
 }
 export {
+  DISCONNECT_LABEL,
   LiveFolderMenu
 };

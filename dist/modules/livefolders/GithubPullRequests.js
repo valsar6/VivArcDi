@@ -1,7 +1,7 @@
 import { PullRequestFilters } from "./PullRequestFilters.js";
 const SEARCH_URL = "https://api.github.com/search/issues";
 const UNREACHABLE_REASON = "GitHub cannot be reached";
-const REFUSED_REASON = "The token was refused";
+const REFUSED_REASON = "GitHub refused the connection";
 const RATE_LIMIT_REASON = "GitHub's rate limit, retrying later";
 const PAGE_SIZE = 50;
 const UNAUTHORIZED = 401;
@@ -10,15 +10,19 @@ const TOO_MANY_REQUESTS = 429;
 const REPOSITORY_PATH = /\/repos\/(.+)$/;
 const SUBTITLE_SEPARATOR = " \xB7 ";
 class GithubFailure extends Error {
+  /** Whether GitHub answered 401: the connection was revoked or is no longer valid. */
+  refused;
   /**
    * Why a request to GitHub failed, in words for the folder's warning mark. It never holds the
    * token or any header.
    *
    * @param reason The short reason to show.
+   * @param refused Whether GitHub refused the token.
    */
-  constructor(reason) {
+  constructor(reason, refused = false) {
     super(reason);
     this.name = "GithubFailure";
+    this.refused = refused;
   }
 }
 class GithubPullRequests {
@@ -65,7 +69,7 @@ class GithubPullRequests {
     const url = `${SEARCH_URL}?${new URLSearchParams({ q: query, sort: "updated", order: "desc", per_page: String(PAGE_SIZE) })}`;
     const response = await this.#send(url, token);
     if (!response.ok) {
-      throw new GithubFailure(GithubPullRequests.#reasonOf(response.status));
+      throw new GithubFailure(GithubPullRequests.#reasonOf(response.status), response.status === UNAUTHORIZED);
     }
     const body = await response.json();
     return (body.items ?? []).map((item) => GithubPullRequests.toRow(item));
@@ -73,6 +77,7 @@ class GithubPullRequests {
   async #send(url, token) {
     try {
       return await this.#fetch(url, {
+        method: "GET",
         headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "X-GitHub-Api-Version": "2022-11-28" }
       });
     } catch {

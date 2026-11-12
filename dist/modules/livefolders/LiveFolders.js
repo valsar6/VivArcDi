@@ -3,10 +3,16 @@ import { ContextMenu } from "../../core/ContextMenu.js";
 import { LinkId } from "../../core/LinkId.js";
 import { Module } from "../../core/Module.js";
 import { SpaceMenuItems } from "../../core/SpaceMenuItems.js";
+import { Toast } from "../../core/Toast.js";
 import { VirtualFolders } from "../../core/VirtualFolders.js";
+import { WorkspaceTabs } from "../../core/WorkspaceTabs.js";
+import { TextCopier } from "../copyurl/UrlCopier.js";
+import { GithubConnect } from "./GithubConnect.js";
+import { GithubConnection } from "./GithubConnection.js";
 import { GithubPullRequests } from "./GithubPullRequests.js";
-import { GithubToken } from "./GithubToken.js";
+import { LiveFolderHandlers } from "./LiveFolderHandlers.js";
 import { LiveFolderMenu } from "./LiveFolderMenu.js";
+import { LiveRowMenu } from "./LiveRowMenu.js";
 import { LiveFolderPublisher } from "./LiveFolderPublisher.js";
 import { defaultTicker, LiveFolderRefresher } from "./LiveFolderRefresher.js";
 import { LiveFolderStore } from "./LiveFolderStore.js";
@@ -16,7 +22,10 @@ const MIN_REFRESH_MINUTES = 1;
 const MS_PER_MINUTE = 6e4;
 const LIVE_FOLDERS_LABEL = "Live Folders";
 const GITHUB_LABEL = "GitHub";
+const TOAST_MS = 2e3;
+const CONNECTED_MS = 2e3;
 const sendWithFetch = (url, init) => globalThis.fetch(url, init);
+const postWithFetch = (url, init) => globalThis.fetch(url, init);
 class LiveFolders extends Module {
   static id = "live-folders";
   #stops = [];
@@ -27,8 +36,11 @@ class LiveFolders extends Module {
    * space header) creates one, and its own menu filters it by list, drafts and repositories,
    * refreshes it and deletes it. Folders, filters and last rows are kept per workspace; the rows
    * are not bookmarks. A folder refreshes at the start, every `refreshMinutes` (default 5), when
-   * it is opened and when a filter changes. The token comes from `vivarcdi live-folders token`.
-   * Without `chrome.tabs` it stays off.
+   * it is opened and when a filter changes. A folder that is not connected shows `Connect GitHub`,
+   * which opens a panel with GitHub's sign-in code (the OAuth device flow, with the client id of
+   * the `githubClientId` option); the token stays in the browser profile's storage. A right click
+   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs`, or
+   * without a client id for the sign-in, there is nothing to connect.
    *
    * @param context What the module may use.
    */
@@ -37,6 +49,9 @@ class LiveFolders extends Module {
     if (!tabs.available) {
       logger.warn("chrome.tabs is missing: the live folders are off");
       return;
+    }
+    if (LiveFolders.#clientId(context.options) === "") {
+      logger.warn("githubClientId is empty: the live folders cannot connect to GitHub");
     }
     this.#stopped = false;
     const parts = this.#build(context);
@@ -60,50 +75,64 @@ class LiveFolders extends Module {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
   }
-  #build({ document, selectors, tabs, storage, payload, options, logger }) {
+  #build({ document, selectors, tabs, storage, options, logger }) {
+    const clientId = LiveFolders.#clientId(options);
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
-    const publisher = new LiveFolderPublisher(store, virtual);
+    const connection = new GithubConnection({ storage, logger, send: sendWithFetch });
+    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: clientId !== "", connected: connection.connected }));
     const parent = () => document.querySelector(selectors.get("browser")) ?? document.body;
     const menu = new ContextMenu({ document, parent });
     const editor = new RepositoryEditor({ document, parent });
+    const active = new ActiveWorkspace(tabs, () => void 0, logger);
+    const copier = TextCopier.for(document, document.defaultView?.navigator.clipboard);
+    const toast = new Toast({ document, parent: parent(), durationMs: TOAST_MS });
     const refresher = new LiveFolderRefresher({
       store,
       github: new GithubPullRequests(sendWithFetch),
-      token: new GithubToken(payload),
+      connection,
       changed: () => this.#stopped ? void 0 : publisher.publish(),
       ticker: defaultTicker,
       intervalMs: LiveFolders.#minutes(options["refreshMinutes"]) * MS_PER_MINUTE,
       logger
     });
+    const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS });
     const folderMenu = new LiveFolderMenu({
       menu,
       editor,
       store,
       refresh: (folderId) => refresher.refresh(folderId),
       remove: (folderId) => this.#delete(store, publisher, folderId),
-      anchor: (linkId) => LiveFolders.#below(document, linkId)
+      connected: () => connection.connected,
+      disconnect: () => connection.forget(),
+      anchor: (linkId) => LiveFolderHandlers.below(document, linkId)
     });
-    const active = new ActiveWorkspace(tabs, () => void 0, logger);
-    return { document, virtual, store, publisher, menu, editor, active, refresher, folderMenu };
+    const rowMenu = new LiveRowMenu({ menu, store, copier, toast: (text) => toast.show(text), changed: () => publisher.publish() });
+    return { document, virtual, store, publisher, menu, editor, active, refresher, folderMenu, rowMenu, connection, connect, toast };
   }
   #wire(parts) {
-    const { document, virtual, publisher, menu, editor, active, refresher } = parts;
+    const { virtual, publisher, menu, editor, active, refresher, connection, connect, toast } = parts;
+    const handlers = new LiveFolderHandlers(parts);
     this.#stops.push(
       () => menu.close(),
       () => editor.close(),
+      () => connect.close(),
+      () => toast.remove(),
       () => active.stop(),
       () => refresher.stop(),
       () => publisher.clear(),
-      SpaceMenuItems.of(document).add(() => [{ label: LIVE_FOLDERS_LABEL, items: [{ label: GITHUB_LABEL, run: () => this.#create(parts) }] }]),
-      virtual.handle({
-        rename: (id, name) => this.#rename(parts, id, name),
-        open: (id) => this.#refresh(parts, id),
-        menu: (id, x, y) => parts.folderMenu.open(id, x, y)
-      })
+      connection.onChange(() => this.#connectionChanged(parts)),
+      SpaceMenuItems.of(parts.document).add(() => [{ label: LIVE_FOLDERS_LABEL, items: [{ label: GITHUB_LABEL, run: () => this.#create(parts) }] }]),
+      virtual.handle(handlers)
     );
     publisher.publish();
     virtual.markReady();
+  }
+  #connectionChanged({ publisher, refresher }) {
+    if (!this.#stopped) {
+      publisher.publish();
+      refresher.refreshAll();
+    }
   }
   #create({ store, publisher, virtual, refresher, active }) {
     const folder = store.add(active.current);
@@ -111,29 +140,20 @@ class LiveFolders extends Module {
     virtual.reveal(LinkId.folder(folder.id));
     refresher.refresh(folder.id);
   }
-  #rename({ store, publisher }, id, name) {
-    const folderId = LinkId.folderOf(id);
-    if (folderId !== null && store.update(folderId, { name })) {
-      publisher.publish();
-    }
-  }
-  #refresh({ refresher }, id) {
-    const folderId = LinkId.folderOf(id);
-    if (folderId !== null) {
-      refresher.refresh(folderId);
-    }
-  }
   #delete(store, publisher, folderId) {
     store.remove(folderId);
     publisher.publish();
   }
+  static #opener(tabs, active, logger) {
+    const workspaceTabs = new WorkspaceTabs(tabs, logger);
+    return (url) => void workspaceTabs.open(url, active.current).catch((error) => logger.warn("could not open the GitHub page", error));
+  }
   static #minutes(value) {
     return typeof value === "number" && Number.isFinite(value) ? Math.max(MIN_REFRESH_MINUTES, value) : DEFAULT_REFRESH_MINUTES;
   }
-  static #below(document, linkId) {
-    const row = document.querySelector(`[data-vivarcdi-folder-id="${linkId}"]`);
-    const rect = row?.getBoundingClientRect();
-    return rect === void 0 ? null : { x: rect.left, y: rect.bottom };
+  static #clientId(options) {
+    const value = options["githubClientId"];
+    return typeof value === "string" ? value.trim() : "";
   }
 }
 export {

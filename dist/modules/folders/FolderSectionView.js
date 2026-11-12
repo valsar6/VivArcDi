@@ -1,3 +1,4 @@
+import { LinkId } from "../../core/LinkId.js";
 import { EDIT_ATTRIBUTE, FolderNameEditor } from "./FolderNameEditor.js";
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from "./FolderRowElement.js";
 import { LinkIcon } from "./LinkIcon.js";
@@ -26,11 +27,11 @@ class FolderSectionView {
    * It reads nothing from the bookmarks and changes none: a new name is only reported. The name of
    * a folder row can be edited in place. A single click on a folder row waits for the double click
    * time, so that a double click edits the name and does not toggle the folder. A live folder
-   * row has its own icon and a warning mark, a right click on it reports the point for its menu,
+   * row has its own icon and a warning mark, a right click on it or on one of its rows reports the point for its menu,
    * and a link row with a subtitle shows it under the title.
    *
    * @param document The browser window document.
-   * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, what a new name does, and what a right click on a live folder does.
+   * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, what a new name does, and what a right click on a live folder or one of its rows does.
    * @param maxHeightPercent The most the section may take of the window's height before it scrolls.
    * @param timers Timers, replaceable in tests.
    */
@@ -140,11 +141,11 @@ class FolderSectionView {
   }
   #contextMenu(event) {
     const row = FolderSectionView.#rowOf(event.target);
-    const folderId = row?.hasAttribute(LIVE_FOLDER_ATTRIBUTE) === true ? row.getAttribute("data-vivarcdi-folder-id") : null;
-    if (folderId !== null) {
+    const id = FolderSectionView.#virtualIdOf(row);
+    if (id !== null) {
       event.preventDefault();
       event.stopPropagation();
-      this.#handlers.onMenu(folderId, event.clientX, event.clientY);
+      this.#handlers.onMenu(id, event.clientX, event.clientY);
     }
   }
   #finished(folderId, name) {
@@ -153,6 +154,13 @@ class FolderSectionView {
       this.#handlers.onRename(folderId, name);
     }
     this.render(this.#rows);
+  }
+  static #virtualIdOf(row) {
+    if (row?.hasAttribute(LIVE_FOLDER_ATTRIBUTE) === true) {
+      return row.getAttribute("data-vivarcdi-folder-id");
+    }
+    const linkId = row?.getAttribute("data-vivarcdi-link-id") ?? null;
+    return linkId !== null && LinkId.isVirtual(linkId) ? linkId : null;
   }
   static #rowOf(target) {
     return target?.closest(ROW_ATTRIBUTES.map((name) => `[${name}]`).join(",")) ?? null;
