@@ -6,6 +6,7 @@
 | Phase | 1 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-09 (PR #119) |
+| Revision | Draft, 2026-11-12: reordering tiles by drag (US-3, FR-8, FR-9, AC-9 to AC-12) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -17,10 +18,13 @@ In Arc the user adds a Favorite by dragging a tab from the tab list into the Fav
 
 - **US-1.** As a user, I want to drag a tab onto the Favorites grid, so that the page becomes a Favorite without opening the Bookmarks panel.
 - **US-2.** As a user, I want to drop it between two tiles, so that I choose its position.
+- **US-3.** As a user, I want to drag a tile to another place of the grid, so that I put my Favorites in the order I like.
 
 ## Expected behavior
 
-The user takes a tab from the tab list or a pinned row and releases it over the Favorites grid. While the tab is over the grid, the tiles move apart to leave a gap where it will land. A new tile appears at the drop position with the page's icon, the same in every workspace, and the tab stays open as the tab of that Favorite. Releasing it on an existing tile leaves the grid unchanged. Tiles can be reordered by dragging, which 001 AC-14 already expects.
+The user takes a tab from the tab list or a pinned row and releases it over the Favorites grid. While the tab is over the grid, the tiles move apart to leave a gap where it will land. A new tile appears at the drop position with the page's icon, the same in every workspace, and the tab stays open as the tab of that Favorite. Releasing it on an existing tile leaves the grid unchanged.
+
+**Reordering (revision of 2026-11-12).** Seen in Arc (Tore's recording `Registrazione schermo 2026-11-12 alle 12.30.02.mov`): the user takes a tile and moves it inside the grid. The tile follows the pointer, its old place closes, and the other tiles move apart to leave a gap where it will land, row by row as the grid of 001 lays them out (1, 2, 3, 2+2, 3+2 …). Released there, the tile takes that place, in every workspace, and the page and its tab stay as they were. Released where it started, nothing changes.
 
 Dragging a tile out of the grid removes the Favorite and keeps the page open, as in Arc. Where the tile lands decides what the page becomes:
 
@@ -40,6 +44,8 @@ The page is never lost: it always ends in the Favorites, the folders or today's 
 - **FR-5.** Dragging a tile onto a folder, between folder rows or onto the space header removes the Favorite bookmark and adds the page as a link of the workspace there, as 012 does for a dropped tab.
 - **FR-6.** While a tab is dragged over the grid, the tiles leave a gap at the drop position.
 - **FR-7.** A Favorite added by drag is shared by every workspace, like every Favorite of 003.
+- **FR-8.** While a tile is dragged over the grid, its own place is left out and the other tiles leave a gap at the drop position, as in FR-6.
+- **FR-9.** A tile released over the grid moves its Favorite bookmark to the drop position inside the Favorites folder; its tabs, its link and its page are unchanged. Released at its own place, nothing is written.
 
 ## Acceptance criteria
 
@@ -53,10 +59,13 @@ The page is never lost: it always ends in the Favorites, the folders or today's 
 | AC-6 | WHEN a tile is released anywhere out of the grid, THE page SHALL stay in the tab bar as a tile, a link or a Today tab. | auto: `never loses the page of a dragged tile` |
 | AC-7 | WHEN Tore drags a Today tab into the grid and switches workspace, THE new tile SHALL show in the other workspace too. | manual |
 | AC-8 | WHEN Tore drags a tile below the separator, THE page SHALL show as a Today tab and the tile SHALL be gone in every workspace. | manual |
+| AC-9 | WHEN a tile is released before another tile of the grid, THE Favorite SHALL move before it in the Favorites folder. | auto: `moves a dropped tile before another tile` |
+| AC-10 | WHEN a tile is released at the end of the grid, THE Favorite SHALL move to the end of the folder. | auto: `moves a dropped tile to the end of the grid` |
+| AC-11 | WHEN a tile is released at its own place, THE module SHALL write nothing. | auto: `leaves a tile released at its own place` |
+| AC-12 | WHEN Tore drags a tile to another place of the grid, THE tiles SHALL open a gap there, and on release the tile SHALL stay there in every workspace and after a restart. | manual |
 
 ## Out of scope
 
-- Reordering tiles: 001 AC-14.
 - Favorites shared by all workspaces: already so in 003.
 
 ## Open questions
@@ -77,6 +86,7 @@ The page is never lost: it always ends in the Favorites, the folders or today's 
 - [x] Vivaldi stores Favorites as bookmarks; the folder is the `Favorites` folder of 003 (option `folder`).
 - [x] Dragging into the grid is how a tab becomes a tile, and the grid is shared by every workspace (Tore, 2026-11-09).
 - [x] Dragging a tile out: below the line a Today tab, onto the folders a link (Tore, 2026-11-09).
+- [x] Reordering tiles inside the grid, as in Arc (Tore, 2026-11-12, recording 12.30.02). It replaces 001 AC-14, which was about Vivaldi's own pinned tabs before the tiles came from the Favorites folder.
 
 ## References
 
