@@ -1,6 +1,6 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { KeptTab } from "../../core/KeptTab.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../../core/AddressKey.js";
+import { KeptTab } from "../../../core/KeptTab.js";
+import { TabData } from "../../../core/TabData.js";
 class LinkTabAdopter {
   #tabs;
   #links;

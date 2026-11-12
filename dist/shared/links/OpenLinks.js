@@ -1,7 +1,7 @@
 import { AddressKey } from "../../core/AddressKey.js";
 import { FrameTask } from "../../core/FrameTask.js";
 import { TabData } from "../../core/TabData.js";
-import { UnloadedTabs } from "../favorites/UnloadedTabs.js";
+import { UnloadedTabs } from "../tabs/UnloadedTabs.js";
 const WATCHED_CHANGES = ["url", "pendingUrl", "discarded", "status", "favIconUrl", "title", "vivExtData"];
 class OpenLinks {
   #tabs;

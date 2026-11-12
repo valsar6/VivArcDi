@@ -1,5 +1,5 @@
 import { TabData } from "../../core/TabData.js";
-import { UnloadedTabs } from "../favorites/UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 const HIDDEN_OWNER = "space-header";
 const RELEVANT_CHANGES = ["discarded", "pinned", "status"];
 class CollapsedPinned {

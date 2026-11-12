@@ -1,6 +1,6 @@
 import { Module } from "../../core/Module.js";
-import { LinkActivator } from "../folders/LinkActivator.js";
-import { OpenLinks } from "../folders/OpenLinks.js";
+import { LinkActivator } from "../../shared/links/LinkActivator.js";
+import { OpenLinks } from "../../shared/links/OpenLinks.js";
 import { PreviewController } from "./PreviewController.js";
 const DEFAULT_DELAY_MS = 400;
 const MIN_DELAY_MS = 100;

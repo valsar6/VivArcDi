@@ -1,6 +1,6 @@
 import { TabData } from "../../core/TabData.js";
 import { WorkspaceTabs } from "../../core/WorkspaceTabs.js";
-import { UnloadedTabs } from "../favorites/UnloadedTabs.js";
+import { UnloadedTabs } from "../tabs/UnloadedTabs.js";
 class LinkActivator {
   #tabs;
   #workspaceTabs;

@@ -1,4 +1,4 @@
-import { LinkIcon } from "../folders/LinkIcon.js";
+import { LinkIcon } from "../../shared/links/LinkIcon.js";
 import { RelativeTime } from "./RelativeTime.js";
 const ROW_LIMIT = 100;
 const ICON_CLASS = "vivarcdi-preview-icon";

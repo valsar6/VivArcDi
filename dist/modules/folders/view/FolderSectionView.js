@@ -1,7 +1,7 @@
-import { LinkId } from "../../core/LinkId.js";
-import { EDIT_ATTRIBUTE, FolderNameEditor } from "./FolderNameEditor.js";
+import { LinkId } from "../../../core/LinkId.js";
+import { EDIT_ATTRIBUTE, FolderNameEditor } from "../editing/FolderNameEditor.js";
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from "./FolderRowElement.js";
-import { LinkIcon } from "./LinkIcon.js";
+import { LinkIcon } from "../../../shared/links/LinkIcon.js";
 import { LEAVING_ATTRIBUTE, RowTransition } from "./RowTransition.js";
 const LETTER_CLASS = `${ICON_CLASS} vivarcdi-folders-letter`;
 const ROW_ATTRIBUTES = ["data-vivarcdi-folder-id", "data-vivarcdi-link-id"];

@@ -1,4 +1,4 @@
-import { FolderTree } from "../folders/FolderTree.js";
+import { FolderTree } from "../../shared/links/FolderTree.js";
 const DEPTH_LIMIT = 10;
 class FolderLinks {
   /**

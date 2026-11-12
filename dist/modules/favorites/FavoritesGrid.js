@@ -10,7 +10,7 @@ import { GridDragging } from "./GridDragging.js";
 import { GridLayout } from "./GridLayout.js";
 import { MiddleClickUnload } from "./MiddleClickUnload.js";
 import { PinnedFavorites } from "./PinnedFavorites.js";
-import { UnloadedTabs } from "./UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 const NO_TABS = { has: () => false };
 const NOTHING_PLACED = { grid: null, count: 0 };
 class FavoritesGrid extends Module {

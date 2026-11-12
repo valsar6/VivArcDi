@@ -5,7 +5,7 @@ import { TabUnloader } from "../../core/TabUnloader.js";
 import { GRID_ORDER } from "./BookmarkFavorites.js";
 import { FavoritesView } from "./FavoritesView.js";
 import { TabChanges } from "./TabChanges.js";
-import { UnloadedTabs } from "./UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 const TILE_SOURCE_ATTRIBUTE = "data-vivarcdi-tile-source";
 const HIDDEN_OWNER = "pinned-favorites";
 const PINNED_GRID_ORDER = GRID_ORDER + 1;

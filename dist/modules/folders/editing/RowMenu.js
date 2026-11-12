@@ -1,6 +1,6 @@
-import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from "../../core/CommandLabels.js";
-import { LinkId } from "../../core/LinkId.js";
-import { LINK_ATTRIBUTE } from "./DropTargets.js";
+import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from "../../../core/CommandLabels.js";
+import { LinkId } from "../../../core/LinkId.js";
+import { LINK_ATTRIBUTE } from "../dragdrop/DropTargets.js";
 class RowMenu {
   #deps;
   #onContext = (event) => this.#context(event);

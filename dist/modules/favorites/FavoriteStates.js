@@ -1,5 +1,5 @@
 import { OwnPage } from "../../core/OwnPage.js";
-import { UnloadedTabs } from "./UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 class FavoriteStates {
   /**
    * Turns the links of the window into what each tile shows.

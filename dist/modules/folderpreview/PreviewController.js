@@ -1,4 +1,4 @@
-import { LastOpenedStore } from "../reopen/LastOpenedStore.js";
+import { LastOpenedStore } from "../../shared/links/LastOpenedStore.js";
 import { FolderHover } from "./FolderHover.js";
 import { FolderLinks } from "./FolderLinks.js";
 import { PreviewPanelView } from "./PreviewPanelView.js";

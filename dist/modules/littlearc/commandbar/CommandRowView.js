@@ -1,4 +1,4 @@
-import { LinkIcon } from "../../folders/LinkIcon.js";
+import { LinkIcon } from "../../../shared/links/LinkIcon.js";
 import { SEARCH_SHAPES, svgIcon } from "../SvgIcon.js";
 import { COMMAND_BAR_CLASS } from "./CommandBarElements.js";
 import { MiddleEllipsis } from "./MiddleEllipsis.js";

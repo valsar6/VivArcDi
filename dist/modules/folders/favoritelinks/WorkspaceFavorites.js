@@ -1,8 +1,8 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { BookmarkCopier } from "../../core/bookmarks/BookmarkCopier.js";
-import { KeptTab } from "../../core/KeptTab.js";
-import { LinkId } from "../../core/LinkId.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../../core/AddressKey.js";
+import { BookmarkCopier } from "../../../core/bookmarks/BookmarkCopier.js";
+import { KeptTab } from "../../../core/KeptTab.js";
+import { LinkId } from "../../../core/LinkId.js";
+import { TabData } from "../../../core/TabData.js";
 const NEW_FOLDER_TITLE = "Untitled";
 class WorkspaceFavorites {
   #deps;

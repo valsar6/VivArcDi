@@ -1,6 +1,6 @@
 import { Module } from "../../core/Module.js";
 import { FolderSection } from "./FolderSection.js";
-import { WorkspaceRoots } from "./WorkspaceRoots.js";
+import { WorkspaceRoots } from "./tree/WorkspaceRoots.js";
 const DEFAULT_MAX_DEPTH = 3;
 const DEFAULT_MAX_HEIGHT_PERCENT = 60;
 const MAX_DEPTH_LIMIT = 10;

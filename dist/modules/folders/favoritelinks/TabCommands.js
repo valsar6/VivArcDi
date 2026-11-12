@@ -1,6 +1,6 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { PIN_TAB_LABEL, TILE_TAB_LABEL } from "../../core/CommandLabels.js";
-import { KeptTab } from "../../core/KeptTab.js";
+import { AddressKey } from "../../../core/AddressKey.js";
+import { PIN_TAB_LABEL, TILE_TAB_LABEL } from "../../../core/CommandLabels.js";
+import { KeptTab } from "../../../core/KeptTab.js";
 import { FAILED_TEXT } from "./FavoriteShortcut.js";
 const PIN_TAB_ID = "vivarcdi-pin-tab";
 const TILE_TAB_ID = "vivarcdi-tile-tab";

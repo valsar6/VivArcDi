@@ -1,4 +1,4 @@
-import { FolderTree } from "./FolderTree.js";
+import { FolderTree } from "../../../shared/links/FolderTree.js";
 class FolderRows {
   /**
    * Decides which rows the section shows. An open folder shows its children. A closed folder shows

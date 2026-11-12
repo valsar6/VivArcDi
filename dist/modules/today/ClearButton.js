@@ -1,4 +1,4 @@
-import { PINNED_LAST_ATTRIBUTE } from "../pinned/TabBarMarker.js";
+import { PINNED_LAST_ATTRIBUTE } from "../../shared/tabs/TabBarMarks.js";
 import { KeptElement, watchSubtree } from "../../core/KeptElement.js";
 const CLEAR_ATTRIBUTE = "data-vivarcdi-clear";
 const CLEAR_TARGET = `[${CLEAR_ATTRIBUTE}]`;

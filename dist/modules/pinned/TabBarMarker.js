@@ -1,6 +1,6 @@
 import { TabSlot } from "../../core/TabSlot.js";
+import { PINNED_LAST_ATTRIBUTE } from "../../shared/tabs/TabBarMarks.js";
 const AWAY_ATTRIBUTE = "data-vivarcdi-away";
-const PINNED_LAST_ATTRIBUTE = "data-vivarcdi-pinned-last";
 class TabBarMarker {
   #selectors;
   #strip = null;
@@ -62,6 +62,5 @@ class TabBarMarker {
 }
 export {
   AWAY_ATTRIBUTE,
-  PINNED_LAST_ATTRIBUTE,
   TabBarMarker
 };

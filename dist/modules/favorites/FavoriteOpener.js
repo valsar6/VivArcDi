@@ -1,5 +1,5 @@
 import { OwnPage } from "../../core/OwnPage.js";
-import { UnloadedTabs } from "./UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 class FavoriteOpener {
   #tabs;
   #links;

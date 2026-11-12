@@ -1,6 +1,6 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { KeptTab } from "../../core/KeptTab.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../../core/AddressKey.js";
+import { KeptTab } from "../../../core/KeptTab.js";
+import { TabData } from "../../../core/TabData.js";
 const NOT_A_PAGE_TEXT = "Only web pages can go to the favorites";
 const KEPT_TEXT = "This link was already a bookmark: it stays";
 const FAILED_TEXT = "Could not change the favorites";

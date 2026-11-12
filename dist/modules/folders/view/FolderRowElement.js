@@ -1,4 +1,4 @@
-import { LinkIcon } from "./LinkIcon.js";
+import { LinkIcon } from "../../../shared/links/LinkIcon.js";
 const CLOSE_ATTRIBUTE = "data-vivarcdi-link-close";
 const LIVE_FOLDER_ATTRIBUTE = "data-vivarcdi-live-folder";
 const LIVE_WARNING_ATTRIBUTE = "data-vivarcdi-live-warning";

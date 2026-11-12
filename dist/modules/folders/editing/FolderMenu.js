@@ -1,4 +1,4 @@
-import { LIVE_FOLDER_ATTRIBUTE } from "./FolderRowElement.js";
+import { LIVE_FOLDER_ATTRIBUTE } from "../view/FolderRowElement.js";
 const FOLDER_ATTRIBUTE = "data-vivarcdi-folder-id";
 class FolderMenu {
   #deps;

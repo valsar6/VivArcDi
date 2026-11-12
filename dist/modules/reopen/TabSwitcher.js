@@ -1,4 +1,4 @@
-import { UnloadedTabs } from "../favorites/UnloadedTabs.js";
+import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 class TabSwitcher {
   #tabs;
   #logger;

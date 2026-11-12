@@ -1,4 +1,4 @@
-import { LinkIcon } from "../folders/LinkIcon.js";
+import { LinkIcon } from "../../shared/links/LinkIcon.js";
 import { ArchiveGroups } from "./ArchiveGroups.js";
 const ENTRY_ATTRIBUTE = "data-vivarcdi-archive-entry";
 const ROW_LIMIT = 200;

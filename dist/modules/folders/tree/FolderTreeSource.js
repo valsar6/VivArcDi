@@ -1,6 +1,6 @@
-import { BookmarkFolderFinder } from "../../core/bookmarks/BookmarkFolderFinder.js";
-import { FrameTask } from "../../core/FrameTask.js";
-import { FolderTree } from "./FolderTree.js";
+import { BookmarkFolderFinder } from "../../../core/bookmarks/BookmarkFolderFinder.js";
+import { FrameTask } from "../../../core/FrameTask.js";
+import { FolderTree } from "../../../shared/links/FolderTree.js";
 class FolderTreeSource {
   #bookmarks;
   #path;

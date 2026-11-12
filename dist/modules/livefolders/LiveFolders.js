@@ -6,7 +6,7 @@ import { SpaceMenuItems } from "../../core/SpaceMenuItems.js";
 import { Toast } from "../../core/Toast.js";
 import { VirtualFolders } from "../../core/VirtualFolders.js";
 import { WorkspaceTabs } from "../../core/WorkspaceTabs.js";
-import { TextCopier } from "../copyurl/UrlCopier.js";
+import { TextCopier } from "../../shared/clipboard/TextCopier.js";
 import { GithubConnect } from "./GithubConnect.js";
 import { GithubConnection } from "./GithubConnection.js";
 import { GithubPullRequests } from "./GithubPullRequests.js";
