@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-12 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -119,13 +119,13 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Name and place of the shared layer.** Proposed: `src/shared/`, separate from `src/core/`.
+- [x] **Name and place of the shared layer.** Decided: `src/shared/`, separate from `src/core/`.
   `core/` keeps the services that `ModuleContext` injects and the infrastructure; `shared/` holds
   feature building blocks. Putting them in `core/` would make the review's point 2 worse.
-- [ ] **Where `WorkspaceFavorites` lives.** It writes to a workspace's favorites but only `folders`
-  uses it. Proposed: it stays in `folders/favoritelinks/`; moving it to `favorites` would create a new
+- [x] **Where `WorkspaceFavorites` lives.** It writes to a workspace's favorites but only `folders`
+  uses it. Decided: it stays in `folders/favoritelinks/`; moving it to `favorites` would create a new
   cross-module import.
-- [ ] **Branch and version.** No behavior changes, so proposed: a `refactor/module-boundaries` branch
+- [x] **Branch and version.** No behavior changes, so decided: a `refactor/module-boundaries` branch
   with no version change, as the "anything else" row of [CONTRIBUTING.md](../../CONTRIBUTING.md#branches-versions-and-releases)
   allows.
 
