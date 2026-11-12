@@ -126,10 +126,15 @@ Approved with the spec revision. It replaces step 6 (missing workspaces).
    to the stored sync id instead of creating a second workspace.
 3. **Renames (FR-10).** When the stored name of a linked sync id differs from the name here and the
    base shows the store changed, VivArcDi renames the workspace here through Vivaldi's own inline
-   editor, opened on the workspace row (gesture found by probe T9: double click or the row's context
-   menu). If T9 finds no gesture that a script can drive, renames from the other computer are only
-   logged once and the workspace keeps its name. When the name changed here, the store entry and the
-   store folder are renamed.
+   editor. Vivaldi opens it only from a native context menu, which scripts cannot click, so
+   `EditorOpener` sets the same state the menu sets (probes of 2026-11-12): from the row's React fiber
+   it walks up to the item (props `isRenaming`, `id`) and to the list (props `workspaces`,
+   `hidePopup`), then calls the list's state setter that holds the renaming id (the hook whose value
+   is `undefined`; index 7 on Vivaldi 8.2, found at run time, not hard-coded) with the workspace id.
+   The editor opens empty; the name is written and saved as for a creation. `ReactInternals` is the
+   only class that touches React internals; any mismatch returns false, which is logged once and leaves
+   the local name, with no second workspace. When the name changed here, the store entry and the store
+   folder are renamed.
 4. **Creating a workspace (FR-7 revised, Q-6).** `WorkspaceCreator` drives Vivaldi's menu:
    full pointer sequence on `button[data-name="WorkspaceButton"]`, then on
    `.WorkspacePopup .actions button[aria-label]` ("New workspace"); writes the name into
