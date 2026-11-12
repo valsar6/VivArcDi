@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { FolderRows } from '../../../src/modules/folders/FolderRows.js';
 import type { Row, RowSources } from '../../../src/modules/folders/FolderRows.js';
-import { FolderTree } from '../../../src/modules/folders/FolderTree.js';
+import { FolderTree } from '../../../src/shared/links/FolderTree.js';
 import { OpenFolders } from '../../../src/modules/folders/OpenFolders.js';
-import type { LinkRef, OpenTab } from '../../../src/modules/folders/OpenLinks.js';
+import type { LinkRef, OpenTab } from '../../../src/shared/links/OpenLinks.js';
 import { silentLogger, MemoryStorage } from '../reopen/fakes.js';
 import { folder, link } from './fakes.js';
 

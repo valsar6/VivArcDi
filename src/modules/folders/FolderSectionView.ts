@@ -2,7 +2,7 @@ import { LinkId } from '../../core/LinkId.js';
 import { EDIT_ATTRIBUTE, FolderNameEditor } from './FolderNameEditor.js';
 import type { Row } from './FolderRows.js';
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from './FolderRowElement.js';
-import { LinkIcon } from './LinkIcon.js';
+import { LinkIcon } from '../../shared/links/LinkIcon.js';
 import { LEAVING_ATTRIBUTE, RowTransition } from './RowTransition.js';
 
 export interface SectionHandlers {

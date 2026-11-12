@@ -2,7 +2,7 @@ import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
 import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
-import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
+import { UnloadedTabs } from '../tabs/UnloadedTabs.js';
 import type { OpenLinks } from './OpenLinks.js';
 
 export type ActivatorTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'create' | 'get' | 'update' | 'remove' | 'discard'>;

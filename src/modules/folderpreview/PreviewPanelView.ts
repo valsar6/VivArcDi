@@ -1,4 +1,4 @@
-import { LinkIcon } from '../folders/LinkIcon.js';
+import { LinkIcon } from '../../shared/links/LinkIcon.js';
 import { RelativeTime } from './RelativeTime.js';
 import type { PreviewSession } from './PreviewSession.js';
 import type { PreviewTexts } from './PreviewText.js';

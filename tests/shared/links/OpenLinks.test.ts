@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { OpenLinks } from '../../../src/modules/folders/OpenLinks.js';
-import { silentLogger } from '../reopen/fakes.js';
-import { FolderTabs, immediateFrames } from './fakes.js';
+import { OpenLinks } from '../../../src/shared/links/OpenLinks.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { FolderTabs, immediateFrames } from '../../modules/folders/fakes.js';
 
 const MAHJONG = { id: '11', key: 'mahjongsoul.game.yo-star.com' };
 const JIRA = { id: '12', key: 'jira.example.com' };

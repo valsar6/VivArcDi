@@ -4,8 +4,8 @@ import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js'
 import { FrameTask } from '../../core/FrameTask.js';
 import type { FrameTiming } from '../../core/FrameTask.js';
 import type { Logger } from '../../core/Logger.js';
-import { FolderTree } from './FolderTree.js';
-import type { TreeEntry } from './FolderTree.js';
+import { FolderTree } from '../../shared/links/FolderTree.js';
+import type { TreeEntry } from '../../shared/links/FolderTree.js';
 
 export type SourceBookmarks = Pick<BrowserBookmarks, 'getTree' | 'onChange'>;
 

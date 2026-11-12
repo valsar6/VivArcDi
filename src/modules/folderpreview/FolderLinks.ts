@@ -1,6 +1,6 @@
 import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import { FolderTree } from '../folders/FolderTree.js';
-import type { LinkEntry } from '../folders/FolderTree.js';
+import { FolderTree } from '../../shared/links/FolderTree.js';
+import type { LinkEntry } from '../../shared/links/FolderTree.js';
 
 const DEPTH_LIMIT = 10;
 

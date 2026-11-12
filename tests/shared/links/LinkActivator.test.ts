@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LinkActivator } from '../../../src/modules/folders/LinkActivator.js';
-import { OpenLinks } from '../../../src/modules/folders/OpenLinks.js';
-import { silentLogger } from '../reopen/fakes.js';
-import { FolderTabs, immediateFrames } from './fakes.js';
+import { LinkActivator } from '../../../src/shared/links/LinkActivator.js';
+import { OpenLinks } from '../../../src/shared/links/OpenLinks.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { FolderTabs, immediateFrames } from '../../modules/folders/fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const MAHJONG_KEY = 'mahjongsoul.game.yo-star.com';

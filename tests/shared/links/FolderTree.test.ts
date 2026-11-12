@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { FolderTree } from '../../../src/modules/folders/FolderTree.js';
-import type { FolderEntry, LinkEntry } from '../../../src/modules/folders/FolderTree.js';
-import { folder, link } from './fakes.js';
+import { FolderTree } from '../../../src/shared/links/FolderTree.js';
+import type { FolderEntry, LinkEntry } from '../../../src/shared/links/FolderTree.js';
+import { folder, link } from '../../modules/folders/fakes.js';
 
 test('builds the folder tree from the bookmarks keeping order and nesting', () => {
   const tree = FolderTree.build(
