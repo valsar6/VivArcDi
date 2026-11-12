@@ -113,7 +113,8 @@ class WorkspaceFavorites {
   }
   /**
    * Takes a link back out of the workspace favorites. The bookmark is removed only when VivArcDi
-   * created it; any other bookmark stays and keeps its link and its tab. Given a tab, it is
+   * created it or it lies inside VivArcDi's own folder of workspaces; any other bookmark stays and
+   * keeps its link and its tab. Given a tab, it is
    * unlinked together with the removal of the bookmark.
    *
    * @param target The tab that may be the tab of a link, or the id of a link that has no tab to unlink.
@@ -127,10 +128,10 @@ class WorkspaceFavorites {
     return tab.id === void 0 || bookmarkId === void 0 ? "none" : this.#takeLink(bookmarkId, tab.id);
   }
   async #takeLink(bookmarkId, tabId) {
-    if (!this.#deps.created.has(bookmarkId)) {
-      return "kept";
-    }
     try {
+      if (!await this.#owns(bookmarkId)) {
+        return "kept";
+      }
       if (tabId !== null) {
         await this.#deps.links.unlink(tabId);
       }
@@ -141,6 +142,10 @@ class WorkspaceFavorites {
       this.#deps.logger.warn("could not take the tab back from the workspace favorites", error);
       return "failed";
     }
+  }
+  async #owns(bookmarkId) {
+    const base = this.#deps.base?.() ?? [];
+    return this.#deps.created.has(bookmarkId) || base.length > 0 && await this.#deps.writer.contains(base, bookmarkId);
   }
   async #rootId() {
     const path = this.#deps.root();

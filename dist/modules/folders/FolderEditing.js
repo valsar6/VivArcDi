@@ -38,6 +38,7 @@ class FolderEditing {
       links: sources.tabLinks,
       created: new CreatedLinks(context.storage),
       root: sources.root,
+      base: sources.base,
       logger: context.logger
     });
   }

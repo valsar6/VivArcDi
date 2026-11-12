@@ -120,6 +120,7 @@ class FolderSection {
   #createEditing() {
     return new FolderEditing(this.#context, this.#view, {
       root: () => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
+      base: () => this.#roots.base,
       childIds: () => this.#source.childIds,
       redraw: () => this.#redraw.request(),
       tabLinks: this.#tabLinks

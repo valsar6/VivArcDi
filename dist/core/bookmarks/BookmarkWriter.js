@@ -85,6 +85,17 @@ class BookmarkWriter {
    * @param path Titles from the outer folder to the wanted one; not empty.
    * @returns The id of the last folder.
    */
+  /**
+   * @param path The titles of a folder, from the top.
+   * @param id A bookmark or folder.
+   * @returns Whether the folder exists and holds it, at any depth.
+   */
+  async contains(path, id) {
+    const tree = await this.#call((api, done) => api.getTree(done));
+    const folder = BookmarkFolderFinder.find(tree, path);
+    const holds = (nodes) => nodes.some((node) => node.id === id || holds(node.children ?? []));
+    return folder !== null && holds(folder.children ?? []);
+  }
   ensurePath(path) {
     const run = this.#queue.then(() => this.#ensure(path));
     this.#queue = run.catch(() => void 0);

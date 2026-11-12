@@ -25,6 +25,12 @@ class WorkspaceRoots {
     this.#byName = WorkspaceRoots.#parse(workspaces, logger);
   }
   /**
+   * @returns The titles of the folder that holds the default root of each workspace.
+   */
+  get base() {
+    return [...this.#base];
+  }
+  /**
    * @param workspaceName The name of the active workspace, or null outside any workspace.
    * @returns The titles of its root folder, which may not exist yet; empty when no folders are shown.
    */
