@@ -38,7 +38,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Approved |
 | [028 Arc sidebar look](028-arc-sidebar-look/spec.md) | 3 | Approved |
 | [029 Arc Light theme](029-arc-light-theme/spec.md) | 3 | Approved |
-| [030 Workspace sync](030-workspace-sync/spec.md) | 3 | Approved |
+| [030 Workspace sync](030-workspace-sync/spec.md) | 3 | Implemented |
 | [031 Pin and tile commands](031-pin-and-tile-commands/spec.md) | 3 | Approved |
 | [032 Compact tab bar](032-compact-tab-bar/spec.md) | 3 | Implemented |
 | [033 Folder menu](033-folder-menu/spec.md) | 3 | Approved |

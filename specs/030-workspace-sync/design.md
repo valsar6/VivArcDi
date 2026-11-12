@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Approved | 2026-11-10, revision 2026-11-12 (with the spec revision) |
 | Spec | [spec.md](spec.md) |
 
