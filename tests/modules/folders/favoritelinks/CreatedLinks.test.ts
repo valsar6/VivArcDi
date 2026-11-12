@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CreatedLinks } from '../../../src/modules/folders/CreatedLinks.js';
-import { MemoryStorage } from '../reopen/fakes.js';
+import { CreatedLinks } from '../../../../src/modules/folders/favoritelinks/CreatedLinks.js';
+import { MemoryStorage } from '../../reopen/fakes.js';
 
 test('remembers the bookmarks it created after a restart and forgets removed ones', () => {
   const storage = new MemoryStorage();

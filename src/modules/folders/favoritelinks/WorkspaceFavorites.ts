@@ -1,13 +1,13 @@
-import { AddressKey } from '../../core/AddressKey.js';
-import { BookmarkCopier } from '../../core/bookmarks/BookmarkCopier.js';
-import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
-import { KeptTab } from '../../core/KeptTab.js';
-import { LinkId } from '../../core/LinkId.js';
-import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
+import { AddressKey } from '../../../core/AddressKey.js';
+import { BookmarkCopier } from '../../../core/bookmarks/BookmarkCopier.js';
+import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
+import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
+import { KeptTab } from '../../../core/KeptTab.js';
+import { LinkId } from '../../../core/LinkId.js';
+import type { Logger } from '../../../core/Logger.js';
+import { TabData } from '../../../core/TabData.js';
 import type { CreatedLinks } from './CreatedLinks.js';
-import type { TabLinks } from './TabLinks.js';
+import type { TabLinks } from '../links/TabLinks.js';
 
 export type FavoritesWriter = Pick<BookmarkWriter, 'create' | 'remove' | 'ensurePath' | 'get' | 'subTree' | 'removeTree' | 'contains'>;
 export type FavoritesLinks = Pick<TabLinks, 'link' | 'unlink'>;

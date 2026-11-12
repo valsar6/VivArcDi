@@ -1,8 +1,8 @@
-import type { LinkDropTarget, LinkPage, LinkTargets } from '../../core/LinkDropZone.js';
-import type { Logger } from '../../core/Logger.js';
+import type { LinkDropTarget, LinkPage, LinkTargets } from '../../../core/LinkDropZone.js';
+import type { Logger } from '../../../core/Logger.js';
 import type { DropPlace } from './DropPlace.js';
 import type { DropTarget, DropTargets } from './DropTargets.js';
-import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
+import type { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
 
 export interface FolderLinkTargetsDependencies {
   targets: Pick<DropTargets, 'at' | 'mark' | 'clear'>;

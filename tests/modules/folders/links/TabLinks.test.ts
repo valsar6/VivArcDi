@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabLinks } from '../../../src/modules/folders/TabLinks.js';
-import { LinkingTabs } from '../favorites/linked.js';
+import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
+import { LinkingTabs } from '../../favorites/linked.js';
 
 const linkedTo = (bookmarkId: string): string => JSON.stringify({ workspaceId: 7, group: 'g', vivarcdi: { bookmarkId, lastActive: 5 } });
 

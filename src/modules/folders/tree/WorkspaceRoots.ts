@@ -1,5 +1,5 @@
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
-import type { Logger } from '../../core/Logger.js';
+import { BookmarkFolderFinder } from '../../../core/bookmarks/BookmarkFolderFinder.js';
+import type { Logger } from '../../../core/Logger.js';
 
 const DEFAULT_BASE = 'VivArcDi';
 const OUTSIDE_NAME = 'Tabs';

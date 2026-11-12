@@ -1,6 +1,6 @@
-import type { FolderEntry, LinkEntry, TreeEntry } from '../../core/FolderEntries.js';
-import { FolderTree } from '../../shared/links/FolderTree.js';
-import type { LinkRef, OpenTab } from '../../shared/links/OpenLinks.js';
+import type { FolderEntry, LinkEntry, TreeEntry } from '../../../core/FolderEntries.js';
+import { FolderTree } from '../../../shared/links/FolderTree.js';
+import type { LinkRef, OpenTab } from '../../../shared/links/OpenLinks.js';
 
 export interface FolderRow {
   kind: 'folder';

@@ -1,25 +1,25 @@
-import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
-import type { ContextMenu } from '../../core/ContextMenu.js';
-import type { DragPill } from '../../core/DragPill.js';
-import { FavoriteDropZone } from '../../core/FavoriteDropZone.js';
-import { LinkId } from '../../core/LinkId.js';
-import { LinkDropZone } from '../../core/LinkDropZone.js';
-import type { Logger } from '../../core/Logger.js';
-import { RowDrag } from '../../core/RowDrag.js';
-import { TabDragPill } from '../../core/TabDragPill.js';
-import { TabDragRelease } from '../../core/TabDragRelease.js';
-import { TodayList } from '../../core/TodayList.js';
+import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
+import type { ContextMenu } from '../../../core/ContextMenu.js';
+import type { DragPill } from '../../../core/DragPill.js';
+import { FavoriteDropZone } from '../../../core/FavoriteDropZone.js';
+import { LinkId } from '../../../core/LinkId.js';
+import { LinkDropZone } from '../../../core/LinkDropZone.js';
+import type { Logger } from '../../../core/Logger.js';
+import { RowDrag } from '../../../core/RowDrag.js';
+import { TabDragPill } from '../../../core/TabDragPill.js';
+import { TabDragRelease } from '../../../core/TabDragRelease.js';
+import { TodayList } from '../../../core/TodayList.js';
 import { DropPlace } from './DropPlace.js';
 import { DropTargets, LINK_ATTRIBUTE } from './DropTargets.js';
 import type { DropTarget } from './DropTargets.js';
 import { FolderLinkTargets } from './FolderLinkTargets.js';
-import { LinkRemoval } from './LinkRemoval.js';
-import type { LinkRemovalTabs } from './LinkRemoval.js';
+import { LinkRemoval } from '../favoritelinks/LinkRemoval.js';
+import type { LinkRemovalTabs } from '../favoritelinks/LinkRemoval.js';
 import { PanelBookmarkDrop } from './PanelBookmarkDrop.js';
-import { RowMenu } from './RowMenu.js';
+import { RowMenu } from '../editing/RowMenu.js';
 import { TabDrops } from './TabDrops.js';
-import type { TabLinks } from './TabLinks.js';
-import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
+import type { TabLinks } from '../links/TabLinks.js';
+import type { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
 
 export interface FolderDragDropDependencies {
   /** The document of Vivaldi's browser window. */

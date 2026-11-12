@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
-import { TabMenuItems } from '../../../src/core/TabMenuItems.js';
-import { FAILED_TEXT } from '../../../src/modules/folders/FavoriteShortcut.js';
-import { TabCommands } from '../../../src/modules/folders/TabCommands.js';
-import { asDocument, DomDocument } from '../../core/dom.js';
-import { SilentSink } from '../../loader/fakes.js';
+import { Logger } from '../../../../src/core/Logger.js';
+import { TabMenuItems } from '../../../../src/core/TabMenuItems.js';
+import { FAILED_TEXT } from '../../../../src/modules/folders/favoritelinks/FavoriteShortcut.js';
+import { TabCommands } from '../../../../src/modules/folders/favoritelinks/TabCommands.js';
+import { asDocument, DomDocument } from '../../../core/dom.js';
+import { SilentSink } from '../../../loader/fakes.js';
 
 const ITEMS = [{ type: 'command', id: 'new-tab', label: 'New Tab', enabled: true }];
 

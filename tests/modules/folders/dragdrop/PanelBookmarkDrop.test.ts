@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DomDocument, asDocument } from '../../core/dom.js';
-import { DropPlace } from '../../../src/modules/folders/DropPlace.js';
-import type { DropTarget } from '../../../src/modules/folders/DropTargets.js';
-import { PanelBookmarkDrop } from '../../../src/modules/folders/PanelBookmarkDrop.js';
-import { PanelDragData } from '../../../src/modules/folders/PanelDragData.js';
-import type { AddPlace } from '../../../src/modules/folders/WorkspaceFavorites.js';
+import { DomDocument, asDocument } from '../../../core/dom.js';
+import { DropPlace } from '../../../../src/modules/folders/dragdrop/DropPlace.js';
+import type { DropTarget } from '../../../../src/modules/folders/dragdrop/DropTargets.js';
+import { PanelBookmarkDrop } from '../../../../src/modules/folders/dragdrop/PanelBookmarkDrop.js';
+import { PanelDragData } from '../../../../src/modules/folders/dragdrop/PanelDragData.js';
+import type { AddPlace } from '../../../../src/modules/folders/favoritelinks/WorkspaceFavorites.js';
 
 const TARGET: DropTarget = { kind: 'folder', id: '32' };
 

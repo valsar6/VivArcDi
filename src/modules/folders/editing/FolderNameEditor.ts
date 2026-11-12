@@ -1,5 +1,5 @@
-import type { Row } from './FolderRows.js';
-import type { ViewTimers } from './FolderSectionView.js';
+import type { Row } from '../view/FolderRows.js';
+import type { ViewTimers } from '../view/FolderSectionView.js';
 
 export const EDIT_ATTRIBUTE = 'data-vivarcdi-edit';
 

@@ -1,15 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import { TabData } from '../../../src/core/TabData.js';
-import { CreatedLinks } from '../../../src/modules/folders/CreatedLinks.js';
-import { FavoriteShortcut, KEPT_TEXT, NOT_A_PAGE_TEXT } from '../../../src/modules/folders/FavoriteShortcut.js';
-import { TabLinks } from '../../../src/modules/folders/TabLinks.js';
-import { WorkspaceFavorites } from '../../../src/modules/folders/WorkspaceFavorites.js';
-import { DomDocument, asDocument } from '../../core/dom.js';
-import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
-import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from './fakes.js';
-import type { FolderTab } from './fakes.js';
+import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
+import { TabData } from '../../../../src/core/TabData.js';
+import { CreatedLinks } from '../../../../src/modules/folders/favoritelinks/CreatedLinks.js';
+import { FavoriteShortcut, KEPT_TEXT, NOT_A_PAGE_TEXT } from '../../../../src/modules/folders/favoritelinks/FavoriteShortcut.js';
+import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
+import { WorkspaceFavorites } from '../../../../src/modules/folders/favoritelinks/WorkspaceFavorites.js';
+import { DomDocument, asDocument } from '../../../core/dom.js';
+import { MemoryStorage, settle, silentLogger } from '../../reopen/fakes.js';
+import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../fakes.js';
+import type { FolderTab } from '../fakes.js';
 
 const PAGE = 'https://example.com/page';
 const ROOT_TREE = (children = [folder('32', 'Hobbies')]): ReturnType<typeof bookmarkTree> => bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', children)])]);

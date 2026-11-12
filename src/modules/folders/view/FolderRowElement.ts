@@ -1,6 +1,6 @@
-import type { FolderNameEditor } from './FolderNameEditor.js';
+import type { FolderNameEditor } from '../editing/FolderNameEditor.js';
 import type { FolderRow, LinkRow, Row } from './FolderRows.js';
-import { LinkIcon } from '../../shared/links/LinkIcon.js';
+import { LinkIcon } from '../../../shared/links/LinkIcon.js';
 
 export const CLOSE_ATTRIBUTE = 'data-vivarcdi-link-close';
 export const LIVE_FOLDER_ATTRIBUTE = 'data-vivarcdi-live-folder';

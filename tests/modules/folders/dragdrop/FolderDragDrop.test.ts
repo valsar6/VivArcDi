@@ -1,13 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import { DRAGGING_ATTRIBUTE } from '../../../src/core/RowDrag.js';
-import { TAB_ENTRIES_TYPE } from '../../../src/core/TabEntries.js';
-import { FolderDragDrop } from '../../../src/modules/folders/FolderDragDrop.js';
-import type { AddPlace } from '../../../src/modules/folders/WorkspaceFavorites.js';
-import { asDocument, asElement, DomDocument } from '../../core/dom.js';
-import type { DomNode } from '../../core/dom.js';
-import { silentLogger } from '../reopen/fakes.js';
+import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
+import { DRAGGING_ATTRIBUTE } from '../../../../src/core/RowDrag.js';
+import { TAB_ENTRIES_TYPE } from '../../../../src/core/TabEntries.js';
+import { FolderDragDrop } from '../../../../src/modules/folders/dragdrop/FolderDragDrop.js';
+import type { AddPlace } from '../../../../src/modules/folders/favoritelinks/WorkspaceFavorites.js';
+import { asDocument, asElement, DomDocument } from '../../../core/dom.js';
+import type { DomNode } from '../../../core/dom.js';
+import { silentLogger } from '../../reopen/fakes.js';
 
 const WRAPPER = '.wrapper';
 const PAGE = 'https://example.com/page';

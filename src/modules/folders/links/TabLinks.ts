@@ -1,6 +1,6 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { TabDataWriter } from '../../core/TabDataWriter.js';
-import { TabData } from '../../core/TabData.js';
+import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import { TabDataWriter } from '../../../core/TabDataWriter.js';
+import { TabData } from '../../../core/TabData.js';
 
 export type TabLinksApi = Pick<BrowserTabs, 'query' | 'get' | 'update'>;
 

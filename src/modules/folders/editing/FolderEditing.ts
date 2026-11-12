@@ -1,21 +1,21 @@
-import { ContextMenu } from '../../core/ContextMenu.js';
-import { DragPill } from '../../core/DragPill.js';
-import { FavoriteDropZone } from '../../core/FavoriteDropZone.js';
-import { FolderCommands } from '../../core/FolderCommands.js';
-import { LinkId } from '../../core/LinkId.js';
-import type { ModuleContext } from '../../core/Module.js';
-import { TabMenuItems } from '../../core/TabMenuItems.js';
-import type { ContextMenuApi } from '../../core/TabMenuItems.js';
-import { Toast } from '../../core/Toast.js';
-import { TodayList } from '../../core/TodayList.js';
-import { VirtualFolders } from '../../core/VirtualFolders.js';
-import { CreatedLinks } from './CreatedLinks.js';
-import { FavoriteShortcut } from './FavoriteShortcut.js';
-import { FolderDragDrop } from './FolderDragDrop.js';
-import type { FolderSectionView } from './FolderSectionView.js';
-import { TabCommands } from './TabCommands.js';
-import type { TabLinks } from './TabLinks.js';
-import { WorkspaceFavorites } from './WorkspaceFavorites.js';
+import { ContextMenu } from '../../../core/ContextMenu.js';
+import { DragPill } from '../../../core/DragPill.js';
+import { FavoriteDropZone } from '../../../core/FavoriteDropZone.js';
+import { FolderCommands } from '../../../core/FolderCommands.js';
+import { LinkId } from '../../../core/LinkId.js';
+import type { ModuleContext } from '../../../core/Module.js';
+import { TabMenuItems } from '../../../core/TabMenuItems.js';
+import type { ContextMenuApi } from '../../../core/TabMenuItems.js';
+import { Toast } from '../../../core/Toast.js';
+import { TodayList } from '../../../core/TodayList.js';
+import { VirtualFolders } from '../../../core/VirtualFolders.js';
+import { CreatedLinks } from '../favoritelinks/CreatedLinks.js';
+import { FavoriteShortcut } from '../favoritelinks/FavoriteShortcut.js';
+import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
+import type { FolderSectionView } from '../view/FolderSectionView.js';
+import { TabCommands } from '../favoritelinks/TabCommands.js';
+import type { TabLinks } from '../links/TabLinks.js';
+import { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
 
 export interface EditingSources {
   /** The path of the root folder of the active workspace; empty when it has none. */

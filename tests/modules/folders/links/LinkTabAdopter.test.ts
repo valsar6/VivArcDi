@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { LinkEntry } from '../../../src/core/FolderEntries.js';
-import { LinkTabAdopter } from '../../../src/modules/folders/LinkTabAdopter.js';
-import { TabLinks } from '../../../src/modules/folders/TabLinks.js';
-import { LinkingTabs } from '../favorites/linked.js';
-import { silentLogger } from '../reopen/fakes.js';
-import type { FolderTab } from './fakes.js';
+import type { LinkEntry } from '../../../../src/core/FolderEntries.js';
+import { LinkTabAdopter } from '../../../../src/modules/folders/links/LinkTabAdopter.js';
+import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
+import { LinkingTabs } from '../../favorites/linked.js';
+import { silentLogger } from '../../reopen/fakes.js';
+import type { FolderTab } from '../fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const MAHJONG_LINK: LinkEntry = { kind: 'link', id: '11', title: 'Mahjong Soul', url: MAHJONG, key: 'mahjongsoul.game.yo-star.com', depth: 0 };

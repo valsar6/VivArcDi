@@ -1,15 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { Row } from '../../../src/modules/folders/FolderRows.js';
-import { FolderSectionView } from '../../../src/modules/folders/FolderSectionView.js';
-import { LinkActivator } from '../../../src/shared/links/LinkActivator.js';
-import { OpenLinks } from '../../../src/shared/links/OpenLinks.js';
-import type { OpenTab } from '../../../src/shared/links/OpenLinks.js';
-import { DomDocument, asDocument } from '../../core/dom.js';
-import type { DomNode } from '../../core/dom.js';
-import { ManualTimers } from '../copyurl/fakes.js';
-import { silentLogger } from '../reopen/fakes.js';
-import { FolderTabs, immediateFrames } from './fakes.js';
+import type { Row } from '../../../../src/modules/folders/view/FolderRows.js';
+import { FolderSectionView } from '../../../../src/modules/folders/view/FolderSectionView.js';
+import { LinkActivator } from '../../../../src/shared/links/LinkActivator.js';
+import { OpenLinks } from '../../../../src/shared/links/OpenLinks.js';
+import type { OpenTab } from '../../../../src/shared/links/OpenLinks.js';
+import { DomDocument, asDocument } from '../../../core/dom.js';
+import type { DomNode } from '../../../core/dom.js';
+import { ManualTimers } from '../../copyurl/fakes.js';
+import { silentLogger } from '../../reopen/fakes.js';
+import { FolderTabs, immediateFrames } from '../fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const KEY = 'mahjongsoul.game.yo-star.com';

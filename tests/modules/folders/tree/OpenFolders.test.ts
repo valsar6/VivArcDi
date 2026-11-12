@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { OPEN_FOLDERS_STORAGE_KEY, OpenFolders } from '../../../src/modules/folders/OpenFolders.js';
-import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
+import { OPEN_FOLDERS_STORAGE_KEY, OpenFolders } from '../../../../src/modules/folders/tree/OpenFolders.js';
+import { MemoryStorage, silentLogger } from '../../reopen/fakes.js';
 
 test('remembers the open folders of each workspace separately', () => {
   const storage = new MemoryStorage();

@@ -1,8 +1,8 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
+import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import type { Logger } from '../../../core/Logger.js';
 import type { DropTarget } from './DropTargets.js';
 import { DropPlace } from './DropPlace.js';
-import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
+import type { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
 
 export interface TabDropDependencies {
   tabs: Pick<BrowserTabs, 'get'>;

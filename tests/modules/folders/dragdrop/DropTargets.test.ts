@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DropTargets } from '../../../src/modules/folders/DropTargets.js';
-import { DomDocument, asElement } from '../../core/dom.js';
-import type { DomNode } from '../../core/dom.js';
+import { DropTargets } from '../../../../src/modules/folders/dragdrop/DropTargets.js';
+import { DomDocument, asElement } from '../../../core/dom.js';
+import type { DomNode } from '../../../core/dom.js';
 
 const ROW_HEIGHT = 30;
 

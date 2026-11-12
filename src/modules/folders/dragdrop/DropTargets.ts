@@ -1,4 +1,4 @@
-import { LinkId } from '../../core/LinkId.js';
+import { LinkId } from '../../../core/LinkId.js';
 
 export type DropTarget =
   | { kind: 'header' }

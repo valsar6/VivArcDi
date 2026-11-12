@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from '../../core/PersistentStorage.js';
+import type { KeyValueStorage } from '../../../core/PersistentStorage.js';
 
 const KEY = 'vivarcdi.createdLinks';
 

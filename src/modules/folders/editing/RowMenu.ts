@@ -1,8 +1,8 @@
-import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from '../../core/CommandLabels.js';
-import type { ContextMenu, MenuItem } from '../../core/ContextMenu.js';
-import { LinkId } from '../../core/LinkId.js';
-import type { LinkRemoval } from './LinkRemoval.js';
-import { LINK_ATTRIBUTE } from './DropTargets.js';
+import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from '../../../core/CommandLabels.js';
+import type { ContextMenu, MenuItem } from '../../../core/ContextMenu.js';
+import { LinkId } from '../../../core/LinkId.js';
+import type { LinkRemoval } from '../favoritelinks/LinkRemoval.js';
+import { LINK_ATTRIBUTE } from '../dragdrop/DropTargets.js';
 
 export interface RowMenuDependencies {
   /** The document of Vivaldi's browser window. */

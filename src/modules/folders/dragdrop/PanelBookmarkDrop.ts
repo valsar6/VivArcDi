@@ -1,7 +1,7 @@
 import type { DropPlace } from './DropPlace.js';
 import type { DropTargets } from './DropTargets.js';
 import { PanelDragData } from './PanelDragData.js';
-import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
+import type { WorkspaceFavorites } from '../favoritelinks/WorkspaceFavorites.js';
 
 export interface PanelBookmarkDropDependencies {
   /** The document of Vivaldi's browser window. */

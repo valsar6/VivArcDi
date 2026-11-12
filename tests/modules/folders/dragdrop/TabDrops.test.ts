@@ -1,14 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import { TabData } from '../../../src/core/TabData.js';
-import { CreatedLinks } from '../../../src/modules/folders/CreatedLinks.js';
-import { TabDrops } from '../../../src/modules/folders/TabDrops.js';
-import { TabLinks } from '../../../src/modules/folders/TabLinks.js';
-import { WorkspaceFavorites } from '../../../src/modules/folders/WorkspaceFavorites.js';
-import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
-import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from './fakes.js';
-import type { FolderTab } from './fakes.js';
+import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
+import { TabData } from '../../../../src/core/TabData.js';
+import { CreatedLinks } from '../../../../src/modules/folders/favoritelinks/CreatedLinks.js';
+import { TabDrops } from '../../../../src/modules/folders/dragdrop/TabDrops.js';
+import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
+import { WorkspaceFavorites } from '../../../../src/modules/folders/favoritelinks/WorkspaceFavorites.js';
+import { MemoryStorage, silentLogger } from '../../reopen/fakes.js';
+import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../fakes.js';
+import type { FolderTab } from '../fakes.js';
 
 const PAGE = 'https://example.com/page';
 const TREE = bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', [folder('32', 'Hobbies', [link('34', 'Chess', 'https://chess.com/')]), link('33', 'Mine', 'https://mine.example/')])])]);

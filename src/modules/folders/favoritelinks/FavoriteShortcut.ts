@@ -1,7 +1,7 @@
-import { AddressKey } from '../../core/AddressKey.js';
-import { KeptTab } from '../../core/KeptTab.js';
-import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
+import { AddressKey } from '../../../core/AddressKey.js';
+import { KeptTab } from '../../../core/KeptTab.js';
+import type { Logger } from '../../../core/Logger.js';
+import { TabData } from '../../../core/TabData.js';
 import type { WorkspaceFavorites } from './WorkspaceFavorites.js';
 
 export type FavoriteKey = Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'shiftKey' | 'altKey' | 'defaultPrevented'>;

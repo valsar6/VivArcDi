@@ -1,5 +1,5 @@
 import type { DropTarget } from './DropTargets.js';
-import type { AddPlace } from './WorkspaceFavorites.js';
+import type { AddPlace } from '../favoritelinks/WorkspaceFavorites.js';
 
 export class DropPlace {
   #indexBefore: (bookmarkId: string | null) => number | undefined;
