@@ -28,7 +28,7 @@ test('allows several live folders in one workspace, each with its own filters', 
   assert.deepEqual(store.folders('5').map((folder) => folder.filters.drafts), [true, false]);
 });
 
-test('restores the last rows at startup', () => {
+test('keeps the rows and the warning across a restart', () => {
   const storage = new MemoryStorage();
   const first = new LiveFolderStore(storage, recordingLogger().logger, ids());
   first.add('5');

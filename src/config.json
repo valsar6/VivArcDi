@@ -53,7 +53,8 @@
     },
     "live-folders": {
       "enabled": true,
-      "refreshMinutes": 5
+      "refreshMinutes": 5,
+      "githubClientId": ""
     },
     "folder-preview": {
       "enabled": true,

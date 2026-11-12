@@ -13,8 +13,10 @@ export interface LiveFolder {
   rows: PullRequestRow[];
   /** Why the last refresh failed, or null. */
   warning: string | null;
-  /** Whether the last refresh found no token. */
-  needsToken: boolean;
+  /** Whether GitHub refused the connection at the last refresh, so that the folder offers `Reconnect GitHub`. */
+  needsReconnect: boolean;
+  /** The pull requests the user archived, by id, with the `updatedAt` they had; one that changed since comes back. */
+  archived: Record<string, string>;
   /** When the last refresh succeeded, in milliseconds since the epoch, or null. */
   refreshedAt: number | null;
 }
@@ -38,7 +40,7 @@ export class LiveFolderStore {
   /**
    * The live folders of every workspace, their filters and their last rows, kept in the
    * interface's storage under `liveFolders` as `{ [workspace]: LiveFolder[] }`. They are read
-   * once, here, and every change is written at once. The token is never part of them.
+   * once, here, and every change is written at once. The GitHub connection is not part of them.
    *
    * @param storage Persistent storage.
    * @param logger Logger for storage failures.
@@ -94,7 +96,8 @@ export class LiveFolderStore {
       filters: PullRequestFilters.defaults(),
       rows: [],
       warning: null,
-      needsToken: false,
+      needsReconnect: false,
+      archived: {},
       refreshedAt: null,
     };
     const key = workspace ?? NO_WORKSPACE;
@@ -177,10 +180,16 @@ export class LiveFolderStore {
         filters: PullRequestFilters.from(item['filters']),
         rows: Array.isArray(item['rows']) ? item['rows'].filter(LiveFolderStore.#isRow) : [],
         warning: typeof item['warning'] === 'string' ? item['warning'] : null,
-        needsToken: item['needsToken'] === true,
+        needsReconnect: item['needsReconnect'] === true,
+        archived: LiveFolderStore.#archivedFrom(item['archived']),
         refreshedAt: typeof item['refreshedAt'] === 'number' ? item['refreshedAt'] : null,
       },
     ];
+  }
+
+  static #archivedFrom(value: unknown): Record<string, string> {
+    const record = typeof value === 'object' && value !== null ? Object.entries(value) : [];
+    return Object.fromEntries(record.filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
   }
 
   static #isRow(value: unknown): value is PullRequestRow {

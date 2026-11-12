@@ -37,4 +37,12 @@ export class LinkId {
   public static folderOf(id: string): string | null {
     return LinkId.isVirtual(id) ? (id.slice(PREFIX.length).split(SEPARATOR)[0] ?? null) : null;
   }
+
+  /**
+   * @param id The id of a live folder or of one of its rows.
+   * @returns The id of the row inside the folder, or null when the id is not virtual or names the folder itself.
+   */
+  public static rowOf(id: string): string | null {
+    return LinkId.isVirtual(id) ? (id.slice(PREFIX.length).split(SEPARATOR)[1] ?? null) : null;
+  }
 }

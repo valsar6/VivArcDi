@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import getpass
 import sys
 from typing import Callable, Protocol
 
@@ -37,34 +36,3 @@ class NeverPrompt:
         """Answer no."""
         return False
 
-
-class SecretPrompt(Protocol):
-    """Asks the user for a secret that must not show on the screen."""
-
-    def ask(self, question: str) -> str:
-        """Return what the user typed, or an empty string when nothing was given."""
-
-
-class ConsoleSecretPrompt:
-    """Asks on the terminal without echoing. No terminal means no answer."""
-
-    def __init__(self, read: Callable[[str], str] = getpass.getpass, interactive: Callable[[], bool] = sys.stdin.isatty):
-        self._read = read
-        self._interactive = interactive
-
-    def ask(self, question: str) -> str:
-        """Ask `question` and return the answer without surrounding spaces."""
-        if not self._interactive():
-            return ""
-        try:
-            return self._read(f"{question} ").strip()
-        except EOFError:
-            return ""
-
-
-class NeverSecretPrompt:
-    """Never asks and always answers nothing, for windows and background runs."""
-
-    def ask(self, question: str) -> str:
-        """Answer nothing."""
-        return ""

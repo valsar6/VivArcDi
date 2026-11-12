@@ -13,10 +13,11 @@ interface Setup {
   opened: Array<{ items: MenuItem[]; x: number; y: number }>;
   refreshed: string[];
   removed: string[];
+  disconnected: string[];
   editors: Array<{ x: number; y: number; repositories: string[]; save: (repositories: string[]) => void }>;
 }
 
-function setup(anchor: { x: number; y: number } | null = null): Setup {
+function setup(anchor: { x: number; y: number } | null = null, connected = true): Setup {
   const storage = new MemoryStorage();
   const store = new LiveFolderStore(storage, recordingLogger().logger, () => 'f1');
   store.add('5');
@@ -24,30 +25,43 @@ function setup(anchor: { x: number; y: number } | null = null): Setup {
   const refreshed: string[] = [];
   const removed: string[] = [];
   const editors: Setup['editors'] = [];
+  const disconnected: string[] = [];
   const menu = new LiveFolderMenu({
     menu: { open: (items, x, y): void => void opened.push({ items, x, y }) },
     editor: { open: (x, y, repositories, save): void => void editors.push({ x, y, repositories, save }) },
     store,
     refresh: (folderId): void => void refreshed.push(folderId),
     remove: (folderId): void => void removed.push(folderId),
+    connected: (): boolean => connected,
+    disconnect: (): void => void disconnected.push('github'),
     anchor: (): { x: number; y: number } | null => anchor,
   });
-  return { storage, store, menu, opened, refreshed, removed, editors };
+  return { storage, store, menu, opened, refreshed, removed, editors, disconnected };
 }
 
 const submenu = (items: MenuItem[], label: string): MenuItem[] => (items.find((item) => item.label === label) as SubmenuItem).items;
 const command = (items: MenuItem[], label: string): CommandItem => items.find((item) => item.label === label) as CommandItem;
 
-test('opens a menu with the filters, Refresh and Delete Live Folder', () => {
+test('opens a menu with the filters, Refresh, Disconnect GitHub and Delete Live Folder', () => {
   const context = setup();
   context.menu.open('live:f1', 10, 20);
   const [menu] = context.opened;
   assert.deepEqual([menu?.x, menu?.y], [10, 20]);
-  assert.deepEqual(menu?.items.map((item) => item.label), ['Pull Requests', 'Refresh', 'Delete Live Folder']);
+  assert.deepEqual(menu?.items.map((item) => item.label), ['Pull Requests', 'Refresh', 'Disconnect GitHub', 'Delete Live Folder']);
   const filters = submenu(menu?.items ?? [], 'Pull Requests');
   assert.deepEqual(filters.map((item) => item.label), ['Created By Me', 'Review Requests', 'Drafts', 'Repositories…']);
   assert.deepEqual(filters.slice(0, 3).map((item) => (item as CommandItem).checked), [true, true, true]);
   assert.equal((filters[3] as CommandItem).checked, undefined);
+});
+
+test('offers Disconnect GitHub only while GitHub is connected, and forgets the connection with it', () => {
+  const connected = setup();
+  connected.menu.open('live:f1', 0, 0);
+  command(connected.opened[0]?.items ?? [], 'Disconnect GitHub').run();
+  assert.deepEqual(connected.disconnected, ['github']);
+  const apart = setup(null, false);
+  apart.menu.open('live:f1', 0, 0);
+  assert.deepEqual(apart.opened[0]?.items.map((item) => item.label), ['Pull Requests', 'Refresh', 'Delete Live Folder']);
 });
 
 test('stores the filters of a live folder', () => {

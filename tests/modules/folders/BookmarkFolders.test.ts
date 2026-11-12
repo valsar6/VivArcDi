@@ -455,6 +455,7 @@ const handlersOf = (seen: string[]): Parameters<VirtualFolders['handle']>[0] => 
   rename: (id, name): void => void seen.push(`rename ${id} ${name}`),
   open: (id): void => void seen.push(`open ${id}`),
   menu: (id, x, y): void => void seen.push(`menu ${id} ${x} ${y}`),
+  activate: (id): boolean => (seen.push(`activate ${id}`), id.endsWith(':connect')),
 });
 
 test('draws the live folders after the bookmark folders of their workspace', async (t) => {
@@ -551,6 +552,45 @@ test('hands the right click on a live folder to its source and leaves bookmark f
   click(rows(dom)[0]);
   assert.deepEqual(seen, ['menu live:f1 4 9']);
   assert.equal(prevented, 1);
+  module.stop();
+});
+
+test('hands the right click on a live row to its source', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = workspaceSetup();
+  const seen: string[] = [];
+  const virtual = VirtualFolders.of(context.document);
+  virtual.handle(handlersOf(seen));
+  virtual.set(casetta, [liveFolder()]);
+  await module.start(context);
+  await frame();
+  rows(dom)[1]?.click();
+  await toggleDelay();
+  await frame();
+  let prevented = 0;
+  sectionOf(dom)?.bubble({ type: 'contextmenu', target: rows(dom)[2], clientX: 6, clientY: 8, preventDefault: (): number => (prevented += 1), stopPropagation: (): void => undefined } as unknown as Event);
+  assert.deepEqual(seen, ['open live:f1', 'menu live:f1:7 6 8']);
+  assert.equal(prevented, 1);
+  module.stop();
+});
+
+test('lets the source take the click on a live row as its own action before opening a tab', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  const seen: string[] = [];
+  const virtual = VirtualFolders.of(context.document);
+  virtual.handle(handlersOf(seen));
+  virtual.set(casetta, [{ kind: 'folder', id: 'live:f1', title: 'Pull Requests', depth: 0, live: true, children: [{ kind: 'link', id: 'live:f1:connect', title: 'Connect GitHub', url: `https://${LIVE_PATH}`, key: LIVE_PATH, depth: 1 }] }]);
+  await module.start(context);
+  await frame();
+  const before = tabs.tabs.size;
+  rows(dom)[1]?.click();
+  await toggleDelay();
+  await frame();
+  rows(dom)[2]?.click();
+  await frame();
+  assert.deepEqual(seen, ['open live:f1', 'activate live:f1:connect']);
+  assert.equal(tabs.tabs.size, before);
   module.stop();
 });
 

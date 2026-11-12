@@ -19,3 +19,10 @@ test('finds the folder of a folder id or of a row id', () => {
   assert.equal(LinkId.folderOf('live:abc:7'), 'abc');
   assert.equal(LinkId.folderOf('123'), null);
 });
+
+test('finds the row of a row id, and none for a folder or a bookmark id', () => {
+  assert.equal(LinkId.rowOf('live:abc:7'), '7');
+  assert.equal(LinkId.rowOf('live:abc:connect'), 'connect');
+  assert.equal(LinkId.rowOf('live:abc'), null);
+  assert.equal(LinkId.rowOf('123'), null);
+});

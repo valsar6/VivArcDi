@@ -67,13 +67,17 @@ test('gives the clicks to the handlers of the source and forgets them when remov
     rename: (id, name): void => void seen.push(`rename ${id} ${name}`),
     open: (id): void => void seen.push(`open ${id}`),
     menu: (id, x, y): void => void seen.push(`menu ${id} ${x} ${y}`),
+    activate: (id): boolean => (seen.push(`activate ${id}`), id === 'live:a:connect'),
   });
   virtual.rename('live:a', 'Mine');
   virtual.open('live:a');
   virtual.openMenu('live:a', 3, 4);
+  assert.equal(virtual.activate('live:a:connect'), true);
+  assert.equal(virtual.activate('live:a:7'), false);
   remove();
   virtual.open('live:a');
-  assert.deepEqual(seen, ['rename live:a Mine', 'open live:a', 'menu live:a 3 4']);
+  assert.equal(virtual.activate('live:a:connect'), false);
+  assert.deepEqual(seen, ['rename live:a Mine', 'open live:a', 'menu live:a 3 4', 'activate live:a:connect', 'activate live:a:7']);
 });
 
 test('asks the section to show a folder open', () => {

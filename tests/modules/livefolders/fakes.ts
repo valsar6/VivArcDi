@@ -1,6 +1,9 @@
 import { Logger } from '../../../src/core/Logger.js';
 import type { LogSink } from '../../../src/core/Logger.js';
+import { CODE_URL, TOKEN_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
+import type { DeviceFetch } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import type { GithubFetch, GithubResponse, SearchItem } from '../../../src/modules/livefolders/GithubPullRequests.js';
+import { settle } from '../reopen/fakes.js';
 
 export const ME = 'tore';
 
@@ -29,6 +32,7 @@ export const pullRequest = (id: number, changes: Partial<FakePullRequest> = {}):
 
 export interface Request {
   url: string;
+  method: string;
   query: string;
   headers: Record<string, string>;
 }
@@ -46,9 +50,12 @@ export class FakeGithub {
 
   public fetch: GithubFetch = async (url, init) => {
     const query = new URL(url).searchParams.get('q') ?? '';
-    this.requests.push({ url, query, headers: init.headers });
+    this.requests.push({ url, method: init.method, query, headers: init.headers });
     if (this.unreachable) {
       throw new TypeError('network down');
+    }
+    if (new URL(url).pathname === '/user') {
+      return { ok: this.status === 200, status: this.status, json: async () => ({ login: ME }) };
     }
     const items = this.status === 200 ? this.pullRequests.filter((candidate) => FakeGithub.#matches(candidate, query)).map(FakeGithub.#item) : [];
     const response: GithubResponse = { ok: this.status === 200, status: this.status, json: async () => ({ items }) };
@@ -124,5 +131,55 @@ export class ManualTicker {
 
   public tick(): void {
     this.runs.forEach((run) => run());
+  }
+}
+
+export interface DeviceRequest {
+  url: string;
+  fields: Record<string, string>;
+}
+
+/** GitHub's device flow: hands out a code, then answers each check with the next scripted answer. */
+export class FakeDeviceGithub {
+  public requests: DeviceRequest[] = [];
+  public answers: Array<Record<string, unknown>> = [];
+  public unreachable = false;
+  public code: Record<string, unknown> = { device_code: 'dev-123', user_code: 'WDJB-MJHT', verification_uri: 'https://github.com/login/device', expires_in: 900, interval: 5 };
+
+  public send: DeviceFetch = async (url, init) => {
+    this.requests.push({ url, fields: Object.fromEntries(new URLSearchParams(init.body)) });
+    if (this.unreachable) {
+      throw new TypeError('network down');
+    }
+    const body = url === CODE_URL ? this.code : (this.answers.shift() ?? { error: 'authorization_pending' });
+    return { ok: true, status: 200, json: async () => body };
+  };
+
+  public get checks(): DeviceRequest[] {
+    return this.requests.filter((request) => request.url === TOKEN_URL);
+  }
+}
+
+/** Timers that run only when the test says so, and remember the delay of each. */
+export class ManualTimers {
+  public delays: number[] = [];
+  public pending: Array<{ run: () => void; handle: number }> = [];
+  #next = 0;
+
+  public set = (run: () => void, delayMs: number): unknown => {
+    this.delays.push(delayMs);
+    this.#next += 1;
+    this.pending.push({ run, handle: this.#next });
+    return this.#next;
+  };
+
+  public clear = (handle: unknown): void => {
+    this.pending = this.pending.filter((timer) => timer.handle !== handle);
+  };
+
+  public async fire(): Promise<void> {
+    const timer = this.pending.shift();
+    timer?.run();
+    await settle();
   }
 }

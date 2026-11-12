@@ -8,8 +8,10 @@ export interface VirtualFolderHandlers {
   rename: (id: string, name: string) => void;
   /** A live folder was opened. */
   open: (id: string) => void;
-  /** The user asked for the menu of a live folder, at a point of the window. */
+  /** The user asked for the menu of a live folder or of one of its rows, at a point of the window. */
   menu: (id: string, x: number, y: number) => void;
+  /** A row was clicked; returns true when it is an action of the source, so that no tab opens for it. */
+  activate: (id: string) => boolean;
 }
 
 const NO_WORKSPACE = '';
@@ -124,7 +126,15 @@ export class VirtualFolders {
   }
 
   /**
-   * @param id A virtual folder.
+   * @param id A virtual row the user clicked.
+   * @returns Whether the source took the click as one of its own actions, such as `Connect GitHub`.
+   */
+  public activate(id: string): boolean {
+    return this.#handlers?.activate(id) ?? false;
+  }
+
+  /**
+   * @param id A virtual folder or row.
    * @param x Horizontal position of the pointer in the window.
    * @param y Vertical position of the pointer in the window.
    */

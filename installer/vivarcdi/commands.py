@@ -6,11 +6,11 @@ from typing import Callable, Protocol
 from .handoff import ReapplyHandoff
 from .errors import PermissionDeniedError
 from .hooks import UpdateHook
-from .live_token import TokenVault
+from .legacy_token import LegacyTokenFiles
 from .notifier import ReapplyOutcome, SilentOutcome
 from .patching import InstallationPatcher
 from .platforms import Platform
-from .prompt import NeverPrompt, NeverSecretPrompt, Prompt, SecretPrompt
+from .prompt import NeverPrompt, Prompt
 from .reporter import Reporter
 from .shortcuts import ShortcutService
 from .modes import InstallMode
@@ -24,7 +24,6 @@ THEME_ASK = "ask"
 THEME_APPLY = "apply"
 THEME_NEVER = "never"
 THEME_QUESTION = "Apply the VivArcDi Light theme?"
-TOKEN_QUESTION = "GitHub token with read access to pull requests (nothing shows while you type):"
 
 
 @dataclass
@@ -44,7 +43,7 @@ class InstallerContext:
     data_dir: Path
     ownership: Ownership
     takeover: LegacyTakeover
-    vault: TokenVault
+    legacy_token: LegacyTokenFiles
     outcome: ReapplyOutcome = field(default_factory=SilentOutcome)
     background: bool = False
     shortcut_action: str = "status"
@@ -56,8 +55,6 @@ class InstallerContext:
     profile_is_yours: bool = True
     prompt: Prompt = field(default_factory=NeverPrompt)
     needs_reapply: bool = False
-    secret_prompt: SecretPrompt = field(default_factory=NeverSecretPrompt)
-    remove_token: bool = False
 
 
 class Command(ABC):
@@ -171,7 +168,7 @@ class UninstallCommand(Command):
         context.hook.remove()
         context.handoff.clear()
         context.stager.unstage()
-        context.vault.remove()
+        context.legacy_token.remove_stored()
         context.ownership.release()
         report.info(f"Backups of the original window.html stay in {context.data_dir}")
         if context.restore_shortcuts:
@@ -242,48 +239,6 @@ class ThemeCommand(Command):
         return service.status(show_keys=context.show_keys)
 
 
-class LiveFoldersCommand(Command):
-    """Stores the GitHub token of the live folders outside the browser, or removes it."""
-
-    name = "live-folders"
-    help = "store or remove the GitHub token of the live folders"
-    actions = ("token",)
-
-    def execute(self, context: InstallerContext) -> int:
-        if context.remove_token:
-            return self._remove(context)
-        token = context.secret_prompt.ask(TOKEN_QUESTION)
-        if not token:
-            context.reporter.error("No token given: run it in a terminal and paste the token")
-            return 1
-        context.vault.save(token)
-        context.reporter.info(f"Stored the GitHub token in {context.vault.path}")
-        for installation in context.platform.find_installations():
-            self._copy(context, installation)
-        context.reporter.info("The live folders use it at their next refresh.")
-        return 0
-
-    @staticmethod
-    def _copy(context: InstallerContext, installation) -> None:
-        if not installation.payload_dir.is_dir():
-            return
-        try:
-            context.vault.copy_to(installation.payload_dir)
-        except OSError:
-            context.reporter.warn(f"Could not copy the token into {installation.label}: run the install command again")
-
-    @staticmethod
-    def _remove(context: InstallerContext) -> int:
-        context.vault.remove()
-        for installation in context.platform.find_installations():
-            try:
-                context.vault.remove_from(installation.payload_dir)
-            except OSError:
-                context.reporter.warn(f"Could not remove the token from {installation.label}: run the install command again")
-        context.reporter.info("Removed the GitHub token of the live folders")
-        return 0
-
-
 class WindowLauncher(Protocol):
     """Opens the window and returns when it is closed."""
 
@@ -322,6 +277,5 @@ COMMANDS: tuple[Command, ...] = (
     StatusCommand(),
     ShortcutsCommand(),
     ThemeCommand(),
-    LiveFoldersCommand(),
     WindowCommand(),
 )
