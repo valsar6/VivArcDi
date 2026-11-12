@@ -1,11 +1,16 @@
-import type { MenuItem } from '../../core/ContextMenu.js';
+import type { MenuItem, SubmenuItem } from '../../core/ContextMenu.js';
 
 export const RENAME_LABEL = 'Rename…';
+export const DUPLICATE_LABEL = 'Duplicate';
 export const DELETE_LABEL = 'Delete';
 
 export interface FolderActions {
   /** Starts editing the name of a folder row. */
   rename: (folderId: string) => void;
+  /** Adds a closed copy of a folder right below it. */
+  duplicate: (folderId: string) => void;
+  /** The `Move to` submenu of a folder; null when there is no workspace to move to. */
+  moveTo: (folderId: string) => SubmenuItem | null;
   /** Moves a folder to the Trash and closes the tabs of its links. */
   remove: (folderId: string) => void;
 }
@@ -35,6 +40,11 @@ export class FolderMenuItems {
   }
 
   #groups(folderId: string): MenuItem[][] {
-    return [[{ label: RENAME_LABEL, run: (): void => this.#actions.rename(folderId) }], [{ label: DELETE_LABEL, run: (): void => this.#actions.remove(folderId) }]];
+    const moveTo = this.#actions.moveTo(folderId);
+    return [
+      [{ label: RENAME_LABEL, run: (): void => this.#actions.rename(folderId) }],
+      [{ label: DUPLICATE_LABEL, run: (): void => this.#actions.duplicate(folderId) }, ...(moveTo === null ? [] : [moveTo])],
+      [{ label: DELETE_LABEL, run: (): void => this.#actions.remove(folderId) }],
+    ];
   }
 }

@@ -3,6 +3,8 @@ export interface BookmarkNode {
   id: string;
   /** The folder that holds it; absent on the root. */
   parentId?: string | undefined;
+  /** Position among the children of its parent, when `chrome.bookmarks` reports it. */
+  index?: number | undefined;
   title: string;
   /** Vivaldi keeps a free text on every bookmark; absent when empty. */
   description?: string | undefined;
