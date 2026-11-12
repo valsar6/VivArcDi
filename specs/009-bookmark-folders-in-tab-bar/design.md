@@ -160,6 +160,26 @@ Uninstalling VivArcDi removes the section and leaves every bookmark as it was (A
 `root` defaults to `VivArcDi` in the module; `config.json` sets Tore's folder. The sizes are clamped
 to 20 to 100.
 
+## Folder icon and transition (FR-18, FR-19)
+
+`$folder-open-glyph` in `_tokens.scss` is the open folder; the closed `$folder-glyph` stays. The mask of
+`.vivarcdi-folders-folder-icon` switches on `[data-vivarcdi-open]`.
+
+`FolderSectionView` remembers the folder id of a click (`#toggled`) when the click delay ends, and the
+next `render` consumes it. A new `RowTransition` class compares the old and new rows of that folder:
+rows only in the new list get `data-vivarcdi-entering`; rows only in the old list are cloned from the old
+DOM, put back at their place with `data-vivarcdi-leaving`, and removed on `animationend` (with a timer
+fallback of 400 ms). Without a toggled id, `render` replaces the rows as before.
+
+`folders.scss` adds two keyframes (`vivarcdi-folders-in`, `vivarcdi-folders-out`: height from 0 to the
+row height and opacity, `$folders-transition` 200 ms), disabled under `prefers-reduced-motion`. Leaving
+rows ignore pointer events.
+
+| Risk | Mitigation |
+|---|---|
+| A render during the leave animation | The leaving rows are cloned, so a second render replaces everything; no state is held |
+| `animationend` never fires | The 400 ms timer removes the clone |
+
 ## Risks
 
 | Risk | Mitigation |
