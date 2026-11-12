@@ -34,6 +34,7 @@ function setup(copyFails = false): {
     copier: { write: async (text): Promise<void> => (copyFails ? Promise.reject(new Error('refused')) : void log.push(`copy ${text}`)) },
     openPage: (url): void => void log.push(`open ${url}`),
     closeAfterMs: 2000,
+    notify: (text): void => void log.push(`toast ${text}`),
     timers,
   });
   panel.open(5, 6);
@@ -63,7 +64,22 @@ test('copies the code and opens the device page', async () => {
   show(CODE_STATE);
   buttons(element())[0]?.click();
   await settle();
-  assert.deepEqual(log, ['run', 'copy WDJB-MJHT', 'open https://github.com/login/device']);
+  assert.deepEqual(log.filter((entry) => !entry.startsWith('toast')), ['run', 'copy WDJB-MJHT', 'open https://github.com/login/device']);
+});
+
+test('confirms the copied code with a toast', async () => {
+  const { element, show, log } = setup();
+  show(CODE_STATE);
+  buttons(element())[0]?.click();
+  await settle();
+  assert.deepEqual(log, ['run', 'copy WDJB-MJHT', 'toast Code copied, paste it on GitHub', 'open https://github.com/login/device']);
+});
+
+test('confirms a cancelled connection with a toast', () => {
+  const { element, show, log } = setup();
+  show(CODE_STATE);
+  buttons(element())[1]?.click();
+  assert.deepEqual(log, ['run', 'cancel', 'toast GitHub connection cancelled']);
 });
 
 test('opens the device page even when the copy is refused', async () => {
@@ -79,7 +95,7 @@ test('cancels the flow and closes on Cancel', () => {
   show(CODE_STATE);
   buttons(element())[1]?.click();
   assert.equal(element(), undefined);
-  assert.deepEqual(log, ['run', 'cancel']);
+  assert.deepEqual(log, ['run', 'cancel', 'toast GitHub connection cancelled']);
 });
 
 test('closes on Escape and stays open on a click elsewhere', () => {
@@ -91,7 +107,7 @@ test('closes on Escape and stays open on a click elsewhere', () => {
   element()?.bubble({ type: 'keydown', key: 'Escape', preventDefault: (): number => (prevented += 1), stopPropagation: (): void => undefined } as unknown as Event);
   assert.equal(element(), undefined);
   assert.equal(prevented, 1);
-  assert.deepEqual(log, ['run', 'cancel']);
+  assert.deepEqual(log, ['run', 'cancel', 'toast GitHub connection cancelled']);
 });
 
 test('says who is connected and closes after two seconds', () => {

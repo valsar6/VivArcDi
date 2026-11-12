@@ -4,6 +4,7 @@ import type { TextCopier } from '../copyurl/UrlCopier.js';
 
 export const PANEL_ATTRIBUTE = 'data-vivarcdi-connect-panel';
 export const CODE_ATTRIBUTE = 'data-vivarcdi-connect-code';
+export const PRIMARY_ATTRIBUTE = 'data-vivarcdi-connect-primary';
 
 export interface ConnectPanelDependencies {
   /** The document of Vivaldi's browser window. */
@@ -16,12 +17,16 @@ export interface ConnectPanelDependencies {
   openPage: (url: string) => void;
   /** How long `Connected as <login>` stays before the panel closes, in milliseconds. */
   closeAfterMs: number;
+  /** Shows a short confirmation to the user, such as the shared toast. */
+  notify: (text: string) => void;
   timers?: ToastTimers;
 }
 
 export const COPY_LABEL = 'Copy code and open GitHub';
 export const CANCEL_LABEL = 'Cancel';
 export const RETRY_LABEL = 'Try again';
+export const COPIED_MESSAGE = 'Code copied, paste it on GitHub';
+export const CANCELLED_MESSAGE = 'GitHub connection cancelled';
 
 const defaultTimers: ToastTimers = {
   set: (run, delayMs) => setTimeout(run, delayMs),
@@ -100,19 +105,27 @@ export class ConnectPanel {
   #content(state: ConnectState): HTMLElement[] {
     switch (state.step) {
       case 'asking':
-        return [this.#text('Asking GitHub for a code…'), this.#button(CANCEL_LABEL, () => this.close())];
+        return [this.#text('Asking GitHub for a code…'), this.#button(CANCEL_LABEL, () => this.#cancel())];
       case 'code':
-        return [this.#code(state.userCode), this.#text('Waiting for GitHub…'), this.#button(COPY_LABEL, () => this.#copyAndOpen(state)), this.#button(CANCEL_LABEL, () => this.close())];
+        return [this.#code(state.userCode), this.#text('Waiting for GitHub…'), this.#button(COPY_LABEL, () => this.#copyAndOpen(state), true), this.#button(CANCEL_LABEL, () => this.#cancel())];
       case 'connected':
         return [this.#text(state.login === '' ? 'Connected' : `Connected as ${state.login}`)];
       case 'failed':
-        return [this.#text(state.message), this.#button(RETRY_LABEL, () => this.#start()), this.#button(CANCEL_LABEL, () => this.close())];
+        return [this.#text(state.message), this.#button(RETRY_LABEL, () => this.#start(), true), this.#button(CANCEL_LABEL, () => this.#cancel())];
     }
   }
 
   #copyAndOpen({ userCode, verificationUri }: { userCode: string; verificationUri: string }): void {
     const open = (): void => this.#deps.openPage(verificationUri);
-    this.#deps.copier.write(userCode).then(open, open);
+    this.#deps.copier.write(userCode).then(() => {
+      this.#deps.notify(COPIED_MESSAGE);
+      open();
+    }, open);
+  }
+
+  #cancel(): void {
+    this.close();
+    this.#deps.notify(CANCELLED_MESSAGE);
   }
 
   #code(userCode: string): HTMLElement {
@@ -127,10 +140,11 @@ export class ConnectPanel {
     return element;
   }
 
-  #button(label: string, run: () => void): HTMLElement {
+  #button(label: string, run: () => void, primary = false): HTMLElement {
     const button = this.#deps.document.createElement('button');
     button.setAttribute('type', 'button');
     button.textContent = label;
+    button.toggleAttribute(PRIMARY_ATTRIBUTE, primary);
     button.addEventListener('click', run);
     return button;
   }
@@ -146,7 +160,7 @@ export class ConnectPanel {
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
-      this.close();
+      this.#cancel();
     }
   }
 }

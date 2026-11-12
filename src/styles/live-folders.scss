@@ -97,12 +97,14 @@
 #{$root} #{$connect-panel} {
   position: fixed;
   z-index: $repository-editor-layer;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: $gap;
   box-sizing: border-box;
-  width: $connect-panel-width;
-  padding: $gap;
+  width: max-content;
+  min-width: $connect-panel-min-width;
+  max-width: calc(100vw - #{2 * $gap});
+  padding: $connect-panel-padding;
   border-radius: $menu-radius;
   background-color: var(--colorBg, #222);
   box-shadow: $menu-shadow;
@@ -111,25 +113,48 @@
   -webkit-app-region: no-drag;
 
   > div {
-    flex: 1 0 100%;
+    grid-column: 1 / -1;
+    opacity: $subtitle-opacity;
+    text-align: center;
   }
 
   > #{$connect-code} {
+    padding-block: $gap;
+    opacity: 1;
     font-family: monospace;
     font-size: $connect-code-size;
-    letter-spacing: 0.08em;
-    text-align: center;
+    letter-spacing: $connect-code-spacing;
     user-select: text;
+    white-space: nowrap;
+
+    &::selection {
+      background-color: transparent;
+      color: inherit;
+    }
   }
 
   > button {
-    flex: 1;
-    height: $menu-row-height;
+    height: $connect-button-height;
+    padding-inline: $connect-button-padding;
     border: 0;
     border-radius: $menu-radius - $menu-padding;
+    background-color: transparent;
     color: inherit;
-    font: inherit;
-    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
     cursor: default;
+    font: inherit;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
+    }
+  }
+
+  > button#{$connect-primary} {
+    background-color: var(--colorHighlightBg, #4c8bf5);
+    color: var(--colorHighlightFg, #fff);
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{100% - $tint-hover}, var(--colorHighlightFg, #fff));
+    }
   }
 }
