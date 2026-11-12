@@ -56,7 +56,7 @@ jobs:
           echo "${contents}" | grep -q './usr/share/vivarcdi/vivarcdi-archive-keyring.gpg'
       - name: Build a signed test repository from the package and read it with apt
         run: scripts/check-apt-repo.sh build/vivarcdi_*_all.deb
-      - run: sudo apt-get install -y lintian && lintian --fail-on error build/*.deb
+      - run: sudo apt-get update && sudo apt-get install -y lintian && lintian --fail-on error build/*.deb
       - uses: actions/upload-artifact@v4
         with:
           name: vivarcdi-deb

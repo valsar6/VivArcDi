@@ -2,8 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Superseded |
 | Spec | [spec.md](spec.md) |
+
+**Superseded on 2026-11-12.** This design belongs to the first version of the spec. The revision of 2026-11-12 (space menu, filters, the user's pull requests) changes them; they will be rewritten after Tore approves it. Nothing here may be implemented.
 
 Written after the spec was approved on 2026-11-08; design approved by Tore on 2026-11-09, with the decisions on the open questions as written here. It says **how**; the spec says **what**.
 
