@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | First version 2026-11-08, never implemented; revision approved by Tore on 2026-11-12 (PR #148 merged with the proposed answers), implemented in 0.49.0 (PR #150); second revision of 2026-11-12 (connect GitHub from the browser) pending approval |
+| Approved | First version 2026-11-08, never implemented; revision approved by Tore on 2026-11-12 (PR #148 merged with the proposed answers), implemented in 0.49.0 (PR #150); second revision (connect GitHub from the browser) approved by Tore on 2026-11-12 (PR #151 merged with the proposed answers) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -196,19 +196,19 @@ Answered on 2026-11-12: Tore merged PR #148, which accepts every proposed answer
 
 ## Open questions of the second revision
 
-Each has a proposed answer; the revision stays Draft until Tore answers.
+Answered on 2026-11-12: Tore merged PR #151, which accepts every proposed answer.
 
-- [ ] **Who registers the OAuth App?** Proposal: Tore registers `VivArcDi` once in his GitHub
+- [x] **Who registers the OAuth App?** Proposal: Tore registers `VivArcDi` once in his GitHub
   settings (Developer settings, OAuth Apps, New OAuth App, "Enable Device Flow" checked) and sends the
   client id, which is public; the guide is in the project files, `live-folders/registra-app-github.md`.
-- [ ] **Scope `repo`.** It lets the app read and write private repositories; GitHub has no read-only
+- [x] **Scope `repo`.** It lets the app read and write private repositories; GitHub has no read-only
   scope for OAuth Apps. Proposal: ask `repo`, say in the manual that VivArcDi only reads. Alternative:
   ask no scope, and the folder lists only public repositories.
-- [ ] **Actions of a pull-request row** (Arc: `Archive Pull Request`, `Copy PR`, `Copy Link`).
+- [x] **Actions of a pull-request row** (Arc: `Archive Pull Request`, `Copy PR`, `Copy Link`).
   Proposal: `Copy Link` now, with the copy and toast of 004; `Archive Pull Request` hides the pull
   request from the folder until it is updated on GitHub. `Copy PR` is left out: the article does not say
   what it copies.
-- [ ] **Where the right click works.** Arc opens the menu on a right click anywhere in the sidebar.
+- [x] **Where the right click works.** Arc opens the menu on a right click anywhere in the sidebar.
   Proposal: keep the space header for now, and add the empty area below the folders in a later
   revision.
 

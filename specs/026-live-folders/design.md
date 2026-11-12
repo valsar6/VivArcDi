@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Draft (second revision); first revision Approved 2026-11-12 (PR #149) |
 | Spec | [spec.md](spec.md) |
 
 Written after the revision of the spec was approved on 2026-11-12 (PR #148). It replaces the design of
@@ -168,3 +168,86 @@ The `live-folders` list of the first version is not read (FR-7). Folders are cre
 | The token is readable in the payload folder | Mode 600, same user as Vivaldi; never in browser storage, never in logs |
 | A virtual id reaches code that writes bookmarks | One `LinkId.isVirtual` test, a unit test for each writer that it skips virtual ids |
 | A live row tab is taken for a bookmark link by 008 or 030 | 008 reads the bookmark tree and 030 syncs bookmarks: neither sees virtual ids; covered by the test above |
+
+## Second revision: connect GitHub from the browser
+
+Written after the second revision of the spec was approved on 2026-11-12 (PR #151, proposals
+accepted). It replaces the token file and the `GithubToken` part above; the rest stays.
+
+### Device flow (FR-5, AC-18 to AC-21)
+
+`GithubDeviceFlow` talks to GitHub's device flow with an injectable `fetch` and timer:
+
+1. `start(clientId)` posts `client_id` and `scope=repo` to `https://github.com/login/device/code`
+   (`Accept: application/json`) and returns `{ userCode, deviceCode, verificationUri, interval,
+   expiresIn }`.
+2. `wait(code)` posts `client_id`, `device_code` and
+   `grant_type=urn:ietf:params:oauth:grant-type:device_code` to
+   `https://github.com/login/oauth/access_token` every `interval` seconds. `authorization_pending`
+   waits again; `slow_down` adds five seconds to the interval, as GitHub asks (AC-19);
+   `expired_token` and `access_denied` end with a typed failure (AC-21); `access_token` ends with the
+   token. `cancel()` stops the timer.
+
+The device flow needs only the client id, which is public; there is no client secret anywhere.
+
+### Connection (FR-5, AC-16, AC-20, AC-22, AC-23)
+
+`GithubConnection` replaces `GithubToken`. It keeps `{ token, login }` in `context.storage` under
+`liveFolders.github`, reads `login` with `GET https://api.github.com/user` right after the token
+arrives, and offers `token`, `login`, `save`, `forget` and `onChange`. `GithubPullRequests` reads
+the token from it. The token goes only into the `Authorization` header of requests to
+`api.github.com`; no log line, warning or error carries it or the headers (AC-16).
+
+- Connected: every live folder refreshes on `onChange` (AC-20).
+- `Disconnect GitHub` in the folder menu calls `forget()`; every folder shows `Connect GitHub`
+  (AC-22).
+- A 401 on a refresh keeps the rows, sets the warning `GitHub refused the connection` and the flag
+  `needsReconnect`; `LiveEntries` then puts a `Reconnect GitHub` row first (AC-23). The token is kept
+  until the user reconnects or disconnects, so a passing GitHub error never logs the user out.
+
+### Connect panel (AC-18)
+
+A click on `Connect GitHub` or `Reconnect GitHub` (a virtual row with id `live:<folderId>:connect`,
+routed by `VirtualFolders` to the module instead of opening a tab) opens `ConnectPanel` below the
+folder row, built like `RepositoryEditor`: it shows `Asking GitHub for a code…`, then the user code
+in large monospace letters, `Copy code and open GitHub` and `Cancel`. The button copies the code with
+the clipboard helper of 004 and opens `verificationUri` with `WorkspaceTabs.open` in the active
+workspace. The panel shows `Waiting for GitHub…` while `wait` runs, `Connected as <login>` for two
+seconds on success, and the failure with `Try again` on expiry or denial. Closing the panel cancels
+the flow. One flow runs at a time, shared by every folder.
+
+Without a client id (`githubClientId` empty) the row reads `GitHub is not set up in this VivArcDi`,
+the panel does not open, and the module logs one warning.
+
+### Row actions (open question answered: Copy Link, Archive Pull Request)
+
+`LiveRowMenu` opens on a right click over a live pull-request row (Vivaldi's menu is cancelled there,
+as `RowMenu` does for bookmark links):
+
+| Item | Effect |
+|---|---|
+| `Copy Link` | Copies the pull request's address and shows the `Copied` toast of 004. |
+| `Archive Pull Request` | Adds `{ id: updatedAt }` to the folder's `archived` map in the store and removes the row. At each refresh a pull request whose `updated_at` is newer than the archived value comes back and leaves the map; ids that are no longer in the answer leave the map too. |
+
+`GithubPullRequests` keeps `updated_at` on each row for this.
+
+### Installer (FR-8, AC-24)
+
+`live_token.py`, the `live-folders token` command, its options and the copy on deploy are removed.
+Every install and reapply deletes `<data dir>/secrets/github-token` and
+`<payload>/secrets/github-token` if present, and the empty `secrets` folders.
+
+### Configuration
+
+```json
+"live-folders": { "enabled": true, "refreshMinutes": 5, "githubClientId": "<client id of the VivArcDi OAuth App>" }
+```
+
+### Risks of the second revision
+
+| Risk | Mitigation |
+|---|---|
+| `github.com/login/device/code` and `/login/oauth/access_token` send no CORS headers | `window.html` is an extension page with host access, where CORS does not apply; the probe `live-folders/sonda-accesso-github.md` confirms it before code. If it fails, the requests go through the extension's background page |
+| The token sits in the browser profile | Only VivArcDi's storage reads it; never logged; GitHub lets the user revoke it at any time, the manual says where |
+| Scope `repo` grants write access | VivArcDi sends only `GET` to `api.github.com`; a test fails if any other method is used with the token |
+| The user closes the panel while GitHub is open | The flow is cancelled; `Connect GitHub` starts a new code |
