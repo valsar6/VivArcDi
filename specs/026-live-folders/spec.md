@@ -129,6 +129,8 @@ touched, because a live folder is not a bookmark folder.
   registered as `VivArcDi`. Its client id ships in `config.json` (option `githubClientId`); the
   device flow needs no client secret. The token is kept in the browser profile's storage of VivArcDi,
   is sent only to `api.github.com`, and is never logged.
+- **FR-9.** Revision of 2026-11-12 (Tore, after the first try on Vivaldi): the connect panel follows
+  the theme and confirms its two buttons with the toast of 004 (AC-25 to AC-27).
 - **FR-8.** The installer command `live-folders token` of the first revision is removed, and so is the
   token file.
 - **FR-6.** A failed refresh keeps the last rows and marks the folder with a warning.
@@ -162,6 +164,9 @@ touched, because a live folder is not a bookmark folder.
 | AC-22 | WHEN the user chooses `Disconnect GitHub`, THE token SHALL be forgotten and every live folder SHALL show `Connect GitHub`. | auto: `forgets the token on disconnect` |
 | AC-23 | IF GitHub answers 401 to a refresh, THEN THE folder SHALL keep its rows, show the warning and offer `Reconnect GitHub`. | auto: `offers to reconnect when the token is refused` |
 | AC-24 | WHEN the installer runs, THE old token file and the `live-folders token` command SHALL be gone. | auto: `removes the old token file` |
+| AC-25 | WHEN the user presses `Copy code and open GitHub`, THE module SHALL show the toast `Code copied, paste it on GitHub`. | auto: `confirms the copied code with a toast` |
+| AC-26 | WHEN the user presses `Cancel` in the connect panel, THE flow SHALL stop and the toast `GitHub connection cancelled` SHALL appear. | auto: `confirms a cancelled connection with a toast` |
+| AC-27 | THE connect panel SHALL follow the colors of the theme: the code on its own line, `Copy code and open GitHub` as the main button in the accent color, `Cancel` as a quiet text button, each label on one line. | manual |
 
 ## Out of scope
 

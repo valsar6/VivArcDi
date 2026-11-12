@@ -123,7 +123,7 @@ export class LiveFolders extends Module {
       intervalMs: LiveFolders.#minutes(options['refreshMinutes']) * MS_PER_MINUTE,
       logger,
     });
-    const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS });
+    const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS, notify: (text, kind): void => toast.show(text, kind) });
     const folderMenu = new LiveFolderMenu({
       menu,
       editor,

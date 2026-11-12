@@ -94,42 +94,135 @@
   }
 }
 
+$connect-pulse: vivarcdi-connect-pulse;
+
+@keyframes #{$connect-pulse} {
+  50% {
+    opacity: $connect-pulse-low;
+  }
+}
+
 #{$root} #{$connect-panel} {
   position: fixed;
   z-index: $repository-editor-layer;
   display: flex;
-  flex-wrap: wrap;
-  gap: $gap;
+  flex-direction: column;
+  gap: $connect-panel-gap;
   box-sizing: border-box;
-  width: $connect-panel-width;
-  padding: $gap;
-  border-radius: $menu-radius;
-  background-color: var(--colorBg, #222);
-  box-shadow: $menu-shadow;
-  color: var(--colorFg, #fff);
-  font-size: $row-font-size;
+  width: max-content;
+  min-width: $connect-panel-min-width;
+  max-width: calc(100vw - #{2 * $gap});
+  padding: $connect-panel-padding;
+  border-radius: $connect-panel-radius;
+  background-color: color-mix(in srgb, var(--colorBg, #{$surface-fallback}) $connect-panel-opacity, transparent);
+  backdrop-filter: blur($connect-panel-blur) saturate($arc-saturation);
+  box-shadow: $connect-panel-shadow;
+  color: var(--colorFg, #{$ink-fallback});
+  font-size: $connect-button-font-size;
   -webkit-app-region: no-drag;
 
-  > div {
-    flex: 1 0 100%;
+  > #{$connect-header} {
+    display: flex;
+    align-items: center;
+    gap: $connect-header-gap;
+    font-size: $connect-header-font-size;
+    font-weight: $connect-header-font-weight;
+
+    &::before {
+      content: '';
+      flex: none;
+      width: $connect-header-icon-size;
+      height: $connect-header-icon-size;
+      background-color: currentcolor;
+      mask: $github-glyph center / contain no-repeat;
+    }
+  }
+
+  > #{$connect-help} {
+    font-size: $connect-help-font-size;
+    opacity: $subtitle-opacity;
   }
 
   > #{$connect-code} {
-    font-family: monospace;
-    font-size: $connect-code-size;
-    letter-spacing: 0.08em;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $connect-code-gap;
     user-select: text;
   }
 
-  > button {
-    flex: 1;
-    height: $menu-row-height;
+  #{$connect-char} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $connect-char-width;
+    height: $connect-char-height;
+    border-radius: $connect-char-radius;
+    background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $connect-char-tint, transparent);
+    font-family: monospace;
+    font-size: $connect-char-font-size;
+  }
+
+  #{$connect-dash} {
+    width: $connect-dash-width;
+    height: $connect-dash-height;
+    border-radius: $connect-dash-height;
+    background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $connect-dash-tint, transparent);
+  }
+
+  > #{$connect-status} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $connect-status-gap;
+    font-size: $connect-status-font-size;
+    opacity: $subtitle-opacity;
+
+    &::before {
+      content: '';
+      flex: none;
+      width: $connect-dot-size;
+      height: $connect-dot-size;
+      border-radius: 50%;
+      animation: $connect-pulse $connect-pulse-duration ease-in-out infinite;
+      background-color: var(--colorHighlightBg, #{$accent-fallback});
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+
+  > #{$connect-actions} {
+    display: flex;
+    justify-content: flex-end;
+    gap: $connect-actions-gap;
+  }
+
+  button {
+    flex: none;
+    height: $connect-button-height;
+    padding-inline: $connect-button-padding;
     border: 0;
-    border-radius: $menu-radius - $menu-padding;
+    border-radius: $connect-button-radius;
+    background-color: transparent;
     color: inherit;
-    font: inherit;
-    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
     cursor: default;
+    font: inherit;
+    font-size: $connect-button-font-size;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $connect-button-tint, transparent);
+    }
+  }
+
+  button#{$connect-primary} {
+    background-color: var(--colorHighlightBg, #{$accent-fallback});
+    color: $accent-ink;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorHighlightBg, #{$accent-fallback}) #{100% - $tint-hover}, $accent-ink);
+    }
   }
 }

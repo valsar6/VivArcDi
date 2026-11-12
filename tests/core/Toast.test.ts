@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../src/core/Toast.js';
+import { KIND_ATTRIBUTE, Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../src/core/Toast.js';
 import { FakeElement } from '../modules/peek/fakes.js';
 import { asDocument, CopyDocument, ManualTimers } from '../modules/copyurl/fakes.js';
 
@@ -43,4 +43,14 @@ test('removing the toast cancels its timer and takes it out of the window', () =
   toast.remove();
   assert.deepEqual(parent.children, []);
   assert.equal(timers.pending.size, 0);
+});
+
+test('toast marks its kind and defaults to ok', () => {
+  const { toast, parent } = setUp();
+  toast.show('Copied');
+  assert.equal(parent.children[0]?.getAttribute(KIND_ATTRIBUTE), 'ok');
+  toast.show('Cancelled', 'neutral');
+  assert.equal(parent.children[0]?.getAttribute(KIND_ATTRIBUTE), 'neutral');
+  toast.show('Failed', 'error');
+  assert.equal(parent.children[0]?.getAttribute(KIND_ATTRIBUTE), 'error');
 });

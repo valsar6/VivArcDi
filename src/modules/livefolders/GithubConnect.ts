@@ -5,7 +5,7 @@ import { GithubDeviceFlow } from './GithubDeviceFlow.js';
 import type { DeviceFetch } from './GithubDeviceFlow.js';
 import type { GithubConnection } from './GithubConnection.js';
 
-export interface GithubConnectDependencies extends Pick<ConnectPanelDependencies, 'document' | 'parent' | 'copier' | 'openPage' | 'closeAfterMs'> {
+export interface GithubConnectDependencies extends Pick<ConnectPanelDependencies, 'document' | 'parent' | 'copier' | 'openPage' | 'closeAfterMs' | 'notify'> {
   /** The client id of the VivArcDi OAuth App, or an empty text when this VivArcDi has none. */
   clientId: string;
   connection: Pick<GithubConnection, 'save'>;

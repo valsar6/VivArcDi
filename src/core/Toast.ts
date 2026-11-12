@@ -1,5 +1,8 @@
 export const TOAST_ATTRIBUTE = 'data-vivarcdi-toast';
 export const VISIBLE_ATTRIBUTE = 'data-vivarcdi-visible';
+export const KIND_ATTRIBUTE = 'data-vivarcdi-toast-kind';
+
+export type ToastKind = 'ok' | 'neutral' | 'error';
 
 export interface ToastTimers {
   set: (run: () => void, delayMs: number) => unknown;
@@ -43,10 +46,12 @@ export class Toast {
    * Shows a message for the toast's duration.
    *
    * @param text The message, such as `Copied`.
+   * @param kind The icon of the message: `ok` by default, `neutral` for a cancellation, `error` for a failure.
    */
-  public show(text: string): void {
+  public show(text: string, kind: ToastKind = 'ok'): void {
     const element = this.#ensureElement();
     element.textContent = text;
+    element.setAttribute(KIND_ATTRIBUTE, kind);
     element.toggleAttribute(VISIBLE_ATTRIBUTE, true);
     this.#cancel();
     this.#pending = this.#timers.set(() => this.#hide(), this.#deps.durationMs);
