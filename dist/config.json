@@ -95,7 +95,8 @@
     },
     "workspace-sync": {
       "enabled": true,
-      "folder": "VivArcDi Sync"
+      "folder": "VivArcDi Sync",
+      "renameFromOtherComputers": true
     }
   }
 }

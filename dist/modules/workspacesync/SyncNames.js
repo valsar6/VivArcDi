@@ -7,13 +7,6 @@ class SyncNames {
   static folderOf(workspaceName) {
     return workspaceName ?? OUTSIDE_WORKSPACES;
   }
-  /**
-   * @param workspaceNames The names of the workspaces that exist here.
-   * @returns The folder titles of every area this computer can show: the workspaces and the one outside them.
-   */
-  static known(workspaceNames) {
-    return /* @__PURE__ */ new Set([OUTSIDE_WORKSPACES, ...workspaceNames]);
-  }
 }
 export {
   SyncNames
