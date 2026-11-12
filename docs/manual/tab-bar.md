@@ -91,6 +91,8 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 |---|---|
 | Add a folder | Rest the pointer on the space header and click `+`, then type the name |
 | Rename a folder | Double click it, or right-click it and choose **Rename…** |
+| Duplicate a folder | Right-click it and choose **Duplicate**: a closed copy, without tabs, appears right below it |
+| Move a folder to another workspace | Right-click it, choose **Move to** and pick the workspace: the folder and its open tabs go there |
 | Delete a folder | Right-click it and choose **Delete**: it goes to the Trash of the Bookmarks panel and its open tabs close |
 | Move a tab into a folder | Drag the tab onto the folder row, onto the space header, or between two rows |
 | Take a link out | Drag its row below the separator to make it a tab of today, or onto the Favorites grid to make it a Favorite |
