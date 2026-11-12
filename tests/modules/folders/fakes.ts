@@ -270,12 +270,12 @@ export class WritableChrome implements WriterHost {
     return this.calls.filter((call) => call.startsWith('create ')).map((call) => call.slice('create '.length));
   }
 
-  #move(id: string, parentId: string, index: number): BookmarkNode {
+  #move(id: string, parentId: string, index: number | undefined): BookmarkNode {
     const from = this.#parentOf(this.tree, id)?.children ?? [];
     const to = findNode(this.tree, parentId)?.children ?? [];
     const old = from.findIndex((child) => child.id === id);
     const [node] = from.splice(old, 1);
-    to.splice(from === to && index > old ? index - 1 : index, 0, node as BookmarkNode);
+    to.splice(index === undefined ? to.length : from === to && index > old ? index - 1 : index, 0, node as BookmarkNode);
     return node as BookmarkNode;
   }
 

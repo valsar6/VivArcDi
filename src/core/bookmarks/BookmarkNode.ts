@@ -12,4 +12,6 @@ export interface BookmarkNode {
   children?: BookmarkNode[] | undefined;
   /** Vivaldi marks the lines it draws between bookmarks. */
   separator?: boolean | undefined;
+  /** Vivaldi marks its bookmark Trash, a top-level folder. */
+  trash?: boolean | undefined;
 }

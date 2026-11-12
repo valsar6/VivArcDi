@@ -17,10 +17,10 @@ export interface BookmarkChanges {
   description?: string;
 }
 
-/** Where a bookmark goes: a folder and a position counted before the bookmark leaves its place. */
+/** Where a bookmark goes: a folder and a position counted before the bookmark leaves its place; omitted, the end. */
 export interface BookmarkDestination {
   parentId: string;
-  index: number;
+  index?: number | undefined;
 }
 
 export interface WritableBookmarksApi {
@@ -127,6 +127,13 @@ export class BookmarkWriter {
    */
   public async subTree(id: string): Promise<BookmarkNode> {
     return BookmarkWriter.#first(id, await this.#call<BookmarkNode[]>((api, done) => api.getSubTree(id, done)));
+  }
+
+  /**
+   * @returns The whole bookmark tree, from its top-level nodes.
+   */
+  public tree(): Promise<BookmarkNode[]> {
+    return this.#call((api, done) => api.getTree(done));
   }
 
   /**

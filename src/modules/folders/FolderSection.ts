@@ -8,6 +8,7 @@ import { SpaceCollapse } from '../../core/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
 import { VirtualFolders } from '../../core/VirtualFolders.js';
 import { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import { ClosingLinks } from './ClosingLinks.js';
 import { FolderEditing } from './FolderEditing.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
@@ -37,6 +38,7 @@ export interface SectionSettings {
 export class FolderSection {
   #context: ModuleContext;
   #redraw: FrameTask;
+  #closing = new ClosingLinks();
   #openFolders: OpenFolders;
   #source: FolderTreeSource;
   #openLinks: OpenLinks;
@@ -153,6 +155,8 @@ export class FolderSection {
       childIds: (): readonly string[] => this.#source.childIds,
       redraw: (): void => this.#redraw.request(),
       tabLinks: this.#tabLinks,
+      openFolders: this.#openFolders,
+      closing: this.#closing,
     });
   }
 
@@ -210,7 +214,7 @@ export class FolderSection {
 
   #unlinkOrphans(): void {
     const ids = this.#source.linkIds;
-    const keep = (id: string): boolean => LinkId.isVirtual(id) && (!this.#virtual.ready || this.#virtual.has(id));
+    const keep = (id: string): boolean => this.#closing.has(id) || (LinkId.isVirtual(id) && (!this.#virtual.ready || this.#virtual.has(id)));
     if (ids !== null) {
       this.#tabLinks.unlinkExcept(ids, keep).catch((error: unknown) => this.#context.logger.warn('could not unlink the tabs of removed bookmarks', error));
     }

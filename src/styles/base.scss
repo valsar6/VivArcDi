@@ -87,6 +87,12 @@
     }
   }
 
+  > [role='separator'] {
+    height: $menu-separator-height;
+    margin: $menu-separator-margin $gap;
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-separator}, transparent);
+  }
+
   > [role='menuitemcheckbox'] {
     display: flex;
     align-items: center;

@@ -481,6 +481,10 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   is added at the end of the workspace's folder, with its name ready to type. Enter saves the name;
   Escape and an empty name keep `Untitled`.
 - **Rename.** Double click a folder. A single click still opens and closes it, after a short wait.
+- **Folder menu.** Right-click a folder row, at any depth, for **Rename…** (the same as the double
+  click) and **Delete**. Delete moves the folder with everything in it into Vivaldi's bookmark Trash,
+  where the Bookmarks panel can restore it, closes the tabs of its links and shows a toast. If the
+  move fails, nothing is closed and a toast says so. The rows of a live folder keep their own menu.
 - **Add a tab to a folder.** Drag a tab of the list onto a folder row and release: it becomes a link at
   the end of that folder and leaves the list. Released on the space header it becomes a link at the end
   of the workspace's folder, and released between two rows it goes there. A Favorite, a pinned tab, a
@@ -509,7 +513,7 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   VivArcDi created it; a link that existed before keeps its bookmark and a message says so. Cmd/Ctrl+D
   replaces the Pin/Unpin mapping of [Arc's keyboard shortcuts](docs/native-settings.md); pinning to the Favorites grid is done by dragging.
 
-Removing and moving folders and links stays in the Bookmarks panel. A write that fails is logged in
+Moving folders and removing links stays in the Bookmarks panel. A write that fails is logged in
 the console and leaves the section as it was.
 
 | Option | Default | Meaning |
