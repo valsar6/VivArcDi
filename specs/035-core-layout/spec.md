@@ -11,7 +11,7 @@ Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/RE
 
 ## Summary
 
-`src/core/` holds 64 files in one flat folder, plus `bookmarks/`. Next to the boot, the services that
+`src/core/` holds 62 files in one flat folder, plus `bookmarks/`. Next to the boot, the services that
 `ModuleContext` injects and generic DOM helpers, it holds feature building blocks such as the Today
 list, the drop zones of favorites and folders, the tab drag pill and the space collapse, and files
 that a single module uses. This spec gives `core/` one job, which is infrastructure and injected
