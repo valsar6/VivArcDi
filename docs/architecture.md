@@ -114,7 +114,7 @@ A large module splits its folder by responsibility. `folders/` keeps the module
 | `links/` | The link between a bookmark row and the tab that shows it |
 | `favoritelinks/` | Adding tabs to a workspace's favorites and taking them back |
 | `dragdrop/` | Where a drop lands and what a drop of a tab, a row or a panel bookmark does |
-| `editing/` | Menus of the rows, renaming, and wiring of the editing parts |
+| `editing/` | Menus of the rows, renaming, deleting a folder, and wiring of the editing parts |
 | `view/` | Turning the tree into rows and drawing them |
 
 ### Selectors
