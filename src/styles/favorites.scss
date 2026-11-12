@@ -218,6 +218,10 @@
   opacity: $dragging-opacity;
 }
 
+#{$root} #{$tiles} > #{$moving} {
+  display: none;
+}
+
 #{$root} #{$drop-today} {
   outline: $today-outline-width solid color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$today-outline-tint}, transparent);
   outline-offset: -$today-outline-width;

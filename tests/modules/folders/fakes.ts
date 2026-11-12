@@ -246,6 +246,8 @@ export class WritableChrome implements WriterHost {
             parent.children = parent.children.filter((child) => child.id !== id);
           }
         }),
+      move: (id, destination, callback): void =>
+        this.#answer(`move ${id} ${destination.parentId} ${destination.index}`, callback, () => this.#move(id, destination.parentId, destination.index)),
       remove: (id, callback): void =>
         this.#answer(`remove ${id}`, callback, () => {
           const parent = this.#parentOf(this.tree, id);
@@ -266,6 +268,15 @@ export class WritableChrome implements WriterHost {
 
   public get created(): string[] {
     return this.calls.filter((call) => call.startsWith('create ')).map((call) => call.slice('create '.length));
+  }
+
+  #move(id: string, parentId: string, index: number): BookmarkNode {
+    const from = this.#parentOf(this.tree, id)?.children ?? [];
+    const to = findNode(this.tree, parentId)?.children ?? [];
+    const old = from.findIndex((child) => child.id === id);
+    const [node] = from.splice(old, 1);
+    to.splice(from === to && index > old ? index - 1 : index, 0, node as BookmarkNode);
+    return node as BookmarkNode;
   }
 
   #parentOf(nodes: BookmarkNode[], id: string): BookmarkNode | undefined {
