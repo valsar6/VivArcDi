@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -27,7 +27,7 @@ and is done when its check passes. Branch `features/workspace-sync-code`, next m
 - [x] **T6.** `WorkspaceSettings` with a sample key in the tests. Satisfies AC-9. Done when `keeps
   workspace settings in the sync store` passes. 019 uses it for its color when it is built.
 - [x] **T7.** README, user manual page on sync, version bump. Done when `make check` passes.
-- [ ] **T8.** Write the manual verification checklist for Tore (Italian, in the project files) from
+- [x] **T8.** Write the manual verification checklist for Tore (Italian, in the project files) from
   AC-12, AC-13, AC-15, and AC-14 once 019 exists.
 
 Revision of 2026-11-12 (workspaces travel). Branch `features/workspace-sync-create-spaces`, 0.55.0.
@@ -46,3 +46,6 @@ Revision of 2026-11-12 (workspaces travel). Branch `features/workspace-sync-crea
   their workspace; replace `MissingSpaces` as the first choice. Done when `make check` passes.
 - [x] **T14.** Manual page `docs/manual/sync.md`, README. Done when `make check` passes.
 - [x] **T15.** Italian checklist (`workspace-sync/verifica-spazi-sincronizzati.md` in the project files) for Tore from AC-15 (revised), AC-21 and the earlier AC-12, AC-13.
+
+Verified by Tore on two computers on 2026-11-12 (workspaces, pinned tabs, renames). The theme color
+(AC-14) waits for 019; deleting a workspace on every computer is a later change request.
