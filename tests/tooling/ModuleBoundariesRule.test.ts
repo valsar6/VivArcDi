@@ -8,6 +8,7 @@ import moduleBoundaries from '../../tools/eslint/module-boundaries.mjs';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const OTHER_MODULE = 'otherModule';
 const SHARED_TO_MODULE = 'sharedToModule';
+const CORE_TO_OUTER = 'coreToOuter';
 
 const linter = new Linter({ cwd: ROOT });
 
@@ -71,4 +72,33 @@ test('rule accepts imports from core, shared and the same module', () => {
   const registry = "import { BookmarkFolders } from './folders/BookmarkFolders.js';";
   assert.deepEqual(messageIdsFor('src/modules/index.ts', registry), []);
   assert.deepEqual(messageIdsFor('src/shared/links/A.ts', "import { X } from '../../core/X.js';"), []);
+});
+
+test('rule reports an import from core into shared or a module', () => {
+  const fromCore = 'src/core/tabs/A.ts';
+  const statements = [
+    "import { X } from '../../shared/links/X.js';",
+    "import type { X } from '../../shared/links/X.js';",
+    "export { X } from '../../modules/today/X.js';",
+    "export * from '../../modules/today/view/X.js';",
+    "const loaded = import('../../modules/index.js');",
+  ];
+  for (const statement of statements) {
+    assert.deepEqual(messageIdsFor(fromCore, statement), [CORE_TO_OUTER], statement);
+  }
+});
+
+test('rule accepts imports from core into core', () => {
+  const fromCore = 'src/core/tabs/A.ts';
+  const statements = [
+    "import { X } from './X.js';",
+    "import type { X } from '../browser/X.js';",
+    "export { X } from '../browser/bookmarks/X.js';",
+    "export * from '../dom/X.js';",
+    "const loaded = import('../support/X.js');",
+    "import { X } from 'some-package';",
+  ];
+  for (const statement of statements) {
+    assert.deepEqual(messageIdsFor(fromCore, statement), [], statement);
+  }
 });
