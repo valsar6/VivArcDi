@@ -3,9 +3,15 @@ import type { Logger } from './Logger.js';
 
 export type WorkspacePrefs = Pick<BrowserPrefs, 'available' | 'canFollow' | 'get' | 'onChange'>;
 
-interface WorkspaceEntry {
+export interface WorkspaceEntry {
   name: string;
   icon: string | null;
+  iconId: number | null;
+}
+
+export interface WorkspaceListing extends WorkspaceEntry {
+  /** The id as `TabData.of` returns it. */
+  id: string;
 }
 
 const LIST_KEY = 'vivaldi.workspaces.list';
@@ -76,6 +82,13 @@ export class WorkspaceNames {
   }
 
   /**
+   * @returns Every workspace Vivaldi lists, with its id, name and icon, in Vivaldi's order.
+   */
+  public get entries(): WorkspaceListing[] {
+    return [...this.#workspaces].map(([id, entry]) => ({ id, ...entry }));
+  }
+
+  /**
    * @param workspaceId The id of a workspace, as `TabData.of` returns it, or null.
    * @returns Its name, or null for no workspace or an unknown one.
    */
@@ -103,7 +116,7 @@ export class WorkspaceNames {
   }
 
   static #same(left: Map<string, WorkspaceEntry>, right: Map<string, WorkspaceEntry>): boolean {
-    return left.size === right.size && [...left].every(([id, { name, icon }]) => right.get(id)?.name === name && right.get(id)?.icon === icon);
+    return left.size === right.size && [...left].every(([id, { name, icon, iconId }]) => right.get(id)?.name === name && right.get(id)?.icon === icon && right.get(id)?.iconId === iconId);
   }
 
   static #parse(value: unknown): Map<string, WorkspaceEntry> {
@@ -111,16 +124,20 @@ export class WorkspaceNames {
     for (const item of Array.isArray(value) ? (value as unknown[]) : []) {
       const entry = WorkspaceNames.#entry(item);
       if (entry !== null && !workspaces.has(entry.id)) {
-        workspaces.set(entry.id, { name: entry.name, icon: entry.icon });
+        workspaces.set(entry.id, { name: entry.name, icon: entry.icon, iconId: entry.iconId });
       }
     }
     return workspaces;
   }
 
+  static #text(value: unknown): string | null {
+    return typeof value === 'string' && value !== '' ? value : null;
+  }
+
   static #entry(item: unknown): ({ id: string } & WorkspaceEntry) | null {
-    const { id, name, icon } = (typeof item === 'object' && item !== null ? item : {}) as Record<string, unknown>;
+    const { id, name, icon, iconId } = (typeof item === 'object' && item !== null ? item : {}) as Record<string, unknown>;
     return (typeof id === 'number' || typeof id === 'string') && typeof name === 'string'
-      ? { id: String(id), name, icon: typeof icon === 'string' && icon !== '' ? icon : null }
+      ? { id: String(id), name, icon: WorkspaceNames.#text(icon), iconId: typeof iconId === 'number' ? iconId : null }
       : null;
   }
 
