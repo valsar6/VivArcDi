@@ -45,3 +45,7 @@ Revision of 2026-10-28, on `features/bookmark-link-tabs` (minor bump to 0.9.0):
   again before writing; all writers use it. AC-27.
 - [x] **T23.** Fix 0.9.2: `HiddenTabMarker` also collapses the marked slots with an inline
   `display: none !important`, because on Vivaldi 8.2 the stylesheet rule has no effect. AC-28.
+- [ ] **T24.** `$folder-open-glyph` token and icon switch in `folders.scss`. AC-29.
+- [ ] **T25.** `RowTransition` and `FolderSectionView` mark entering and leaving rows on a click; keyframes
+  in `folders.scss`, reduced motion. AC-30, AC-31.
+- [ ] **T26.** Version 0.46.0, manual checklist for AC-32 (`phase-3/verifica-animazione-cartelle.md` in the project files).

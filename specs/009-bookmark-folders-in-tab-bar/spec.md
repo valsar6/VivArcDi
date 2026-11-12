@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-10-27; revision approved 2026-10-28 |
+| Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) pending approval |
 
 ## Summary
 
@@ -130,6 +130,13 @@ Favorite.
 - **FR-17.** Peek of 002 treats the tab of a link as a Favorite or pinned tab: a click on a link to
   another site opens in Peek (option `pinnedCrossSite`).
 
+- **FR-18.** A folder row shows a closed folder icon while the folder is closed and an open folder icon
+  while it is open (Tore's recording of Arc, 2026-11-12).
+- **FR-19.** Opening a folder slides its rows in, and closing it slides them out, with a short transition
+  of height and opacity, as in Arc (Tore's recording, 2026-11-12). Only a click on the folder animates:
+  a rebuild caused by a change of bookmarks, a new workspace or a restart draws the rows at once. WHEN
+  the system asks for reduced motion, THEN the rows appear and disappear at once.
+
 ### Non-functional
 
 - **NFR-1.** The section follows Vivaldi's theme colors and the rounded style of the Favorites grid.
@@ -174,6 +181,10 @@ Favorite.
 | AC-26 | WHEN the user clicks a link to another site in the tab of a link, THE page SHALL open in Peek and the tab SHALL keep its page. | manual |
 | AC-27 | WHILE another module writes the data of the tab of a link at the same time, THE module SHALL keep the bookmark id in the tab. | auto: `keeps the bookmark id when another module writes the tab at the same time` |
 | AC-28 | THE module SHALL collapse the slot of the tab of a link with an inline style, since Vivaldi's own rules beat the stylesheet. | auto: `collapses the slot of a hidden tab with an inline style` |
+| AC-29 | WHILE a folder is closed, ITS row SHALL show the closed folder icon, and WHILE it is open the open folder icon. | auto: `marks the folder row open and closed for its icon` |
+| AC-30 | WHEN a click opens a folder, THE rows it shows SHALL be marked as entering; WHEN a click closes it, THE rows it hides SHALL stay in place marked as leaving until the transition ends, and then be removed. | auto: `animates the rows of a folder opened and closed by a click` |
+| AC-31 | WHEN the rows change for any other reason than a click on a folder, THE section SHALL draw them at once with no entering or leaving rows. | auto: `draws rows at once when no folder was clicked` |
+| AC-32 | WHEN Tore clicks a folder, THE icon SHALL change and the rows SHALL slide in or out in about 200 ms; WITH reduced motion on, THEY SHALL appear at once. | manual |
 
 ## Out of scope
 
