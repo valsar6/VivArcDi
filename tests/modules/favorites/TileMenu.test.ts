@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { MenuItem } from '../../../src/core/ContextMenu.js';
+import type { MenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { TILE_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
 import { TileMenu } from '../../../src/modules/favorites/TileMenu.js';
 import { asDocument, asElement, DomDocument } from '../../core/dom.js';

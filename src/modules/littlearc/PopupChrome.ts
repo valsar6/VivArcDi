@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 
 export const HEADER_ATTRIBUTE = 'data-vivarcdi-popup-header';
 export const PAGE_ATTRIBUTE = 'data-vivarcdi-popup-page';

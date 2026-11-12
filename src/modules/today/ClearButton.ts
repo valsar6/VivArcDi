@@ -1,6 +1,6 @@
 import { PINNED_LAST_ATTRIBUTE } from '../../shared/tabs/TabBarMarks.js';
-import { KeptElement, watchSubtree } from '../../core/KeptElement.js';
-import type { KeptElementPlacement } from '../../core/KeptElement.js';
+import { KeptElement, watchSubtree } from '../../core/dom/KeptElement.js';
+import type { KeptElementPlacement } from '../../core/dom/KeptElement.js';
 
 export const CLEAR_ATTRIBUTE = 'data-vivarcdi-clear';
 

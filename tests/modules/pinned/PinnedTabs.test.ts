@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabUnloader } from '../../../src/core/TabUnloader.js';
+import { TabUnloader } from '../../../src/core/tabs/TabUnloader.js';
 import { FavoriteOpener } from '../../../src/modules/favorites/FavoriteOpener.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
 import { AwayTabs } from '../../../src/modules/pinned/AwayTabs.js';

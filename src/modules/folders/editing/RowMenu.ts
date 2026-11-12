@@ -1,5 +1,5 @@
 import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from '../../../shared/tabs/CommandLabels.js';
-import type { ContextMenu, MenuItem } from '../../../core/ContextMenu.js';
+import type { ContextMenu, MenuItem } from '../../../core/dom/ContextMenu.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import type { LinkRemoval } from '../favoritelinks/LinkRemoval.js';
 import { LINK_ATTRIBUTE } from '../dragdrop/DropTargets.js';

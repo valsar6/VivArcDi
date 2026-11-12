@@ -1,4 +1,4 @@
-import { ShortcutKeys } from '../core/ShortcutKeys.js';
+import { ShortcutKeys } from '../core/dom/ShortcutKeys.js';
 import { ARCHIVE_CONSOLE_PREFIX, ARCHIVE_MESSAGE_TYPE } from '../modules/today/ArchiveMessage.js';
 import { sendToInterface } from './lib/PageChannel.js';
 

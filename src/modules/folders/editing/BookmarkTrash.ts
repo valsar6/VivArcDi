@@ -1,4 +1,4 @@
-import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
+import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
 
 export interface BookmarkTrashSource {
   /** Gives the whole bookmark tree. */

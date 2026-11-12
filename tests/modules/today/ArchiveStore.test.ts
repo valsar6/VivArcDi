@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { ARCHIVE_STORAGE_KEY, ArchiveStore } from '../../../src/modules/today/ArchiveStore.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';

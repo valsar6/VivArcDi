@@ -1,4 +1,4 @@
-import type { ModuleContext } from '../../../core/Module.js';
+import type { ModuleContext } from '../../../core/boot/Module.js';
 import type { LittleArcLauncher } from '../LittleArcLauncher.js';
 import type { LittleArcRegistry } from '../LittleArcRegistry.js';
 import { BookmarkSuggestions } from './BookmarkSuggestions.js';

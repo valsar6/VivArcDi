@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DropPlace } from '../../../../src/modules/folders/dragdrop/DropPlace.js';
-import { TabData } from '../../../../src/core/TabData.js';
+import { TabData } from '../../../../src/core/tabs/TabData.js';
 import { CreatedLinks } from '../../../../src/modules/folders/favoritelinks/CreatedLinks.js';
 import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
 import { WorkspaceFavorites } from '../../../../src/modules/folders/favoritelinks/WorkspaceFavorites.js';
-import { Logger } from '../../../../src/core/Logger.js';
+import { Logger } from '../../../../src/core/support/Logger.js';
 import { MemoryStorage, settle, silentLogger } from '../../reopen/fakes.js';
 import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../fakes.js';
 

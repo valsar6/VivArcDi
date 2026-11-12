@@ -1,4 +1,4 @@
-import { TabSlot } from '../../core/TabSlot.js';
+import { TabSlot } from '../../core/tabs/TabSlot.js';
 
 export type CloseKey = Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'shiftKey' | 'altKey'>;
 

@@ -1,9 +1,9 @@
-import { AddressKey } from '../../core/AddressKey.js';
-import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { TabData } from '../../core/tabs/TabData.js';
 import type { LinkedTabs } from './LinkedTabs.js';
 
 export type FavoriteDropWriter = Pick<BookmarkWriter, 'ensurePath' | 'children' | 'create' | 'remove'>;

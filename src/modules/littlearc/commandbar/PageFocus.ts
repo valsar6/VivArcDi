@@ -1,5 +1,5 @@
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
-import { tabIdOf } from '../../../core/Webview.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
+import { tabIdOf } from '../../../core/browser/Webview.js';
 
 export interface PageFocusOptions {
   document: Document;

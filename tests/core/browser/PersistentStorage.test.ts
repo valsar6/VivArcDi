@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PersistentStorage } from '../../src/core/PersistentStorage.js';
-import type { StorageArea, StorageChangeListener, StorageHost } from '../../src/core/PersistentStorage.js';
-import { silentLogger } from '../modules/reopen/fakes.js';
-import { DomDocument, asDocument } from './dom.js';
+import { PersistentStorage } from '../../../src/core/browser/PersistentStorage.js';
+import type { StorageArea, StorageChangeListener, StorageHost } from '../../../src/core/browser/PersistentStorage.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { DomDocument, asDocument } from '../dom.js';
 
 class FakeArea implements StorageArea {
   public items: Record<string, unknown>;

@@ -1,7 +1,7 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { DragPill } from './DragPill.js';
 import { DRAGGING_ATTRIBUTE } from './RowDrag.js';
-import type { Logger } from '../../core/Logger.js';
+import type { Logger } from '../../core/support/Logger.js';
 
 export interface TabDragPillDependencies {
   /** The document of Vivaldi's browser window. */

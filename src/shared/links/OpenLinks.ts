@@ -1,9 +1,9 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import { AddressKey } from '../../core/AddressKey.js';
-import { FrameTask } from '../../core/FrameTask.js';
-import type { FrameTiming } from '../../core/FrameTask.js';
-import { TabData } from '../../core/TabData.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
+import { FrameTask } from '../../core/support/FrameTask.js';
+import type { FrameTiming } from '../../core/support/FrameTask.js';
+import { TabData } from '../../core/tabs/TabData.js';
 import { UnloadedTabs } from '../tabs/UnloadedTabs.js';
 
 export type OpenLinksTabs = Pick<BrowserTabs, 'query' | 'onCreated' | 'onUpdated' | 'onActivated' | 'onRemoved'>;

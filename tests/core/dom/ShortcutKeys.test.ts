@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ShortcutKeys } from '../../src/core/ShortcutKeys.js';
-import type { ShortcutKey } from '../../src/core/ShortcutKeys.js';
+import { ShortcutKeys } from '../../../src/core/dom/ShortcutKeys.js';
+import type { ShortcutKey } from '../../../src/core/dom/ShortcutKeys.js';
 
 const press = (key: string, modifiers: Partial<Record<'metaKey' | 'ctrlKey' | 'shiftKey' | 'altKey', boolean>> = {}): ShortcutKey => ({
   key,

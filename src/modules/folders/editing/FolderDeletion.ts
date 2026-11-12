@@ -1,10 +1,10 @@
-import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
-import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
+import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
+import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
 import type { BookmarkTrash } from './BookmarkTrash.js';
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
-import type { Logger } from '../../../core/Logger.js';
-import { TabData } from '../../../core/TabData.js';
-import type { ToastKind } from '../../../core/Toast.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../../core/support/Logger.js';
+import { TabData } from '../../../core/tabs/TabData.js';
+import type { ToastKind } from '../../../core/dom/Toast.js';
 import type { ClosingLinks } from './ClosingLinks.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 

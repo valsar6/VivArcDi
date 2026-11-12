@@ -1,4 +1,4 @@
-import type { CommandItem, ContextMenu, MenuItem } from '../../core/ContextMenu.js';
+import type { CommandItem, ContextMenu, MenuItem } from '../../core/dom/ContextMenu.js';
 import { LinkId } from '../../shared/links/LinkId.js';
 import { PullRequestFilters } from './PullRequestFilters.js';
 import type { ToggleName } from './PullRequestFilters.js';

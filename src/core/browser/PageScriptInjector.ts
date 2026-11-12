@@ -1,4 +1,4 @@
-import type { Logger } from './Logger.js';
+import type { Logger } from '../support/Logger.js';
 import { tabIdOf } from './Webview.js';
 import type { ConsoleMessageEvent, LoadCommitEvent, WebviewElement } from './Webview.js';
 

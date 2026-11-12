@@ -1,15 +1,15 @@
-import type { BookmarkWriter } from './bookmarks/BookmarkWriter.js';
-import type { BrowserBookmarks } from './bookmarks/BrowserBookmarks.js';
-import type { BrowserHistory } from './BrowserHistory.js';
-import type { BrowserPrefs } from './BrowserPrefs.js';
-import type { BrowserRuntime } from './BrowserRuntime.js';
-import type { BrowserSearch } from './BrowserSearch.js';
-import type { BrowserTabs } from './BrowserTabs.js';
-import type { BrowserWindows } from './BrowserWindows.js';
-import type { Logger } from './Logger.js';
-import type { KeyValueStorage } from './PersistentStorage.js';
+import type { BookmarkWriter } from '../browser/bookmarks/BookmarkWriter.js';
+import type { BrowserBookmarks } from '../browser/bookmarks/BrowserBookmarks.js';
+import type { BrowserHistory } from '../browser/BrowserHistory.js';
+import type { BrowserPrefs } from '../browser/BrowserPrefs.js';
+import type { BrowserRuntime } from '../browser/BrowserRuntime.js';
+import type { BrowserSearch } from '../browser/BrowserSearch.js';
+import type { BrowserTabs } from '../browser/BrowserTabs.js';
+import type { BrowserWindows } from '../browser/BrowserWindows.js';
+import type { Logger } from '../support/Logger.js';
+import type { KeyValueStorage } from '../browser/PersistentStorage.js';
 import type { PayloadSource } from './ResourceLoader.js';
-import type { SelectorCatalog } from './SelectorCatalog.js';
+import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import type { BuildInfo, ModuleOptions } from './types.js';
 
 export interface ModuleContext {

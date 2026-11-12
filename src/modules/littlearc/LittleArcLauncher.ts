@@ -1,5 +1,5 @@
-import type { BrowserWindows } from '../../core/BrowserWindows.js';
-import type { Logger } from '../../core/Logger.js';
+import type { BrowserWindows } from '../../core/browser/BrowserWindows.js';
+import type { Logger } from '../../core/support/Logger.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import { WindowBounds } from './WindowBounds.js';
 import type { ScreenArea, WindowBoundsSettings } from './WindowBounds.js';

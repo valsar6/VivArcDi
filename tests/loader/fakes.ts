@@ -1,4 +1,4 @@
-import type { PayloadSource } from '../../src/core/ResourceLoader.js';
+import type { PayloadSource } from '../../src/core/boot/ResourceLoader.js';
 
 export class FakeLoader implements PayloadSource {
   #files: Record<string, unknown>;

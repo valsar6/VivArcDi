@@ -1,6 +1,6 @@
 import type { AddressField } from './AddressField.js';
-import type { BrowserRuntime } from '../../core/BrowserRuntime.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserRuntime } from '../../core/browser/BrowserRuntime.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 
 export class NewTabOpener {
   #tabs: Pick<BrowserTabs, 'create'>;

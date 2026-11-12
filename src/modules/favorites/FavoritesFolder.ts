@@ -1,6 +1,6 @@
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
-import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
+import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
+import type { BookmarkNode } from '../../core/browser/bookmarks/BookmarkNode.js';
+import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 
 export interface Favorite {
   /** Id of the bookmark. */

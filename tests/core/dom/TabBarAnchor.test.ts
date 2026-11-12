@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabBarAnchor } from '../../src/core/TabBarAnchor.js';
-import type { AnchorWatcher } from '../../src/core/TabBarAnchor.js';
-import { DomDocument, asDocument, asElement } from './dom.js';
+import { TabBarAnchor } from '../../../src/core/dom/TabBarAnchor.js';
+import type { AnchorWatcher } from '../../../src/core/dom/TabBarAnchor.js';
+import { DomDocument, asDocument, asElement } from '../dom.js';
 
 function setup(): { document: DomDocument; anchor: TabBarAnchor; changed: () => void; watched: () => Node | null } {
   const document = new DomDocument();

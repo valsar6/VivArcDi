@@ -1,4 +1,4 @@
-import type { BrowserTabs } from './BrowserTabs.js';
+import type { BrowserTabs } from '../browser/BrowserTabs.js';
 
 export type UnloaderTabs = Pick<BrowserTabs, 'get' | 'query' | 'activate' | 'discard'>;
 

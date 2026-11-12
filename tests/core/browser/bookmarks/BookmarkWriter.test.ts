@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
-import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import { WritableChrome, bookmarkTree, folder, link, recordingChrome } from '../../modules/folders/fakes.js';
+import { BookmarkWriter } from '../../../../src/core/browser/bookmarks/BookmarkWriter.js';
+import { BrowserBookmarks } from '../../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import { WritableChrome, bookmarkTree, folder, link, recordingChrome } from '../../../modules/folders/fakes.js';
 
 const titlesUnder = (chrome: WritableChrome, id: string): string[] => {
   const find = (nodes: typeof chrome.tree): (typeof chrome.tree)[number] | undefined =>

@@ -1,4 +1,4 @@
-import { AddressKey } from '../../../core/AddressKey.js';
+import { AddressKey } from '../../../core/tabs/AddressKey.js';
 import { PIN_TAB_LABEL, TILE_TAB_LABEL } from '../../../shared/tabs/CommandLabels.js';
 import type { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { KeptTab } from '../../../shared/tabs/KeptTab.js';

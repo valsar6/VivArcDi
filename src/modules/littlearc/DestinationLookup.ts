@@ -1,5 +1,5 @@
-import type { BrowserRuntime } from '../../core/BrowserRuntime.js';
-import type { Logger } from '../../core/Logger.js';
+import type { BrowserRuntime } from '../../core/browser/BrowserRuntime.js';
+import type { Logger } from '../../core/support/Logger.js';
 import { destinationQuestion, parseDestinationAnswer } from './LittleArcMessage.js';
 import type { DestinationAnswer } from './LittleArcMessage.js';
 

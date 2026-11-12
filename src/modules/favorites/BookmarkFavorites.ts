@@ -1,11 +1,11 @@
-import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
-import { TabBarAnchor } from '../../core/TabBarAnchor.js';
-import { SerialTask } from '../../core/SerialTask.js';
-import { TabUnloader } from '../../core/TabUnloader.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
+import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
+import { SerialTask } from '../../core/support/SerialTask.js';
+import { TabUnloader } from '../../core/tabs/TabUnloader.js';
 import { FavoriteOpener } from './FavoriteOpener.js';
 import { FavoriteStates } from './FavoriteStates.js';
 import { FavoritesFolder } from './FavoritesFolder.js';

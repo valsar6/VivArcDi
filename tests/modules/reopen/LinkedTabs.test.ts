@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import type { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import type { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import { LAST_OPENED_STORAGE_KEY } from '../../../src/shared/links/LastOpenedStore.js';
 import { bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';

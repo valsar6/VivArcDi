@@ -1,4 +1,4 @@
-import type { ToastKind, ToastTimers } from '../../core/Toast.js';
+import type { ToastKind, ToastTimers } from '../../core/dom/Toast.js';
 import type { ConnectFlow, ConnectState } from './ConnectFlow.js';
 import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 

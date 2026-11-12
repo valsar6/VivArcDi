@@ -1,4 +1,4 @@
-import type { ContextMenu } from '../../core/ContextMenu.js';
+import type { ContextMenu } from '../../core/dom/ContextMenu.js';
 import { LinkId } from '../../shared/links/LinkId.js';
 import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 import type { LiveFolderStore } from './LiveFolderStore.js';

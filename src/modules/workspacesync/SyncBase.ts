@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from '../../core/PersistentStorage.js';
+import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
 import { SyncNames } from './SyncNames.js';
 
 const KEY_PREFIX = 'vivarcdi.sync.base.';

@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import type { MenuResult } from './MenuCommand.js';
 import type { MissingSpaces } from './MissingSpaces.js';
 import type { SpaceBase } from './SpaceBase.js';

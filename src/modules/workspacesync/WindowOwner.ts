@@ -1,4 +1,4 @@
-import type { BrowserWindows } from '../../core/BrowserWindows.js';
+import type { BrowserWindows } from '../../core/browser/BrowserWindows.js';
 
 export class WindowOwner {
   #windows: Pick<BrowserWindows, 'current' | 'normalIds'>;

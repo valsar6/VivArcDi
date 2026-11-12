@@ -1,4 +1,4 @@
-import { TabSlot } from '../../core/TabSlot.js';
+import { TabSlot } from '../../core/tabs/TabSlot.js';
 
 export interface ResetClickDependencies {
   /** The document of Vivaldi's browser window. */

@@ -1,5 +1,5 @@
 import { PIN_TAB_LABEL, UNTILE_TAB_LABEL } from '../../shared/tabs/CommandLabels.js';
-import type { ContextMenu, MenuItem } from '../../core/ContextMenu.js';
+import type { ContextMenu, MenuItem } from '../../core/dom/ContextMenu.js';
 import type { FavoriteRemoval } from './FavoriteRemoval.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
 

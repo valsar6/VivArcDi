@@ -1,4 +1,4 @@
-import type { Logger } from './Logger.js';
+import type { Logger } from '../support/Logger.js';
 
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>;
 

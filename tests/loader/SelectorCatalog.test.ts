@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SelectorCatalog } from '../../src/core/SelectorCatalog.js';
+import { SelectorCatalog } from '../../src/core/dom/SelectorCatalog.js';
 import { FakeLoader } from './fakes.js';
 
 test('bestMatch picks the exact major.minor', () => {

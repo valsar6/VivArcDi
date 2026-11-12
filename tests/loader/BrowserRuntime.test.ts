@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserRuntime } from '../../src/core/BrowserRuntime.js';
-import type { ChromeApi, RuntimeMessageListener } from '../../src/core/BrowserTabs.js';
+import { BrowserRuntime } from '../../src/core/browser/BrowserRuntime.js';
+import type { ChromeApi, RuntimeMessageListener } from '../../src/core/browser/BrowserTabs.js';
 
 test('BrowserRuntime listens to runtime messages and removes the listener', () => {
   const listeners = new Set<RuntimeMessageListener>();

@@ -1,4 +1,4 @@
-import type { BrowserHistory } from '../../../core/BrowserHistory.js';
+import type { BrowserHistory } from '../../../core/browser/BrowserHistory.js';
 import { suggestionOf } from './Suggestion.js';
 import type { Suggestion } from './Suggestion.js';
 import type { SuggestionSource } from './SuggestionSource.js';

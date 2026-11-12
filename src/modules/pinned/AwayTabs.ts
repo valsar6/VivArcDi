@@ -1,6 +1,6 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import { OwnPage } from '../../shared/tabs/OwnPage.js';
-import { TabData } from '../../core/TabData.js';
+import { TabData } from '../../core/tabs/TabData.js';
 
 export interface TabMarks {
   /** Pinned tabs, Favorites included, that show another page than their own. */

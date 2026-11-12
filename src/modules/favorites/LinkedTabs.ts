@@ -1,7 +1,7 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { TabDataWriter } from '../../core/TabDataWriter.js';
-import { TabData } from '../../core/TabData.js';
-import type { OwnTabChanges } from '../../core/TabData.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { TabDataWriter } from '../../core/tabs/TabDataWriter.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import type { OwnTabChanges } from '../../core/tabs/TabData.js';
 import type { Favorite } from './FavoritesFolder.js';
 
 export interface LinkSnapshot {

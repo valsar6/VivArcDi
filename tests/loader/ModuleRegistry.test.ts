@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Module } from '../../src/core/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../../src/core/Module.js';
-import { ModuleRegistry } from '../../src/core/ModuleRegistry.js';
+import { Module } from '../../src/core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../src/core/boot/Module.js';
+import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
 import { createDefaultRegistry } from '../../src/modules/index.js';
 
 class Alpha extends Module {

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { createDefaultRegistry } from '../../../src/modules/index.js';
 import { WorkspaceSync } from '../../../src/modules/workspacesync/WorkspaceSync.js';
 import { WorkspaceSettings } from '../../../src/modules/workspacesync/WorkspaceSettings.js';
-import { Logger } from '../../../src/core/Logger.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { WritableChrome, bookmarkTree } from '../folders/fakes.js';
 import { CountingSink, FOLDER, page, listIn, pinnedIn, pinnedTab, world } from './fakes.js';
 import type { SpaceEntry } from '../../../src/modules/workspacesync/SpaceEntry.js';

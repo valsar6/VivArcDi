@@ -1,8 +1,8 @@
-import type { BrowserTabs } from './BrowserTabs.js';
-import type { Logger } from './Logger.js';
-import { TabDataWriter } from './TabDataWriter.js';
-import { TabData } from './TabData.js';
-import type { OwnTabChanges } from './TabData.js';
+import type { BrowserTabs } from '../browser/BrowserTabs.js';
+import type { Logger } from '../support/Logger.js';
+import { TabDataWriter } from '../tabs/TabDataWriter.js';
+import { TabData } from '../tabs/TabData.js';
+import type { OwnTabChanges } from '../tabs/TabData.js';
 
 export type WorkspaceTabsApi = Pick<BrowserTabs, 'create' | 'discard' | 'get' | 'update'>;
 

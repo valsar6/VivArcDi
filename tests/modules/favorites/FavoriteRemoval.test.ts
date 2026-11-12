@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
 import { LinkDropZone } from '../../../src/shared/dragdrop/LinkDropZone.js';
-import { TabData } from '../../../src/core/TabData.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { FavoriteRemoval } from '../../../src/modules/favorites/FavoriteRemoval.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
 import type { TodayTarget } from '../../../src/shared/tabs/TodayList.js';

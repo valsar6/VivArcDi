@@ -1,4 +1,4 @@
-import { BrowserSearch } from '../../../core/BrowserSearch.js';
+import { BrowserSearch } from '../../../core/browser/BrowserSearch.js';
 import { AddressResolver } from '../AddressResolver.js';
 import type { Suggestion } from './Suggestion.js';
 

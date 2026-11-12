@@ -1,5 +1,5 @@
-import { Logger } from '../../../src/core/Logger.js';
-import type { LogSink } from '../../../src/core/Logger.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { LogSink } from '../../../src/core/support/Logger.js';
 import { CODE_URL, TOKEN_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import type { DeviceFetch } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import type { GithubFetch, GithubResponse, SearchItem } from '../../../src/modules/livefolders/GithubPullRequests.js';

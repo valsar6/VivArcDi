@@ -1,10 +1,10 @@
-import type { BookmarksApi, BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
-import type { WritableBookmarksApi, WriterHost } from '../../../src/core/bookmarks/BookmarkWriter.js';
-import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import type { TabActivatedListener, TabCreatedListener, TabRemovedListener, TabUpdateListener } from '../../../src/core/BrowserTabs.js';
-import type { FrameTiming } from '../../../src/core/FrameTask.js';
+import type { BookmarksApi, BookmarksHost } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import { BookmarkWriter } from '../../../src/core/browser/bookmarks/BookmarkWriter.js';
+import type { WritableBookmarksApi, WriterHost } from '../../../src/core/browser/bookmarks/BookmarkWriter.js';
+import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import type { TabActivatedListener, TabCreatedListener, TabRemovedListener, TabUpdateListener } from '../../../src/core/browser/BrowserTabs.js';
+import type { FrameTiming } from '../../../src/core/support/FrameTask.js';
 
 export const folder = (id: string, title: string, children: BookmarkNode[] = []): BookmarkNode => ({ id, title, children });
 

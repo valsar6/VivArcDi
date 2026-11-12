@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserPrefs } from '../../src/core/BrowserPrefs.js';
-import { Logger } from '../../src/core/Logger.js';
-import { TabData } from '../../src/core/TabData.js';
-import { WorkspaceNames } from '../../src/core/WorkspaceNames.js';
-import { CASETTA, FakePrefsApi, WORK } from './prefs.js';
+import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
+import { WorkspaceNames } from '../../../src/core/workspaces/WorkspaceNames.js';
+import { CASETTA, FakePrefsApi, WORK } from '../prefs.js';
 
 const LIST = 'vivaldi.workspaces.list';
 const tabIn = (workspaceId: number): chrome.tabs.Tab => ({ vivExtData: JSON.stringify({ workspaceId }) }) as unknown as chrome.tabs.Tab;

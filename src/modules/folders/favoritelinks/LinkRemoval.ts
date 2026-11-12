@@ -1,9 +1,9 @@
-import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
 import type { FavoriteDropTarget, FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
-import type { Logger } from '../../../core/Logger.js';
-import { TabData } from '../../../core/TabData.js';
+import type { Logger } from '../../../core/support/Logger.js';
+import { TabData } from '../../../core/tabs/TabData.js';
 import { TabRowMove } from '../../../shared/dragdrop/TabRowMove.js';
 import type { TodayList, TodayTarget } from '../../../shared/tabs/TodayList.js';
 import { FAILED_TEXT, KEPT_TEXT } from './FavoriteShortcut.js';

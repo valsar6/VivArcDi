@@ -1,4 +1,4 @@
-import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { GRID_ORDER } from './BookmarkFavorites.js';
 
 export const FIRST_TILE_ATTRIBUTE = 'data-vivarcdi-first-tile';

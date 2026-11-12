@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BrowserTabs } from '../../../src/core/BrowserTabs.js';
+import type { BrowserTabs } from '../../../src/core/browser/BrowserTabs.js';
 import { AddressField } from '../../../src/shared/newtab/AddressField.js';
 import { CommandLauncher } from '../../../src/modules/incognito/CommandLauncher.js';
 import { DownloadsButton } from '../../../src/modules/incognito/DownloadsButton.js';

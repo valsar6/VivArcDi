@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import { SerialTask } from '../../core/SerialTask.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { SerialTask } from '../../core/support/SerialTask.js';
 import { GithubFailure, UNREACHABLE_REASON } from './GithubPullRequests.js';
 import type { GithubPullRequests } from './GithubPullRequests.js';
 import { ArchivedPullRequests } from './ArchivedPullRequests.js';

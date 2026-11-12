@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from '../../core/PersistentStorage.js';
+import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
 
 const KEY = 'vivarcdi.little-arc.windows';
 const KEPT = 20;

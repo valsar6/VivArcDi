@@ -1,6 +1,6 @@
-import type { BrowserTabs } from './BrowserTabs.js';
-import type { Logger } from './Logger.js';
-import { TabData } from './TabData.js';
+import type { BrowserTabs } from '../browser/BrowserTabs.js';
+import type { Logger } from '../support/Logger.js';
+import { TabData } from '../tabs/TabData.js';
 
 export type ActiveWorkspaceTabs = Pick<BrowserTabs, 'query' | 'onActivated' | 'onUpdated'>;
 

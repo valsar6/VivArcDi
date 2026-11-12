@@ -1,5 +1,5 @@
 import type { FakeNames } from './fakes.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { readFileSync } from 'node:fs';
 
 export const catalog = new SelectorCatalog(JSON.parse(readFileSync('src/selectors/8.1.json', 'utf8')) as Record<string, string>, '8.1');

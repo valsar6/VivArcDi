@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserWindows } from '../../../src/core/BrowserWindows.js';
-import type { ChromeApi } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
+import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
+import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { Debounce } from '../../../src/modules/workspacesync/Debounce.js';
 import { LocalPinned } from '../../../src/modules/workspacesync/LocalPinned.js';
 import { MissingSpaces } from '../../../src/modules/workspacesync/MissingSpaces.js';

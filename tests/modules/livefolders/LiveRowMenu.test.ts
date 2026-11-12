@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { CommandItem, MenuItem } from '../../../src/core/ContextMenu.js';
+import type { CommandItem, MenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { LiveRowMenu } from '../../../src/modules/livefolders/LiveRowMenu.js';
 import { LiveFolderStore } from '../../../src/modules/livefolders/LiveFolderStore.js';
 import { MemoryStorage, recordingLogger } from './fakes.js';

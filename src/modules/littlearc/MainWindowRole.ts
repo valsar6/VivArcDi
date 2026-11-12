@@ -1,8 +1,8 @@
-import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
-import { WorkspaceNames } from '../../core/WorkspaceNames.js';
-import type { ModuleContext } from '../../core/Module.js';
-import { ShortcutKeys } from '../../core/ShortcutKeys.js';
-import { WindowKeys } from '../../core/WindowKeys.js';
+import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
+import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
+import { WindowKeys } from '../../core/dom/WindowKeys.js';
 import { DestinationPalette } from './DestinationPalette.js';
 import { DestinationPicker } from './DestinationPicker.js';
 import { ExternalLinkDetector } from './ExternalLinkDetector.js';

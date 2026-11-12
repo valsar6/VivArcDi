@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { Incognito } from '../../../src/modules/incognito/Incognito.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';

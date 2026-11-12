@@ -1,13 +1,13 @@
-import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
-import { FrameTask } from '../../core/FrameTask.js';
+import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
+import { FrameTask } from '../../core/support/FrameTask.js';
 import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
 import { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import { LinkId } from '../../shared/links/LinkId.js';
-import type { ModuleContext } from '../../core/Module.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
 import { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
-import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { VirtualFolders } from '../../shared/links/VirtualFolders.js';
-import { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import { ClosingLinks } from './editing/ClosingLinks.js';
 import { FolderEditing } from './editing/FolderEditing.js';
 import { FolderRows } from './view/FolderRows.js';

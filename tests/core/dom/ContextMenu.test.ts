@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ContextMenu, MENU_ATTRIBUTE } from '../../src/core/ContextMenu.js';
-import { asDocument, DomDocument } from './dom.js';
-import type { DomNode } from './dom.js';
+import { ContextMenu, MENU_ATTRIBUTE } from '../../../src/core/dom/ContextMenu.js';
+import { asDocument, DomDocument } from '../dom.js';
+import type { DomNode } from '../dom.js';
 
 interface Setup {
   dom: DomDocument;

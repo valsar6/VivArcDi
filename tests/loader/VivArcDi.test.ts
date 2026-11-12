@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../src/core/Logger.js';
-import type { BrowserRuntime } from '../../src/core/BrowserRuntime.js';
-import { Module } from '../../src/core/Module.js';
-import type { PrivateWindowPolicy } from '../../src/core/Module.js';
-import { ModuleRegistry } from '../../src/core/ModuleRegistry.js';
-import type { ModuleOptions } from '../../src/core/types.js';
-import { VivArcDi } from '../../src/core/VivArcDi.js';
+import { Logger } from '../../src/core/support/Logger.js';
+import type { BrowserRuntime } from '../../src/core/browser/BrowserRuntime.js';
+import { Module } from '../../src/core/boot/Module.js';
+import type { PrivateWindowPolicy } from '../../src/core/boot/Module.js';
+import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
+import type { ModuleOptions } from '../../src/core/boot/types.js';
+import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
 import { ActivationMarker } from '../../src/modules/ActivationMarker.js';
 import { FakeDocument, FakeElement, FakeLoader, SilentSink } from './fakes.js';
 

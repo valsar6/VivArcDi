@@ -1,5 +1,5 @@
-import { KeptElement } from '../../core/KeptElement.js';
-import type { KeptElementPlacement } from '../../core/KeptElement.js';
+import { KeptElement } from '../../core/dom/KeptElement.js';
+import type { KeptElementPlacement } from '../../core/dom/KeptElement.js';
 import type { BarButton } from './BarButton.js';
 
 export const BOTTOM_BAR_ATTRIBUTE = 'data-vivarcdi-bottom-bar';

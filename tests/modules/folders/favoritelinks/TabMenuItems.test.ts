@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { TabMenuItems } from '../../../../src/modules/folders/favoritelinks/TabMenuItems.js';
 import type { ContextMenuApi, TabMenuCommand } from '../../../../src/modules/folders/favoritelinks/TabMenuItems.js';
-import { Logger } from '../../../../src/core/Logger.js';
+import { Logger } from '../../../../src/core/support/Logger.js';
 import { asDocument, DomDocument } from '../../../core/dom.js';
 
 const ITEMS = [

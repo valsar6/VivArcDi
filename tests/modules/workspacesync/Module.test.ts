@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
-import { BrowserWindows } from '../../../src/core/BrowserWindows.js';
-import type { ChromeApi } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
+import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
+import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { SYNC_DELAY_MS, WorkspaceSync } from '../../../src/modules/workspacesync/WorkspaceSync.js';
 import { FakePrefsApi } from '../../core/prefs.js';
 import { FakeDocument, FakeElement } from '../peek/fakes.js';

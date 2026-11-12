@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../../src/core/Logger.js';
+import { Logger } from '../../../../src/core/support/Logger.js';
 import { WorkspaceRoots } from '../../../../src/modules/folders/tree/WorkspaceRoots.js';
 
 function recordingLogger(): { logger: Logger; warnings: unknown[][] } {

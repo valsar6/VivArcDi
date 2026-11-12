@@ -1,5 +1,5 @@
-import { FrameTask } from '../../core/FrameTask.js';
-import type { FrameTiming } from '../../core/FrameTask.js';
+import { FrameTask } from '../../core/support/FrameTask.js';
+import type { FrameTiming } from '../../core/support/FrameTask.js';
 
 const DEFAULT_FRAMES = 30;
 

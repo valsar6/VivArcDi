@@ -1,4 +1,4 @@
-import type { Logger } from '../../core/Logger.js';
+import type { Logger } from '../../core/support/Logger.js';
 import type { LinkOpener, LinkRequest } from './LinkOpener.js';
 import type { TabTiler } from './TabTiler.js';
 

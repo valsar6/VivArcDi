@@ -1,4 +1,4 @@
-import type { Logger } from '../../../core/Logger.js';
+import type { Logger } from '../../../core/support/Logger.js';
 import { MAX_ROWS, suggestionRow, typedRow } from './CommandRow.js';
 import type { CommandRow } from './CommandRow.js';
 import { SelectionCursor } from './SelectionCursor.js';

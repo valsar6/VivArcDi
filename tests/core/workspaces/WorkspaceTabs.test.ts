@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { WorkspaceTabs } from '../../src/core/WorkspaceTabs.js';
-import { FolderTabs } from '../modules/folders/fakes.js';
-import { silentLogger } from '../modules/reopen/fakes.js';
+import { WorkspaceTabs } from '../../../src/core/workspaces/WorkspaceTabs.js';
+import { FolderTabs } from '../../modules/folders/fakes.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
 
 const URL = 'https://example.com/';
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { CommandItem, MenuItem, SubmenuItem } from '../../../src/core/ContextMenu.js';
+import type { CommandItem, MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { LiveFolderMenu } from '../../../src/modules/livefolders/LiveFolderMenu.js';
 import { LiveFolderStore } from '../../../src/modules/livefolders/LiveFolderStore.js';
 import { PullRequestFilters } from '../../../src/modules/livefolders/PullRequestFilters.js';

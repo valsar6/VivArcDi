@@ -1,8 +1,8 @@
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import type { TabMovedListener } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
-import type { LogSink } from '../../../src/core/Logger.js';
-import { WorkspaceTabs } from '../../../src/core/WorkspaceTabs.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import type { TabMovedListener } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { LogSink } from '../../../src/core/support/Logger.js';
+import { WorkspaceTabs } from '../../../src/core/workspaces/WorkspaceTabs.js';
 import { LocalPinned } from '../../../src/modules/workspacesync/LocalPinned.js';
 import type { MenuResult } from '../../../src/modules/workspacesync/MenuCommand.js';
 import { MissingSpaces } from '../../../src/modules/workspacesync/MissingSpaces.js';

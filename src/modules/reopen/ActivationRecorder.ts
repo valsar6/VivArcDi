@@ -1,6 +1,6 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import { AddressKey } from '../../core/AddressKey.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
 import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import type { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
 

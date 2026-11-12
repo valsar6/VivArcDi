@@ -1,4 +1,4 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 
 export type UnloadedTabsApi = Pick<BrowserTabs, 'query' | 'onUpdated'>;
 

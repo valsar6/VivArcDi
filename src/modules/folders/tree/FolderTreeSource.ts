@@ -1,9 +1,9 @@
-import { BookmarkFolderFinder } from '../../../core/bookmarks/BookmarkFolderFinder.js';
-import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
-import type { BrowserBookmarks } from '../../../core/bookmarks/BrowserBookmarks.js';
-import { FrameTask } from '../../../core/FrameTask.js';
-import type { FrameTiming } from '../../../core/FrameTask.js';
-import type { Logger } from '../../../core/Logger.js';
+import { BookmarkFolderFinder } from '../../../core/browser/bookmarks/BookmarkFolderFinder.js';
+import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
+import type { BrowserBookmarks } from '../../../core/browser/bookmarks/BrowserBookmarks.js';
+import { FrameTask } from '../../../core/support/FrameTask.js';
+import type { FrameTiming } from '../../../core/support/FrameTask.js';
+import type { Logger } from '../../../core/support/Logger.js';
 import { FolderTree } from '../../../shared/links/FolderTree.js';
 import type { TreeEntry } from '../../../shared/links/FolderEntries.js';
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabUnloader } from '../../../src/core/TabUnloader.js';
+import { TabUnloader } from '../../../src/core/tabs/TabUnloader.js';
 import { UnloadedTabs } from '../../../src/shared/tabs/UnloadedTabs.js';
 import { FakeTabs } from './fakes.js';
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ResourceLoader } from '../../src/core/ResourceLoader.js';
+import { ResourceLoader } from '../../src/core/boot/ResourceLoader.js';
 
 const fetchOf =
   (files: Record<string, string>) =>

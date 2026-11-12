@@ -1,12 +1,12 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { DomQuery } from '../../core/DomQuery.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { DomQuery } from '../../core/dom/DomQuery.js';
 import { KeptTab } from '../../shared/tabs/KeptTab.js';
-import { Module } from '../../core/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../core/boot/Module.js';
 import type { PeekTriggers } from './LinkClassifier.js';
 import { LinkOpener } from './LinkOpener.js';
 import type { LinkRequest } from './LinkOpener.js';
-import { PageScriptInjector } from '../../core/PageScriptInjector.js';
+import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
 import { PageScripts } from './PageScripts.js';
 import { PeekController } from './PeekController.js';
 import { PeekKeys } from './PeekKeys.js';
@@ -14,7 +14,7 @@ import { parsePeekMessage } from './PeekMessage.js';
 import { PeekPanel } from './PeekPanel.js';
 import type { PanelCommand, PanelSize } from './PeekPanel.js';
 import { TabTiler } from './TabTiler.js';
-import { TAB_ID_ATTRIBUTE } from '../../core/Webview.js';
+import { TAB_ID_ATTRIBUTE } from '../../core/browser/Webview.js';
 
 export const OPEN_ATTRIBUTE = 'data-vivarcdi-peek';
 

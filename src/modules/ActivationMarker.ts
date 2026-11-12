@@ -1,6 +1,6 @@
-import { DomQuery } from '../core/DomQuery.js';
-import { Module } from '../core/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../core/Module.js';
+import { DomQuery } from '../core/dom/DomQuery.js';
+import { Module } from '../core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../core/boot/Module.js';
 
 export class ActivationMarker extends Module {
   public static override id = 'activation-marker';

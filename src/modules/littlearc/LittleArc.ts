@@ -1,5 +1,5 @@
-import { Module } from '../../core/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../core/boot/Module.js';
 import { LITTLE_ARC_DEFAULTS, settingsFrom } from './LittleArcSettings.js';
 import type { LittleArcSettings } from './LittleArcSettings.js';
 import { LittleArcRegistry } from './LittleArcRegistry.js';

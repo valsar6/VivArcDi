@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
+import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { FolderPreview } from '../../../src/modules/folderpreview/FolderPreview.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';

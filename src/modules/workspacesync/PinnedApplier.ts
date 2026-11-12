@@ -1,6 +1,6 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
-import type { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
+import type { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import { LocalPinned } from './LocalPinned.js';
 import type { LocalPinnedTab } from './LocalPinned.js';
 import type { PinnedEntry } from './SyncStore.js';

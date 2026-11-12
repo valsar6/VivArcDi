@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserRuntime } from '../../src/core/BrowserRuntime.js';
-import type { ChromeApi } from '../../src/core/BrowserTabs.js';
+import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
+import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
 
 function runtimeWith(getCurrent: (callback: (info?: unknown) => void) => void, lastError?: { message: string }): BrowserRuntime {
   const chromeApi = { windows: { create: (): void => undefined, getCurrent }, runtime: { lastError } } as unknown as ChromeApi;

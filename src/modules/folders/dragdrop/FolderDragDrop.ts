@@ -1,10 +1,10 @@
-import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
-import type { ContextMenu } from '../../../core/ContextMenu.js';
+import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
+import type { ContextMenu } from '../../../core/dom/ContextMenu.js';
 import type { DragPill } from '../../../shared/dragdrop/DragPill.js';
 import { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import { LinkDropZone } from '../../../shared/dragdrop/LinkDropZone.js';
-import type { Logger } from '../../../core/Logger.js';
+import type { Logger } from '../../../core/support/Logger.js';
 import { RowDrag } from '../../../shared/dragdrop/RowDrag.js';
 import { TabDragPill } from '../../../shared/dragdrop/TabDragPill.js';
 import { TabDragRelease } from '../../../shared/dragdrop/TabDragRelease.js';

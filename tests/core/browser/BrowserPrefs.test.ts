@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserPrefs } from '../../src/core/BrowserPrefs.js';
-import { FakePrefsApi } from './prefs.js';
+import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { FakePrefsApi } from '../prefs.js';
 
 test('reads the value of a preference', async () => {
   const api = new FakePrefsApi();

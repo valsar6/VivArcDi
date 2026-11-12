@@ -1,4 +1,4 @@
-import type { MenuItem } from '../../core/ContextMenu.js';
+import type { MenuItem } from '../../core/dom/ContextMenu.js';
 
 export type SpaceMenuProvider = () => MenuItem[];
 

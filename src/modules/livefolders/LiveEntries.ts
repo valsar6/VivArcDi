@@ -1,4 +1,4 @@
-import { AddressKey } from '../../core/AddressKey.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
 import type { FolderEntry, LinkEntry } from '../../shared/links/FolderEntries.js';
 import { LinkId } from '../../shared/links/LinkId.js';
 import type { PullRequestRow } from './GithubPullRequests.js';

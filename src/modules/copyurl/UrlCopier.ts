@@ -1,4 +1,4 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import { ClipboardApiCopy, SelectionCopy, TextCopier } from '../../shared/clipboard/TextCopier.js';
 import type { ClipboardWriter, CopyStrategy } from '../../shared/clipboard/TextCopier.js';
 

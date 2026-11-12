@@ -1,5 +1,5 @@
-import type { PayloadSource } from './ResourceLoader.js';
-import type { SelectorIndex } from './types.js';
+import type { PayloadSource } from '../boot/ResourceLoader.js';
+import type { SelectorIndex } from '../boot/types.js';
 
 type VersionPair = [number, number];
 

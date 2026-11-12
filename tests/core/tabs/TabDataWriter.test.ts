@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabDataWriter } from '../../src/core/TabDataWriter.js';
-import { TabData } from '../../src/core/TabData.js';
-import { FolderTabs } from '../modules/folders/fakes.js';
+import { TabDataWriter } from '../../../src/core/tabs/TabDataWriter.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
+import { FolderTabs } from '../../modules/folders/fakes.js';
 
 class SlowTabs extends FolderTabs {
   public override async get(tabId: number): Promise<chrome.tabs.Tab> {

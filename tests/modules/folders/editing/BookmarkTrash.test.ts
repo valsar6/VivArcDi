@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
+import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
 import { BookmarkTrash } from '../../../../src/modules/folders/editing/BookmarkTrash.js';
 import { folder } from '../fakes.js';
 

@@ -1,5 +1,5 @@
-import type { BrowserPrefs } from './BrowserPrefs.js';
-import type { Logger } from './Logger.js';
+import type { BrowserPrefs } from '../browser/BrowserPrefs.js';
+import type { Logger } from '../support/Logger.js';
 
 export type WorkspacePrefs = Pick<BrowserPrefs, 'available' | 'canFollow' | 'get' | 'onChange'>;
 

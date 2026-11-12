@@ -1,8 +1,8 @@
-import { AddressKey } from '../../../core/AddressKey.js';
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import { AddressKey } from '../../../core/tabs/AddressKey.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
 import { KeptTab } from '../../../shared/tabs/KeptTab.js';
-import type { Logger } from '../../../core/Logger.js';
-import { TabData } from '../../../core/TabData.js';
+import type { Logger } from '../../../core/support/Logger.js';
+import { TabData } from '../../../core/tabs/TabData.js';
 import type { LinkEntry } from '../../../shared/links/FolderEntries.js';
 import type { TabLinks } from './TabLinks.js';
 

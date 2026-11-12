@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabData } from '../../src/core/TabData.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 
 const tabWith = (data: Record<string, unknown>): chrome.tabs.Tab => ({ vivExtData: JSON.stringify(data) }) as unknown as chrome.tabs.Tab;
 const parsed = (text: string): Record<string, unknown> => JSON.parse(text) as Record<string, unknown>;

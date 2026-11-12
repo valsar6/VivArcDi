@@ -1,5 +1,5 @@
-import type { BrowserRuntime } from '../../core/BrowserRuntime.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
+import type { BrowserRuntime } from '../../core/browser/BrowserRuntime.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { Disposition } from './LinkClassifier.js';
 
 export interface LinkRequest {
