@@ -8,12 +8,15 @@ import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
 import { SpaceMenuItems } from '../../../src/core/SpaceMenuItems.js';
 import { VirtualFolders } from '../../../src/core/VirtualFolders.js';
 import { LiveFolders } from '../../../src/modules/livefolders/LiveFolders.js';
+import { CONNECTION_STORAGE_KEY } from '../../../src/modules/livefolders/GithubConnection.js';
+import { PANEL_ATTRIBUTE } from '../../../src/modules/livefolders/ConnectPanel.js';
 import { LiveFolderStore, LIVE_FOLDERS_STORAGE_KEY } from '../../../src/modules/livefolders/LiveFolderStore.js';
 import { asDocument, DomDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { FolderTabs, WritableChrome, bookmarkTree, link } from '../folders/fakes.js';
 import { settle } from '../reopen/fakes.js';
-import { FakeGithub, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
+import { CODE_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
+import { FakeDeviceGithub, FakeGithub, ME, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 
 const TOKEN = 'ghp_module_token';
 const WORKSPACE = '5';
@@ -30,11 +33,20 @@ interface Setup {
   lines: () => string[];
 }
 
-function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, hang = false }: { storage?: MemoryStorage; token?: string | null; hang?: boolean } = {}): Setup {
+function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, hang = false, clientId = 'Iv1.client' }: { storage?: MemoryStorage; token?: string | null; hang?: boolean; clientId?: string } = {}): Setup {
   const dom = new DomDocument();
   const github = new FakeGithub([pullRequest(1, { title: 'Mine' }), pullRequest(2, { title: 'Theirs', author: 'ada', reviewRequested: true })]);
   const original = globalThis.fetch;
-  globalThis.fetch = ((url: string, init: { headers: Record<string, string> }) => (hang ? new Promise(() => undefined) : github.fetch(url, init))) as unknown as typeof fetch;
+  if (token !== null) {
+    storage.setItem(CONNECTION_STORAGE_KEY, JSON.stringify({ token, login: ME }));
+  }
+  storage.writes.length = 0;
+  globalThis.fetch = ((url: string, init: { method: 'GET'; headers: Record<string, string> }) => {
+    if (url === CODE_URL) {
+      return Promise.resolve({ ok: true, status: 200, json: async () => new FakeDeviceGithub().code });
+    }
+    return hang ? new Promise(() => undefined) : github.fetch(url, init);
+  }) as unknown as typeof fetch;
   const { logger, sink } = recordingLogger();
   const bookmarks = new WritableChrome(bookmarkTree([link('10', 'Docs', 'https://docs.example/')]));
   const module = new LiveFolders();
@@ -46,10 +58,9 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     document: asDocument(dom),
     selectors: new SelectorCatalog({ browser: '#browser', tabListHost: '.list', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
     logger,
-    options: { enabled: true, refreshMinutes: 5 },
+    options: { enabled: true, refreshMinutes: 5, githubClientId: clientId },
     tabs: new FolderTabs([{ id: 1, active: true, url: 'https://a.example/', vivExtData: inWorkspace }]),
     storage,
-    payload: { url: (path: string): string => path, json: async (): Promise<never> => Promise.reject(new Error('no json')), text: async (): Promise<string> => (token === null ? Promise.reject(new Error('404')) : token) },
     bookmarks: bookmarks.reader,
     bookmarkWriter: bookmarks.writer,
   } as unknown as ModuleContext;
@@ -136,15 +147,81 @@ test('refreshes a live folder when it is opened', async (t) => {
   assert.equal(context.github.requests.length, before + 2);
 });
 
-test('shows only the Connect GitHub row without a token and sends no request', async (t) => {
+const childTitles = (virtual: VirtualFolders): string[] => {
+  const [folder] = virtual.entriesFor(WORKSPACE);
+  return folder?.kind === 'folder' ? folder.children.map((child) => child.title) : [];
+};
+
+test('shows only the Connect GitHub row when GitHub is not connected and sends no request', async (t) => {
   const context = setup(t, { token: null });
   await context.module.start(context.context);
   createFolder(context.dom);
   await settle();
   await settle();
-  const [folder] = context.virtual.entriesFor(WORKSPACE);
-  assert.deepEqual(folder?.kind === 'folder' ? folder.children.map((child) => child.title) : [], ['Connect GitHub']);
+  assert.deepEqual(childTitles(context.virtual), ['Connect GitHub']);
   assert.equal(context.github.requests.length, 0);
+});
+
+test('opens the connect panel from the Connect GitHub row', async (t) => {
+  const context = setup(t, { token: null });
+  await context.module.start(context.context);
+  createFolder(context.dom);
+  await settle();
+  const [folder] = context.virtual.entriesFor(WORKSPACE);
+  assert.equal(context.virtual.activate(`${folder?.id}:connect`), true);
+  await settle();
+  assert.ok(context.dom.created.some((node) => node.hasAttribute(PANEL_ATTRIBUTE) && node.parentElement !== null));
+  assert.equal(context.virtual.activate(`${folder?.id}:7`), false);
+  assert.deepEqual(context.github.requests, []);
+});
+
+test('says GitHub is not set up without a client id, opens no panel and logs one warning', async (t) => {
+  const context = setup(t, { token: null, clientId: '' });
+  await context.module.start(context.context);
+  createFolder(context.dom);
+  await settle();
+  const [folder] = context.virtual.entriesFor(WORKSPACE);
+  assert.deepEqual(childTitles(context.virtual), ['GitHub is not set up in this VivArcDi']);
+  assert.equal(context.virtual.activate(`${folder?.id}:connect`), true);
+  await settle();
+  assert.ok(!context.dom.created.some((node) => node.hasAttribute(PANEL_ATTRIBUTE)));
+  assert.equal(context.lines().filter((line) => line.includes('githubClientId')).length, 1);
+});
+
+test('disconnects from the folder menu: every folder asks to connect again', async (t) => {
+  const context = setup(t);
+  await context.module.start(context.context);
+  createFolder(context.dom);
+  createFolder(context.dom);
+  await settle();
+  await settle();
+  const [first] = context.virtual.entriesFor(WORKSPACE);
+  assert.ok(first !== undefined);
+  context.virtual.openMenu(first.id, 1, 2);
+  menuItems(context.dom).find((row) => row.textContent === 'Disconnect GitHub')?.click();
+  await settle();
+  await settle();
+  const folders = context.virtual.entriesFor(WORKSPACE);
+  assert.deepEqual(folders.map((folder) => (folder.kind === 'folder' ? folder.children.map((child) => child.title) : [])), [['Connect GitHub'], ['Connect GitHub']]);
+  assert.ok(!(context.storage.getItem(CONNECTION_STORAGE_KEY) ?? '').includes(TOKEN));
+});
+
+test('offers Copy Link and Archive Pull Request on a pull request row, and nothing on the connect row', async (t) => {
+  const context = setup(t);
+  await context.module.start(context.context);
+  createFolder(context.dom);
+  await settle();
+  await settle();
+  const [folder] = context.virtual.entriesFor(WORKSPACE);
+  const row = folder?.kind === 'folder' ? folder.children[0] : undefined;
+  assert.ok(row !== undefined);
+  context.virtual.openMenu(row.id, 3, 4);
+  assert.deepEqual(menuItems(context.dom).map((item) => item.textContent), ['Copy Link', 'Archive Pull Request']);
+  menuItems(context.dom).find((item) => item.textContent === 'Archive Pull Request')?.click();
+  assert.deepEqual(childTitles(context.virtual), ['Mine']);
+  const before = context.dom.created.length;
+  context.virtual.openMenu(`${folder?.id}:connect`, 3, 4);
+  assert.equal(context.dom.created.length, before);
 });
 
 test('stops cleanly: the folders leave the section, the stored ones stay', async (t) => {

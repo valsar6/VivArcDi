@@ -93,3 +93,43 @@
     cursor: default;
   }
 }
+
+#{$root} #{$connect-panel} {
+  position: fixed;
+  z-index: $repository-editor-layer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+  box-sizing: border-box;
+  width: $connect-panel-width;
+  padding: $gap;
+  border-radius: $menu-radius;
+  background-color: var(--colorBg, #222);
+  box-shadow: $menu-shadow;
+  color: var(--colorFg, #fff);
+  font-size: $row-font-size;
+  -webkit-app-region: no-drag;
+
+  > div {
+    flex: 1 0 100%;
+  }
+
+  > #{$connect-code} {
+    font-family: monospace;
+    font-size: $connect-code-size;
+    letter-spacing: 0.08em;
+    text-align: center;
+    user-select: text;
+  }
+
+  > button {
+    flex: 1;
+    height: $menu-row-height;
+    border: 0;
+    border-radius: $menu-radius - $menu-padding;
+    color: inherit;
+    font: inherit;
+    background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
+    cursor: default;
+  }
+}

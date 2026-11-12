@@ -257,18 +257,6 @@ def invoking_user_home() -> Path:
     return Path.home()
 
 
-def invoking_user_ids() -> tuple[int, int] | None:
-    """The user and group ids of the person who ran `sudo`, or None outside sudo."""
-    sudo_user = os.environ.get("SUDO_USER")
-    if is_root() and sudo_user:
-        try:
-            entry = pwd.getpwnam(sudo_user)
-        except KeyError:
-            return None
-        return entry.pw_uid, entry.pw_gid
-    return None
-
-
 def is_root() -> bool:
     """True when the installer runs with administrator rights."""
     return os.geteuid() == 0

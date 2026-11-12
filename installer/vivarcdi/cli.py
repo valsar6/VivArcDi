@@ -5,7 +5,7 @@ from pathlib import Path
 
 from . import __version__
 from .backup import BackupStore
-from .commands import COMMANDS, Command, InstallerContext, InstallCommand, LiveFoldersCommand, ReapplyCommand, ShortcutsCommand, ThemeCommand, THEME_APPLY, THEME_ASK, THEME_NEVER, UninstallCommand, WindowCommand
+from .commands import COMMANDS, Command, InstallerContext, InstallCommand, ReapplyCommand, ShortcutsCommand, ThemeCommand, THEME_APPLY, THEME_ASK, THEME_NEVER, UninstallCommand, WindowCommand
 from .distribution import DIST_FOLDER, payload_root
 from .errors import VivArcDiError
 from .modes import MODES, CommandLineMode, InstallMode, mode_named
@@ -13,10 +13,10 @@ from .patching import InstallationPatcher
 from .preferences import ShortcutTable
 from .preferences_backup import PreferencesBackupStore
 from .payload import PayloadDeployer
-from .live_token import TokenVault
-from .platforms import Platform, PlatformFactory, invoking_user_ids, is_root
+from .legacy_token import LegacyTokenFiles
+from .platforms import Platform, PlatformFactory, is_root
 from .profiles import ProfileLocator
-from .prompt import ConsolePrompt, ConsoleSecretPrompt
+from .prompt import ConsolePrompt
 from .reporter import Reporter
 from .running import ProcessGuard
 from .shortcuts import ShortcutService
@@ -45,10 +45,10 @@ def build_context(
     runner = runner or CommandRunner()
     data_dir = mode.data_dir(platform)
     reapply = mode.reapply_command(repo_root, data_dir)
-    vault = TokenVault(data_dir, invoking_user_ids())
+    legacy_token = LegacyTokenFiles(data_dir)
     installations = InstallationPatcher(
         WindowHtmlPatcher(),
-        PayloadDeployer(repo_root / DIST_FOLDER, __version__, vault),
+        PayloadDeployer(repo_root / DIST_FOLDER, __version__, legacy_token),
         BackupStore(data_dir / "backups"),
         mode.permission_advisor(platform),
     )
@@ -80,7 +80,7 @@ def build_context(
         data_dir=data_dir,
         ownership=mode.ownership(platform, data_dir),
         takeover=mode.takeover(platform, data_dir, runner),
-        vault=vault,
+        legacy_token=legacy_token,
         outcome=mode.reapply_outcome(runner),
         background=background,
     )
@@ -113,9 +113,6 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
             subparser.add_argument("action", choices=command.actions, help="what to do with the theme")
             subparser.add_argument("--dry-run", action="store_true", help="print the changes and write nothing")
             subparser.add_argument("--keys", action="store_true", help="status: print the theme key names and ids")
-        if isinstance(command, LiveFoldersCommand):
-            subparser.add_argument("action", choices=command.actions, help="what to do with the live folders")
-            subparser.add_argument("--remove", action="store_true", help="delete the stored token instead of asking for one")
         if isinstance(command, ShortcutsCommand):
             subparser.add_argument("action", choices=command.actions, help="what to do with the shortcuts")
             subparser.add_argument("--dry-run", action="store_true", help="print the differences and change nothing")
@@ -158,8 +155,6 @@ def main(argv: list[str]) -> int:
         context.theme_choice = theme_choice(arguments)
         context.profile_is_yours = not is_root()
         context.prompt = ConsolePrompt()
-        context.secret_prompt = ConsoleSecretPrompt()
-        context.remove_token = getattr(arguments, "remove", False)
         context.dry_run = getattr(arguments, "dry_run", False)
         context.restore_shortcuts = getattr(arguments, "restore_shortcuts", False)
         context.needs_reapply = getattr(arguments, "needs_reapply", False)

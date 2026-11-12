@@ -9,24 +9,48 @@ nothing is written to your bookmarks.
 
 ## Connect GitHub
 
-A live folder reads GitHub as you, so it needs a token. Until you give one, the folder shows a single
-row, **Connect GitHub**, that opens this page.
+A live folder reads GitHub as you, so you connect GitHub once, from the browser. You type nothing in a
+terminal and copy no token. Until you connect, every live folder shows a single row, **Connect GitHub**.
 
-1. On GitHub, create a personal access token that can read pull requests: a fine-grained token with
-   read access to the repositories you follow, or a classic token with the `repo` scope.
-2. Run the command and paste the token. Nothing shows while you type.
+1. Click **Connect GitHub**. A small panel opens below the folder and shows a code in large letters,
+   for example `WDJB-MJHT`.
+2. Press **Copy code and open GitHub**. VivArcDi copies the code and opens
+   `https://github.com/login/device` in a new tab. If you are not signed in to GitHub, sign in there
+   first.
+3. Paste the code on that page. GitHub shows the name **VivArcDi** and the access it asks for. Press
+   **Authorize**.
+4. Go back to the panel. It checks with GitHub while it waits, and when you have authorized it says
+   **Connected as** and your GitHub name, then closes after two seconds. The GitHub tab stays where it
+   is, so close it when you like. Every live folder of every workspace refreshes and uses the connection.
 
-   ```
-   vivarcdi live-folders token
-   ```
+The code lasts about fifteen minutes. If it expires, or you press **Cancel** on GitHub, the panel says
+so and offers **Try again**, which asks for a new code. **Cancel** in the panel, or the Escape key, stops
+connecting. A click elsewhere does not close it, so you can switch to the GitHub tab and come back.
 
-   From a source checkout, use `python3 installer live-folders token`. On Debian use `sudo`.
+If a folder says **GitHub is not set up in this VivArcDi**, this copy of VivArcDi has no client id for
+its GitHub app (the `githubClientId` option of the `live-folders` module). The panel does not open.
 
-3. The folder uses the token at its next refresh. Choose **Refresh** in its menu to see it at once.
+### The access VivArcDi asks for
 
-The token stays on your computer, in a file only you can read, outside Vivaldi's storage. VivArcDi
-never writes it to the browser's storage or to the console. Run `vivarcdi live-folders token --remove`
-to delete it. Uninstalling VivArcDi deletes it too.
+GitHub asks you to allow the scope `repo`. It is the only scope GitHub has that lets an app read the
+pull requests of private repositories, and GitHub words it as access to read and write them. **VivArcDi
+only reads**: it sends nothing but read requests, and only to `api.github.com`. The token stays in the
+storage of VivArcDi in your browser profile; it is never written to the console or anywhere else.
+
+### Disconnect
+
+Right click a live folder and choose **Disconnect GitHub**. VivArcDi forgets the token, and every live
+folder shows **Connect GitHub** again. The connection belongs to the browser profile, so it applies to
+all live folders at once.
+
+To take the access away on GitHub too, open GitHub, then **Settings**, **Applications**, **Authorized
+OAuth Apps**, find **VivArcDi** and choose **Revoke**.
+
+### Reconnect
+
+If you revoke VivArcDi on GitHub, or GitHub stops accepting the connection, the folder keeps its last
+rows, shows the warning mark, and its first row becomes **Reconnect GitHub**. Click it and follow the
+same steps as above. A passing GitHub problem, such as no network, does not disconnect you.
 
 ## Create a live folder
 
@@ -50,19 +74,36 @@ Right click the live folder and open **Pull Requests**:
 With **Created By Me** and **Review Requests** both off the folder is empty. A change takes effect at
 once and stays after a restart. **Refresh** in the same menu reads GitHub again now.
 
+## Row actions
+
+Right click a pull request in the folder:
+
+| Item | Does |
+|---|---|
+| Copy Link | Copies the address of the pull request and shows **Copied** at the bottom of the window |
+| Archive Pull Request | Hides the pull request from the folder until it is updated on GitHub, then it comes back |
+
+Archiving changes nothing on GitHub and no bookmark.
+
 ## Updates
 
 The folder refreshes every five minutes (option `refreshMinutes` of the `live-folders` module), when
 you open it and after a filter change. After a restart it shows its last rows at once. If a refresh
-fails, because you are offline, the token was refused or GitHub's rate limit was reached, the folder
-keeps its last rows and shows a warning mark; rest the pointer on it to read why.
+fails, because you are offline or GitHub's rate limit was reached, the folder keeps its last rows and
+shows a warning mark; rest the pointer on it to read why.
 
 ## Delete a live folder
 
 Right click it and choose **Delete Live Folder**. The folder, its filters and its rows go; no bookmark
-changes.
+changes. The connection to GitHub stays, because it belongs to the browser profile.
 
 ## Click a row
 
 A click on a row opens the pull request as a tab of the workspace, below the row like the link of a
 bookmark folder. When the pull request leaves the folder, its tab goes back to the list of today's tabs.
+
+## Upgrading from 0.49 to 0.51
+
+Those versions asked for a token with a terminal command. That command is gone: install or reapply
+VivArcDi and the installer deletes the old token file it left on your computer. Then connect GitHub as
+described above.

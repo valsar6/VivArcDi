@@ -36,18 +36,18 @@ Branch `features/live-folders`, next minor version. Replaces the tasks of the fi
 
 - [ ] **T10.** Probe for Tore: `live-folders/sonda-accesso-github.md` (device endpoints reachable from
   `window.html`) and the OAuth App client id (`live-folders/registra-app-github.md`).
-- [ ] **T11.** `GithubDeviceFlow` with fixtures. Satisfies AC-19, AC-21. Done when `polls at the
+- [x] **T11.** `GithubDeviceFlow` with fixtures. Satisfies AC-19, AC-21. Done when `polls at the
   interval github asks for` and `stores nothing when the code expires or is denied` pass.
-- [ ] **T12.** `GithubConnection` replaces `GithubToken`; 401 handling and `Reconnect GitHub`. Satisfies
+- [x] **T12.** `GithubConnection` replaces `GithubToken`; 401 handling and `Reconnect GitHub`. Satisfies
   AC-11, AC-16, AC-20, AC-22, AC-23. Done when `asks to connect when github is not connected`, `never
   logs the token`, `stores the token and refreshes after authorization`, `forgets the token on
   disconnect` and `offers to reconnect when the token is refused` pass; the old test names of AC-11
   and AC-16 are renamed.
-- [ ] **T13.** `ConnectPanel`, connect row routing, `Disconnect GitHub` item. Satisfies AC-18.
-- [ ] **T14.** `LiveRowMenu` with `Copy Link` and `Archive Pull Request`.
-- [ ] **T15.** Installer: remove the token command and delete the old files. Satisfies AC-24. Done when
+- [x] **T13.** `ConnectPanel`, connect row routing, `Disconnect GitHub` item. Satisfies AC-18.
+- [x] **T14.** `LiveRowMenu` with `Copy Link` and `Archive Pull Request`.
+- [x] **T15.** Installer: remove the token command and delete the old files. Satisfies AC-24. Done when
   `removes the old token file` passes.
-- [ ] **T16.** `githubClientId` in `config.json`, manual page rewritten without the terminal, version
+- [x] **T16.** `githubClientId` in `config.json`, manual page rewritten without the terminal, version
   bump, `make check`.
 - [ ] **T17.** Manual verification checklist for Tore from AC-1, AC-9, AC-17, AC-18 and the row actions.
 

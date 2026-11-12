@@ -87,7 +87,7 @@ test('maps a pull request to a row', async () => {
     subtitle: 'ada · acme/web',
     updatedAt: '2026-11-07T10:00:00Z',
   });
-  const entry = LiveEntries.folder({ id: 'f1', name: 'Pull Requests', filters: PullRequestFilters.defaults(), rows: row === undefined ? [] : [row], warning: null, needsToken: false, refreshedAt: null });
+  const entry = LiveEntries.folder({ id: 'f1', name: 'Pull Requests', filters: PullRequestFilters.defaults(), rows: row === undefined ? [] : [row], warning: null, needsReconnect: false, archived: {}, refreshedAt: null }, { configured: true, connected: true });
   assert.deepEqual(entry.children, [
     { kind: 'link', id: 'live:f1:7', title: 'Fix the tab bar', url: 'https://github.com/acme/web/pull/7', key: 'github.com/acme/web/pull/7', depth: 1, subtitle: 'ada · acme/web' },
   ]);
@@ -107,7 +107,7 @@ test('sends the token only in the authorization header', async () => {
 
 test('names why a request failed, without the token', async () => {
   const reasons = new Map<number, string>([
-    [401, 'The token was refused'],
+    [401, 'GitHub refused the connection'],
     [403, "GitHub's rate limit, retrying later"],
     [422, 'GitHub answered 422'],
   ]);

@@ -19,8 +19,8 @@ export interface GithubResponse {
   json: () => Promise<unknown>;
 }
 
-/** The part of `fetch` that the search needs; replaceable in tests, so that no test reaches the network. */
-export type GithubFetch = (url: string, init: { headers: Record<string, string> }) => Promise<GithubResponse>;
+/** The part of `fetch` that GitHub's API needs: only `GET`, which is all VivArcDi sends with the token. Replaceable in tests, so that no test reaches the network. */
+export type GithubFetch = (url: string, init: { method: 'GET'; headers: Record<string, string> }) => Promise<GithubResponse>;
 
 export interface SearchItem {
   id: number;
@@ -33,7 +33,7 @@ export interface SearchItem {
 
 export const SEARCH_URL = 'https://api.github.com/search/issues';
 export const UNREACHABLE_REASON = 'GitHub cannot be reached';
-export const REFUSED_REASON = 'The token was refused';
+export const REFUSED_REASON = 'GitHub refused the connection';
 export const RATE_LIMIT_REASON = "GitHub's rate limit, retrying later";
 
 const PAGE_SIZE = 50;
@@ -44,15 +44,20 @@ const REPOSITORY_PATH = /\/repos\/(.+)$/;
 const SUBTITLE_SEPARATOR = ' · ';
 
 export class GithubFailure extends Error {
+  /** Whether GitHub answered 401: the connection was revoked or is no longer valid. */
+  public readonly refused: boolean;
+
   /**
    * Why a request to GitHub failed, in words for the folder's warning mark. It never holds the
    * token or any header.
    *
    * @param reason The short reason to show.
+   * @param refused Whether GitHub refused the token.
    */
-  constructor(reason: string) {
+  constructor(reason: string, refused = false) {
     super(reason);
     this.name = 'GithubFailure';
+    this.refused = refused;
   }
 }
 
@@ -104,7 +109,7 @@ export class GithubPullRequests {
     const url = `${SEARCH_URL}?${new URLSearchParams({ q: query, sort: 'updated', order: 'desc', per_page: String(PAGE_SIZE) })}`;
     const response = await this.#send(url, token);
     if (!response.ok) {
-      throw new GithubFailure(GithubPullRequests.#reasonOf(response.status));
+      throw new GithubFailure(GithubPullRequests.#reasonOf(response.status), response.status === UNAUTHORIZED);
     }
     const body = (await response.json()) as { items?: SearchItem[] };
     return (body.items ?? []).map((item) => GithubPullRequests.toRow(item));
@@ -113,6 +118,7 @@ export class GithubPullRequests {
   async #send(url: string, token: string): Promise<GithubResponse> {
     try {
       return await this.#fetch(url, {
+        method: 'GET',
         headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
       });
     } catch {
