@@ -138,8 +138,9 @@ is fixed by the design's mapping and checked in review.
   the base every module stands on. Moving them would make `little-arc` and `peek` build their own
   services, which changes the boot and `ModuleContext`, the alternative that 034 already rejected.
 - [x] **Order with 034.** 034 is not merged yet, and main gained spec 033's classes in the flat
-  `folders/` and `core/bookmarks/BookmarkTrash.ts`. Proposed: merge 034 first, after a rebase onto
-  main that puts 033's classes in `folders/editing/`. 035 then starts from that main.
+  `folders/` and `core/bookmarks/BookmarkTrash.ts`. Decided: 034 takes main first and puts 033's
+  classes in `folders/editing/`, then merges; 035 starts from that main, so the two refactors never
+  conflict.
 - [x] **Branch and version.** Decided: `refactor/core-layout`, with no version change, as for 034.
 
 ## References
