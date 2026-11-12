@@ -179,3 +179,18 @@ test('places a submenu at the right of its row, level with it', () => {
   assert.equal(submenu?.properties.get('left'), '160px');
   assert.equal(submenu?.properties.get('top'), '80px');
 });
+
+test('draws a separator that cannot be clicked', () => {
+  const dom = new DomDocument();
+  dom.defaultView = { innerWidth: 400, innerHeight: 300 };
+  const ran: string[] = [];
+  const menu = new ContextMenu({ document: asDocument(dom), parent: (): Element => dom.parent as unknown as Element });
+  menu.open([{ label: 'A', run: (): void => void ran.push('a') }, { separator: true }, { label: 'B', run: (): void => void ran.push('b') }], 10, 10);
+  const element = dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE));
+  const [, line] = element?.children ?? [];
+  assert.equal(line?.getAttribute('role'), 'separator');
+  assert.equal(line?.textContent, '');
+  line?.click();
+  assert.deepEqual(ran, []);
+  assert.notEqual(element?.parentElement, null);
+});

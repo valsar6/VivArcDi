@@ -14,7 +14,7 @@ function setup(): { dom: DomDocument; opened: Array<{ labels: string[]; x: numbe
     menu: {
       open: (items, x, y): void => {
         last = items;
-        opened.push({ labels: items.map((item) => item.label), x, y });
+        opened.push({ labels: items.map((item) => item.label ?? ''), x, y });
       },
       close: (): void => undefined,
     },

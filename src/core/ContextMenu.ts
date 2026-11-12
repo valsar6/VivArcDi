@@ -13,7 +13,13 @@ export interface SubmenuItem {
   items: MenuItem[];
 }
 
-export type MenuItem = CommandItem | SubmenuItem;
+/** A thin line between two groups of items; it cannot be clicked. */
+export interface SeparatorItem {
+  separator: true;
+  label?: undefined;
+}
+
+export type MenuItem = CommandItem | SubmenuItem | SeparatorItem;
 
 export interface ContextMenuDependencies {
   /** The document of Vivaldi's browser window. */
@@ -92,6 +98,10 @@ export class ContextMenu {
 
   #row(item: MenuItem, level: number): HTMLElement {
     const row = this.#deps.document.createElement('div');
+    if ('separator' in item) {
+      row.setAttribute('role', 'separator');
+      return row;
+    }
     row.setAttribute('role', 'menuitem');
     row.textContent = item.label;
     if ('items' in item) {
