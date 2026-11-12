@@ -77,6 +77,12 @@ class BookmarkWriter {
     return BookmarkWriter.#first(id, await this.#call((api, done) => api.getSubTree(id, done)));
   }
   /**
+   * @returns The whole bookmark tree, from its top-level nodes.
+   */
+  tree() {
+    return this.#call((api, done) => api.getTree(done));
+  }
+  /**
    * @param id A folder.
    * @returns Its children, in Vivaldi's order.
    */

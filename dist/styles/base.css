@@ -80,6 +80,11 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=menuitem]:hover {
   background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=separator] {
+  height: 1px;
+  margin: 4px 8px;
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 15%, transparent);
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=menuitemcheckbox] {
   display: flex;
   align-items: center;

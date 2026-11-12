@@ -4,11 +4,13 @@ import { FavoriteDropZone } from "../../core/FavoriteDropZone.js";
 import { FolderCommands } from "../../core/FolderCommands.js";
 import { LinkId } from "../../core/LinkId.js";
 import { TabMenuItems } from "../../core/TabMenuItems.js";
+import { BookmarkTrash } from "../../core/bookmarks/BookmarkTrash.js";
 import { Toast } from "../../core/Toast.js";
 import { TodayList } from "../../core/TodayList.js";
 import { VirtualFolders } from "../../core/VirtualFolders.js";
 import { CreatedLinks } from "./CreatedLinks.js";
 import { FavoriteShortcut } from "./FavoriteShortcut.js";
+import { FolderDeletion } from "./FolderDeletion.js";
 import { FolderDragDrop } from "./FolderDragDrop.js";
 import { TabCommands } from "./TabCommands.js";
 import { WorkspaceFavorites } from "./WorkspaceFavorites.js";
@@ -57,7 +59,7 @@ class FolderEditing {
       () => toast.remove(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
-      this.#startDrops((text) => toast.show(text)),
+      this.#startDrops((text, kind) => toast.show(text, kind)),
       this.#startTabMenu((text) => toast.show(text))
     );
   }
@@ -111,6 +113,16 @@ class FolderEditing {
   }
   #startDrops(notify) {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
+    const deletion = new FolderDeletion({
+      writer: bookmarkWriter,
+      trash: new BookmarkTrash({ tree: () => bookmarkWriter.tree() }),
+      tabs,
+      openFolders: this.#sources.openFolders,
+      closing: this.#sources.closing,
+      redraw: this.#sources.redraw,
+      notify,
+      logger
+    });
     const drops = new FolderDragDrop({
       document,
       wrapperSelector: selectors.get("tabWrapper"),
@@ -120,6 +132,7 @@ class FolderEditing {
       menu: new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body }),
       section: () => this.#view.element,
       header: () => document.querySelector(HEADER_SELECTOR),
+      folderActions: { rename: (folderId) => this.#view.edit(folderId), remove: (folderId) => void deletion.delete(folderId) },
       tabs,
       writer: bookmarkWriter,
       tabLinks: this.#sources.tabLinks,

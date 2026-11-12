@@ -54,6 +54,10 @@ class ContextMenu {
   }
   #row(item, level) {
     const row = this.#deps.document.createElement("div");
+    if ("separator" in item) {
+      row.setAttribute("role", "separator");
+      return row;
+    }
     row.setAttribute("role", "menuitem");
     row.textContent = item.label;
     if ("items" in item) {

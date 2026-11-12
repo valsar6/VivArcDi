@@ -7,6 +7,7 @@ import { SpaceCollapse } from "../../core/SpaceCollapse.js";
 import { TabBarAnchor } from "../../core/TabBarAnchor.js";
 import { VirtualFolders } from "../../core/VirtualFolders.js";
 import { WorkspaceNames } from "../../core/WorkspaceNames.js";
+import { ClosingLinks } from "./ClosingLinks.js";
 import { FolderEditing } from "./FolderEditing.js";
 import { FolderRows } from "./FolderRows.js";
 import { FolderSectionView } from "./FolderSectionView.js";
@@ -22,6 +23,7 @@ const HIDDEN_OWNER = "bookmark-folders";
 class FolderSection {
   #context;
   #redraw;
+  #closing = new ClosingLinks();
   #openFolders;
   #source;
   #openLinks;
@@ -133,7 +135,9 @@ class FolderSection {
       base: () => this.#roots.base,
       childIds: () => this.#source.childIds,
       redraw: () => this.#redraw.request(),
-      tabLinks: this.#tabLinks
+      tabLinks: this.#tabLinks,
+      openFolders: this.#openFolders,
+      closing: this.#closing
     });
   }
   async #useWorkspace(workspace) {
@@ -182,7 +186,7 @@ class FolderSection {
   }
   #unlinkOrphans() {
     const ids = this.#source.linkIds;
-    const keep = (id) => LinkId.isVirtual(id) && (!this.#virtual.ready || this.#virtual.has(id));
+    const keep = (id) => this.#closing.has(id) || LinkId.isVirtual(id) && (!this.#virtual.ready || this.#virtual.has(id));
     if (ids !== null) {
       this.#tabLinks.unlinkExcept(ids, keep).catch((error) => this.#context.logger.warn("could not unlink the tabs of removed bookmarks", error));
     }

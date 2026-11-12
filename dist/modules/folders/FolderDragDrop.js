@@ -10,12 +10,14 @@ import { DropTargets, LINK_ATTRIBUTE } from "./DropTargets.js";
 import { FolderLinkTargets } from "./FolderLinkTargets.js";
 import { LinkRemoval } from "./LinkRemoval.js";
 import { PanelBookmarkDrop } from "./PanelBookmarkDrop.js";
+import { FolderMenu } from "./FolderMenu.js";
+import { FolderMenuItems } from "./FolderMenuItems.js";
 import { RowMenu } from "./RowMenu.js";
 import { TabDrops } from "./TabDrops.js";
 class FolderDragDrop {
   #release;
   #rowDrag;
-  #rowMenu;
+  #menus;
   #panelDrop;
   #zone;
   #linkTargets;
@@ -25,14 +27,14 @@ class FolderDragDrop {
    * the space header to become a link there, with the mouse or with an HTML5 drop, and a bookmark
    * or folder of the Bookmarks panel be dropped there to be copied. A link row can be dragged out
    * of the section onto today's list or the Favorites grid, through `LinkRemoval`, which its
-   * right-click menu also offers as Remove pin and Tile tab; the rows of a live folder are not
+   * right-click menu also offers as Remove pin and Tile tab, and a folder row has its own right-click menu; the rows of a live folder are not
    * bookmarks and stay where they are. A pill with the icon and the title
    * follows what is dragged. It marks the target under the pointer while either is dragged, and
    * offers the same places to the other modules through `LinkDropZone`.
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }) {
+  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }) {
     const targets = new DropTargets(section, header);
     const drops = new TabDrops({ tabs, favorites, indexBefore, logger });
     this.#release = new TabDragRelease({
@@ -67,7 +69,7 @@ class FolderDragDrop {
       onEnd: () => removal.clear(),
       pill
     });
-    this.#rowMenu = new RowMenu({ document, menu, removal });
+    this.#menus = [new RowMenu({ document, menu, removal }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
     this.#zone = LinkDropZone.of(document);
     this.#linkTargets = new FolderLinkTargets({ targets, place: new DropPlace(indexBefore), favorites, logger });
     this.#panelDrop = new PanelBookmarkDrop({ document, targets, place: new DropPlace(indexBefore), favorites });
@@ -78,7 +80,7 @@ class FolderDragDrop {
   start() {
     this.#release.start();
     this.#rowDrag.attach();
-    this.#rowMenu.attach();
+    this.#menus.forEach((menu) => menu.attach());
     this.#panelDrop.attach();
     this.#unregister = this.#zone.register(this.#linkTargets);
   }
@@ -88,7 +90,7 @@ class FolderDragDrop {
   stop() {
     this.#release.stop();
     this.#rowDrag.detach();
-    this.#rowMenu.detach();
+    this.#menus.forEach((menu) => menu.detach());
     this.#panelDrop.detach();
     this.#unregister?.();
     this.#unregister = null;

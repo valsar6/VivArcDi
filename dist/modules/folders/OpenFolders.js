@@ -52,6 +52,19 @@ class OpenFolders {
     if (!this.#ids.delete(id)) {
       this.#ids.add(id);
     }
+    this.#save();
+  }
+  /**
+   * Drops a folder that no longer exists, so that it comes back closed if it is restored.
+   *
+   * @param id A folder id.
+   */
+  forget(id) {
+    if (this.#ids.delete(id)) {
+      this.#save();
+    }
+  }
+  #save() {
     try {
       this.#storage?.setItem(this.#key, JSON.stringify([...this.#ids]));
     } catch (error) {
