@@ -1,4 +1,4 @@
-import type { ClipboardWriter } from '../../../src/modules/copyurl/UrlCopier.js';
+import type { ClipboardWriter } from '../../../src/shared/clipboard/TextCopier.js';
 import type { ToastTimers } from '../../../src/core/Toast.js';
 import { FakeElement } from '../peek/fakes.js';
 

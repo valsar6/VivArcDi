@@ -1,6 +1,6 @@
 import type { ToastKind, ToastTimers } from '../../core/Toast.js';
 import type { ConnectFlow, ConnectState } from './ConnectFlow.js';
-import type { TextCopier } from '../copyurl/UrlCopier.js';
+import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 
 export const PANEL_ATTRIBUTE = 'data-vivarcdi-connect-panel';
 export const CODE_ATTRIBUTE = 'data-vivarcdi-connect-code';

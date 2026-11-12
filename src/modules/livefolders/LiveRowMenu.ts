@@ -1,6 +1,6 @@
 import type { ContextMenu } from '../../core/ContextMenu.js';
 import { LinkId } from '../../core/LinkId.js';
-import type { TextCopier } from '../copyurl/UrlCopier.js';
+import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 import type { LiveFolderStore } from './LiveFolderStore.js';
 
 export interface LiveRowMenuDependencies {
