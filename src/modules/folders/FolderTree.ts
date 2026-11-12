@@ -1,26 +1,8 @@
 import { AddressKey } from '../../core/AddressKey.js';
 import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
+import type { FolderEntry, LinkEntry, TreeEntry } from '../../core/FolderEntries.js';
 
-export interface FolderEntry {
-  kind: 'folder';
-  id: string;
-  title: string;
-  /** Nesting level, 0 for the children of the root. */
-  depth: number;
-  children: TreeEntry[];
-}
-
-export interface LinkEntry {
-  kind: 'link';
-  id: string;
-  title: string;
-  url: string;
-  /** Address key used to match the link with a tab. */
-  key: string;
-  depth: number;
-}
-
-export type TreeEntry = FolderEntry | LinkEntry;
+export type { FolderEntry, LinkEntry, TreeEntry };
 
 export class FolderTree {
   /**

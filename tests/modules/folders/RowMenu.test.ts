@@ -35,7 +35,11 @@ test('opens the menu of a link row with Remove pin and Tile tab', () => {
   row.setAttribute('data-vivarcdi-link-id', '33');
   assert.equal(rightClick(dom, row).prevented, 1);
   assert.deepEqual(opened, [{ labels: ['Remove pin', 'Tile tab'], x: 7, y: 9 }]);
-  items().forEach((item) => item.run());
+  items().forEach((item) => {
+    if ('run' in item) {
+      item.run();
+    }
+  });
   assert.deepEqual(calls, ['removePin 33', 'tile 33']);
 });
 
@@ -52,4 +56,12 @@ test('stops listening on detach', () => {
   row.attach();
   row.detach();
   assert.equal([...dom.listeners.values()].flat().length, 0);
+});
+
+test('leaves the menu of a row of a live folder to Vivaldi', () => {
+  const { dom, opened } = setup();
+  const row = dom.createElement('div');
+  row.setAttribute('data-vivarcdi-link-id', 'live:f1:7');
+  assert.equal(rightClick(dom, row).prevented, 0);
+  assert.deepEqual(opened, []);
 });

@@ -1,3 +1,5 @@
+import { LinkId } from '../../core/LinkId.js';
+
 export type DropTarget =
   | { kind: 'header' }
   | { kind: 'folder'; id: string }
@@ -7,6 +9,7 @@ interface RowBox {
   element: HTMLElement;
   id: string;
   isFolder: boolean;
+  virtual: boolean;
   depth: number;
   top: number;
   height: number;
@@ -31,7 +34,8 @@ export class DropTargets {
    * rectangles of the rows, since Vivaldi moves tabs with the mouse and sends no drag events. On a
    * folder row the upper and lower quarters are the gaps next to it and the rest is the folder; on
    * a link row the upper and lower halves are the gaps. A row inside a folder stands for that
-   * folder: a tab released over it goes to the end of the folder.
+   * folder: a tab released over it goes to the end of the folder. The folders and rows of a
+   * live folder are not drop targets: over them there is no target.
    *
    * @param section Gives the element of the folders section.
    * @param header Gives the element of the space header, if it is in the window.
@@ -54,12 +58,17 @@ export class DropTargets {
     if (section.hasAttribute('hidden') || !DropTargets.#inside(section, x, y)) {
       return null;
     }
-    const rows = DropTargets.#rows(section);
+    const all = DropTargets.#rows(section);
+    const holds = (row: RowBox): boolean => y >= row.top && y < row.top + row.height;
+    return all.find(holds)?.virtual === true ? null : DropTargets.#among(all.filter((row) => !row.virtual), y, holds);
+  }
+
+  static #among(rows: RowBox[], y: number, holds: (row: RowBox) => boolean): DropTarget | null {
     const first = rows[0];
     if (first === undefined) {
       return null;
     }
-    const index = rows.findIndex((row) => y >= row.top && y < row.top + row.height);
+    const index = rows.findIndex(holds);
     if (index >= 0) {
       return DropTargets.#onRow(rows, index, y);
     }
@@ -142,7 +151,7 @@ export class DropTargets {
       const element = child as HTMLElement;
       const id = element.getAttribute(FOLDER_ATTRIBUTE) ?? element.getAttribute(LINK_ATTRIBUTE);
       const { top, height } = element.getBoundingClientRect();
-      return id === null ? [] : [{ element, id, isFolder: element.hasAttribute(FOLDER_ATTRIBUTE), depth: Number(element.getAttribute(DEPTH_ATTRIBUTE) ?? 0), top, height }];
+      return id === null ? [] : [{ element, id, isFolder: element.hasAttribute(FOLDER_ATTRIBUTE), virtual: LinkId.isVirtual(id), depth: Number(element.getAttribute(DEPTH_ATTRIBUTE) ?? 0), top, height }];
     });
   }
 

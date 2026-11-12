@@ -30,6 +30,7 @@ async function setup(tabs: FolderTabs): Promise<{ document: DomDocument; view: F
       onLink: (link): void => void clicks.push(`link ${link.id}`),
       onClose: (tabId): void => void activator.close(tabId),
       onRename: (id, name): void => void clicks.push(`rename ${id} ${name}`),
+      onMenu: (id, x, y): void => void clicks.push(`menu ${id} ${x} ${y}`),
     },
     60,
     timers,

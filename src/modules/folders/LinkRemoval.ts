@@ -1,6 +1,7 @@
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { FavoriteDropTarget, FavoriteDropZone } from '../../core/FavoriteDropZone.js';
+import { LinkId } from '../../core/LinkId.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
 import { TabRowMove } from '../../core/TabRowMove.js';
@@ -128,12 +129,16 @@ export class LinkRemoval {
   }
 
   /**
-   * Keeps the page of a link at a place and takes the link out.
+   * Keeps the page of a link at a place and takes the link out. A row of a live folder is not a
+   * bookmark and is left alone.
    *
    * @param linkId The bookmark of the link.
    * @param place Where the page goes.
    */
   public async moveTo(linkId: string, place: LinkRemovalPlace): Promise<void> {
+    if (LinkId.isVirtual(linkId)) {
+      return;
+    }
     try {
       const { title, url } = await this.#deps.writer.get(linkId);
       if (url === undefined) {

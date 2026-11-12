@@ -228,3 +228,13 @@ test('logs a failed link and leaves the bookmarks as they were', async () => {
   assert.deepEqual(childrenOf(chrome, 'Casetta'), []);
   assert.equal(warnings.length, 1);
 });
+
+test('does not take a row of a live folder, which is not a bookmark', async () => {
+  const live = JSON.stringify({ vivarcdi: { bookmarkId: 'live:f1:7' } });
+  const tabs = new FolderTabs([{ id: 1, url: PAGE, vivExtData: live }]);
+  const { chrome, favorites } = setup(bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta')])]), tabs);
+  assert.equal(await favorites.take(await tabs.get(1)), 'none');
+  assert.equal(await favorites.take('live:f1:7'), 'none');
+  assert.equal((await ownOf(tabs, 1)).bookmarkId, 'live:f1:7');
+  assert.deepEqual(chrome.calls.filter((call) => call.startsWith('remove')), []);
+});

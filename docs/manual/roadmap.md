@@ -64,14 +64,6 @@ Proposed, [spec 025](../../specs/025-annotated-screenshots/spec.md).
 After Vivaldi's own capture, draw on the picture with an arrow, a box, a pen or text, then copy it with
 Cmd/Ctrl+C or save it with Cmd/Ctrl+S.
 
-## Live folders
-
-Proposed, [spec 026](../../specs/026-live-folders/spec.md).
-
-A folder that fills itself. The first source lists the open pull requests of a GitHub repository, one
-row per pull request with its title and author. It refreshes every five minutes, and closed pull
-requests leave the folder.
-
 ## Rename pinned tabs
 
 Proposed, [spec 027](../../specs/027-rename-pinned-tabs/spec.md).
@@ -81,6 +73,7 @@ icon…** for an emoji. **Reset** brings back the page title and icon. The name 
 bookmark.
 
 The menus of a pinned tab (Rename, Change Icon, Edit Pinned Page) and of the space header (Edit Theme
-Color, New Folder, Live Folders), as specs 019, 026 and 027 propose them:
+Color, New Folder, Live Folders), as specs 019, 026 and 027 propose them (New Folder and Live Folders
+are built, see [Live folders](live-folders.md)):
 
 ![Mockup: pinned tab menu, then space header menu](images/mockups/pinned-and-space-menus.gif)

@@ -3,6 +3,7 @@ import { BookmarkCopier } from '../../core/bookmarks/BookmarkCopier.js';
 import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import { KeptTab } from '../../core/KeptTab.js';
+import { LinkId } from '../../core/LinkId.js';
 import type { Logger } from '../../core/Logger.js';
 import { TabData } from '../../core/TabData.js';
 import type { CreatedLinks } from './CreatedLinks.js';
@@ -176,6 +177,9 @@ export class WorkspaceFavorites {
   }
 
   async #takeLink(bookmarkId: string, tabId: number | null): Promise<TakeResult> {
+    if (LinkId.isVirtual(bookmarkId)) {
+      return 'none';
+    }
     try {
       if (!(await this.#owns(bookmarkId))) {
         return 'kept';

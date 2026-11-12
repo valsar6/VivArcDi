@@ -2,11 +2,13 @@ import { ContextMenu } from '../../core/ContextMenu.js';
 import { DragPill } from '../../core/DragPill.js';
 import { FavoriteDropZone } from '../../core/FavoriteDropZone.js';
 import { FolderCommands } from '../../core/FolderCommands.js';
+import { LinkId } from '../../core/LinkId.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { TabMenuItems } from '../../core/TabMenuItems.js';
 import type { ContextMenuApi } from '../../core/TabMenuItems.js';
 import { Toast } from '../../core/Toast.js';
 import { TodayList } from '../../core/TodayList.js';
+import { VirtualFolders } from '../../core/VirtualFolders.js';
 import { CreatedLinks } from './CreatedLinks.js';
 import { FavoriteShortcut } from './FavoriteShortcut.js';
 import { FolderDragDrop } from './FolderDragDrop.js';
@@ -90,12 +92,17 @@ export class FolderEditing {
   }
 
   /**
-   * Renames a bookmark folder. A failure is logged and the section is drawn again with the old name.
+   * Renames a bookmark folder, or hands the new name of a live folder to the source that fills it.
+   * A failure is logged and the section is drawn again with the old name.
    *
    * @param folderId The folder.
    * @param name Its new name.
    */
   public async rename(folderId: string, name: string): Promise<void> {
+    if (LinkId.isVirtual(folderId)) {
+      VirtualFolders.of(this.#context.document).rename(folderId, name);
+      return;
+    }
     try {
       await this.#context.bookmarkWriter.update(folderId, name);
     } catch (error) {

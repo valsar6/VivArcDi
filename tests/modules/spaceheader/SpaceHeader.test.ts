@@ -8,7 +8,9 @@ import { Logger } from '../../../src/core/Logger.js';
 import type { ModuleContext } from '../../../src/core/Module.js';
 import { ModuleRegistry } from '../../../src/core/ModuleRegistry.js';
 import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
+import { MENU_ATTRIBUTE } from '../../../src/core/ContextMenu.js';
 import { SpaceCollapse } from '../../../src/core/SpaceCollapse.js';
+import { SpaceMenuItems } from '../../../src/core/SpaceMenuItems.js';
 import { SpaceHeader } from '../../../src/modules/spaceheader/SpaceHeader.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
@@ -226,4 +228,49 @@ test('asks the folders section for a new folder from the plus button without col
   assert.equal(isCollapsed(dom), false);
   stop();
   module.stop();
+});
+
+const menuRows = (dom: DomDocument): DomNode[] => dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE) && node.parentElement !== null)?.children ?? [];
+
+const rightClick = (dom: DomDocument): number => {
+  let prevented = 0;
+  headerOf(dom)?.bubble({ type: 'contextmenu', clientX: 12, clientY: 34, preventDefault: (): number => (prevented += 1), stopPropagation: (): void => undefined } as unknown as Event);
+  return prevented;
+};
+
+test('opens a menu with New Folder and the items of other modules on a right click', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = setup(TABS(), { api: twoWorkspaces() });
+  const asked: string[] = [];
+  const stop = FolderCommands.of(context.document).onNewFolder(() => void asked.push('new folder'));
+  const ran: string[] = [];
+  const remove = SpaceMenuItems.of(context.document).add(() => [{ label: 'Live Folders', items: [{ label: 'GitHub', run: (): void => void ran.push('github') }] }]);
+  await module.start(context);
+  assert.equal(rightClick(dom), 1);
+  assert.deepEqual(menuRows(dom).map((row) => row.textContent), ['New Folder', 'Live Folders']);
+  assert.equal(isCollapsed(dom), false);
+
+  menuRows(dom)[0]?.click();
+  assert.deepEqual(asked, ['new folder']);
+  assert.equal(menuRows(dom).length, 0);
+
+  rightClick(dom);
+  menuRows(dom)[1]?.click();
+  const submenu = menuRows(dom);
+  assert.deepEqual(submenu.map((row) => row.textContent), ['GitHub']);
+  submenu[0]?.click();
+  assert.deepEqual(ran, ['github']);
+  stop();
+  remove();
+  module.stop();
+});
+
+test('closes the space menu when the module stops', async (t) => {
+  installFrames(t);
+  const { dom, module, context } = setup(TABS(), { api: twoWorkspaces() });
+  await module.start(context);
+  rightClick(dom);
+  assert.equal(menuRows(dom).length, 1);
+  module.stop();
+  assert.equal(menuRows(dom).length, 0);
 });

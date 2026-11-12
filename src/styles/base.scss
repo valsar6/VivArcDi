@@ -86,4 +86,46 @@
       background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
     }
   }
+
+  > [role='menuitemcheckbox'] {
+    display: flex;
+    align-items: center;
+    height: $menu-row-height;
+    padding-inline: $gap;
+    border-radius: $menu-radius - $menu-padding;
+    cursor: default;
+
+    &::before {
+      flex: none;
+      width: $menu-mark-size;
+      height: $menu-mark-size;
+      margin-inline-end: $gap;
+      background-color: currentcolor;
+      content: '';
+      mask: $check-glyph center / contain no-repeat;
+      opacity: 0;
+    }
+
+    &[data-vivarcdi-checked]::before {
+      opacity: 1;
+    }
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-hover}, transparent);
+    }
+  }
+
+  > [aria-haspopup] {
+    justify-content: space-between;
+
+    &::after {
+      flex: none;
+      width: $menu-mark-size;
+      height: $menu-mark-size;
+      margin-inline-start: $gap;
+      background-color: currentcolor;
+      content: '';
+      mask: $submenu-glyph center / contain no-repeat;
+    }
+  }
 }

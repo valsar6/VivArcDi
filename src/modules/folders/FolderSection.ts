@@ -2,15 +2,17 @@ import { ActiveWorkspace } from '../../core/ActiveWorkspace.js';
 import { FrameTask } from '../../core/FrameTask.js';
 import { HiddenTabMarker } from '../../core/HiddenTabMarker.js';
 import { HiddenTabs } from '../../core/HiddenTabs.js';
+import { LinkId } from '../../core/LinkId.js';
 import type { ModuleContext } from '../../core/Module.js';
 import { SpaceCollapse } from '../../core/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { VirtualFolders } from '../../core/VirtualFolders.js';
 import { WorkspaceNames } from '../../core/WorkspaceNames.js';
 import { FolderEditing } from './FolderEditing.js';
 import { FolderRows } from './FolderRows.js';
 import { FolderSectionView } from './FolderSectionView.js';
 import { FolderTree } from './FolderTree.js';
-import type { LinkEntry } from './FolderTree.js';
+import type { LinkEntry, TreeEntry } from './FolderTree.js';
 import { FolderTreeSource } from './FolderTreeSource.js';
 import { LinkActivator } from './LinkActivator.js';
 import { LinkTabAdopter } from './LinkTabAdopter.js';
@@ -45,6 +47,8 @@ export class FolderSection {
   #hiddenTabs: HiddenTabs;
   #hiddenMarker: HiddenTabMarker;
   #collapse: SpaceCollapse;
+  #virtual: VirtualFolders;
+  #rootEmpty = true;
   #roots: WorkspaceRoots;
   #names: WorkspaceNames;
   #active: ActiveWorkspace;
@@ -54,7 +58,9 @@ export class FolderSection {
   /**
    * The section in the tab bar and everything it needs: the tree of the bookmarks, the tabs that
    * stand for the links, the folders that are open, and the clicks. The tabs of the links are
-   * hidden from Vivaldi's tab list, since their rows stand for them.
+   * hidden from Vivaldi's tab list, since their rows stand for them. The folders that a source
+   * fills, such as the live folders, are drawn after the bookmarks with the same rows; the
+   * section opens them, renames them and reports their clicks through `VirtualFolders`.
    *
    * @param context What the module may use.
    * @param settings The root folders and the sizes.
@@ -81,6 +87,7 @@ export class FolderSection {
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
     this.#hiddenTabs = HiddenTabs.of(document);
     this.#collapse = SpaceCollapse.of(document);
+    this.#virtual = VirtualFolders.of(document);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
     this.#view = new FolderSectionView(
@@ -90,6 +97,7 @@ export class FolderSection {
         onLink: (link): void => void activator.activate(link),
         onClose: (tabId): void => void activator.close(tabId),
         onRename: (id, name): void => void this.#editing.rename(id, name),
+        onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },
       maxHeightPercent,
     );
@@ -107,6 +115,8 @@ export class FolderSection {
     this.#hiddenMarker.start();
     this.#stops.push(
       this.#collapse.onChange(() => this.#redraw.request()),
+      this.#virtual.onChange(() => this.#virtualChanged()),
+      this.#virtual.onReveal((id) => this.#reveal(id)),
       () => this.#hiddenMarker.stop(),
       () => this.#hiddenTabs.clear(HIDDEN_OWNER),
       () => this.#redraw.cancel(),
@@ -150,7 +160,7 @@ export class FolderSection {
     this.#workspace = workspace;
     const root = this.#roots.rootFor(this.#names.nameOf(workspace));
     this.#openFolders.useWorkspace(workspace);
-    this.#view.setEmpty(root.length === 0);
+    this.#rootEmpty = root.length === 0;
     await this.#source.useRoot(root);
   }
 
@@ -171,6 +181,21 @@ export class FolderSection {
   #toggle(folderId: string): void {
     this.#openFolders.toggle(folderId);
     this.#redraw.request();
+    if (this.#openFolders.has(folderId) && LinkId.isVirtual(folderId)) {
+      this.#virtual.open(folderId);
+    }
+  }
+
+  #reveal(folderId: string): void {
+    if (!this.#openFolders.has(folderId)) {
+      this.#openFolders.toggle(folderId);
+    }
+    this.#redraw.request();
+  }
+
+  #virtualChanged(): void {
+    this.#redraw.request();
+    this.#unlinkOrphans();
   }
 
   #tabsChanged(): void {
@@ -180,9 +205,14 @@ export class FolderSection {
 
   #treeChanged(): void {
     this.#redraw.request();
+    this.#unlinkOrphans();
+  }
+
+  #unlinkOrphans(): void {
     const ids = this.#source.linkIds;
+    const keep = (id: string): boolean => LinkId.isVirtual(id) && (!this.#virtual.ready || this.#virtual.has(id));
     if (ids !== null) {
-      this.#tabLinks.unlinkExcept(ids).catch((error: unknown) => this.#context.logger.warn('could not unlink the tabs of removed bookmarks', error));
+      this.#tabLinks.unlinkExcept(ids, keep).catch((error: unknown) => this.#context.logger.warn('could not unlink the tabs of removed bookmarks', error));
     }
   }
 
@@ -191,6 +221,9 @@ export class FolderSection {
       isOpen: (id: string): boolean => this.#openFolders.has(id),
       tabFor: (link: LinkRef): OpenTab | undefined => this.#openLinks.tabFor(link),
     };
-    this.#view.render(FolderRows.build(this.#source.entries, sources, this.#collapse.collapsed));
+    const live = this.#virtual.entriesFor(this.#workspace ?? null);
+    const entries: TreeEntry[] = [...this.#source.entries, ...live];
+    this.#view.setEmpty(this.#rootEmpty && live.length === 0);
+    this.#view.render(FolderRows.build(entries, sources, this.#collapse.collapsed));
   }
 }
