@@ -1,17 +1,17 @@
-import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
 import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
 import type { BookmarkTrash } from '../../core/bookmarks/BookmarkTrash.js';
 import type { BrowserTabs } from '../../core/BrowserTabs.js';
 import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
 import type { ToastKind } from '../../core/Toast.js';
 import type { ClosingLinks } from './ClosingLinks.js';
+import type { FolderLinkTabs } from './FolderLinkTabs.js';
 import type { OpenFolders } from './OpenFolders.js';
 
 export interface FolderDeletionDependencies {
   writer: Pick<BookmarkWriter, 'subTree' | 'move'>;
   trash: Pick<BookmarkTrash, 'id'>;
-  tabs: Pick<BrowserTabs, 'query' | 'remove'>;
+  tabs: Pick<BrowserTabs, 'remove'>;
+  linkTabs: Pick<FolderLinkTabs, 'linkIds' | 'tabsOf'>;
   openFolders: Pick<OpenFolders, 'forget'>;
   closing: Pick<ClosingLinks, 'add' | 'clear'>;
   /** Draws the section again from the bookmarks. */
@@ -46,8 +46,8 @@ export class FolderDeletion {
     try {
       const folder = await this.#deps.writer.subTree(folderId);
       name = folder.title;
-      linkIds = FolderDeletion.#linkIds(folder);
-      const tabIds = await this.#tabsOf(linkIds);
+      linkIds = this.#deps.linkTabs.linkIds(folder);
+      const tabIds = await this.#deps.linkTabs.tabsOf(linkIds);
       closing.add(linkIds);
       await this.#moveToTrash(folderId);
       this.#deps.openFolders.forget(folderId);
@@ -70,14 +70,6 @@ export class FolderDeletion {
     await this.#deps.writer.move(folderId, { parentId: trashId });
   }
 
-  async #tabsOf(linkIds: string[]): Promise<number[]> {
-    const wanted = new Set(linkIds);
-    return (await this.#deps.tabs.query({})).flatMap((tab) => {
-      const { bookmarkId } = TabData.ownOf(tab);
-      return tab.id !== undefined && bookmarkId !== undefined && wanted.has(bookmarkId) ? [tab.id] : [];
-    });
-  }
-
   async #close(tabIds: number[]): Promise<void> {
     for (const tabId of tabIds) {
       try {
@@ -86,10 +78,5 @@ export class FolderDeletion {
         this.#deps.logger.warn('could not close a tab of the deleted folder', error);
       }
     }
-  }
-
-  static #linkIds(node: BookmarkNode): string[] {
-    const own = node.url !== undefined ? [node.id] : [];
-    return [...own, ...(node.children ?? []).flatMap((child) => FolderDeletion.#linkIds(child))];
   }
 }
