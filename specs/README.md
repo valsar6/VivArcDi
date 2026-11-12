@@ -28,7 +28,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [017 Package managers](017-package-managers/spec.md) | 0 | Approved |
 | [018 Copy bookmarks into a workspace](018-copy-bookmarks-to-workspace/spec.md) | 3 | Implemented |
 | [019 Space theme color](019-space-theme-color/spec.md) | 3 | Draft |
-| [020 Drag a tab into the Favorites](020-drag-tab-to-favorites/spec.md) | 1 | Approved |
+| [020 Drag a tab into the Favorites](020-drag-tab-to-favorites/spec.md) | 1 | Approved, revision Draft |
 | [021 Auto-hide tab bar](021-auto-hide-tab-bar/spec.md) | 3 | Approved |
 | [022 Split from a dragged tab](022-split-from-drag/spec.md) | 2 | Draft |
 | [023 Command panel with tab actions](023-command-panel/spec.md) | 5 | Approved |

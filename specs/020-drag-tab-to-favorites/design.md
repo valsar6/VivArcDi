@@ -54,7 +54,8 @@ On release:
 - **Over the tab list below the separator** (FR-4): the Favorite bookmark is removed; the tab of the
   Favorite in the active workspace is unlinked and unpinned, so Vivaldi shows it as a Today tab, and
   moved to the index of the row under the pointer. Without a tab, a tab is opened on the address.
-- **Over the grid or outside the tab bar**: nothing changes. Reordering tiles stays with 001 AC-14.
+- **Over the grid** (FR-8, FR-9, revision of 2026-11-12): the tile is reordered, see below.
+- **Outside the tab bar**: nothing changes.
 
 The Favorite's tabs in other workspaces are closed, so the tile is gone everywhere (AC-8) and no
 other workspace is left with an unlinked pinned tab that would turn into a pinned tile. The page is
@@ -68,6 +69,27 @@ Rejected:
 - Making the tiles `draggable` and using HTML5 drag: Vivaldi's tab list does not accept HTML5 drops
   of foreign elements, so the drop below the separator would have no target.
 
+### Reordering a tile (FR-8, FR-9)
+
+The tile drag (`RowDrag` over `[data-vivarcdi-tile]`, created in `GridDragging`) already reports each
+move and the release. It asks `GridDropZone` first:
+
+- **Move.** When `GridDropZone.at(x, y)` gives a target, the dragged tile is hidden
+  (`data-vivarcdi-moving`, `display: none`) so its place closes, and `GridDropZone.mark` puts the gap
+  before the target tile; the marks of `FavoriteRemoval` are cleared. Elsewhere the tile shows again
+  faded, the gap goes and `FavoriteRemoval.over` marks the folders or the tab list, as today.
+- **Release.** Over the grid, `FavoriteReorder.move(favoriteId, beforeId)` moves the bookmark; elsewhere
+  `FavoriteRemoval.release` keeps its role. A target equal to the tile itself or to the tile right
+  after it is its own place, so nothing is written (AC-11).
+- **`FavoriteReorder`** (new, Favorites module) reads the children of the Favorites folder and calls
+  `BookmarkWriter.move(id, { parentId, index })` (new; `chrome.bookmarks.move`): the index of
+  `beforeId`, or the end. Chrome counts the index before the bookmark leaves its place, so the same
+  index works upward and downward. The grid redraws from the `onMoved` event that `BookmarkFavorites`
+  already follows, in every workspace.
+
+Rejected: changing the order only on screen and keeping it in storage. The Favorites folder is the
+order everywhere, Vivaldi Sync included (030).
+
 ## Components
 
 | Class or file | Responsibility | Pattern |
@@ -76,6 +98,8 @@ Rejected:
 | `src/modules/favorites/GridDropZone.ts` | Hit test of the grid and of its tiles under the pointer; the gap element before the target tile; HTML5 `dragover`/`drop` with `vivaldi/x-tab-entries` | Adapter |
 | `src/modules/favorites/TabToFavorite.ts` | Wires a `TabPointerDrag` and the HTML5 path to `GridDropZone` and `FavoriteDrop` | Mediator |
 | `src/modules/favorites/TileDrag.ts` | Follows the press, move and release on a tile; dims it; swallows the click after a drag; reports the place of the release | Observer |
+| `src/modules/favorites/FavoriteReorder.ts` | Moves a Favorite bookmark before another or to the end of the folder; skips a move to its own place | Command |
+| `src/core/bookmarks/BookmarkWriter.ts` | Gains `move(id, destination)` | |
 | `src/modules/favorites/FavoriteRemoval.ts` | Turns a released tile into a link through `LinkDropZone` or into a Today tab, closes the Favorite's tabs of the other workspaces, then removes the bookmark | Command |
 | `src/core/LinkDropZone.ts` | Shared, per window: the folders section registers its targets; the Favorites ask for them | Mediator, like `FolderCommands` |
 | `src/modules/folders/WorkspaceFavorites.ts` | Gains `addLink(page, place)` for a link without a tab | |
@@ -87,7 +111,8 @@ Rejected:
 
 No new selector: the tab list uses `tabStrip` and `tabWrapper`, the drag uses `TabSlot`. New marks:
 `data-vivarcdi-drop-gap` on the gap element, `data-vivarcdi-dragging` on the dragged tile,
-`data-vivarcdi-drop-today` on the tab list while a tile is over it. Every element the user drags or
+`data-vivarcdi-drop-today` on the tab list while a tile is over it, `data-vivarcdi-moving` on a tile
+dragged over its own grid. Every element the user drags or
 drops on keeps `-webkit-app-region: no-drag` (issue #30).
 
 ## Configuration

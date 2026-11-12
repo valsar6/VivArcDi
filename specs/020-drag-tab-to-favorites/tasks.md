@@ -24,3 +24,12 @@ and is done when its check passes. Branch `features/drag-tab-to-favorites`, mino
 - [x] **T7.** Manual verification checklist for Tore from AC-1, AC-3, AC-7 and AC-8
   (`pinned-regression/verifica-trascina-favorites.md` in the project files).
 - [ ] **T8.** Manual checks on macOS and Debian.
+
+Revision of 2026-11-12 (reordering), branch `features/tile-reorder`, minor bump of the version:
+
+- [ ] **T9.** `BookmarkWriter.move` and `FavoriteReorder`. AC-9, AC-10, AC-11.
+- [ ] **T10.** `GridDragging`: gap and hidden tile while a tile is over the grid; release over the grid
+  goes to `FavoriteReorder`. FR-8.
+- [ ] **T11.** `docs/manual/tab-bar.md`; manual checklist for Tore from AC-12
+  (`pin-tile/verifica-riordino-tile.md` in the project files).
+- [ ] **T12.** Manual checks on macOS and Debian.
