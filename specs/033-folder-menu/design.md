@@ -14,7 +14,7 @@ before their code.
 
 ### Opening the menu (FR-1)
 
-A new `FolderMenu` in `src/modules/folders`, next to `RowMenu`, listens to `contextmenu` in the capture
+A new `FolderMenu` in `src/modules/folders/editing`, next to `RowMenu`, listens to `contextmenu` in the capture
 phase on the document and reacts only to a row with `data-vivarcdi-folder-id` that is **not** marked
 `data-vivarcdi-live-folder`; live folder rows keep going to `LiveFolderMenu` through
 `FolderSectionView` (AC-2). On such a row it cancels Vivaldi's menu and opens the shared `ContextMenu`
@@ -40,7 +40,7 @@ use. Nothing else changes.
 
 ### Delete (FR-2, FR-3, FR-4, NFR-1)
 
-A new `FolderDeletion` in `src/modules/folders` does the work in this order:
+A new `FolderDeletion` in `src/modules/folders/editing` does the work in this order:
 
 1. **Find the tabs.** `BookmarkWriter.subTree(folderId)` gives the folder with every descendant; the
    ids of its links (any depth) are collected. `tabs.query({})` and `TabData.ownOf(tab).bookmarkId`
@@ -74,7 +74,7 @@ Revision of 2026-11-12, after step 1 shipped in 0.57.0 (PR #164).
 after the group of `Rename…` (AC-1). `Move to ▸` is a `SubmenuItem` of the shared `ContextMenu`, whose
 items are built when the menu opens.
 
-**Duplicate (AC-8).** A new `FolderDuplication` in `src/modules/folders`:
+**Duplicate (AC-8).** A new `FolderDuplication` in `src/modules/folders/editing`:
 
 1. `BookmarkWriter.get(folderId)` gives the parent and the index of the folder.
 2. `BookmarkCopier.copy([folderId], parentId, index + 1)` (018) copies the folder with all its
@@ -85,7 +85,7 @@ items are built when the menu opens.
 
 A failure keeps the original as it was and shows `Could not duplicate "<name>"` (AC-6).
 
-**Move to ▸ (AC-9, AC-10).** A new `FolderRelocation` in `src/modules/folders`:
+**Move to ▸ (AC-9, AC-10).** A new `FolderRelocation` in `src/modules/folders/editing`:
 
 - **Submenu.** One item per entry of `WorkspaceNames.entries`, in Vivaldi's order, labelled with the
   workspace name; the current workspace (`ActiveWorkspace.current`) has `checked: true` and does
@@ -121,19 +121,21 @@ bookmarks change.
 
 ## Files
 
+Paths follow the `folders` layout of [034](../034-module-boundaries/design.md#folders-layout).
+
 | File | Change |
 |---|---|
 | `src/core/ContextMenu.ts` | Separator item. |
 | `src/core/bookmarks/BookmarkNode.ts` | Optional `trash` flag. |
 | `src/core/bookmarks/BookmarkTrash.ts` | New: finds and caches the Trash id. |
-| `src/modules/folders/FolderMenu.ts` | New: opens the menu on folder rows. |
-| `src/modules/folders/FolderMenuItems.ts` | New: the items, by step and group. |
-| `src/modules/folders/FolderDeletion.ts` | New: tabs, move to Trash, close, toast. |
-| `src/modules/folders/OpenFolders.ts` | `forget(id)`. |
-| `src/modules/folders/FolderDragDrop.ts`, `FolderEditing.ts`, `FolderSection.ts` | Wiring and the `keep` set. |
-| `src/modules/folders/FolderLinkTabs.ts` | Step 2. New: link ids and tab ids of a folder, taken out of `FolderDeletion`. |
-| `src/modules/folders/FolderDuplication.ts` | Step 2. New: `Duplicate`. |
-| `src/modules/folders/FolderRelocation.ts` | Step 2. New: `Move to ▸` and its submenu. |
+| `src/modules/folders/editing/FolderMenu.ts` | New: opens the menu on folder rows. |
+| `src/modules/folders/editing/FolderMenuItems.ts` | New: the items, by step and group. |
+| `src/modules/folders/editing/FolderDeletion.ts` | New: tabs, move to Trash, close, toast. |
+| `src/modules/folders/tree/OpenFolders.ts` | `forget(id)`. |
+| `src/modules/folders/dragdrop/FolderDragDrop.ts`, `editing/FolderEditing.ts`, `FolderSection.ts` | Wiring and the `keep` set. |
+| `src/modules/folders/editing/FolderLinkTabs.ts` | Step 2. New: link ids and tab ids of a folder, taken out of `FolderDeletion`. |
+| `src/modules/folders/editing/FolderDuplication.ts` | Step 2. New: `Duplicate`. |
+| `src/modules/folders/editing/FolderRelocation.ts` | Step 2. New: `Move to ▸` and its submenu. |
 
 ## Risks
 
