@@ -4,30 +4,81 @@ $toast: '[data-vivarcdi-toast]';
 $toast-visible: '[data-vivarcdi-visible]';
 $toast-offset: 24px;
 $toast-layer: 60;
-$toast-radius: 8px;
-$toast-padding-block: 8px;
-$toast-padding-inline: 14px;
-$toast-shadow: 0 8px 24px rgb(0 0 0 / 30%);
 $toast-shift: 8px;
+$toast-glyph-inset: calc(#{$toast-padding-start} + #{($toast-icon-size - $toast-glyph-size) * 0.5});
+$toast-from: --vivarcdi-toast-from;
+$toast-hidden-transform: translate(-50%, $toast-shift) scale($toast-scale);
 
 #{$root} #{$toast} {
   position: fixed;
   z-index: $toast-layer;
   bottom: $toast-offset;
   left: 50%;
-  padding: $toast-padding-block $toast-padding-inline;
+  display: flex;
+  align-items: center;
+  gap: $toast-gap;
+  box-sizing: border-box;
+  height: $toast-height;
+  padding: 0 $toast-padding-end 0 $toast-padding-start;
   border-radius: $toast-radius;
   opacity: 0;
-  background-color: var(--colorBg, #222);
+  background-color: color-mix(in srgb, var(--colorBg, #{$surface-fallback}) $toast-opacity, transparent);
+  backdrop-filter: blur($toast-blur) saturate($arc-saturation);
   box-shadow: $toast-shadow;
-  color: var(--colorFg, #fff);
-  font-size: 13px;
+  color: var(--colorFg, #{$ink-fallback});
+  font-size: $toast-font-size;
+  font-weight: $toast-font-weight;
+  white-space: nowrap;
   pointer-events: none;
-  transform: translate(-50%, $toast-shift);
+  #{$toast-from}: #{$toast-hidden-transform};
+  transform: var(#{$toast-from});
   transition:
-    opacity $transition,
-    transform $transition;
+    opacity $toast-duration ease-out,
+    transform $toast-duration ease-out;
   -webkit-app-region: no-drag;
+
+  &::before {
+    content: '';
+    flex: none;
+    width: $toast-icon-size;
+    height: $toast-icon-size;
+    border-radius: 50%;
+    background-color: $toast-ok-bg;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: $toast-glyph-inset;
+    width: $toast-glyph-size;
+    height: $toast-glyph-size;
+    background-color: var(--colorHighlightBg, #{$accent-fallback});
+    mask: $check-glyph center / contain no-repeat;
+    transform: translateY(-50%);
+  }
+
+  &[#{$toast-kind}='neutral'] {
+    &::before {
+      background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $toast-neutral-tint, transparent);
+    }
+
+    &::after {
+      background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $toast-neutral-glyph-tint, transparent);
+      mask-image: $close-glyph;
+    }
+  }
+
+  &[#{$toast-kind}='error'] {
+    &::before {
+      background-color: $toast-error-bg;
+    }
+
+    &::after {
+      background-color: $toast-error-ink;
+      mask-image: $alert-glyph;
+    }
+  }
 
   &#{$toast-visible} {
     opacity: 1;
@@ -35,7 +86,12 @@ $toast-shift: 8px;
 
     @starting-style {
       opacity: 0;
-      transform: translate(-50%, $toast-shift);
+      transform: var(#{$toast-from});
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #{$toast-from}: translate(-50%, 0);
+    transition: opacity $toast-duration ease-out;
   }
 }
