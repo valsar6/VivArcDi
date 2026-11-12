@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-13 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -132,15 +132,15 @@ is fixed by the design's mapping and checked in review.
 
 ## Open questions
 
-- [ ] **Injected services used by one module.** `BrowserHistory` and `BrowserSearch` serve only
+- [x] **Injected services used by one module.** `BrowserHistory` and `BrowserSearch` serve only
   `little-arc`, and `ResourceLoader`'s `PayloadSource` serves only `peek`, but all three come through
-  `ModuleContext`. Proposed: they stay in `core/browser/` and `core/boot/`. Moving them would make
-  `little-arc` and `peek` build their own services. That changes the boot and `ModuleContext`, the
-  alternative that 034 already rejected.
-- [ ] **Order with 034.** 034 is not merged yet, and main gained spec 033's classes in the flat
+  `ModuleContext`. Decided: they stay in `core/browser/` and `core/boot/`, because they are part of
+  the base every module stands on. Moving them would make `little-arc` and `peek` build their own
+  services, which changes the boot and `ModuleContext`, the alternative that 034 already rejected.
+- [x] **Order with 034.** 034 is not merged yet, and main gained spec 033's classes in the flat
   `folders/` and `core/bookmarks/BookmarkTrash.ts`. Proposed: merge 034 first, after a rebase onto
   main that puts 033's classes in `folders/editing/`. 035 then starts from that main.
-- [ ] **Branch and version.** Proposed: `refactor/core-layout`, with no version change, as for 034.
+- [x] **Branch and version.** Decided: `refactor/core-layout`, with no version change, as for 034.
 
 ## References
 
