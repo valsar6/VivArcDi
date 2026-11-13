@@ -482,9 +482,13 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   Escape and an empty name keep `Untitled`.
 - **Rename.** Double click a folder. A single click still opens and closes it, after a short wait.
 - **Folder menu.** Right-click a folder row, at any depth, for **Rename…** (the same as the double
-  click) and **Delete**. Delete moves the folder with everything in it into Vivaldi's bookmark Trash,
-  where the Bookmarks panel can restore it, closes the tabs of its links and shows a toast. If the
-  move fails, nothing is closed and a toast says so. The rows of a live folder keep their own menu.
+  click), **Duplicate**, **Move to** and **Delete**. Duplicate adds a closed copy, with the same name
+  and content and no tabs, right below the folder. Move to lists your workspaces, the current one
+  checked: choose another and the folder goes to the end of that workspace's folder, with its open
+  tabs, and a toast says so; if both workspaces share one folder, nothing moves. Delete moves the
+  folder with everything in it into Vivaldi's bookmark Trash, where the Bookmarks panel can restore
+  it, closes the tabs of its links and shows a toast. If a move fails, nothing is closed or moved and
+  a toast says so. The rows of a live folder keep their own menu.
 - **Add a tab to a folder.** Drag a tab of the list onto a folder row and release: it becomes a link at
   the end of that folder and leaves the list. Released on the space header it becomes a link at the end
   of the workspace's folder, and released between two rows it goes there. A Favorite, a pinned tab, a

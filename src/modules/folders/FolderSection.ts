@@ -157,6 +157,9 @@ export class FolderSection {
       tabLinks: this.#tabLinks,
       openFolders: this.#openFolders,
       closing: this.#closing,
+      names: this.#names,
+      active: this.#active,
+      roots: this.#roots,
     });
   }
 

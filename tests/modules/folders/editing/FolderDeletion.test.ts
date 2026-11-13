@@ -4,6 +4,7 @@ import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/Bookma
 import { BookmarkTrash } from '../../../../src/modules/folders/editing/BookmarkTrash.js';
 import type { ToastKind } from '../../../../src/core/dom/Toast.js';
 import { ClosingLinks } from '../../../../src/modules/folders/editing/ClosingLinks.js';
+import { FolderLinkTabs } from '../../../../src/modules/folders/editing/FolderLinkTabs.js';
 import { FolderDeletion } from '../../../../src/modules/folders/editing/FolderDeletion.js';
 import { OpenFolders } from '../../../../src/modules/folders/tree/OpenFolders.js';
 import { MemoryStorage, silentLogger } from '../../reopen/fakes.js';
@@ -46,8 +47,8 @@ function setup(withTrash = true): {
   const deletion = new FolderDeletion({
     writer,
     trash: new BookmarkTrash({ tree: (): Promise<BookmarkNode[]> => writer.tree() }),
+    linkTabs: new FolderLinkTabs({ tabs: { query: (info): Promise<chrome.tabs.Tab[]> => tabs.query({ ...info }) } }),
     tabs: {
-      query: (info): Promise<chrome.tabs.Tab[]> => tabs.query({ ...info }),
       remove: async (tabId): Promise<void> => {
         seen.push(`closing while held: ${closing.has('11')}`);
         await tabs.remove(tabId);
