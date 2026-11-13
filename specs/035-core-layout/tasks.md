@@ -25,6 +25,6 @@ test names as before.
 - [x] **T7.** `docs/architecture.md`: the core folders, the three layers and the core paths it cites.
   NFR-5.
 - [x] **T8.** One-off check that every relative import in the built `dist/` points to a file. NFR-4.
-- [ ] **T9.** Pull request, with the manual verification checklist for Tore from AC-6, in Italian, in
+- [x] **T9.** Pull request, with the manual verification checklist for Tore from AC-6, in Italian, in
   its description.
-- [ ] **T10.** Manual check on macOS and Debian (Tore). AC-6.
+- [x] **T10.** Manual check on macOS and Debian (Tore). AC-6.
