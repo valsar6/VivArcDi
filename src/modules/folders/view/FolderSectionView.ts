@@ -1,4 +1,4 @@
-import { LinkId } from '../../../core/LinkId.js';
+import { LinkId } from '../../../shared/links/LinkId.js';
 import { EDIT_ATTRIBUTE, FolderNameEditor } from '../editing/FolderNameEditor.js';
 import type { Row } from './FolderRows.js';
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from './FolderRowElement.js';

@@ -1,4 +1,4 @@
-import { OwnPage } from '../../core/OwnPage.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { LinkSnapshot } from './LinkedTabs.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';

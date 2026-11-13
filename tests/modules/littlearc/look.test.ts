@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { AddressDisplay } from '../../../src/modules/littlearc/AddressDisplay.js';
 import { BackButtonState } from '../../../src/modules/littlearc/BackButtonState.js';
 import { DestinationLookup } from '../../../src/modules/littlearc/DestinationLookup.js';

@@ -1,4 +1,4 @@
-import type { Logger } from '../../core/Logger.js';
+import type { Logger } from '../../core/support/Logger.js';
 import { SyncNames } from './SyncNames.js';
 import type { SyncStore } from './SyncStore.js';
 

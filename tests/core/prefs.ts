@@ -1,4 +1,4 @@
-import type { PrefChangeListener, PrefsApi } from '../../src/core/BrowserPrefs.js';
+import type { PrefChangeListener, PrefsApi } from '../../src/core/browser/BrowserPrefs.js';
 
 export const CASETTA = { id: 1781382688540, name: 'Casetta', icon: 'workspace_icon_1' };
 export const WORK = { id: 1781382688541, name: 'Work', icon: 'workspace_icon_2' };

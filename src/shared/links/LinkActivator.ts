@@ -1,7 +1,7 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
-import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import { UnloadedTabs } from '../tabs/UnloadedTabs.js';
 import type { OpenLinks } from './OpenLinks.js';
 

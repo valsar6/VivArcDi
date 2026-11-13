@@ -1,6 +1,6 @@
-import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
-import { TabData } from '../../../core/TabData.js';
+import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
+import { TabData } from '../../../core/tabs/TabData.js';
 
 export interface FolderLinkTabsDependencies {
   tabs: Pick<BrowserTabs, 'query'>;

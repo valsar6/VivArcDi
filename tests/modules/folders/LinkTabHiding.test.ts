@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { BookmarkWriter } from '../../../src/core/bookmarks/BookmarkWriter.js';
-import { BrowserPrefs } from '../../../src/core/BrowserPrefs.js';
-import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { TabData } from '../../../src/core/TabData.js';
+import { BookmarkWriter } from '../../../src/core/browser/bookmarks/BookmarkWriter.js';
+import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
 import { ActivityStamps } from '../../../src/modules/today/ActivityStamps.js';

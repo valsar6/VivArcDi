@@ -1,5 +1,5 @@
-import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
-import type { Logger } from '../../core/Logger.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import type { Logger } from '../../core/support/Logger.js';
 
 export interface FavoriteReorderDependencies {
   writer: Pick<BookmarkWriter, 'get' | 'children' | 'move'>;

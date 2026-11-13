@@ -1,8 +1,8 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { OwnPage } from '../../core/OwnPage.js';
-import { TabDataWriter } from '../../core/TabDataWriter.js';
-import { TabData } from '../../core/TabData.js';
-import type { OwnTabChanges } from '../../core/TabData.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
+import { TabDataWriter } from '../../core/tabs/TabDataWriter.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import type { OwnTabChanges } from '../../core/tabs/TabData.js';
 
 export type SavedAddressTabs = Pick<BrowserTabs, 'get' | 'update'>;
 

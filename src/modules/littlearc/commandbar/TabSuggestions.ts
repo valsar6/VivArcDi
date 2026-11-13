@@ -1,4 +1,4 @@
-import type { BrowserTabs } from '../../../core/BrowserTabs.js';
+import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
 import { matches } from './MatchScore.js';
 import { suggestionOf } from './Suggestion.js';
 import type { Suggestion } from './Suggestion.js';

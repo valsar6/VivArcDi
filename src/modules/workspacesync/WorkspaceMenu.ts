@@ -1,5 +1,5 @@
-import type { ElementGestures } from '../../core/ElementGestures.js';
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import type { ElementGestures } from './ElementGestures.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import type { EditorOpener } from './EditorOpener.js';
 import type { Poll } from './Poll.js';
 

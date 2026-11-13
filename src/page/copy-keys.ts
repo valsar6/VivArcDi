@@ -1,4 +1,4 @@
-import { ShortcutKeys } from '../core/ShortcutKeys.js';
+import { ShortcutKeys } from '../core/dom/ShortcutKeys.js';
 import { COPY_CONSOLE_PREFIX, COPY_MESSAGE_TYPE } from '../modules/copyurl/CopyMessage.js';
 import { sendToInterface } from './lib/PageChannel.js';
 

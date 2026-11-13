@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { MENU_ATTRIBUTE } from '../../../src/core/ContextMenu.js';
-import type { MenuItem, SubmenuItem } from '../../../src/core/ContextMenu.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
-import { SpaceMenuItems } from '../../../src/core/SpaceMenuItems.js';
-import { VirtualFolders } from '../../../src/core/VirtualFolders.js';
+import { MENU_ATTRIBUTE } from '../../../src/core/dom/ContextMenu.js';
+import type { MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
+import { SpaceMenuItems } from '../../../src/shared/spaces/SpaceMenuItems.js';
+import { VirtualFolders } from '../../../src/shared/links/VirtualFolders.js';
 import { LiveFolders } from '../../../src/modules/livefolders/LiveFolders.js';
 import { CONNECTION_STORAGE_KEY } from '../../../src/modules/livefolders/GithubConnection.js';
 import { PANEL_ATTRIBUTE } from '../../../src/modules/livefolders/ConnectPanel.js';

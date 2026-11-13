@@ -1,7 +1,7 @@
-import { DomQuery } from '../../core/DomQuery.js';
-import { FrameTask } from '../../core/FrameTask.js';
-import type { ModuleContext } from '../../core/Module.js';
-import { SerialTask } from '../../core/SerialTask.js';
+import { DomQuery } from '../../core/dom/DomQuery.js';
+import { FrameTask } from '../../core/support/FrameTask.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import { SerialTask } from '../../core/support/SerialTask.js';
 import { AwayTabs } from './AwayTabs.js';
 import type { TabMarks } from './AwayTabs.js';
 import { TabBarMarker } from './TabBarMarker.js';

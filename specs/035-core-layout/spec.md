@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-13 |
+| Approved | Tore, 2026-11-13; FR-8 added and approved the same day |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -92,6 +92,8 @@ the design.
   folders that the design fixes.
 - **FR-7.** The tests mirror the source layout: `tests/core/<folder>/` for core files,
   `tests/shared/` and `tests/modules/<name>/` for the files that move there.
+- **FR-8.** `src/loader.ts` builds the module registry and hands it to `VivArcDi.boot`, so it is the
+  only file that joins core and the modules. Core never imports `src/modules/index.ts`.
 
 ### Non-functional
 

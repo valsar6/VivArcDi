@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import { LocalPinned } from './LocalPinned.js';
 import type { PinnedGroups } from './LocalPinned.js';
 import type { PinnedApplier } from './PinnedApplier.js';

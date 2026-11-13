@@ -2,6 +2,7 @@ import { dirname, relative, resolve, sep } from 'node:path';
 
 const MODULES = ['src', 'modules'];
 const SHARED = ['src', 'shared'];
+const CORE = ['src', 'core'];
 
 function startsWith(parts, prefix) {
   return prefix.every((part, index) => parts[index] === part);
@@ -12,6 +13,9 @@ function moduleOf(parts) {
 }
 
 function violation(fileParts, targetParts) {
+  if (startsWith(fileParts, CORE)) {
+    return startsWith(targetParts, SHARED) || startsWith(targetParts, MODULES) ? 'coreToOuter' : undefined;
+  }
   const targetModule = moduleOf(targetParts);
   if (targetModule === undefined) {
     return undefined;
@@ -26,11 +30,12 @@ function violation(fileParts, targetParts) {
 const rule = {
   meta: {
     type: 'problem',
-    docs: { description: 'Keep modules apart: a module imports core, shared and its own files only; shared never imports a module' },
+    docs: { description: 'Keep the layers apart: a module imports core, shared and its own files only; shared never imports a module; core imports core only' },
     schema: [],
     messages: {
       otherModule: 'A module cannot import another module. Move the shared piece to src/shared/.',
       sharedToModule: 'src/shared/ cannot import a module.',
+      coreToOuter: 'src/core/ cannot import src/shared/ or a module.',
     },
   },
   create(context) {

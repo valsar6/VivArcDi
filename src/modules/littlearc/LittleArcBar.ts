@@ -1,6 +1,6 @@
-import { BrowserSearch } from '../../core/BrowserSearch.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
+import { BrowserSearch } from '../../core/browser/BrowserSearch.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
 import { AddressDisplay } from './AddressDisplay.js';
 import { AddressResolver } from './AddressResolver.js';
 import { BackButtonState } from './BackButtonState.js';

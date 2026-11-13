@@ -1,8 +1,8 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { BrowserWindows } from '../../core/BrowserWindows.js';
-import type { Logger } from '../../core/Logger.js';
-import { TabData } from '../../core/TabData.js';
-import { TabDataWriter } from '../../core/TabDataWriter.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { BrowserWindows } from '../../core/browser/BrowserWindows.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import { TabDataWriter } from '../../core/tabs/TabDataWriter.js';
 import type { DestinationPicker } from './DestinationPicker.js';
 import { destinationAnswer } from './LittleArcMessage.js';
 import type { AdoptMessage, DestinationAnswer, DestinationColors } from './LittleArcMessage.js';

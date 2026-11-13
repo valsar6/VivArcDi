@@ -1,5 +1,5 @@
-import { LinkId } from '../../core/LinkId.js';
-import type { VirtualFolderHandlers } from '../../core/VirtualFolders.js';
+import { LinkId } from '../../shared/links/LinkId.js';
+import type { VirtualFolderHandlers } from '../../shared/links/VirtualFolders.js';
 import type { GithubConnect } from './GithubConnect.js';
 import { CONNECT_ROW_ID } from './LiveEntries.js';
 import type { LiveFolderMenu } from './LiveFolderMenu.js';

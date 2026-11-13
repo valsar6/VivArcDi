@@ -1,4 +1,4 @@
-import type { BrowserBookmarks } from '../../../core/bookmarks/BrowserBookmarks.js';
+import type { BrowserBookmarks } from '../../../core/browser/bookmarks/BrowserBookmarks.js';
 import { suggestionOf } from './Suggestion.js';
 import type { Suggestion } from './Suggestion.js';
 import type { SuggestionSource } from './SuggestionSource.js';

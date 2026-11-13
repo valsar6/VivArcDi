@@ -1,5 +1,5 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { SerialTask } from '../../core/SerialTask.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { SerialTask } from '../../core/support/SerialTask.js';
 
 export class ActiveTab {
   #tabs: Pick<BrowserTabs, 'query' | 'onActivated' | 'onUpdated'>;

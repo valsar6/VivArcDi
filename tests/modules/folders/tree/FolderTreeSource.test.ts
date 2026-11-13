@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { FolderTreeSource } from '../../../../src/modules/folders/tree/FolderTreeSource.js';
-import { BookmarkFolderFinder } from '../../../../src/core/bookmarks/BookmarkFolderFinder.js';
+import { BookmarkFolderFinder } from '../../../../src/core/browser/bookmarks/BookmarkFolderFinder.js';
 import { silentLogger, settle } from '../../reopen/fakes.js';
 import { FakeBookmarks, ROOT_PATH, bookmarkTree, folder, immediateFrames, link, recordingChrome } from '../fakes.js';
-import { Logger } from '../../../../src/core/Logger.js';
-import { LinkKeyIndex } from '../../../../src/core/bookmarks/LinkKeyIndex.js';
+import { Logger } from '../../../../src/core/support/Logger.js';
+import { LinkKeyIndex } from '../../../../src/modules/reopen/LinkKeyIndex.js';
 
 function source(bookmarks: FakeBookmarks, onChange: () => void = (): void => undefined): FolderTreeSource {
   return new FolderTreeSource(bookmarks, { path: ROOT_PATH, maxDepth: 3, onChange, logger: silentLogger(), timing: immediateFrames });

@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserRuntime } from '../../../src/core/BrowserRuntime.js';
-import type { RuntimeMessageListener } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
+import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
+import type { RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { OPEN_ATTRIBUTE, Peek } from '../../../src/modules/peek/Peek.js';
 import { PEEK_MESSAGE_TYPE } from '../../../src/modules/peek/PeekMessage.js';
 import { FakeLoader, SilentSink } from '../../loader/fakes.js';

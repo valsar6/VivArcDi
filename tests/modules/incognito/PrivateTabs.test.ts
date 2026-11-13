@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BrowserTabs } from '../../../src/core/BrowserTabs.js';
+import type { BrowserTabs } from '../../../src/core/browser/BrowserTabs.js';
 import { PrivateTabs } from '../../../src/modules/incognito/PrivateTabs.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { runtimeOf } from './fakes.js';

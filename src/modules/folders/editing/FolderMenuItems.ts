@@ -1,4 +1,4 @@
-import type { MenuItem, SubmenuItem } from '../../../core/ContextMenu.js';
+import type { MenuItem, SubmenuItem } from '../../../core/dom/ContextMenu.js';
 
 export const RENAME_LABEL = 'Rename…';
 export const DUPLICATE_LABEL = 'Duplicate';

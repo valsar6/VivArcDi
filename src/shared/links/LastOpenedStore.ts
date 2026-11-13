@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import type { KeyValueStorage } from '../../core/PersistentStorage.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
 
 export const LAST_OPENED_STORAGE_KEY = 'vivarcdi.lastOpened';
 

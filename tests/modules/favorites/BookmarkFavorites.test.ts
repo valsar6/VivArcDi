@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HiddenTabMarker } from '../../../src/core/HiddenTabMarker.js';
-import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
-import { TabUnloader } from '../../../src/core/TabUnloader.js';
+import { HiddenTabMarker } from '../../../src/shared/tabs/HiddenTabMarker.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import { TabUnloader } from '../../../src/core/tabs/TabUnloader.js';
 import { FavoriteOpener } from '../../../src/modules/favorites/FavoriteOpener.js';
 import { FavoriteStates } from '../../../src/modules/favorites/FavoriteStates.js';
 import { FavoritesFolder } from '../../../src/modules/favorites/FavoritesFolder.js';

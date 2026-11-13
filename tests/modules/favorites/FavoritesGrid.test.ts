@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
-import type { ModuleContext } from '../../../src/core/Module.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { FAVORITE_ATTRIBUTE, GRID_ATTRIBUTE } from '../../../src/modules/favorites/FavoriteTagger.js';
 import { FavoritesGrid } from '../../../src/modules/favorites/FavoritesGrid.js';
 import { SilentSink } from '../../loader/fakes.js';

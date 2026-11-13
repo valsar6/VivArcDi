@@ -1,5 +1,5 @@
-import type { BrowserRuntime } from '../../../src/core/BrowserRuntime.js';
-import type { FrameTiming } from '../../../src/core/FrameTask.js';
+import type { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
+import type { FrameTiming } from '../../../src/core/support/FrameTask.js';
 import { DomDocument, DomNode } from '../../core/dom.js';
 
 export class FieldNode extends DomNode {

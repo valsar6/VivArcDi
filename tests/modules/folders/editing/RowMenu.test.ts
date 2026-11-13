@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { MenuItem } from '../../../../src/core/ContextMenu.js';
+import type { MenuItem } from '../../../../src/core/dom/ContextMenu.js';
 import { RowMenu } from '../../../../src/modules/folders/editing/RowMenu.js';
 import { asDocument, DomDocument } from '../../../core/dom.js';
 

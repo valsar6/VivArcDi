@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from '../../core/PersistentStorage.js';
+import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
 import type { SpaceEntry } from './SpaceEntry.js';
 
 const KEY = 'vivarcdi.sync.base.spaces';

@@ -1,4 +1,4 @@
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import type { Poll } from './Poll.js';
 import type { ReactInternals } from './ReactInternals.js';
 

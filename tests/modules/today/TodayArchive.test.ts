@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { ModuleRegistry } from '../../../src/core/ModuleRegistry.js';
-import { BrowserRuntime } from '../../../src/core/BrowserRuntime.js';
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { ModuleRegistry } from '../../../src/core/boot/ModuleRegistry.js';
+import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { ARCHIVE_STORAGE_KEY } from '../../../src/modules/today/ArchiveStore.js';
 import { TodayArchive } from '../../../src/modules/today/TodayArchive.js';
 import { asDocument } from '../../core/dom.js';

@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
-import { TabDataWriter } from '../../../../src/core/TabDataWriter.js';
-import type { ToastKind } from '../../../../src/core/Toast.js';
-import type { WorkspaceListing } from '../../../../src/core/WorkspaceNames.js';
+import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { TabDataWriter } from '../../../../src/core/tabs/TabDataWriter.js';
+import type { ToastKind } from '../../../../src/core/dom/Toast.js';
+import type { WorkspaceListing } from '../../../../src/core/workspaces/WorkspaceNames.js';
 import { ClosingLinks } from '../../../../src/modules/folders/editing/ClosingLinks.js';
 import { FolderLinkTabs } from '../../../../src/modules/folders/editing/FolderLinkTabs.js';
 import { FolderRelocation } from '../../../../src/modules/folders/editing/FolderRelocation.js';

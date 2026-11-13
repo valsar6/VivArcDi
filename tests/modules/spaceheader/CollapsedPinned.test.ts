@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HiddenTabs } from '../../../src/core/HiddenTabs.js';
-import { SpaceCollapse } from '../../../src/core/SpaceCollapse.js';
+import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import { SpaceCollapse } from '../../../src/shared/spaces/SpaceCollapse.js';
 import { CollapsedPinned } from '../../../src/modules/spaceheader/CollapsedPinned.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { settle, silentLogger } from '../reopen/fakes.js';

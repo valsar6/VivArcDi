@@ -4,7 +4,7 @@ import { RelativeTime } from '../../../src/modules/folderpreview/RelativeTime.js
 import { PreviewRows } from '../../../src/modules/folderpreview/PreviewRows.js';
 import { PreviewSession } from '../../../src/modules/folderpreview/PreviewSession.js';
 import { PreviewText } from '../../../src/modules/folderpreview/PreviewText.js';
-import type { LinkEntry } from '../../../src/core/FolderEntries.js';
+import type { LinkEntry } from '../../../src/shared/links/FolderEntries.js';
 
 const NOW = new Date('2026-10-27T12:00:00Z');
 const ago = (ms: number): Date => new Date(NOW.getTime() - ms);

@@ -1,4 +1,4 @@
-import type { PayloadSource } from '../../core/ResourceLoader.js';
+import type { PayloadSource } from '../../core/boot/ResourceLoader.js';
 import type { PeekTriggers } from './LinkClassifier.js';
 
 export interface PagePolicy {

@@ -1,4 +1,4 @@
-import type { VirtualFolders } from '../../core/VirtualFolders.js';
+import type { VirtualFolders } from '../../shared/links/VirtualFolders.js';
 import { LiveEntries } from './LiveEntries.js';
 import type { ConnectionState } from './LiveEntries.js';
 import type { LiveFolderStore } from './LiveFolderStore.js';

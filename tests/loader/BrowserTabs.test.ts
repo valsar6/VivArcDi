@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserTabs } from '../../src/core/BrowserTabs.js';
-import type { ChromeApi, TabUpdateListener } from '../../src/core/BrowserTabs.js';
-import { FrameTask } from '../../src/core/FrameTask.js';
+import { BrowserTabs } from '../../src/core/browser/BrowserTabs.js';
+import type { ChromeApi, TabUpdateListener } from '../../src/core/browser/BrowserTabs.js';
+import { FrameTask } from '../../src/core/support/FrameTask.js';
 
 type Callback = (result: unknown) => void;
 

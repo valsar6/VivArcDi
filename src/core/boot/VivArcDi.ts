@@ -1,0 +1,238 @@
+import { BookmarkWriter } from '../browser/bookmarks/BookmarkWriter.js';
+import { BrowserBookmarks } from '../browser/bookmarks/BrowserBookmarks.js';
+import { BrowserPrefs } from '../browser/BrowserPrefs.js';
+import type { PrefsApi } from '../browser/BrowserPrefs.js';
+import { BrowserRuntime } from '../browser/BrowserRuntime.js';
+import { BrowserHistory } from '../browser/BrowserHistory.js';
+import { BrowserSearch } from '../browser/BrowserSearch.js';
+import { BrowserTabs } from '../browser/BrowserTabs.js';
+import type { ChromeApi } from '../browser/BrowserTabs.js';
+import { BrowserWindows } from '../browser/BrowserWindows.js';
+import { Logger } from '../support/Logger.js';
+import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
+import { PersistentStorage } from '../browser/PersistentStorage.js';
+import type { KeyValueStorage } from '../browser/PersistentStorage.js';
+import { ResourceLoader } from './ResourceLoader.js';
+import type { PayloadSource } from './ResourceLoader.js';
+import { SelectorCatalog } from '../dom/SelectorCatalog.js';
+import { StyleInjector } from './StyleInjector.js';
+import type { BuildInfo, Config, ModuleOptions } from './types.js';
+import { UiReadiness } from './UiReadiness.js';
+
+export interface VivArcDiDependencies {
+  /** Loads payload files. */
+  loader: PayloadSource;
+  /** Available modules. */
+  registry: ModuleRegistry;
+  /** Logger for the application. */
+  logger: Logger;
+  /** The document of Vivaldi's browser window. */
+  document: Document;
+  /** The tabs API given to modules. */
+  tabs?: BrowserTabs;
+  /** The bookmarks API given to modules. */
+  bookmarks?: BrowserBookmarks;
+  /** The bookmark writer given to modules. */
+  bookmarkWriter?: BookmarkWriter;
+  /** The runtime API given to modules. */
+  runtime?: BrowserRuntime;
+  /** The windows API given to modules. */
+  windows?: BrowserWindows;
+  /** The web search given to modules. */
+  search?: BrowserSearch;
+  /** The history given to modules. */
+  history?: BrowserHistory;
+  /** Vivaldi's preferences given to modules. */
+  prefs?: BrowserPrefs;
+  /** The persistent storage given to modules. */
+  storage?: KeyValueStorage;
+}
+
+export class VivArcDi {
+  #loader: PayloadSource;
+  #registry: ModuleRegistry;
+  #logger: Logger;
+  #document: Document;
+  #tabs: BrowserTabs;
+  #bookmarks: BrowserBookmarks;
+  #bookmarkWriter: BookmarkWriter;
+  #runtime: BrowserRuntime;
+  #windows: BrowserWindows | undefined;
+  #search: BrowserSearch | undefined;
+  #history: BrowserHistory;
+  #prefs: BrowserPrefs;
+  #storage: KeyValueStorage;
+  #styles: StyleInjector;
+  #started: EnabledModule[] = [];
+
+  /**
+   * The application: reads the configuration, waits for Vivaldi's interface,
+   * then injects stylesheets and starts the enabled modules.
+   *
+   * @param dependencies Everything the application collaborates with.
+   */
+  constructor({
+    loader,
+    registry,
+    logger,
+    document,
+    tabs = new BrowserTabs(undefined),
+    bookmarks = new BrowserBookmarks(undefined),
+    bookmarkWriter = new BookmarkWriter(undefined),
+    runtime = new BrowserRuntime(undefined),
+    windows,
+    search,
+    history = new BrowserHistory(undefined),
+    prefs = new BrowserPrefs(undefined),
+    storage = new PersistentStorage(new Map(), null, undefined, logger),
+  }: VivArcDiDependencies) {
+    this.#loader = loader;
+    this.#registry = registry;
+    this.#logger = logger;
+    this.#document = document;
+    this.#tabs = tabs;
+    this.#bookmarks = bookmarks;
+    this.#bookmarkWriter = bookmarkWriter;
+    this.#runtime = runtime;
+    this.#windows = windows;
+    this.#search = search;
+    this.#history = history;
+    this.#prefs = prefs;
+    this.#storage = storage;
+    this.#styles = new StyleInjector(document, loader);
+  }
+
+  /**
+   * Creates the application with its default dependencies and starts it.
+   * Startup errors are logged, never thrown, so Vivaldi keeps working.
+   *
+   * @param baseUrl URL of the payload folder, ending with a slash.
+   * @param registry The modules the payload knows, built by the loader.
+   * @param document The browser window document.
+   * @returns The application, started or failed.
+   */
+  public static async boot(
+    baseUrl: string | URL,
+    registry: ModuleRegistry,
+    document: Document = globalThis.document,
+  ): Promise<VivArcDi> {
+    const chromeApi = globalThis.chrome as unknown as ChromeApi | undefined;
+    const logger = new Logger();
+    const app = new VivArcDi({
+      loader: new ResourceLoader(baseUrl),
+      registry,
+      logger,
+      document,
+      tabs: new BrowserTabs(chromeApi),
+      bookmarks: new BrowserBookmarks(chromeApi),
+      bookmarkWriter: new BookmarkWriter(chromeApi),
+      runtime: new BrowserRuntime(chromeApi),
+      windows: new BrowserWindows(chromeApi),
+      search: new BrowserSearch(chromeApi),
+      history: new BrowserHistory(chromeApi),
+      prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
+      storage: await PersistentStorage.open(document, chromeApi, logger),
+    });
+    try {
+      await app.start();
+    } catch (error) {
+      app.#logger.error('Startup failed', error);
+    }
+    return app;
+  }
+
+  static #prefsApi(chromeApi: ChromeApi | undefined): PrefsApi | undefined {
+    const vivaldi = (globalThis as { vivaldi?: { prefs?: PrefsApi } }).vivaldi;
+    return vivaldi?.prefs ?? chromeApi?.vivaldiPrivate?.prefs;
+  }
+
+  /**
+   * @returns Ids of the modules that started successfully.
+   */
+  public get startedModules(): string[] {
+    return this.#started.map(({ id }) => id);
+  }
+
+  /**
+   * Starts VivArcDi. Does nothing beyond a warning when no selector catalog
+   * fits the running Vivaldi, so an unsupported version is left untouched.
+   */
+  public async start(): Promise<void> {
+    const [config, build] = await Promise.all([
+      this.#loader.json<Config>('config.json'),
+      this.#loader.json<BuildInfo>('build.json'),
+    ]);
+    const selectors = await SelectorCatalog.load(this.#loader, build.vivaldiVersion);
+    if (selectors.version === null) {
+      this.#logger.warn(`No selectors for Vivaldi ${build.vivaldiVersion}, staying inactive`);
+      return;
+    }
+
+    await new UiReadiness(this.#document).waitFor(selectors.get('browser'));
+    config.styles.forEach((path) => this.#styles.inject(path));
+
+    const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
+    unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
+    for (const entry of modules) {
+      await this.#startModule(entry, selectors, build, config.modules);
+    }
+
+    this.#logger.info(
+      `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
+      `(selectors ${selectors.version}, modules: ${this.startedModules.join(', ') || 'none'})`,
+    );
+  }
+
+  /**
+   * Stops the started modules in reverse order and removes the stylesheets.
+   */
+  public async stop(): Promise<void> {
+    for (const { id, module } of [...this.#started].reverse()) {
+      try {
+        await module.stop();
+      } catch (error) {
+        this.#logger.error(`Module "${id}" failed to stop`, error);
+      }
+    }
+    this.#started = [];
+    this.#styles.removeAll();
+  }
+
+  async #isPrivateWindow(): Promise<boolean> {
+    try {
+      return await this.#runtime.isPrivateWindow();
+    } catch (error) {
+      this.#logger.warn('Cannot tell if this is a private window, treating it as a normal window', error);
+      return false;
+    }
+  }
+
+  async #startModule(entry: EnabledModule, selectors: SelectorCatalog, build: BuildInfo,
+    modules: Readonly<Record<string, ModuleOptions>>,
+  ): Promise<void> {
+    const logger = this.#logger.child(entry.id);
+    try {
+      await entry.module.start({
+        document: this.#document,
+        selectors,
+        logger,
+        options: entry.options,
+        build,
+        tabs: this.#tabs,
+        bookmarks: this.#bookmarks,
+        bookmarkWriter: this.#bookmarkWriter,
+        modules,
+        runtime: this.#runtime,
+        windows: this.#windows ?? new BrowserWindows(undefined),
+        search: this.#search ?? new BrowserSearch(undefined),
+        history: this.#history,
+        prefs: this.#prefs,
+        storage: this.#storage,
+        payload: this.#loader,
+      });
+      this.#started.push(entry);
+    } catch (error) {
+      logger.error('Failed to start', error);
+    }
+  }
+}

@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import type { BookmarksHost } from '../../../src/core/bookmarks/BrowserBookmarks.js';
-import { BrowserHistory } from '../../../src/core/BrowserHistory.js';
-import type { ChromeApi } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
+import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import type { BookmarksHost } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
+import { BrowserHistory } from '../../../src/core/browser/BrowserHistory.js';
+import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { BookmarkSuggestions } from '../../../src/modules/littlearc/commandbar/BookmarkSuggestions.js';
 import { CommandBarController } from '../../../src/modules/littlearc/commandbar/CommandBarController.js';
 import { keyCommand } from '../../../src/modules/littlearc/commandbar/CommandBarKeys.js';

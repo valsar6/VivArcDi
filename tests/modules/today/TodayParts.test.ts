@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabData } from '../../../src/core/TabData.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { ArchiveButton } from '../../../src/modules/today/ArchiveButton.js';
 import { ARCHIVE_CONSOLE_PREFIX, parseArchiveMessage } from '../../../src/modules/today/ArchiveMessage.js';
 import { ArchiveRestorer } from '../../../src/modules/today/ArchiveRestorer.js';

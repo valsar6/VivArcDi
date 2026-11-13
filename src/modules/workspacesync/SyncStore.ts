@@ -1,8 +1,8 @@
-import { AddressKey } from '../../core/AddressKey.js';
-import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
-import type { BookmarkWriter } from '../../core/bookmarks/BookmarkWriter.js';
-import type { BrowserBookmarks } from '../../core/bookmarks/BrowserBookmarks.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
+import type { BookmarkNode } from '../../core/browser/bookmarks/BookmarkNode.js';
+import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 import { SyncNames } from './SyncNames.js';
 
 export interface PinnedEntry {

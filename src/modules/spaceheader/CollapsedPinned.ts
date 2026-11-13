@@ -1,8 +1,8 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { HiddenTabs } from '../../core/HiddenTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import type { SpaceCollapse } from '../../core/SpaceCollapse.js';
-import { TabData } from '../../core/TabData.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
+import { TabData } from '../../core/tabs/TabData.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
 export type CollapsedPinnedTabs = Pick<BrowserTabs, 'query' | 'onUpdated' | 'onActivated' | 'onRemoved'>;

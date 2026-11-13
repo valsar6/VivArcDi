@@ -1,4 +1,4 @@
-import type { Logger } from '../../../src/core/Logger.js';
+import type { Logger } from '../../../src/core/support/Logger.js';
 import { silentLogger as reopenLogger } from '../reopen/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
 

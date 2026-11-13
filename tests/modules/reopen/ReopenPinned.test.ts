@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { ModuleContext } from '../../../src/core/Module.js';
-import { BrowserBookmarks } from '../../../src/core/bookmarks/BrowserBookmarks.js';
+import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import type { FakeTab } from '../favorites/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';

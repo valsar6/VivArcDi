@@ -1,5 +1,5 @@
-import type { TabActivatedListener, TabCreatedListener } from '../../../src/core/BrowserTabs.js';
-import { Logger } from '../../../src/core/Logger.js';
+import type { TabActivatedListener, TabCreatedListener } from '../../../src/core/browser/BrowserTabs.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FakeTabs } from '../favorites/fakes.js';
 import type { FakeTab } from '../favorites/fakes.js';

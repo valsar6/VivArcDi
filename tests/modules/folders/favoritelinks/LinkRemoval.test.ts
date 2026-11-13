@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
-import { FavoriteDropZone } from '../../../../src/core/FavoriteDropZone.js';
-import type { TodayTarget } from '../../../../src/core/TodayList.js';
-import { TabData } from '../../../../src/core/TabData.js';
+import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { FavoriteDropZone } from '../../../../src/shared/dragdrop/FavoriteDropZone.js';
+import type { TodayTarget } from '../../../../src/shared/tabs/TodayList.js';
+import { TabData } from '../../../../src/core/tabs/TabData.js';
 import { FavoriteDrop } from '../../../../src/modules/favorites/FavoriteDrop.js';
 import type { GridTarget } from '../../../../src/modules/favorites/GridDropZone.js';
 import { GridFavoriteTargets } from '../../../../src/modules/favorites/GridFavoriteTargets.js';

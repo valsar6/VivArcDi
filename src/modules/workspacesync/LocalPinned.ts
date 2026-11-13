@@ -1,8 +1,8 @@
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import type { Logger } from '../../core/Logger.js';
-import { OwnPage } from '../../core/OwnPage.js';
-import { TabData } from '../../core/TabData.js';
-import type { WorkspaceNames } from '../../core/WorkspaceNames.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import type { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import type { PinnedEntry } from './SyncStore.js';
 
 export interface LocalPinnedTab {

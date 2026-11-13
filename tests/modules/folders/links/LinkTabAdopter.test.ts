@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { LinkEntry } from '../../../../src/core/FolderEntries.js';
+import type { LinkEntry } from '../../../../src/shared/links/FolderEntries.js';
 import { LinkTabAdopter } from '../../../../src/modules/folders/links/LinkTabAdopter.js';
 import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';
 import { LinkingTabs } from '../../favorites/linked.js';

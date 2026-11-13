@@ -1,4 +1,4 @@
-import { WindowKeys } from '../../core/WindowKeys.js';
+import { WindowKeys } from '../../core/dom/WindowKeys.js';
 import { commandFor } from './PeekKeyMap.js';
 import type { PeekCommand } from './PeekMessage.js';
 

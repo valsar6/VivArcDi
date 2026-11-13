@@ -1,6 +1,6 @@
-import type { Logger } from '../../core/Logger.js';
+import type { Logger } from '../../core/support/Logger.js';
 import { FAVORITE_ATTRIBUTE, FavoriteTagger } from './FavoriteTagger.js';
-import type { TabUnloader } from '../../core/TabUnloader.js';
+import type { TabUnloader } from '../../core/tabs/TabUnloader.js';
 
 const MIDDLE_BUTTON = 1;
 const BLOCKED_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'auxclick'];

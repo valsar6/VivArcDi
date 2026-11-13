@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../src/core/bookmarks/BookmarkNode.js';
-import { TabData } from '../../../src/core/TabData.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { FavoriteDrop } from '../../../src/modules/favorites/FavoriteDrop.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
 import { WritableChrome, bookmarkTree, folder, link } from '../folders/fakes.js';

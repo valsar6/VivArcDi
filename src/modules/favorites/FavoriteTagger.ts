@@ -1,5 +1,5 @@
-import { TabSlot } from '../../core/TabSlot.js';
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
+import { TabSlot } from '../../core/tabs/TabSlot.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 
 export const FAVORITE_ATTRIBUTE = 'data-vivarcdi-favorite';
 export const UNLOADED_ATTRIBUTE = 'data-vivarcdi-unloaded';

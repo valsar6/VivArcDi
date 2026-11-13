@@ -1,5 +1,5 @@
-import { SelectorCatalog } from '../../../src/core/SelectorCatalog.js';
-import type { TabUpdateListener } from '../../../src/core/BrowserTabs.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
+import type { TabUpdateListener } from '../../../src/core/browser/BrowserTabs.js';
 
 export const selectors = new SelectorCatalog(
   {

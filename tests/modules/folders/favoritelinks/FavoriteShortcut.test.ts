@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/bookmarks/BookmarkNode.js';
-import { TabData } from '../../../../src/core/TabData.js';
+import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { TabData } from '../../../../src/core/tabs/TabData.js';
 import { CreatedLinks } from '../../../../src/modules/folders/favoritelinks/CreatedLinks.js';
 import { FavoriteShortcut, KEPT_TEXT, NOT_A_PAGE_TEXT } from '../../../../src/modules/folders/favoritelinks/FavoriteShortcut.js';
 import { TabLinks } from '../../../../src/modules/folders/links/TabLinks.js';

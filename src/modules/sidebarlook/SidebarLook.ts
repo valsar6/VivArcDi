@@ -1,10 +1,10 @@
-import { AddressField } from '../../core/AddressField.js';
-import { DomQuery } from '../../core/DomQuery.js';
-import { Module } from '../../core/Module.js';
-import type { ModuleContext } from '../../core/Module.js';
-import { NewTabOpener } from '../../core/NewTabOpener.js';
-import { NewTabRow } from '../../core/NewTabRow.js';
-import { TabBarAnchor } from '../../core/TabBarAnchor.js';
+import { AddressField } from '../../shared/newtab/AddressField.js';
+import { DomQuery } from '../../core/dom/DomQuery.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import { NewTabOpener } from '../../shared/newtab/NewTabOpener.js';
+import { NewTabRow } from '../../shared/newtab/NewTabRow.js';
+import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { Palettes } from './Palettes.js';
 import type { Palette } from './Palettes.js';
 import { ScrollMark } from './ScrollMark.js';

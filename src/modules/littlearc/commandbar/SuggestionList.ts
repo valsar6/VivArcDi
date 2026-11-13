@@ -1,4 +1,4 @@
-import type { Logger } from '../../../core/Logger.js';
+import type { Logger } from '../../../core/support/Logger.js';
 import type { Suggestion } from './Suggestion.js';
 import { SuggestionRanker } from './SuggestionRanker.js';
 import type { SuggestionSource } from './SuggestionSource.js';

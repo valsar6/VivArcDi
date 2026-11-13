@@ -1,5 +1,5 @@
-import { Module } from '../../core/Module.js';
-import type { ModuleContext } from '../../core/Module.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
 import { FolderSection } from './FolderSection.js';
 import { WorkspaceRoots } from './tree/WorkspaceRoots.js';
 

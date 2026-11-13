@@ -1,6 +1,6 @@
-import type { ModuleContext } from '../../core/Module.js';
-import { PageScriptInjector } from '../../core/PageScriptInjector.js';
-import { ShortcutKeys } from '../../core/ShortcutKeys.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
+import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
 import { parseArchiveMessage } from './ArchiveMessage.js';
 
 const KEYS_PATH = 'page/archive-keys.js';

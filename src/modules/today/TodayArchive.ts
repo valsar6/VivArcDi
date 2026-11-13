@@ -1,7 +1,7 @@
-import type { FrameTiming } from '../../core/FrameTask.js';
-import { Module } from '../../core/Module.js';
-import type { ModuleContext } from '../../core/Module.js';
-import { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
+import type { FrameTiming } from '../../core/support/FrameTask.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import { ActivityStamps } from './ActivityStamps.js';
 import { ArchiveButton } from './ArchiveButton.js';
 import { ArchiveKeys } from './ArchiveKeys.js';

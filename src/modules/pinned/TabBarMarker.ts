@@ -1,5 +1,5 @@
-import type { SelectorCatalog } from '../../core/SelectorCatalog.js';
-import { TabSlot } from '../../core/TabSlot.js';
+import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
+import { TabSlot } from '../../core/tabs/TabSlot.js';
 import { PINNED_LAST_ATTRIBUTE } from '../../shared/tabs/TabBarMarks.js';
 import type { TabMarks } from './AwayTabs.js';
 

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { WorkspaceTabs } from '../../../src/core/WorkspaceTabs.js';
-import { TabData } from '../../../src/core/TabData.js';
+import { WorkspaceTabs } from '../../../src/core/workspaces/WorkspaceTabs.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { ActivityStamps } from '../../../src/modules/today/ActivityStamps.js';
 import { silentLogger } from '../reopen/fakes.js';
 import { TodayTabs } from '../today/fakes.js';

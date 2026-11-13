@@ -1,7 +1,7 @@
-import { AddressKey } from '../../core/AddressKey.js';
-import type { LinkKeyIndex } from '../../core/bookmarks/LinkKeyIndex.js';
-import type { BrowserTabs } from '../../core/BrowserTabs.js';
-import { TabData } from '../../core/TabData.js';
+import { AddressKey } from '../../core/tabs/AddressKey.js';
+import type { LinkKeyIndex } from './LinkKeyIndex.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { TabData } from '../../core/tabs/TabData.js';
 import type { TabFinder } from './TabTargets.js';
 
 export class LinkedTabFinder implements TabFinder {

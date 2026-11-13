@@ -1,6 +1,6 @@
 import type { PageScripts } from './PageScripts.js';
 import { shortcutLabels } from './PeekKeyMap.js';
-import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from '../../core/Webview.js';
+import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from '../../core/browser/Webview.js';
 
 export type PanelCommand = 'close' | 'expand' | 'split';
 

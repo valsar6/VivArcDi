@@ -1,7 +1,7 @@
-import { FrameTask } from '../../core/FrameTask.js';
-import type { FrameTiming } from '../../core/FrameTask.js';
-import { watchSubtree } from '../../core/KeptElement.js';
-import type { SubtreeWatcher } from '../../core/KeptElement.js';
+import { FrameTask } from '../../core/support/FrameTask.js';
+import type { FrameTiming } from '../../core/support/FrameTask.js';
+import { watchSubtree } from '../../core/dom/KeptElement.js';
+import type { SubtreeWatcher } from '../../core/dom/KeptElement.js';
 
 export const PRIVATE_HIDDEN_ATTRIBUTE = 'data-vivarcdi-private-hidden';
 

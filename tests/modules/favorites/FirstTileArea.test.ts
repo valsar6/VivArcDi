@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabBarAnchor } from '../../../src/core/TabBarAnchor.js';
+import { TabBarAnchor } from '../../../src/core/dom/TabBarAnchor.js';
 import { FIRST_TILE_ATTRIBUTE, FirstTileArea, OPEN_ATTRIBUTE } from '../../../src/modules/favorites/FirstTileArea.js';
 import { GridDropZone } from '../../../src/modules/favorites/GridDropZone.js';
 import { TabToFavorite } from '../../../src/modules/favorites/TabToFavorite.js';

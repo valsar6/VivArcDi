@@ -1,4 +1,4 @@
-import type { ContextMenu } from '../../../core/ContextMenu.js';
+import type { ContextMenu } from '../../../core/dom/ContextMenu.js';
 import { LIVE_FOLDER_ATTRIBUTE } from '../view/FolderRowElement.js';
 import type { FolderMenuItems } from './FolderMenuItems.js';
 

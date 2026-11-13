@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../../src/core/Logger.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 import type { LinkRequest } from '../../../src/modules/peek/LinkOpener.js';
 import { PeekController } from '../../../src/modules/peek/PeekController.js';
 import type { PanelHandle } from '../../../src/modules/peek/PeekController.js';

@@ -1,8 +1,8 @@
-import { Module } from '../../core/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../../core/Module.js';
-import { PageScriptInjector } from '../../core/PageScriptInjector.js';
-import { ShortcutKeys } from '../../core/ShortcutKeys.js';
-import { Toast } from '../../core/Toast.js';
+import { Module } from '../../core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../core/boot/Module.js';
+import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
+import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
+import { Toast } from '../../core/dom/Toast.js';
 import { parseCopyMessage } from './CopyMessage.js';
 import { UrlCopier } from './UrlCopier.js';
 

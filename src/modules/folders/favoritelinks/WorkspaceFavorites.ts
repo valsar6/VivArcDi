@@ -1,11 +1,11 @@
-import { AddressKey } from '../../../core/AddressKey.js';
-import { BookmarkCopier } from '../../../core/bookmarks/BookmarkCopier.js';
-import type { BookmarkNode } from '../../../core/bookmarks/BookmarkNode.js';
-import type { BookmarkWriter } from '../../../core/bookmarks/BookmarkWriter.js';
-import { KeptTab } from '../../../core/KeptTab.js';
-import { LinkId } from '../../../core/LinkId.js';
-import type { Logger } from '../../../core/Logger.js';
-import { TabData } from '../../../core/TabData.js';
+import { AddressKey } from '../../../core/tabs/AddressKey.js';
+import { BookmarkCopier } from '../editing/BookmarkCopier.js';
+import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
+import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
+import { KeptTab } from '../../../shared/tabs/KeptTab.js';
+import { LinkId } from '../../../shared/links/LinkId.js';
+import type { Logger } from '../../../core/support/Logger.js';
+import { TabData } from '../../../core/tabs/TabData.js';
 import type { CreatedLinks } from './CreatedLinks.js';
 import type { TabLinks } from '../links/TabLinks.js';
 

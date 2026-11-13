@@ -1,5 +1,5 @@
-import type { BookmarkNode } from '../../core/bookmarks/BookmarkNode.js';
-import { BookmarkFolderFinder } from '../../core/bookmarks/BookmarkFolderFinder.js';
+import type { BookmarkNode } from '../../core/browser/bookmarks/BookmarkNode.js';
+import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
 import type { StoreReader, StoreWriter } from './SyncStore.js';
 import type { SpaceEntry } from './SpaceEntry.js';
 

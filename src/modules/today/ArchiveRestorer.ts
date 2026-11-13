@@ -1,5 +1,5 @@
-import type { Logger } from '../../core/Logger.js';
-import type { WorkspaceTabs } from '../../core/WorkspaceTabs.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import type { ArchiveEntry, ArchiveStore } from './ArchiveStore.js';
 
 export class ArchiveRestorer {

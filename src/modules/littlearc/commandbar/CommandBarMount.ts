@@ -1,4 +1,4 @@
-import type { Logger } from '../../../core/Logger.js';
+import type { Logger } from '../../../core/support/Logger.js';
 import type { CommandBarController } from './CommandBarController.js';
 import type { CommandBarView } from './CommandBarView.js';
 
