@@ -1,6 +1,6 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { OwnPage } from "../../core/OwnPage.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { OwnPage } from "../../shared/tabs/OwnPage.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class PinnedTabFinder {
   #tabs;
   /**

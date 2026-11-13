@@ -1,6 +1,6 @@
-import { OwnPage } from "../../core/OwnPage.js";
-import { TabDataWriter } from "../../core/TabDataWriter.js";
-import { TabData } from "../../core/TabData.js";
+import { OwnPage } from "../../shared/tabs/OwnPage.js";
+import { TabDataWriter } from "../../core/tabs/TabDataWriter.js";
+import { TabData } from "../../core/tabs/TabData.js";
 const WEB_URL = /^https?:\/\//i;
 class SavedAddresses {
   #tabs;

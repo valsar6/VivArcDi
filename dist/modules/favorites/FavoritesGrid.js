@@ -1,9 +1,9 @@
-import { DomQuery } from "../../core/DomQuery.js";
-import { FrameTask } from "../../core/FrameTask.js";
-import { HiddenTabMarker } from "../../core/HiddenTabMarker.js";
-import { HiddenTabs } from "../../core/HiddenTabs.js";
-import { Module } from "../../core/Module.js";
-import { TabUnloader } from "../../core/TabUnloader.js";
+import { DomQuery } from "../../core/dom/DomQuery.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
+import { HiddenTabMarker } from "../../shared/tabs/HiddenTabMarker.js";
+import { HiddenTabs } from "../../shared/tabs/HiddenTabs.js";
+import { Module } from "../../core/boot/Module.js";
+import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { BookmarkFavorites } from "./BookmarkFavorites.js";
 import { FavoriteTagger } from "./FavoriteTagger.js";
 import { GridDragging } from "./GridDragging.js";

@@ -1,9 +1,9 @@
-import { ContextMenu } from "../../core/ContextMenu.js";
-import { DragPill } from "../../core/DragPill.js";
-import { FavoriteDropZone } from "../../core/FavoriteDropZone.js";
-import { LinkDropZone } from "../../core/LinkDropZone.js";
-import { RowDrag } from "../../core/RowDrag.js";
-import { TodayList } from "../../core/TodayList.js";
+import { ContextMenu } from "../../core/dom/ContextMenu.js";
+import { DragPill } from "../../shared/dragdrop/DragPill.js";
+import { FavoriteDropZone } from "../../shared/dragdrop/FavoriteDropZone.js";
+import { LinkDropZone } from "../../shared/dragdrop/LinkDropZone.js";
+import { RowDrag } from "../../shared/dragdrop/RowDrag.js";
+import { TodayList } from "../../shared/tabs/TodayList.js";
 import { FavoriteDrop } from "./FavoriteDrop.js";
 import { FavoriteRemoval } from "./FavoriteRemoval.js";
 import { FavoriteReorder } from "./FavoriteReorder.js";

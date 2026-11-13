@@ -1,4 +1,4 @@
-import { TabSlot } from "../../core/TabSlot.js";
+import { TabSlot } from "../../core/tabs/TabSlot.js";
 import { PINNED_LAST_ATTRIBUTE } from "../../shared/tabs/TabBarMarks.js";
 const AWAY_ATTRIBUTE = "data-vivarcdi-away";
 class TabBarMarker {

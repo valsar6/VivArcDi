@@ -1,5 +1,5 @@
-import { TabDataWriter } from "../../core/TabDataWriter.js";
-import { TabData } from "../../core/TabData.js";
+import { TabDataWriter } from "../../core/tabs/TabDataWriter.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class LinkedTabs {
   #tabs;
   #writer;

@@ -1,5 +1,5 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { OwnPage } from "../../core/OwnPage.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { OwnPage } from "../../shared/tabs/OwnPage.js";
 const currentDate = () => /* @__PURE__ */ new Date();
 const isPinned = (tab) => tab.pinned;
 class ActivationRecorder {

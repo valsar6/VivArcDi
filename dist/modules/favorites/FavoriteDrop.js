@@ -1,6 +1,6 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { BookmarkFolderFinder } from "../../core/bookmarks/BookmarkFolderFinder.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { BookmarkFolderFinder } from "../../core/browser/bookmarks/BookmarkFolderFinder.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class FavoriteDrop {
   #deps;
   #path;

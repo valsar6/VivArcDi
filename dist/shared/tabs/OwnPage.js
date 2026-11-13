@@ -1,5 +1,5 @@
-import { AddressKey } from "./AddressKey.js";
-import { TabData } from "./TabData.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class OwnPage {
   /**
    * @param tab A tab.

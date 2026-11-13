@@ -1,5 +1,5 @@
-import { DomQuery } from "../core/DomQuery.js";
-import { Module } from "../core/Module.js";
+import { DomQuery } from "../core/dom/DomQuery.js";
+import { Module } from "../core/boot/Module.js";
 class ActivationMarker extends Module {
   static id = "activation-marker";
   static privateWindows = "allowed";

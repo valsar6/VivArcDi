@@ -25,7 +25,7 @@ var VivArcDiPinnedKeys = (() => {
     uninstall: () => uninstall
   });
 
-  // src/core/TabSlot.ts
+  // src/core/tabs/TabSlot.ts
   var TAB_ID = /^tab-(\d+)$/;
   var TabSlot = class {
     /**

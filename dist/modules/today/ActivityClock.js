@@ -1,4 +1,4 @@
-import { TabData } from "../../core/TabData.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class ActivityClock {
   /**
    * Tells when a tab was last active: the later of VivArcDi's own stamp, which survives a

@@ -1,5 +1,5 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { LinkId } from "../../core/LinkId.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { LinkId } from "../../shared/links/LinkId.js";
 const MANUAL_URL = "https://github.com/valsar6/VivArcDi/blob/main/docs/manual/live-folders.md";
 const CONNECT_TITLE = "Connect GitHub";
 const RECONNECT_TITLE = "Reconnect GitHub";

@@ -1,5 +1,5 @@
-import { DomQuery } from "../../core/DomQuery.js";
-import { WindowKeys } from "../../core/WindowKeys.js";
+import { DomQuery } from "../../core/dom/DomQuery.js";
+import { WindowKeys } from "../../core/dom/WindowKeys.js";
 import { DestinationLookup } from "./DestinationLookup.js";
 import { IdleTimer } from "./IdleTimer.js";
 import { LittleArcBar } from "./LittleArcBar.js";

@@ -1,6 +1,6 @@
-import { TabBarAnchor } from "../../core/TabBarAnchor.js";
-import { SerialTask } from "../../core/SerialTask.js";
-import { TabUnloader } from "../../core/TabUnloader.js";
+import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
+import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { FavoriteOpener } from "./FavoriteOpener.js";
 import { FavoriteStates } from "./FavoriteStates.js";
 import { FavoritesFolder } from "./FavoritesFolder.js";

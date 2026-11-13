@@ -1,4 +1,4 @@
-import { Module } from "../../core/Module.js";
+import { Module } from "../../core/boot/Module.js";
 import { LinkActivator } from "../../shared/links/LinkActivator.js";
 import { OpenLinks } from "../../shared/links/OpenLinks.js";
 import { PreviewController } from "./PreviewController.js";

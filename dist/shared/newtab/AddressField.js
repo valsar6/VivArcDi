@@ -1,4 +1,4 @@
-import { FrameTask } from "./FrameTask.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
 const DEFAULT_FRAMES = 30;
 class AddressField {
   #document;

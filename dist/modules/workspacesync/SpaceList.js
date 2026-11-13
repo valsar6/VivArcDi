@@ -1,4 +1,4 @@
-import { BookmarkFolderFinder } from "../../core/bookmarks/BookmarkFolderFinder.js";
+import { BookmarkFolderFinder } from "../../core/browser/bookmarks/BookmarkFolderFinder.js";
 const SPACES = "Spaces";
 const URL_PREFIX = "https://vivarcdi.invalid/space/";
 class SpaceList {

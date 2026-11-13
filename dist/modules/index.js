@@ -1,4 +1,4 @@
-import { ModuleRegistry } from "../core/ModuleRegistry.js";
+import { ModuleRegistry } from "../core/boot/ModuleRegistry.js";
 import { ActivationMarker } from "./ActivationMarker.js";
 import { CopyUrl } from "./copyurl/CopyUrl.js";
 import { BookmarkFolders } from "./folders/BookmarkFolders.js";

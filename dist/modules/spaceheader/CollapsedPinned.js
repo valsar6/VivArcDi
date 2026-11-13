@@ -1,4 +1,4 @@
-import { TabData } from "../../core/TabData.js";
+import { TabData } from "../../core/tabs/TabData.js";
 import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 const HIDDEN_OWNER = "space-header";
 const RELEVANT_CHANGES = ["discarded", "pinned", "status"];

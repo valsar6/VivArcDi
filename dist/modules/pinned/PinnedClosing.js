@@ -1,5 +1,5 @@
-import { PageScriptInjector } from "../../core/PageScriptInjector.js";
-import { TabUnloader } from "../../core/TabUnloader.js";
+import { PageScriptInjector } from "../../core/browser/PageScriptInjector.js";
+import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { ActiveTab } from "./ActiveTab.js";
 import { CloseShortcut } from "./CloseShortcut.js";
 import { parsePinnedMessage } from "./PinnedMessage.js";

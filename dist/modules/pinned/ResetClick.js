@@ -1,4 +1,4 @@
-import { TabSlot } from "../../core/TabSlot.js";
+import { TabSlot } from "../../core/tabs/TabSlot.js";
 class ResetClick {
   #deps;
   #listener = (event) => this.#handle(event);

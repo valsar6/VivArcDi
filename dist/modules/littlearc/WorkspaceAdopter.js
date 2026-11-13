@@ -1,5 +1,5 @@
-import { TabData } from "../../core/TabData.js";
-import { TabDataWriter } from "../../core/TabDataWriter.js";
+import { TabData } from "../../core/tabs/TabData.js";
+import { TabDataWriter } from "../../core/tabs/TabDataWriter.js";
 import { destinationAnswer } from "./LittleArcMessage.js";
 const NO_DESTINATION = { nameOf: () => null, colors: () => null };
 class WorkspaceAdopter {

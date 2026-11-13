@@ -1,5 +1,5 @@
-import { FrameTask } from "../../core/FrameTask.js";
-import { watchSubtree } from "../../core/KeptElement.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
+import { watchSubtree } from "../../core/dom/KeptElement.js";
 const PRIVATE_HIDDEN_ATTRIBUTE = "data-vivarcdi-private-hidden";
 class HiddenButtons {
   #document;

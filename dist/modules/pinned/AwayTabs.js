@@ -1,5 +1,5 @@
-import { OwnPage } from "../../core/OwnPage.js";
-import { TabData } from "../../core/TabData.js";
+import { OwnPage } from "../../shared/tabs/OwnPage.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class AwayTabs {
   #tabs;
   /**

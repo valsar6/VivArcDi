@@ -1,5 +1,5 @@
-import { AddressKey } from "../AddressKey.js";
-import { BookmarkFolderFinder } from "./BookmarkFolderFinder.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { BookmarkFolderFinder } from "../../core/browser/bookmarks/BookmarkFolderFinder.js";
 class LinkKeyIndex {
   static #instances = /* @__PURE__ */ new WeakMap();
   #bookmarks;

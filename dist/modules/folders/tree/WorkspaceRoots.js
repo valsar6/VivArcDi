@@ -1,4 +1,4 @@
-import { BookmarkFolderFinder } from "../../../core/bookmarks/BookmarkFolderFinder.js";
+import { BookmarkFolderFinder } from "../../../core/browser/bookmarks/BookmarkFolderFinder.js";
 const DEFAULT_BASE = "VivArcDi";
 const OUTSIDE_NAME = "Tabs";
 class WorkspaceRoots {

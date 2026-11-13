@@ -1,4 +1,4 @@
-import { AddressKey } from "../../core/AddressKey.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
 class FolderTree {
   /**
    * Turns the children of the root folder into the tree the section shows. Separators, links that

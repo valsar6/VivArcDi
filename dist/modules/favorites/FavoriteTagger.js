@@ -1,4 +1,4 @@
-import { TabSlot } from "../../core/TabSlot.js";
+import { TabSlot } from "../../core/tabs/TabSlot.js";
 const FAVORITE_ATTRIBUTE = "data-vivarcdi-favorite";
 const UNLOADED_ATTRIBUTE = "data-vivarcdi-unloaded";
 const GRID_ATTRIBUTE = "data-vivarcdi-favorites";

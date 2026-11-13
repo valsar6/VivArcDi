@@ -1,8 +1,8 @@
-import { AddressField } from "../../core/AddressField.js";
-import { DomQuery } from "../../core/DomQuery.js";
-import { Module } from "../../core/Module.js";
-import { NewTabRow } from "../../core/NewTabRow.js";
-import { TabBarAnchor } from "../../core/TabBarAnchor.js";
+import { AddressField } from "../../shared/newtab/AddressField.js";
+import { DomQuery } from "../../core/dom/DomQuery.js";
+import { Module } from "../../core/boot/Module.js";
+import { NewTabRow } from "../../shared/newtab/NewTabRow.js";
+import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
 import { BarButton } from "./BarButton.js";
 import { BottomBar } from "./BottomBar.js";
 import { CommandLauncher } from "./CommandLauncher.js";

@@ -1,4 +1,4 @@
-import { FrameTask } from "./FrameTask.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
 const DRAG_PILL_ATTRIBUTE = "data-vivarcdi-drag-pill";
 const OFFSET_PX = 12;
 class DragPill {

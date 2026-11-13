@@ -1,4 +1,4 @@
-import { KeptElement } from "../../core/KeptElement.js";
+import { KeptElement } from "../../core/dom/KeptElement.js";
 const BOTTOM_BAR_ATTRIBUTE = "data-vivarcdi-bottom-bar";
 class BottomBar {
   #kept;

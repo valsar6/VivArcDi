@@ -1,7 +1,7 @@
-import { SerialTask } from "../../core/SerialTask.js";
-import { TabBarAnchor } from "../../core/TabBarAnchor.js";
-import { TabData } from "../../core/TabData.js";
-import { TabUnloader } from "../../core/TabUnloader.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
+import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
+import { TabData } from "../../core/tabs/TabData.js";
+import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { GRID_ORDER } from "./BookmarkFavorites.js";
 import { FavoritesView } from "./FavoritesView.js";
 import { TabChanges } from "./TabChanges.js";

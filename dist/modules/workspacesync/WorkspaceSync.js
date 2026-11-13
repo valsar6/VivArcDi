@@ -1,9 +1,9 @@
-import { ElementGestures } from "../../core/ElementGestures.js";
-import { Module } from "../../core/Module.js";
-import { SerialTask } from "../../core/SerialTask.js";
-import { Toast } from "../../core/Toast.js";
-import { WorkspaceNames } from "../../core/WorkspaceNames.js";
-import { WorkspaceTabs } from "../../core/WorkspaceTabs.js";
+import { ElementGestures } from "./ElementGestures.js";
+import { Module } from "../../core/boot/Module.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
+import { Toast } from "../../core/dom/Toast.js";
+import { WorkspaceNames } from "../../core/workspaces/WorkspaceNames.js";
+import { WorkspaceTabs } from "../../core/workspaces/WorkspaceTabs.js";
 import { Debounce } from "./Debounce.js";
 import { LocalPinned } from "./LocalPinned.js";
 import { ReactEditorOpener } from "./EditorOpener.js";

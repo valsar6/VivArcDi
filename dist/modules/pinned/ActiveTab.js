@@ -1,4 +1,4 @@
-import { SerialTask } from "../../core/SerialTask.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
 class ActiveTab {
   #tabs;
   #tab = null;

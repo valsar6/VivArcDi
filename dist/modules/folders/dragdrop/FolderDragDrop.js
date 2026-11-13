@@ -1,10 +1,10 @@
-import { FavoriteDropZone } from "../../../core/FavoriteDropZone.js";
-import { LinkId } from "../../../core/LinkId.js";
-import { LinkDropZone } from "../../../core/LinkDropZone.js";
-import { RowDrag } from "../../../core/RowDrag.js";
-import { TabDragPill } from "../../../core/TabDragPill.js";
-import { TabDragRelease } from "../../../core/TabDragRelease.js";
-import { TodayList } from "../../../core/TodayList.js";
+import { FavoriteDropZone } from "../../../shared/dragdrop/FavoriteDropZone.js";
+import { LinkId } from "../../../shared/links/LinkId.js";
+import { LinkDropZone } from "../../../shared/dragdrop/LinkDropZone.js";
+import { RowDrag } from "../../../shared/dragdrop/RowDrag.js";
+import { TabDragPill } from "../../../shared/dragdrop/TabDragPill.js";
+import { TabDragRelease } from "../../../shared/dragdrop/TabDragRelease.js";
+import { TodayList } from "../../../shared/tabs/TodayList.js";
 import { DropPlace } from "./DropPlace.js";
 import { DropTargets, LINK_ATTRIBUTE } from "./DropTargets.js";
 import { FolderLinkTargets } from "./FolderLinkTargets.js";

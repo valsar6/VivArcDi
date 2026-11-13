@@ -1,4 +1,4 @@
-import { LinkId } from "../../core/LinkId.js";
+import { LinkId } from "../../shared/links/LinkId.js";
 const COPY_LINK_LABEL = "Copy Link";
 const ARCHIVE_LABEL = "Archive Pull Request";
 const COPIED_TEXT = "Copied";

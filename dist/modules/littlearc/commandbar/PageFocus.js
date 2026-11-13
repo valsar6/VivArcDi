@@ -1,4 +1,4 @@
-import { tabIdOf } from "../../../core/Webview.js";
+import { tabIdOf } from "../../../core/browser/Webview.js";
 class PageFocus {
   #options;
   #previous = null;

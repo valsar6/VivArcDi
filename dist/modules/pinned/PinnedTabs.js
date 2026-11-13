@@ -1,4 +1,4 @@
-import { Module } from "../../core/Module.js";
+import { Module } from "../../core/boot/Module.js";
 import { PinnedClosing } from "./PinnedClosing.js";
 import { PinnedMarking } from "./PinnedMarking.js";
 import { PinWatcher } from "./PinWatcher.js";

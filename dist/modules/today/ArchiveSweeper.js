@@ -1,4 +1,4 @@
-import { TabData } from "../../core/TabData.js";
+import { TabData } from "../../core/tabs/TabData.js";
 import { ActivityClock } from "./ActivityClock.js";
 import { TodayTabPolicy } from "./TodayTabPolicy.js";
 const SWEEP_INTERVAL_MS = 6e4;

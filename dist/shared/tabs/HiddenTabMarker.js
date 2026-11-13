@@ -1,6 +1,6 @@
-import { DomQuery } from "./DomQuery.js";
-import { FrameTask } from "./FrameTask.js";
-import { TabSlot } from "./TabSlot.js";
+import { DomQuery } from "../../core/dom/DomQuery.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
+import { TabSlot } from "../../core/tabs/TabSlot.js";
 const HIDDEN_ATTRIBUTE = "data-vivarcdi-hidden";
 const watchSubtree = (target, onChange) => {
   const observer = new MutationObserver(onChange);

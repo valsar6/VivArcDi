@@ -1,5 +1,5 @@
 import { MenuItemShape } from "./MenuItemShape.js";
-import { TabSlot } from "./TabSlot.js";
+import { TabSlot } from "../../../core/tabs/TabSlot.js";
 const MAX_AGE_MS = 1e3;
 class TabMenuItems {
   #deps;

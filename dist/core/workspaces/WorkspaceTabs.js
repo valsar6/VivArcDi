@@ -1,5 +1,5 @@
-import { TabDataWriter } from "./TabDataWriter.js";
-import { TabData } from "./TabData.js";
+import { TabDataWriter } from "../tabs/TabDataWriter.js";
+import { TabData } from "../tabs/TabData.js";
 class WorkspaceTabs {
   #tabs;
   #writer;

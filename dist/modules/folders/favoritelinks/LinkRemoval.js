@@ -1,6 +1,6 @@
-import { LinkId } from "../../../core/LinkId.js";
-import { TabData } from "../../../core/TabData.js";
-import { TabRowMove } from "../../../core/TabRowMove.js";
+import { LinkId } from "../../../shared/links/LinkId.js";
+import { TabData } from "../../../core/tabs/TabData.js";
+import { TabRowMove } from "../../../shared/dragdrop/TabRowMove.js";
 import { FAILED_TEXT, KEPT_TEXT } from "./FavoriteShortcut.js";
 class LinkRemoval {
   #deps;

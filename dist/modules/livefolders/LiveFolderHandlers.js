@@ -1,4 +1,4 @@
-import { LinkId } from "../../core/LinkId.js";
+import { LinkId } from "../../shared/links/LinkId.js";
 import { CONNECT_ROW_ID } from "./LiveEntries.js";
 class LiveFolderHandlers {
   #deps;

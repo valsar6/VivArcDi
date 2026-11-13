@@ -1,5 +1,5 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { BookmarkFolderFinder } from "../../core/bookmarks/BookmarkFolderFinder.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { BookmarkFolderFinder } from "../../core/browser/bookmarks/BookmarkFolderFinder.js";
 import { SyncNames } from "./SyncNames.js";
 const PINNED = "Pinned";
 const SETTINGS = "Settings";

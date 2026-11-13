@@ -1,4 +1,4 @@
-import { SerialTask } from "../../core/SerialTask.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
 import { GithubFailure, UNREACHABLE_REASON } from "./GithubPullRequests.js";
 import { ArchivedPullRequests } from "./ArchivedPullRequests.js";
 const defaultTicker = {

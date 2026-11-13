@@ -1,16 +1,15 @@
-import { createDefaultRegistry } from "../modules/index.js";
-import { BookmarkWriter } from "./bookmarks/BookmarkWriter.js";
-import { BrowserBookmarks } from "./bookmarks/BrowserBookmarks.js";
-import { BrowserPrefs } from "./BrowserPrefs.js";
-import { BrowserRuntime } from "./BrowserRuntime.js";
-import { BrowserHistory } from "./BrowserHistory.js";
-import { BrowserSearch } from "./BrowserSearch.js";
-import { BrowserTabs } from "./BrowserTabs.js";
-import { BrowserWindows } from "./BrowserWindows.js";
-import { Logger } from "./Logger.js";
-import { PersistentStorage } from "./PersistentStorage.js";
+import { BookmarkWriter } from "../browser/bookmarks/BookmarkWriter.js";
+import { BrowserBookmarks } from "../browser/bookmarks/BrowserBookmarks.js";
+import { BrowserPrefs } from "../browser/BrowserPrefs.js";
+import { BrowserRuntime } from "../browser/BrowserRuntime.js";
+import { BrowserHistory } from "../browser/BrowserHistory.js";
+import { BrowserSearch } from "../browser/BrowserSearch.js";
+import { BrowserTabs } from "../browser/BrowserTabs.js";
+import { BrowserWindows } from "../browser/BrowserWindows.js";
+import { Logger } from "../support/Logger.js";
+import { PersistentStorage } from "../browser/PersistentStorage.js";
 import { ResourceLoader } from "./ResourceLoader.js";
-import { SelectorCatalog } from "./SelectorCatalog.js";
+import { SelectorCatalog } from "../dom/SelectorCatalog.js";
 import { StyleInjector } from "./StyleInjector.js";
 import { UiReadiness } from "./UiReadiness.js";
 class VivArcDi {
@@ -70,15 +69,16 @@ class VivArcDi {
    * Startup errors are logged, never thrown, so Vivaldi keeps working.
    *
    * @param baseUrl URL of the payload folder, ending with a slash.
+   * @param registry The modules the payload knows, built by the loader.
    * @param document The browser window document.
    * @returns The application, started or failed.
    */
-  static async boot(baseUrl, document = globalThis.document) {
+  static async boot(baseUrl, registry, document = globalThis.document) {
     const chromeApi = globalThis.chrome;
     const logger = new Logger();
     const app = new VivArcDi({
       loader: new ResourceLoader(baseUrl),
-      registry: createDefaultRegistry(),
+      registry,
       logger,
       document,
       tabs: new BrowserTabs(chromeApi),

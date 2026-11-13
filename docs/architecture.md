@@ -37,7 +37,8 @@ Vivaldi installation. The installer adds a single line to it, between two marker
 and copies `dist/` next to it as `vivarcdi/`, adding a generated `build.json` with the VivArcDi and
 Vivaldi versions.
 
-`loader.js` boots `VivArcDi` (`src/core/VivArcDi.ts`), which:
+`loader.js` is the composition root: it builds the module registry (`src/modules/index.ts`) and
+boots `VivArcDi` (`src/core/boot/VivArcDi.ts`) with it, which:
 
 1. loads `config.json` and `build.json`;
 2. picks the selector catalog for the running Vivaldi version;
@@ -50,11 +51,11 @@ never blocked.
 
 ### Modules
 
-A module is a class that extends `Module` (`src/core/Module.ts`), declares a static `id`, and
+A module is a class that extends `Module` (`src/core/boot/Module.ts`), declares a static `id`, and
 implements `start(context)` and `stop()`. The context gives it the document, the selector catalog,
 a logger tagged with its id, its options from `config.json`, the build versions, `tabs`, a
-promise-based wrapper of `chrome.tabs` (`src/core/BrowserTabs.ts`; check `tabs.available` first),
-`runtime` for `chrome.runtime` messages and new windows (`src/core/BrowserRuntime.ts`), and
+promise-based wrapper of `chrome.tabs` (`src/core/browser/BrowserTabs.ts`; check `tabs.available` first),
+`runtime` for `chrome.runtime` messages and new windows (`src/core/browser/BrowserRuntime.ts`), and
 `payload`, which loads files that ship with VivArcDi.
 
 Modules mark Vivaldi's elements with `data-vivarcdi-*` attributes and stylesheets style those marks.
@@ -90,20 +91,33 @@ Modules are registered in `src/modules/index.ts` and enabled in `config.json` un
 
 ### Module boundaries
 
-Modules never import each other ([spec 034](../specs/034-module-boundaries/spec.md)). A module imports
-from `src/core/`, from `src/shared/` and from its own folder only; `src/modules/index.ts`, the
-registry, is the one file that sees every module.
+The payload has three layers, and imports only go down: modules, then shared, then core
+([spec 034](../specs/034-module-boundaries/spec.md), [spec 035](../specs/035-core-layout/spec.md)).
+Modules never import each other. `src/modules/index.ts`, the registry, is the one file that sees
+every module, and only `src/loader.ts` imports it.
 
 | Folder | Holds | May import |
 |---|---|---|
-| `src/core/` | Services that `ModuleContext` injects and infrastructure: browser API wrappers, DOM helpers, logger | `src/core/` |
-| `src/shared/` | Building blocks that two or more modules use, grouped by topic: `links/`, `tabs/`, `clipboard/` | `src/core/`, `src/shared/` |
+| `src/core/` | The boot, the services that `ModuleContext` injects, and generic helpers that name no feature | `src/core/` |
+| `src/shared/` | Feature building blocks that two or more modules use, grouped by topic: `clipboard/`, `dragdrop/`, `links/`, `newtab/`, `spaces/`, `tabs/` | `src/core/`, `src/shared/` |
 | `src/modules/<name>/` | One module | `src/core/`, `src/shared/`, its own folder |
 
 A file moves to `src/shared/` when a second module needs it, and back into its module when only one
-module still uses it. The local ESLint rule `local/module-boundaries` (`tools/eslint/`) fails the
+module still uses it. A core file is used by the boot or another core file, or by two or more
+modules; a core file that names a feature belongs in `src/shared/`. The local ESLint rule `local/module-boundaries` (`tools/eslint/`) fails the
 lint on an import that crosses these lines, and `tests/structure/ModuleBoundaries.test.ts` checks
 the real tree. Tests are not bound by the rule: an integration test may drive two modules together.
+
+`src/core/` keeps no file at its top level:
+
+| Folder | Responsibility |
+|---|---|
+| `boot/` | Starting the payload, the module system, and loading styles and resources |
+| `browser/` | Promise wrappers of the Vivaldi and Chrome APIs, scripts injected into web views; `bookmarks/` reads and writes bookmarks |
+| `tabs/` | The data Vivaldi keeps on a tab, the tab strip's slots, and the key of a tab's address |
+| `workspaces/` | Which workspace is active, its name, and its tabs |
+| `dom/` | Finding and keeping elements in Vivaldi's window, menus, toasts and keys |
+| `support/` | The logger, and running work once per frame or one at a time |
 
 A large module splits its folder by responsibility. `folders/` keeps the module
 (`BookmarkFolders.ts`) and the composition root of a section (`FolderSection.ts`) at its top level:

@@ -1,4 +1,4 @@
-import { NewTabOpener } from "../../core/NewTabOpener.js";
+import { NewTabOpener } from "../../shared/newtab/NewTabOpener.js";
 class CommandLauncher {
   #opener;
   #downloads;

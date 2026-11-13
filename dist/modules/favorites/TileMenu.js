@@ -1,4 +1,4 @@
-import { PIN_TAB_LABEL, UNTILE_TAB_LABEL } from "../../core/CommandLabels.js";
+import { PIN_TAB_LABEL, UNTILE_TAB_LABEL } from "../../shared/tabs/CommandLabels.js";
 import { TILE_ATTRIBUTE } from "./FavoritesView.js";
 class TileMenu {
   #deps;

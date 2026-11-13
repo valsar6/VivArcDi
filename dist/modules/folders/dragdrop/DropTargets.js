@@ -1,4 +1,4 @@
-import { LinkId } from "../../../core/LinkId.js";
+import { LinkId } from "../../../shared/links/LinkId.js";
 const DROP_ATTRIBUTE = "data-vivarcdi-drop";
 const FOLDER_ATTRIBUTE = "data-vivarcdi-folder-id";
 const LINK_ATTRIBUTE = "data-vivarcdi-link-id";

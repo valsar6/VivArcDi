@@ -25,7 +25,7 @@ var VivArcDiCopyKeys = (() => {
     uninstall: () => uninstall
   });
 
-  // src/core/ShortcutKeys.ts
+  // src/core/dom/ShortcutKeys.ts
   var ShortcutKeys = class {
     /**
      * Tells whether a key press is Cmd/Ctrl+Shift and a letter, with no other modifier. Like the

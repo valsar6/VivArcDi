@@ -1,5 +1,5 @@
-import { TabDragPill } from "../../core/TabDragPill.js";
-import { TabDragRelease } from "../../core/TabDragRelease.js";
+import { TabDragPill } from "../../shared/dragdrop/TabDragPill.js";
+import { TabDragRelease } from "../../shared/dragdrop/TabDragRelease.js";
 class TabToFavorite {
   #release;
   /**

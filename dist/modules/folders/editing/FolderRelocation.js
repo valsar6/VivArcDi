@@ -1,4 +1,4 @@
-import { TabData } from "../../../core/TabData.js";
+import { TabData } from "../../../core/tabs/TabData.js";
 const MOVE_TO_LABEL = "Move to";
 class FolderRelocation {
   #deps;

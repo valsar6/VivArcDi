@@ -1,6 +1,6 @@
-import { TabData } from "../../core/TabData.js";
-import { TabDataWriter } from "../../core/TabDataWriter.js";
-import { TabRowMove } from "../../core/TabRowMove.js";
+import { TabData } from "../../core/tabs/TabData.js";
+import { TabDataWriter } from "../../core/tabs/TabDataWriter.js";
+import { TabRowMove } from "../../shared/dragdrop/TabRowMove.js";
 class FavoriteRemoval {
   #deps;
   #writer;

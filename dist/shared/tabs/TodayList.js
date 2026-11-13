@@ -1,5 +1,5 @@
 import { HIDDEN_ATTRIBUTE } from "./HiddenTabMarker.js";
-import { TabSlot } from "./TabSlot.js";
+import { TabSlot } from "../../core/tabs/TabSlot.js";
 const TODAY_ATTRIBUTE = "data-vivarcdi-drop-today";
 class TodayList {
   #deps;

@@ -1,6 +1,6 @@
-import { DomQuery } from "../../core/DomQuery.js";
-import { FrameTask } from "../../core/FrameTask.js";
-import { SerialTask } from "../../core/SerialTask.js";
+import { DomQuery } from "../../core/dom/DomQuery.js";
+import { FrameTask } from "../../core/support/FrameTask.js";
+import { SerialTask } from "../../core/support/SerialTask.js";
 import { AwayTabs } from "./AwayTabs.js";
 import { TabBarMarker } from "./TabBarMarker.js";
 class PinnedMarking {

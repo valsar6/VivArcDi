@@ -1,5 +1,5 @@
-import { AddressKey } from "../../core/AddressKey.js";
-import { TabData } from "../../core/TabData.js";
+import { AddressKey } from "../../core/tabs/AddressKey.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class LinkedTabFinder {
   #tabs;
   #links;

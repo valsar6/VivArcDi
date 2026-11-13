@@ -1,4 +1,4 @@
-import { TabData } from "./TabData.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class KeptTab {
   /**
    * Tells whether a tab is kept apart from today's tabs: pinned, a Favorite, or the tab of a

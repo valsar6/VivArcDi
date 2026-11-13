@@ -1,4 +1,4 @@
-import { FrameTask } from "./FrameTask.js";
+import { FrameTask } from "../support/FrameTask.js";
 const ANCHOR_ATTRIBUTE = "data-vivarcdi-anchor";
 const watchTree = (target, onChange) => {
   const observer = new MutationObserver(onChange);
