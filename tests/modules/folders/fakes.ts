@@ -237,7 +237,7 @@ export class WritableChrome implements WriterHost {
           node.description = changes.description ?? node.description;
           return node;
         }),
-      get: (id, callback): void => nodeAnswer('get', id, callback, (node) => ({ id: node.id, title: node.title, url: node.url, parentId: this.#parentOf(this.tree, node.id)?.id })),
+      get: (id, callback): void => nodeAnswer('get', id, callback, (node) => ({ id: node.id, title: node.title, url: node.url, parentId: this.#parentOf(this.tree, node.id)?.id, index: this.#parentOf(this.tree, node.id)?.children?.findIndex((child) => child.id === node.id) })),
       getSubTree: (id, callback): void => nodeAnswer('getSubTree', id, callback, (node) => node),
       removeTree: (id, callback): void =>
         this.#answer(`removeTree ${id}`, callback, () => {
