@@ -51,7 +51,7 @@ function setup(): Setup {
     skipSelector: '.skip',
     pill: { show: (): void => undefined, move: (): void => undefined, hide: (): void => undefined },
     menu: { open: (): void => undefined, close: (): void => undefined },
-    folderActions: { rename: (): void => undefined, remove: (): void => undefined },
+    folderActions: { rename: (): void => undefined, duplicate: (): void => undefined, moveTo: (): null => null, remove: (): void => undefined },
     tabs: {
       get: async (id): Promise<chrome.tabs.Tab> => ({ id, url: PAGE }) as chrome.tabs.Tab,
       query: async (): Promise<chrome.tabs.Tab[]> => (calls.push('query'), []),

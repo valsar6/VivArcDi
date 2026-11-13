@@ -31,11 +31,11 @@ Branch `features/folder-duplicate-move`, minor bump of the version.
 
 - [x] **T8.** Design revision for step 2 (this file and design.md, 2026-11-12), approved by Tore with
   the merge of its pull request.
-- [ ] **T8a.** `FolderLinkTabs` taken out of `FolderDeletion` (its tests stay green).
-- [ ] **T8b.** `FolderDuplication` and the `Duplicate` item. AC-8, AC-6.
-- [ ] **T8c.** `FolderRelocation`, the `Move to ▸` submenu with the checked workspace, the same-root
+- [x] **T8a.** `FolderLinkTabs` taken out of `FolderDeletion` (its tests stay green).
+- [x] **T8b.** `FolderDuplication` and the `Duplicate` item. AC-8, AC-6.
+- [x] **T8c.** `FolderRelocation`, the `Move to ▸` submenu with the checked workspace, the same-root
   case and the tabs moved after the bookmark. AC-9, AC-10, AC-6.
-- [ ] **T8d.** Version bump, README and manual note, `make check`.
+- [x] **T8d.** Version bump, README and manual note, `make check`.
 - [ ] **T8e.** Manual verification checklist for Tore from AC-16 (`folder-delete/verifica-duplica-sposta.md`).
 
 ## Step 3: New Nested Folder and Change Icon
