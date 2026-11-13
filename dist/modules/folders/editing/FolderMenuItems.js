@@ -1,4 +1,5 @@
 const RENAME_LABEL = "Rename\u2026";
+const DUPLICATE_LABEL = "Duplicate";
 const DELETE_LABEL = "Delete";
 class FolderMenuItems {
   #actions;
@@ -20,11 +21,17 @@ class FolderMenuItems {
     return this.#groups(folderId).filter((group) => group.length > 0).flatMap((group, index) => index === 0 ? group : [{ separator: true }, ...group]);
   }
   #groups(folderId) {
-    return [[{ label: RENAME_LABEL, run: () => this.#actions.rename(folderId) }], [{ label: DELETE_LABEL, run: () => this.#actions.remove(folderId) }]];
+    const moveTo = this.#actions.moveTo(folderId);
+    return [
+      [{ label: RENAME_LABEL, run: () => this.#actions.rename(folderId) }],
+      [{ label: DUPLICATE_LABEL, run: () => this.#actions.duplicate(folderId) }, ...moveTo === null ? [] : [moveTo]],
+      [{ label: DELETE_LABEL, run: () => this.#actions.remove(folderId) }]
+    ];
   }
 }
 export {
   DELETE_LABEL,
+  DUPLICATE_LABEL,
   FolderMenuItems,
   RENAME_LABEL
 };

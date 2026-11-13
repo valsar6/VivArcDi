@@ -137,7 +137,10 @@ class FolderSection {
       redraw: () => this.#redraw.request(),
       tabLinks: this.#tabLinks,
       openFolders: this.#openFolders,
-      closing: this.#closing
+      closing: this.#closing,
+      names: this.#names,
+      active: this.#active,
+      roots: this.#roots
     });
   }
   async #useWorkspace(workspace) {

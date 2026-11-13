@@ -1,4 +1,3 @@
-import { TabData } from "../../../core/TabData.js";
 class FolderDeletion {
   #deps;
   /**
@@ -22,8 +21,8 @@ class FolderDeletion {
     try {
       const folder = await this.#deps.writer.subTree(folderId);
       name = folder.title;
-      linkIds = FolderDeletion.#linkIds(folder);
-      const tabIds = await this.#tabsOf(linkIds);
+      linkIds = this.#deps.linkTabs.linkIds(folder);
+      const tabIds = await this.#deps.linkTabs.tabsOf(linkIds);
       closing.add(linkIds);
       await this.#moveToTrash(folderId);
       this.#deps.openFolders.forget(folderId);
@@ -44,13 +43,6 @@ class FolderDeletion {
     }
     await this.#deps.writer.move(folderId, { parentId: trashId });
   }
-  async #tabsOf(linkIds) {
-    const wanted = new Set(linkIds);
-    return (await this.#deps.tabs.query({})).flatMap((tab) => {
-      const { bookmarkId } = TabData.ownOf(tab);
-      return tab.id !== void 0 && bookmarkId !== void 0 && wanted.has(bookmarkId) ? [tab.id] : [];
-    });
-  }
   async #close(tabIds) {
     for (const tabId of tabIds) {
       try {
@@ -59,10 +51,6 @@ class FolderDeletion {
         this.#deps.logger.warn("could not close a tab of the deleted folder", error);
       }
     }
-  }
-  static #linkIds(node) {
-    const own = node.url !== void 0 ? [node.id] : [];
-    return [...own, ...(node.children ?? []).flatMap((child) => FolderDeletion.#linkIds(child))];
   }
 }
 export {
