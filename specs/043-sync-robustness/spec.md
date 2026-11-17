@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-17 |
 | Amends | [030 Workspace sync](../030-workspace-sync/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -155,10 +155,10 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Toast for a reserved name.** The user who names a workspace `Spaces` does not see the console,
-  so their tabs stop syncing without notice. Proposed: not in this spec. Once 041 defines the toast
+- [x] **Toast for a reserved name.** The user who names a workspace `Spaces` does not see the console,
+  so their tabs stop syncing without notice. Answered (Tore, 2026-11-17): not in this spec. Once 041 defines the toast
   for severe failures, a follow-up adds this notice to it, once per workspace.
-- [ ] **How 030 shows the amendment.** Proposed: when this spec is approved, 030 keeps its status
+- [x] **How 030 shows the amendment.** Answered (Tore, 2026-11-17): when this spec is approved, 030 keeps its status
   `Implemented` and gains the header row `| Amended by | [043 Sync robustness](../043-sync-robustness/spec.md) |`.
   Its References also get a link to 043. The sentence "The user edits the store by hand: treated like a
   change from another computer" in 030's design gets a pointer to FR-5 and FR-8 here. The text of
