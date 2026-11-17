@@ -29,7 +29,7 @@ Branch `fix/module-options`, with a patch version change in `package.json` and
   raw pass-through of T3: `OptionSchema.none` now drops every key with a warning.
 - [x] **T8. Manual and docs.** Paragraph in `docs/manual/getting-started.md`; the `ModuleContext`
   section of `docs/architecture.md`.
-- [ ] **T9. Version and checks.** Patch version change; `npm run release -- check --base origin/main
+- [x] **T9. Version and checks.** Patch version change; `npm run release -- check --base origin/main
   --branch fix/module-options`; `make check`.
 - [ ] **T10. Manual verification.** Checklist from AC-11 and AC-12 for Tore, on macOS and Debian.
   Then set the spec to `Implemented`.
