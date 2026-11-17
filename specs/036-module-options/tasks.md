@@ -18,16 +18,16 @@ Branch `fix/module-options`, with a patch version change in `package.json` and
   values; `VivArcDi.start` checks every known module's options, warns, skips modules with a missing
   required option, and fills `context.modules`. Tests AC-7, AC-8 and AC-9. Until T7, a module that
   still has `OptionSchema.none` receives its raw section, so every task stays green.
-- [ ] **T4. Simple modules.** Schemas for `copy-url`, `folder-preview`, `today-archive`,
+- [x] **T4. Simple modules.** Schemas for `copy-url`, `folder-preview`, `today-archive`,
   `sidebar-look`, `pinned-tabs`; remove their own checks; update their tests as listed in the design.
-- [ ] **T5. Modules with nested settings.** `peek`, `little-arc`, `favorites-grid`; remove
+- [x] **T5. Modules with nested settings.** `peek`, `little-arc`, `favorites-grid`; remove
   `settingsFrom` and `defaults`; update the tests that use them.
-- [ ] **T6. Folder and sync modules.** `bookmark-folders` (with `WorkspaceRoots`), `live-folders`
+- [x] **T6. Folder and sync modules.** `bookmark-folders` (with `WorkspaceRoots`), `live-folders`
   (required `githubClientId`), `workspace-sync`, and `reopen-pinned` reading checked `modules`.
   Keep 010/AC-8 green under its name.
-- [ ] **T7. Shipped config.** `tests/core/boot/options/ShippedConfig.test.ts` (AC-10). Remove the
+- [x] **T7. Shipped config.** `tests/core/boot/options/ShippedConfig.test.ts` (AC-10). Remove the
   raw pass-through of T3: `OptionSchema.none` now drops every key with a warning.
-- [ ] **T8. Manual and docs.** Paragraph in `docs/manual/getting-started.md`; the `ModuleContext`
+- [x] **T8. Manual and docs.** Paragraph in `docs/manual/getting-started.md`; the `ModuleContext`
   section of `docs/architecture.md`.
 - [ ] **T9. Version and checks.** Patch version change; `npm run release -- check --base origin/main
   --branch fix/module-options`; `make check`.

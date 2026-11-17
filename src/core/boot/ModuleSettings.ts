@@ -1,5 +1,5 @@
 import type { Logger } from '../support/Logger.js';
-import { OptionSchema } from './options/OptionSchema.js';
+import type { OptionSchema } from './options/OptionSchema.js';
 import type { ModuleOptions } from './types.js';
 
 export interface SchemaSource {
@@ -44,7 +44,7 @@ export class ModuleSettings {
       const raw = ModuleSettings.#sectionOf(entry);
       const moduleLogger = logger.child(id);
       ModuleSettings.#checkEnabled(raw, moduleLogger);
-      const checked = schema === OptionSchema.none ? ModuleSettings.#withoutEnabled(raw) : (schema.check(raw, moduleLogger) as Values | null);
+      const checked = schema.check(raw, moduleLogger) as Values | null;
       values.set(id, checked);
       all[id] = Object.freeze({ ...checked, enabled: raw['enabled'] === true && checked !== null });
     }
@@ -76,9 +76,5 @@ export class ModuleSettings {
     if (enabled !== undefined && typeof enabled !== 'boolean') {
       logger.warn(`"enabled" is ${String(JSON.stringify(enabled))}, not true or false: the module stays off`);
     }
-  }
-
-  static #withoutEnabled(raw: Values): Values {
-    return Object.freeze(Object.fromEntries(Object.entries(raw).filter(([name]) => name !== 'enabled')));
   }
 }
