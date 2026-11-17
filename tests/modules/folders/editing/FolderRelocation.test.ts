@@ -65,7 +65,7 @@ function setup(active: string | null = '7', entries = workspaces, rootOption = '
     tabData: TabDataWriter.of(tabs),
     names: { entries },
     active: { current: active },
-    roots: new WorkspaceRoots({ root: rootOption, workspaces: undefined }, silentLogger()),
+    roots: new WorkspaceRoots({ root: rootOption, workspaces: {}, workspacesBase: 'VivArcDi' }),
     openFolders: open,
     closing,
     notify: (text, kind): void => void toasts.push([text, kind]),

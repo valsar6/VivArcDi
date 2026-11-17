@@ -4,6 +4,8 @@ import type { MenuItem } from '../../core/dom/ContextMenu.js';
 import { LinkId } from '../../shared/links/LinkId.js';
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
+import { LIVE_FOLDERS_OPTIONS } from './LiveFoldersOptions.js';
+import type { LiveFoldersOptions } from './LiveFoldersOptions.js';
 import { SpaceMenuItems } from '../../shared/spaces/SpaceMenuItems.js';
 import { Toast } from '../../core/dom/Toast.js';
 import { VirtualFolders } from '../../shared/links/VirtualFolders.js';
@@ -22,8 +24,6 @@ import { defaultTicker, LiveFolderRefresher } from './LiveFolderRefresher.js';
 import { LiveFolderStore } from './LiveFolderStore.js';
 import { RepositoryEditor } from './RepositoryEditor.js';
 
-const DEFAULT_REFRESH_MINUTES = 5;
-const MIN_REFRESH_MINUTES = 1;
 const MS_PER_MINUTE = 60_000;
 const LIVE_FOLDERS_LABEL = 'Live Folders';
 const GITHUB_LABEL = 'GitHub';
@@ -49,8 +49,9 @@ interface Parts {
   toast: Toast;
 }
 
-export class LiveFolders extends Module {
+export class LiveFolders extends Module<LiveFoldersOptions> {
   public static override id = 'live-folders';
+  public static override options = LIVE_FOLDERS_OPTIONS;
 
   #stops: Array<() => void> = [];
   #stopped = true;
@@ -64,19 +65,16 @@ export class LiveFolders extends Module {
    * it is opened and when a filter changes. A folder that is not connected shows `Connect GitHub`,
    * which opens a panel with GitHub's sign-in code (the OAuth device flow, with the client id of
    * the `githubClientId` option); the token stays in the browser profile's storage. A right click
-   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs`, or
-   * without a client id for the sign-in, there is nothing to connect.
+   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs` there is
+   * nothing to connect; without `githubClientId` the module stays off.
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<LiveFoldersOptions>): Promise<void> {
     const { tabs, logger } = context;
     if (!tabs.available) {
       logger.warn('chrome.tabs is missing: the live folders are off');
       return;
-    }
-    if (LiveFolders.#clientId(context.options) === '') {
-      logger.warn('githubClientId is empty: the live folders cannot connect to GitHub');
     }
     this.#stopped = false;
     const parts = this.#build(context);
@@ -102,12 +100,12 @@ export class LiveFolders extends Module {
     this.#stops = [];
   }
 
-  #build({ document, selectors, tabs, storage, options, logger }: ModuleContext): Parts {
-    const clientId = LiveFolders.#clientId(options);
+  #build({ document, selectors, tabs, storage, options, logger }: ModuleContext<LiveFoldersOptions>): Parts {
+    const clientId = options.githubClientId;
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
     const connection = new GithubConnection({ storage, logger, send: sendWithFetch });
-    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: clientId !== '', connected: connection.connected }));
+    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: true, connected: connection.connected }));
     const parent = (): Element => document.querySelector(selectors.get('browser')) ?? document.body;
     const menu = new ContextMenu({ document, parent });
     const editor = new RepositoryEditor({ document, parent });
@@ -120,7 +118,7 @@ export class LiveFolders extends Module {
       connection,
       changed: (): void => (this.#stopped ? undefined : publisher.publish()),
       ticker: defaultTicker,
-      intervalMs: LiveFolders.#minutes(options['refreshMinutes']) * MS_PER_MINUTE,
+      intervalMs: options.refreshMinutes * MS_PER_MINUTE,
       logger,
     });
     const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS, notify: (text, kind): void => toast.show(text, kind) });
@@ -179,14 +177,5 @@ export class LiveFolders extends Module {
   static #opener(tabs: ModuleContext['tabs'], active: ActiveWorkspace, logger: ModuleContext['logger']): (url: string) => void {
     const workspaceTabs = new WorkspaceTabs(tabs, logger);
     return (url): void => void workspaceTabs.open(url, active.current).catch((error: unknown) => logger.warn('could not open the GitHub page', error));
-  }
-
-  static #minutes(value: unknown): number {
-    return typeof value === 'number' && Number.isFinite(value) ? Math.max(MIN_REFRESH_MINUTES, value) : DEFAULT_REFRESH_MINUTES;
-  }
-
-  static #clientId(options: Record<string, unknown>): string {
-    const value = options['githubClientId'];
-    return typeof value === 'string' ? value.trim() : '';
   }
 }

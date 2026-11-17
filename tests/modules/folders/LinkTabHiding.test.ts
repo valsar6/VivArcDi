@@ -8,6 +8,8 @@ import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { TabData } from '../../../src/core/tabs/TabData.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
+import { BOOKMARK_FOLDERS_OPTIONS } from '../../../src/modules/folders/BookmarkFoldersOptions.js';
+import type { BookmarkFoldersOptions } from '../../../src/modules/folders/BookmarkFoldersOptions.js';
 import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
 import { ActivityStamps } from '../../../src/modules/today/ActivityStamps.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
@@ -51,13 +53,13 @@ function running(tabs: RacingFolderTabs): Running {
     document: asDocument(dom),
     selectors: new SelectorCatalog({ tabListHost: '.list', browser: '#browser', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
     logger: silentLogger(),
-    options: { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 },
+    options: { ...BOOKMARK_FOLDERS_OPTIONS.defaults, root: 'Importati da Firefox/Bookmarks Bar' },
     tabs,
     bookmarks: new FakeBookmarks(TREE),
     bookmarkWriter: new BookmarkWriter(undefined),
     prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<BookmarkFoldersOptions>;
   const module = new BookmarkFolders();
   const stamps = new ActivityStamps(tabs, () => 42, silentLogger());
   return {

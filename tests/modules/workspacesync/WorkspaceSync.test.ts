@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createDefaultRegistry } from '../../../src/modules/index.js';
 import { WorkspaceSync } from '../../../src/modules/workspacesync/WorkspaceSync.js';
+import { WORKSPACE_SYNC_OPTIONS } from '../../../src/modules/workspacesync/WorkspaceSyncOptions.js';
 import { WorkspaceSettings } from '../../../src/modules/workspacesync/WorkspaceSettings.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import { WritableChrome, bookmarkTree } from '../folders/fakes.js';
@@ -152,9 +153,9 @@ test('does nothing when disabled', async () => {
   assert.deepEqual(registry.createEnabled({ 'workspace-sync': shipped }, true).modules, []);
   assert.equal(registry.createEnabled({ 'workspace-sync': shipped }).modules.length, 1);
   assert.equal(shipped.enabled, true);
-  assert.equal(shipped.folder, WorkspaceSync.defaults.folder);
+  assert.equal(shipped.folder, WORKSPACE_SYNC_OPTIONS.defaults.folder);
   assert.equal(shipped.renameFromOtherComputers, true);
-  assert.equal(WorkspaceSync.defaults.renameFromOtherComputers, true);
+  assert.equal(WORKSPACE_SYNC_OPTIONS.defaults.renameFromOtherComputers, true);
 });
 
 const entry = (syncId: string, name: string, icon: string | null = null): SpaceEntry => ({ syncId, name, icon, iconId: null });

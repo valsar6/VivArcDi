@@ -1,16 +1,13 @@
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
+import { BOOKMARK_FOLDERS_OPTIONS } from './BookmarkFoldersOptions.js';
+import type { BookmarkFoldersOptions } from './BookmarkFoldersOptions.js';
 import { FolderSection } from './FolderSection.js';
 import { WorkspaceRoots } from './tree/WorkspaceRoots.js';
 
-const DEFAULT_MAX_DEPTH = 3;
-const DEFAULT_MAX_HEIGHT_PERCENT = 60;
-const MAX_DEPTH_LIMIT = 10;
-const MIN_PERCENT = 20;
-const MAX_PERCENT = 100;
-
-export class BookmarkFolders extends Module {
+export class BookmarkFolders extends Module<BookmarkFoldersOptions> {
   public static override id = 'bookmark-folders';
+  public static override options = BOOKMARK_FOLDERS_OPTIONS;
 
   #section: FolderSection | null = null;
 
@@ -24,16 +21,16 @@ export class BookmarkFolders extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<BookmarkFoldersOptions>): Promise<void> {
     const { tabs, bookmarks, logger, options } = context;
     if (!bookmarks.available || !tabs.available) {
       logger.warn('chrome.bookmarks or chrome.tabs is missing: the bookmark folders are off');
       return;
     }
     this.#section = new FolderSection(context, {
-      roots: new WorkspaceRoots({ root: options['root'], workspaces: options['workspaces'], workspacesBase: options['workspacesBase'] }, logger),
-      maxDepth: BookmarkFolders.#number(options['maxDepth'], DEFAULT_MAX_DEPTH, 1, MAX_DEPTH_LIMIT),
-      maxHeightPercent: BookmarkFolders.#number(options['maxHeightPercent'], DEFAULT_MAX_HEIGHT_PERCENT, MIN_PERCENT, MAX_PERCENT),
+      roots: new WorkspaceRoots(options),
+      maxDepth: options.maxDepth,
+      maxHeightPercent: options.maxHeightPercent,
     });
     try {
       await this.#section.start();
@@ -49,9 +46,5 @@ export class BookmarkFolders extends Module {
   public override stop(): void {
     this.#section?.stop();
     this.#section = null;
-  }
-
-  static #number(value: unknown, fallback: number, min: number, max: number): number {
-    return typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   }
 }

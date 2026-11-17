@@ -92,7 +92,7 @@ test('folders keeps only the module and the section at its top level', () => {
     .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
     .map((entry) => entry.name)
     .sort();
-  assert.deepEqual(top, ['BookmarkFolders.ts', 'FolderSection.ts']);
+  assert.deepEqual(top, ['BookmarkFolders.ts', 'BookmarkFoldersOptions.ts', 'FolderSection.ts']);
 });
 
 test('core imports only core', () => {
