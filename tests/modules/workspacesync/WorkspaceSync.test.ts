@@ -8,6 +8,8 @@ import { WorkspaceSettings } from '../../../src/modules/workspacesync/WorkspaceS
 import { Logger } from '../../../src/core/support/Logger.js';
 import { WritableChrome, bookmarkTree } from '../folders/fakes.js';
 import { CountingSink, FOLDER, page, listIn, pinnedIn, pinnedTab, world } from './fakes.js';
+import { own } from '../favorites/linked.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
 import type { SpaceEntry } from '../../../src/modules/workspacesync/SpaceEntry.js';
 import { SyncStore } from '../../../src/modules/workspacesync/SyncStore.js';
 
@@ -327,4 +329,155 @@ test('names a workspace missing here once', async () => {
   assert.equal(announced.length, 1);
   assert.equal(ids.syncIdOf('8'), 's-x');
   assert.equal(tabs.tabCalls().filter(([name]) => name === 'create').length, 2);
+});
+
+const inWorkspace = (id: number, name: string, workspaceId: number): ReturnType<typeof pinnedTab> => pinnedTab(id, name, { vivExtData: own({ workspaceId }, undefined, page(name)) });
+
+const outside = (id: number, name: string): ReturnType<typeof pinnedTab> => pinnedTab(id, name, { vivExtData: own({}, undefined, page(name)) });
+
+const warningsAbout = (sink: CountingSink, pattern: RegExp): number => sink.warnings.filter((message) => pattern.test(message.map(String).join(' '))).length;
+
+const findFolder = (nodes: BookmarkNode[], title: string): BookmarkNode | undefined =>
+  nodes.flatMap((node) => (node.title === title && node.children !== undefined ? [node] : (findFolder(node.children ?? [], title) ?? []))).at(0);
+
+const folderAt = (nodes: BookmarkNode[], [first, ...rest]: string[]): BookmarkNode | undefined =>
+  rest.reduce<BookmarkNode | undefined>((node, title) => node?.children?.find((child) => child.title === title && child.children !== undefined), findFolder(nodes, first ?? ''));
+
+const removeNode = (nodes: BookmarkNode[], target: BookmarkNode): void => {
+  const index = nodes.indexOf(target);
+  if (index >= 0) {
+    nodes.splice(index, 1);
+  } else {
+    nodes.forEach((node) => removeNode(node.children ?? [], target));
+  }
+};
+
+const dropFolder = (nodes: BookmarkNode[], path: string[]): void => {
+  const target = folderAt(nodes, path);
+  if (target !== undefined) {
+    removeNode(nodes, target);
+  }
+};
+
+test('skips a workspace with a reserved name', async () => {
+  const { pass, chrome, tabs, sink, storage } = world({
+    tabs: [pinnedTab(1, 'mail'), inWorkspace(2, 'docs', 8)],
+    workspaces: { '7': 'Casetta', '8': 'spaces' },
+    store: { Casetta: ['mail'] },
+    base: { Casetta: ['mail'] },
+  });
+  const listBase = storage.getItem('vivarcdi.sync.base.spaces');
+  await pass.run();
+  await pass.run();
+  assert.deepEqual(tabs.tabCalls(), []);
+  assert.deepEqual(pinnedIn(chrome, 'spaces'), []);
+  assert.equal(storage.getItem('vivarcdi.sync.base.spaces'), listBase);
+  assert.equal(warningsAbout(sink, /"spaces"/), 1);
+  const settingsChrome = new WritableChrome(bookmarkTree([]));
+  const store = new SyncStore(settingsChrome.reader, settingsChrome.writer, FOLDER);
+  await store.writeSettings('Tabs', JSON.stringify({ themeColor: '#336699' }));
+  const settings = new WorkspaceSettings(store, new Logger('test', sink));
+  const writes = settingsChrome.calls.length;
+  assert.equal(await settings.get('Tabs', 'themeColor'), undefined);
+  await settings.set('Tabs', 'themeColor', '#000000');
+  assert.deepEqual(writesOf(settingsChrome.calls.slice(writes)), []);
+});
+
+test('keeps the pinned tabs of a workspace with a reserved name', async () => {
+  const { pass, tabs } = world({
+    tabs: [inWorkspace(1, 'mail', 8), inWorkspace(2, 'docs', 8)],
+    workspaces: { '7': 'Casetta', '8': 'Spaces' },
+    base: { Spaces: ['mail', 'docs'] },
+  });
+  await pass.run();
+  await pass.run();
+  assert.deepEqual(tabs.tabCalls(), []);
+});
+
+test('writes only workspace entries into the workspace list', async () => {
+  const { pass, chrome } = world({ tabs: [inWorkspace(1, 'mail', 8)], workspaces: { '7': 'Casetta', '8': 'Spaces' } });
+  folderAt(chrome.tree, [FOLDER, 'Spaces'])?.children?.push({ id: '99', title: 'Pinned', children: [{ id: '98', title: 'mail', url: page('mail') }] });
+  await pass.run();
+  await pass.run();
+  const list = folderAt(chrome.tree, [FOLDER, 'Spaces'])?.children ?? [];
+  assert.deepEqual(list.map(({ title }) => title), ['Casetta', 'Spaces']);
+  assert.ok(list.every((node) => node.children === undefined));
+});
+
+test('keeps the area outside workspaces apart from a workspace named Tabs', async () => {
+  const { pass, chrome, tabs, base } = world({ tabs: [outside(1, 'news'), inWorkspace(2, 'docs', 8)], workspaces: { '7': 'Casetta', '8': 'Tabs' } });
+  await pass.run();
+  await pass.run();
+  assert.deepEqual(pinnedIn(chrome, 'Tabs'), ['news']);
+  assert.deepEqual(base.get(null), ['news.example']);
+  assert.deepEqual(tabs.tabCalls(), []);
+});
+
+test('lists a workspace with a reserved name', async () => {
+  const { pass, chrome } = world({ workspaces: { '7': 'Casetta', '8': 'Spaces', '9': 'Tabs' }, spaces: [entry('s-7', 'Casetta')], spaceBase: [entry('s-7', 'Casetta')], links: { '7': 's-7' } });
+  await pass.run();
+  assert.deepEqual(listIn(chrome).map(({ name }) => name), ['Casetta', 'Spaces', 'Tabs']);
+});
+
+test('syncs a workspace once its reserved name changes', async () => {
+  const { pass, chrome, names, tabs } = world({ tabs: [inWorkspace(1, 'docs', 8)], workspaces: { '7': 'Casetta', '8': 'Spaces' } });
+  await pass.run();
+  names.workspaces = { '7': 'Casetta', '8': 'Work' };
+  await pass.run();
+  assert.deepEqual(pinnedIn(chrome, 'Work'), ['docs']);
+  assert.deepEqual(listIn(chrome).map(({ name }) => name), ['Casetta', 'Work']);
+  assert.ok(folderAt(chrome.tree, [FOLDER, 'Spaces']) !== undefined);
+  assert.deepEqual(tabs.tabCalls(), []);
+});
+
+test('rewrites a missing workspace store from this computer', async () => {
+  const folderGone = world({ tabs: [pinnedTab(1, 'mail'), pinnedTab(2, 'docs')], base: { Casetta: ['mail', 'docs'] } });
+  await folderGone.pass.run();
+  assert.deepEqual(folderGone.tabs.tabCalls(), []);
+  assert.deepEqual(pinnedIn(folderGone.chrome, 'Casetta'), ['mail', 'docs']);
+  const pinnedGone = world({ tabs: [pinnedTab(1, 'mail'), pinnedTab(2, 'docs')], store: { Casetta: ['mail', 'docs'] }, base: { Casetta: ['mail', 'docs'] } });
+  dropFolder(pinnedGone.chrome.tree, [FOLDER, 'Casetta', 'Pinned']);
+  await pinnedGone.pass.run();
+  assert.deepEqual(pinnedGone.tabs.tabCalls(), []);
+  assert.deepEqual(pinnedIn(pinnedGone.chrome, 'Casetta'), ['mail', 'docs']);
+});
+
+test('rewrites a missing sync folder from this computer', async () => {
+  const { pass, chrome, tabs } = world({ tabs: [pinnedTab(1, 'mail'), outside(2, 'news')], spaces: [], base: { Casetta: ['mail'], Tabs: ['news'] } });
+  assert.equal(folderAt(chrome.tree, [FOLDER]), undefined);
+  await pass.run();
+  assert.deepEqual(tabs.tabCalls(), []);
+  assert.deepEqual(pinnedIn(chrome, 'Casetta'), ['mail']);
+  assert.deepEqual(pinnedIn(chrome, 'Tabs'), ['news']);
+  assert.deepEqual(listIn(chrome).map(({ name }) => name), ['Casetta']);
+});
+
+test('rewrites a missing workspace list from this computer', async () => {
+  const { pass, chrome, ids, creator } = world({ store: { Casetta: [] }, workspaces: { '7': 'Casetta', '8': 'Work' } });
+  dropFolder(chrome.tree, [FOLDER, 'Spaces']);
+  await pass.run();
+  assert.deepEqual(listIn(chrome).map(({ syncId, name }) => [syncId, name]), [['s-7', 'Casetta'], ['s-8', 'Work']]);
+  assert.equal(ids.syncIdOf('8'), 's-8');
+  assert.deepEqual(creator.calls, []);
+});
+
+test('warns once when the store went missing', async () => {
+  const { pass, chrome, sink } = world({ tabs: [pinnedTab(1, 'mail')], spaces: [], base: { Casetta: ['mail'] } });
+  await pass.run();
+  await pass.run();
+  dropFolder(chrome.tree, [FOLDER]);
+  await pass.run();
+  assert.equal(warningsAbout(sink, /sync store of "Casetta" was missing/), 1);
+  assert.equal(warningsAbout(sink, /workspace list of the sync store was missing/), 1);
+  assert.equal(sink.warnings.length, 2);
+});
+
+test('still closes a tab whose entry was removed by hand', async () => {
+  const one = world({ tabs: [pinnedTab(1, 'mail'), pinnedTab(2, 'docs')], store: { Casetta: ['mail'] }, base: { Casetta: ['mail', 'docs'] } });
+  await one.pass.run();
+  assert.deepEqual(one.tabs.tabCalls(), [['remove', 2]]);
+  const all = world({ tabs: [pinnedTab(1, 'mail')], store: { Casetta: [] }, base: { Casetta: ['mail'] } });
+  await all.pass.run();
+  assert.deepEqual(all.tabs.tabCalls(), [['remove', 1]]);
+  assert.equal(all.sink.warnings.length, 0);
 });

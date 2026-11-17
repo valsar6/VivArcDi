@@ -10,7 +10,8 @@ export class WorkspaceSettings {
   /**
    * The settings a workspace owns in VivArcDi, kept in the sync store so they follow the workspace
    * to the other computers. Each key holds one JSON value, and the last write of a key wins. The
-   * specs that use a setting own its key, such as the theme color of 019.
+   * specs that use a setting own its key, such as the theme color of 019. A workspace whose name
+   * the store uses for itself has no settings here: nothing is read or written for it.
    *
    * @param store The sync store.
    * @param logger Logger for settings that cannot be read.
@@ -35,6 +36,9 @@ export class WorkspaceSettings {
    * @param value A JSON value; the store is written only when it differs from the stored one.
    */
   public async set(workspaceName: string | null, key: string, value: unknown): Promise<void> {
+    if (workspaceName !== null && SyncNames.reserved(workspaceName)) {
+      return;
+    }
     const settings = await this.#all(workspaceName);
     if (JSON.stringify(settings[key]) !== JSON.stringify(value)) {
       await this.#store.writeSettings(workspaceName, JSON.stringify({ ...settings, [key]: value }));
@@ -42,6 +46,9 @@ export class WorkspaceSettings {
   }
 
   async #all(workspaceName: string | null): Promise<Record<string, unknown>> {
+    if (workspaceName !== null && SyncNames.reserved(workspaceName)) {
+      return {};
+    }
     const text = (await this.#store.spaces()).get(SyncNames.folderOf(workspaceName))?.settings ?? null;
     if (text === null) {
       return {};

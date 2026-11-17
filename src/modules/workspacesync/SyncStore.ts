@@ -14,8 +14,8 @@ export interface PinnedEntry {
 }
 
 export interface StoredSpace {
-  /** The pinned tabs of the workspace, in the order of the store. */
-  pinned: PinnedEntry[];
+  /** The pinned tabs of the workspace, in the order of the store; null when the folder `Pinned` is missing. */
+  pinned: PinnedEntry[] | null;
   /** The text of the `Settings` bookmark, or null when the workspace has none. */
   settings: string | null;
 }
@@ -121,7 +121,7 @@ export class SyncStore {
   }
 
   static #space(pinned: BookmarkNode | undefined, settings: BookmarkNode | undefined): StoredSpace {
-    return { pinned: SyncStore.#entriesOf(pinned?.children ?? []), settings: settings?.description ?? null };
+    return { pinned: pinned === undefined ? null : SyncStore.#entriesOf(pinned.children ?? []), settings: settings?.description ?? null };
   }
 
   static #entriesOf(nodes: BookmarkNode[]): PinnedEntry[] {

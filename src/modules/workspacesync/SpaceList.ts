@@ -27,11 +27,11 @@ export class SpaceList {
   }
 
   /**
-   * @returns The workspaces of the store, in order; empty when the list does not exist yet.
+   * @returns The workspaces of the store, in order; null when the list folder does not exist.
    */
-  public async read(): Promise<SpaceEntry[]> {
+  public async read(): Promise<SpaceEntry[] | null> {
     const folder = BookmarkFolderFinder.find(await this.#reader.getTree(), [this.#folder, SPACES]);
-    return (folder?.children ?? []).flatMap((node) => SpaceList.#entryOf(node) ?? []);
+    return folder === null ? null : (folder.children ?? []).flatMap((node) => SpaceList.#entryOf(node) ?? []);
   }
 
   /**
