@@ -39,8 +39,8 @@ class LiveFolders extends Module {
    * it is opened and when a filter changes. A folder that is not connected shows `Connect GitHub`,
    * which opens a panel with GitHub's sign-in code (the OAuth device flow, with the client id of
    * the `githubClientId` option); the token stays in the browser profile's storage. A right click
-   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs` there is
-   * nothing to connect; without `githubClientId` the module stays off.
+   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs`, or
+   * without a client id for the sign-in, there is nothing to connect.
    *
    * @param context What the module may use.
    */
@@ -49,6 +49,9 @@ class LiveFolders extends Module {
     if (!tabs.available) {
       logger.warn("chrome.tabs is missing: the live folders are off");
       return;
+    }
+    if (context.options.githubClientId === "") {
+      logger.warn("githubClientId is empty: the live folders cannot connect to GitHub");
     }
     this.#stopped = false;
     const parts = this.#build(context);
@@ -77,7 +80,7 @@ class LiveFolders extends Module {
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
     const connection = new GithubConnection({ storage, logger, send: sendWithFetch });
-    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: true, connected: connection.connected }));
+    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: clientId !== "", connected: connection.connected }));
     const parent = () => document.querySelector(selectors.get("browser")) ?? document.body;
     const menu = new ContextMenu({ document, parent });
     const editor = new RepositoryEditor({ document, parent });
