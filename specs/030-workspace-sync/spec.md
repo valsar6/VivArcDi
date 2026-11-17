@@ -6,6 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-10, revision 2026-11-12 |
+| Amended by | [043 Sync robustness](../043-sync-robustness/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -238,3 +239,4 @@ Q-1 again. Tore approved it on 2026-11-12 with the proposed answers to Q-7 to Q-
 - [003 Favorites and pinned tabs](../003-pinned-tabs-and-folders/spec.md), own page.
 - [010 Folders per workspace](../010-folders-per-workspace/spec.md), match by workspace name.
 - [019 Space theme color](../019-space-theme-color/spec.md), the setting to sync.
+- [043 Sync robustness](../043-sync-robustness/spec.md): reserved workspace names and a missing store.

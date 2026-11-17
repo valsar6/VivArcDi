@@ -163,7 +163,7 @@ Approved with the spec revision. It replaces step 6 (missing workspaces).
 | Vivaldi Sync never carries the bookmarks between Tore's two computers | Nothing breaks; the manual checks AC-12 to AC-15 show it |
 | Two computers pin the same page in the same workspace before syncing | Same address key, merged into one entry |
 | A pinned tab without a web address (`vivaldi://`, `file://`) | No address key: left out of the store, logged once |
-| The user edits the store by hand | Treated like a change from another computer; malformed `Settings` JSON is ignored and logged once |
+| The user edits the store by hand | Treated like a change from another computer; malformed `Settings` JSON is ignored and logged once. A missing folder is rebuilt from this computer instead ([043](../043-sync-robustness/spec.md) FR-5, FR-6, FR-8) |
 | Many pinned tabs open at once on a new computer | Opened unloaded, one at a time through `SerialTask` |
 | The owner window is closed during a run | The run finishes; the next window becomes owner and its first run repairs any gap |
 | A workspace renamed on one computer | Followed through the sync id (revision step 3) |
