@@ -4,8 +4,10 @@ import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
 import type { RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import type { PeekOptions } from '../../../src/modules/peek/PeekOptions.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { OPEN_ATTRIBUTE, Peek } from '../../../src/modules/peek/Peek.js';
+import { PEEK_OPTIONS } from '../../../src/modules/peek/PeekOptions.js';
 import { PEEK_MESSAGE_TYPE } from '../../../src/modules/peek/PeekMessage.js';
 import { FakeLoader, SilentSink } from '../../loader/fakes.js';
 import { FakeTabs } from '../favorites/fakes.js';
@@ -48,7 +50,7 @@ const selectors = new SelectorCatalog(
 const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
 function setUp(tab: { pinned?: boolean; vivExtData?: string } = { pinned: true }): {
-  context: ModuleContext;
+  context: ModuleContext<PeekOptions>;
   document: FakeDocument;
   container: FakeElement;
   webview: FakeElement;
@@ -65,12 +67,12 @@ function setUp(tab: { pinned?: boolean; vivExtData?: string } = { pinned: true }
     document,
     selectors,
     logger: new Logger('test', new SilentSink()),
-    options: {},
+    options: PEEK_OPTIONS.defaults,
     tabs,
     runtime: new BrowserRuntime({ runtime: { onMessage: messages } }),
     payload: new FakeLoader({ 'page/peek-links.js': 'LINKS', 'page/peek-keys.js': 'KEYS' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<PeekOptions>;
   return { context, document, container, webview, messages, tabs };
 }
 
@@ -199,19 +201,19 @@ test('peek module cleans up on stop', async () => {
 
 test('peek module stays off without chrome.tabs', async () => {
   const { context, webview } = setUp();
-  await new Peek().start({ ...context, tabs: { available: false } } as unknown as ModuleContext);
+  await new Peek().start({ ...context, tabs: { available: false } } as unknown as ModuleContext<PeekOptions>);
   assert.deepEqual(webview.executed, []);
 });
 
 test('peek settings keep sizes between 40 and 100 percent', () => {
-  const settings = Peek.settingsFrom({ widthPercent: 10, heightPercent: 300, anyCrossSite: true });
+  const settings = PEEK_OPTIONS.check({ widthPercent: 10, heightPercent: 300, anyCrossSite: true }, { warn: (): void => undefined });
   assert.deepEqual(settings, {
     shiftClick: true,
     pinnedCrossSite: true,
     anyCrossSite: true,
     pinnedNewTab: true,
     anyNewTab: false,
-    widthPercent: 40,
-    heightPercent: 100,
+    widthPercent: 90,
+    heightPercent: 94,
   });
 });

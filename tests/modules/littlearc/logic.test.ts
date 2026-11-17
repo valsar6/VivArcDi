@@ -9,7 +9,7 @@ import type { Scheduler } from '../../../src/modules/littlearc/IdleTimer.js';
 import { commandFor } from '../../../src/modules/littlearc/LittleArcKeyMap.js';
 import { adoptMessage, parseAdoptMessage } from '../../../src/modules/littlearc/LittleArcMessage.js';
 import { LittleArcRegistry } from '../../../src/modules/littlearc/LittleArcRegistry.js';
-import { LITTLE_ARC_DEFAULTS, settingsFrom } from '../../../src/modules/littlearc/LittleArcSettings.js';
+import { LITTLE_ARC_OPTIONS } from '../../../src/modules/littlearc/LittleArcOptions.js';
 import { WindowBounds } from '../../../src/modules/littlearc/WindowBounds.js';
 
 test('address resolver tells URLs from searches', () => {
@@ -162,10 +162,11 @@ test('registry remembers the marked windows and forgets the oldest', () => {
   assert.equal(registry.has(1), false);
 });
 
-test('settings are read with defaults and clamped sizes', () => {
-  assert.deepEqual(settingsFrom({}), LITTLE_ARC_DEFAULTS);
-  const custom = settingsFrom({ externalLinks: false, askWorkspace: true, idleCloseHours: -3, widthPercent: 5, heightPercent: 500 });
-  assert.deepEqual(custom, { commandBar: true, externalLinks: false, askWorkspace: true, idleCloseHours: 0, widthPercent: 20, heightPercent: 100 });
+test('settings are read with defaults and sizes in range', () => {
+  const warnings = { warn: (): void => undefined };
+  assert.deepEqual(LITTLE_ARC_OPTIONS.check({}, warnings), LITTLE_ARC_OPTIONS.defaults);
+  const custom = LITTLE_ARC_OPTIONS.check({ externalLinks: false, askWorkspace: true, idleCloseHours: -3, widthPercent: 5, heightPercent: 500 }, warnings);
+  assert.deepEqual(custom, { commandBar: true, externalLinks: false, askWorkspace: true, idleCloseHours: 6, widthPercent: 34, heightPercent: 60 });
 });
 
 test('window bounds centre a share of the screen', () => {

@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { LITTLE_ARC_OPTIONS } from '../../../src/modules/littlearc/LittleArcOptions.js';
 import assert from 'node:assert/strict';
 import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
 import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
@@ -8,6 +9,7 @@ import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
 import type { WindowDetails } from '../../../src/core/browser/BrowserWindows.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import type { LittleArcOptions } from '../../../src/modules/littlearc/LittleArcOptions.js';
 import { ShortcutKeys } from '../../../src/core/dom/ShortcutKeys.js';
 import { WindowKeys } from '../../../src/core/dom/WindowKeys.js';
 import { ExternalLinkWatcher } from '../../../src/modules/littlearc/ExternalLinkWatcher.js';
@@ -137,7 +139,7 @@ test('workspace adopter leaves the workspace alone when none is known', async ()
 
 class Events<ListenerType> extends FakeEvent<ListenerType> {}
 
-function contextOf(options: Record<string, unknown>, type: string): { context: ModuleContext; document: FakeDocument; created: Events<(tab: chrome.tabs.Tab) => void>; focus: Events<(id: number) => void>; messages: Events<RuntimeMessageListener> } {
+function contextOf(options: Record<string, unknown>, type: string): { context: ModuleContext<LittleArcOptions>; document: FakeDocument; created: Events<(tab: chrome.tabs.Tab) => void>; focus: Events<(id: number) => void>; messages: Events<RuntimeMessageListener> } {
   const created = new Events<(tab: chrome.tabs.Tab) => void>();
   const focus = new Events<(id: number) => void>();
   const messages = new Events<RuntimeMessageListener>();
@@ -160,7 +162,7 @@ function contextOf(options: Record<string, unknown>, type: string): { context: M
   const context = {
     document,
     logger,
-    options,
+    options: { ...LITTLE_ARC_OPTIONS.defaults, ...options },
     tabs,
     windows: new BrowserWindows(chromeApi),
     search: new BrowserSearch(chromeApi),
@@ -168,7 +170,7 @@ function contextOf(options: Record<string, unknown>, type: string): { context: M
     prefs: new BrowserPrefs(undefined),
     selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<LittleArcOptions>;
   return { context, document, created, focus, messages };
 }
 

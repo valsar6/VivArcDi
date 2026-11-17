@@ -9,6 +9,8 @@ import type { LinkRequest } from './LinkOpener.js';
 import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
 import { PageScripts } from './PageScripts.js';
 import { PeekController } from './PeekController.js';
+import { PEEK_OPTIONS } from './PeekOptions.js';
+import type { PeekOptions } from './PeekOptions.js';
 import { PeekKeys } from './PeekKeys.js';
 import { parsePeekMessage } from './PeekMessage.js';
 import { PeekPanel } from './PeekPanel.js';
@@ -18,28 +20,13 @@ import { TAB_ID_ATTRIBUTE } from '../../core/browser/Webview.js';
 
 export const OPEN_ATTRIBUTE = 'data-vivarcdi-peek';
 
-export interface PeekSettings extends PeekTriggers, PanelSize {}
-
-const MIN_PERCENT = 40;
-const MAX_PERCENT = 100;
 const WEB_URL = /^https?:\/\//i;
 
-export class Peek extends Module {
+export class Peek extends Module<PeekOptions> {
   public static override id = 'peek';
   public static override privateWindows: PrivateWindowPolicy = 'allowed';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<PeekSettings> = Object.freeze({
-    shiftClick: true,
-    pinnedCrossSite: true,
-    anyCrossSite: false,
-    pinnedNewTab: true,
-    anyNewTab: false,
-    widthPercent: 90,
-    heightPercent: 94,
-  });
+  public static override options = PEEK_OPTIONS;
 
   #token = '';
   #container: HTMLElement | null = null;
@@ -57,12 +44,12 @@ export class Peek extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<PeekOptions>): Promise<void> {
     if (!context.tabs.available) {
       context.logger.warn('chrome.tabs is missing: Peek is off');
       return;
     }
-    const settings = Peek.settingsFrom(context.options);
+    const settings = context.options;
     const container = DomQuery.require(context.document, context.selectors.get('webviewContainer'));
     const scripts = await PageScripts.load(context.payload);
     this.#token = crypto.randomUUID();
@@ -91,27 +78,7 @@ export class Peek extends Module {
     this.#controller = null;
   }
 
-  /**
-   * Reads the options of `config.json`, keeping sizes within 40 to 100 percent.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  public static settingsFrom(options: Record<string, unknown>): PeekSettings {
-    const settings = { ...Peek.defaults, ...options };
-    const clamp = (value: number): number => Math.min(MAX_PERCENT, Math.max(MIN_PERCENT, Number(value) || MAX_PERCENT));
-    return {
-      shiftClick: settings.shiftClick === true,
-      pinnedCrossSite: settings.pinnedCrossSite === true,
-      anyCrossSite: settings.anyCrossSite === true,
-      pinnedNewTab: settings.pinnedNewTab === true,
-      anyNewTab: settings.anyNewTab === true,
-      widthPercent: clamp(settings.widthPercent),
-      heightPercent: clamp(settings.heightPercent),
-    };
-  }
-
-  #createController({ document, tabs, runtime, logger }: ModuleContext, size: PanelSize, scripts: PageScripts): PeekController {
+  #createController({ document, tabs, runtime, logger }: ModuleContext<PeekOptions>, size: PanelSize, scripts: PageScripts): PeekController {
     const container = this.#container as HTMLElement;
     return new PeekController({
       createPanel: (request: LinkRequest) =>
@@ -132,7 +99,7 @@ export class Peek extends Module {
     });
   }
 
-  #createInjector({ selectors, tabs, logger }: ModuleContext, triggers: PeekTriggers, scripts: PageScripts): PageScriptInjector {
+  #createInjector({ selectors, tabs, logger }: ModuleContext<PeekOptions>, triggers: PeekTriggers, scripts: PageScripts): PageScriptInjector {
     const { shiftClick, pinnedCrossSite, anyCrossSite, pinnedNewTab, anyNewTab } = triggers;
     return new PageScriptInjector({
       container: this.#container as HTMLElement,
@@ -151,7 +118,7 @@ export class Peek extends Module {
     });
   }
 
-  #subscribe({ tabs, runtime, logger }: ModuleContext): void {
+  #subscribe({ tabs, runtime, logger }: ModuleContext<PeekOptions>): void {
     if (runtime.messagesAvailable) {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message, null)));
     }

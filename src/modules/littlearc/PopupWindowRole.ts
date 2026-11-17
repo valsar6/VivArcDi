@@ -8,7 +8,7 @@ import { commandFor } from './LittleArcKeyMap.js';
 import type { LittleArcCommand } from './LittleArcKeyMap.js';
 import { adoptMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
-import type { LittleArcSettings } from './LittleArcSettings.js';
+import type { LittleArcOptions } from './LittleArcOptions.js';
 import { PopupChrome } from './PopupChrome.js';
 
 const REGISTRY_ATTEMPTS = 30;
@@ -18,7 +18,7 @@ const ACTIVITY_EVENTS = ['keydown', 'pointerdown', 'pointermove', 'wheel'];
 
 export class PopupWindowRole {
   #context: ModuleContext;
-  #settings: LittleArcSettings;
+  #settings: LittleArcOptions;
   #registry: LittleArcRegistry;
   #windowId: number;
   #cleanups: Array<() => void> = [];
@@ -32,7 +32,7 @@ export class PopupWindowRole {
    * @param registry Remembers which windows are Little Arc windows.
    * @param windowId The id of this window.
    */
-  constructor(context: ModuleContext, settings: LittleArcSettings, registry: LittleArcRegistry, windowId: number) {
+  constructor(context: ModuleContext<LittleArcOptions>, settings: LittleArcOptions, registry: LittleArcRegistry, windowId: number) {
     this.#context = context;
     this.#settings = settings;
     this.#registry = registry;
