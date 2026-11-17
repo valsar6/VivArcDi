@@ -59,6 +59,12 @@ the [README](../../README.md#install).
 Each feature is a module in `config.json` with an `enabled` option. Set it to `false` and run the
 install again. The options of every module are in the [README](../../README.md#configuration).
 
+A value that a module does not accept (a word where a number goes, a size out of its range, a name
+that is not among the choices) is replaced by the module's default, so a mistake never breaks the
+interface. The reason is in the console: open `vivaldi://inspect/#apps`, inspect `window.html`, and
+look for lines like `option "widthPercent" is 500, not a number from 40 to 100: using 90`. A module
+starts only when `enabled` is exactly `true`.
+
 ## Uninstall
 
 - **macOS:** click **Uninstall** in the VivArcDi window, restart Vivaldi, then delete VivArcDi from

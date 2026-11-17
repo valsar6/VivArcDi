@@ -2,17 +2,12 @@ import { Module } from "../../core/boot/Module.js";
 import { PinnedClosing } from "./PinnedClosing.js";
 import { PinnedMarking } from "./PinnedMarking.js";
 import { PinWatcher } from "./PinWatcher.js";
+import { PINNED_TABS_OPTIONS } from "./PinnedTabsOptions.js";
 import { ResetClick } from "./ResetClick.js";
 import { SavedAddresses } from "./SavedAddresses.js";
 class PinnedTabs extends Module {
   static id = "pinned-tabs";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({
-    resetButton: true,
-    unloadOnClose: true
-  });
+  static options = PINNED_TABS_OPTIONS;
   #watcher = null;
   #marking = null;
   #reset = null;
@@ -29,16 +24,15 @@ class PinnedTabs extends Module {
       logger.warn("chrome.tabs is missing: pinned tabs are left to Vivaldi");
       return;
     }
-    const settings = { ...PinnedTabs.defaults, ...options };
     const addresses = new SavedAddresses(tabs);
     this.#watcher = new PinWatcher(tabs, addresses, logger);
     this.#marking = new PinnedMarking(context);
     await this.#watcher.start();
     await this.#marking.start();
-    if (settings.resetButton) {
+    if (options.resetButton) {
       this.#startReset(context, addresses);
     }
-    if (settings.unloadOnClose) {
+    if (options.unloadOnClose) {
       this.#closing = new PinnedClosing(context);
       await this.#closing.start();
     }

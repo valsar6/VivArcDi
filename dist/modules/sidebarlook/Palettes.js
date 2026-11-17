@@ -32,6 +32,10 @@ class Palettes {
     { name: "lagoon", space: "#8ec5cf", pill: "#e4f1f4", ink: "#0c2126" }
   ]);
   /**
+   * The names of the palettes, in the order of `all`.
+   */
+  static names = Palettes.all.map((palette) => palette.name);
+  /**
    * Name of the palette a workspace without a color of its own uses.
    */
   static defaultName = "arclight";

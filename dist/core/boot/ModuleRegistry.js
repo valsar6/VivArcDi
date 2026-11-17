@@ -31,7 +31,14 @@ class ModuleRegistry {
     return this.#classes.has(id);
   }
   /**
-   * Creates an instance of every module that `config.json` enables.
+   * @param id Module id.
+   * @returns The option schema of the module registered under that id, if any.
+   */
+  schemaOf(id) {
+    return this.#classes.get(id)?.options;
+  }
+  /**
+   * Creates an instance of every module whose `enabled` is `true` in `config.json`.
    *
    * Modules whose `privateWindows` policy does not fit the kind of window are left out.
    *
@@ -43,7 +50,7 @@ class ModuleRegistry {
     const modules = [];
     const unknown = [];
     for (const [id, options] of Object.entries(settings)) {
-      if (!options?.enabled) {
+      if (options?.enabled !== true) {
         continue;
       }
       const moduleClass = this.#classes.get(id);
@@ -54,7 +61,7 @@ class ModuleRegistry {
       if (!FITS[moduleClass.privateWindows](privateWindow)) {
         continue;
       }
-      modules.push({ id, module: new moduleClass(), options });
+      modules.push({ id, module: new moduleClass() });
     }
     return { modules, unknown };
   }

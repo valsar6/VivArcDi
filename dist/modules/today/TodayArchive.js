@@ -8,16 +8,12 @@ import { ArchiveRestorer } from "./ArchiveRestorer.js";
 import { ArchiveStore } from "./ArchiveStore.js";
 import { ArchiveSweeper, repeatEvery } from "./ArchiveSweeper.js";
 import { ClearButton } from "./ClearButton.js";
+import { TODAY_ARCHIVE_OPTIONS } from "./TodayArchiveOptions.js";
 const HOUR_MS = 36e5;
-const DEFAULT_HOURS = 12;
-const MIN_HOURS = 1;
-const MAX_HOURS = 720;
-const DEFAULT_LIMIT = 500;
-const MIN_LIMIT = 50;
-const MAX_LIMIT = 5e3;
 const SYSTEM_CLOCK = { now: () => Date.now(), repeat: repeatEvery };
 class TodayArchive extends Module {
   static id = "today-archive";
+  static options = TODAY_ARCHIVE_OPTIONS;
   #clock;
   #stops = [];
   #store = null;
@@ -44,8 +40,8 @@ class TodayArchive extends Module {
       logger.warn("chrome.tabs is missing: the archive is off");
       return;
     }
-    const limitMs = TodayArchive.#number(options["archiveAfterHours"], DEFAULT_HOURS, MIN_HOURS, MAX_HOURS) * HOUR_MS;
-    const store = new ArchiveStore(storage, TodayArchive.#number(options["archiveLimit"], DEFAULT_LIMIT, MIN_LIMIT, MAX_LIMIT), logger);
+    const limitMs = options.archiveAfterHours * HOUR_MS;
+    const store = new ArchiveStore(storage, options.archiveLimit, logger);
     store.load();
     this.#store = store;
     try {
@@ -129,9 +125,6 @@ class TodayArchive extends Module {
     if (this.#panel?.isOpen === true && this.#store !== null) {
       this.#panel.refresh(this.#store.entries);
     }
-  }
-  static #number(value, fallback, min, max) {
-    return typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   }
 }
 export {

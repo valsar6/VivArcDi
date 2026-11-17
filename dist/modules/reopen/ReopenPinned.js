@@ -65,7 +65,7 @@ class ReopenPinned extends Module {
    */
   static #linksOf({ bookmarks, modules, logger }) {
     const folders = modules["bookmark-folders"];
-    if (folders === void 0 || folders.enabled === false || !bookmarks.available) {
+    if (folders === void 0 || folders.enabled !== true || !bookmarks.available) {
       return null;
     }
     const root = typeof folders["root"] === "string" ? folders["root"] : "";

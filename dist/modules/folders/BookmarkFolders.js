@@ -1,13 +1,10 @@
 import { Module } from "../../core/boot/Module.js";
+import { BOOKMARK_FOLDERS_OPTIONS } from "./BookmarkFoldersOptions.js";
 import { FolderSection } from "./FolderSection.js";
 import { WorkspaceRoots } from "./tree/WorkspaceRoots.js";
-const DEFAULT_MAX_DEPTH = 3;
-const DEFAULT_MAX_HEIGHT_PERCENT = 60;
-const MAX_DEPTH_LIMIT = 10;
-const MIN_PERCENT = 20;
-const MAX_PERCENT = 100;
 class BookmarkFolders extends Module {
   static id = "bookmark-folders";
+  static options = BOOKMARK_FOLDERS_OPTIONS;
   #section = null;
   /**
    * Shows a bookmark folder in the vertical tab bar, below the Favorites grid: folders open and
@@ -26,9 +23,9 @@ class BookmarkFolders extends Module {
       return;
     }
     this.#section = new FolderSection(context, {
-      roots: new WorkspaceRoots({ root: options["root"], workspaces: options["workspaces"], workspacesBase: options["workspacesBase"] }, logger),
-      maxDepth: BookmarkFolders.#number(options["maxDepth"], DEFAULT_MAX_DEPTH, 1, MAX_DEPTH_LIMIT),
-      maxHeightPercent: BookmarkFolders.#number(options["maxHeightPercent"], DEFAULT_MAX_HEIGHT_PERCENT, MIN_PERCENT, MAX_PERCENT)
+      roots: new WorkspaceRoots(options),
+      maxDepth: options.maxDepth,
+      maxHeightPercent: options.maxHeightPercent
     });
     try {
       await this.#section.start();
@@ -43,9 +40,6 @@ class BookmarkFolders extends Module {
   stop() {
     this.#section?.stop();
     this.#section = null;
-  }
-  static #number(value, fallback, min, max) {
-    return typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   }
 }
 export {

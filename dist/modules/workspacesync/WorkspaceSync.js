@@ -1,5 +1,6 @@
 import { ElementGestures } from "./ElementGestures.js";
 import { Module } from "../../core/boot/Module.js";
+import { WORKSPACE_SYNC_OPTIONS } from "./WorkspaceSyncOptions.js";
 import { SerialTask } from "../../core/support/SerialTask.js";
 import { Toast } from "../../core/dom/Toast.js";
 import { WorkspaceNames } from "../../core/workspaces/WorkspaceNames.js";
@@ -28,13 +29,7 @@ const QUIET_RETRY_MS = 5e3;
 const TOAST_MS = 8e3;
 class WorkspaceSync extends Module {
   static id = "workspace-sync";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({
-    folder: "VivArcDi Sync",
-    renameFromOtherComputers: true
-  });
+  static options = WORKSPACE_SYNC_OPTIONS;
   #unsubscribe = [];
   #trigger = null;
   #names = null;
@@ -82,7 +77,7 @@ class WorkspaceSync extends Module {
   }
   #pass(context, names) {
     const { tabs, windows, bookmarks, bookmarkWriter, storage, logger, document, selectors } = context;
-    const folder = WorkspaceSync.#folderOf(context.options);
+    const folder = context.options.folder;
     const syncStore = new SyncStore(bookmarks, bookmarkWriter, folder);
     const syncBase = new SyncBase(storage);
     const local = new LocalPinned(tabs, names, logger);
@@ -104,7 +99,7 @@ class WorkspaceSync extends Module {
         pinnedBase: syncBase,
         store: syncStore,
         creator: new WorkspaceCreator(menuParts),
-        renamer: WorkspaceSync.#renamerOf(context.options, menuParts),
+        renamer: WorkspaceSync.#renamerOf(context.options.renameFromOtherComputers, menuParts),
         missing: new MissingSpaces(storage, (text) => toast.show(text)),
         retry: () => this.#retry?.request(),
         logger
@@ -122,8 +117,8 @@ class WorkspaceSync extends Module {
     const menu = new WorkspaceMenu(document, selectors, { gestures, poll, editor: new ReactEditorOpener(document, selectors, poll, new ReactInternals()) });
     return { menu, quiet: new QuietMoment(document), names, poll, logger };
   }
-  static #renamerOf(options, parts) {
-    return options.renameFromOtherComputers === false ? new DisabledRenamer() : new WorkspaceRenamer(parts);
+  static #renamerOf(renames, parts) {
+    return renames ? new WorkspaceRenamer(parts) : new DisabledRenamer();
   }
   #subscribe({ tabs, bookmarks, logger }, trigger) {
     const request = () => trigger.request();
@@ -140,10 +135,6 @@ class WorkspaceSync extends Module {
       this.#unsubscribe = [];
       logger.warn("cannot follow tabs or bookmarks: pinned tabs are synced only when the workspaces change", error);
     }
-  }
-  static #folderOf(options) {
-    const { folder } = options;
-    return typeof folder === "string" && folder.trim() !== "" ? folder.trim() : WorkspaceSync.defaults.folder;
   }
 }
 export {

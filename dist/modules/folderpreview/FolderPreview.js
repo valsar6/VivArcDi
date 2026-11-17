@@ -1,12 +1,11 @@
 import { Module } from "../../core/boot/Module.js";
 import { LinkActivator } from "../../shared/links/LinkActivator.js";
 import { OpenLinks } from "../../shared/links/OpenLinks.js";
+import { FOLDER_PREVIEW_OPTIONS } from "./FolderPreviewOptions.js";
 import { PreviewController } from "./PreviewController.js";
-const DEFAULT_DELAY_MS = 400;
-const MIN_DELAY_MS = 100;
-const MAX_DELAY_MS = 2e3;
 class FolderPreview extends Module {
   static id = "folder-preview";
+  static options = FOLDER_PREVIEW_OPTIONS;
   #controller = null;
   /**
    * Opens a panel with a search field and the links of a folder, each with the time since it was
@@ -22,7 +21,6 @@ class FolderPreview extends Module {
       logger.warn("chrome.bookmarks, chrome.tabs or the browser element is missing: the folder panel is off");
       return;
     }
-    const delay = options["hoverDelayMs"];
     const openLinks = new OpenLinks(tabs, () => void 0, logger);
     this.#controller = new PreviewController({
       document,
@@ -33,7 +31,7 @@ class FolderPreview extends Module {
       activator: new LinkActivator(tabs, openLinks, logger),
       storage: context.storage,
       locale: document.defaultView?.navigator.language ?? "en",
-      delayMs: typeof delay === "number" ? Math.min(MAX_DELAY_MS, Math.max(MIN_DELAY_MS, delay)) : DEFAULT_DELAY_MS,
+      delayMs: options.hoverDelayMs,
       logger
     });
     this.#controller.start();

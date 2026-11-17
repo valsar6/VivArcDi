@@ -1,3 +1,4 @@
+import { OptionSchema } from "./options/OptionSchema.js";
 class Module {
   /**
    * Unique id used in `config.json` to enable and configure the module.
@@ -10,6 +11,11 @@ class Module {
    * `only` (private windows alone). A module that stores data must keep `never`.
    */
   static privateWindows = "never";
+  /**
+   * The options the module reads from `config.json`, with their defaults. The boot checks them
+   * before `start`, so the module receives complete, valid values.
+   */
+  static options = OptionSchema.none;
   /**
    * Starts the module. Called once, after Vivaldi's interface is ready.
    *

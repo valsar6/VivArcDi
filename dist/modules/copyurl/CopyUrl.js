@@ -3,21 +3,17 @@ import { PageScriptInjector } from "../../core/browser/PageScriptInjector.js";
 import { ShortcutKeys } from "../../core/dom/ShortcutKeys.js";
 import { Toast } from "../../core/dom/Toast.js";
 import { parseCopyMessage } from "./CopyMessage.js";
+import { COPY_URL_OPTIONS } from "./CopyUrlOptions.js";
 import { UrlCopier } from "./UrlCopier.js";
 const COPIED_TEXT = "Copied";
 const FAILED_TEXT = "Copy failed";
 const KEYS_PATH = "page/copy-keys.js";
 const KEYS_GLOBAL = "VivArcDiCopyKeys";
 const SHORTCUT_LETTER = "c";
-const MIN_TOAST_MS = 500;
-const MAX_TOAST_MS = 1e4;
 class CopyUrl extends Module {
   static id = "copy-url";
   static privateWindows = "allowed";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({ toastMs: 2e3 });
+  static options = COPY_URL_OPTIONS;
   #context = null;
   #token = "";
   #copier = null;
@@ -44,7 +40,7 @@ class CopyUrl extends Module {
     this.#toast = new Toast({
       document,
       parent: document.querySelector(selectors.get("browser")) ?? document.body,
-      durationMs: CopyUrl.settingsFrom(options).toastMs
+      durationMs: options.toastMs
     });
     document.addEventListener("keydown", this.#onKey, true);
     await this.#startPageScript(context);
@@ -62,16 +58,6 @@ class CopyUrl extends Module {
     this.#toast = null;
     this.#copier = null;
     this.#context = null;
-  }
-  /**
-   * Reads the options of `config.json`, keeping the toast between half a second and ten seconds.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  static settingsFrom(options) {
-    const toastMs = Number(options["toastMs"] ?? CopyUrl.defaults.toastMs) || CopyUrl.defaults.toastMs;
-    return { toastMs: Math.min(MAX_TOAST_MS, Math.max(MIN_TOAST_MS, toastMs)) };
   }
   async #startPageScript({ document, selectors, runtime, payload, logger }) {
     const script = await payload.text(KEYS_PATH);

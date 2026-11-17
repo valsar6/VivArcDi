@@ -6,6 +6,7 @@ import { Module } from "../../core/boot/Module.js";
 import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { BookmarkFavorites } from "./BookmarkFavorites.js";
 import { FavoriteTagger } from "./FavoriteTagger.js";
+import { FAVORITES_GRID_OPTIONS } from "./FavoritesGridOptions.js";
 import { GridDragging } from "./GridDragging.js";
 import { GridLayout } from "./GridLayout.js";
 import { MiddleClickUnload } from "./MiddleClickUnload.js";
@@ -15,21 +16,10 @@ const NO_TABS = { has: () => false };
 const NOTHING_PLACED = { grid: null, count: 0 };
 class FavoritesGrid extends Module {
   static id = "favorites-grid";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({
-    folder: "Favorites",
-    maxTiles: 12,
-    maxColumns: 3,
-    tileMinWidth: 64,
-    tileHeight: 44,
-    gap: 8,
-    unloadOnMiddleClick: true
-  });
+  static options = FAVORITES_GRID_OPTIONS;
   #document = null;
   #selectors = null;
-  #settings = FavoritesGrid.defaults;
+  #settings = FAVORITES_GRID_OPTIONS.defaults;
   #observer = null;
   #refresh = null;
   #tagger = null;
@@ -57,7 +47,7 @@ class FavoritesGrid extends Module {
    * @param context What the module may use.
    */
   async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter }) {
-    const settings = { ...FavoritesGrid.defaults, ...options };
+    const settings = options;
     this.#settings = settings;
     this.#document = document;
     this.#selectors = selectors;

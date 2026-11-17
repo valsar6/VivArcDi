@@ -7,6 +7,7 @@ import { BrowserSearch } from "../browser/BrowserSearch.js";
 import { BrowserTabs } from "../browser/BrowserTabs.js";
 import { BrowserWindows } from "../browser/BrowserWindows.js";
 import { Logger } from "../support/Logger.js";
+import { ModuleSettings } from "./ModuleSettings.js";
 import { PersistentStorage } from "../browser/PersistentStorage.js";
 import { ResourceLoader } from "./ResourceLoader.js";
 import { SelectorCatalog } from "../dom/SelectorCatalog.js";
@@ -124,10 +125,11 @@ class VivArcDi {
     }
     await new UiReadiness(this.#document).waitFor(selectors.get("browser"));
     config.styles.forEach((path) => this.#styles.inject(path));
+    const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
     const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, selectors, build, config.modules);
+      await this.#startModule(entry, settings, selectors, build);
     }
     this.#logger.info(
       `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
@@ -156,19 +158,23 @@ class VivArcDi {
       return false;
     }
   }
-  async #startModule(entry, selectors, build, modules) {
+  async #startModule(entry, settings, selectors, build) {
+    const options = settings.optionsOf(entry.id);
+    if (options === null) {
+      return;
+    }
     const logger = this.#logger.child(entry.id);
     try {
       await entry.module.start({
         document: this.#document,
         selectors,
         logger,
-        options: entry.options,
+        options,
         build,
         tabs: this.#tabs,
         bookmarks: this.#bookmarks,
         bookmarkWriter: this.#bookmarkWriter,
-        modules,
+        modules: settings.all,
         runtime: this.#runtime,
         windows: this.#windows ?? new BrowserWindows(void 0),
         search: this.#search ?? new BrowserSearch(void 0),

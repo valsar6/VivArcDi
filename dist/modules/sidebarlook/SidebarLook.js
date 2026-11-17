@@ -6,6 +6,7 @@ import { NewTabRow } from "../../shared/newtab/NewTabRow.js";
 import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
 import { Palettes } from "./Palettes.js";
 import { ScrollMark } from "./ScrollMark.js";
+import { SIDEBAR_LOOK_OPTIONS } from "./SidebarLookOptions.js";
 const LOOK_ATTRIBUTE = "data-vivarcdi-look";
 const PALETTE_ATTRIBUTE = "data-vivarcdi-palette";
 const GRADIENT_ATTRIBUTE = "data-vivarcdi-gradient";
@@ -13,13 +14,7 @@ const GRADIENT_PROPERTY = "--vivarcdi-gradient";
 const NEW_TAB_ORDER = 30;
 class SidebarLook extends Module {
   static id = "sidebar-look";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({
-    enabled: true,
-    palette: Palettes.defaultName
-  });
+  static options = SIDEBAR_LOOK_OPTIONS;
   #stops = [];
   /**
    * Gives the vertical tab bar Arc's look: marks Vivaldi's root so that `sidebar-look.css` applies,
@@ -31,7 +26,7 @@ class SidebarLook extends Module {
    */
   start({ document, selectors, options, tabs, runtime, logger }) {
     const browser = DomQuery.require(document, selectors.get("browser"));
-    const palette = Palettes.byName(options["palette"] ?? SidebarLook.defaults.palette);
+    const palette = Palettes.byName(options.palette);
     this.#paint(browser, palette);
     const scroll = new ScrollMark(document, selectors.get("tabBar"));
     scroll.start();

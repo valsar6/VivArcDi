@@ -5,30 +5,18 @@ import { LinkOpener } from "./LinkOpener.js";
 import { PageScriptInjector } from "../../core/browser/PageScriptInjector.js";
 import { PageScripts } from "./PageScripts.js";
 import { PeekController } from "./PeekController.js";
+import { PEEK_OPTIONS } from "./PeekOptions.js";
 import { PeekKeys } from "./PeekKeys.js";
 import { parsePeekMessage } from "./PeekMessage.js";
 import { PeekPanel } from "./PeekPanel.js";
 import { TabTiler } from "./TabTiler.js";
 import { TAB_ID_ATTRIBUTE } from "../../core/browser/Webview.js";
 const OPEN_ATTRIBUTE = "data-vivarcdi-peek";
-const MIN_PERCENT = 40;
-const MAX_PERCENT = 100;
 const WEB_URL = /^https?:\/\//i;
 class Peek extends Module {
   static id = "peek";
   static privateWindows = "allowed";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = Object.freeze({
-    shiftClick: true,
-    pinnedCrossSite: true,
-    anyCrossSite: false,
-    pinnedNewTab: true,
-    anyNewTab: false,
-    widthPercent: 90,
-    heightPercent: 94
-  });
+  static options = PEEK_OPTIONS;
   #token = "";
   #container = null;
   #controller = null;
@@ -49,7 +37,7 @@ class Peek extends Module {
       context.logger.warn("chrome.tabs is missing: Peek is off");
       return;
     }
-    const settings = Peek.settingsFrom(context.options);
+    const settings = context.options;
     const container = DomQuery.require(context.document, context.selectors.get("webviewContainer"));
     const scripts = await PageScripts.load(context.payload);
     this.#token = crypto.randomUUID();
@@ -75,25 +63,6 @@ class Peek extends Module {
     this.#keys = null;
     this.#injector = null;
     this.#controller = null;
-  }
-  /**
-   * Reads the options of `config.json`, keeping sizes within 40 to 100 percent.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  static settingsFrom(options) {
-    const settings = { ...Peek.defaults, ...options };
-    const clamp = (value) => Math.min(MAX_PERCENT, Math.max(MIN_PERCENT, Number(value) || MAX_PERCENT));
-    return {
-      shiftClick: settings.shiftClick === true,
-      pinnedCrossSite: settings.pinnedCrossSite === true,
-      anyCrossSite: settings.anyCrossSite === true,
-      pinnedNewTab: settings.pinnedNewTab === true,
-      anyNewTab: settings.anyNewTab === true,
-      widthPercent: clamp(settings.widthPercent),
-      heightPercent: clamp(settings.heightPercent)
-    };
   }
   #createController({ document, tabs, runtime, logger }, size, scripts) {
     const container = this.#container;

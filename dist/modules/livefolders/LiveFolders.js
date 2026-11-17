@@ -2,6 +2,7 @@ import { ActiveWorkspace } from "../../core/workspaces/ActiveWorkspace.js";
 import { ContextMenu } from "../../core/dom/ContextMenu.js";
 import { LinkId } from "../../shared/links/LinkId.js";
 import { Module } from "../../core/boot/Module.js";
+import { LIVE_FOLDERS_OPTIONS } from "./LiveFoldersOptions.js";
 import { SpaceMenuItems } from "../../shared/spaces/SpaceMenuItems.js";
 import { Toast } from "../../core/dom/Toast.js";
 import { VirtualFolders } from "../../shared/links/VirtualFolders.js";
@@ -17,8 +18,6 @@ import { LiveFolderPublisher } from "./LiveFolderPublisher.js";
 import { defaultTicker, LiveFolderRefresher } from "./LiveFolderRefresher.js";
 import { LiveFolderStore } from "./LiveFolderStore.js";
 import { RepositoryEditor } from "./RepositoryEditor.js";
-const DEFAULT_REFRESH_MINUTES = 5;
-const MIN_REFRESH_MINUTES = 1;
 const MS_PER_MINUTE = 6e4;
 const LIVE_FOLDERS_LABEL = "Live Folders";
 const GITHUB_LABEL = "GitHub";
@@ -28,6 +27,7 @@ const sendWithFetch = (url, init) => globalThis.fetch(url, init);
 const postWithFetch = (url, init) => globalThis.fetch(url, init);
 class LiveFolders extends Module {
   static id = "live-folders";
+  static options = LIVE_FOLDERS_OPTIONS;
   #stops = [];
   #stopped = true;
   /**
@@ -39,8 +39,8 @@ class LiveFolders extends Module {
    * it is opened and when a filter changes. A folder that is not connected shows `Connect GitHub`,
    * which opens a panel with GitHub's sign-in code (the OAuth device flow, with the client id of
    * the `githubClientId` option); the token stays in the browser profile's storage. A right click
-   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs`, or
-   * without a client id for the sign-in, there is nothing to connect.
+   * on a pull request offers `Copy Link` and `Archive Pull Request`. Without `chrome.tabs` there is
+   * nothing to connect; without `githubClientId` the module stays off.
    *
    * @param context What the module may use.
    */
@@ -49,9 +49,6 @@ class LiveFolders extends Module {
     if (!tabs.available) {
       logger.warn("chrome.tabs is missing: the live folders are off");
       return;
-    }
-    if (LiveFolders.#clientId(context.options) === "") {
-      logger.warn("githubClientId is empty: the live folders cannot connect to GitHub");
     }
     this.#stopped = false;
     const parts = this.#build(context);
@@ -76,11 +73,11 @@ class LiveFolders extends Module {
     this.#stops = [];
   }
   #build({ document, selectors, tabs, storage, options, logger }) {
-    const clientId = LiveFolders.#clientId(options);
+    const clientId = options.githubClientId;
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
     const connection = new GithubConnection({ storage, logger, send: sendWithFetch });
-    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: clientId !== "", connected: connection.connected }));
+    const publisher = new LiveFolderPublisher(store, virtual, () => ({ configured: true, connected: connection.connected }));
     const parent = () => document.querySelector(selectors.get("browser")) ?? document.body;
     const menu = new ContextMenu({ document, parent });
     const editor = new RepositoryEditor({ document, parent });
@@ -93,7 +90,7 @@ class LiveFolders extends Module {
       connection,
       changed: () => this.#stopped ? void 0 : publisher.publish(),
       ticker: defaultTicker,
-      intervalMs: LiveFolders.#minutes(options["refreshMinutes"]) * MS_PER_MINUTE,
+      intervalMs: options.refreshMinutes * MS_PER_MINUTE,
       logger
     });
     const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS, notify: (text, kind) => toast.show(text, kind) });
@@ -147,13 +144,6 @@ class LiveFolders extends Module {
   static #opener(tabs, active, logger) {
     const workspaceTabs = new WorkspaceTabs(tabs, logger);
     return (url) => void workspaceTabs.open(url, active.current).catch((error) => logger.warn("could not open the GitHub page", error));
-  }
-  static #minutes(value) {
-    return typeof value === "number" && Number.isFinite(value) ? Math.max(MIN_REFRESH_MINUTES, value) : DEFAULT_REFRESH_MINUTES;
-  }
-  static #clientId(options) {
-    const value = options["githubClientId"];
-    return typeof value === "string" ? value.trim() : "";
   }
 }
 export {

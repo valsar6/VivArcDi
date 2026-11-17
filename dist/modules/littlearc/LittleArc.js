@@ -1,15 +1,12 @@
 import { Module } from "../../core/boot/Module.js";
-import { LITTLE_ARC_DEFAULTS, settingsFrom } from "./LittleArcSettings.js";
+import { LITTLE_ARC_OPTIONS } from "./LittleArcOptions.js";
 import { LittleArcRegistry } from "./LittleArcRegistry.js";
 import { MainWindowRole } from "./MainWindowRole.js";
 import { PopupWindowRole } from "./PopupWindowRole.js";
 class LittleArc extends Module {
   static id = "little-arc";
   static privateWindows = "never";
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  static defaults = LITTLE_ARC_DEFAULTS;
+  static options = LITTLE_ARC_OPTIONS;
   #role = null;
   /**
    * Little Arc: a small, minimal window for a quick lookup. In a normal window the module opens it on
@@ -29,7 +26,7 @@ class LittleArc extends Module {
       context.logger.warn("this window has no id: Little Arc is off");
       return;
     }
-    const settings = settingsFrom(context.options);
+    const settings = context.options;
     const registry = new LittleArcRegistry(context.storage);
     const Role = current.type === "popup" ? PopupWindowRole : MainWindowRole;
     this.#role = new Role(context, settings, registry, current.id);
@@ -41,15 +38,6 @@ class LittleArc extends Module {
   stop() {
     this.#role?.stop();
     this.#role = null;
-  }
-  /**
-   * Reads the options of `config.json`, keeping sizes within 20 to 100 percent.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  static settingsFrom(options) {
-    return settingsFrom(options);
   }
 }
 export {
