@@ -13,7 +13,8 @@ import { CommandBarView } from '../../../src/modules/littlearc/commandbar/Comman
 import { PageFocus } from '../../../src/modules/littlearc/commandbar/PageFocus.js';
 import type { Suggestion } from '../../../src/modules/littlearc/commandbar/Suggestion.js';
 import { LittleArc } from '../../../src/modules/littlearc/LittleArc.js';
-import { settingsFrom } from '../../../src/modules/littlearc/LittleArcSettings.js';
+import { LITTLE_ARC_OPTIONS } from '../../../src/modules/littlearc/LittleArcOptions.js';
+import type { LittleArcOptions } from '../../../src/modules/littlearc/LittleArcOptions.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FakeEvent } from '../peek/fakes.js';
 import { FakeNode, FakePage, dispatch } from './commandbarFakes.js';
@@ -136,7 +137,7 @@ test('page focus gives the focus back or falls to the active page', async () => 
   assert.equal(other.focused, false);
 });
 
-function contextOf(options: Record<string, unknown>, hasHost: boolean): { context: ModuleContext; created: unknown[]; page: FakePage } {
+function contextOf(options: Record<string, unknown>, hasHost: boolean): { context: ModuleContext<LittleArcOptions>; created: unknown[]; page: FakePage } {
   const created: unknown[] = [];
   const page = new FakePage();
   const document = {
@@ -161,7 +162,7 @@ function contextOf(options: Record<string, unknown>, hasHost: boolean): { contex
   const context = {
     document,
     logger,
-    options,
+    options: { ...LITTLE_ARC_OPTIONS.defaults, ...options },
     tabs,
     bookmarks: none,
     history: none,
@@ -171,7 +172,7 @@ function contextOf(options: Record<string, unknown>, hasHost: boolean): { contex
     prefs: new BrowserPrefs(undefined),
     selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<LittleArcOptions>;
   return { context, created, page };
 }
 
@@ -203,7 +204,8 @@ test('little arc opens the blank window when the command bar is off or cannot mo
 });
 
 test('little arc settings read the commandBar option', () => {
-  assert.equal(settingsFrom({}).commandBar, true);
-  assert.equal(settingsFrom({ commandBar: false }).commandBar, false);
-  assert.equal(settingsFrom({ commandBar: 'no' }).commandBar, false);
+  const check = (raw: Record<string, unknown>): LittleArcOptions => LITTLE_ARC_OPTIONS.check(raw, { warn: (): void => undefined }) as LittleArcOptions;
+  assert.equal(check({}).commandBar, true);
+  assert.equal(check({ commandBar: false }).commandBar, false);
+  assert.equal(check({ commandBar: 'no' }).commandBar, true);
 });

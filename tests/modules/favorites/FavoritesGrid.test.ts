@@ -2,8 +2,10 @@ import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import type { FavoritesGridOptions } from '../../../src/modules/favorites/FavoritesGridOptions.js';
 import { FAVORITE_ATTRIBUTE, GRID_ATTRIBUTE } from '../../../src/modules/favorites/FavoriteTagger.js';
 import { FavoritesGrid } from '../../../src/modules/favorites/FavoritesGrid.js';
+import { FAVORITES_GRID_OPTIONS } from '../../../src/modules/favorites/FavoritesGridOptions.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FakeNode, FakeTabs, selectors, tabBar, tabSlot } from './fakes.js';
 
@@ -50,7 +52,7 @@ beforeEach(() => {
 afterEach(() => Object.assign(globalThis, saved));
 
 function setUp(tabs: unknown): {
-  context: ModuleContext;
+  context: ModuleContext<FavoritesGridOptions>;
   document: FakeDocument;
   strip: FakeNode;
   sink: SilentSink;
@@ -62,9 +64,9 @@ function setUp(tabs: unknown): {
     document,
     selectors,
     logger: new Logger('test', sink),
-    options: {},
+    options: FAVORITES_GRID_OPTIONS.defaults,
     tabs,
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<FavoritesGridOptions>;
   return { context, document, strip, sink };
 }
 
