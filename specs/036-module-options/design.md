@@ -2,7 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
+| Approved | Tore, 2026-11-17 |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -163,9 +164,9 @@ the module uses what it receives, so the test keeps working, now with a 50 ms de
 
 ## Open questions
 
-- [ ] **New ranges.** Approve the ranges in bold in the modules table, or give others.
-- [ ] **Tests named after clamping.** NFR-4 keeps every name, but two names would then describe
-  behavior that no longer exists. Proposed: rename only those two, to
+- [x] **New ranges.** Decided: the ranges in bold in the modules table, as proposed.
+- [x] **Tests named after clamping.** NFR-4 keeps every name, but two names would then describe
+  behavior that no longer exists. Decided: rename only those two, to
   `settings are read with defaults and sizes in range` and
   `archiveAfterHours below one hour falls back to the default`, as a stated exception to NFR-4. No
   spec uses them as an `auto:` check.
