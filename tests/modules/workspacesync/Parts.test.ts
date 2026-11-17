@@ -120,7 +120,7 @@ test('rebuilds the copy only when the order differs and renames changed titles',
   assert.deepEqual(pinnedIn(chrome, 'Casetta'), ['n', 'a']);
   const spaces = await store.spaces();
   assert.deepEqual([...spaces.keys()], ['Casetta']);
-  assert.deepEqual(spaces.get('Casetta')?.pinned.map(({ key }) => key), ['n.example', 'a.example']);
+  assert.deepEqual(spaces.get('Casetta')?.pinned?.map(({ key }) => key), ['n.example', 'a.example']);
   assert.equal(spaces.get('Casetta')?.settings, null);
 });
 

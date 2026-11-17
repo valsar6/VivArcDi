@@ -44,6 +44,10 @@ Vivaldi Sync does not carry workspaces, so VivArcDi does.
   list; the other computer keeps it, with its tabs, until you delete it there.
 - On the first run, workspaces with the same name on both computers are taken as the same one, and the
   others are added to the other computer, so both end up with all of them.
+- **Three names are taken by the sync folder:** `Spaces`, `spaces` and `Tabs`, with this case. A
+  workspace with one of them still reaches the other computer, but its pinned tabs and settings are not
+  synced, and the console asks you to rename it. Its tabs stay as they are. Rename it and it syncs from
+  the next pass.
 
 If the menu cannot be driven (a future Vivaldi changed it), VivArcDi names the missing workspaces once
 in a message and does not try again until Vivaldi restarts. Create them by hand with the same name and
@@ -55,6 +59,11 @@ Open the Bookmarks panel and look for `VivArcDi Sync`. It holds the list of work
 `Pinned` (one bookmark for each pinned tab, in order) and `Settings`. You can look at it and repair it by
 hand; a change you make there is treated like a change from your other computer. The folder is not part
 of the folders VivArcDi shows in the tab bar.
+
+Removing bookmarks from a `Pinned` folder removes those tabs on every computer. Deleting a whole folder
+does not: when `VivArcDi Sync`, a workspace folder, its `Pinned` folder or `Spaces` is missing,
+VivArcDi writes it again from the computer where it notices, closes nothing, and says so once in the
+console. So deleting `VivArcDi Sync` is not a way to reset the sync.
 
 ## Options
 
