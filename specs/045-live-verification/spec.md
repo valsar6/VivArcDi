@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | Tooling |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-17 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -107,7 +107,7 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 | AC-1 | WHEN the harness starts Vivaldi, THE harness SHALL pass a new temporary user data directory and a port bound to 127.0.0.1 | auto: `harness starts Vivaldi on a temporary profile and a local port` |
 | AC-2 | IF the user data directory holds an existing Vivaldi profile, THEN THE harness SHALL refuse to start | auto: `harness refuses a directory that holds a profile` |
 | AC-3 | WHEN a run ends, fails or is interrupted, THE harness SHALL stop the Vivaldi it started and delete the temporary profile | auto: `harness cleans up after a failed run` |
-| AC-4 | THE harness SHALL patch only the lab copy of Vivaldi and never the installed one | auto: `harness patches only the lab copy` |
+| AC-4 | THE harness SHALL patch only the lab copy of Vivaldi and never the installed one | auto: `test_harness_patches_only_the_lab_copy` |
 | AC-5 | WHEN attached to window.html, THE selector check SHALL report every catalog selector of the running version as pass, fail or not checked | auto: `selector check reports every selector of the version` |
 | AC-6 | THE selector check SHALL pick the selector file with the same version matching as SelectorCatalog | auto: `selector check matches versions like the catalog` |
 | AC-7 | IF a check fails, THEN THE harness SHALL save a screenshot of window.html and exit with a non-zero code | auto: `harness saves a screenshot and fails on a failed check` |
@@ -131,21 +131,21 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Lab copy of Vivaldi.** Proposed: the harness copies the installed Vivaldi into
+- [x] **Lab copy of Vivaldi.** Decided: the harness copies the installed Vivaldi into
   `~/.cache/vivarcdi/lab/<version>/` (macOS: the `.app` bundle; Debian: `/opt/vivaldi`) and patches
   the copy; a `--vivaldi <path>` option points to another build, which the snapshot spec will use.
   Alternative: patch the installed Vivaldi and restore it after the run, which is simpler but touches
   the user's browser.
-- [ ] **Raw CDP or Playwright.** Proposed: raw CDP over Node's WebSocket (NFR-3), with a small driver
+- [x] **Raw CDP or Playwright.** Decided: raw CDP over Node's WebSocket (NFR-3), with a small driver
   of our own. Playwright's `connectOverCDP` gives richer waiting and input but adds a large dev
   dependency and is built for page targets, not for an extension window like `window.html`.
-- [ ] **A third check kind.** Proposed: `live: <scenario name>` in the `Check` column, with test-name
+- [x] **A third check kind.** Decided: `live: <scenario name>` in the `Check` column, with test-name
   rules identical to `auto`. Alternative: keep `manual` and add a "covered by" note, which changes no
   format but hides what is automated.
-- [ ] **State-only selectors.** Proposed: the selector check opens the workspace popup and pins a tab
+- [x] **State-only selectors.** Decided: the selector check opens the workspace popup and pins a tab
   itself, and lists any other state-only selector in a small map in `tests/live/` so it is reported
   as `not checked` with a reason instead of failing.
-- [ ] **Vivaldi on Debian without a display.** Proposed: run under the user's desktop session; a
+- [x] **Vivaldi on Debian without a display.** Decided: run under the user's desktop session; a
   headless or `xvfb` run is decided with CI in the snapshot spec.
 
 ## References
