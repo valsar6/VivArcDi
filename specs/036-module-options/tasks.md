@@ -8,13 +8,13 @@
 Branch `fix/module-options`, with a patch version change in `package.json` and
 `installer/vivarcdi/__init__.py`. Each task ends green on `make check`.
 
-- [ ] **T1. Option kinds and schema.** `src/core/boot/options/`: `Option`, the five kinds,
+- [x] **T1. Option kinds and schema.** `src/core/boot/options/`: `Option`, the five kinds,
   `OptionSchema`, `OptionValues`. Tests AC-1 to AC-7 in `tests/core/boot/options/OptionSchema.test.ts`.
   Confirm that `Module<PeekOptions>` fits `Module<object>` without `any`.
-- [ ] **T2. Module and context.** `Module<O>`, `static options`, `ModuleContext<O>`, and `modules` typed
+- [x] **T2. Module and context.** `Module<O>`, `static options`, `ModuleContext<O>`, and `modules` typed
   as checked values. No module changes yet: every module keeps `OptionSchema.none` and reads its raw
   section as today.
-- [ ] **T3. Boot.** `ModuleRegistry.createEnabled` requires `enabled === true` and reports non-boolean
+- [x] **T3. Boot.** `ModuleRegistry.createEnabled` requires `enabled === true` and reports non-boolean
   values; `VivArcDi.start` checks every known module's options, warns, skips modules with a missing
   required option, and fills `context.modules`. Tests AC-7, AC-8 and AC-9. Until T7, a module that
   still has `OptionSchema.none` receives its raw section, so every task stays green.

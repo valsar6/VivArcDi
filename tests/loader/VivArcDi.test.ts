@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { Logger } from '../../src/core/support/Logger.js';
 import type { BrowserRuntime } from '../../src/core/browser/BrowserRuntime.js';
 import { Module } from '../../src/core/boot/Module.js';
-import type { PrivateWindowPolicy } from '../../src/core/boot/Module.js';
+import type { ModuleContext, PrivateWindowPolicy } from '../../src/core/boot/Module.js';
+import { Option } from '../../src/core/boot/options/Option.js';
+import { OptionSchema } from '../../src/core/boot/options/OptionSchema.js';
+import type { OptionValues } from '../../src/core/boot/options/OptionSchema.js';
 import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
 import type { ModuleOptions } from '../../src/core/boot/types.js';
 import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
@@ -29,6 +32,30 @@ class Private extends Module {
   public static override privateWindows: PrivateWindowPolicy = 'only';
 
   public override start(): void {}
+}
+
+const CONFIGURED_OPTIONS = OptionSchema.of({
+  clientId: Option.requiredText({ nonEmpty: true }),
+  size: Option.number(3, { min: 1, max: 9 }),
+});
+
+const seen: Array<ModuleContext<object>> = [];
+
+class Configured extends Module<OptionValues<typeof CONFIGURED_OPTIONS>> {
+  public static override id = 'configured';
+  public static override options = CONFIGURED_OPTIONS;
+
+  public override start(context: ModuleContext<OptionValues<typeof CONFIGURED_OPTIONS>>): void {
+    seen.push(context);
+  }
+}
+
+class Follower extends Module {
+  public static override id = 'follower';
+
+  public override start(context: ModuleContext): void {
+    seen.push(context);
+  }
 }
 
 const runtimeAnswering = (answer: () => Promise<boolean>): BrowserRuntime => ({ isPrivateWindow: answer }) as unknown as BrowserRuntime;
@@ -57,7 +84,7 @@ function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime }: AppOpti
     'selectors/index.json': { versions: ['8.1'] },
     'selectors/8.1.json': { browser: '#browser' },
   });
-  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken).register(Hidden).register(Private);
+  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken).register(Hidden).register(Private).register(Configured).register(Follower);
   const app = new VivArcDi({
     loader,
     registry,
@@ -134,4 +161,40 @@ test('treats an unreadable window as normal', async () => {
   await app.start();
   assert.deepEqual(app.startedModules, ['hidden', 'activation-marker']);
   assert.equal(sink.lines.filter(([level]) => level === 'warn').length, 1);
+});
+
+const warningsOf = (sink: SilentSink, tag: string): string[] =>
+  sink.lines.filter(([level, line]) => level === 'warn' && line === tag).map((line) => line.slice(2).join(' '));
+
+test('module without a required option stays off with a warning', async () => {
+  const { app, sink } = createApp({ modules: { configured: { enabled: true, size: 4 } } });
+  await app.start();
+  assert.deepEqual(app.startedModules, []);
+  assert.deepEqual(warningsOf(sink, '[test:configured]'), ['option "clientId" is required and missing: the module stays off']);
+});
+
+test('module starts only when enabled is true', async () => {
+  for (const enabled of ['yes', 1, 'true']) {
+    const { app, sink } = createApp({ modules: { configured: { enabled, clientId: 'abc' } } as unknown as Record<string, ModuleOptions> });
+    await app.start();
+    assert.deepEqual(app.startedModules, [], String(enabled));
+    assert.deepEqual(warningsOf(sink, '[test:configured]'), [`"enabled" is ${JSON.stringify(enabled)}, not true or false: the module stays off`]);
+  }
+  const { app, sink } = createApp({ modules: { configured: { enabled: false, clientId: 'abc' } } });
+  await app.start();
+  assert.deepEqual(app.startedModules, []);
+  assert.deepEqual(warningsOf(sink, '[test:configured]'), []);
+});
+
+test("other modules' options are checked too", async () => {
+  seen.length = 0;
+  const { app, sink } = createApp({
+    modules: { configured: { enabled: true, clientId: ' abc ', size: 50 }, follower: { enabled: true } },
+  });
+  await app.start();
+  assert.deepEqual(app.startedModules, ['configured', 'follower']);
+  assert.deepEqual(seen[0]?.options, { clientId: 'abc', size: 3 });
+  assert.deepEqual(seen[1]?.modules['configured'], { clientId: 'abc', size: 3, enabled: true });
+  assert.deepEqual(warningsOf(sink, '[test:configured]'), ['option "size" is 50, not a number from 1 to 9: using 3']);
+  await app.stop();
 });
