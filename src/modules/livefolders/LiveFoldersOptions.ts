@@ -7,7 +7,7 @@ const MAX_REFRESH_MINUTES = 60;
 
 export const LIVE_FOLDERS_OPTIONS = OptionSchema.of({
   refreshMinutes: Option.number(DEFAULT_REFRESH_MINUTES, { min: 1, max: MAX_REFRESH_MINUTES }),
-  githubClientId: Option.requiredText({ nonEmpty: true }),
+  githubClientId: Option.text(''),
 });
 
 export type LiveFoldersOptions = OptionValues<typeof LIVE_FOLDERS_OPTIONS>;

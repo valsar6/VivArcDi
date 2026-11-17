@@ -65,7 +65,7 @@ Warning texts, through the module's child logger (so the line already names the 
 
 - `option "widthPercent" is 500, not a number from 40 to 100: using 90`
 - `option "toastMS" is not known: ignored`
-- `option "githubClientId" is required and missing: the module stays off`
+- `option "clientId" is required and missing: the module stays off`
 - `"enabled" is "yes", not true or false: the module stays off`
 
 ### Module and context (`src/core/boot/Module.ts`)
@@ -95,7 +95,7 @@ checks. The defaults equal the shipped `config.json` (NFR-2).
 | `favorites-grid` | `folder` (`Favorites`, non-empty text); `maxTiles` (12, **1–48**); `maxColumns` (3, **1–6**); `tileMinWidth` (64, **40–200**); `tileHeight` (44, **32–96**); `gap` (8, **0–24**); `unloadOnMiddleClick` (true) | `defaults`, the spread at `FavoritesGrid.ts:87` |
 | `peek` | `shiftClick` (true), `pinnedCrossSite` (true), `anyCrossSite` (false), `pinnedNewTab` (true), `anyNewTab` (false); `widthPercent` (90, 40–100); `heightPercent` (94, 40–100) | `defaults`, `settingsFrom` |
 | `bookmark-folders` | `root` ('', text); `workspaces` ({}, map of texts); `workspacesBase` (`VivArcDi`, non-empty text); `maxDepth` (3, 1–10); `maxHeightPercent` (60, 20–100) | `#number`; the `typeof` checks in `WorkspaceRoots` |
-| `live-folders` | `refreshMinutes` (5, 1–**60**); `githubClientId` (required, non-empty text) | `#minutes`, `#clientId` |
+| `live-folders` | `refreshMinutes` (5, 1–**60**); `githubClientId` ('', text; empty keeps the `not set up` row of 026) | `#minutes`, `#clientId` |
 | `folder-preview` | `hoverDelayMs` (400, 100–2000) | the inline clamp |
 | `pinned-tabs` | `resetButton` (true), `unloadOnClose` (true) | `defaults`, the spread at `PinnedTabs.ts:44` |
 | `today-archive` | `archiveAfterHours` (12, 1–720); `archiveLimit` (500, 50–5000) | `#number` |
