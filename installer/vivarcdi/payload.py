@@ -48,6 +48,19 @@ class PayloadDeployer:
         if installation.payload_dir.exists():
             shutil.rmtree(installation.payload_dir)
 
+    @property
+    def version(self) -> str:
+        """The VivArcDi version this deployer writes into build.json."""
+        return self._vivarcdi_version
+
+    def deployed_version(self, installation: VivaldiInstallation) -> str | None:
+        """The VivArcDi version of the payload deployed in an installation, or None when it cannot be read."""
+        try:
+            version = json.loads((installation.payload_dir / BUILD_FILE).read_text()).get("vivarcdiVersion")
+        except (OSError, ValueError, AttributeError):
+            return None
+        return version if isinstance(version, str) else None
+
     def is_current(self, installation: VivaldiInstallation) -> bool:
         """Return True when the deployed payload matches the source and the Vivaldi version."""
         build_file = installation.payload_dir / BUILD_FILE

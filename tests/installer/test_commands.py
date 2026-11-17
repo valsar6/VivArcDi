@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from support import WINDOW_HTML, FakeRunner, make_debian_vivaldi, make_payload_source
+from vivarcdi import __version__
 from vivarcdi.cli import build_context
 from vivarcdi.errors import InstallerError
 from vivarcdi.commands import InstallCommand, ReapplyCommand, StatusCommand, UninstallCommand
@@ -87,6 +88,106 @@ class CommandsTest(unittest.TestCase):
         self.assertFalse(self.context.hook.is_installed())
         self.assertFalse((self.platform.data_dir / "installer").exists())
         self.assertTrue((self.platform.data_dir / "backups").exists())
+
+    def build_json(self, resources=None):
+        return (resources or self.resources) / "vivarcdi" / "build.json"
+
+    def deploy_version(self, version, resources=None):
+        build = json.loads(self.build_json(resources).read_text())
+        self.build_json(resources).write_text(json.dumps({**build, "vivarcdiVersion": version}))
+
+    def deployed_version(self, resources=None):
+        return json.loads(self.build_json(resources).read_text())["vivarcdiVersion"]
+
+    def stage(self):
+        return self.platform.data_dir / "installer"
+
+    def test_install_refuses_an_older_version(self):
+        self.run_command(InstallCommand())
+        self.deploy_version("99.0.0")
+        self.window_html.write_text(WINDOW_HTML)
+        shutil.rmtree(self.stage())
+        self.assertEqual(self.run_command(InstallCommand()), 1)
+        self.assertEqual(self.window_html.read_text(), WINDOW_HTML)
+        self.assertFalse(self.stage().exists())
+        self.assertEqual(self.deployed_version(), "99.0.0")
+        output = self.output.getvalue()
+        self.assertIn(f"VivArcDi 99.0.0 is already installed, newer than this VivArcDi ({__version__})", output)
+        self.assertIn("--allow-downgrade", output)
+
+    def test_install_allows_an_older_version_on_request(self):
+        self.run_command(InstallCommand())
+        self.deploy_version("99.0.0")
+        shutil.rmtree(self.stage())
+        self.context.allow_downgrade = True
+        self.assertEqual(self.run_command(InstallCommand()), 0)
+        self.assertEqual(self.deployed_version(), __version__)
+        self.assertTrue(self.stage().exists())
+
+    def test_install_redeploys_the_same_version(self):
+        self.run_command(InstallCommand())
+        (self.repo / "dist" / "extra.js").write_text("export {};\n")
+        self.assertEqual(self.run_command(InstallCommand()), 0)
+        self.assertTrue((self.resources / "vivarcdi" / "extra.js").exists())
+
+    def test_reapply_keeps_a_newer_payload(self):
+        self.run_command(InstallCommand())
+        self.deploy_version("99.0.0")
+        before = self.output.getvalue()
+        self.run_command(ReapplyCommand())
+        self.assertEqual(self.deployed_version(), "99.0.0")
+        self.assertEqual(self.output.getvalue(), before)
+
+    def test_reapply_restores_the_block_of_a_newer_payload(self):
+        self.run_command(InstallCommand())
+        self.deploy_version("99.0.0")
+        (self.repo / "dist" / "extra.js").write_text("export {};\n")
+        self.window_html.write_text(WINDOW_HTML)
+        self.run_command(ReapplyCommand())
+        self.assertIn("vivarcdi/loader.js", self.window_html.read_text())
+        self.assertEqual(self.deployed_version(), "99.0.0")
+        self.assertFalse((self.resources / "vivarcdi" / "extra.js").exists())
+
+    def test_reapply_warns_when_the_stage_is_older(self):
+        snapshot = make_debian_vivaldi(self.root, "opt/vivaldi-snapshot")
+        self.run_command(InstallCommand())
+        self.deploy_version("99.0.0")
+        shutil.rmtree(snapshot / "vivarcdi")
+        (snapshot / "window.html").write_text(WINDOW_HTML)
+        self.run_command(ReapplyCommand())
+        self.assertEqual(self.deployed_version(snapshot), __version__)
+        self.assertEqual(self.deployed_version(), "99.0.0")
+        warnings = [line for line in self.output.getvalue().splitlines() if "Applied the staged" in line]
+        self.assertEqual(len(warnings), 1)
+        self.assertIn(f"VivArcDi {__version__}", warnings[0])
+        self.assertIn("99.0.0", warnings[0])
+
+    def test_status_shows_installed_and_staged_versions(self):
+        (self.repo / "installer" / "vivarcdi").mkdir()
+        (self.repo / "installer" / "vivarcdi" / "__init__.py").write_text(f'__version__ = "{__version__}"\n')
+        self.run_command(InstallCommand())
+        self.run_command(StatusCommand())
+        output = self.output.getvalue()
+        self.assertIn(f"Vivaldi stable 8.1.3740.12: patched, up to date ({__version__})", output)
+        self.assertIn(f"Staged copy: {__version__}", output)
+        self.assertNotIn("older than the installed", output)
+        init = self.stage() / "vivarcdi" / "__init__.py"
+        init.write_text(init.read_text().replace(__version__, "0.1.0"))
+        self.run_command(StatusCommand())
+        self.assertIn(f"The staged copy (0.1.0) is older than the installed VivArcDi ({__version__}): run install from {__version__} again", self.output.getvalue())
+
+    def test_unreadable_versions_block_nothing(self):
+        self.run_command(InstallCommand())
+        for content in ("{broken", json.dumps({"vivarcdiVersion": "dev"}), json.dumps({"vivarcdiVersion": 7})):
+            with self.subTest(content=content):
+                self.build_json().write_text(content)
+                self.assertEqual(self.run_command(InstallCommand()), 0)
+                self.assertEqual(self.deployed_version(), __version__)
+                self.build_json().write_text(content)
+                self.run_command(ReapplyCommand())
+                self.assertEqual(self.deployed_version(), __version__)
+        self.build_json().unlink()
+        self.assertEqual(self.run_command(InstallCommand()), 0)
 
     def test_status_reports_each_state(self):
         self.run_command(StatusCommand())

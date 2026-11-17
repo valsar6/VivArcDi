@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-from ..commands import Command, InstallCommand, InstallerContext, ReapplyCommand, UninstallCommand
+from ..commands import Command, InstallCommand, InstallerContext, ReapplyCommand, UninstallCommand, installed_version
 from ..errors import PermissionDeniedError, VivArcDiError
 from ..modes import WindowAction
 from ..quitter import VivaldiQuitter
@@ -28,6 +28,7 @@ SHORTCUTS_QUESTION = "Change Vivaldi's keyboard shortcuts as listed below?"
 RESTORE_QUESTION = "Put back the keyboard shortcuts that were saved before VivArcDi changed them?"
 APP_MODE = "app"
 DECLINED = "Nothing was changed."
+NEWER_INSTALLED = "VivArcDi {installed} is already installed, newer than this app ({own}). Nothing will change: download the latest app."
 SUCCESS_MESSAGES = {
     WindowAction.INSTALL: "VivArcDi is installed. Restart Vivaldi to load it.",
     WindowAction.UPDATE: "VivArcDi is up to date. Restart Vivaldi to load it.",
@@ -193,13 +194,19 @@ class WindowPresenter:
             rows=rows,
             visible_actions=self._context.mode.visible_actions,
             enabled_actions=self._enabled_actions(rows),
-            message=self._notice.text,
+            message=self._notice.text or self._newer_warning(rows),
             message_buttons=self._notice.buttons,
             offer_shortcuts=self._notice.offer_shortcuts,
             update_version=release.version if release else "",
             update_url=release.url if release else "",
             update_advice=self._update_advisor.advise(release) if release else "",
         )
+
+    def _newer_warning(self, rows: tuple[BuildStatus, ...]) -> str:
+        if not any(row.state is BuildState.NEWER for row in rows):
+            return ""
+        installed = installed_version(self._context, self._context.platform.find_installations())
+        return NEWER_INSTALLED.format(installed=installed, own=self._context.installations.versions.own)
 
     def _enabled_actions(self, rows: tuple[BuildStatus, ...]) -> frozenset:
         states = {row.state for row in rows}
