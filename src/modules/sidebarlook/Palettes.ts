@@ -54,6 +54,11 @@ export class Palettes {
   ]);
 
   /**
+   * The names of the palettes, in the order of `all`.
+   */
+  public static readonly names: readonly string[] = Palettes.all.map((palette) => palette.name);
+
+  /**
    * Name of the palette a workspace without a color of its own uses.
    */
   public static readonly defaultName = 'arclight';

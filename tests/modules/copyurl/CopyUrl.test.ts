@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
+import { COPY_URL_OPTIONS } from '../../../src/modules/copyurl/CopyUrlOptions.js';
+import type { CopyUrlOptions } from '../../../src/modules/copyurl/CopyUrlOptions.js';
 import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
 import type { RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
@@ -44,7 +46,7 @@ const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolv
 const URL = 'https://active.example/';
 
 interface Setup {
-  context: ModuleContext;
+  context: ModuleContext<CopyUrlOptions>;
   document: CopyDocument;
   browser: FakeElement;
   webview: FakeElement;
@@ -67,12 +69,12 @@ function setUp(): Setup {
     document,
     selectors,
     logger: new Logger('test', sink),
-    options: {},
+    options: COPY_URL_OPTIONS.defaults,
     tabs: new FakeTabs([active]),
     runtime: new BrowserRuntime({ runtime: { onMessage: messages } }),
     payload: new FakeLoader({ 'page/copy-keys.js': 'KEYS' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<CopyUrlOptions>;
   return { context, document, browser, webview, messages, clipboard, sink };
 }
 
@@ -164,14 +166,17 @@ test('copy module removes its listeners, page script and toast on stop', async (
 
 test('copy module stays off without chrome.tabs', async () => {
   const { context, document, webview } = setUp();
-  await new CopyUrl().start({ ...context, tabs: { available: false } } as unknown as ModuleContext);
+  await new CopyUrl().start({ ...context, tabs: { available: false } } as unknown as ModuleContext<CopyUrlOptions>);
   assert.equal(document.root.listenerCount(), 0);
   assert.deepEqual(webview.executed, []);
 });
 
 test('copy settings keep the toast between half a second and ten seconds', () => {
-  assert.deepEqual(CopyUrl.settingsFrom({}), { toastMs: 2000 });
-  assert.deepEqual(CopyUrl.settingsFrom({ toastMs: 100 }), { toastMs: 500 });
-  assert.deepEqual(CopyUrl.settingsFrom({ toastMs: 60000 }), { toastMs: 10000 });
-  assert.deepEqual(CopyUrl.settingsFrom({ toastMs: 'soon' }), { toastMs: 2000 });
+  const check = (raw: Record<string, unknown>): CopyUrlOptions | null => COPY_URL_OPTIONS.check(raw, { warn: (): void => undefined });
+  assert.deepEqual(check({}), { toastMs: 2000 });
+  assert.deepEqual(check({ toastMs: 500 }), { toastMs: 500 });
+  assert.deepEqual(check({ toastMs: 10000 }), { toastMs: 10000 });
+  assert.deepEqual(check({ toastMs: 100 }), { toastMs: 2000 });
+  assert.deepEqual(check({ toastMs: 60000 }), { toastMs: 2000 });
+  assert.deepEqual(check({ toastMs: 'soon' }), { toastMs: 2000 });
 });
