@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-17 |
 | Amends | [000 Foundations](../000-foundations/spec.md), [016 Plug-and-play installer](../016-plug-and-play-installer/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -63,6 +63,9 @@ Vivaldi builds on the machine. Versions are compared as `X.Y.Z` numbers.
 - `status` lists, for each build, the VivArcDi version of its payload, and the version of the staged
   copy. When they differ, it says which command fixes it.
 - The Debian package runs `install --allow-downgrade`, because apt already chose that version.
+- The macOS app (016) never installs an older version and has no downgrade button. A build that
+  holds a newer payload shows `Newer version installed`, and the window opens with a short warning:
+  `VivArcDi 0.58.3 is already installed, newer than this app (0.55.0). Nothing will change: download the latest app.`
 - A version that cannot be read (missing or malformed `build.json`, a version that is not `X.Y.Z`)
   never blocks anything: the command behaves as today.
 
@@ -87,6 +90,9 @@ Vivaldi builds on the machine. Versions are compared as `X.Y.Z` numbers.
 - **FR-8.** The Debian `postinst` runs `install` with `--allow-downgrade`.
 - **FR-9.** A version that cannot be read or parsed is never treated as higher or lower: the
   command behaves as today.
+- **FR-10.** The macOS app refuses to install an older version, offers no action that would, marks
+  each build with a newer payload as `Newer version installed`, and shows a warning that names the
+  installed version and the app's version as soon as the window opens.
 
 ### Non-functional
 
@@ -113,13 +119,12 @@ performs.
 | AC-8 | THE `status` command SHALL show the payload version of each build and the staged version, and the fix when they differ | auto: `test_status_shows_installed_and_staged_versions` |
 | AC-9 | THE Debian `postinst` SHALL run `install` with `--allow-downgrade` | auto: `test_postinst_allows_downgrade` |
 | AC-10 | IF a version cannot be read, THEN THE installer SHALL behave as without this spec | auto: `test_unreadable_versions_block_nothing` |
-| AC-11 | WHEN Tore runs `python3 installer install` from a checkout of an older tag (for example `git worktree add /tmp/old v0.58.2`) on the Mac, THE installer SHALL refuse, and Vivaldi SHALL still log `0.58.x active` with the newer version after a restart | manual |
-| AC-12 | WHEN Tore runs `python3 installer status` on the Mac and on Debian, THE output SHALL show the same version for every build and for the staged copy | manual |
+| AC-11 | WHILE a build holds a payload newer than the app, THE app window SHALL mark it `Newer version installed`, SHALL enable no Install or Update for it, and SHALL show a warning naming both versions | auto: `test_window_warns_about_a_newer_installed_version` |
+| AC-12 | WHEN Tore runs `python3 installer install` from a checkout of an older tag (for example `git worktree add /tmp/old v0.58.2`) on the Mac, THE installer SHALL refuse, and Vivaldi SHALL still log `0.58.x active` with the newer version after a restart | manual |
+| AC-13 | WHEN Tore runs `python3 installer status` on the Mac and on Debian, THE output SHALL show the same version for every build and for the staged copy | manual |
 
 ## Out of scope
 
-- The macOS app of 016: it installs the version it ships with. Whether its **Install** button
-  should refuse an older version is [open question](#open-questions) Q-1.
 - Finding which installer of 0.55.0 ran on 2026-11-17. Its copy is gone; this spec makes a repeat
   visible and harmless instead.
 - The failing `package-deb` job on `main` (missing apt signing key), which also skips the apt, tap
@@ -128,11 +133,9 @@ performs.
 
 ## Open questions
 
-- [ ] **Q-1. The macOS app.** The app (016) shows `outdated` and offers **Install**. Proposed: its
-  install also refuses an older version and shows the same message in the window; the app has no
-  downgrade button, because a downgrade from the app means an old app was opened by mistake.
-- [ ] **Q-2. Option name.** Proposed: `--allow-downgrade`, as apt's `--allow-downgrades` but singular
-  like the other options of the installer.
+- [x] **Q-1. The macOS app.** Answered (Tore, 2026-11-17): it refuses too, with no downgrade
+  button, and warns that a newer version is already installed (FR-10, AC-11).
+- [x] **Q-2. Option name.** Answered (Tore, 2026-11-17): `--allow-downgrade`.
 
 ## References
 
