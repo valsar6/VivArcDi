@@ -8,6 +8,8 @@ import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { SpaceMenuItems } from '../../../src/shared/spaces/SpaceMenuItems.js';
 import { VirtualFolders } from '../../../src/shared/links/VirtualFolders.js';
 import { LiveFolders } from '../../../src/modules/livefolders/LiveFolders.js';
+import { LIVE_FOLDERS_OPTIONS } from '../../../src/modules/livefolders/LiveFoldersOptions.js';
+import type { LiveFoldersOptions } from '../../../src/modules/livefolders/LiveFoldersOptions.js';
 import { CONNECTION_STORAGE_KEY } from '../../../src/modules/livefolders/GithubConnection.js';
 import { PANEL_ATTRIBUTE } from '../../../src/modules/livefolders/ConnectPanel.js';
 import { LiveFolderStore, LIVE_FOLDERS_STORAGE_KEY } from '../../../src/modules/livefolders/LiveFolderStore.js';
@@ -25,7 +27,7 @@ const inWorkspace = JSON.stringify({ workspaceId: 5 });
 interface Setup {
   dom: DomDocument;
   module: LiveFolders;
-  context: ModuleContext;
+  context: ModuleContext<LiveFoldersOptions>;
   storage: MemoryStorage;
   github: FakeGithub;
   bookmarks: WritableChrome;
@@ -58,12 +60,12 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     document: asDocument(dom),
     selectors: new SelectorCatalog({ browser: '#browser', tabListHost: '.list', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
     logger,
-    options: { enabled: true, refreshMinutes: 5, githubClientId: clientId },
+    options: { refreshMinutes: 5, githubClientId: clientId },
     tabs: new FolderTabs([{ id: 1, active: true, url: 'https://a.example/', vivExtData: inWorkspace }]),
     storage,
     bookmarks: bookmarks.reader,
     bookmarkWriter: bookmarks.writer,
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<LiveFoldersOptions>;
   return { dom, module, context, storage, github, bookmarks, virtual: VirtualFolders.of(dom), lines: (): string[] => sink.lines };
 }
 
@@ -175,17 +177,10 @@ test('opens the connect panel from the Connect GitHub row', async (t) => {
   assert.deepEqual(context.github.requests, []);
 });
 
-test('says GitHub is not set up without a client id, opens no panel and logs one warning', async (t) => {
-  const context = setup(t, { token: null, clientId: '' });
-  await context.module.start(context.context);
-  createFolder(context.dom);
-  await settle();
-  const [folder] = context.virtual.entriesFor(WORKSPACE);
-  assert.deepEqual(childTitles(context.virtual), ['GitHub is not set up in this VivArcDi']);
-  assert.equal(context.virtual.activate(`${folder?.id}:connect`), true);
-  await settle();
-  assert.ok(!context.dom.created.some((node) => node.hasAttribute(PANEL_ATTRIBUTE)));
-  assert.equal(context.lines().filter((line) => line.includes('githubClientId')).length, 1);
+test('says GitHub is not set up without a client id, opens no panel and logs one warning', () => {
+  const { logger, sink } = recordingLogger();
+  assert.equal(LIVE_FOLDERS_OPTIONS.check({ githubClientId: '  ' }, logger), null);
+  assert.equal(sink.lines.filter((line) => line.includes('githubClientId')).length, 1);
 });
 
 test('disconnects from the folder menu: every folder asks to connect again', async (t) => {

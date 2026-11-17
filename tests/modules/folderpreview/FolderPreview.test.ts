@@ -4,21 +4,23 @@ import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBoo
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { FolderPreview } from '../../../src/modules/folderpreview/FolderPreview.js';
+import { FOLDER_PREVIEW_OPTIONS } from '../../../src/modules/folderpreview/FolderPreviewOptions.js';
+import type { FolderPreviewOptions } from '../../../src/modules/folderpreview/FolderPreviewOptions.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
 import { FolderTabs, bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
 
-function context(dom: DomDocument, bookmarks: BrowserBookmarks): ModuleContext {
+function context(dom: DomDocument, bookmarks: BrowserBookmarks): ModuleContext<FolderPreviewOptions> {
   dom.defaultView = { navigator: { language: 'it' } };
   return {
     document: asDocument(dom),
     selectors: new SelectorCatalog({ browser: '.browser', tabBar: '.bar' }, 'test'),
     logger: silentLogger(),
-    options: { hoverDelayMs: 50 },
+    options: { ...FOLDER_PREVIEW_OPTIONS.defaults, hoverDelayMs: 50 },
     tabs: new FolderTabs(),
     storage: new MemoryStorage(),
     bookmarks,
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<FolderPreviewOptions>;
 }
 
 test('folder panel listens to the pointer and stops cleanly', () => {

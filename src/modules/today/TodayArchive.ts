@@ -12,6 +12,8 @@ import type { ArchiveEntry } from './ArchiveStore.js';
 import { ArchiveSweeper, repeatEvery } from './ArchiveSweeper.js';
 import type { RepeatTimer } from './ArchiveSweeper.js';
 import { ClearButton } from './ClearButton.js';
+import { TODAY_ARCHIVE_OPTIONS } from './TodayArchiveOptions.js';
+import type { TodayArchiveOptions } from './TodayArchiveOptions.js';
 
 export interface TodayArchiveClock {
   /** The current time in milliseconds. */
@@ -23,16 +25,11 @@ export interface TodayArchiveClock {
 }
 
 const HOUR_MS = 3_600_000;
-const DEFAULT_HOURS = 12;
-const MIN_HOURS = 1;
-const MAX_HOURS = 720;
-const DEFAULT_LIMIT = 500;
-const MIN_LIMIT = 50;
-const MAX_LIMIT = 5000;
 const SYSTEM_CLOCK: TodayArchiveClock = { now: () => Date.now(), repeat: repeatEvery };
 
-export class TodayArchive extends Module {
+export class TodayArchive extends Module<TodayArchiveOptions> {
   public static override id = 'today-archive';
+  public static override options = TODAY_ARCHIVE_OPTIONS;
 
   #clock: TodayArchiveClock;
   #stops: Array<() => void> = [];
@@ -56,14 +53,14 @@ export class TodayArchive extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<TodayArchiveOptions>): Promise<void> {
     const { tabs, logger, options, storage } = context;
     if (!tabs.available) {
       logger.warn('chrome.tabs is missing: the archive is off');
       return;
     }
-    const limitMs = TodayArchive.#number(options['archiveAfterHours'], DEFAULT_HOURS, MIN_HOURS, MAX_HOURS) * HOUR_MS;
-    const store = new ArchiveStore(storage, TodayArchive.#number(options['archiveLimit'], DEFAULT_LIMIT, MIN_LIMIT, MAX_LIMIT), logger);
+    const limitMs = options.archiveAfterHours * HOUR_MS;
+    const store = new ArchiveStore(storage, options.archiveLimit, logger);
     store.load();
     this.#store = store;
     try {
@@ -92,7 +89,7 @@ export class TodayArchive extends Module {
     this.#store = null;
   }
 
-  async #startInterface(context: ModuleContext, restorer: ArchiveRestorer): Promise<void> {
+  async #startInterface(context: ModuleContext<TodayArchiveOptions>, restorer: ArchiveRestorer): Promise<void> {
     const { document, selectors, logger } = context;
     const browser = document.querySelector<HTMLElement>(selectors.get('browser'));
     if (browser === null) {
@@ -128,7 +125,7 @@ export class TodayArchive extends Module {
     part.start();
   }
 
-  #toggle({ document, selectors }: ModuleContext): void {
+  #toggle({ document, selectors }: ModuleContext<TodayArchiveOptions>): void {
     const panel = this.#panel;
     if (panel === null || this.#store === null) {
       return;
@@ -153,9 +150,5 @@ export class TodayArchive extends Module {
     if (this.#panel?.isOpen === true && this.#store !== null) {
       this.#panel.refresh(this.#store.entries);
     }
-  }
-
-  static #number(value: unknown, fallback: number, min: number, max: number): number {
-    return typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   }
 }

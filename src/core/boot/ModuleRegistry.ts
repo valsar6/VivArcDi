@@ -1,4 +1,6 @@
 import type { Module, PrivateWindowPolicy } from './Module.js';
+import type { OptionSchema } from './options/OptionSchema.js';
+import type { SchemaSource } from './ModuleSettings.js';
 import type { ModuleOptions } from './types.js';
 
 export interface EnabledModule {
@@ -6,13 +8,12 @@ export interface EnabledModule {
   id: string;
   /** A new instance of the module. */
   module: Module;
-  /** The module's options from `config.json`. */
-  options: ModuleOptions;
 }
 
 export interface ModuleClass {
   new (): Module;
   id: string;
+  options: OptionSchema<object>;
   name: string;
   privateWindows: PrivateWindowPolicy;
 }
@@ -23,7 +24,7 @@ const FITS: Record<PrivateWindowPolicy, (privateWindow: boolean) => boolean> = {
   only: (privateWindow) => privateWindow,
 };
 
-export class ModuleRegistry {
+export class ModuleRegistry implements SchemaSource {
   #classes = new Map<string, ModuleClass>();
 
   /**
@@ -54,7 +55,15 @@ export class ModuleRegistry {
   }
 
   /**
-   * Creates an instance of every module that `config.json` enables.
+   * @param id Module id.
+   * @returns The option schema of the module registered under that id, if any.
+   */
+  public schemaOf(id: string): OptionSchema<object> | undefined {
+    return this.#classes.get(id)?.options;
+  }
+
+  /**
+   * Creates an instance of every module whose `enabled` is `true` in `config.json`.
    *
    * Modules whose `privateWindows` policy does not fit the kind of window are left out.
    *
@@ -69,7 +78,7 @@ export class ModuleRegistry {
     const modules: EnabledModule[] = [];
     const unknown: string[] = [];
     for (const [id, options] of Object.entries(settings)) {
-      if (!options?.enabled) {
+      if (options?.enabled !== true) {
         continue;
       }
       const moduleClass = this.#classes.get(id);
@@ -80,7 +89,7 @@ export class ModuleRegistry {
       if (!FITS[moduleClass.privateWindows](privateWindow)) {
         continue;
       }
-      modules.push({ id, module: new moduleClass(), options });
+      modules.push({ id, module: new moduleClass() });
     }
     return { modules, unknown };
   }

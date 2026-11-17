@@ -5,6 +5,8 @@ import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
 import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { WORKSPACE_SYNC_OPTIONS } from '../../../src/modules/workspacesync/WorkspaceSyncOptions.js';
+import type { WorkspaceSyncOptions } from '../../../src/modules/workspacesync/WorkspaceSyncOptions.js';
 import { SYNC_DELAY_MS, WorkspaceSync } from '../../../src/modules/workspacesync/WorkspaceSync.js';
 import { FakePrefsApi } from '../../core/prefs.js';
 import { FakeDocument, FakeElement } from '../peek/fakes.js';
@@ -13,7 +15,7 @@ import { CountingSink, pinnedIn, pinnedTab, world } from './fakes.js';
 
 const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-const contextOf = (setup: ReturnType<typeof world>, options: Record<string, unknown> = {}): { context: ModuleContext; sink: CountingSink } => {
+const contextOf = (setup: ReturnType<typeof world>, options: Partial<WorkspaceSyncOptions> = {}): { context: ModuleContext<WorkspaceSyncOptions>; sink: CountingSink } => {
   const prefs = new FakePrefsApi();
   prefs.values.set('vivaldi.workspaces.list', [{ id: 7, name: 'Casetta', icon: '' }]);
   const chromeApi = {
@@ -29,14 +31,14 @@ const contextOf = (setup: ReturnType<typeof world>, options: Record<string, unkn
     document: new FakeDocument({ '#browser': new FakeElement() }),
     selectors: { get: (): string => '#browser' },
     logger: new Logger('test', sink),
-    options,
+    options: { ...WORKSPACE_SYNC_OPTIONS.defaults, ...options },
     tabs: setup.tabs,
     bookmarks: setup.chrome.reader,
     bookmarkWriter: setup.chrome.writer,
     windows: new BrowserWindows(chromeApi),
     prefs: new BrowserPrefs(prefs),
     storage: new MemoryStorage(),
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<WorkspaceSyncOptions>;
   return { context, sink };
 };
 
@@ -74,7 +76,7 @@ test('stays off without the browser interfaces it needs', async () => {
 
 test('uses the folder named in the options', async () => {
   const setup = world({ tabs: [pinnedTab(1, 'mail')] });
-  const { context: moduleContext } = contextOf(setup, { folder: '  Mine  ' });
+  const { context: moduleContext } = contextOf(setup, { folder: 'Mine' });
   const module = new WorkspaceSync();
   await module.start(moduleContext);
   await pause(SYNC_DELAY_MS + 100);

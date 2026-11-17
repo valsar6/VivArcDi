@@ -12,9 +12,10 @@ import { TabUnloader } from '../../core/tabs/TabUnloader.js';
 import { BookmarkFavorites } from './BookmarkFavorites.js';
 import { FavoriteTagger } from './FavoriteTagger.js';
 import type { UnloadedLookup } from './FavoriteTagger.js';
+import { FAVORITES_GRID_OPTIONS } from './FavoritesGridOptions.js';
+import type { FavoritesGridOptions } from './FavoritesGridOptions.js';
 import { GridDragging } from './GridDragging.js';
 import { GridLayout } from './GridLayout.js';
-import type { GridSettings } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
 import { PinnedFavorites } from './PinnedFavorites.js';
 import type { TileSource } from './TileSource.js';
@@ -28,34 +29,14 @@ interface PlacedGrid {
   count: number;
 }
 
-export interface FavoritesGridSettings extends GridSettings {
-  /** Bookmark folder that holds the Favorites, as a path of titles separated by `/`. */
-  folder: string;
-  /** How many Favorites become tiles. */
-  maxTiles: number;
-  /** Whether a middle click unloads a tile instead of closing it. */
-  unloadOnMiddleClick: boolean;
-}
-
-export class FavoritesGrid extends Module {
+export class FavoritesGrid extends Module<FavoritesGridOptions> {
   public static override id = 'favorites-grid';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<FavoritesGridSettings> = Object.freeze({
-    folder: 'Favorites',
-    maxTiles: 12,
-    maxColumns: 3,
-    tileMinWidth: 64,
-    tileHeight: 44,
-    gap: 8,
-    unloadOnMiddleClick: true,
-  });
+  public static override options = FAVORITES_GRID_OPTIONS;
 
   #document: Document | null = null;
   #selectors: SelectorCatalog | null = null;
-  #settings: FavoritesGridSettings = FavoritesGrid.defaults;
+  #settings: FavoritesGridOptions = FAVORITES_GRID_OPTIONS.defaults;
   #observer: MutationObserver | null = null;
   #refresh: FrameTask | null = null;
   #tagger: FavoriteTagger | null = null;
@@ -83,8 +64,8 @@ export class FavoritesGrid extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter }: ModuleContext): Promise<void> {
-    const settings: FavoritesGridSettings = { ...FavoritesGrid.defaults, ...options };
+  public override async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter }: ModuleContext<FavoritesGridOptions>): Promise<void> {
+    const settings = options;
     this.#settings = settings;
     this.#document = document;
     this.#selectors = selectors;
@@ -146,7 +127,7 @@ export class FavoritesGrid extends Module {
     this.#hiddenTabs = null;
   }
 
-  #startMiddleClick(settings: FavoritesGridSettings, tabs: BrowserTabs, logger: Logger): void {
+  #startMiddleClick(settings: FavoritesGridOptions, tabs: BrowserTabs, logger: Logger): void {
     if (!settings.unloadOnMiddleClick || this.#document === null || this.#selectors === null) {
       return;
     }

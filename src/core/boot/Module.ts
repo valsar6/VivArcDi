@@ -11,23 +11,26 @@ import type { KeyValueStorage } from '../browser/PersistentStorage.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import type { BuildInfo, ModuleOptions } from './types.js';
+import { OptionSchema } from './options/OptionSchema.js';
 
-export interface ModuleContext {
+type RawOptions = Readonly<Record<string, unknown>>;
+
+export interface ModuleContext<O extends object = RawOptions> {
   /** The document of Vivaldi's browser window. */
   document: Document;
   /** Selectors for the running Vivaldi. */
   selectors: SelectorCatalog;
   /** Logger tagged with the module id. */
   logger: Logger;
-  /** The module's options from `config.json`. */
-  options: Record<string, unknown>;
+  /** The module's options from `config.json`, checked against its schema. */
+  options: Readonly<O>;
   /** The `chrome.tabs` API; check `tabs.available` first. */
   tabs: BrowserTabs;
   /** The `chrome.bookmarks` API, read-only; check `bookmarks.available` first. */
   bookmarks: BrowserBookmarks;
   /** The only way to create, rename and delete bookmarks; check `bookmarkWriter.available` first. */
   bookmarkWriter: BookmarkWriter;
-  /** The options of every module in `config.json`, for modules that follow another one. */
+  /** The checked options of every module in `config.json`, for modules that follow another one. */
   modules: Readonly<Record<string, ModuleOptions>>;
   /** `chrome.runtime` messages and `chrome.windows`; check before use. */
   runtime: BrowserRuntime;
@@ -49,7 +52,7 @@ export interface ModuleContext {
 
 export type PrivateWindowPolicy = 'never' | 'allowed' | 'only';
 
-export class Module {
+export class Module<O extends object = RawOptions> {
   /**
    * Unique id used in `config.json` to enable and configure the module.
    * Every subclass must override it.
@@ -64,11 +67,17 @@ export class Module {
   public static privateWindows: PrivateWindowPolicy = 'never';
 
   /**
+   * The options the module reads from `config.json`, with their defaults. The boot checks them
+   * before `start`, so the module receives complete, valid values.
+   */
+  public static options: OptionSchema<object> = OptionSchema.none;
+
+  /**
    * Starts the module. Called once, after Vivaldi's interface is ready.
    *
    * @param _context What the module may use.
    */
-  public start(_context: ModuleContext): Promise<void> | void {
+  public start(_context: ModuleContext<O>): Promise<void> | void {
     throw new Error(`${this.constructor.name} must implement start()`);
   }
 

@@ -4,12 +4,9 @@ import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
 import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
 import { Toast } from '../../core/dom/Toast.js';
 import { parseCopyMessage } from './CopyMessage.js';
+import { COPY_URL_OPTIONS } from './CopyUrlOptions.js';
+import type { CopyUrlOptions } from './CopyUrlOptions.js';
 import { UrlCopier } from './UrlCopier.js';
-
-export interface CopyUrlSettings {
-  /** How long the confirmation stays, in milliseconds. */
-  toastMs: number;
-}
 
 export const COPIED_TEXT = 'Copied';
 export const FAILED_TEXT = 'Copy failed';
@@ -17,19 +14,14 @@ export const FAILED_TEXT = 'Copy failed';
 const KEYS_PATH = 'page/copy-keys.js';
 const KEYS_GLOBAL = 'VivArcDiCopyKeys';
 const SHORTCUT_LETTER = 'c';
-const MIN_TOAST_MS = 500;
-const MAX_TOAST_MS = 10000;
 
-export class CopyUrl extends Module {
+export class CopyUrl extends Module<CopyUrlOptions> {
   public static override id = 'copy-url';
   public static override privateWindows: PrivateWindowPolicy = 'allowed';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<CopyUrlSettings> = Object.freeze({ toastMs: 2000 });
+  public static override options = COPY_URL_OPTIONS;
 
-  #context: ModuleContext | null = null;
+  #context: ModuleContext<CopyUrlOptions> | null = null;
   #token = '';
   #copier: UrlCopier | null = null;
   #toast: Toast | null = null;
@@ -44,7 +36,7 @@ export class CopyUrl extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<CopyUrlOptions>): Promise<void> {
     const { document, selectors, tabs, logger, options } = context;
     if (!tabs.available) {
       logger.warn('chrome.tabs is missing: copying the address is off');
@@ -56,7 +48,7 @@ export class CopyUrl extends Module {
     this.#toast = new Toast({
       document,
       parent: document.querySelector(selectors.get('browser')) ?? document.body,
-      durationMs: CopyUrl.settingsFrom(options).toastMs,
+      durationMs: options.toastMs,
     });
     document.addEventListener('keydown', this.#onKey, true);
     await this.#startPageScript(context);
@@ -77,18 +69,7 @@ export class CopyUrl extends Module {
     this.#context = null;
   }
 
-  /**
-   * Reads the options of `config.json`, keeping the toast between half a second and ten seconds.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  public static settingsFrom(options: Record<string, unknown>): CopyUrlSettings {
-    const toastMs = Number(options['toastMs'] ?? CopyUrl.defaults.toastMs) || CopyUrl.defaults.toastMs;
-    return { toastMs: Math.min(MAX_TOAST_MS, Math.max(MIN_TOAST_MS, toastMs)) };
-  }
-
-  async #startPageScript({ document, selectors, runtime, payload, logger }: ModuleContext): Promise<void> {
+  async #startPageScript({ document, selectors, runtime, payload, logger }: ModuleContext<CopyUrlOptions>): Promise<void> {
     const script = await payload.text(KEYS_PATH);
     this.#injector = new PageScriptInjector({
       container: document.querySelector(selectors.get('webviewContainer')) ?? document.body,

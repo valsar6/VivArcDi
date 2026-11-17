@@ -284,6 +284,11 @@ it says so, restart Vivaldi and close the window. If you installed a version old
 After editing it in a release build, run `install` again. In a source checkout, run `make build`
 first.
 
+Every option has a default, and a module starts only when `enabled` is `true`. A value that an option
+does not accept (the wrong type, a number out of its range, a name that is not among the choices) is
+replaced by the default and leaves a warning in the console of `window.html`; an unknown option is
+ignored with a warning.
+
 ## Favorites
 
 With the tab bar on the left or right, the Favorites are a grid of square icon tiles at the top of the
@@ -312,11 +317,11 @@ Options of `favorites-grid` in `config.json`:
 | Option | Default | Meaning |
 |---|---|---|
 | `folder` | `Favorites` | The bookmark folder of the Favorites, as titles separated by `/`, compared exactly; the first match is used |
-| `maxTiles` | `12` | How many Favorites become tiles |
-| `minColumns` | `3` | Columns of a narrow tab bar |
-| `tileMinWidth` | `64` | Narrowest tile, in pixels, before the grid drops a column |
-| `tileHeight` | `44` | Tile height, in pixels |
-| `gap` | `8` | Space between tiles and between their rows, in pixels |
+| `maxTiles` | `12` | How many Favorites become tiles (1 to 48) |
+| `maxColumns` | `3` | Most columns of the grid; fewer when the tab bar is narrow (1 to 6) |
+| `tileMinWidth` | `64` | Narrowest tile, in pixels, before the grid drops a column (40 to 200) |
+| `tileHeight` | `44` | Tile height, in pixels (32 to 96) |
+| `gap` | `8` | Space between tiles and between their rows, in pixels (0 to 24) |
 | `unloadOnMiddleClick` | `true` | Middle click unloads a tile instead of closing it |
 
 ## Pinned tabs
@@ -411,7 +416,7 @@ Options of `little-arc` in `config.json`:
 | `commandBar` | `true` | The shortcut shows the command bar; `false` opens an empty window with the address field ready |
 | `externalLinks` | `true` | Links opened from other apps open in Little Arc |
 | `askWorkspace` | `false` | Reserved: the choice of workspace is not available yet, the most recent one is used |
-| `idleCloseHours` | `6` | Closes an untouched window after this many hours; `0` never |
+| `idleCloseHours` | `6` | Closes an untouched window after this many hours; `0` never (0 to 168) |
 | `widthPercent` | `34` | Window width, as a percentage of the screen (20 to 100) |
 | `heightPercent` | `60` | Window height, as a percentage of the screen (20 to 100) |
 
@@ -525,7 +530,7 @@ the console and leaves the section as it was.
 | `root` | empty | The folder to show in every workspace that has no entry in `workspaces`, as titles separated by `/`, compared exactly; the first match is used. Empty uses `<workspacesBase>/<workspace name>` |
 | `workspaces` | `{}` | The folder of each workspace: the name of the workspace (as in Vivaldi's workspace menu) and the path of its folder, written like `root` |
 | `workspacesBase` | `VivArcDi` | The folder that holds the default folder of each workspace, written like `root`. It is created the first time you write in a workspace |
-| `maxDepth` | `3` | How many levels of folders are shown |
+| `maxDepth` | `3` | How many levels of folders are shown (1 to 10) |
 | `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
 
 Each workspace can show its own folders, as the spaces of Arc do:
@@ -587,7 +592,7 @@ pull request as a link tab of the workspace; a pull request that closes leaves t
 | Option | Default | Meaning |
 |---|---|---|
 | `enabled` | `true` | Set to `false` and no live folder is drawn or refreshed |
-| `refreshMinutes` | `5` | Minutes between two refreshes of every live folder (1 or more) |
+| `refreshMinutes` | `5` | Minutes between two refreshes of every live folder (1 to 60) |
 | `githubClientId` | `""` | The client id of the `VivArcDi` OAuth App on GitHub; empty, and the folder says GitHub is not set up |
 
 ## Folder panel

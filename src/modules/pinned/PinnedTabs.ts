@@ -3,26 +3,15 @@ import type { ModuleContext } from '../../core/boot/Module.js';
 import { PinnedClosing } from './PinnedClosing.js';
 import { PinnedMarking } from './PinnedMarking.js';
 import { PinWatcher } from './PinWatcher.js';
+import { PINNED_TABS_OPTIONS } from './PinnedTabsOptions.js';
+import type { PinnedTabsOptions } from './PinnedTabsOptions.js';
 import { ResetClick } from './ResetClick.js';
 import { SavedAddresses } from './SavedAddresses.js';
 
-export interface PinnedTabsSettings {
-  /** Whether the favicon of an away pinned row brings it back to its own page. */
-  resetButton: boolean;
-  /** Whether Cmd/Ctrl+W and the close button unload Favorites and pinned tabs. */
-  unloadOnClose: boolean;
-}
-
-export class PinnedTabs extends Module {
+export class PinnedTabs extends Module<PinnedTabsOptions> {
   public static override id = 'pinned-tabs';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<PinnedTabsSettings> = Object.freeze({
-    resetButton: true,
-    unloadOnClose: true,
-  });
+  public static override options = PINNED_TABS_OPTIONS;
 
   #watcher: PinWatcher | null = null;
   #marking: PinnedMarking | null = null;
@@ -35,22 +24,21 @@ export class PinnedTabs extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<PinnedTabsOptions>): Promise<void> {
     const { tabs, logger, options } = context;
     if (!tabs.available) {
       logger.warn('chrome.tabs is missing: pinned tabs are left to Vivaldi');
       return;
     }
-    const settings: PinnedTabsSettings = { ...PinnedTabs.defaults, ...options };
     const addresses = new SavedAddresses(tabs);
     this.#watcher = new PinWatcher(tabs, addresses, logger);
     this.#marking = new PinnedMarking(context);
     await this.#watcher.start();
     await this.#marking.start();
-    if (settings.resetButton) {
+    if (options.resetButton) {
       this.#startReset(context, addresses);
     }
-    if (settings.unloadOnClose) {
+    if (options.unloadOnClose) {
       this.#closing = new PinnedClosing(context);
       await this.#closing.start();
     }
@@ -70,7 +58,7 @@ export class PinnedTabs extends Module {
     this.#watcher = null;
   }
 
-  #startReset({ document, selectors, logger }: ModuleContext, addresses: SavedAddresses): void {
+  #startReset({ document, selectors, logger }: ModuleContext<PinnedTabsOptions>, addresses: SavedAddresses): void {
     const marking = this.#marking;
     this.#reset = new ResetClick({
       document,

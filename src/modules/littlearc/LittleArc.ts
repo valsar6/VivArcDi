@@ -1,19 +1,16 @@
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext, PrivateWindowPolicy } from '../../core/boot/Module.js';
-import { LITTLE_ARC_DEFAULTS, settingsFrom } from './LittleArcSettings.js';
-import type { LittleArcSettings } from './LittleArcSettings.js';
+import { LITTLE_ARC_OPTIONS } from './LittleArcOptions.js';
+import type { LittleArcOptions } from './LittleArcOptions.js';
 import { LittleArcRegistry } from './LittleArcRegistry.js';
 import { MainWindowRole } from './MainWindowRole.js';
 import { PopupWindowRole } from './PopupWindowRole.js';
 
-export class LittleArc extends Module {
+export class LittleArc extends Module<LittleArcOptions> {
   public static override id = 'little-arc';
   public static override privateWindows: PrivateWindowPolicy = 'never';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<LittleArcSettings> = LITTLE_ARC_DEFAULTS;
+  public static override options = LITTLE_ARC_OPTIONS;
 
   #role: MainWindowRole | PopupWindowRole | null = null;
 
@@ -25,7 +22,7 @@ export class LittleArc extends Module {
    *
    * @param context What the module may use.
    */
-  public override async start(context: ModuleContext): Promise<void> {
+  public override async start(context: ModuleContext<LittleArcOptions>): Promise<void> {
     if (!context.tabs.available || !context.windows.available) {
       context.logger.warn('chrome.tabs or chrome.windows is missing: Little Arc is off');
       return;
@@ -35,7 +32,7 @@ export class LittleArc extends Module {
       context.logger.warn('this window has no id: Little Arc is off');
       return;
     }
-    const settings = settingsFrom(context.options);
+    const settings = context.options;
     const registry = new LittleArcRegistry(context.storage);
     const Role = current.type === 'popup' ? PopupWindowRole : MainWindowRole;
     this.#role = new Role(context, settings, registry, current.id);
@@ -48,15 +45,5 @@ export class LittleArc extends Module {
   public override stop(): void {
     this.#role?.stop();
     this.#role = null;
-  }
-
-  /**
-   * Reads the options of `config.json`, keeping sizes within 20 to 100 percent.
-   *
-   * @param options The module's options.
-   * @returns Complete settings.
-   */
-  public static settingsFrom(options: Record<string, unknown>): LittleArcSettings {
-    return settingsFrom(options);
   }
 }

@@ -6,6 +6,8 @@ import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { ARCHIVE_STORAGE_KEY } from '../../../src/modules/today/ArchiveStore.js';
 import { TodayArchive } from '../../../src/modules/today/TodayArchive.js';
+import { TODAY_ARCHIVE_OPTIONS } from '../../../src/modules/today/TodayArchiveOptions.js';
+import type { TodayArchiveOptions } from '../../../src/modules/today/TodayArchiveOptions.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { FakeLoader } from '../../loader/fakes.js';
@@ -22,17 +24,17 @@ const selectors = new SelectorCatalog(
   'test',
 );
 
-function context(tabs: TodayTabs, storage: MemoryStorage, dom: TodayDocument, options: Record<string, unknown> = {}): ModuleContext {
+function context(tabs: TodayTabs, storage: MemoryStorage, dom: TodayDocument, options: Partial<TodayArchiveOptions> = {}): ModuleContext<TodayArchiveOptions> {
   return {
     document: asDocument(dom),
     selectors,
     logger: silentLogger(),
-    options: { enabled: true, ...options },
+    options: { ...TODAY_ARCHIVE_OPTIONS.defaults, ...options },
     tabs,
     storage,
     runtime: new BrowserRuntime(undefined),
     payload: new FakeLoader({ 'page/archive-keys.js': 'code' }),
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<TodayArchiveOptions>;
 }
 
 function headless(): TodayDocument {
@@ -75,11 +77,14 @@ test('disabled module closes nothing', async () => {
   assert.equal(tabs.listenerCount(), 0);
 });
 
-test('clamps archiveAfterHours to at least one hour', async () => {
-  const tabs = new TodayTabs([{ id: 1, active: true, url: 'https://active.example/' }, { id: 2, url: 'https://a.example/', vivExtData: stamped(NOW - 30 * 60_000) }]);
+test('archiveAfterHours below one hour falls back to the default', async () => {
+  const tabs = new TodayTabs([{ id: 1, active: true, url: 'https://active.example/' }, { id: 2, url: 'https://a.example/', vivExtData: stamped(NOW - 6 * HOUR) }]);
+  const warnings: string[] = [];
+  const checked = TODAY_ARCHIVE_OPTIONS.check({ archiveAfterHours: 0 }, { warn: (message: string): void => void warnings.push(message) });
+  assert.equal(warnings.length, 1);
   const timer = new ManualTimer();
   const module = new TodayArchive({ now: (): number => NOW, repeat: timer.repeat });
-  await module.start(context(tabs, new MemoryStorage(), headless(), { archiveAfterHours: 0 }));
+  await module.start(context(tabs, new MemoryStorage(), headless(), checked ?? {}));
   timer.tick();
   await settle();
   assert.deepEqual(tabs.removedIds(), []);

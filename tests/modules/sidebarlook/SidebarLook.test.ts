@@ -8,6 +8,8 @@ import { createDefaultRegistry } from '../../../src/modules/index.js';
 import { GRADIENT_ATTRIBUTE, LOOK_ATTRIBUTE, PALETTE_ATTRIBUTE, SidebarLook } from '../../../src/modules/sidebarlook/SidebarLook.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
+import { SIDEBAR_LOOK_OPTIONS } from '../../../src/modules/sidebarlook/SidebarLookOptions.js';
+import type { SidebarLookOptions } from '../../../src/modules/sidebarlook/SidebarLookOptions.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { BrowserNode, FieldNode, IncognitoDocument, runtimeOf } from '../incognito/fakes.js';
@@ -35,10 +37,10 @@ interface Setup {
   dom: LookDocument;
   browser: LookBrowser;
   tabs: FolderTabs;
-  context: ModuleContext;
+  context: ModuleContext<SidebarLookOptions>;
 }
 
-function setup(t: TestContext, options: Record<string, unknown> = { enabled: true }): Setup {
+function setup(t: TestContext, options: Partial<SidebarLookOptions> = {}): Setup {
   const frames = globalThis as unknown as Record<string, unknown>;
   frames['MutationObserver'] = class {
     public observe(): void {}
@@ -52,10 +54,10 @@ function setup(t: TestContext, options: Record<string, unknown> = { enabled: tru
     document: asDocument(dom),
     selectors: new SelectorCatalog(SELECTORS, 'test'),
     logger: new Logger('test', new SilentSink()),
-    options,
+    options: { ...SIDEBAR_LOOK_OPTIONS.defaults, ...options },
     tabs,
     runtime: runtimeOf(7, false),
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<SidebarLookOptions>;
   return { dom, browser: dom.browser, tabs, context };
 }
 
@@ -64,7 +66,7 @@ const COLORS = ['--vivarcdi-space', '--vivarcdi-pill', '--vivarcdi-ink'];
 const GRADIENT = 'linear-gradient(135deg, #f3b8ac, #d0c9c5, #8ae3f2)';
 
 test('disabled sidebar look changes nothing', (t) => {
-  const { dom, browser } = setup(t, { enabled: false });
+  const { dom, browser } = setup(t);
   const { modules } = createDefaultRegistry().createEnabled({ 'sidebar-look': { enabled: false } });
   assert.deepEqual(modules, []);
   assert.equal(browser.hasAttribute(LOOK_ATTRIBUTE), false);
@@ -88,17 +90,18 @@ test('uses the arclight palette by default', (t) => {
 });
 
 test('a palette without a gradient leaves no gradient behind', (t) => {
-  const { browser, context } = setup(t, { enabled: true, palette: 'sky' });
+  const { browser, context } = setup(t, { palette: 'sky' });
   new SidebarLook().start(context);
   assert.equal(browser.hasAttribute(GRADIENT_ATTRIBUTE), false);
   assert.equal(browser.properties.has('--vivarcdi-gradient'), false);
 });
 
 test('uses the palette chosen in the options and falls back to arclight for an unknown one', (t) => {
-  const lagoon = setup(t, { enabled: true, palette: 'lagoon' });
+  const lagoon = setup(t, { palette: 'lagoon' });
   new SidebarLook().start(lagoon.context);
   assert.equal(lagoon.browser.properties.get('--vivarcdi-space'), '#8ec5cf');
-  const unknown = setup(t, { enabled: true, palette: 'neon' });
+  const checked = SIDEBAR_LOOK_OPTIONS.check({ palette: 'neon' }, { warn: (): void => undefined });
+  const unknown = setup(t, checked ?? {});
   new SidebarLook().start(unknown.context);
   assert.equal(unknown.browser.getAttribute(PALETTE_ATTRIBUTE), 'arclight');
 });

@@ -31,7 +31,6 @@ test('createEnabled instantiates only enabled modules', () => {
   });
   assert.equal(modules.length, 1);
   assert.ok(modules[0]?.module instanceof Alpha);
-  assert.deepEqual(modules[0]?.options, { enabled: true, size: 3 });
   assert.deepEqual(unknown, ['beta']);
 });
 

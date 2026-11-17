@@ -11,7 +11,7 @@ import { FocusHistory } from './FocusHistory.js';
 import { LittleArcLauncher } from './LittleArcLauncher.js';
 import { isDestinationQuestion, parseAdoptMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
-import type { LittleArcSettings } from './LittleArcSettings.js';
+import type { LittleArcOptions } from './LittleArcOptions.js';
 import { screenOf } from './ScreenAreas.js';
 import { assembleCommandBar } from './commandbar/CommandBarAssembly.js';
 import type { CommandBarMount } from './commandbar/CommandBarMount.js';
@@ -20,7 +20,7 @@ import type { DestinationSource } from './WorkspaceAdopter.js';
 
 export class MainWindowRole {
   #context: ModuleContext;
-  #settings: LittleArcSettings;
+  #settings: LittleArcOptions;
   #registry: LittleArcRegistry;
   #windowId: number;
   #launcher: LittleArcLauncher;
@@ -35,7 +35,7 @@ export class MainWindowRole {
    * @param registry Remembers which windows are Little Arc windows.
    * @param windowId The id of this window.
    */
-  constructor(context: ModuleContext, settings: LittleArcSettings, registry: LittleArcRegistry, windowId: number) {
+  constructor(context: ModuleContext<LittleArcOptions>, settings: LittleArcOptions, registry: LittleArcRegistry, windowId: number) {
     this.#context = context;
     this.#settings = settings;
     this.#registry = registry;
