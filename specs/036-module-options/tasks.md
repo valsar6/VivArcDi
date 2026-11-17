@@ -23,7 +23,7 @@ Branch `fix/module-options`, with a patch version change in `package.json` and
 - [x] **T5. Modules with nested settings.** `peek`, `little-arc`, `favorites-grid`; remove
   `settingsFrom` and `defaults`; update the tests that use them.
 - [x] **T6. Folder and sync modules.** `bookmark-folders` (with `WorkspaceRoots`), `live-folders`
-  (required `githubClientId`), `workspace-sync`, and `reopen-pinned` reading checked `modules`.
+  (`githubClientId` optional text, see the 0.58.2 fix), `workspace-sync`, and `reopen-pinned` reading checked `modules`.
   Keep 010/AC-8 green under its name.
 - [x] **T7. Shipped config.** `tests/core/boot/options/ShippedConfig.test.ts` (AC-10). Remove the
   raw pass-through of T3: `OptionSchema.none` now drops every key with a warning.

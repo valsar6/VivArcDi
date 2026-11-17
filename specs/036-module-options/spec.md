@@ -42,7 +42,8 @@ When a user changes `config.json`, each option is checked against its module's s
 - An option that the module does not declare is ignored with a warning, so a misspelled name
   (`toastMS` for `toastMs`) does not pass silently.
 - An option without a sensible default is required. If it is missing or invalid, the module stays
-  off and says so in the console, as `live-folders` already does without `githubClientId`.
+  off and says so in the console. No shipped module has a required option yet: `live-folders`
+  without `githubClientId` keeps the `GitHub is not set up in this VivArcDi` row of 026.
 - `enabled` must be `true` to start a module. Any other value keeps it off; a value that is not a
   boolean also leaves a warning.
 
