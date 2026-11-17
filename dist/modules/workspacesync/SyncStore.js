@@ -90,7 +90,7 @@ class SyncStore {
     return pinned === void 0 && settings === void 0 ? null : SyncStore.#space(pinned, settings);
   }
   static #space(pinned, settings) {
-    return { pinned: SyncStore.#entriesOf(pinned?.children ?? []), settings: settings?.description ?? null };
+    return { pinned: pinned === void 0 ? null : SyncStore.#entriesOf(pinned.children ?? []), settings: settings?.description ?? null };
   }
   static #entriesOf(nodes) {
     const entries = /* @__PURE__ */ new Map();
