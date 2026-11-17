@@ -44,7 +44,8 @@ boots `VivArcDi` (`src/core/boot/VivArcDi.ts`) with it, which:
 2. picks the selector catalog for the running Vivaldi version;
 3. waits for Vivaldi's interface to exist;
 4. injects the stylesheets listed in the configuration;
-5. creates and starts every enabled module.
+5. checks the options of every module against its schema (see below);
+6. creates and starts every module whose `enabled` is `true`.
 
 A module that fails to start is logged and skipped; the others keep running, and Vivaldi itself is
 never blocked.
@@ -57,6 +58,13 @@ a logger tagged with its id, its options from `config.json`, the build versions,
 promise-based wrapper of `chrome.tabs` (`src/core/browser/BrowserTabs.ts`; check `tabs.available` first),
 `runtime` for `chrome.runtime` messages and new windows (`src/core/browser/BrowserRuntime.ts`), and
 `payload`, which loads files that ship with VivArcDi.
+
+A module with options declares them as a static `options` schema (`src/core/boot/options/`): for
+each option its kind, its default and the values it accepts. The boot checks the module's section of
+`config.json` before `start`, so `context.options` is typed, complete and valid. A value of the wrong
+type, out of range or not among its choices is replaced by the default, never by the nearest limit,
+and leaves one warning; an unknown option is dropped with a warning; a missing required option keeps
+the module off ([spec 036](../specs/036-module-options/spec.md)).
 
 Modules mark Vivaldi's elements with `data-vivarcdi-*` attributes and stylesheets style those marks.
 Vivaldi re-renders its interface often and rewrites the `class` attribute when it does, but leaves
