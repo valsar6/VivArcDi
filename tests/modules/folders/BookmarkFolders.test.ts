@@ -8,6 +8,8 @@ import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { BookmarkFolders } from '../../../src/modules/folders/BookmarkFolders.js';
+import { BOOKMARK_FOLDERS_OPTIONS } from '../../../src/modules/folders/BookmarkFoldersOptions.js';
+import type { BookmarkFoldersOptions } from '../../../src/modules/folders/BookmarkFoldersOptions.js';
 import { DomDocument, asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { FolderCommands } from '../../../src/shared/links/FolderCommands.js';
@@ -22,10 +24,10 @@ import { FolderTabs, WritableChrome, bookmarkTree, folder, link, recordingChrome
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG)]), folder('20', 'Music')]);
 
-const DEFAULT_OPTIONS = { root: 'Importati da Firefox/Bookmarks Bar', maxDepth: 3, maxHeightPercent: 60 };
+const DEFAULT_OPTIONS: BookmarkFoldersOptions = { ...BOOKMARK_FOLDERS_OPTIONS.defaults, root: 'Importati da Firefox/Bookmarks Bar' };
 
 interface SetupExtras {
-  options?: Record<string, unknown>;
+  options?: BookmarkFoldersOptions;
   prefs?: BrowserPrefs;
   logger?: Logger;
   bookmarkWriter?: BookmarkWriter;
@@ -35,7 +37,7 @@ function setup(
   tabs: FolderTabs,
   bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks,
   { options = DEFAULT_OPTIONS, prefs = new BrowserPrefs(undefined), logger = silentLogger(), bookmarkWriter = new BookmarkWriter(undefined) }: SetupExtras = {},
-): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
+): { dom: DomDocument; module: BookmarkFolders; context: ModuleContext<BookmarkFoldersOptions> } {
   const dom = new DomDocument();
   const context = {
     document: asDocument(dom),
@@ -47,7 +49,7 @@ function setup(
     bookmarkWriter,
     prefs,
     storage: new MemoryStorage(),
-  } as unknown as ModuleContext;
+  } as unknown as ModuleContext<BookmarkFoldersOptions>;
   return { dom, module: new BookmarkFolders(), context };
 }
 
@@ -161,11 +163,11 @@ const WORKSPACE_TREE = bookmarkTree([
   folder('20', 'Music', [folder('21', 'Radio'), link('22', 'Player', 'https://player.example/')]),
 ]);
 const BAR = 'Importati da Firefox/Bookmarks Bar';
-const WORKSPACE_OPTIONS = { root: '', workspaces: { Casetta: `${BAR}/Work`, Work: `${BAR}/Music` }, maxDepth: 3, maxHeightPercent: 60 };
+const WORKSPACE_OPTIONS: BookmarkFoldersOptions = { ...BOOKMARK_FOLDERS_OPTIONS.defaults, workspaces: { Casetta: `${BAR}/Work`, Work: `${BAR}/Music` } };
 
 const inWorkspace = (workspaceId: number): string => JSON.stringify({ workspaceId });
 
-function workspaceSetup(options: Record<string, unknown> = WORKSPACE_OPTIONS, chrome?: WritableChrome): { tabs: FolderTabs; prefs: FakePrefsApi; dom: DomDocument; module: BookmarkFolders; context: ModuleContext } {
+function workspaceSetup(options: BookmarkFoldersOptions = WORKSPACE_OPTIONS, chrome?: WritableChrome): { tabs: FolderTabs; prefs: FakePrefsApi; dom: DomDocument; module: BookmarkFolders; context: ModuleContext<BookmarkFoldersOptions> } {
   const tabs = new FolderTabs([
     { id: 1, active: true, url: 'https://example.com/', vivExtData: inWorkspace(CASETTA.id) },
     { id: 2, url: 'https://example.org/', vivExtData: inWorkspace(WORK.id) },
@@ -279,7 +281,7 @@ test('keeps the tab of a link linked while another workspace shows its own folde
 test('creates nothing until the first write', async (t) => {
   installFrames(t);
   const chrome = new WritableChrome(WORKSPACE_TREE);
-  const { tabs, dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  const { tabs, dom, module, context } = workspaceSetup({ ...BOOKMARK_FOLDERS_OPTIONS.defaults }, chrome);
   await module.start(context);
   await frame();
   activate(tabs, 2);
@@ -293,7 +295,7 @@ test('creates nothing until the first write', async (t) => {
 test('shows the folder named after the workspace once it exists', async (t) => {
   installFrames(t);
   const chrome = new WritableChrome(bookmarkTree([folder('30', 'VivArcDi', [folder('31', 'Casetta', [folder('32', 'Hobbies'), link('33', 'Chess', 'https://chess.com/')])])]));
-  const { dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  const { dom, module, context } = workspaceSetup({ ...BOOKMARK_FOLDERS_OPTIONS.defaults }, chrome);
   await module.start(context);
   await frame();
   assert.deepEqual(titles(dom), ['Hobbies', 'Chess']);
@@ -303,14 +305,14 @@ test('shows the folder named after the workspace once it exists', async (t) => {
 test('listens to Cmd/Ctrl+D while it runs and stops on stop', async (t) => {
   installFrames(t);
   const chrome = new WritableChrome(WORKSPACE_TREE);
-  const { dom, module, context } = workspaceSetup({ root: '', workspaces: {}, maxDepth: 3, maxHeightPercent: 60 }, chrome);
+  const { dom, module, context } = workspaceSetup({ ...BOOKMARK_FOLDERS_OPTIONS.defaults }, chrome);
   await module.start(context);
   assert.equal(dom.listeners.get('keydown')?.length, 1);
   module.stop();
   assert.deepEqual(dom.listeners.get('keydown'), []);
 });
 
-const EDITABLE = { root: '', workspaces: { Casetta: `${BAR}/Work` }, maxDepth: 3, maxHeightPercent: 60 };
+const EDITABLE: BookmarkFoldersOptions = { ...BOOKMARK_FOLDERS_OPTIONS.defaults, workspaces: { Casetta: `${BAR}/Work` } };
 const fieldOf = (dom: DomDocument): DomNode | undefined => rows(dom)[0]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
 const keyOn = (node: DomNode | undefined, key: string): void => node?.bubble({ type: 'keydown', key, stopPropagation: (): void => undefined, preventDefault: (): void => undefined } as unknown as Event);
 const doubleClickFirst = (dom: DomDocument): void => rows(dom)[0]?.bubble({ type: 'dblclick', target: rows(dom)[0] } as unknown as Event);

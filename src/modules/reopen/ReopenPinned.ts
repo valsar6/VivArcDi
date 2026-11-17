@@ -72,7 +72,7 @@ export class ReopenPinned extends Module {
    */
   static #linksOf({ bookmarks, modules, logger }: ModuleContext): LinkKeyIndex | null {
     const folders = modules['bookmark-folders'];
-    if (folders === undefined || folders.enabled === false || !bookmarks.available) {
+    if (folders === undefined || folders.enabled !== true || !bookmarks.available) {
       return null;
     }
     const root = typeof folders['root'] === 'string' ? folders['root'] : '';
