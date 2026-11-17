@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-17 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -133,11 +133,11 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Branch and version.** Invalid values now fall back to the default instead of being clamped,
-  and a truthy non-boolean `enabled` no longer starts a module. Proposed: `fix/module-options`, with
+- [x] **Branch and version.** Invalid values now fall back to the default instead of being clamped,
+  and a truthy non-boolean `enabled` no longer starts a module. Decided: `fix/module-options`, with
   a patch version change, because the behavior changes for invalid configurations only.
-- [ ] **Shorter `config.json`.** Convention over configuration suggests shipping only `enabled` and the
-  values that differ from the defaults, so a non-standard setting stands out. Proposed: not in this
+- [x] **Shorter `config.json`.** Convention over configuration suggests shipping only `enabled` and the
+  values that differ from the defaults, so a non-standard setting stands out. Decided: not in this
   spec. The manual documents each option through the shipped file; trimming it is a separate
   decision once the schemas exist.
 
