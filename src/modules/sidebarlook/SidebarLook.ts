@@ -8,6 +8,8 @@ import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { Palettes } from './Palettes.js';
 import type { Palette } from './Palettes.js';
 import { ScrollMark } from './ScrollMark.js';
+import { SIDEBAR_LOOK_OPTIONS } from './SidebarLookOptions.js';
+import type { SidebarLookOptions } from './SidebarLookOptions.js';
 
 export const LOOK_ATTRIBUTE = 'data-vivarcdi-look';
 export const PALETTE_ATTRIBUTE = 'data-vivarcdi-palette';
@@ -15,23 +17,10 @@ export const GRADIENT_ATTRIBUTE = 'data-vivarcdi-gradient';
 const GRADIENT_PROPERTY = '--vivarcdi-gradient';
 const NEW_TAB_ORDER = 30;
 
-export interface SidebarLookSettings {
-  /** Whether the look is applied. */
-  enabled: boolean;
-  /** Name of the palette that a workspace without a color of its own uses. */
-  palette: string;
-}
-
-export class SidebarLook extends Module {
+export class SidebarLook extends Module<SidebarLookOptions> {
   public static override id = 'sidebar-look';
 
-  /**
-   * Options accepted in `config.json`, with their defaults.
-   */
-  public static readonly defaults: Readonly<SidebarLookSettings> = Object.freeze({
-    enabled: true,
-    palette: Palettes.defaultName,
-  });
+  public static override options = SIDEBAR_LOOK_OPTIONS;
 
   #stops: Array<() => void> = [];
 
@@ -43,9 +32,9 @@ export class SidebarLook extends Module {
    *
    * @param context What the module may use.
    */
-  public override start({ document, selectors, options, tabs, runtime, logger }: ModuleContext): void {
+  public override start({ document, selectors, options, tabs, runtime, logger }: ModuleContext<SidebarLookOptions>): void {
     const browser = DomQuery.require(document, selectors.get('browser'));
-    const palette = Palettes.byName(options['palette'] ?? SidebarLook.defaults.palette);
+    const palette = Palettes.byName(options.palette);
     this.#paint(browser, palette);
 
     const scroll = new ScrollMark(document, selectors.get('tabBar'));

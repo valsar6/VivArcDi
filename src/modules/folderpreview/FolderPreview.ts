@@ -2,14 +2,13 @@ import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { LinkActivator } from '../../shared/links/LinkActivator.js';
 import { OpenLinks } from '../../shared/links/OpenLinks.js';
+import { FOLDER_PREVIEW_OPTIONS } from './FolderPreviewOptions.js';
+import type { FolderPreviewOptions } from './FolderPreviewOptions.js';
 import { PreviewController } from './PreviewController.js';
 
-const DEFAULT_DELAY_MS = 400;
-const MIN_DELAY_MS = 100;
-const MAX_DELAY_MS = 2000;
-
-export class FolderPreview extends Module {
+export class FolderPreview extends Module<FolderPreviewOptions> {
   public static override id = 'folder-preview';
+  public static override options = FOLDER_PREVIEW_OPTIONS;
 
   #controller: PreviewController | null = null;
 
@@ -20,14 +19,13 @@ export class FolderPreview extends Module {
    *
    * @param context What the module may use.
    */
-  public override start(context: ModuleContext): void {
+  public override start(context: ModuleContext<FolderPreviewOptions>): void {
     const { document, tabs, bookmarks, logger, options, selectors } = context;
     const parent = bookmarks.available && tabs.available ? document.querySelector<HTMLElement>(selectors.get('browser')) : null;
     if (parent === null) {
       logger.warn('chrome.bookmarks, chrome.tabs or the browser element is missing: the folder panel is off');
       return;
     }
-    const delay = options['hoverDelayMs'];
     const openLinks = new OpenLinks(tabs, (): void => undefined, logger);
     this.#controller = new PreviewController({
       document,
@@ -38,7 +36,7 @@ export class FolderPreview extends Module {
       activator: new LinkActivator(tabs, openLinks, logger),
       storage: context.storage,
       locale: document.defaultView?.navigator.language ?? 'en',
-      delayMs: typeof delay === 'number' ? Math.min(MAX_DELAY_MS, Math.max(MIN_DELAY_MS, delay)) : DEFAULT_DELAY_MS,
+      delayMs: options.hoverDelayMs,
       logger,
     });
     this.#controller.start();
