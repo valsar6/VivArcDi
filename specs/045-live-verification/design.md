@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved, Tore, 2026-11-17 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
