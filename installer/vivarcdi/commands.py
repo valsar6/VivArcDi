@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -17,6 +19,7 @@ from .modes import InstallMode
 from .ownership import Ownership
 from .staging import Stager
 from .theme import ThemeService
+from .versions import VersionGuard, read_staged_version
 from .takeover import LegacyTakeover
 
 
@@ -55,6 +58,7 @@ class InstallerContext:
     profile_is_yours: bool = True
     prompt: Prompt = field(default_factory=NeverPrompt)
     needs_reapply: bool = False
+    allow_downgrade: bool = False
 
 
 class Command(ABC):
@@ -86,6 +90,10 @@ class InstallCommand(Command):
         if not found:
             report.error(f"No Vivaldi installation found on {context.platform.name}")
             return 1
+        refusal = self._downgrade(context, found)
+        if refusal:
+            report.error(refusal)
+            return 1
         if context.takeover.run():
             report.info("Took over the command line installation")
         context.stager.stage()
@@ -98,6 +106,19 @@ class InstallCommand(Command):
         self._offer_theme(context)
         report.info("Restart Vivaldi to load VivArcDi.")
         return 0
+
+    @staticmethod
+    def _downgrade(context: InstallerContext, found: list) -> str:
+        if context.allow_downgrade:
+            return ""
+        versions = context.installations.versions
+        installed = installed_version(context, found)
+        if not versions.is_newer(installed):
+            return ""
+        refusal = f"VivArcDi {installed} is already installed, newer than this VivArcDi ({versions.own}): nothing changed."
+        if not context.mode.offers_downgrade:
+            return refusal
+        return f"{refusal} To install {versions.own} anyway, run: python3 installer install --allow-downgrade"
 
     @staticmethod
     def _offer_theme(context: InstallerContext) -> None:
@@ -124,11 +145,8 @@ class ReapplyCommand(Command):
     help = "patch again the Vivaldi builds that an update reset"
 
     def execute(self, context: InstallerContext) -> int:
-        outdated = [
-            installation
-            for installation in context.platform.find_installations()
-            if context.installations.state(installation).needs_reapply
-        ]
+        found = context.platform.find_installations()
+        outdated = [installation for installation in found if context.installations.state(installation).needs_reapply]
         if not outdated:
             return 0
         if context.background and context.handoff.available:
@@ -136,7 +154,7 @@ class ReapplyCommand(Command):
             context.reporter.info("Asked the terminal to apply VivArcDi again")
             return 0
         try:
-            self._apply_all(context, outdated)
+            self._apply_all(context, outdated, installed_version(context, found))
         except PermissionDeniedError as error:
             if context.background and context.outcome.denied(error):
                 context.reporter.warn(str(error))
@@ -148,10 +166,17 @@ class ReapplyCommand(Command):
         return 0
 
     @staticmethod
-    def _apply_all(context: InstallerContext, outdated: list) -> None:
+    def _apply_all(context: InstallerContext, outdated: list, installed: str | None) -> None:
+        installations = context.installations
         for installation in outdated:
-            context.installations.apply(installation)
+            deployed = installations.deployed_version(installation)
+            installations.apply(installation, keep_payload=installations.versions.is_newer(deployed))
             context.reporter.info(f"Reapplied VivArcDi to {installation.label}")
+            if deployed is None and installations.versions.is_newer(installed):
+                context.reporter.warn(
+                    f"Applied the staged VivArcDi {installations.versions.own} to {installation.label}, "
+                    f"but {installed} is installed elsewhere: run install from VivArcDi {installed} again"
+                )
 
 
 class UninstallCommand(Command):
@@ -190,17 +215,40 @@ class StatusCommand(Command):
         if not found:
             report.info(f"No Vivaldi installation found on {context.platform.name}")
         for installation in found:
-            state = context.installations.state(installation)
-            if not state.patched:
-                status = "not patched"
-            elif state.current:
-                status = "patched, up to date"
-            else:
-                status = "patched, outdated payload"
-            report.info(f"{installation.label}: {status}")
+            report.info(f"{installation.label}: {self._describe(context, installation)}")
+        self._report_stage(context, installed_version(context, found))
         hook_status = "active" if context.hook.is_installed() else "not installed"
         report.info(f"Update hook: {hook_status}")
         return 0
+
+
+    @staticmethod
+    def _describe(context: InstallerContext, installation) -> str:
+        state = context.installations.state(installation)
+        if not state.patched:
+            status = "not patched"
+        elif state.current:
+            status = "patched, up to date"
+        elif state.newer:
+            status = "patched, newer than this installer"
+        else:
+            status = "patched, outdated payload"
+        deployed = context.installations.deployed_version(installation)
+        return status if deployed is None else f"{status} ({deployed})"
+
+    @staticmethod
+    def _report_stage(context: InstallerContext, installed: str | None) -> None:
+        staged = read_staged_version(context.data_dir)
+        context.reporter.info(f"Staged copy: {staged or 'none'}")
+        if staged is not None and VersionGuard(staged).is_newer(installed):
+            context.reporter.info(
+                f"The staged copy ({staged}) is older than the installed VivArcDi ({installed}): run install from {installed} again"
+            )
+
+
+def installed_version(context: InstallerContext, found: list) -> str | None:
+    """The highest VivArcDi version deployed in the given Vivaldi builds, or None when none can be read."""
+    return VersionGuard.highest(context.installations.deployed_version(installation) for installation in found)
 
 
 class ShortcutsCommand(Command):

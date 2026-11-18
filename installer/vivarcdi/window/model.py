@@ -10,12 +10,13 @@ from ..platforms import Platform
 
 
 class BuildState(Enum):
-    """The four states a Vivaldi build can be in, as the window shows them."""
+    """The five states a Vivaldi build can be in, as the window shows them."""
 
     NOT_INSTALLED = "not_installed"
     CURRENT = "current"
     OUTDATED = "outdated"
     NEEDS_REAPPLY = "needs_reapply"
+    NEWER = "newer"
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,8 @@ class StatusModel:
 
     A build is:
     - `current` when window.html is patched and the payload matches this VivArcDi and this Vivaldi;
+    - `newer` when window.html is patched and the payload is a newer VivArcDi than this one, which
+      no action replaces;
     - `outdated` when window.html is patched but the payload is another VivArcDi's or another
       Vivaldi's, which the Update action refreshes;
     - `needs_reapply` when window.html is not patched but VivArcDi was installed: its payload
@@ -53,6 +56,8 @@ class StatusModel:
 
     def _state_of(self, installation: VivaldiInstallation) -> BuildState:
         state = self._installations.state(installation)
+        if state.patched and state.newer:
+            return BuildState.NEWER
         if state.patched:
             return BuildState.CURRENT if state.current else BuildState.OUTDATED
         if installation.payload_dir.exists() or self._is_registered():

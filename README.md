@@ -191,8 +191,8 @@ package instead, or uninstall it first.
 
 4. Open Vivaldi.
 
-Check it with `python3 installer status`: it should list your Vivaldi as `patched, up to date` and
-the update hook as `active`.
+Check it with `python3 installer status`: it should list your Vivaldi as `patched, up to date` with
+the VivArcDi version, the staged copy with the same version, and the update hook as `active`.
 
 ### Update and uninstall
 
@@ -231,10 +231,10 @@ installer stops and tells you to download a release build or to run `make build`
 
 | Command | What it does |
 |---|---|
-| `install` | Backs up `window.html`, copies the payload, patches `window.html`, registers the update hook. Refuses when the app or the package manages VivArcDi |
-| `reapply` | Patches again any Vivaldi build that an update reset; run automatically by the hook |
+| `install` | Backs up `window.html`, copies the payload, patches `window.html`, registers the update hook. Refuses when the app or the package manages VivArcDi, and when a newer VivArcDi is already installed (`--allow-downgrade` installs it anyway) |
+| `reapply` | Patches again any Vivaldi build that an update reset; run automatically by the hook. Never replaces a newer VivArcDi |
 | `uninstall` | Removes the patch, the payload and the hook; keeps the backups |
-| `status` | Shows which builds are patched and whether the hook is active |
+| `status` | Shows which builds are patched, with their VivArcDi version, the version of the staged copy, and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
 | `theme apply\|restore\|status` | Adds the "VivArcDi Light" theme to the Vivaldi profile and selects it, backs it up first; `restore` selects the previous theme again; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
 | `window` | Opens the VivArcDi window, the same one as in the app and the package |
@@ -260,6 +260,10 @@ handle this as described in [Install](#install). For the command line installer:
 The hook runs a copy of the installer kept in `~/Library/Application Support/VivArcDi` on macOS and
 `/usr/local/share/vivarcdi` on Debian, so you can move or delete the cloned repository.
 After an update, restart Vivaldi once more to load the reapplied modules.
+
+An older copy of VivArcDi (an old clone, an old app) never replaces a newer one by mistake: `install`
+refuses and says which versions it found, and `reapply` keeps the newer payload. To go back to an
+older version on purpose, run `python3 installer install --allow-downgrade` from it.
 
 On macOS, App Management lets only the apps you allowed change Vivaldi, and the launchd agent is not
 one of them. So after an update the agent opens a Terminal window that applies VivArcDi again; when
