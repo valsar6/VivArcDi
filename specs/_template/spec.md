@@ -38,7 +38,8 @@ performance, configuration in `config.json`, macOS and Debian support.
 ## Acceptance criteria
 
 Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `Check` says how:
-`auto` names the test that proves it, `manual` is a step Tore performs on a real Vivaldi.
+`auto` names the test that proves it, `live` names the scenario that proves it on a lab Vivaldi,
+`manual` is a step Tore performs on a real Vivaldi.
 
 | ID | Criterion | Check |
 |---|---|---|

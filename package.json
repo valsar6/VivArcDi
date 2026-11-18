@@ -1,6 +1,6 @@
 {
   "name": "vivarcdi",
-  "version": "0.58.4",
+  "version": "0.59.0",
   "private": true,
   "description": "Make Vivaldi behave like Arc",
   "type": "module",
@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && stylelint \"src/**/*.scss\"",
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",
-    "release": "tsx scripts/release/cli.ts"
+    "release": "tsx scripts/release/cli.ts",
+    "live": "npm run build && tsx scripts/live/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

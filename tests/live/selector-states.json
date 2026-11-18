@@ -1,0 +1,10 @@
+{
+  "pinnedTab": "pinned-tab",
+  "pinnedGroup": "pinned-tab",
+  "workspacePopup": "workspace-popup",
+  "workspaceCreate": "workspace-popup",
+  "workspaceRow": "workspace-popup",
+  "workspaceTitle": "workspace-editor",
+  "workspaceForm": "workspace-editor",
+  "workspaceSave": "workspace-editor"
+}

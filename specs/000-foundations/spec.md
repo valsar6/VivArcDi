@@ -118,7 +118,7 @@ Phase 0 also documents the native Vivaldi settings that already give Arc's behav
 | AC-14 | IF every selector file is newer than the running Vivaldi, THEN THE loader SHALL stay inactive and log a warning. | auto: `start stays inactive on a Vivaldi older than every catalog` |
 | AC-15 | WHEN a module fails to start, THE loader SHALL log it and start the other modules. | auto: `a failing module does not stop the others` |
 | AC-16 | THE loader SHALL start only modules enabled in `config.json` and warn about unknown ids. | auto: `createEnabled instantiates only enabled modules` |
-| AC-17 | WHEN Vivaldi starts after `install`, THE interface console SHALL show `[VivArcDi] <version> active on Vivaldi <version>`. | manual |
+| AC-17 | WHEN Vivaldi starts after `install`, THE interface console SHALL show `[VivArcDi] <version> active on Vivaldi <version>`. | live: `boot check finds the active line` |
 | AC-18 | WHEN Vivaldi updates itself, THE hook SHALL reapply VivArcDi: on Debian without user action, on macOS by opening a Terminal window that does it. | manual: update Vivaldi (or replace `window.html` with the backup), wait for the Terminal window, restart Vivaldi and look for the console line of AC-17 |
 | AC-19 | WHEN `uninstall` runs and Vivaldi restarts, THE browser SHALL look and behave as before the install. | manual |
 | AC-20 | WHEN Vivaldi rewrites the classes of the browser root, THE activation mark SHALL stay. | auto: `the activation mark survives a rewrite of the browser classes` |

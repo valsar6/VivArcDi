@@ -10,7 +10,7 @@ feature does, and code follows it. No code is written for a behavior that no app
 | 1. Specify | `specs/NNN-name/spec.md`, from [the template](specs/_template/spec.md): user stories, expected behavior, requirements, acceptance criteria, out of scope | Tore approves the spec |
 | 2. Design | `design.md` and `tasks.md` in the same folder | Tore approves the design |
 | 3. Implement | Code and tests, one task at a time | Review of the pull request |
-| 4. Verify | Manual checklist from the `manual` acceptance criteria | Tore checks it on macOS and Debian |
+| 4. Verify | `npm run live` for the `live` criteria, then the checklist of the `manual` ones | Tore checks it on macOS and Debian |
 
 - **Approval is explicit.** A spec or design becomes `Approved` only when Tore says so on its pull
   request; the author then sets the status and the date in its header. Steps 1 and 2 may share a pull
@@ -20,7 +20,8 @@ feature does, and code follows it. No code is written for a behavior that no app
   `Implemented` when the last task is merged.
 - **Behavior changes start in the spec.** A bug that the spec did not foresee gets an acceptance
   criterion first, then the fix. A change of intent updates the spec and goes through approval again.
-- **Each acceptance criterion has a check**: an automated test with the same name, or a manual step.
+- **Each acceptance criterion has a check**: an automated test with the same name, a live scenario
+  with the same name, or a manual step.
 
 ## Principles
 
@@ -58,6 +59,7 @@ the installer deploys. Users never need Node.
 | `npm run build` | Build `dist/` |
 | `make test-py` | Installer tests (Python 3.9+, standard library only) |
 | `make check` | Lint, typecheck, all tests and build in one go |
+| `npm run live` | Build, then run the boot check, the selector check and the live scenarios on a lab copy of Vivaldi; `--only <name or spec>`, `--probe <file>`, `--channel snapshot`, `--vivaldi <root>` |
 | `npm run release -- check --base origin/main --branch <branch>` | The branch and version check that CI runs on pull requests |
 
 `any` is not allowed. Add tests with every behavior change.

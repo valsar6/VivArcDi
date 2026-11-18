@@ -1,0 +1,38 @@
+{
+  "vivaldi": {
+    "tabs": {
+      "bar": {
+        "position": 1
+      }
+    },
+    "welcome": {
+      "read_pages": [
+        "intro",
+        "a11y_settings",
+        "account",
+        "control",
+        "import_data",
+        "tracker_and_ad",
+        "layouts",
+        "personalize",
+        "panel_internal",
+        "panel_apps",
+        "welcome_feature_amount"
+      ]
+    },
+    "workspaces": {
+      "list": [
+        {
+          "icon": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"8\" cy=\"8\" r=\"6\"/></svg>",
+          "id": 1000000000001.0,
+          "name": "Lab One"
+        },
+        {
+          "icon": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"8\" cy=\"8\" r=\"6\"/></svg>",
+          "id": 1000000000002.0,
+          "name": "Lab Two"
+        }
+      ]
+    }
+  }
+}

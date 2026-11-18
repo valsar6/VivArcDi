@@ -99,7 +99,7 @@ a workspace stay in Vivaldi's own workspace menu; the space menu of Arc is a lat
 | AC-10 | THE module SHALL save the collapsed state for each workspace separately. | auto: `remembers the collapsed state of each workspace` |
 | AC-11 | IF the list of workspaces cannot be read, THEN THE header SHALL show `Tabs` and log the problem once. | auto: `falls back to Tabs when workspaces are unreadable` |
 | AC-12 | WHERE `space-header` is disabled, THE module SHALL draw no header and hide nothing. | auto: `disabled module draws no header` |
-| AC-13 | WHEN Tore switches between two workspaces, THE header SHALL show the icon and name of each. | manual |
+| AC-13 | WHEN Tore switches between two workspaces, THE header SHALL show the icon and name of each. | live: `space header shows each workspace name` |
 | AC-14 | WHEN Tore collapses a workspace with a loaded pinned tab, an unloaded pinned tab and an open link, ONLY the loaded pinned tab and the open link SHALL stay visible. | manual |
 | AC-15 | WHEN Tore restarts Vivaldi, EACH workspace SHALL be collapsed or open as he left it. | manual |
 | AC-16 | WHEN Tore hovers and clicks the header on macOS, THE arrow SHALL appear and the click SHALL toggle it. | manual |

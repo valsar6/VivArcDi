@@ -1,8 +1,8 @@
-# 045 Live verification: design
+# 046 Live verification: design
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved, Tore, 2026-11-17 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
