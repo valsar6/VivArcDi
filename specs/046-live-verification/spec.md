@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | Tooling |
 | Owner | Tore |
-| Approved | Tore, 2026-11-17 |
+| Approved | Tore, 2026-11-17; amendment (payload injected, lab copy untouched) approved by Tore, 2026-11-18 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -35,8 +35,9 @@ spec), then running several specs in parallel and measuring where the maintainer
 
 ## Expected behavior
 
-`npm run live` builds the payload, prepares a lab Vivaldi with that payload, starts it on a fresh
-profile with remote debugging bound to `127.0.0.1`, attaches to `window.html` and runs, in order:
+`npm run live` builds the payload, prepares a lab copy of Vivaldi that stays exactly as Vivaldi
+shipped it, starts it on a fresh profile with remote debugging bound to `127.0.0.1`, attaches to
+`window.html`, injects the payload of the working tree into it and runs, in order:
 
 1. **Boot check.** The payload loaded, every enabled module started, no `VivArcDi` error appeared in
    the console.
@@ -70,9 +71,13 @@ profile, and anything the harness cannot reach.
 - **FR-2.** The harness never uses the user's Vivaldi profile: it creates a temporary
   `--user-data-dir`, refuses any directory that holds an existing Vivaldi profile, and deletes the
   temporary one at the end, also after a failure or an interruption.
-- **FR-3.** The harness never patches the user's installed Vivaldi. It uses a lab copy of Vivaldi in
-  a cache directory, patched with the `dist/` of the working tree through the installer's own
-  patching code.
+- **FR-3.** The harness never modifies a Vivaldi build. It uses a lab copy of Vivaldi in a cache
+  directory, made identical to the build Vivaldi shipped: when the installed Vivaldi carries
+  VivArcDi, the copy loses the patch and the payload through the installer's own code. On macOS the
+  harness refuses a copy whose code signature does not verify.
+- **FR-3a.** The harness serves the `dist/` of the working tree on a free port of `127.0.0.1` and
+  injects it into `window.html` through CDP before the window loads: Content Security Policy is
+  bypassed for the lab window only, and `build.json` is generated with the lab's Vivaldi version.
 - **FR-4.** The remote debugging port is a free port bound to `127.0.0.1` and lives only as long as
   the run.
 - **FR-5.** The harness stops only the processes it started.
@@ -107,7 +112,8 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 | AC-1 | WHEN the harness starts Vivaldi, THE harness SHALL pass a new temporary user data directory and a port bound to 127.0.0.1 | auto: `harness starts Vivaldi on a temporary profile and a local port` |
 | AC-2 | IF the user data directory holds an existing Vivaldi profile, THEN THE harness SHALL refuse to start | auto: `harness refuses a directory that holds a profile` |
 | AC-3 | WHEN a run ends, fails or is interrupted, THE harness SHALL stop the Vivaldi it started and delete the temporary profile | auto: `harness cleans up after a failed run` |
-| AC-4 | THE harness SHALL patch only the lab copy of Vivaldi and never the installed one | auto: `test_harness_patches_only_the_lab_copy` |
+| AC-4 | THE harness SHALL leave the lab copy identical to the shipped Vivaldi and never change the installed one | auto: `test_lab_copy_stays_as_vivaldi_shipped_it` |
+| AC-4a | WHEN the lab window loads, THE harness SHALL inject the payload served from 127.0.0.1 before the page scripts run | auto: `harness injects the served payload before window.html loads` |
 | AC-5 | WHEN attached to window.html, THE selector check SHALL report every catalog selector of the running version as pass, fail or not checked | auto: `selector check reports every selector of the version` |
 | AC-6 | THE selector check SHALL pick the selector file with the same version matching as SelectorCatalog | auto: `selector check matches versions like the catalog` |
 | AC-7 | IF a check fails, THEN THE harness SHALL save a screenshot of window.html and exit with a non-zero code | auto: `harness saves a screenshot and fails on a failed check` |
@@ -132,8 +138,10 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 ## Open questions
 
 - [x] **Lab copy of Vivaldi.** Decided: the harness copies the installed Vivaldi into
-  `~/.cache/vivarcdi/lab/<version>/` (macOS: the `.app` bundle; Debian: `/opt/vivaldi`) and patches
-  the copy; a `--vivaldi <path>` option points to another build, which the snapshot spec will use.
+  `~/.cache/vivarcdi/lab/<version>/` (macOS: the `.app` bundle; Debian: `/opt/vivaldi`). Amended on
+  2026-11-18: the copy is no longer patched, because a patched copy breaks the macOS code signature
+  and Gatekeeper refuses it ("damaged", then "rejected" after an ad hoc signature); the payload is
+  injected through CDP instead, which the first run on Tore's Mac proved to work; a `--vivaldi <path>` option points to another build, which the snapshot spec will use.
   Alternative: patch the installed Vivaldi and restore it after the run, which is simpler but touches
   the user's browser.
 - [x] **Raw CDP or Playwright.** Decided: raw CDP over Node's WebSocket (NFR-3), with a small driver

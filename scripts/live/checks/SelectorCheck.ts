@@ -7,6 +7,8 @@ import type { Check, Session } from '../Session.js';
 import { DEFAULT_STATE, SELECTOR_STATES } from './SelectorStates.js';
 import type { SelectorState, StateMap } from './SelectorStates.js';
 
+const PRESENCE_WAIT_MS = 2_000;
+
 export interface CatalogFile {
   version: string | null;
   selectors: Record<string, string>;
@@ -86,7 +88,8 @@ export class SelectorCheck implements Check {
 
   async #probe(driver: Driver, name: string, state: string): Promise<CheckResult> {
     const css = this.#selectors[name] ?? '';
-    const found = await driver.exists(css).catch(() => false);
+    const query = `document.querySelector(${JSON.stringify(css)})`;
+    const found = await driver.waitFor(query, PRESENCE_WAIT_MS).then(() => true, () => false);
     return this.#result(name, found ? 'pass' : 'fail', `${css} in ${state}`);
   }
 

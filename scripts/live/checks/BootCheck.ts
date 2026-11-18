@@ -17,7 +17,7 @@ export class BootCheck implements Check {
    * Proves that the payload booted: the active line appeared, it lists every enabled module, and
    * no VivArcDi error was logged.
    *
-   * @param enabled Ids of the modules enabled in `dist/config.json`.
+   * @param enabled Ids of the modules the payload starts in a normal window.
    * @param waitMs How long to wait for the active line.
    */
   constructor(enabled: string[], waitMs = WAIT_MS) {

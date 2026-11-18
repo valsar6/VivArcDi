@@ -9,7 +9,13 @@ import type { Session } from '../../scripts/live/Session.js';
 import { tempDir, writeJson } from './fakes.js';
 
 function session(present: string[]): Session {
-  const driver = { exists: async (css: string) => present.includes(css) } as unknown as Driver;
+  const driver = {
+    waitFor: async (expression: string) => {
+      if (!present.some((css) => expression === `document.querySelector(${JSON.stringify(css)})`)) {
+        throw new Error(`Timed out waiting for ${expression}`);
+      }
+    },
+  } as unknown as Driver;
   return { driver, console: undefined as never };
 }
 

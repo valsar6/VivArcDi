@@ -4,6 +4,7 @@ import { Cleanup } from './Cleanup.js';
 import { ConsoleLog } from './ConsoleLog.js';
 import { Driver } from './Driver.js';
 import type { LabBuild } from './LabVivaldi.js';
+import { PayloadInjector } from './PayloadInjector.js';
 import type { CheckResult, Report, RunFacts } from './Report.js';
 import type { Check, Session } from './Session.js';
 
@@ -17,8 +18,14 @@ export interface RunningVivaldi {
   stop(): Promise<void>;
 }
 
+export interface ServedPayload {
+  url: string;
+  close(): Promise<void>;
+}
+
 export interface LiveRunParts {
   prepareLab(): Promise<LabBuild>;
+  servePayload(vivaldiVersion: string): Promise<ServedPayload>;
   createProfile(): Promise<LabProfile>;
   launch(executable: string, profile: string): Promise<RunningVivaldi>;
   attach(endpoint: string): Promise<CdpConnection>;
@@ -89,6 +96,8 @@ export class LiveRun {
     const parts = this.#parts;
     const lab = await parts.prepareLab();
     this.#facts.vivaldiVersion = lab.vivaldiVersion;
+    const payload = await parts.servePayload(lab.vivaldiVersion);
+    this.#cleanup.add(() => payload.close());
     const profile = await parts.createProfile();
     this.#cleanup.add(() => profile.remove());
     const vivaldi = await parts.launch(lab.executable, profile.path);
@@ -97,6 +106,7 @@ export class LiveRun {
     this.#cleanup.add(() => cdp.close());
     const console = new ConsoleLog(cdp);
     await cdp.send('Runtime.enable');
+    await new PayloadInjector(cdp).inject(payload.url);
     const catalog = await parts.catalog(lab.vivaldiVersion);
     this.#facts.catalogVersion = catalog.version;
     return { session: { driver: new Driver(cdp, catalog.selectors), console }, catalog };
