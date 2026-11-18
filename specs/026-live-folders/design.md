@@ -60,7 +60,7 @@ folders. Its parts:
 
 | Part | Job |
 |---|---|
-| `LiveFolderStore` | Reads and writes the folders of every workspace in `context.storage` under `liveFolders`: `{ [workspace]: LiveFolder[] }`, with `LiveFolder = { id, name, filters, rows, warning, refreshedAt }`. Rows are kept, so a restart shows them at once (AC-14). |
+| `LiveFolderStore` | Reads and writes the folders of every workspace in `context.storage` under `liveFolders`: `{ [workspace]: LiveFolder[] }`, with `LiveFolder = { id, name, filters, rows, warning, refreshedAt }`. Rows are kept, so a restart shows them at once (AC-14). The folders are read at each call and saved per change, so one window does not undo another (spec 040). |
 | `PullRequestFilters` | The filters (`createdByMe`, `reviewRequests`, `drafts`, `repositories`), defaults all on and no repository, and the GitHub search queries they make. |
 | `GithubPullRequests` | Runs the queries and maps the answer to rows. |
 | `GithubToken` | Reads the token for each refresh. |
