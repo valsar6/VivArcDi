@@ -73,6 +73,8 @@ toast, kind `error`:
 
 Each text shows at most once per window session; the console warnings stay as they are.
 
+Spec 037 adds two notices to this list, for data from a newer version and for unreadable data.
+
 **Toast service.** The module context gains one shared notice service, backed by a single `Toast`
 element per window. It shows a message now, or once per session under a key. Modules that already
 build their own `Toast` keep it; moving them to the service is out of scope.

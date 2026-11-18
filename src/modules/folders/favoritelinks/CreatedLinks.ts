@@ -1,9 +1,20 @@
-import type { KeyValueStorage } from '../../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../../core/browser/StoredFormat.js';
 
 const KEY = 'vivarcdi.createdLinks';
 
+const FORMAT = new StoredFormat<string[]>({
+  empty: [],
+  read: (data): Readout<string[]> | null => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id): id is string => typeof id === 'string');
+    return { value: ids, skipped: ids.length < data.length };
+  },
+});
+
 export class CreatedLinks {
-  #storage: KeyValueStorage;
+  #storage: ReadingStorage;
 
   /**
    * The ids of the bookmarks VivArcDi made when a tab was added to the workspace favorites, kept
@@ -12,7 +23,7 @@ export class CreatedLinks {
    *
    * @param storage Strings that survive a restart.
    */
-  constructor(storage: KeyValueStorage) {
+  constructor(storage: ReadingStorage) {
     this.#storage = storage;
   }
 
@@ -42,15 +53,10 @@ export class CreatedLinks {
   }
 
   #read(): Set<string> {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage.getItem(KEY) ?? '[]');
-      return new Set(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []);
-    } catch {
-      return new Set();
-    }
+    return new Set(this.#storage.read(KEY, FORMAT).value);
   }
 
   #write(ids: Set<string>): void {
-    this.#storage.setItem(KEY, JSON.stringify([...ids]));
+    this.#storage.setItem(KEY, FORMAT.encode([...ids]));
   }
 }

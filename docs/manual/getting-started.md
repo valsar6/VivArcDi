@@ -54,6 +54,17 @@ the [README](../../README.md#install).
   on Debian. The VivArcDi window says when a newer release exists. On macOS, a new version may ask for
   App Management again.
 
+## Saved data
+
+VivArcDi keeps its data under `vivarcdi.*` keys. After you go back to an older version, data written
+by the newer one is shown but not changed, and a notice says so. A value that cannot be read is copied
+once to `vivarcdi.recovery.<name>` before VivArcDi overwrites it. With the GitHub connection, that
+copy may hold the token.
+
+To put a copy back, open the console of `window.html`, read it with `chrome.storage.local.get` and
+write it under the original key with `chrome.storage.local.set`, then restart Vivaldi. To remove a
+copy, use `chrome.storage.local.remove` on its key.
+
 ## Turn a feature off
 
 Each feature is a module in `config.json` with an `enabled` option. Set it to `false` and run the

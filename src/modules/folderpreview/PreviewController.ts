@@ -3,7 +3,7 @@ import type { Logger } from '../../core/support/Logger.js';
 import type { LinkActivator } from '../../shared/links/LinkActivator.js';
 import type { OpenLinks } from '../../shared/links/OpenLinks.js';
 import { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import type { ReadingStorage } from '../../core/browser/StoredFormat.js';
 import { FolderHover } from './FolderHover.js';
 import { FolderLinks } from './FolderLinks.js';
 import { PreviewPanelView } from './PreviewPanelView.js';
@@ -23,7 +23,7 @@ export interface PreviewParts {
   bookmarks: Pick<BrowserBookmarks, 'getTree'>;
   openLinks: Pick<OpenLinks, 'refresh'>;
   activator: Pick<LinkActivator, 'activate'>;
-  storage: KeyValueStorage | null;
+  storage: ReadingStorage | null;
   locale: string;
   delayMs: number;
   logger: Logger;

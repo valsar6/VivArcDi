@@ -2,20 +2,20 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Logger } from '../../../src/core/support/Logger.js';
 import { ARCHIVE_STORAGE_KEY, ArchiveStore } from '../../../src/modules/today/ArchiveStore.js';
-import { SilentSink } from '../../loader/fakes.js';
-import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
+import { SilentSink, guarded } from '../../loader/fakes.js';
+import { MemoryStorage } from '../reopen/fakes.js';
 import { NOW, OutcomeStorage, entry } from './fakes.js';
 
 test('drops the oldest entries past the limit', () => {
   const storage = new MemoryStorage();
-  const store = new ArchiveStore(storage, 50, silentLogger());
+  const store = new ArchiveStore(storage, 50);
   store.load();
   store.add(Array.from({ length: 49 }, (_, index) => entry(`https://site.example/${index}`, `Page ${index}`, NOW + index)));
   store.add([entry('https://a.example/', 'A', NOW + 100), entry('https://b.example/', 'B', NOW + 101)]);
   assert.equal(store.entries.length, 50);
   assert.equal(store.entries[0]?.url, 'https://b.example/');
   assert.ok(!store.entries.some(({ url }) => url === 'https://site.example/0'));
-  const reloaded = new ArchiveStore(storage, 50, silentLogger());
+  const reloaded = new ArchiveStore(storage, 50);
   reloaded.load();
   assert.deepEqual(reloaded.entries, store.entries);
 });
@@ -24,7 +24,7 @@ test('skips malformed entries and warns once', () => {
   const storage = new MemoryStorage();
   storage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify([entry('https://ok.example/', 'Ok', NOW), { url: 3 }, null, { ...entry('https://x.example/', 'X', NOW), archivedAt: 'yesterday' }]));
   const sink = new SilentSink();
-  const store = new ArchiveStore(storage, 500, new Logger('test', sink));
+  const store = new ArchiveStore(guarded(storage, new Logger('test', sink)), 500);
   store.load();
   assert.deepEqual(store.entries.map(({ url }) => url), ['https://ok.example/']);
   assert.equal(sink.lines.filter(([level]) => level === 'warn').length, 1);
@@ -32,7 +32,7 @@ test('skips malformed entries and warns once', () => {
 
 test('removes a restored entry and saves the archive', () => {
   const storage = new MemoryStorage();
-  const store = new ArchiveStore(storage, 500, silentLogger());
+  const store = new ArchiveStore(storage, 500);
   store.add([entry('https://a.example/', 'A', NOW), entry('https://b.example/', 'B', NOW - 1)]);
   const [first] = store.entries;
   assert.ok(first);
@@ -43,15 +43,15 @@ test('removes a restored entry and saves the archive', () => {
 test('adds nothing when the archive cannot be saved', async () => {
   const storage = new OutcomeStorage();
   storage.outcome = 'failed';
-  const store = new ArchiveStore(storage, 500, silentLogger());
+  const store = new ArchiveStore(storage, 500);
   assert.equal(await store.add([entry('https://a.example/', 'A', NOW)]), 'failed');
   assert.equal(store.entries.length, 0);
 });
 
 test('keeps entries another window added', () => {
   const storage = new MemoryStorage();
-  const first = new ArchiveStore(storage, 500, silentLogger());
-  const second = new ArchiveStore(storage, 500, silentLogger());
+  const first = new ArchiveStore(storage, 500);
+  const second = new ArchiveStore(storage, 500);
   first.load();
   second.load();
   first.add([entry('https://a.example/', 'A', NOW)]);
@@ -62,8 +62,8 @@ test('keeps entries another window added', () => {
 
 test('removes an entry by value after another window changed the archive', () => {
   const storage = new MemoryStorage();
-  const first = new ArchiveStore(storage, 500, silentLogger());
-  const second = new ArchiveStore(storage, 500, silentLogger());
+  const first = new ArchiveStore(storage, 500);
+  const second = new ArchiveStore(storage, 500);
   first.add([entry('https://a.example/', 'A', NOW), entry('https://b.example/', 'B', NOW - 1)]);
   const [target] = first.entries;
   assert.ok(target);

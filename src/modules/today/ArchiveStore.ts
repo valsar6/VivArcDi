@@ -1,5 +1,6 @@
-import type { Logger } from '../../core/support/Logger.js';
 import type { SaveOutcome, SavingStorage } from '../../core/browser/SavingStorage.js';
+import { StoredFormat } from '../../core/browser/StoredFormat.js';
+import type { Readout, StoredReader } from '../../core/browser/StoredFormat.js';
 
 export const ARCHIVE_STORAGE_KEY = 'vivarcdi.archive';
 
@@ -27,11 +28,28 @@ const FIELD_CHECKS: Readonly<Record<keyof ArchiveEntry, (value: unknown) => bool
   archivedAt: (value) => typeof value === 'number' && Number.isFinite(value),
 };
 
+const isEntry = (value: unknown): boolean => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const fields = value as Record<string, unknown>;
+  return Object.entries(FIELD_CHECKS).every(([name, check]) => check(fields[name]));
+};
+
+const FORMAT = new StoredFormat<ArchiveEntry[]>({
+  empty: [],
+  read: (data): Readout<ArchiveEntry[]> | null => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const valid = (data as unknown[]).filter((entry): entry is ArchiveEntry => isEntry(entry));
+    return { value: valid, skipped: valid.length < data.length };
+  },
+});
+
 export class ArchiveStore {
-  #storage: SavingStorage;
+  #storage: SavingStorage & StoredReader;
   #limit: number;
-  #logger: Logger;
-  #warned = false;
 
   /**
    * The archive of closed Today tabs, newest first, kept in VivArcDi's shared storage so that it
@@ -39,12 +57,10 @@ export class ArchiveStore {
    *
    * @param storage Persistent storage.
    * @param limit The most entries kept; older ones are dropped.
-   * @param logger Logger for entries that cannot be read.
    */
-  constructor(storage: SavingStorage, limit: number, logger: Logger) {
+  constructor(storage: SavingStorage & StoredReader, limit: number) {
     this.#storage = storage;
     this.#limit = limit;
-    this.#logger = logger;
   }
 
   /**
@@ -55,7 +71,7 @@ export class ArchiveStore {
   }
 
   /**
-   * Reads the saved entries. Malformed ones are skipped, with one warning.
+   * Reads the saved entries. Malformed ones are skipped.
    */
   public load(): void {
     this.#current();
@@ -70,7 +86,7 @@ export class ArchiveStore {
    */
   public async add(entries: ArchiveEntry[]): Promise<SaveOutcome> {
     const added = ArchiveStore.#newestFirst([...entries, ...this.#current()]).slice(0, this.#limit);
-    const outcome = await this.#storage.save(ARCHIVE_STORAGE_KEY, JSON.stringify(added));
+    const outcome = await this.#storage.save(ARCHIVE_STORAGE_KEY, FORMAT.encode(added));
     if (outcome !== 'saved') {
       this.#save(this.#current().filter((candidate) => !entries.some((entry) => ArchiveStore.#same(candidate, entry))));
     }
@@ -88,27 +104,11 @@ export class ArchiveStore {
   }
 
   #save(entries: ArchiveEntry[]): void {
-    this.#storage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(entries));
+    this.#storage.setItem(ARCHIVE_STORAGE_KEY, FORMAT.encode(entries));
   }
 
   #current(): ArchiveEntry[] {
-    const saved = this.#read();
-    const valid = saved.filter((entry): entry is ArchiveEntry => ArchiveStore.#isEntry(entry));
-    if (valid.length < saved.length && !this.#warned) {
-      this.#warned = true;
-      this.#logger.warn(`skipped ${saved.length - valid.length} malformed archive entries`);
-    }
-    return ArchiveStore.#newestFirst(valid).slice(0, this.#limit);
-  }
-
-  #read(): unknown[] {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage.getItem(ARCHIVE_STORAGE_KEY) ?? '[]');
-      return Array.isArray(parsed) ? (parsed as unknown[]) : [parsed];
-    } catch (error) {
-      this.#logger.warn('the saved archive cannot be read', error);
-      return [];
-    }
+    return ArchiveStore.#newestFirst(this.#storage.read(ARCHIVE_STORAGE_KEY, FORMAT).value).slice(0, this.#limit);
   }
 
   static #same(a: ArchiveEntry, b: ArchiveEntry): boolean {
@@ -117,13 +117,5 @@ export class ArchiveStore {
 
   static #newestFirst(entries: ArchiveEntry[]): ArchiveEntry[] {
     return [...entries].sort((a, b) => b.archivedAt - a.archivedAt);
-  }
-
-  static #isEntry(value: unknown): boolean {
-    if (typeof value !== 'object' || value === null) {
-      return false;
-    }
-    const fields = value as Record<string, unknown>;
-    return Object.entries(FIELD_CHECKS).every(([name, check]) => check(fields[name]));
   }
 }

@@ -7,7 +7,7 @@ import type { BrowserSearch } from '../browser/BrowserSearch.js';
 import type { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { BrowserWindows } from '../browser/BrowserWindows.js';
 import type { Logger } from '../support/Logger.js';
-import type { SavingStorage } from '../browser/SavingStorage.js';
+import type { VersionedStorage } from '../browser/StoredFormat.js';
 import type { NoticeBoard } from '../dom/Notices.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
@@ -43,8 +43,8 @@ export interface ModuleContext<O extends object = RawOptions> {
   history: BrowserHistory;
   /** Vivaldi's preferences, read-only; check `prefs.available` first. */
   prefs: BrowserPrefs;
-  /** Strings that survive a restart, shared by all modules. */
-  storage: SavingStorage;
+  /** Strings that survive a restart, shared by all modules; `read` loads JSON values (spec 037). */
+  storage: VersionedStorage;
   /** Tells the user something through the window's one shared toast. */
   notices: NoticeBoard;
   /** Loads files that ship with VivArcDi. */

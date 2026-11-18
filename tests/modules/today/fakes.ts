@@ -1,3 +1,4 @@
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import { DomDocument, DomNode } from '../../core/dom.js';
 import { LinkingTabs } from '../favorites/linked.js';
 import type { ArchiveEntry } from '../../../src/modules/today/ArchiveStore.js';
@@ -88,6 +89,10 @@ export class OutcomeStorage {
 
   public getItem(key: string): string | null {
     return this.items.get(key) ?? null;
+  }
+
+  public read<T>(key: string, format: StoredFormat<T>): StoredRead<T> {
+    return format.decode(this.getItem(key));
   }
 
   public setItem(key: string, value: string): void {

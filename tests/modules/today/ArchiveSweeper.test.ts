@@ -13,7 +13,7 @@ const ACTIVE: FolderTab = { id: 1, active: true, url: 'https://active.example/',
 
 function setup(tabs: FolderTab[], clock = { now: NOW }): { tabs: TodayTabs; store: ArchiveStore; sweeper: ArchiveSweeper; stamps: ActivityStamps; timer: ManualTimer } {
   const fake = new TodayTabs(tabs);
-  const store = new ArchiveStore(new MemoryStorage(), 500, silentLogger());
+  const store = new ArchiveStore(new MemoryStorage(), 500);
   const stamps = new ActivityStamps(fake, (): number => clock.now, silentLogger());
   const timer = new ManualTimer();
   const sweeper = new ArchiveSweeper({ tabs: fake, store, stamps, limitMs: 12 * HOUR, now: (): number => clock.now, repeat: timer.repeat, notices: silentNotices(), logger: silentLogger() });
@@ -93,7 +93,7 @@ const OLD: FolderTab = { id: 2, url: 'https://old.example/', vivExtData: stamped
 
 function outcomeSetup(storage: OutcomeStorage, notices: Notices = silentNotices()): { tabs: TodayTabs; store: ArchiveStore; sweeper: ArchiveSweeper } {
   const tabs = new TodayTabs([ACTIVE, OLD]);
-  const store = new ArchiveStore(storage, 500, silentLogger());
+  const store = new ArchiveStore(storage, 500);
   const stamps = new ActivityStamps(tabs, (): number => NOW, silentLogger());
   const sweeper = new ArchiveSweeper({ tabs, store, stamps, limitMs: 12 * HOUR, now: (): number => NOW, repeat: new ManualTimer().repeat, notices, logger: silentLogger() });
   return { tabs, store, sweeper };

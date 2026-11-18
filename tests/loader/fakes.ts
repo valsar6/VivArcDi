@@ -1,6 +1,9 @@
+import { GuardedStorage } from '../../src/core/boot/GuardedStorage.js';
 import type { PayloadSource } from '../../src/core/boot/ResourceLoader.js';
+import type { SavingStorage } from '../../src/core/browser/SavingStorage.js';
 import { Notices } from '../../src/core/dom/Notices.js';
 import type { ToastKind } from '../../src/core/dom/Toast.js';
+import { Logger } from '../../src/core/support/Logger.js';
 
 export class FakeLoader implements PayloadSource {
   #files: Record<string, unknown>;
@@ -114,3 +117,6 @@ export class RecordingToast {
 }
 
 export const silentNotices = (): Notices => new Notices(new RecordingToast());
+
+export const guarded = (inner: SavingStorage, logger: Logger = new Logger('test', new SilentSink())): GuardedStorage =>
+  new GuardedStorage(inner, silentNotices(), logger);

@@ -1,10 +1,21 @@
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat, type ReadingStorage, type Readout } from '../../core/browser/StoredFormat.js';
 
 const KEY = 'vivarcdi.little-arc.windows';
 const KEPT = 20;
 
+const FORMAT = new StoredFormat<number[]>({
+  empty: [],
+  read: (data): Readout<number[]> | null => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id): id is number => Number.isInteger(id));
+    return { value: ids, skipped: ids.length < data.length };
+  },
+});
+
 export class LittleArcRegistry {
-  #storage: KeyValueStorage;
+  #storage: ReadingStorage;
 
   /**
    * Remembers which windows are Little Arc windows, so that a window opened by a website is never
@@ -12,7 +23,7 @@ export class LittleArcRegistry {
    *
    * @param storage Strings shared by all windows.
    */
-  constructor(storage: KeyValueStorage) {
+  constructor(storage: ReadingStorage) {
     this.#storage = storage;
   }
 
@@ -22,7 +33,7 @@ export class LittleArcRegistry {
   public mark(windowId: number): void {
     const ids = this.#read().filter((id) => id !== windowId);
     ids.push(windowId);
-    this.#storage.setItem(KEY, JSON.stringify(ids.slice(-KEPT)));
+    this.#storage.setItem(KEY, FORMAT.encode(ids.slice(-KEPT)));
   }
 
   /**
@@ -37,15 +48,10 @@ export class LittleArcRegistry {
    * @param windowId A window id.
    */
   public unmark(windowId: number): void {
-    this.#storage.setItem(KEY, JSON.stringify(this.#read().filter((id) => id !== windowId)));
+    this.#storage.setItem(KEY, FORMAT.encode(this.#read().filter((id) => id !== windowId)));
   }
 
   #read(): number[] {
-    try {
-      const value: unknown = JSON.parse(this.#storage.getItem(KEY) ?? '[]');
-      return Array.isArray(value) ? value.filter((id): id is number => Number.isInteger(id)) : [];
-    } catch {
-      return [];
-    }
+    return this.#storage.read(KEY, FORMAT).value;
   }
 }

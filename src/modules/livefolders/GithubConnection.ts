@@ -1,5 +1,6 @@
 import type { Logger } from '../../core/support/Logger.js';
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat } from '../../core/browser/StoredFormat.js';
+import type { Readout, ReadingStorage } from '../../core/browser/StoredFormat.js';
 import type { GithubFetch } from './GithubPullRequests.js';
 
 export const CONNECTION_STORAGE_KEY = 'vivarcdi.liveFolders.github';
@@ -8,7 +9,7 @@ export const USER_URL = 'https://api.github.com/user';
 export type ConnectionListener = () => void;
 
 export interface ConnectionDependencies {
-  storage: KeyValueStorage;
+  storage: ReadingStorage;
   logger: Logger;
   send: GithubFetch;
 }
@@ -17,6 +18,18 @@ interface Stored {
   token: string;
   login: string;
 }
+
+const FORMAT = new StoredFormat<Stored | null>({
+  empty: null,
+  read: (data): Readout<Stored | null> | null => {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const stored = data as Partial<Stored>;
+    const value = typeof stored.token === 'string' && stored.token !== '' ? { token: stored.token, login: typeof stored.login === 'string' ? stored.login : '' } : null;
+    return { value, skipped: false };
+  },
+});
 
 export class GithubConnection {
   #deps: ConnectionDependencies;
@@ -102,12 +115,7 @@ export class GithubConnection {
   }
 
   #read(): Stored | null {
-    try {
-      const stored = JSON.parse(this.#deps.storage.getItem(CONNECTION_STORAGE_KEY) ?? '{}') as Partial<Stored> | null;
-      return typeof stored?.token === 'string' && stored.token !== '' ? { token: stored.token, login: typeof stored.login === 'string' ? stored.login : '' } : null;
-    } catch {
-      return null;
-    }
+    return this.#deps.storage.read(CONNECTION_STORAGE_KEY, FORMAT).value;
   }
 
   #write(stored: Stored | null): void {

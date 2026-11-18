@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import { AddressResolver } from '../../../src/modules/littlearc/AddressResolver.js';
 import { DestinationPicker } from '../../../src/modules/littlearc/DestinationPicker.js';
 import { ExternalLinkDetector } from '../../../src/modules/littlearc/ExternalLinkDetector.js';
@@ -146,7 +147,11 @@ test('little arc messages are validated', () => {
 
 test('registry remembers the marked windows and forgets the oldest', () => {
   const values = new Map<string, string>();
-  const registry = new LittleArcRegistry({ getItem: (key): string | null => values.get(key) ?? null, setItem: (key, value): void => void values.set(key, value) });
+  const registry = new LittleArcRegistry({
+    getItem: (key): string | null => values.get(key) ?? null,
+    setItem: (key, value): void => void values.set(key, value),
+    read: <T>(key: string, format: StoredFormat<T>): StoredRead<T> => format.decode(values.get(key) ?? null),
+  });
   assert.equal(registry.has(3), false);
   registry.mark(3);
   registry.mark(3);

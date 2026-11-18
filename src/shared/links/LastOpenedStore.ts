@@ -1,12 +1,24 @@
 import type { Logger } from '../../core/support/Logger.js';
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../core/browser/StoredFormat.js';
 
 export const LAST_OPENED_STORAGE_KEY = 'vivarcdi.lastOpened';
 
 const ONE_YEAR_MS = 31_536_000_000;
 
+const FORMAT = new StoredFormat<Record<string, number>>({
+  empty: {},
+  read: (data): Readout<Record<string, number>> | null => {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const entries = Object.entries(data);
+    const dates = entries.filter((entry): entry is [string, number] => typeof entry[1] === 'number');
+    return { value: Object.fromEntries(dates), skipped: dates.length < entries.length };
+  },
+});
+
 export class LastOpenedStore {
-  #storage: KeyValueStorage | null;
+  #storage: ReadingStorage | null;
   #logger: Logger;
   #dates = new Map<string, number>();
   #warned = false;
@@ -18,7 +30,7 @@ export class LastOpenedStore {
    * @param storage Persistent storage, or null to keep dates for the session only.
    * @param logger Logger for storage failures.
    */
-  constructor(storage: KeyValueStorage | null, logger: Logger) {
+  constructor(storage: ReadingStorage | null, logger: Logger) {
     this.#storage = storage;
     this.#logger = logger;
   }
@@ -29,12 +41,8 @@ export class LastOpenedStore {
    * @param now The current date.
    */
   public load(now: Date): void {
-    const saved = this.#read();
-    this.#dates = new Map(
-      Object.entries(saved).filter(
-        (entry): entry is [string, number] => typeof entry[1] === 'number' && now.getTime() - entry[1] < ONE_YEAR_MS,
-      ),
-    );
+    const saved = this.#storage?.read(LAST_OPENED_STORAGE_KEY, FORMAT).value ?? {};
+    this.#dates = new Map(Object.entries(saved).filter((entry) => now.getTime() - entry[1] < ONE_YEAR_MS));
   }
 
   /**
@@ -57,19 +65,9 @@ export class LastOpenedStore {
     this.#write();
   }
 
-  #read(): Record<string, unknown> {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage?.getItem(LAST_OPENED_STORAGE_KEY) ?? '{}');
-      return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
-    } catch (error) {
-      this.#warnOnce(error);
-      return {};
-    }
-  }
-
   #write(): void {
     try {
-      this.#storage?.setItem(LAST_OPENED_STORAGE_KEY, JSON.stringify(Object.fromEntries(this.#dates)));
+      this.#storage?.setItem(LAST_OPENED_STORAGE_KEY, FORMAT.encode(Object.fromEntries(this.#dates)));
     } catch (error) {
       this.#warnOnce(error);
     }

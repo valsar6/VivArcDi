@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { FolderRows } from '../../../../src/modules/folders/view/FolderRows.js';
 import type { Row, RowSources } from '../../../../src/modules/folders/view/FolderRows.js';
+import type { StoredFormat, StoredRead } from '../../../../src/core/browser/StoredFormat.js';
 import { FolderTree } from '../../../../src/shared/links/FolderTree.js';
 import { OpenFolders } from '../../../../src/modules/folders/tree/OpenFolders.js';
 import type { LinkRef, OpenTab } from '../../../../src/shared/links/OpenLinks.js';
@@ -75,7 +76,11 @@ test('remembers which folders are open', () => {
 });
 
 test('keeps folder states for the session when storage fails', () => {
-  const broken = { getItem: (): string => 'not json', setItem: (): void => { throw new Error('full'); } };
+  const broken = {
+    getItem: (): string => 'not json',
+    setItem: (): void => { throw new Error('full'); },
+    read: <T>(_key: string, format: StoredFormat<T>): StoredRead<T> => format.decode('not json'),
+  };
   const folders = new OpenFolders(broken, silentLogger());
   folders.load();
   folders.toggle('10');
