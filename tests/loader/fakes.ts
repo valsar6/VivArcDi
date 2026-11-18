@@ -90,6 +90,10 @@ export class FakeDocument {
 export class SilentSink {
   public lines: unknown[][] = [];
 
+  public debug(...args: unknown[]): void {
+    this.lines.push(['debug', ...args]);
+  }
+
   public info(...args: unknown[]): void {
     this.lines.push(['info', ...args]);
   }

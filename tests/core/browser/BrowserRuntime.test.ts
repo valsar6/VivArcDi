@@ -19,6 +19,13 @@ test('reports a normal window as normal', async () => {
   assert.equal(await runtime.isPrivateWindow(), false);
 });
 
+test('browser runtime reads the message of the last error', () => {
+  assert.equal(runtimeWith(() => undefined).lastError, null);
+  assert.equal(runtimeWith(() => undefined, { message: 'boom' }).lastError, 'boom');
+  assert.equal(runtimeWith(() => undefined, {} as { message: string }).lastError, 'unknown error');
+  assert.equal(new BrowserRuntime(undefined).lastError, null);
+});
+
 test('rejects when the window cannot be read', async () => {
   await assert.rejects(runtimeWith((callback) => callback(undefined), { message: 'boom' }).isPrivateWindow(), /boom/);
   await assert.rejects(new BrowserRuntime(undefined).isPrivateWindow(), /not available/);
