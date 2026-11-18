@@ -35,9 +35,9 @@ and is done when its check passes.
   `docs/architecture.md` and the `vivarcdi-verifica-vivaldi` skill; 000/AC-17 and 011/AC-13 marked
   `live` after the first green run. Satisfies FR-10.
 - [ ] **T10.** Write the manual verification checklist for Tore from AC-10, AC-11 and AC-12.
-- [ ] **T11.** Amendment: `lab.py` copies and unpatches instead of deploying and patching, and
+- [x] **T11.** Amendment: `lab.py` copies and unpatches instead of deploying and patching, and
   verifies the macOS signature; `PayloadServer` and `PayloadInjector` wired into `LiveRun`.
   Satisfies AC-4, AC-4a, FR-3, FR-3a. Done when `test_lab_copy_stays_as_vivaldi_shipped_it` and
   `harness injects the served payload before window.html loads` pass.
-- [ ] **T12.** Unit tests clean up their temporary folders; run `npm run live` on Tore's Mac and
+- [x] **T12.** Unit tests clean up their temporary folders; run `npm run live` on Tore's Mac and
   attach the report to the pull request.
