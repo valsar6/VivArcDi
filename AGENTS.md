@@ -12,7 +12,10 @@ Rules that are easy to miss:
 
 - Implement only what an `Approved` spec describes. If the request is not covered, write or update
   the spec and stop for approval.
-- Keep test names identical to the `auto:` checks of the acceptance criteria.
-- Nothing can be tested on a real Vivaldi from an automated session: end the work with the manual
-  verification checklist built from the `manual` criteria.
+- Keep test names identical to the `auto:` checks of the acceptance criteria, and scenario names
+  identical to the `live:` checks.
+- `npm run live` runs a lab copy of Vivaldi on a throwaway profile; run it only on a machine with
+  Vivaldi and a desktop session, and only when the person you work for agrees. Use
+  `npm run live -- --probe <file>` instead of asking for a probe pasted into DevTools.
+- End the work with the manual verification checklist built from the `manual` criteria.
 - Run `make check` before opening a pull request.

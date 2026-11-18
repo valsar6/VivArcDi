@@ -89,8 +89,12 @@ sentence:
 Every criterion has an id (`AC-n`) and a check:
 
 - `auto: <test name>` when an automated test proves it. The test keeps that name.
-- `manual` when only a real Vivaldi can prove it. Manual criteria become the verification checklist
-  Tore runs on macOS and Debian, because automated checks cannot reach a real Vivaldi.
+- `live: <scenario name>` when a real Vivaldi can prove it without a person: a scenario in
+  `tests/live/scenarios/` with that exact `name` proves it on a lab Vivaldi with `npm run live`
+  ([spec 045](045-live-verification/spec.md)). Prefer it to `manual` whenever the result can be read
+  from the DOM, `chrome.tabs` or storage.
+- `manual` when only a person can judge it: how it looks, macOS permission dialogs, a restart of
+  Tore's own profile. Manual criteria become the verification checklist Tore runs on macOS and Debian.
 
 Refer to a criterion from elsewhere as `<spec number>/<id>`, for example `001/AC-4`.
 

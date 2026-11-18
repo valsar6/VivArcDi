@@ -149,6 +149,23 @@ The catalog picks the newest file that is not newer than the running Vivaldi. Wh
 newer, VivArcDi stays inactive instead of guessing. Supporting a new Vivaldi version usually means
 adding one selector file.
 
+## Live verification
+
+`npm run live` ([spec 045](../specs/045-live-verification/spec.md)) checks the payload on a real
+Vivaldi without touching the user's one. It is development tooling in `scripts/live/`, never shipped.
+
+| Piece | Role |
+|---|---|
+| `lab.py` | Copies the installed Vivaldi into `~/.cache/vivarcdi/lab/<channel>-<version>/` once and patches the copy with the installer's own classes |
+| `ProfileDirectory` | A temporary profile seeded from `tests/live/profile/Preferences.json`; refuses any existing profile |
+| `VivaldiProcess` | Starts the copy with `--remote-debugging-port=0` on `127.0.0.1` and stops only that process |
+| `CdpConnection`, `WindowTarget`, `Driver` | The Chrome DevTools Protocol over Node's WebSocket, attached to `window.html`, behind a small API for scenarios |
+| `BootCheck`, `SelectorCheck` | The active line and the module list; every selector of the matching catalog, in the state it needs (`tests/live/selector-states.json`) |
+| `ScenarioCheck` | One `tests/live/scenarios/*.live.ts` file, named after the `live:` criterion it proves |
+| `Report` | `build/live/report.json`, `report.md` and a screenshot per failed check |
+
+Scenarios end in `.live.ts`, so `npm test` and `make check` never need a Vivaldi.
+
 ## Installer
 
 Plain Python 3.9+, standard library only. The main pieces:
