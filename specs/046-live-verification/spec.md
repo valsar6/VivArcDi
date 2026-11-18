@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | Tooling |
 | Owner | Tore |
-| Approved | Tore, 2026-11-17; amendment of 2026-11-18 (payload injected, lab copy untouched) awaits approval |
+| Approved | Tore, 2026-11-17; amendment (payload injected, lab copy untouched) approved by Tore, 2026-11-18 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

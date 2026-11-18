@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft: T11 and T12 await the approval of the 2026-11-18 amendment |
+| Status | Approved, Tore, 2026-11-17; T11 and T12 approved 2026-11-18 |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 

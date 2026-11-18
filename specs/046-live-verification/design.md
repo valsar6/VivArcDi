@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft: amendment of 2026-11-18 awaits approval (approved 2026-11-17) |
+| Status | Approved, Tore, 2026-11-17; amendment approved 2026-11-18 |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -17,7 +17,7 @@ A run goes through fixed steps, each owned by one class and composed in `LiveRun
 1. `npm run live` builds `dist/`, then `scripts/live/cli.ts` parses the options.
 2. `LabVivaldi` runs `scripts/live/lab.py prepare`, which copies the installed Vivaldi into the lab
    folder (once per Vivaldi version), removes the VivArcDi block and payload the copy inherited
-   with the installer's `WindowHtmlPatcher.revert` and `PayloadDeployer.remove`, and on macOS checks
+   with the installer's `WindowHtmlPatcher.revert` and the installation's `payload_dir`, and on macOS checks
    `codesign --verify --deep --strict`. It prints the executable, the Vivaldi version and the
    resources folder as JSON.
 2a. `PayloadServer` serves `dist/` on a free port of `127.0.0.1`, with a generated `build.json`
