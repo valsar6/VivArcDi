@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-18 |
 | Amends | [040 Live folders writes](../040-live-folders-writes/spec.md) (FR-7), [041 Write outcome](../041-write-outcome/spec.md) (notices) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
