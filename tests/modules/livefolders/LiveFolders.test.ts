@@ -18,6 +18,7 @@ import { FolderTabs, WritableChrome, bookmarkTree, link } from '../folders/fakes
 import { settle } from '../reopen/fakes.js';
 import { CODE_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import { FakeDeviceGithub, FakeGithub, ME, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const TOKEN = 'ghp_module_token';
 const WORKSPACE = '5';
@@ -64,6 +65,7 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     storage,
     bookmarks: bookmarks.reader,
     bookmarkWriter: bookmarks.writer,
+    notices: silentNotices(),
   } as unknown as ModuleContext<LiveFoldersOptions>;
   return { dom, module, context, storage, github, bookmarks, virtual: VirtualFolders.of(dom), lines: (): string[] => sink.lines };
 }

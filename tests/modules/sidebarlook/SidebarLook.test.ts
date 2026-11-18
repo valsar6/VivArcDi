@@ -10,7 +10,7 @@ import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { SIDEBAR_LOOK_OPTIONS } from '../../../src/modules/sidebarlook/SidebarLookOptions.js';
 import type { SidebarLookOptions } from '../../../src/modules/sidebarlook/SidebarLookOptions.js';
-import { SilentSink } from '../../loader/fakes.js';
+import { SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { BrowserNode, FieldNode, IncognitoDocument, runtimeOf } from '../incognito/fakes.js';
 import { settle } from '../reopen/fakes.js';
@@ -57,6 +57,7 @@ function setup(t: TestContext, options: Partial<SidebarLookOptions> = {}): Setup
     options: { ...SIDEBAR_LOOK_OPTIONS.defaults, ...options },
     tabs,
     runtime: runtimeOf(7, false),
+    notices: silentNotices(),
   } as unknown as ModuleContext<SidebarLookOptions>;
   return { dom, browser: dom.browser, tabs, context };
 }

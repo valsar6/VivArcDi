@@ -57,7 +57,9 @@ implements `start(context)` and `stop()`. The context gives it the document, the
 a logger tagged with its id, its options from `config.json`, the build versions, `tabs`, a
 promise-based wrapper of `chrome.tabs` (`src/core/browser/BrowserTabs.ts`; check `tabs.available` first),
 `runtime` for `chrome.runtime` messages and new windows (`src/core/browser/BrowserRuntime.ts`), and
-`payload`, which loads files that ship with VivArcDi.
+`payload`, which loads files that ship with VivArcDi, `storage`, whose `save(key, value)` resolves
+`saved`, `failed` or `memory` and whose `mode` tells whether anything is kept, and `notices`, one shared
+toast per window (`show`, and `once(key, ...)` for a notice that appears once per session).
 
 A module with options declares them as a static `options` schema (`src/core/boot/options/`): for
 each option its kind, its default and the values it accepts. The boot checks the module's section of

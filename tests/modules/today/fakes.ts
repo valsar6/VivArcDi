@@ -1,6 +1,7 @@
 import { DomDocument, DomNode } from '../../core/dom.js';
 import { LinkingTabs } from '../favorites/linked.js';
 import type { ArchiveEntry } from '../../../src/modules/today/ArchiveStore.js';
+import type { SaveOutcome } from '../../../src/core/browser/SavingStorage.js';
 import type { RepeatTimer } from '../../../src/modules/today/ArchiveSweeper.js';
 
 export const HOUR = 3_600_000;
@@ -75,5 +76,27 @@ export class TodayDocument extends DomDocument {
 
   public panel(): DomNode | undefined {
     return this.created.findLast((node) => node.hasAttribute('data-vivarcdi-archive') && node.parentElement !== null);
+  }
+}
+
+/** A storage that keeps the value in memory, then ends the write as the test says. */
+export class OutcomeStorage {
+  public readonly mode = 'persistent';
+  public items = new Map<string, string>();
+  public outcome: SaveOutcome = 'saved';
+  public hold: Promise<void> | null = null;
+
+  public getItem(key: string): string | null {
+    return this.items.get(key) ?? null;
+  }
+
+  public setItem(key: string, value: string): void {
+    this.items.set(key, value);
+  }
+
+  public async save(key: string, value: string): Promise<SaveOutcome> {
+    this.setItem(key, value);
+    await this.hold;
+    return this.outcome;
   }
 }

@@ -10,7 +10,7 @@ import { TODAY_ARCHIVE_OPTIONS } from '../../../src/modules/today/TodayArchiveOp
 import type { TodayArchiveOptions } from '../../../src/modules/today/TodayArchiveOptions.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
-import { FakeLoader } from '../../loader/fakes.js';
+import { FakeLoader, silentNotices } from '../../loader/fakes.js';
 import { immediateFrames } from '../folders/fakes.js';
 import type { FolderTab } from '../folders/fakes.js';
 import { event } from '../pinned/fakes.js';
@@ -34,6 +34,7 @@ function context(tabs: TodayTabs, storage: MemoryStorage, dom: TodayDocument, op
     storage,
     runtime: new BrowserRuntime(undefined),
     payload: new FakeLoader({ 'page/archive-keys.js': 'code' }),
+    notices: silentNotices(),
   } as unknown as ModuleContext<TodayArchiveOptions>;
 }
 

@@ -1,4 +1,5 @@
 import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { NoticeBoard } from '../../core/dom/Notices.js';
 import type { Logger } from '../../core/support/Logger.js';
 import { TabData } from '../../core/tabs/TabData.js';
 import { ActivityClock } from './ActivityClock.js';
@@ -22,10 +23,14 @@ export interface SweeperDependencies {
   now: () => number;
   /** Runs a job at a fixed interval; returns a function that stops it. */
   repeat: RepeatTimer;
+  /** Where the user is told that tabs stay open. */
+  notices: Pick<NoticeBoard, 'once'>;
   logger: Logger;
 }
 
 const SWEEP_INTERVAL_MS = 60_000;
+const KEPT_KEY = 'today-archive-kept';
+const KEPT_TEXT = 'Today tabs stay open: VivArcDi cannot save the archive';
 
 /**
  * Runs a job with `setInterval`.
@@ -129,10 +134,10 @@ export class ArchiveSweeper {
       return;
     }
     const archivedAt = this.#deps.now();
-    try {
-      this.#deps.store.add(tabs.map((tab) => ArchiveSweeper.#entryOf(tab, archivedAt)));
-    } catch (error) {
-      this.#deps.logger.warn('could not save to the archive: the tabs stay open', error);
+    const outcome = await this.#deps.store.add(tabs.map((tab) => ArchiveSweeper.#entryOf(tab, archivedAt)));
+    if (outcome !== 'saved') {
+      this.#deps.logger.warn(`could not save to the archive (${outcome}): the tabs stay open`);
+      this.#deps.notices.once(KEPT_KEY, KEPT_TEXT, 'error');
       return;
     }
     for (const tab of tabs) {

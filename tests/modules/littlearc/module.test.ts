@@ -17,7 +17,7 @@ import { LittleArc } from '../../../src/modules/littlearc/LittleArc.js';
 import { LittleArcLauncher } from '../../../src/modules/littlearc/LittleArcLauncher.js';
 import { adoptMessage, destinationAnswer } from '../../../src/modules/littlearc/LittleArcMessage.js';
 import { WorkspaceAdopter } from '../../../src/modules/littlearc/WorkspaceAdopter.js';
-import { SilentSink } from '../../loader/fakes.js';
+import { SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FakeDocument, FakeEvent } from '../peek/fakes.js';
 
 const logger = new Logger('test', new SilentSink());
@@ -170,6 +170,7 @@ function contextOf(options: Record<string, unknown>, type: string): { context: M
     prefs: new BrowserPrefs(undefined),
     selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
+    notices: silentNotices(),
   } as unknown as ModuleContext<LittleArcOptions>;
   return { context, document, created, focus, messages };
 }

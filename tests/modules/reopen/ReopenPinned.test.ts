@@ -5,6 +5,7 @@ import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBoo
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import type { FakeTab } from '../favorites/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 
@@ -18,6 +19,7 @@ function start(pinned: FakeTab[]): ReopenTabs {
     tabs,
     bookmarks: new BrowserBookmarks(undefined),
     modules: {},
+    notices: silentNotices(),
   } as unknown as ModuleContext;
   new ReopenPinned().start(context);
   return tabs;
@@ -90,6 +92,7 @@ test('reopen module stays off without tab events', () => {
     bookmarks: new BrowserBookmarks(undefined),
     modules: {},
     tabs: { available: true, onCreated: (): never => { throw new Error('missing'); }, onActivated: (): (() => void) => () => {}, onUpdated: (): (() => void) => () => {} },
+    notices: silentNotices(),
   } as unknown as ModuleContext;
   assert.doesNotThrow(() => new ReopenPinned().start(context));
 });

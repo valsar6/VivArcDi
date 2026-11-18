@@ -17,6 +17,7 @@ import type { DomNode } from '../../core/dom.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
 import { bookmarkTree, FakeBookmarks, folder, link } from './fakes.js';
 import { RacingFolderTabs } from './racing.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG)])]);
@@ -59,6 +60,7 @@ function running(tabs: RacingFolderTabs): Running {
     bookmarkWriter: new BookmarkWriter(undefined),
     prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
+    notices: silentNotices(),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   const module = new BookmarkFolders();
   const stamps = new ActivityStamps(tabs, () => 42, silentLogger());

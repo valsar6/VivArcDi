@@ -17,6 +17,7 @@ import type { DomNode } from '../../core/dom.js';
 import { CASETTA, FakePrefsApi, WORK } from '../../core/prefs.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const LIST = 'vivaldi.workspaces.list';
 const HEART = '❤️';
@@ -41,6 +42,7 @@ function setup(tabs: FolderTabs, { api = new FakePrefsApi(), logger = silentLogg
     tabs,
     prefs: prefs ?? new BrowserPrefs(api),
     storage,
+    notices: silentNotices(),
   } as unknown as ModuleContext;
   return { dom, module: new SpaceHeader(), context, tabs, api, storage };
 }

@@ -4,7 +4,7 @@ import { Logger } from '../../../src/core/support/Logger.js';
 import { ARCHIVE_STORAGE_KEY, ArchiveStore } from '../../../src/modules/today/ArchiveStore.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
-import { NOW, entry } from './fakes.js';
+import { NOW, OutcomeStorage, entry } from './fakes.js';
 
 test('drops the oldest entries past the limit', () => {
   const storage = new MemoryStorage();
@@ -40,9 +40,11 @@ test('removes a restored entry and saves the archive', () => {
   assert.deepEqual(JSON.parse(storage.getItem(ARCHIVE_STORAGE_KEY) ?? '[]'), [entry('https://b.example/', 'B', NOW - 1)]);
 });
 
-test('adds nothing when the archive cannot be saved', () => {
-  const store = new ArchiveStore({ getItem: (): null => null, setItem: (): never => { throw new Error('quota'); } }, 500, silentLogger());
-  assert.throws(() => store.add([entry('https://a.example/', 'A', NOW)]), /quota/);
+test('adds nothing when the archive cannot be saved', async () => {
+  const storage = new OutcomeStorage();
+  storage.outcome = 'failed';
+  const store = new ArchiveStore(storage, 500, silentLogger());
+  assert.equal(await store.add([entry('https://a.example/', 'A', NOW)]), 'failed');
   assert.equal(store.entries.length, 0);
 });
 

@@ -9,7 +9,7 @@ import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { OPEN_ATTRIBUTE, Peek } from '../../../src/modules/peek/Peek.js';
 import { PEEK_OPTIONS } from '../../../src/modules/peek/PeekOptions.js';
 import { PEEK_MESSAGE_TYPE } from '../../../src/modules/peek/PeekMessage.js';
-import { FakeLoader, SilentSink } from '../../loader/fakes.js';
+import { FakeLoader, SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FakeTabs } from '../favorites/fakes.js';
 import { FakeDocument, FakeElement, FakeEvent } from './fakes.js';
 
@@ -72,6 +72,7 @@ function setUp(tab: { pinned?: boolean; vivExtData?: string } = { pinned: true }
     runtime: new BrowserRuntime({ runtime: { onMessage: messages } }),
     payload: new FakeLoader({ 'page/peek-links.js': 'LINKS', 'page/peek-keys.js': 'KEYS' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
+    notices: silentNotices(),
   } as unknown as ModuleContext<PeekOptions>;
   return { context, document, container, webview, messages, tabs };
 }

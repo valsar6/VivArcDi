@@ -5,7 +5,7 @@ import type { BrowserRuntime } from '../../src/core/browser/BrowserRuntime.js';
 import { BrowserTabs } from '../../src/core/browser/BrowserTabs.js';
 import type { ChromeApi, TabsApi } from '../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../src/core/support/Logger.js';
-import type { KeyValueStorage } from '../../src/core/browser/PersistentStorage.js';
+import type { SaveOutcome, SavingStorage } from '../../src/core/browser/SavingStorage.js';
 import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
 import { createDefaultRegistry } from '../../src/modules/index.js';
 import { recordingChrome } from '../modules/folders/fakes.js';
@@ -30,8 +30,13 @@ const WRITING_BOOKMARK_CALLS = ['create', 'update', 'move', 'remove', 'removeTre
 class WriteLog {
   public attempts: string[] = [];
 
-  public readonly storage: KeyValueStorage = {
+  public readonly storage: SavingStorage = {
+    mode: 'persistent',
     getItem: () => null,
+    save: async (key): Promise<SaveOutcome> => {
+      this.attempts.push(`storage ${key}`);
+      return 'failed';
+    },
     setItem: (key) => {
       this.attempts.push(`storage ${key}`);
       throw new Error('storage must not be written');

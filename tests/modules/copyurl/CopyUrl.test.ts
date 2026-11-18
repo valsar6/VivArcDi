@@ -10,7 +10,7 @@ import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { COPY_CONSOLE_PREFIX, COPY_MESSAGE_TYPE } from '../../../src/modules/copyurl/CopyMessage.js';
 import { COPIED_TEXT, CopyUrl, FAILED_TEXT } from '../../../src/modules/copyurl/CopyUrl.js';
 import { TOAST_ATTRIBUTE } from '../../../src/core/dom/Toast.js';
-import { FakeLoader, SilentSink } from '../../loader/fakes.js';
+import { FakeLoader, SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FakeTabs } from '../favorites/fakes.js';
 import { event } from '../pinned/fakes.js';
 import type { FakeEvent as KeyEvent } from '../pinned/fakes.js';
@@ -74,6 +74,7 @@ function setUp(): Setup {
     runtime: new BrowserRuntime({ runtime: { onMessage: messages } }),
     payload: new FakeLoader({ 'page/copy-keys.js': 'KEYS' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
+    notices: silentNotices(),
   } as unknown as ModuleContext<CopyUrlOptions>;
   return { context, document, browser, webview, messages, clipboard, sink };
 }
