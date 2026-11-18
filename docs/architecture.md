@@ -156,7 +156,8 @@ Vivaldi without touching the user's one. It is development tooling in `scripts/l
 
 | Piece | Role |
 |---|---|
-| `lab.py` | Copies the installed Vivaldi into `~/.cache/vivarcdi/lab/<channel>-<version>/` once and patches the copy with the installer's own classes |
+| `lab.py` | Copies the installed Vivaldi into `~/.cache/vivarcdi/lab/<channel>-<version>/` once, removes any VivArcDi patch from the copy with the installer's own classes and, on macOS, verifies its code signature: the copy stays as Vivaldi shipped it, so Gatekeeper accepts it |
+| `PayloadServer`, `PayloadInjector` | Serve `dist/` and a generated `build.json` on `127.0.0.1`, then load it into the lab `window.html` through CDP before the page scripts run (CSP bypassed for the lab window only) |
 | `ProfileDirectory` | A temporary profile seeded from `tests/live/profile/Preferences.json`; refuses any existing profile |
 | `VivaldiProcess` | Starts the copy with `--remote-debugging-port=0` on `127.0.0.1` and stops only that process |
 | `CdpConnection`, `WindowTarget`, `Driver` | The Chrome DevTools Protocol over Node's WebSocket, attached to `window.html`, behind a small API for scenarios |
