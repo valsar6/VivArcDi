@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-18 |
 | Amends | [004 Today tabs and keyboard](../004-today-tabs-and-keyboard/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -140,13 +140,13 @@ Vivaldi without breaking the profile, so the failure paths are covered by the te
 
 ## Open questions
 
-- [ ] **Q-1. Rollback.** After a failed write, should the memory copy go back to the old value?
-  Proposed: no. The user keeps seeing what they did for the rest of the session, the notice says it
+- [x] **Q-1. Rollback.** After a failed write, should the memory copy go back to the old value?
+  Answered (Tore, 2026-11-18): no. The user keeps seeing what they did for the rest of the session, the notice says it
   may be lost, and the archive, the only place where losing it closes tabs, waits for `saved`.
-- [ ] **Q-2. Memory mode and the archive.** In `memory` mode the archive would close tabs into a
-  list that disappears at restart. Proposed: treat `memory` like `failed`: Today tabs stay open
+- [x] **Q-2. Memory mode and the archive.** In `memory` mode the archive would close tabs into a
+  list that disappears at restart. Answered (Tore, 2026-11-18): treat `memory` like `failed`: Today tabs stay open
   until saving works again, with the archive notice once.
-- [ ] **Q-3. Toast texts.** Proposed as in [After](#after), in English like the rest of the
+- [x] **Q-3. Toast texts.** Answered (Tore, 2026-11-18): as in [After](#after), in English like the rest of the
   interface.
 
 ## References
