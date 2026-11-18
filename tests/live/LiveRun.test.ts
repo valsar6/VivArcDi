@@ -15,6 +15,7 @@ import type { FakeSocket } from './fakes.js';
 const PNG = Buffer.from('fake png');
 const ACTIVE = '0.59.0 active on Vivaldi 8.3';
 const PAYLOAD_URL = 'http://127.0.0.1:2/';
+const DOM = '<html><body><div id="browser"></div></body></html>';
 
 interface Harness {
   run: LiveRun;
@@ -29,6 +30,9 @@ function harness(checks: Check[], overrides: Partial<LiveRunParts> = {}): Harnes
   const { cdp, socket } = fakeCdp((method) => {
     if (method === 'Runtime.enable') {
       queueMicrotask(() => socket.emit('Runtime.consoleAPICalled', consoleEvent('info', '[VivArcDi]', ACTIVE)));
+    }
+    if (method === 'Runtime.evaluate') {
+      return { result: { value: DOM } };
     }
     return method === 'Page.captureScreenshot' ? { data: PNG.toString('base64') } : {};
   });
@@ -130,4 +134,15 @@ test('harness injects the served payload before window.html loads', async () => 
   const added = socket.sent.find(({ method }) => method === 'Page.addScriptToEvaluateOnNewDocument');
   assert.equal(added?.params['source'], PayloadInjector.bootstrap(PAYLOAD_URL));
   assert.match(String(added?.params['source']), /^import\("http:\/\/127\.0\.0\.1:2\/loader\.js"\)/);
+});
+
+test('harness saves a dom dump on a failed check', async () => {
+  const failing = harness([check([{ name: 'selector tabStrip', outcome: 'fail', detail: '' }])]);
+  const passing = harness([check([{ name: 'selector browser', outcome: 'pass', detail: '' }])]);
+
+  await failing.run.run();
+  await passing.run.run();
+
+  assert.equal(readFileSync(join(failing.dir, 'window.html'), 'utf8'), DOM);
+  assert.equal(existsSync(join(passing.dir, 'window.html')), false);
 });

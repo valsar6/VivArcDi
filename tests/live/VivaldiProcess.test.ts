@@ -32,6 +32,7 @@ test('harness starts Vivaldi on a temporary profile and a local port', async () 
   assert.ok(calls[0]?.args.includes('--remote-debugging-port=0'));
   assert.ok(calls[0]?.args.includes('--remote-debugging-address=127.0.0.1'));
   assert.ok(calls[0]?.args.includes('--remote-allow-origins=http://127.0.0.1'));
+  assert.ok(calls[0]?.args.includes('--password-store=basic'));
   assert.equal(vivaldi.endpoint, `http://127.0.0.1:${PORT}`);
   await profile.remove();
 });

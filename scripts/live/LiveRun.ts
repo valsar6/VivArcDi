@@ -35,7 +35,10 @@ export interface LiveRunParts {
   payloadVersion: string;
 }
 
-const RUN_FAILURE = 'live run';
+/**
+ * Name of the result reported when the run stops before or between the checks.
+ */
+export const RUN_FAILURE = 'live run';
 
 export class LiveRun {
   #parts: LiveRunParts;
@@ -67,6 +70,9 @@ export class LiveRun {
       console = opened.session.console;
       for (const check of this.#parts.checks(opened.catalog)) {
         await this.#runCheck(check, opened.session);
+      }
+      if (report.failed) {
+        await report.saveDom(await opened.session.driver.evaluate<string>('document.documentElement.outerHTML'));
       }
     } catch (error) {
       report.add([{ name: RUN_FAILURE, outcome: 'fail', detail: error instanceof Error ? error.message : String(error) }]);

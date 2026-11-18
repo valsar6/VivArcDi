@@ -79,6 +79,19 @@ export class Report {
   }
 
   /**
+   * Saves the markup of window.html, from which broken selectors can be fixed without Vivaldi.
+   *
+   * @param html The `outerHTML` of the document.
+   * @returns The path of the saved file.
+   */
+  public async saveDom(html: string): Promise<string> {
+    await mkdir(this.#dir, { recursive: true });
+    const path = join(this.#dir, 'window.html');
+    await writeFile(path, html);
+    return path;
+  }
+
+  /**
    * Writes `report.json` and `report.md`.
    *
    * @param facts The versions under test.
