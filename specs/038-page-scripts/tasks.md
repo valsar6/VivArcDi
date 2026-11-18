@@ -61,7 +61,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   `executeScript` row points to 038 for how failures are logged. `specs/README.md`: no change until
   the spec is `Implemented`. Patch version bump to 0.59.4, checked with
   `npm run release -- check --base origin/main --branch fix/page-scripts`.
-- [ ] **T6. Manual check.** Italian checklist for AC-12 and AC-13 under
+- [x] **T6. Manual check.** Italian checklist for AC-12 and AC-13 under
   `~/Desktop/sonde-vivarci/038-page-scripts/`, on macOS and Debian with 0.59.4 installed and Vivaldi
   restarted. AC-12: in a Peek, Esc, Cmd/Ctrl+W and Cmd/Ctrl+O close and expand as before, also after
   following a link inside the Peek and after opening a second Peek; Cmd/Ctrl+W in a pinned tab unloads
