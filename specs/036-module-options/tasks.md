@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Design | [design.md](design.md) |
 
 Branch `fix/module-options`, with a patch version change in `package.json` and
@@ -31,5 +31,5 @@ Branch `fix/module-options`, with a patch version change in `package.json` and
   section of `docs/architecture.md`.
 - [x] **T9. Version and checks.** Patch version change; `npm run release -- check --base origin/main
   --branch fix/module-options`; `make check`.
-- [ ] **T10. Manual verification.** Checklist from AC-11 and AC-12 for Tore, on macOS and Debian.
+- [x] **T10. Manual verification.** Checklist from AC-11 and AC-12 for Tore, on macOS and Debian.
   Then set the spec to `Implemented`.
