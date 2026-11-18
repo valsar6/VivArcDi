@@ -20,10 +20,14 @@ test-js:
 test-py:
 	python3 -m unittest discover -s tests/installer
 	python3 -m unittest discover -s tests/packaging
+	python3 -m unittest discover -s tests/live
 
 check: lint typecheck test build
+
+live:
+	npm run live
 
 clean:
 	rm -rf dist
 
-.PHONY: all deps build lint typecheck test test-js test-py check clean
+.PHONY: all deps build lint typecheck test test-js test-py check live clean
