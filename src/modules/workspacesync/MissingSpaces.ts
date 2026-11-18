@@ -1,9 +1,20 @@
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../core/browser/StoredFormat.js';
 
 const ANNOUNCED_KEY = 'vivarcdi.sync.announced';
 
+const FORMAT = new StoredFormat<string[]>({
+  empty: [],
+  read: (data): Readout<string[]> | null => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const names = data.filter((name): name is string => typeof name === 'string');
+    return { value: names, skipped: names.length < data.length };
+  },
+});
+
 export class MissingSpaces {
-  #storage: KeyValueStorage;
+  #storage: ReadingStorage;
   #notify: (text: string) => void;
 
   /**
@@ -13,7 +24,7 @@ export class MissingSpaces {
    * @param storage Where the shown names are kept.
    * @param notify Shows the message.
    */
-  constructor(storage: KeyValueStorage, notify: (text: string) => void) {
+  constructor(storage: ReadingStorage, notify: (text: string) => void) {
     this.#storage = storage;
     this.#notify = notify;
   }
@@ -25,17 +36,12 @@ export class MissingSpaces {
     const shown = this.#shown();
     const fresh = names.filter((name) => !shown.includes(name));
     if (fresh.length > 0) {
-      this.#storage.setItem(ANNOUNCED_KEY, JSON.stringify([...shown, ...fresh]));
+      this.#storage.setItem(ANNOUNCED_KEY, FORMAT.encode([...shown, ...fresh]));
       this.#notify(`Spaces from your other computers: ${fresh.join(', ')}. Create them with the same name to get their pinned tabs.`);
     }
   }
 
   #shown(): string[] {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage.getItem(ANNOUNCED_KEY) ?? '[]');
-      return Array.isArray(parsed) ? parsed.filter((name): name is string => typeof name === 'string') : [];
-    } catch {
-      return [];
-    }
+    return this.#storage.read(ANNOUNCED_KEY, FORMAT).value;
   }
 }

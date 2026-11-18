@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../core/browser/StoredFormat.js';
 
 const KEY = 'vivarcdi.sync.spaceIds';
 
@@ -8,8 +8,24 @@ interface Detached {
 
 type Link = string | Detached;
 
+const isLink = (value: unknown): value is Link =>
+  typeof value === 'string' ||
+  (typeof value === 'object' && value !== null && typeof (value as Record<string, unknown>).detached === 'string');
+
+const FORMAT = new StoredFormat<Record<string, Link>>({
+  empty: {},
+  read: (data): Readout<Record<string, Link>> | null => {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const entries = Object.entries(data);
+    const kept = entries.filter(([, link]) => isLink(link));
+    return { value: Object.fromEntries(kept), skipped: kept.length < entries.length };
+  },
+});
+
 export class SpaceIds {
-  #storage: KeyValueStorage;
+  #storage: ReadingStorage;
   #generate: () => string;
 
   /**
@@ -20,7 +36,7 @@ export class SpaceIds {
    * @param storage Where the links are kept.
    * @param generate Makes a new sync id, replaceable in tests.
    */
-  constructor(storage: KeyValueStorage, generate: () => string = () => crypto.randomUUID()) {
+  constructor(storage: ReadingStorage, generate: () => string = () => crypto.randomUUID()) {
     this.#storage = storage;
     this.#generate = generate;
   }
@@ -71,16 +87,11 @@ export class SpaceIds {
   }
 
   #all(): Record<string, Link> {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage.getItem(KEY) ?? '{}');
-      return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed) ? (parsed as Record<string, Link>) : {};
-    } catch {
-      return {};
-    }
+    return this.#storage.read(KEY, FORMAT).value;
   }
 
   #save(links: Record<string, Link>): void {
-    const text = JSON.stringify(links);
+    const text = FORMAT.encode(links);
     if (this.#storage.getItem(KEY) !== text) {
       this.#storage.setItem(KEY, text);
     }

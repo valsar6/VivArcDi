@@ -1,10 +1,15 @@
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../core/browser/StoredFormat.js';
 import { SyncNames } from './SyncNames.js';
 
 const KEY_PREFIX = 'vivarcdi.sync.base.';
 
+const FORMAT = new StoredFormat<string[] | null>({
+  empty: null,
+  read: (data): Readout<string[] | null> | null => (Array.isArray(data) && data.every((key) => typeof key === 'string') ? { value: data, skipped: false } : null),
+});
+
 export class SyncBase {
-  #storage: KeyValueStorage;
+  #storage: ReadingStorage;
 
   /**
    * Remembers, for each workspace, the list of pinned tabs this computer last agreed with the sync
@@ -12,7 +17,7 @@ export class SyncBase {
    *
    * @param storage Where the lists are kept.
    */
-  constructor(storage: KeyValueStorage) {
+  constructor(storage: ReadingStorage) {
     this.#storage = storage;
   }
 
@@ -21,12 +26,7 @@ export class SyncBase {
    * @returns The address keys last agreed on, or null when the workspace never synced here.
    */
   public get(workspaceName: string | null): string[] | null {
-    try {
-      const parsed: unknown = JSON.parse(this.#storage.getItem(SyncBase.#key(workspaceName)) ?? 'null');
-      return Array.isArray(parsed) && parsed.every((key) => typeof key === 'string') ? parsed : null;
-    } catch {
-      return null;
-    }
+    return this.#storage.read(SyncBase.#key(workspaceName), FORMAT).value;
   }
 
   /**
@@ -34,7 +34,7 @@ export class SyncBase {
    * @param keys The address keys the computer and the store now agree on.
    */
   public set(workspaceName: string | null, keys: string[]): void {
-    const text = JSON.stringify(keys);
+    const text = FORMAT.encode(keys);
     if (this.#storage.getItem(SyncBase.#key(workspaceName)) !== text) {
       this.#storage.setItem(SyncBase.#key(workspaceName), text);
     }
