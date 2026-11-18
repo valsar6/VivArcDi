@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CdpConnection } from '../../scripts/live/cdp/CdpConnection.js';
@@ -69,8 +69,14 @@ export class FakeChild implements ChildHandle {
   }
 }
 
+const temporary: string[] = [];
+
+process.once('exit', () => temporary.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
+
 export function tempDir(): string {
-  return mkdtempSync(join(tmpdir(), 'vivarcdi-live-test-'));
+  const dir = mkdtempSync(join(tmpdir(), 'vivarcdi-live-test-'));
+  temporary.push(dir);
+  return dir;
 }
 
 export function writeJson(path: string, value: unknown): void {
