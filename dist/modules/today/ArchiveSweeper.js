@@ -2,6 +2,8 @@ import { TabData } from "../../core/tabs/TabData.js";
 import { ActivityClock } from "./ActivityClock.js";
 import { TodayTabPolicy } from "./TodayTabPolicy.js";
 const SWEEP_INTERVAL_MS = 6e4;
+const KEPT_KEY = "today-archive-kept";
+const KEPT_TEXT = "Today tabs stay open: VivArcDi cannot save the archive";
 const repeatEvery = (run, intervalMs) => {
   const handle = setInterval(run, intervalMs);
   return () => clearInterval(handle);
@@ -86,10 +88,10 @@ class ArchiveSweeper {
       return;
     }
     const archivedAt = this.#deps.now();
-    try {
-      this.#deps.store.add(tabs.map((tab) => ArchiveSweeper.#entryOf(tab, archivedAt)));
-    } catch (error) {
-      this.#deps.logger.warn("could not save to the archive: the tabs stay open", error);
+    const outcome = await this.#deps.store.add(tabs.map((tab) => ArchiveSweeper.#entryOf(tab, archivedAt)));
+    if (outcome !== "saved") {
+      this.#deps.logger.warn(`could not save to the archive (${outcome}): the tabs stay open`);
+      this.#deps.notices.once(KEPT_KEY, KEPT_TEXT, "error");
       return;
     }
     for (const tab of tabs) {

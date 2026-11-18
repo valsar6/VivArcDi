@@ -40,12 +40,18 @@ class ArchiveStore {
   }
   /**
    * Adds entries to what is saved now and saves the archive, dropping the oldest past the limit.
+   * When the outcome is not `saved`, the entries are taken back out of the archive again.
    *
    * @param entries The entries to add.
-   * @throws {Error} When the archive cannot be saved; nothing is added then.
+   * @returns How the write ended; it never rejects.
    */
-  add(entries) {
-    this.#save(ArchiveStore.#newestFirst([...entries, ...this.#current()]).slice(0, this.#limit));
+  async add(entries) {
+    const added = ArchiveStore.#newestFirst([...entries, ...this.#current()]).slice(0, this.#limit);
+    const outcome = await this.#storage.save(ARCHIVE_STORAGE_KEY, JSON.stringify(added));
+    if (outcome !== "saved") {
+      this.#save(this.#current().filter((candidate) => !entries.some((entry) => ArchiveStore.#same(candidate, entry))));
+    }
+    return outcome;
   }
   /**
    * Removes one entry from what is saved now and saves the archive. The entry is matched by its

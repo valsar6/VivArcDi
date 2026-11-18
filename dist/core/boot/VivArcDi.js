@@ -9,6 +9,7 @@ import { BrowserWindows } from "../browser/BrowserWindows.js";
 import { Logger } from "../support/Logger.js";
 import { ModuleSettings } from "./ModuleSettings.js";
 import { PersistentStorage } from "../browser/PersistentStorage.js";
+import { WindowServices } from "./WindowServices.js";
 import { ResourceLoader } from "./ResourceLoader.js";
 import { SelectorCatalog } from "../dom/SelectorCatalog.js";
 import { StyleInjector } from "./StyleInjector.js";
@@ -27,6 +28,7 @@ class VivArcDi {
   #history;
   #prefs;
   #storage;
+  #notices = null;
   #styles;
   #started = [];
   /**
@@ -125,11 +127,13 @@ class VivArcDi {
     }
     await new UiReadiness(this.#document).waitFor(selectors.get("browser"));
     config.styles.forEach((path) => this.#styles.inject(path));
+    const services = WindowServices.open(this.#document, selectors, this.#storage);
+    this.#notices = services.notices;
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
     const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, settings, selectors, build);
+      await this.#startModule(entry, { settings, selectors, build, ...services });
     }
     this.#logger.info(
       `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
@@ -148,6 +152,7 @@ class VivArcDi {
       }
     }
     this.#started = [];
+    this.#notices?.remove();
     this.#styles.removeAll();
   }
   async #isPrivateWindow() {
@@ -158,7 +163,8 @@ class VivArcDi {
       return false;
     }
   }
-  async #startModule(entry, settings, selectors, build) {
+  async #startModule(entry, start) {
+    const { settings, selectors, build, storage, notices } = start;
     const options = settings.optionsOf(entry.id);
     if (options === null) {
       return;
@@ -180,7 +186,8 @@ class VivArcDi {
         search: this.#search ?? new BrowserSearch(void 0),
         history: this.#history,
         prefs: this.#prefs,
-        storage: this.#storage,
+        storage,
+        notices,
         payload: this.#loader
       });
       this.#started.push(entry);
