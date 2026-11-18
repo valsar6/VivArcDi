@@ -74,7 +74,7 @@ Private APIs and fallbacks:
 
 | API | Use | IF missing or failing |
 |---|---|---|
-| `webview.executeScript` | Inject the page script | Log once; no Peek for that tab, links behave as usual |
+| `webview.executeScript` | Inject the page script | Log once (see [038](../038-page-scripts/spec.md) for how failures are logged); no Peek for that tab, links behave as usual |
 | `chrome.runtime.onMessage` | Receive Peek requests | Module does not start, logged |
 | `chrome.tabs.create`, `update` | Expand, Split, fallback | Expand and Split buttons hidden |
 | `vivExtData` tiling | Split | Split acts as Expand, logged |
