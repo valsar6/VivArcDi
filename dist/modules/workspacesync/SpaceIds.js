@@ -1,4 +1,17 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 const KEY = "vivarcdi.sync.spaceIds";
+const isLink = (value) => typeof value === "string" || typeof value === "object" && value !== null && typeof value.detached === "string";
+const FORMAT = new StoredFormat({
+  empty: {},
+  read: (data) => {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const entries = Object.entries(data);
+    const kept = entries.filter(([, link]) => isLink(link));
+    return { value: Object.fromEntries(kept), skipped: kept.length < entries.length };
+  }
+});
 class SpaceIds {
   #storage;
   #generate;
@@ -55,15 +68,10 @@ class SpaceIds {
     this.#save({ ...this.#all(), [vivaldiId]: { detached: name } });
   }
   #all() {
-    try {
-      const parsed = JSON.parse(this.#storage.getItem(KEY) ?? "{}");
-      return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) ? parsed : {};
-    } catch {
-      return {};
-    }
+    return this.#storage.read(KEY, FORMAT).value;
   }
   #save(links) {
-    const text = JSON.stringify(links);
+    const text = FORMAT.encode(links);
     if (this.#storage.getItem(KEY) !== text) {
       this.#storage.setItem(KEY, text);
     }

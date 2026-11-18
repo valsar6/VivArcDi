@@ -41,7 +41,7 @@ class TodayArchive extends Module {
       return;
     }
     const limitMs = options.archiveAfterHours * HOUR_MS;
-    const store = new ArchiveStore(storage, options.archiveLimit, logger);
+    const store = new ArchiveStore(storage, options.archiveLimit);
     store.load();
     this.#store = store;
     try {

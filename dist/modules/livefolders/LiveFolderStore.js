@@ -1,3 +1,4 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 import { PullRequestFilters } from "./PullRequestFilters.js";
 const LIVE_FOLDERS_STORAGE_KEY = "vivarcdi.liveFolders";
 const NO_WORKSPACE = "";
@@ -6,10 +7,13 @@ const ID_RADIX = 36;
 const ID_START = 2;
 const ID_LENGTH = 10;
 class LiveFolderStore {
+  static #FORMAT = new StoredFormat({
+    empty: {},
+    read: (data) => LiveFolderStore.#readFolders(data)
+  });
   #storage;
   #logger;
   #nextId;
-  #warned = false;
   /**
    * The live folders of every workspace, their filters and their last rows, kept in the
    * interface's storage under `liveFolders` as `{ [workspace]: LiveFolder[] }`. Nothing is kept in
@@ -125,34 +129,33 @@ class LiveFolderStore {
     return Math.random().toString(ID_RADIX).slice(ID_START, ID_LENGTH);
   }
   #read() {
-    try {
-      return LiveFolderStore.#parse(this.#storage.getItem(LIVE_FOLDERS_STORAGE_KEY) ?? "{}");
-    } catch (error) {
-      if (!this.#warned) {
-        this.#warned = true;
-        this.#logger.warn("the live folders could not be read", error);
-      }
-      return /* @__PURE__ */ new Map();
-    }
-  }
-  static #parse(text) {
-    const saved = /* @__PURE__ */ new Map();
-    const stored = JSON.parse(text);
-    const record = typeof stored === "object" && stored !== null ? stored : {};
-    for (const [key, value] of Object.entries(record)) {
-      const folders = Array.isArray(value) ? value.flatMap((item) => LiveFolderStore.#folderFrom(item)) : [];
-      if (folders.length > 0) {
-        saved.set(key, folders);
-      }
-    }
-    return saved;
+    return new Map(Object.entries(this.#storage.read(LIVE_FOLDERS_STORAGE_KEY, LiveFolderStore.#FORMAT).value));
   }
   #write(folders) {
     try {
-      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, JSON.stringify(Object.fromEntries(folders)));
+      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, LiveFolderStore.#FORMAT.encode(Object.fromEntries(folders)));
     } catch (error) {
       this.#logger.warn("the live folders are kept for this session only", error);
     }
+  }
+  static #readFolders(data) {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const value = {};
+    let skipped = false;
+    for (const [key, entry] of Object.entries(data)) {
+      if (!Array.isArray(entry)) {
+        skipped = true;
+        continue;
+      }
+      const folders = entry.flatMap((item) => LiveFolderStore.#folderFrom(item));
+      skipped ||= folders.length < entry.length;
+      if (folders.length > 0) {
+        value[key] = folders;
+      }
+    }
+    return { value, skipped };
   }
   static #folderFrom(value) {
     if (typeof value !== "object" || value === null) {

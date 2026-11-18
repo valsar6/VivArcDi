@@ -1,5 +1,17 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 const LAST_OPENED_STORAGE_KEY = "vivarcdi.lastOpened";
 const ONE_YEAR_MS = 31536e6;
+const FORMAT = new StoredFormat({
+  empty: {},
+  read: (data) => {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const entries = Object.entries(data);
+    const dates = entries.filter((entry) => typeof entry[1] === "number");
+    return { value: Object.fromEntries(dates), skipped: dates.length < entries.length };
+  }
+});
 class LastOpenedStore {
   #storage;
   #logger;
@@ -22,12 +34,8 @@ class LastOpenedStore {
    * @param now The current date.
    */
   load(now) {
-    const saved = this.#read();
-    this.#dates = new Map(
-      Object.entries(saved).filter(
-        (entry) => typeof entry[1] === "number" && now.getTime() - entry[1] < ONE_YEAR_MS
-      )
-    );
+    const saved = this.#storage?.read(LAST_OPENED_STORAGE_KEY, FORMAT).value ?? {};
+    this.#dates = new Map(Object.entries(saved).filter((entry) => now.getTime() - entry[1] < ONE_YEAR_MS));
   }
   /**
    * @param key An address key.
@@ -47,18 +55,9 @@ class LastOpenedStore {
     this.#dates.set(key, date.getTime());
     this.#write();
   }
-  #read() {
-    try {
-      const parsed = JSON.parse(this.#storage?.getItem(LAST_OPENED_STORAGE_KEY) ?? "{}");
-      return typeof parsed === "object" && parsed !== null ? parsed : {};
-    } catch (error) {
-      this.#warnOnce(error);
-      return {};
-    }
-  }
   #write() {
     try {
-      this.#storage?.setItem(LAST_OPENED_STORAGE_KEY, JSON.stringify(Object.fromEntries(this.#dates)));
+      this.#storage?.setItem(LAST_OPENED_STORAGE_KEY, FORMAT.encode(Object.fromEntries(this.#dates)));
     } catch (error) {
       this.#warnOnce(error);
     }

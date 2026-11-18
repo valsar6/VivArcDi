@@ -1,4 +1,15 @@
+import { StoredFormat } from "../../../core/browser/StoredFormat.js";
 const OPEN_FOLDERS_STORAGE_KEY = "vivarcdi.openFolders";
+const FORMAT = new StoredFormat({
+  empty: [],
+  read: (data) => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id) => typeof id === "string");
+    return { value: ids, skipped: ids.length < data.length };
+  }
+});
 class OpenFolders {
   #storage;
   #logger;
@@ -28,13 +39,7 @@ class OpenFolders {
    * Reads the saved ids of the current workspace.
    */
   load() {
-    this.#ids = /* @__PURE__ */ new Set();
-    try {
-      const saved = JSON.parse(this.#storage?.getItem(this.#key) ?? "[]");
-      this.#ids = new Set(Array.isArray(saved) ? saved.filter((id) => typeof id === "string") : []);
-    } catch (error) {
-      this.#logger.warn("open folders are kept for this session only", error);
-    }
+    this.#ids = new Set(this.#storage?.read(this.#key, FORMAT).value);
   }
   /**
    * @param id A folder id.
@@ -66,7 +71,7 @@ class OpenFolders {
   }
   #save() {
     try {
-      this.#storage?.setItem(this.#key, JSON.stringify([...this.#ids]));
+      this.#storage?.setItem(this.#key, FORMAT.encode([...this.#ids]));
     } catch (error) {
       this.#logger.warn("open folders are kept for this session only", error);
     }

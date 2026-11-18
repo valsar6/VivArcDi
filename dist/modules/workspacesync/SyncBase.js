@@ -1,5 +1,10 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 import { SyncNames } from "./SyncNames.js";
 const KEY_PREFIX = "vivarcdi.sync.base.";
+const FORMAT = new StoredFormat({
+  empty: null,
+  read: (data) => Array.isArray(data) && data.every((key) => typeof key === "string") ? { value: data, skipped: false } : null
+});
 class SyncBase {
   #storage;
   /**
@@ -16,19 +21,14 @@ class SyncBase {
    * @returns The address keys last agreed on, or null when the workspace never synced here.
    */
   get(workspaceName) {
-    try {
-      const parsed = JSON.parse(this.#storage.getItem(SyncBase.#key(workspaceName)) ?? "null");
-      return Array.isArray(parsed) && parsed.every((key) => typeof key === "string") ? parsed : null;
-    } catch {
-      return null;
-    }
+    return this.#storage.read(SyncBase.#key(workspaceName), FORMAT).value;
   }
   /**
    * @param workspaceName A workspace name, or null for the area outside any workspace.
    * @param keys The address keys the computer and the store now agree on.
    */
   set(workspaceName, keys) {
-    const text = JSON.stringify(keys);
+    const text = FORMAT.encode(keys);
     if (this.#storage.getItem(SyncBase.#key(workspaceName)) !== text) {
       this.#storage.setItem(SyncBase.#key(workspaceName), text);
     }

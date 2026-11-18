@@ -1,4 +1,15 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 const ANNOUNCED_KEY = "vivarcdi.sync.announced";
+const FORMAT = new StoredFormat({
+  empty: [],
+  read: (data) => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const names = data.filter((name) => typeof name === "string");
+    return { value: names, skipped: names.length < data.length };
+  }
+});
 class MissingSpaces {
   #storage;
   #notify;
@@ -20,17 +31,12 @@ class MissingSpaces {
     const shown = this.#shown();
     const fresh = names.filter((name) => !shown.includes(name));
     if (fresh.length > 0) {
-      this.#storage.setItem(ANNOUNCED_KEY, JSON.stringify([...shown, ...fresh]));
+      this.#storage.setItem(ANNOUNCED_KEY, FORMAT.encode([...shown, ...fresh]));
       this.#notify(`Spaces from your other computers: ${fresh.join(", ")}. Create them with the same name to get their pinned tabs.`);
     }
   }
   #shown() {
-    try {
-      const parsed = JSON.parse(this.#storage.getItem(ANNOUNCED_KEY) ?? "[]");
-      return Array.isArray(parsed) ? parsed.filter((name) => typeof name === "string") : [];
-    } catch {
-      return [];
-    }
+    return this.#storage.read(ANNOUNCED_KEY, FORMAT).value;
   }
 }
 export {

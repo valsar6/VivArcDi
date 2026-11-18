@@ -1,4 +1,15 @@
+import { StoredFormat } from "../../../core/browser/StoredFormat.js";
 const KEY = "vivarcdi.createdLinks";
+const FORMAT = new StoredFormat({
+  empty: [],
+  read: (data) => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id) => typeof id === "string");
+    return { value: ids, skipped: ids.length < data.length };
+  }
+});
 class CreatedLinks {
   #storage;
   /**
@@ -34,15 +45,10 @@ class CreatedLinks {
     }
   }
   #read() {
-    try {
-      const parsed = JSON.parse(this.#storage.getItem(KEY) ?? "[]");
-      return new Set(Array.isArray(parsed) ? parsed.filter((id) => typeof id === "string") : []);
-    } catch {
-      return /* @__PURE__ */ new Set();
-    }
+    return new Set(this.#storage.read(KEY, FORMAT).value);
   }
   #write(ids) {
-    this.#storage.setItem(KEY, JSON.stringify([...ids]));
+    this.#storage.setItem(KEY, FORMAT.encode([...ids]));
   }
 }
 export {

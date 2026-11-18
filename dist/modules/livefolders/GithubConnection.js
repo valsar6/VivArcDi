@@ -1,5 +1,17 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 const CONNECTION_STORAGE_KEY = "vivarcdi.liveFolders.github";
 const USER_URL = "https://api.github.com/user";
+const FORMAT = new StoredFormat({
+  empty: null,
+  read: (data) => {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const stored = data;
+    const value = typeof stored.token === "string" && stored.token !== "" ? { token: stored.token, login: typeof stored.login === "string" ? stored.login : "" } : null;
+    return { value, skipped: false };
+  }
+});
 class GithubConnection {
   #deps;
   #listeners = /* @__PURE__ */ new Set();
@@ -75,12 +87,7 @@ class GithubConnection {
     }
   }
   #read() {
-    try {
-      const stored = JSON.parse(this.#deps.storage.getItem(CONNECTION_STORAGE_KEY) ?? "{}");
-      return typeof stored?.token === "string" && stored.token !== "" ? { token: stored.token, login: typeof stored.login === "string" ? stored.login : "" } : null;
-    } catch {
-      return null;
-    }
+    return this.#deps.storage.read(CONNECTION_STORAGE_KEY, FORMAT).value;
   }
   #write(stored) {
     try {

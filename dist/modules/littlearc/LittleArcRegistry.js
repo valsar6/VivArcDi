@@ -1,5 +1,16 @@
+import { StoredFormat } from "../../core/browser/StoredFormat.js";
 const KEY = "vivarcdi.little-arc.windows";
 const KEPT = 20;
+const FORMAT = new StoredFormat({
+  empty: [],
+  read: (data) => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id) => Number.isInteger(id));
+    return { value: ids, skipped: ids.length < data.length };
+  }
+});
 class LittleArcRegistry {
   #storage;
   /**
@@ -17,7 +28,7 @@ class LittleArcRegistry {
   mark(windowId) {
     const ids = this.#read().filter((id) => id !== windowId);
     ids.push(windowId);
-    this.#storage.setItem(KEY, JSON.stringify(ids.slice(-KEPT)));
+    this.#storage.setItem(KEY, FORMAT.encode(ids.slice(-KEPT)));
   }
   /**
    * @param windowId A window id.
@@ -30,15 +41,10 @@ class LittleArcRegistry {
    * @param windowId A window id.
    */
   unmark(windowId) {
-    this.#storage.setItem(KEY, JSON.stringify(this.#read().filter((id) => id !== windowId)));
+    this.#storage.setItem(KEY, FORMAT.encode(this.#read().filter((id) => id !== windowId)));
   }
   #read() {
-    try {
-      const value = JSON.parse(this.#storage.getItem(KEY) ?? "[]");
-      return Array.isArray(value) ? value.filter((id) => Number.isInteger(id)) : [];
-    } catch {
-      return [];
-    }
+    return this.#storage.read(KEY, FORMAT).value;
   }
 }
 export {
