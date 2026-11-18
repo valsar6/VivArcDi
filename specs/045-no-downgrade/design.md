@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 
 ## Approach

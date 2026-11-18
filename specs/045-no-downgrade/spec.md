@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 0 |
 | Owner | Tore |
 | Approved | 2026-11-17 |
@@ -120,7 +120,7 @@ performs.
 | AC-9 | THE Debian `postinst` SHALL run `install` with `--allow-downgrade` | auto: `test_postinst_allows_downgrade` |
 | AC-10 | IF a version cannot be read, THEN THE installer SHALL behave as without this spec | auto: `test_unreadable_versions_block_nothing` |
 | AC-11 | WHILE a build holds a payload newer than the app, THE app window SHALL mark it `Newer version installed`, SHALL enable no Install or Update for it, and SHALL show a warning naming both versions | auto: `test_window_warns_about_a_newer_installed_version` |
-| AC-12 | WHEN Tore runs `python3 installer install` from a checkout of an older tag (for example `git worktree add /tmp/old v0.58.2`) on the Mac, THE installer SHALL refuse, and Vivaldi SHALL still log `0.58.x active` with the newer version after a restart | manual |
+| AC-12 | WHEN Tore runs `python3 installer install` from a copy of this version with a lower version number (an older tag has no guard and still downgrades) on the Mac, THE installer SHALL refuse, and Vivaldi SHALL still log `0.58.x active` with the newer version after a restart | manual |
 | AC-13 | WHEN Tore runs `python3 installer status` on the Mac and on Debian, THE output SHALL show the same version for every build and for the staged copy | manual |
 
 ## Out of scope
