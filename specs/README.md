@@ -45,6 +45,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [034 Module boundaries](034-module-boundaries/spec.md) | 0 | Approved |
 | [035 Core layout](035-core-layout/spec.md) | 0 | Implemented |
 | [036 Module options](036-module-options/spec.md) | 0 | Approved |
+| [040 Live folders writes](040-live-folders-writes/spec.md) | 3 | Draft |
 | [041 Write outcome](041-write-outcome/spec.md) | 0 | Approved |
 | [043 Sync robustness](043-sync-robustness/spec.md) | 3 | Implemented |
 | [045 No downgrade](045-no-downgrade/spec.md) | 0 | Implemented |
