@@ -59,7 +59,8 @@ the installer deploys. Users never need Node.
 | `npm run build` | Build `dist/` |
 | `make test-py` | Installer tests (Python 3.9+, standard library only) |
 | `make check` | Lint, typecheck, all tests and build in one go |
-| `npm run live` | Build, then run the boot check, the selector check and the live scenarios on a lab copy of Vivaldi; `--only <name or spec>`, `--probe <file>`, `--channel snapshot`, `--vivaldi <root>` |
+| `npm run live` | Build, then run the boot check, the selector check and the live scenarios on a lab copy of Vivaldi; `--only <name or spec>`, `--probe <file>`, `--channel snapshot`, `--vivaldi <root>`, `--vivaldi-version <v>`, `--no-sandbox` |
+| `npm run watch -- run --channel snapshot\|stable [--no-issues]` | What the nightly `snapshot-watch` workflow runs: download the newest Vivaldi of the channel, unpack it, run the live checks, update the issue (Linux with `dpkg-deb` only) |
 | `npm run release -- check --base origin/main --branch <branch>` | The branch and version check that CI runs on pull requests |
 
 `any` is not allowed. Add tests with every behavior change.
