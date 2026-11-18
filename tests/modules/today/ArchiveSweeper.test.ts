@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { ActivityStamps } from '../../../src/modules/today/ActivityStamps.js';
 import { ArchiveStore } from '../../../src/modules/today/ArchiveStore.js';
 import { ArchiveSweeper } from '../../../src/modules/today/ArchiveSweeper.js';
+import { silentNotices, RecordingToast } from '../../loader/fakes.js';
+import { Notices } from '../../../src/core/dom/Notices.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
-import { HOUR, ManualTimer, NOW, TodayTabs, stamped } from './fakes.js';
+import { HOUR, ManualTimer, NOW, OutcomeStorage, TodayTabs, stamped } from './fakes.js';
 import type { FolderTab } from '../folders/fakes.js';
 
 const ACTIVE: FolderTab = { id: 1, active: true, url: 'https://active.example/', vivExtData: stamped(NOW, { workspaceId: 7 }) };
@@ -14,7 +16,7 @@ function setup(tabs: FolderTab[], clock = { now: NOW }): { tabs: TodayTabs; stor
   const store = new ArchiveStore(new MemoryStorage(), 500, silentLogger());
   const stamps = new ActivityStamps(fake, (): number => clock.now, silentLogger());
   const timer = new ManualTimer();
-  const sweeper = new ArchiveSweeper({ tabs: fake, store, stamps, limitMs: 12 * HOUR, now: (): number => clock.now, repeat: timer.repeat, logger: silentLogger() });
+  const sweeper = new ArchiveSweeper({ tabs: fake, store, stamps, limitMs: 12 * HOUR, now: (): number => clock.now, repeat: timer.repeat, notices: silentNotices(), logger: silentLogger() });
   return { tabs: fake, store, sweeper, stamps, timer };
 }
 
@@ -87,19 +89,50 @@ test('a later lastAccessed keeps a tab open', async () => {
   assert.deepEqual(tabs.removedIds(), []);
 });
 
-test('keeps the tabs open when the archive cannot be saved', async () => {
-  const tabs = new TodayTabs([ACTIVE, { id: 2, url: 'https://old.example/', vivExtData: stamped(NOW - 13 * HOUR) }]);
-  const failing = new ArchiveSweeper({
-    tabs,
-    store: { add: (): void => { throw new Error('quota'); } },
-    stamps: { stamp: async (): Promise<void> => undefined },
-    limitMs: 12 * HOUR,
-    now: (): number => NOW,
-    repeat: new ManualTimer().repeat,
-    logger: silentLogger(),
-  });
-  await failing.sweep();
+const OLD: FolderTab = { id: 2, url: 'https://old.example/', vivExtData: stamped(NOW - 13 * HOUR) };
+
+function outcomeSetup(storage: OutcomeStorage, notices: Notices = silentNotices()): { tabs: TodayTabs; store: ArchiveStore; sweeper: ArchiveSweeper } {
+  const tabs = new TodayTabs([ACTIVE, OLD]);
+  const store = new ArchiveStore(storage, 500, silentLogger());
+  const stamps = new ActivityStamps(tabs, (): number => NOW, silentLogger());
+  const sweeper = new ArchiveSweeper({ tabs, store, stamps, limitMs: 12 * HOUR, now: (): number => NOW, repeat: new ManualTimer().repeat, notices, logger: silentLogger() });
+  return { tabs, store, sweeper };
+}
+
+test('closes archived tabs only after the save', async () => {
+  const storage = new OutcomeStorage();
+  let release: () => void = () => undefined;
+  storage.hold = new Promise<void>((resolve) => { release = resolve; });
+  const { tabs, sweeper } = outcomeSetup(storage);
+  const sweeping = sweeper.sweep();
+  await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(tabs.removedIds(), []);
+  release();
+  await sweeping;
+  assert.deepEqual(tabs.removedIds(), [2]);
+});
+
+test('keeps the tabs open when the archive cannot be saved', async () => {
+  for (const outcome of ['failed', 'memory'] as const) {
+    const storage = new OutcomeStorage();
+    storage.outcome = outcome;
+    const { tabs, store, sweeper } = outcomeSetup(storage);
+    await sweeper.sweep();
+    await sweeper.clear();
+    assert.deepEqual(tabs.removedIds(), []);
+    assert.deepEqual(store.entries, []);
+  }
+});
+
+test('warns once when Today tabs stay open', async () => {
+  const storage = new OutcomeStorage();
+  storage.outcome = 'failed';
+  const toast = new RecordingToast();
+  const { sweeper } = outcomeSetup(storage, new Notices(toast));
+  await sweeper.sweep();
+  await sweeper.sweep();
+  assert.equal(toast.shown.length, 1);
+  assert.equal(toast.shown[0]?.kind, 'error');
 });
 
 test('clear archives every Today tab of the workspace except the active one', async () => {

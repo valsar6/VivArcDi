@@ -67,7 +67,7 @@ export class TodayArchive extends Module<TodayArchiveOptions> {
       const stamps = new ActivityStamps(tabs, this.#clock.now, logger);
       this.#stops.push(() => stamps.stop());
       await stamps.start();
-      this.#sweeper = new ArchiveSweeper({ tabs, store, stamps, limitMs, now: this.#clock.now, repeat: this.#clock.repeat, logger });
+      this.#sweeper = new ArchiveSweeper({ tabs, store, stamps, limitMs, now: this.#clock.now, repeat: this.#clock.repeat, notices: context.notices, logger });
       this.#sweeper.start();
       this.#stops.push(() => this.#sweeper?.stop());
       await this.#startInterface(context, new ArchiveRestorer(new WorkspaceTabs(tabs, logger), store, logger));
