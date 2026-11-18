@@ -44,6 +44,8 @@ export class LiveFolderRefresher {
    * sent. A failed refresh keeps the rows and sets the warning to the reason, which is logged
    * without any header; when GitHub refused the token the folder is marked to offer
    * `Reconnect GitHub`. Pull requests the user archived stay hidden until GitHub says they changed.
+   * A refresh changes only the rows, the archived rows, the warning and the refresh time, as saved
+   * when GitHub answers, so a rename or an archive made in another window stays.
    *
    * @param dependencies Everything it collaborates with.
    */

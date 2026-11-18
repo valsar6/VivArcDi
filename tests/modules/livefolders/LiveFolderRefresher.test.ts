@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import type { Logger } from '../../../src/core/support/Logger.js';
 import { GithubPullRequests } from '../../../src/modules/livefolders/GithubPullRequests.js';
 import { LiveEntries, CONNECT_TITLE, NOT_SET_UP_TITLE, RECONNECT_TITLE } from '../../../src/modules/livefolders/LiveEntries.js';
 import type { ConnectionState } from '../../../src/modules/livefolders/LiveEntries.js';
 import { LiveFolderRefresher } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
 import { LiveFolderStore } from '../../../src/modules/livefolders/LiveFolderStore.js';
 import type { LiveFolder } from '../../../src/modules/livefolders/LiveFolderStore.js';
-import { FakeGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
+import { FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 
 const TOKEN = 'ghp_never_stored_anywhere';
 const FIVE_MINUTES = 300_000;
@@ -18,6 +19,7 @@ interface Setup {
   connection: { token: string | null };
   github: FakeGithub;
   store: LiveFolderStore;
+  logger: Logger;
   storage: MemoryStorage;
   refresher: LiveFolderRefresher;
   ticker: ManualTicker;
@@ -26,7 +28,7 @@ interface Setup {
   logged: () => string;
 }
 
-function setup(token: string | null = TOKEN): Setup {
+function setup(token: string | null = TOKEN, held?: HeldGithub): Setup {
   const github = new FakeGithub([pullRequest(1, { title: 'First' }), pullRequest(2, { title: 'Second', reviewRequested: true })]);
   const storage = new MemoryStorage();
   const { logger, sink } = recordingLogger();
@@ -38,7 +40,7 @@ function setup(token: string | null = TOKEN): Setup {
   let changed = 0;
   const refresher = new LiveFolderRefresher({
     store,
-    github: new GithubPullRequests(github.fetch),
+    github: held ?? new GithubPullRequests(github.fetch),
     connection,
     changed: (): void => void (changed += 1),
     ticker,
@@ -46,7 +48,7 @@ function setup(token: string | null = TOKEN): Setup {
     logger,
     now: (): number => 1234,
   });
-  return { connection, github, store, storage, refresher, ticker, folder, changes: (): number => changed, logged: (): string => sink.lines.join('\n') };
+  return { connection, github, store, logger, storage, refresher, ticker, folder, changes: (): number => changed, logged: (): string => sink.lines.join('\n') };
 }
 
 const refreshed = async ({ refresher, folder }: Setup): Promise<void> => {
@@ -194,4 +196,40 @@ test('ignores a folder that was deleted', async () => {
   await context.refresher.idle();
   assert.equal(context.github.requests.length, 0);
   assert.equal(context.changes(), 0);
+});
+
+const heldSetup = (): { context: Setup; held: HeldGithub; other: LiveFolderStore } => {
+  const github = new FakeGithub([pullRequest(1, { title: 'First' }), pullRequest(2, { title: 'Second' })]);
+  const held = new HeldGithub(github);
+  const context = setup(TOKEN, held);
+  const other = new LiveFolderStore(context.storage, context.logger);
+  return { context, held, other };
+};
+
+test('a refresh keeps a rename made in another window', async () => {
+  const { context, held, other } = heldSetup();
+  held.hold();
+  context.refresher.refresh('f1');
+  other.update('f1', { name: 'Renamed', filters: { createdByMe: false, reviewRequests: true, drafts: false, repositories: ['a/b'] } });
+  held.release();
+  await context.refresher.idle();
+  const saved = context.store.find('f1');
+  assert.equal(saved?.name, 'Renamed');
+  assert.deepEqual(saved?.filters, { createdByMe: false, reviewRequests: true, drafts: false, repositories: ['a/b'] });
+  assert.equal(saved?.rows.length, 2);
+});
+
+test('a refresh keeps rows archived in another window', async () => {
+  const { context, held, other } = heldSetup();
+  await refreshed(context);
+  const first = context.store.find('f1')?.rows.find((row) => row.title === 'First');
+  assert.ok(first !== undefined);
+  held.hold();
+  context.refresher.refresh('f1');
+  other.update('f1', { archived: { [first.id]: first.updatedAt } });
+  held.release();
+  await context.refresher.idle();
+  const saved = context.store.find('f1');
+  assert.deepEqual(saved?.rows.map((row) => row.title), ['Second']);
+  assert.deepEqual(Object.keys(saved?.archived ?? {}), [first.id]);
 });
