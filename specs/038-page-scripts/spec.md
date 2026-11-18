@@ -187,27 +187,27 @@ console (Q-7).
 
 ## Open questions
 
-- [ ] **Q-1. Scope confirmed.** The approved title names only the `peek-keys` uninstall. This draft
+- [x] **Q-1. Scope confirmed.** The approved title names only the `peek-keys` uninstall. This draft
   adds F-2 (late install), F-3 (out-of-order installs), F-4 (lost failures) and tests. Keep them in
   038? Recommendation: yes; they live in the same two files, are small, and F-2 is the same kind of
   leak as F-1.
-- [ ] **Q-2. Is the `peek-keys` uninstall worth it?** F-1 shows the listener dies with the panel's
+- [x] **Q-2. Is the `peek-keys` uninstall worth it?** F-1 shows the listener dies with the panel's
   webview today. Alternatives: (a) add `uninstall` and run it on close, as FR-4 says; (b) only make
   `install` replace and export `uninstall`, without running it on close; (c) leave `peek-keys` as it
   is and document why. Recommendation: (a); it costs one `executeScript` per close and keeps one rule
   for all page scripts, so a later change (a reused or kept panel webview) cannot leak.
-- [ ] **Q-3. Shared helper.** FR-8 removes four copies of the registry (F-6). It changes four page
+- [x] **Q-3. Shared helper.** FR-8 removes four copies of the registry (F-6). It changes four page
   scripts that work today. Recommendation: yes, in the same `fix/` branch, covered by AC-1 to AC-4.
-- [ ] **Q-4. What fails, and how.** It is inferred, not confirmed, that `vivaldi://` pages and the Web
+- [x] **Q-4. What fails, and how.** It is inferred, not confirmed, that `vivaldi://` pages and the Web
   Store refuse `executeScript` asynchronously and print "Unchecked runtime.lastError". Recommendation:
-  check it on the lab Vivaldi with a probe (`npm run live -- --probe`) before the design, with Tore's
-  agreement, and adjust FR-7 if Vivaldi behaves otherwise.
-- [ ] **Q-5. Toast.** Should a page script that cannot be injected anywhere show a notice of 041?
+  check it with a probe before the design and adjust FR-7 if Vivaldi behaves otherwise. Tore's
+  answer: a probe that Tore runs himself on his own Vivaldi, not `npm run live`.
+- [x] **Q-5. Toast.** Should a page script that cannot be injected anywhere show a notice of 041?
   Recommendation: no; nothing is lost, the interface shortcuts still work, and a toast on every
   `vivaldi://` page would be noise. 039 can decide on a toast if no page at all accepts scripts.
-- [ ] **Q-6. Branch and version.** Recommendation: `fix/page-scripts`, patch version, after 037 is
+- [x] **Q-6. Branch and version.** Recommendation: `fix/page-scripts`, patch version, after 037 is
   merged.
-- [ ] **Q-7. Live checks.** AC-12 and AC-13 could become `live:` scenarios if the harness of 046 can
+- [x] **Q-7. Live checks.** AC-12 and AC-13 could become `live:` scenarios if the harness of 046 can
   dispatch keys into a tab's webview and collect the interface console. Recommendation: keep them
   `manual` in 038 and open a follow-up for the harness, rather than grow 046 inside this spec.
 
