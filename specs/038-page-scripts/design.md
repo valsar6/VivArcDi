@@ -287,5 +287,9 @@ being `#report` at 3.
 
 ## Open questions
 
-- **Debug level for the closed tab.** The design adds `Logger.debug` (`console.debug`, hidden by
-  default in Chromium). Alternative: `logger.info`, which is always shown. Debug as designed?
+- [x] **Debug level for the closed tab.** The design adds `Logger.debug` (`console.debug`, hidden by
+  default in Chromium). Alternative: `logger.info`, which is always shown. Tore's answer: debug, as
+  designed; it is for developers checking the behavior, and the same level applies on the settings
+  page.
+- [x] **A second probe for `Unchecked runtime.lastError`.** Skipped: every call passes a callback, so
+  the answer no longer changes the design.
