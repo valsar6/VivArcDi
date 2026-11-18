@@ -15,7 +15,7 @@ Order and parallel work: T1 and T3 touch different files and can run in parallel
 fake of T1 (its tests fail without them), so it starts from the commit that has T1; T3 touches no
 file of T2 and may still be running then. T4 comes last, after T1 to T3 are merged.
 
-- [ ] **T1. Store reads fresh and patches per change.** In
+- [x] **T1. Store reads fresh and patches per change.** In
   `src/modules/livefolders/LiveFolderStore.ts`: drop `#folders` and the read in the constructor;
   `workspaces`, `folders`, `all`, `find` read `#read()` at each call; `add`, `update`, `remove`
   read, change only what they name and write; `update` returns `false` and `remove` writes nothing
@@ -28,14 +28,14 @@ file of T2 and may still be running then. T4 comes last, after T1 to T3 are merg
   `does not bring back a folder deleted in another window`,
   `removes only the given folder`,
   `warns once when the saved live folders are damaged`.
-- [ ] **T2. Refresher keeps changes from other windows.** One sentence in the class JSDoc of
+- [x] **T2. Refresher keeps changes from other windows.** One sentence in the class JSDoc of
   `src/modules/livefolders/LiveFolderRefresher.ts` (a refresh changes only the rows, the archived
   rows, the warning and the refresh time, as saved when GitHub answers); `setup` in
   `tests/modules/livefolders/LiveFolderRefresher.test.ts` takes an optional `HeldGithub`. Satisfies
   AC-6 and AC-7 in that file: `a refresh keeps a rename made in another window`,
   `a refresh keeps rows archived in another window`. No other code change; if one turns out to be
   needed, stop and report it, since the design says none is.
-- [ ] **T3. Docs and version.** `docs/manual/live-folders.md`: a short paragraph that, with several
+- [x] **T3. Docs and version.** `docs/manual/live-folders.md`: a short paragraph that, with several
   windows open, a change made in one window stays, and the others show it at their next refresh,
   within `refreshMinutes`. `specs/026-live-folders/design.md`: the `LiveFolderStore` row says the
   folders are read at each call and saved per change (spec 040). Patch version bump to 0.59.2,
