@@ -17,8 +17,10 @@ One channel, one job of the workflow matrix:
 
 1. `AptIndex` downloads `dists/stable/main/binary-amd64/Packages` and picks the newest
    `vivaldi-<channel>` entry by Debian version order, with its `Filename`, `SHA256` and `Depends`.
-2. The workflow installs the libraries of `Depends` from Ubuntu (`apt-get install
-   --no-install-recommends`) and `xvfb`. Vivaldi itself is not installed.
+2. The workflow installs the libraries of `Depends` from Ubuntu with `apt-get satisfy
+   --no-install-recommends`, which resolves alternatives, version constraints and virtual packages
+   (`libasound2` is provided by `libasound2t64` on Ubuntu 24.04) as installing the package would,
+   and `xvfb`. Vivaldi itself is not installed.
 3. `PackageFetcher` downloads the `.deb`, checks its SHA256 and unpacks it with `dpkg-deb -x` into
    `build/watch/<channel>/root/`.
 4. `WatchRun` starts `npm run live -- --channel <channel> --vivaldi <root> --vivaldi-version
@@ -95,7 +97,7 @@ knows.
 | Risk | Mitigation |
 |---|---|
 | The unpacked Vivaldi misses a system library | The workflow installs the `Depends` of the index entry; a start failure is labelled `infrastructure`, not a broken selector |
-| Ubuntu package names differ from Debian's in `Depends` (`libasound2` vs `libasound2t64`) | Alternatives (`a \| b`) are tried in order; T7 runs the workflow by hand before the schedule is enabled |
+| Ubuntu package names differ from Debian's in `Depends` (`libasound2` vs `libasound2t64`) | `apt-get satisfy` resolves the raw field like a package install would; the first T7 run showed that `apt-get install` of the first alternatives fails on `libasound2` |
 | A snapshot opens a first-run dialog that hides the interface | The fixture preferences and `--no-first-run`; the screenshot in the artifact shows it, and the issue is opened anyway |
 | Flapping infrastructure floods the issue with comments | One comment per run, and at most one run per night per channel |
 | The apt index moves or changes format | `AptIndex` fails with a clear message, labelled `infrastructure` |

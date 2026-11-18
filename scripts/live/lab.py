@@ -11,7 +11,7 @@ import json
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable
 
@@ -88,20 +88,21 @@ class LabBuilder:
         self._copier = copier
         self._verifier = verifier
 
-    def prepare(self, channel: str, source_root: Path) -> dict:
+    def prepare(self, channel: str, source_root: Path, version: str | None = None) -> dict:
         """Make sure the lab copy exists and carries no VivArcDi patch inherited from the installed build.
 
+        `version` replaces the version the platform reads, for an unpacked package that dpkg does not know.
         Returns the executable, the Vivaldi version and the resources folder of the copy.
         Raises LabError when no build of the channel is installed, the target is not in the lab,
         or the copy fails its code signature.
         """
-        installation = self._installed(channel)
+        installation = self._installed(channel, version)
         layout = LAYOUTS[self._source.name][channel]
         lab_dir = self._lab_root / f"{channel}-{installation.version}"
         copy = lab_dir / layout.folder
         if not copy.exists():
             self._copier(source_root / layout.folder, copy)
-        target = self._lab_installation(lab_dir, channel)
+        target = self._lab_installation(lab_dir, channel, version)
         self._unpatch(target)
         self._verifier(copy)
         return {
@@ -111,17 +112,17 @@ class LabBuilder:
             "labDir": str(lab_dir),
         }
 
-    def _installed(self, channel: str) -> VivaldiInstallation:
+    def _installed(self, channel: str, version: str | None) -> VivaldiInstallation:
         found = [item for item in self._source.find_installations() if item.channel == channel]
         if not found:
             raise LabError(f"No Vivaldi {channel} installation was found")
-        return found[-1]
+        return with_version(found[-1], version)
 
-    def _lab_installation(self, lab_dir: Path, channel: str) -> VivaldiInstallation:
+    def _lab_installation(self, lab_dir: Path, channel: str, version: str | None) -> VivaldiInstallation:
         found = [item for item in self._platform_at(lab_dir).find_installations() if item.channel == channel]
         if not found:
             raise LabError(f"The lab copy in {lab_dir} holds no Vivaldi {channel}")
-        installation = found[-1]
+        installation = with_version(found[-1], version)
         if not installation.resources_dir.resolve().is_relative_to(self._lab_root.resolve()):
             raise LabError(f"{installation.resources_dir} is outside the lab, refusing to change it")
         return installation
@@ -135,23 +136,29 @@ class LabBuilder:
             shutil.rmtree(installation.payload_dir)
 
 
+def with_version(installation: VivaldiInstallation, version: str | None) -> VivaldiInstallation:
+    """The installation with a known version instead of the one the platform read, when given."""
+    return installation if version is None else replace(installation, version=version)
+
+
 def platform_at(kind: type) -> Callable[[Path], Platform]:
     """Factory of platforms of the same kind rooted at another folder."""
     return lambda root: kind(root=root)
 
 
 def main(argv: list[str]) -> int:
-    """Command line: `prepare [--channel stable|snapshot] [--vivaldi <root>] [--lab <dir>]`."""
+    """Command line: `prepare [--channel stable|snapshot] [--vivaldi <root>] [--version <v>] [--lab <dir>]`."""
     parser = argparse.ArgumentParser(prog="lab.py")
     parser.add_argument("command", choices=["prepare"])
     parser.add_argument("--channel", choices=["stable", "snapshot"], default="stable")
     parser.add_argument("--vivaldi", type=Path, default=Path("/"), help="root folder laid out like / with a Vivaldi build")
+    parser.add_argument("--version", help="Vivaldi version of an unpacked build that dpkg does not know")
     parser.add_argument("--lab", type=Path, default=DEFAULT_LAB_ROOT)
     args = parser.parse_args(argv)
     try:
         kind = type(PlatformFactory().create())
         builder = LabBuilder(kind(root=args.vivaldi), platform_at(kind), args.lab)
-        print(json.dumps(builder.prepare(args.channel, args.vivaldi)))
+        print(json.dumps(builder.prepare(args.channel, args.vivaldi, args.version)))
     except VivArcDiError as error:
         print(str(error), file=sys.stderr)
         return 1

@@ -11,6 +11,7 @@ export interface LabBuild {
 export interface LabOptions {
   channel: 'stable' | 'snapshot';
   vivaldiRoot?: string;
+  vivaldiVersion?: string;
 }
 
 export type CommandRunner = (command: string, args: string[]) => Promise<string>;
@@ -33,7 +34,7 @@ export class LabVivaldi {
   }
 
   /**
-   * @param options Channel and, for another build, its root folder.
+   * @param options Channel and, for another build, its root folder and, if dpkg does not know it, its version.
    * @returns The patched lab copy.
    * @throws {Error} When `lab.py` fails, with its message.
    */
@@ -41,6 +42,9 @@ export class LabVivaldi {
     const args = [this.#script, 'prepare', '--channel', options.channel];
     if (options.vivaldiRoot !== undefined) {
       args.push('--vivaldi', options.vivaldiRoot);
+    }
+    if (options.vivaldiVersion !== undefined) {
+      args.push('--version', options.vivaldiVersion);
     }
     try {
       return JSON.parse(await this.#run('python3', args)) as LabBuild;

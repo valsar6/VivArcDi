@@ -8,8 +8,9 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "tests" / "installer"))
 sys.path.insert(0, str(REPO / "scripts" / "live"))
 
-from support import WINDOW_HTML, make_macos_vivaldi
-from vivarcdi.platforms import MacOSPlatform
+from support import WINDOW_HTML, FakeRunner, make_debian_vivaldi, make_macos_vivaldi
+from vivarcdi.platforms import DebianPlatform, MacOSPlatform
+from vivarcdi.system import CommandResult
 from vivarcdi.window_patch import WindowHtmlPatcher
 
 from lab import LabBuilder, LabError, platform_at
@@ -94,6 +95,24 @@ class LabBuilderTest(unittest.TestCase):
         builder.prepare("stable", self.real)
 
         self.assertEqual(len(self.copies), 1)
+
+    def test_lab_uses_the_given_version_for_an_unpacked_build(self):
+        unpacked = self.root / "unpacked"
+        make_debian_vivaldi(unpacked, "opt/vivaldi-snapshot")
+        no_dpkg_record = FakeRunner({"dpkg-query": CommandResult(1, "", "not installed")})
+        builder = LabBuilder(
+            DebianPlatform(root=unpacked, runner=no_dpkg_record, home=self.root),
+            lambda root: DebianPlatform(root=root, runner=no_dpkg_record, home=self.root),
+            self.lab,
+            copy_with_links,
+            self.verified.append,
+        )
+
+        result = builder.prepare("snapshot", unpacked, "8.4.4226.3")
+
+        self.assertEqual(result["vivaldiVersion"], "8.4.4226.3")
+        self.assertEqual(result["labDir"], str(self.lab / "snapshot-8.4.4226.3"))
+        self.assertEqual(result["executable"], str(self.lab / "snapshot-8.4.4226.3" / "opt/vivaldi-snapshot/vivaldi-snapshot"))
 
     def test_refuses_a_channel_that_is_not_installed(self):
         with self.assertRaises(LabError):

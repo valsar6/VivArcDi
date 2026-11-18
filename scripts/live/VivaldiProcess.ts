@@ -45,6 +45,7 @@ export class VivaldiProcess {
       `--remote-allow-origins=http://${DEBUG_HOST}`,
       '--no-first-run',
       '--no-default-browser-check',
+      '--password-store=basic',
       ...extra,
     ];
   }

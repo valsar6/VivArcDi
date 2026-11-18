@@ -1,0 +1,63 @@
+name: snapshot-watch
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Vivaldi channel to check
+        type: choice
+        options: [both, snapshot, stable]
+        default: both
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [snapshot, stable]
+    env:
+      ASKED: ${{ github.event.inputs.channel || 'both' }}
+    steps:
+      - name: Decide whether this channel was asked for
+        id: asked
+        run: |
+          if [ "${ASKED}" = both ] || [ "${ASKED}" = "${{ matrix.channel }}" ]; then
+            echo "run=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "run=false" >> "${GITHUB_OUTPUT}"
+          fi
+      - uses: actions/checkout@v7
+        if: steps.asked.outputs.run == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.asked.outputs.run == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - if: steps.asked.outputs.run == 'true'
+        run: npm ci
+      - name: Install xvfb and the libraries Vivaldi depends on, not Vivaldi
+        if: steps.asked.outputs.run == 'true'
+        run: |
+          depends="$(npm run -s watch -- deps --channel ${{ matrix.channel }})"
+          sudo apt-get update
+          sudo apt-get satisfy -y --no-install-recommends "xvfb, ${depends}"
+      - name: Check the newest Vivaldi ${{ matrix.channel }}
+        id: check
+        if: steps.asked.outputs.run == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: xvfb-run -a npm run -s watch -- run --channel ${{ matrix.channel }}
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.asked.outputs.run == 'true'
+        with:
+          name: live-${{ matrix.channel }}-${{ steps.check.outputs.version || 'unknown' }}
+          path: build/live/
+          if-no-files-found: warn

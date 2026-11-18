@@ -29,6 +29,7 @@ const LIVE_TESTS = join(ROOT, 'tests', 'live');
 interface Options {
   only: string[];
   probe?: string;
+  noSandbox: boolean;
   lab: LabOptions;
 }
 
@@ -48,16 +49,27 @@ function options(argv: string[]): Options {
       probe: { type: 'string' },
       vivaldi: { type: 'string' },
       channel: { type: 'string', default: 'stable' },
+      'vivaldi-version': { type: 'string' },
+      'no-sandbox': { type: 'boolean', default: false },
     },
   });
   const lab: LabOptions = { channel: values.channel === 'snapshot' ? 'snapshot' : 'stable' };
   if (values.vivaldi !== undefined) {
     lab.vivaldiRoot = values.vivaldi;
   }
-  return values.probe === undefined ? { only: values.only, lab } : { only: values.only, probe: values.probe, lab };
+  if (values['vivaldi-version'] !== undefined) {
+    lab.vivaldiVersion = values['vivaldi-version'];
+  }
+  const base = { only: values.only, noSandbox: values['no-sandbox'], lab };
+  return values.probe === undefined ? base : { ...base, probe: values.probe };
 }
 
-async function launch(executable: string, profile: string): Promise<RunningVivaldi> {
+const NO_SANDBOX = ['--no-sandbox'];
+
+async function launch(executable: string, profile: string, noSandbox: boolean): Promise<RunningVivaldi> {
+  if (noSandbox) {
+    return VivaldiProcess.start(executable, profile, spawnVivaldi, NO_SANDBOX);
+  }
   try {
     return await VivaldiProcess.start(executable, profile, spawnVivaldi);
   } catch (error) {
@@ -65,7 +77,7 @@ async function launch(executable: string, profile: string): Promise<RunningVival
       throw error;
     }
     console.warn('Vivaldi did not start with its sandbox; retrying the lab copy with --no-sandbox');
-    return VivaldiProcess.start(executable, profile, spawnVivaldi, ['--no-sandbox']);
+    return VivaldiProcess.start(executable, profile, spawnVivaldi, NO_SANDBOX);
   }
 }
 
@@ -81,7 +93,7 @@ function parts(opts: Options, scenarios: Scenario[]): LiveRunParts {
     servePayload: (vivaldiVersion) =>
       PayloadServer.start(join(ROOT, 'dist'), { vivarcdiVersion: version, vivaldiVersion, payloadFingerprint: 'live' }),
     createProfile: () => ProfileDirectory.temporary(join(LIVE_TESTS, 'profile', 'Preferences.json')),
-    launch,
+    launch: (executable, profile) => launch(executable, profile, opts.noSandbox),
     attach: async (endpoint) => CdpConnection.connect(await WindowTarget.find(endpoint)),
     catalog: (version) => SelectorCheck.catalogFor(join(ROOT, 'src', 'selectors'), version),
     checks: (catalog) => [

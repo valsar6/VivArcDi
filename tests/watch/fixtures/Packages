@@ -1,0 +1,37 @@
+Package: vivaldi-snapshot
+Version: 8.4.4226.3-1
+Architecture: amd64
+Depends: ca-certificates, libasound2 (>= 1.0.17), libcurl3-gnutls | libcurl3-nss | libcurl4, libgtk-3-0 (>= 3.9.10) | libgtk-4-1, libnss3 (>= 2:3.35)
+Filename: pool/main/vivaldi-snapshot_8.4.4226.3-1_amd64.deb
+Size: 143455492
+SHA256: 9a4410c8bfd6288753cd5f4635d49f100cd1030d162402a87635aac096712451
+Description: Experience the web in a whole new way with Vivaldi.
+ Vivaldi is a browser that has the features you need.
+
+Package: vivaldi-stable
+Version: 8.3.4191.44-1
+Architecture: amd64
+Depends: ca-certificates, libnss3 (>= 2:3.35)
+Filename: pool/main/vivaldi-stable_8.3.4191.44-1_amd64.deb
+SHA256: 1111111111111111111111111111111111111111111111111111111111111111
+
+Package: vivaldi-snapshot
+Version: 8.4.4226.10-1
+Architecture: amd64
+Depends: ca-certificates
+Filename: pool/main/vivaldi-snapshot_8.4.4226.10-1_amd64.deb
+SHA256: 2222222222222222222222222222222222222222222222222222222222222222
+
+Package: vivaldi-snapshot
+Version: 8.4.4226.9-1
+Architecture: amd64
+Depends: ca-certificates
+Filename: pool/main/vivaldi-snapshot_8.4.4226.9-1_amd64.deb
+SHA256: 3333333333333333333333333333333333333333333333333333333333333333
+
+Package: vivaldi-stable
+Version: 8.3.4191.35-1
+Architecture: amd64
+Depends: ca-certificates
+Filename: pool/main/vivaldi-stable_8.3.4191.35-1_amd64.deb
+SHA256: 4444444444444444444444444444444444444444444444444444444444444444
