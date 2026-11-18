@@ -5,6 +5,7 @@ import { PullRequestFilters } from '../../../src/modules/livefolders/PullRequest
 import type { CommandItem, MenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { LiveFolderRefresher } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
 import { LiveRowMenu } from '../../../src/modules/livefolders/LiveRowMenu.js';
+import { guarded } from '../../loader/fakes.js';
 import { FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 
 const ROW = { id: '1', title: 'Fix', url: 'https://github.com/a/b/pull/1', subtitle: 'ada · a/b', updatedAt: '2026-11-01T00:00:00Z' };
@@ -67,10 +68,10 @@ test('starts empty when the stored text is damaged', () => {
   const storage = new MemoryStorage();
   storage.setItem(LIVE_FOLDERS_STORAGE_KEY, '{not json');
   const { logger, sink } = recordingLogger();
-  assert.deepEqual(new LiveFolderStore(storage, logger).all(), []);
+  assert.deepEqual(new LiveFolderStore(guarded(storage, logger), logger).all(), []);
   assert.equal(sink.lines.length, 1);
   storage.setItem(LIVE_FOLDERS_STORAGE_KEY, JSON.stringify({ 5: [{ id: 'x', name: 'Mine', rows: [{ id: 3 }, ROW], filters: 'bad' }, 'junk'] }));
-  const [folder] = new LiveFolderStore(storage, logger).all();
+  const [folder] = new LiveFolderStore(guarded(storage, logger), logger).all();
   assert.deepEqual([folder?.name, folder?.rows, folder?.filters], ['Mine', [ROW], PullRequestFilters.defaults()]);
 });
 
@@ -176,9 +177,10 @@ test('warns once when the saved live folders are damaged', () => {
   const storage = new MemoryStorage();
   storage.setItem(LIVE_FOLDERS_STORAGE_KEY, '{not json');
   const { logger, sink } = recordingLogger();
-  const store = new LiveFolderStore(storage, logger, ids());
+  const store = new LiveFolderStore(guarded(storage, logger), logger, ids());
   assert.deepEqual([store.all(), store.find('x'), store.workspaces, store.folders('5')], [[], undefined, [], []]);
   store.add('5');
   assert.equal(sink.lines.length, 1);
+  assert.equal(storage.getItem('vivarcdi.recovery.liveFolders'), '{not json');
   assert.deepEqual(savedIds(storage), { 5: ['f1'] });
 });

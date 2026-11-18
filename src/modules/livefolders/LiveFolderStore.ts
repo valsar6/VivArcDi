@@ -1,5 +1,7 @@
 import type { Logger } from '../../core/support/Logger.js';
-import type { KeyValueStorage } from '../../core/browser/PersistentStorage.js';
+import { StoredFormat } from '../../core/browser/StoredFormat.js';
+import type { ReadingStorage } from '../../core/browser/StoredFormat.js';
+import type { Readout } from '../../core/browser/StoredFormat.js';
 import type { PullRequestRow } from './GithubPullRequests.js';
 import { PullRequestFilters } from './PullRequestFilters.js';
 import type { PullRequestFilterValues } from './PullRequestFilters.js';
@@ -32,10 +34,14 @@ const ID_START = 2;
 const ID_LENGTH = 10;
 
 export class LiveFolderStore {
-  #storage: KeyValueStorage;
+  static readonly #FORMAT = new StoredFormat<Record<string, LiveFolder[]>>({
+    empty: {},
+    read: (data): Readout<Record<string, LiveFolder[]>> | null => LiveFolderStore.#readFolders(data),
+  });
+
+  #storage: ReadingStorage;
   #logger: Logger;
   #nextId: () => string;
-  #warned = false;
 
   /**
    * The live folders of every workspace, their filters and their last rows, kept in the
@@ -48,7 +54,7 @@ export class LiveFolderStore {
    * @param logger Logger for storage failures.
    * @param nextId Makes the id of a new folder; replaceable in tests.
    */
-  constructor(storage: KeyValueStorage, logger: Logger, nextId: () => string = LiveFolderStore.#randomId) {
+  constructor(storage: ReadingStorage, logger: Logger, nextId: () => string = LiveFolderStore.#randomId) {
     this.#storage = storage;
     this.#logger = logger;
     this.#nextId = nextId;
@@ -161,36 +167,35 @@ export class LiveFolderStore {
   }
 
   #read(): Map<string, LiveFolder[]> {
-    try {
-      return LiveFolderStore.#parse(this.#storage.getItem(LIVE_FOLDERS_STORAGE_KEY) ?? '{}');
-    } catch (error) {
-      if (!this.#warned) {
-        this.#warned = true;
-        this.#logger.warn('the live folders could not be read', error);
-      }
-      return new Map();
-    }
-  }
-
-  static #parse(text: string): Map<string, LiveFolder[]> {
-    const saved = new Map<string, LiveFolder[]>();
-    const stored: unknown = JSON.parse(text);
-    const record = typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {};
-    for (const [key, value] of Object.entries(record)) {
-      const folders = Array.isArray(value) ? value.flatMap((item) => LiveFolderStore.#folderFrom(item)) : [];
-      if (folders.length > 0) {
-        saved.set(key, folders);
-      }
-    }
-    return saved;
+    return new Map(Object.entries(this.#storage.read(LIVE_FOLDERS_STORAGE_KEY, LiveFolderStore.#FORMAT).value));
   }
 
   #write(folders: Map<string, LiveFolder[]>): void {
     try {
-      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, JSON.stringify(Object.fromEntries(folders)));
+      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, LiveFolderStore.#FORMAT.encode(Object.fromEntries(folders)));
     } catch (error) {
       this.#logger.warn('the live folders are kept for this session only', error);
     }
+  }
+
+  static #readFolders(data: unknown): Readout<Record<string, LiveFolder[]>> | null {
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      return null;
+    }
+    const value: Record<string, LiveFolder[]> = {};
+    let skipped = false;
+    for (const [key, entry] of Object.entries(data)) {
+      if (!Array.isArray(entry)) {
+        skipped = true;
+        continue;
+      }
+      const folders = entry.flatMap((item) => LiveFolderStore.#folderFrom(item));
+      skipped ||= folders.length < entry.length;
+      if (folders.length > 0) {
+        value[key] = folders;
+      }
+    }
+    return { value, skipped };
   }
 
   static #folderFrom(value: unknown): LiveFolder[] {
