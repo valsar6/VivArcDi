@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import { ActivationRecorder } from '../../../src/modules/reopen/ActivationRecorder.js';
 import { LAST_OPENED_STORAGE_KEY, LastOpenedStore } from '../../../src/shared/links/LastOpenedStore.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
@@ -38,6 +39,7 @@ test('last opened dates survive a reload and expire after one year', () => {
 test('last opened dates stay in memory when storage fails', () => {
   const broken = {
     getItem: (): string => '{broken',
+    read: <T>(_key: string, format: StoredFormat<T>): StoredRead<T> => format.decode('{broken'),
     setItem: (): void => {
       throw new Error('quota');
     },

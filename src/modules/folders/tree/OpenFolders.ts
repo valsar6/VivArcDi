@@ -1,10 +1,21 @@
 import type { Logger } from '../../../core/support/Logger.js';
-import type { KeyValueStorage } from '../../../core/browser/PersistentStorage.js';
+import { StoredFormat, type Readout, type ReadingStorage } from '../../../core/browser/StoredFormat.js';
 
 export const OPEN_FOLDERS_STORAGE_KEY = 'vivarcdi.openFolders';
 
+const FORMAT = new StoredFormat<string[]>({
+  empty: [],
+  read: (data): Readout<string[]> | null => {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+    const ids = data.filter((id): id is string => typeof id === 'string');
+    return { value: ids, skipped: ids.length < data.length };
+  },
+});
+
 export class OpenFolders {
-  #storage: KeyValueStorage | null;
+  #storage: ReadingStorage | null;
   #logger: Logger;
   #key = OPEN_FOLDERS_STORAGE_KEY;
   #ids = new Set<string>();
@@ -16,7 +27,7 @@ export class OpenFolders {
    * @param storage Persistent storage, or null.
    * @param logger Logger for storage failures.
    */
-  constructor(storage: KeyValueStorage | null, logger: Logger) {
+  constructor(storage: ReadingStorage | null, logger: Logger) {
     this.#storage = storage;
     this.#logger = logger;
   }
@@ -35,13 +46,7 @@ export class OpenFolders {
    * Reads the saved ids of the current workspace.
    */
   public load(): void {
-    this.#ids = new Set();
-    try {
-      const saved: unknown = JSON.parse(this.#storage?.getItem(this.#key) ?? '[]');
-      this.#ids = new Set(Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string') : []);
-    } catch (error) {
-      this.#logger.warn('open folders are kept for this session only', error);
-    }
+    this.#ids = new Set(this.#storage?.read(this.#key, FORMAT).value);
   }
 
   /**
@@ -77,7 +82,7 @@ export class OpenFolders {
 
   #save(): void {
     try {
-      this.#storage?.setItem(this.#key, JSON.stringify([...this.#ids]));
+      this.#storage?.setItem(this.#key, FORMAT.encode([...this.#ids]));
     } catch (error) {
       this.#logger.warn('open folders are kept for this session only', error);
     }
