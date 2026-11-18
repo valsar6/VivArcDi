@@ -71,6 +71,7 @@ export class PinnedClosing {
       uninstallScript: `globalThis.${KEYS_GLOBAL}?.uninstall();`,
       purpose: 'pinned tab shortcuts',
       onConsoleMessage: (message): void => this.#receive(message),
+      errors: runtime,
       logger,
     });
     if (runtime.messagesAvailable) {

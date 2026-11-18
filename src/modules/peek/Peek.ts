@@ -99,7 +99,7 @@ export class Peek extends Module<PeekOptions> {
     });
   }
 
-  #createInjector({ selectors, tabs, logger }: ModuleContext<PeekOptions>, triggers: PeekTriggers, scripts: PageScripts): PageScriptInjector {
+  #createInjector({ selectors, tabs, runtime, logger }: ModuleContext<PeekOptions>, triggers: PeekTriggers, scripts: PageScripts): PageScriptInjector {
     const { shiftClick, pinnedCrossSite, anyCrossSite, pinnedNewTab, anyNewTab } = triggers;
     return new PageScriptInjector({
       container: this.#container as HTMLElement,
@@ -114,6 +114,7 @@ export class Peek extends Module<PeekOptions> {
       uninstallScript: scripts.uninstallLinks(),
       purpose: 'Peek links',
       onConsoleMessage: (message, tabId) => this.#receive(message, tabId),
+      errors: runtime,
       logger,
     });
   }
