@@ -151,7 +151,7 @@ adding one selector file.
 
 ## Live verification
 
-`npm run live` ([spec 045](../specs/045-live-verification/spec.md)) checks the payload on a real
+`npm run live` ([spec 046](../specs/046-live-verification/spec.md)) checks the payload on a real
 Vivaldi without touching the user's one. It is development tooling in `scripts/live/`, never shipped.
 
 | Piece | Role |

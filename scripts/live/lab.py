@@ -1,4 +1,4 @@
-"""Prepares the lab Vivaldi of the live verification harness (spec 045).
+"""Prepares the lab Vivaldi of the live verification harness (spec 046).
 
 The lab is a copy of an installed Vivaldi, patched with the dist folder of the working tree, so the
 harness never touches the Vivaldi the user browses with.
