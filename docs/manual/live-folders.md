@@ -102,6 +102,12 @@ changes. The connection to GitHub stays, because it belongs to the browser profi
 A click on a row opens the pull request as a tab of the workspace, below the row like the link of a
 bookmark folder. When the pull request leaves the folder, its tab goes back to the list of today's tabs.
 
+## Several windows
+
+With several windows open, a change made in one window stays: renaming or deleting a live folder is not
+undone by another window. The other windows show the change at their next refresh, within
+`refreshMinutes` (five minutes by default).
+
 ## Upgrading from 0.49 to 0.51
 
 Those versions asked for a token with a terminal command. That command is gone: install or reapply
