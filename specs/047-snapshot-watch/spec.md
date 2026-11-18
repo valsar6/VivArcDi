@@ -35,7 +35,8 @@ specs in parallel.
 
 Every night a GitHub Actions job reads the Vivaldi apt index, takes the newest `vivaldi-snapshot` and
 `vivaldi-stable` packages, unpacks each into a folder without installing it, and runs `npm run live`
-on it under a virtual display. Nothing is installed on the runner beyond what the job unpacks.
+on it under a virtual display. Vivaldi itself is never installed on the runner: only the system
+libraries its package depends on are installed from Ubuntu.
 
 When a run fails, the job opens an issue titled `Vivaldi <channel> <version> breaks VivArcDi`, or
 comments on it if it is already open, with the summary of `build/live/report.md`, and attaches the
