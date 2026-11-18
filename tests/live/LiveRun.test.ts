@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Cleanup } from '../../scripts/live/Cleanup.js';
 import { LiveRun } from '../../scripts/live/LiveRun.js';
+import { PayloadInjector } from '../../scripts/live/PayloadInjector.js';
 import type { LiveRunParts } from '../../scripts/live/LiveRun.js';
 import { Report } from '../../scripts/live/Report.js';
 import type { CheckResult } from '../../scripts/live/Report.js';
@@ -13,6 +14,7 @@ import type { FakeSocket } from './fakes.js';
 
 const PNG = Buffer.from('fake png');
 const ACTIVE = '0.59.0 active on Vivaldi 8.3';
+const PAYLOAD_URL = 'http://127.0.0.1:2/';
 
 interface Harness {
   run: LiveRun;
@@ -32,6 +34,7 @@ function harness(checks: Check[], overrides: Partial<LiveRunParts> = {}): Harnes
   });
   const parts: LiveRunParts = {
     prepareLab: async () => ({ executable: '/lab/Vivaldi', vivaldiVersion: '8.3.4191.44', resourcesDir: '/lab/r', labDir: '/lab' }),
+    servePayload: async () => ({ url: PAYLOAD_URL, close: async () => void events.push('payload closed') }),
     createProfile: async () => ({ path: '/tmp/profile', remove: async () => void events.push('profile removed') }),
     launch: async () => ({ endpoint: 'http://127.0.0.1:1', stop: async () => void events.push('vivaldi stopped') }),
     attach: async () => cdp,
@@ -57,7 +60,7 @@ test('harness cleans up after a failed run', async () => {
   const code = await run.run();
 
   assert.equal(code, 1);
-  assert.deepEqual(events, ['vivaldi stopped', 'profile removed']);
+  assert.deepEqual(events, ['vivaldi stopped', 'profile removed', 'payload closed']);
   assert.equal(socket.closed, true);
   assert.match(readFileSync(join(dir, 'report.md'), 'utf8'), /the window vanished/);
 });
@@ -70,7 +73,7 @@ test('cleans up when Vivaldi cannot be attached', async () => {
   });
 
   assert.equal(await run.run(), 1);
-  assert.deepEqual(events, ['vivaldi stopped', 'profile removed']);
+  assert.deepEqual(events, ['vivaldi stopped', 'profile removed', 'payload closed']);
 });
 
 test('harness saves a screenshot and fails on a failed check', async () => {
@@ -114,4 +117,17 @@ test('report lists versions, results and console lines', async () => {
   const summary = readFileSync(join(dir, 'report.md'), 'utf8');
   assert.match(summary, /Vivaldi 8\.3\.4191\.44, VivArcDi 0\.59\.0, selectors 8\.1/);
   assert.match(summary, /\| selector browser \| pass \|/);
+});
+
+test('harness injects the served payload before window.html loads', async () => {
+  const { run, socket } = harness([check([{ name: 'selector browser', outcome: 'pass', detail: '' }])]);
+
+  await run.run();
+
+  const methods = socket.methods();
+  const order = ['Runtime.enable', 'Page.setBypassCSP', 'Page.addScriptToEvaluateOnNewDocument', 'Page.reload'];
+  assert.deepEqual(methods.filter((method) => order.includes(method)), order);
+  const added = socket.sent.find(({ method }) => method === 'Page.addScriptToEvaluateOnNewDocument');
+  assert.equal(added?.params['source'], PayloadInjector.bootstrap(PAYLOAD_URL));
+  assert.match(String(added?.params['source']), /^import\("http:\/\/127\.0\.0\.1:2\/loader\.js"\)/);
 });

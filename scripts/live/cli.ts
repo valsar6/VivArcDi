@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import type { ModuleOptions } from '../../src/core/boot/types.js';
+import { createDefaultRegistry } from '../../src/modules/index.js';
 import { CdpConnection } from './cdp/CdpConnection.js';
 import { WindowTarget } from './cdp/WindowTarget.js';
 import { BootCheck } from './checks/BootCheck.js';
@@ -12,6 +14,7 @@ import { Cleanup } from './Cleanup.js';
 import { LabVivaldi } from './LabVivaldi.js';
 import type { LabOptions } from './LabVivaldi.js';
 import { LiveRun } from './LiveRun.js';
+import { PayloadServer } from './PayloadServer.js';
 import type { LiveRunParts, RunningVivaldi } from './LiveRun.js';
 import { ProbeRunner } from './probe/ProbeRunner.js';
 import { ProfileDirectory } from './ProfileDirectory.js';
@@ -30,7 +33,7 @@ interface Options {
 }
 
 interface DistConfig {
-  modules: Record<string, { enabled?: boolean }>;
+  modules: Record<string, ModuleOptions>;
 }
 
 function readJson<T>(path: string): T {
@@ -66,25 +69,28 @@ async function launch(executable: string, profile: string): Promise<RunningVival
   }
 }
 
-function enabledModules(): string[] {
+function modulesOfNormalWindow(): string[] {
   const config = readJson<DistConfig>(join(ROOT, 'dist', 'config.json'));
-  return Object.entries(config.modules).filter(([, module]) => module.enabled === true).map(([id]) => id);
+  return createDefaultRegistry().createEnabled(config.modules, false).modules.map(({ id }) => id);
 }
 
 function parts(opts: Options, scenarios: Scenario[]): LiveRunParts {
+  const { version } = readJson<{ version: string }>(join(ROOT, 'package.json'));
   return {
     prepareLab: () => new LabVivaldi(join(ROOT, 'scripts', 'live', 'lab.py')).prepare(opts.lab),
+    servePayload: (vivaldiVersion) =>
+      PayloadServer.start(join(ROOT, 'dist'), { vivarcdiVersion: version, vivaldiVersion, payloadFingerprint: 'live' }),
     createProfile: () => ProfileDirectory.temporary(join(LIVE_TESTS, 'profile', 'Preferences.json')),
     launch,
     attach: async (endpoint) => CdpConnection.connect(await WindowTarget.find(endpoint)),
     catalog: (version) => SelectorCheck.catalogFor(join(ROOT, 'src', 'selectors'), version),
     checks: (catalog) => [
-      new BootCheck(enabledModules()),
+      new BootCheck(modulesOfNormalWindow()),
       new SelectorCheck(catalog.selectors, readJson<StateMap>(join(LIVE_TESTS, 'selector-states.json'))),
       ...scenarios.map((scenario) => new ScenarioCheck(scenario)),
     ],
     report: new Report(join(ROOT, 'build', 'live')),
-    payloadVersion: readJson<{ version: string }>(join(ROOT, 'package.json')).version,
+    payloadVersion: version,
   };
 }
 
