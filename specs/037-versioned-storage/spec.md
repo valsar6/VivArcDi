@@ -174,21 +174,21 @@ directly into a fake storage.
 
 ## Open questions
 
-- [ ] **Q-1. Malformed entries.** The archive, live folders and lists skip single entries they cannot
+- [x] **Q-1. Malformed entries.** The archive, live folders and lists skip single entries they cannot
   read, and the next write drops them. Should a read that skipped entries count as `unreadable` for
   the recovery copy (FR-6), without the notice? Recommendation: yes, copy once and log, no toast, so
   a partly damaged value is never lost either.
-- [ ] **Q-2. Notice for unreadable data.** The approved decisions name a notice only for newer data.
+- [x] **Q-2. Notice for unreadable data.** The approved decisions name a notice only for newer data.
   Should unreadable data show a toast too, or only log? Recommendation: one toast per session as in
   [After](#after), because the user sees data missing and the copy exists only if someone knows.
-- [ ] **Q-3. Notice texts.** Recommendation: as in [After](#after), in English, kind `error`.
-- [ ] **Q-4. Recovery copy once.** If the recovery key already holds an older copy, the newer
+- [x] **Q-3. Notice texts.** Recommendation: as in [After](#after), in English, kind `error`.
+- [x] **Q-4. Recovery copy once.** If the recovery key already holds an older copy, the newer
   unreadable text is overwritten without a copy (FR-6). Alternatives: replace the old copy, or keep
   one copy per day. Recommendation: keep the first copy; a second damage of the same key is unlikely,
   and one slot per key keeps the storage bounded.
-- [ ] **Q-5. `spaceCollapsed`.** Leave the scalar `true`/`false` keys out of versioning?
+- [x] **Q-5. `spaceCollapsed`.** Leave the scalar `true`/`false` keys out of versioning?
   Recommendation: yes; an unreadable value means "expanded", there is nothing to lose.
-- [ ] **Q-6. Branch.** The behavior changes only for damaged or newer data. Recommendation: `fix/`,
+- [x] **Q-6. Branch.** The behavior changes only for damaged or newer data. Recommendation: `fix/`,
   patch version, after 040 is merged, since both touch `LiveFolderStore`.
 
 ## References
