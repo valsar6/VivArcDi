@@ -1,3 +1,4 @@
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { LogSink } from '../../../src/core/support/Logger.js';
 import { CODE_URL, TOKEN_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
@@ -142,6 +143,10 @@ export class MemoryStorage {
 
   public getItem(key: string): string | null {
     return this.items.get(key) ?? null;
+  }
+
+  public read<T>(key: string, format: StoredFormat<T>): StoredRead<T> {
+    return format.decode(this.getItem(key));
   }
 
   public setItem(key: string, value: string): void {

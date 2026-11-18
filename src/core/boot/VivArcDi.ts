@@ -175,7 +175,7 @@ export class VivArcDi {
 
     await new UiReadiness(this.#document).waitFor(selectors.get('browser'));
     config.styles.forEach((path) => this.#styles.inject(path));
-    const services = WindowServices.open(this.#document, selectors, this.#storage);
+    const services = WindowServices.open(this.#document, selectors, this.#storage, this.#logger);
     this.#notices = services.notices;
 
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);

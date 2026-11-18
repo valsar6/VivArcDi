@@ -1,3 +1,4 @@
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import type { TabActivatedListener, TabCreatedListener } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import { SilentSink } from '../../loader/fakes.js';
@@ -59,6 +60,10 @@ export class MemoryStorage {
 
   public getItem(key: string): string | null {
     return this.items.get(key) ?? null;
+  }
+
+  public read<T>(key: string, format: StoredFormat<T>): StoredRead<T> {
+    return format.decode(this.getItem(key));
   }
 
   public setItem(key: string, value: string): void {
