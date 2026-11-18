@@ -83,6 +83,13 @@ class BackgroundReapplyTest(AppBackgroundCase):
         def is_current(self, installation):
             return self.deployer.is_current(installation)
 
+        @property
+        def version(self):
+            return self.deployer.version
+
+        def deployed_version(self, installation):
+            return self.deployer.deployed_version(installation)
+
     def denied_context(self):
         context = self.context(background=True)
         deployer = self.Denying(context.installations._deployer, str(self.resources))

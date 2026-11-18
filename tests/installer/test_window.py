@@ -20,6 +20,7 @@ from vivarcdi.system import CommandResult
 from vivarcdi.window.assembly import assemble_presenter, build_presenter
 from vivarcdi.window.model import BuildState
 from vivarcdi.window.presenter import MessageButtonKind, WindowView
+from vivarcdi import __version__
 from vivarcdi.window_patch import WindowHtmlPatcher
 
 NOT_RUNNING = CommandResult(1, "", "")
@@ -96,6 +97,17 @@ class WindowStateTest(DebianWindowCase):
             (self.snapshot / "window.html").write_text(WINDOW_HTML)
             presenter.refresh()
             self.assertEqual(self.states(), [BuildState.OUTDATED, BuildState.NEEDS_REAPPLY])
+
+    def test_window_warns_about_a_newer_installed_version(self):
+        presenter = self.presenter()
+        presenter.perform(WindowAction.INSTALL)
+        build_json = self.stable / "vivarcdi" / "build.json"
+        build_json.write_text(json.dumps({**json.loads(build_json.read_text()), "vivarcdiVersion": "99.0.0"}))
+        self.presenter().refresh()
+        self.assertEqual(self.states(), [BuildState.NEWER, BuildState.CURRENT])
+        self.assertNotIn(WindowAction.INSTALL, self.view.state.enabled_actions)
+        self.assertNotIn(WindowAction.UPDATE, self.view.state.enabled_actions)
+        self.assertIn(f"VivArcDi 99.0.0 is already installed, newer than this app ({__version__})", self.view.state.message)
 
     def test_a_package_build_with_no_patch_and_no_payload_needs_reapplying(self):
         presenter = self.presenter(DebPackageMode())
@@ -248,6 +260,13 @@ class AppManagementDenialTest(MacWindowCase):
 
         def is_current(self, installation):
             return self.deployer.is_current(installation)
+
+        @property
+        def version(self):
+            return self.deployer.version
+
+        def deployed_version(self, installation):
+            return self.deployer.deployed_version(installation)
 
     def denying_presenter(self):
         reporter = CollectingReporter()

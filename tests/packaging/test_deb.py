@@ -170,7 +170,7 @@ class DebScriptsTest(DebCase):
     def test_deb_postinst_installs_and_reapplies_on_trigger(self):
         environment = self.fake_commands("vivarcdi", "install")
         with self.subTest("configure installs"):
-            self.assertEqual(self.run_script("postinst", environment, "configure", "0.1")[-1], "vivarcdi install --mode deb --quiet")
+            self.assertEqual(self.run_script("postinst", environment, "configure", "0.1")[-1], "vivarcdi install --mode deb --quiet --allow-downgrade")
         with self.subTest("trigger reapplies"):
             calls = self.run_script("postinst", environment, "triggered", "/opt/vivaldi")
             self.assertEqual(calls[-1], "vivarcdi reapply --mode deb --quiet")
@@ -179,6 +179,10 @@ class DebScriptsTest(DebCase):
             self.run_script("postinst", environment, "configure")
         with self.subTest("other actions do nothing"):
             self.assertEqual(len(self.run_script("postinst", environment, "abort-upgrade")), 4)
+
+    def test_postinst_allows_downgrade(self):
+        environment = self.fake_commands("vivarcdi", "install")
+        self.assertIn("--allow-downgrade", self.run_script("postinst", environment, "configure", "0.1")[-1].split())
 
     def test_deb_prerm_uninstalls_and_keeps_backups(self):
         environment = self.fake_commands("vivarcdi", "rm")

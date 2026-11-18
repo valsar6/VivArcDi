@@ -4,7 +4,7 @@ set -e
 case "$1" in
 configure)
     install -D -m 0644 /usr/share/vivarcdi/vivarcdi-archive-keyring.gpg /usr/share/keyrings/vivarcdi-archive-keyring.gpg
-    vivarcdi install --mode deb --quiet || true
+    vivarcdi install --mode deb --quiet --allow-downgrade || true
     ;;
 triggered)
     vivarcdi reapply --mode deb --quiet || true

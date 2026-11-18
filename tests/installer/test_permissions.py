@@ -24,6 +24,11 @@ class DeniedDeployer:
     def is_current(self, installation):
         return False
 
+    version = "0.0.0"
+
+    def deployed_version(self, installation):
+        return None
+
 
 class RecordingAdvisor:
     def __init__(self):

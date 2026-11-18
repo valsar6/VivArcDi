@@ -36,13 +36,15 @@ class InstallMode(ABC):
 
     A mode decides the data folder, the update hook, whether the installer
     stages a copy of itself, how permission problems are explained and which
-    window actions are shown. Subclasses only answer these questions.
+    window actions are shown, and whether a refused downgrade names the
+    `--allow-downgrade` option. Subclasses only answer these questions.
     """
 
     name: str
     marker_name: str | None = None
     visible_actions: frozenset = ALL_ACTIONS
     settings_url: str | None = None
+    offers_downgrade: bool = True
 
     @abstractmethod
     def supports(self, platform: Platform) -> bool:
@@ -123,6 +125,7 @@ class MacAppMode(InstallMode):
 
     name = "app"
     marker_name = "app"
+    offers_downgrade = False
     settings_url = "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles"
 
     def __init__(self, app_executable: Path | None = None):
