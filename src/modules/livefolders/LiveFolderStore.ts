@@ -34,13 +34,15 @@ const ID_LENGTH = 10;
 export class LiveFolderStore {
   #storage: KeyValueStorage;
   #logger: Logger;
-  #folders = new Map<string, LiveFolder[]>();
   #nextId: () => string;
+  #warned = false;
 
   /**
    * The live folders of every workspace, their filters and their last rows, kept in the
-   * interface's storage under `liveFolders` as `{ [workspace]: LiveFolder[] }`. They are read
-   * once, here, and every change is written at once. The GitHub connection is not part of them.
+   * interface's storage under `liveFolders` as `{ [workspace]: LiveFolder[] }`. Nothing is kept in
+   * memory: every call reads the saved value, so a change made in another window shows at once,
+   * and every change reads it, alters only what it names and writes it at once. The GitHub
+   * connection is not part of them.
    *
    * @param storage Persistent storage.
    * @param logger Logger for storage failures.
@@ -50,14 +52,13 @@ export class LiveFolderStore {
     this.#storage = storage;
     this.#logger = logger;
     this.#nextId = nextId;
-    this.#read();
   }
 
   /**
    * @returns The workspaces that have live folders; null stands for the area outside any workspace.
    */
   public get workspaces(): Array<string | null> {
-    return [...this.#folders.keys()].map((key) => (key === NO_WORKSPACE ? null : key));
+    return [...this.#read().keys()].map((key) => (key === NO_WORKSPACE ? null : key));
   }
 
   /**
@@ -65,14 +66,14 @@ export class LiveFolderStore {
    * @returns Its live folders, in order.
    */
   public folders(workspace: string | null): readonly LiveFolder[] {
-    return this.#folders.get(workspace ?? NO_WORKSPACE) ?? [];
+    return this.#read().get(workspace ?? NO_WORKSPACE) ?? [];
   }
 
   /**
    * @returns Every live folder of every workspace.
    */
   public all(): LiveFolder[] {
-    return [...this.#folders.values()].flat();
+    return [...this.#read().values()].flat();
   }
 
   /**
@@ -100,66 +101,93 @@ export class LiveFolderStore {
       archived: {},
       refreshedAt: null,
     };
+    const saved = this.#read();
     const key = workspace ?? NO_WORKSPACE;
-    this.#folders.set(key, [...(this.#folders.get(key) ?? []), folder]);
-    this.#write();
+    saved.set(key, [...(saved.get(key) ?? []), folder]);
+    this.#write(saved);
     return folder;
   }
 
   /**
+   * Changes the named fields of a saved folder and leaves everything else as saved.
+   *
    * @param id A folder id.
    * @param changes The fields to change.
-   * @returns Whether the folder exists.
+   * @returns Whether the folder exists; if not, nothing is written.
    */
   public update(id: string, changes: LiveFolderChanges): boolean {
-    const found = this.find(id);
-    if (found === undefined) {
-      return false;
+    const saved = this.#read();
+    for (const [key, folders] of saved) {
+      const found = folders.find((folder) => folder.id === id);
+      if (found !== undefined) {
+        saved.set(
+          key,
+          folders.map((folder) => (folder === found ? { ...found, ...changes } : folder)),
+        );
+        this.#write(saved);
+        return true;
+      }
     }
-    Object.assign(found, changes);
-    this.#write();
-    return true;
+    return false;
   }
 
   /**
-   * Removes a folder with its filters and its rows.
+   * Removes a folder with its filters and its rows; nothing is written when it is not saved.
    *
    * @param id A folder id.
    */
   public remove(id: string): void {
-    for (const [key, folders] of this.#folders) {
+    const saved = this.#read();
+    let removed = false;
+    for (const [key, folders] of saved) {
       const kept = folders.filter((folder) => folder.id !== id);
+      if (kept.length === folders.length) {
+        continue;
+      }
+      removed = true;
       if (kept.length === 0) {
-        this.#folders.delete(key);
+        saved.delete(key);
       } else {
-        this.#folders.set(key, kept);
+        saved.set(key, kept);
       }
     }
-    this.#write();
+    if (removed) {
+      this.#write(saved);
+    }
   }
 
   static #randomId(): string {
     return Math.random().toString(ID_RADIX).slice(ID_START, ID_LENGTH);
   }
 
-  #read(): void {
+  #read(): Map<string, LiveFolder[]> {
     try {
-      const stored: unknown = JSON.parse(this.#storage.getItem(LIVE_FOLDERS_STORAGE_KEY) ?? '{}');
-      const record = typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {};
-      for (const [key, value] of Object.entries(record)) {
-        const folders = Array.isArray(value) ? value.flatMap((item) => LiveFolderStore.#folderFrom(item)) : [];
-        if (folders.length > 0) {
-          this.#folders.set(key, folders);
-        }
-      }
+      return LiveFolderStore.#parse(this.#storage.getItem(LIVE_FOLDERS_STORAGE_KEY) ?? '{}');
     } catch (error) {
-      this.#logger.warn('the live folders could not be read', error);
+      if (!this.#warned) {
+        this.#warned = true;
+        this.#logger.warn('the live folders could not be read', error);
+      }
+      return new Map();
     }
   }
 
-  #write(): void {
+  static #parse(text: string): Map<string, LiveFolder[]> {
+    const saved = new Map<string, LiveFolder[]>();
+    const stored: unknown = JSON.parse(text);
+    const record = typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {};
+    for (const [key, value] of Object.entries(record)) {
+      const folders = Array.isArray(value) ? value.flatMap((item) => LiveFolderStore.#folderFrom(item)) : [];
+      if (folders.length > 0) {
+        saved.set(key, folders);
+      }
+    }
+    return saved;
+  }
+
+  #write(folders: Map<string, LiveFolder[]>): void {
     try {
-      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, JSON.stringify(Object.fromEntries(this.#folders)));
+      this.#storage.setItem(LIVE_FOLDERS_STORAGE_KEY, JSON.stringify(Object.fromEntries(folders)));
     } catch (error) {
       this.#logger.warn('the live folders are kept for this session only', error);
     }

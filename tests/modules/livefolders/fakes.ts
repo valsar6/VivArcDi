@@ -2,6 +2,7 @@ import { Logger } from '../../../src/core/support/Logger.js';
 import type { LogSink } from '../../../src/core/support/Logger.js';
 import { CODE_URL, TOKEN_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import type { DeviceFetch } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
+import { GithubPullRequests } from '../../../src/modules/livefolders/GithubPullRequests.js';
 import type { GithubFetch, GithubResponse, SearchItem } from '../../../src/modules/livefolders/GithubPullRequests.js';
 import { settle } from '../reopen/fakes.js';
 
@@ -88,6 +89,37 @@ export class FakeGithub {
       repository_url: `https://api.github.com/repos/${candidate.repository}`,
     };
   }
+}
+
+/** A GitHub whose search waits after `hold()` until the test calls `release()`; otherwise it answers at once. */
+export class HeldGithub implements Pick<GithubPullRequests, 'list'> {
+  public readonly github: FakeGithub;
+  #search: GithubPullRequests;
+  #gate: Promise<void> | null = null;
+  #open: (() => void) | null = null;
+
+  constructor(github: FakeGithub) {
+    this.github = github;
+    this.#search = new GithubPullRequests(github.fetch);
+  }
+
+  public hold(): void {
+    this.#gate = new Promise<void>((resolve) => {
+      this.#open = resolve;
+    });
+  }
+
+  public release(): void {
+    this.#open?.();
+    this.#gate = null;
+    this.#open = null;
+  }
+
+  public list: GithubPullRequests['list'] = async (filters, token) => {
+    const rows = await this.#search.list(filters, token);
+    await this.#gate;
+    return rows;
+  };
 }
 
 export class RecordingSink implements LogSink {
