@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved, Tore, 2026-11-18 |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
