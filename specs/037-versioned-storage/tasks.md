@@ -22,7 +22,7 @@ Order and parallel work:
 - **T8** (docs and version) touches no source file and may run in parallel with T2 to T6.
 - **T9** comes last.
 
-- [ ] **T1. Format and reader.** `src/core/browser/StoredFormat.ts` (`ReadStatus`, `StoredRead`,
+- [x] **T1. Format and reader.** `src/core/browser/StoredFormat.ts` (`ReadStatus`, `StoredRead`,
   `Readout`, `Upgrade`, `FormatRules`, `StoredReader`, `ReadingStorage`, `VersionedStorage`,
   `StoredFormat` with `version`, `decode`, `encode`, and the envelope members `vivarcdi:version`
   and `vivarcdi:data`); `src/core/boot/GuardedStorage.ts` (`read`, the per-key hold of a newer
@@ -42,14 +42,14 @@ Order and parallel work:
   `keeps a copy of an unreadable value before overwriting it`,
   `does not replace an existing recovery copy`, `warns once about unreadable data`,
   `shows no notice and keeps no copy for readable data`.
-- [ ] **T2. Archive.** `src/modules/today/ArchiveStore.ts`: `FORMAT` (empty `[]`, rejects a
+- [x] **T2. Archive.** `src/modules/today/ArchiveStore.ts`: `FORMAT` (empty `[]`, rejects a
   non-array, skips entries that fail `#isEntry`), reads through `storage.read`, writes
   `FORMAT.encode`; `#read`, the malformed-entries warning and the `logger` parameter go;
   `src/modules/today/TodayArchive.ts` stops passing the logger. In
   `tests/modules/today/ArchiveStore.test.ts`, `skips malformed entries and warns once` builds the
   store over `guarded(...)` with its recording logger; the other archive tests drop the logger
   argument and keep their bodies.
-- [ ] **T3. Live folders and GitHub connection.** `src/modules/livefolders/LiveFolderStore.ts`:
+- [x] **T3. Live folders and GitHub connection.** `src/modules/livefolders/LiveFolderStore.ts`:
   `FORMAT` (empty `{}`, rejects a non-object, skips a workspace that is not an array and a folder
   `#folderFrom` cannot read, not rows or archived ids), `#read` builds the map from `.value`,
   `#warned` and the read warning go, `#write` uses `FORMAT.encode` (FR-9).
@@ -57,27 +57,27 @@ Order and parallel work:
   In `tests/modules/livefolders/LiveFolderStore.test.ts`,
   `warns once when the saved live folders are damaged` (040/AC-8) builds the store over
   `guarded(...)` and also expects `vivarcdi.recovery.liveFolders` to hold `{not json`.
-- [ ] **T4. Links and folders.** `src/shared/links/LastOpenedStore.ts` (empty `{}`, rejects a
+- [x] **T4. Links and folders.** `src/shared/links/LastOpenedStore.ts` (empty `{}`, rejects a
   non-object, skips members that are not numbers; expired dates are not skipped; the write warning
   stays), `src/modules/folders/tree/OpenFolders.ts` (empty `[]`, rejects a non-array, skips
   non-texts; the read `try`/`catch` goes), `src/modules/folders/favoritelinks/CreatedLinks.ts`
   (same rule as `OpenFolders`). Existing tests in `tests/modules/reopen/`,
   `tests/modules/folders/tree/OpenFolders.test.ts` and
   `tests/modules/folders/favoritelinks/CreatedLinks.test.ts` keep their bodies.
-- [ ] **T5. Little Arc.** `src/modules/littlearc/LittleArcRegistry.ts` (empty `[]`, rejects a
+- [x] **T5. Little Arc.** `src/modules/littlearc/LittleArcRegistry.ts` (empty `[]`, rejects a
   non-array, skips ids that are not whole numbers). The inline storage of
   `tests/modules/littlearc/logic.test.ts` gains `read`.
-- [ ] **T6. Workspace sync.** `src/modules/workspacesync/SyncBase.ts` and `SpaceBase.ts` (empty
+- [x] **T6. Workspace sync.** `src/modules/workspacesync/SyncBase.ts` and `SpaceBase.ts` (empty
   `null`, reject anything but a fully valid array, never skip), `SpaceIds.ts` (empty `{}`, rejects a
   non-object, skips links that are neither a text nor `{ detached: text }`), `MissingSpaces.ts`
   (empty `[]`, rejects a non-array, skips non-texts). `set` and `#save` compare and write
   `FORMAT.encode(...)`. Tests in `tests/modules/workspacesync/` keep their bodies.
-- [ ] **T7. Every key through the reader.** `tests/structure/StoredKeys.test.ts` with a `ReadLog`
+- [x] **T7. Every key through the reader.** `tests/structure/StoredKeys.test.ts` with a `ReadLog`
   storage. Satisfies AC-11: `every stored JSON key reads through the shared reader`, covering the
   eleven rows of the spec's table and failing on any file under `src/modules/` or `src/shared/` that
   has both `getItem(` and `JSON.parse(`. If it finds a store that T2 to T6 missed, stop and report
   it rather than widening the task.
-- [ ] **T8. Docs and version.** `docs/architecture.md`: the context paragraph says that `storage`
+- [x] **T8. Docs and version.** `docs/architecture.md`: the context paragraph says that `storage`
   also has `read(key, format)` for JSON values, with versions, the read-only hold and the recovery
   copy (spec 037). `docs/manual/getting-started.md`: a short section **Saved data** after
   **Updates**: VivArcDi keeps its data under `vivarcdi.*` keys; after going back to an older
