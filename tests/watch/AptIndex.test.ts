@@ -16,18 +16,15 @@ test('picks the newest package of a channel from the apt index', () => {
   assert.throws(() => index.newest('vivaldi-beta'), /lists no vivaldi-beta/);
 });
 
-test('reads checksums and dependency alternatives without version constraints', () => {
+test('reads checksums and the Depends field as apt-get satisfy takes it', () => {
   const entry = new AptIndex(PACKAGES).newest('vivaldi-snapshot');
   const first = new AptIndex(PACKAGES.split('\n\n')[0] ?? '').newest('vivaldi-snapshot');
 
   assert.equal(entry.sha256, '2222222222222222222222222222222222222222222222222222222222222222');
-  assert.deepEqual(first.depends, [
-    ['ca-certificates'],
-    ['libasound2'],
-    ['libcurl3-gnutls', 'libcurl3-nss', 'libcurl4'],
-    ['libgtk-3-0', 'libgtk-4-1'],
-    ['libnss3'],
-  ]);
+  assert.equal(
+    first.depends,
+    'ca-certificates, libasound2 (>= 1.0.17), libcurl3-gnutls | libcurl3-nss | libcurl4, libgtk-3-0 (>= 3.9.10) | libgtk-4-1, libnss3 (>= 2:3.35)',
+  );
 });
 
 test('compares Debian versions as dpkg does', () => {

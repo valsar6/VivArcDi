@@ -12,7 +12,7 @@ const folder = mkdtempSync(join(tmpdir(), 'vivarcdi-watch-test-'));
 after(() => rmSync(folder, { recursive: true, force: true }));
 
 function entry(sha256: string): PackageEntry {
-  return { package: 'vivaldi-snapshot', version: '8.4.4226.3-1', filename: 'pool/main/v_8.4_amd64.deb', sha256, depends: [] };
+  return { package: 'vivaldi-snapshot', version: '8.4.4226.3-1', filename: 'pool/main/v_8.4_amd64.deb', sha256, depends: '' };
 }
 
 test('downloads, checks and unpacks a package into a root folder', async () => {

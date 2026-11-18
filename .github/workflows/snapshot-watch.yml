@@ -46,9 +46,9 @@ jobs:
       - name: Install xvfb and the libraries Vivaldi depends on, not Vivaldi
         if: steps.asked.outputs.run == 'true'
         run: |
-          libraries="$(npm run -s watch -- deps --channel ${{ matrix.channel }})"
+          depends="$(npm run -s watch -- deps --channel ${{ matrix.channel }})"
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends xvfb ${libraries}
+          sudo apt-get satisfy -y --no-install-recommends "xvfb, ${depends}"
       - name: Check the newest Vivaldi ${{ matrix.channel }}
         id: check
         if: steps.asked.outputs.run == 'true'

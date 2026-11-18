@@ -63,7 +63,7 @@ function parts(env: NodeJS.ProcessEnv, issues: boolean): WatchParts {
 
 async function dependencies(channel: Channel): Promise<string> {
   const entry = (await AptIndex.download()).newest(`vivaldi-${channel}`);
-  return entry.depends.map(([first]) => first).join(' ');
+  return entry.depends;
 }
 
 async function main(argv: string[]): Promise<number> {
@@ -86,7 +86,7 @@ async function main(argv: string[]): Promise<number> {
     console.log(`Vivaldi ${channel} ${result.version}: ${result.outcome}, ${action}`);
     return 0;
   }
-  console.error('Usage: watch deps|run --channel snapshot|stable [--no-issues]');
+  console.error('Usage: watch deps|run --channel snapshot|stable [--no-issues]; deps prints the Depends field for apt-get satisfy');
   return 2;
 }
 
