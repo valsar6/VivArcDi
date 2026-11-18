@@ -11,6 +11,8 @@ import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
 import type { ModuleOptions } from '../../src/core/boot/types.js';
 import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
 import { ActivationMarker } from '../../src/modules/ActivationMarker.js';
+import type { SaveOutcome, SavingStorage, StorageMode } from '../../src/core/browser/SavingStorage.js';
+import { TOAST_ATTRIBUTE } from '../../src/core/dom/Toast.js';
 import { FakeDocument, FakeElement, FakeLoader, SilentSink } from './fakes.js';
 
 class Broken extends Module {
@@ -60,13 +62,21 @@ class Follower extends Module {
 
 const runtimeAnswering = (answer: () => Promise<boolean>): BrowserRuntime => ({ isPrivateWindow: answer }) as unknown as BrowserRuntime;
 
+const savingStorage = (mode: StorageMode): SavingStorage => ({
+  mode,
+  getItem: () => null,
+  setItem: () => undefined,
+  save: async (): Promise<SaveOutcome> => (mode === 'memory' ? 'memory' : 'saved'),
+});
+
 interface AppOptions {
+  storage?: SavingStorage;
   runtime?: BrowserRuntime;
   vivaldiVersion?: string;
   modules?: Record<string, ModuleOptions>;
 }
 
-function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime }: AppOptions = {}): {
+function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime, storage = savingStorage('persistent') }: AppOptions = {}): {
   app: VivArcDi;
   browser: FakeElement;
   document: FakeDocument;
@@ -90,6 +100,7 @@ function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime }: AppOpti
     registry,
     logger: new Logger('test', sink),
     document: document as unknown as Document,
+    storage,
     ...(runtime === undefined ? {} : { runtime }),
   });
   return { app, browser, document, sink };
@@ -196,5 +207,35 @@ test("other modules' options are checked too", async () => {
   assert.deepEqual(seen[0]?.options, { clientId: 'abc', size: 3 });
   assert.deepEqual(seen[1]?.modules['configured'], { clientId: 'abc', size: 3, enabled: true });
   assert.deepEqual(warningsOf(sink, '[test:configured]'), ['option "size" is 50, not a number from 1 to 9: using 3']);
+  await app.stop();
+});
+
+const toastsOf = (browser: FakeElement): FakeElement[] => browser.children.filter((child) => TOAST_ATTRIBUTE in child.attributes);
+
+test('warns once when nothing can be saved', async () => {
+  seen.length = 0;
+  const { app, browser } = createApp({
+    modules: { configured: { enabled: true, clientId: 'abc' }, follower: { enabled: true } },
+    storage: savingStorage('memory'),
+  });
+  await app.start();
+  seen.forEach(({ storage }) => storage.setItem('key', 'value'));
+  await new Promise((resolve) => setImmediate(resolve));
+  const toasts = toastsOf(browser);
+  assert.equal(toasts.length, 1);
+  assert.equal(toasts[0]?.textContent, 'VivArcDi cannot save its data: changes last until Vivaldi restarts');
+  assert.equal(toasts[0]?.attributes['data-vivarcdi-toast-kind'], 'error');
+  await app.stop();
+  assert.equal(toastsOf(browser).length, 0);
+});
+
+test('shows no notice when saving works', async () => {
+  seen.length = 0;
+  const { app, browser } = createApp({ modules: { follower: { enabled: true } } });
+  await app.start();
+  seen.forEach(({ storage }) => storage.setItem('key', 'value'));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(seen.length, 1);
+  assert.equal(toastsOf(browser).length, 0);
   await app.stop();
 });

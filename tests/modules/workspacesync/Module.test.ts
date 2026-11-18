@@ -12,6 +12,7 @@ import { FakePrefsApi } from '../../core/prefs.js';
 import { FakeDocument, FakeElement } from '../peek/fakes.js';
 import { MemoryStorage } from '../reopen/fakes.js';
 import { CountingSink, pinnedIn, pinnedTab, world } from './fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -38,6 +39,7 @@ const contextOf = (setup: ReturnType<typeof world>, options: Partial<WorkspaceSy
     windows: new BrowserWindows(chromeApi),
     prefs: new BrowserPrefs(prefs),
     storage: new MemoryStorage(),
+    notices: silentNotices(),
   } as unknown as ModuleContext<WorkspaceSyncOptions>;
   return { context, sink };
 };

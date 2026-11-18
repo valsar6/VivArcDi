@@ -15,7 +15,7 @@ import type { Suggestion } from '../../../src/modules/littlearc/commandbar/Sugge
 import { LittleArc } from '../../../src/modules/littlearc/LittleArc.js';
 import { LITTLE_ARC_OPTIONS } from '../../../src/modules/littlearc/LittleArcOptions.js';
 import type { LittleArcOptions } from '../../../src/modules/littlearc/LittleArcOptions.js';
-import { SilentSink } from '../../loader/fakes.js';
+import { SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FakeEvent } from '../peek/fakes.js';
 import { FakeNode, FakePage, dispatch } from './commandbarFakes.js';
 
@@ -172,6 +172,7 @@ function contextOf(options: Record<string, unknown>, hasHost: boolean): { contex
     prefs: new BrowserPrefs(undefined),
     selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
+    notices: silentNotices(),
   } as unknown as ModuleContext<LittleArcOptions>;
   return { context, created, page };
 }

@@ -9,6 +9,7 @@ import type { FolderPreviewOptions } from '../../../src/modules/folderpreview/Fo
 import { DomDocument, asDocument } from '../../core/dom.js';
 import { MemoryStorage, silentLogger } from '../reopen/fakes.js';
 import { FolderTabs, bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 function context(dom: DomDocument, bookmarks: BrowserBookmarks): ModuleContext<FolderPreviewOptions> {
   dom.defaultView = { navigator: { language: 'it' } };
@@ -20,6 +21,7 @@ function context(dom: DomDocument, bookmarks: BrowserBookmarks): ModuleContext<F
     tabs: new FolderTabs(),
     storage: new MemoryStorage(),
     bookmarks,
+    notices: silentNotices(),
   } as unknown as ModuleContext<FolderPreviewOptions>;
 }
 

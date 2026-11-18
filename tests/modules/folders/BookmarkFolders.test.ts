@@ -20,6 +20,7 @@ import { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBoo
 import { MemoryStorage, settle, silentLogger } from '../reopen/fakes.js';
 import { CASETTA, FakePrefsApi, WORK } from '../../core/prefs.js';
 import { FolderTabs, WritableChrome, bookmarkTree, folder, link, recordingChrome } from './fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const MAHJONG = 'https://mahjongsoul.game.yo-star.com/';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG)]), folder('20', 'Music')]);
@@ -49,6 +50,7 @@ function setup(
     bookmarkWriter,
     prefs,
     storage: new MemoryStorage(),
+    notices: silentNotices(),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   return { dom, module: new BookmarkFolders(), context };
 }

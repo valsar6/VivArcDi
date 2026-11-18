@@ -6,6 +6,7 @@ import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import { LAST_OPENED_STORAGE_KEY } from '../../../src/shared/links/LastOpenedStore.js';
 import { bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
+import { silentNotices } from '../../loader/fakes.js';
 
 const NIX = 'https://nixos.org/manual';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Nix manual', NIX)])]);
@@ -20,6 +21,7 @@ async function start(tabs: ReopenTabs, bookmarks: BrowserBookmarks = recordingCh
     tabs,
     bookmarks,
     modules: { 'bookmark-folders': { enabled: true, root: 'Importati da Firefox/Bookmarks Bar' } },
+    notices: silentNotices(),
   } as unknown as ModuleContext;
   new ReopenPinned().start(context);
   await settle();

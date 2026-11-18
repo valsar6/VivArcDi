@@ -31,6 +31,8 @@ export class FakeElement {
   public classes = new Set<string>();
   public children: FakeElement[] = [];
   public parent: FakeElement | null = null;
+  public textContent = '';
+  public attributes: Record<string, string> = {};
   public classList = {
     add: (name: string): Set<string> => this.classes.add(name),
     remove: (name: string): boolean => this.classes.delete(name),
@@ -39,6 +41,18 @@ export class FakeElement {
 
   constructor(tagName = 'div') {
     this.tagName = tagName;
+  }
+
+  public setAttribute(name: string, value: string): void {
+    this.attributes[name] = value;
+  }
+
+  public toggleAttribute(name: string, force: boolean): void {
+    if (force) {
+      this.attributes[name] = '';
+    } else {
+      delete this.attributes[name];
+    }
   }
 
   public append(child: FakeElement): void {

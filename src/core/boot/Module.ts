@@ -7,7 +7,8 @@ import type { BrowserSearch } from '../browser/BrowserSearch.js';
 import type { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { BrowserWindows } from '../browser/BrowserWindows.js';
 import type { Logger } from '../support/Logger.js';
-import type { KeyValueStorage } from '../browser/PersistentStorage.js';
+import type { SavingStorage } from '../browser/SavingStorage.js';
+import type { NoticeBoard } from '../dom/Notices.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import type { BuildInfo, ModuleOptions } from './types.js';
@@ -43,7 +44,9 @@ export interface ModuleContext<O extends object = RawOptions> {
   /** Vivaldi's preferences, read-only; check `prefs.available` first. */
   prefs: BrowserPrefs;
   /** Strings that survive a restart, shared by all modules. */
-  storage: KeyValueStorage;
+  storage: SavingStorage;
+  /** Tells the user something through the window's one shared toast. */
+  notices: NoticeBoard;
   /** Loads files that ship with VivArcDi. */
   payload: PayloadSource;
   /** Versions written by the installer. */

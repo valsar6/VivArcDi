@@ -7,7 +7,7 @@ import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { Incognito } from '../../../src/modules/incognito/Incognito.js';
 import { asDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
-import { SilentSink } from '../../loader/fakes.js';
+import { SilentSink, silentNotices } from '../../loader/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
 import { settle } from '../reopen/fakes.js';
 import { FieldNode, IncognitoDocument, runtimeOf } from './fakes.js';
@@ -68,6 +68,7 @@ function setup(t: TestContext, tabs = new FolderTabs([{ id: 1, active: false }, 
     tabs,
     runtime: runtimeOf(1),
     storage,
+    notices: silentNotices(),
   } as unknown as ModuleContext;
   return { dom, module: new Incognito(), tabs, sink, writes, context, downloads };
 }
