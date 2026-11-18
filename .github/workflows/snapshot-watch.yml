@@ -1,6 +1,8 @@
 name: snapshot-watch
 
 on:
+  schedule:
+    - cron: '30 4 * * *'
   workflow_dispatch:
     inputs:
       channel:
@@ -8,8 +10,6 @@ on:
         type: choice
         options: [both, snapshot, stable]
         default: both
-  push:
-    branches: [chore/snapshot-watch]
 
 permissions:
   contents: read
@@ -54,8 +54,7 @@ jobs:
         if: steps.asked.outputs.run == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          ISSUES: ${{ github.event_name == 'push' && '--no-issues' || '' }}
-        run: xvfb-run -a npm run -s watch -- run --channel ${{ matrix.channel }} ${ISSUES}
+        run: xvfb-run -a npm run -s watch -- run --channel ${{ matrix.channel }}
       - uses: actions/upload-artifact@v4
         if: always() && steps.asked.outputs.run == 'true'
         with:
