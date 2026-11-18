@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-18 |
 | Amends | [026 Live folders](../026-live-folders/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
