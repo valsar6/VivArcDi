@@ -2,10 +2,12 @@ import { LinkClassifier } from '../modules/peek/LinkClassifier.js';
 import type { PagePolicy } from '../modules/peek/PageScripts.js';
 import { PEEK_MESSAGE_TYPE } from '../modules/peek/PeekMessage.js';
 import { sendToInterface } from './lib/PageChannel.js';
+import { PageInstall } from './lib/PageInstall.js';
+import type { PageHook } from './lib/PageInstall.js';
 
-const INSTANCE_KEY = Symbol.for('vivarcdi.peek.links');
+const INSTALL = new PageInstall('vivarcdi.peek.links');
 
-class PeekLinkListener {
+class PeekLinkListener implements PageHook {
   #policy: PagePolicy;
   #classifier: LinkClassifier;
   #listener = (event: MouseEvent): void => this.#handle(event);
@@ -49,25 +51,18 @@ class PeekLinkListener {
   }
 }
 
-type Registry = Record<symbol, PeekLinkListener | undefined>;
-
 /**
  * Starts catching Peek clicks in this page, replacing a previous installation.
  *
  * @param policy Triggers and the state of the tab.
  */
 export function install(policy: PagePolicy): void {
-  uninstall();
-  const listener = new PeekLinkListener(policy);
-  listener.attach();
-  (globalThis as unknown as Registry)[INSTANCE_KEY] = listener;
+  INSTALL.replace(new PeekLinkListener(policy));
 }
 
 /**
  * Stops catching clicks and leaves the page as it was.
  */
 export function uninstall(): void {
-  const registry = globalThis as unknown as Registry;
-  registry[INSTANCE_KEY]?.detach();
-  registry[INSTANCE_KEY] = undefined;
+  INSTALL.remove();
 }
