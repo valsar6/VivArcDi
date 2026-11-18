@@ -16,6 +16,7 @@ STATE_TEXT = {
     BuildState.CURRENT: "Installed",
     BuildState.OUTDATED: "Needs an update",
     BuildState.NEEDS_REAPPLY: "Needs to be applied again",
+    BuildState.NEWER: "Newer version installed",
 }
 ACTION_TEXT = {
     WindowAction.INSTALL: "Install",

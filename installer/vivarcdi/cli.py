@@ -109,6 +109,9 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
         if isinstance(command, InstallCommand):
             subparser.add_argument("--yes", action="store_true", help="apply the VivArcDi Light theme without asking")
             subparser.add_argument("--no-theme", action="store_true", help="do not offer the VivArcDi Light theme")
+            subparser.add_argument(
+                "--allow-downgrade", action="store_true", help="install even when a newer VivArcDi is already installed"
+            )
         if isinstance(command, ThemeCommand):
             subparser.add_argument("action", choices=command.actions, help="what to do with the theme")
             subparser.add_argument("--dry-run", action="store_true", help="print the changes and write nothing")
@@ -158,6 +161,7 @@ def main(argv: list[str]) -> int:
         context.dry_run = getattr(arguments, "dry_run", False)
         context.restore_shortcuts = getattr(arguments, "restore_shortcuts", False)
         context.needs_reapply = getattr(arguments, "needs_reapply", False)
+        context.allow_downgrade = getattr(arguments, "allow_downgrade", False)
         return command.execute(context)
     except VivArcDiError as error:
         reporter.error(str(error))

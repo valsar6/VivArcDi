@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import tempfile
 import unittest
@@ -53,6 +54,15 @@ class MacOSReapplyHandoffTest(unittest.TestCase):
         self.runner.calls.clear()
         ReapplyCommand().execute(self.context(background=True))
         self.assertEqual(self.runner.calls, [])
+
+    def test_background_reapply_ignores_newer_payloads(self):
+        ReapplyCommand().execute(self.context(background=False))
+        build_json = self.window_html.parent / "vivarcdi" / "build.json"
+        build_json.write_text(json.dumps({**json.loads(build_json.read_text()), "vivarcdiVersion": "99.0.0"}))
+        self.runner.calls.clear()
+        ReapplyCommand().execute(self.context(background=True))
+        self.assertEqual(self.runner.calls, [])
+        self.assertFalse(self.script().exists())
 
     def test_interactive_reapply_on_macos_patches_and_clears_the_script(self):
         ReapplyCommand().execute(self.context(background=True))
