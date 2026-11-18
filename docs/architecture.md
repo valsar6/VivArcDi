@@ -167,6 +167,22 @@ Vivaldi without touching the user's one. It is development tooling in `scripts/l
 
 Scenarios end in `.live.ts`, so `npm test` and `make check` never need a Vivaldi.
 
+### Snapshot watch
+
+The `snapshot-watch` workflow ([spec 047](../specs/047-snapshot-watch/spec.md)) runs the live
+verification every night against the newest `vivaldi-snapshot` and `vivaldi-stable` of the Vivaldi apt
+index, on an Ubuntu runner under `xvfb`, in `scripts/watch/`:
+
+| Piece | Role |
+|---|---|
+| `AptIndex`, `DebianVersion` | Reads the apt index and picks the newest package of a channel by Debian version order |
+| `PackageFetcher` | Downloads the `.deb`, checks its SHA256 and unpacks it with `dpkg-deb -x`; Vivaldi is never installed |
+| `WatchRun` | Runs `npm run live -- --vivaldi <root> --vivaldi-version <v> --no-sandbox` and classifies the result as pass, fail or infrastructure |
+| `IssueTracker` | One issue per broken channel and version, labelled `snapshot-watch` and `channel:<channel>`; comments on repeats, closes on a later pass |
+
+The artifact `live-<channel>-<version>` of each run holds the report, the screenshots and, on a
+failure, the DOM of `window.html`.
+
 ## Installer
 
 Plain Python 3.9+, standard library only. The main pieces:
