@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | Tooling |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-18 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -106,15 +106,15 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Where the job runs.** Proposed: GitHub Actions on `ubuntu-latest` with `xvfb-run`, so it runs
+- [x] **Where the job runs.** Decided: GitHub Actions on `ubuntu-latest` with `xvfb-run`, so it runs
   without anyone's computer being on. Alternative: launchd on Tore's Mac, which also covers macOS but
   only runs when the Mac is awake.
-- [ ] **Sandbox on the runner.** Proposed: start the lab with `--no-sandbox` on the runner. Ubuntu
+- [x] **Sandbox on the runner.** Decided: start the lab with `--no-sandbox` on the runner. Ubuntu
   24.04 restricts unprivileged user namespaces, the unpacked `chrome-sandbox` has no setuid bit, and
   the runner is thrown away after the job. The harness already falls back to `--no-sandbox` on Linux.
-- [ ] **Schedule.** Proposed: every night at 04:30 UTC. Vivaldi publishes snapshots a few times a
+- [x] **Schedule.** Decided: every night at 04:30 UTC. Vivaldi publishes snapshots a few times a
   week, so a nightly run finds a new build within a day.
-- [ ] **How Tore is told.** Proposed: the GitHub issue, which GitHub mails to the repository owner.
+- [x] **How Tore is told.** Decided: the GitHub issue, which GitHub mails to the repository owner.
   Alternative: also a Telegram message, which needs a bot token as a secret.
 
 ## References
