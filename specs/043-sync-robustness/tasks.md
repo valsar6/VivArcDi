@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -23,6 +23,6 @@ parallel.
 - [x] **T4. Manual and version.** A short paragraph in `docs/manual/sync.md`: the reserved names,
   and what happens when the sync folder is deleted. Patch version bump, checked with
   `npm run release -- check --base origin/main --branch fix/sync-robustness`.
-- [ ] **T5. Manual check.** Italian checklist for Tore from AC-12 to AC-14, on a test profile, under
+- [x] **T5. Manual check.** Italian checklist for Tore from AC-12 to AC-14, on a test profile, under
   `~/Desktop/sonde-vivarci/043-sync/`. Done when Tore reports it green on macOS and Debian; then
   the spec becomes `Implemented`.
