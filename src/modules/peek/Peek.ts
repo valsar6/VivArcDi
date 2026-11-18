@@ -7,6 +7,7 @@ import type { PeekTriggers } from './LinkClassifier.js';
 import { LinkOpener } from './LinkOpener.js';
 import type { LinkRequest } from './LinkOpener.js';
 import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
+import { ScriptRunner } from '../../core/browser/ScriptRunner.js';
 import { PageScripts } from './PageScripts.js';
 import { PeekController } from './PeekController.js';
 import { PEEK_OPTIONS } from './PeekOptions.js';
@@ -80,6 +81,7 @@ export class Peek extends Module<PeekOptions> {
 
   #createController({ document, tabs, runtime, logger }: ModuleContext<PeekOptions>, size: PanelSize, scripts: PageScripts): PeekController {
     const container = this.#container as HTMLElement;
+    const runner = new ScriptRunner('Peek keys', runtime, logger);
     return new PeekController({
       createPanel: (request: LinkRequest) =>
         new PeekPanel(request.url, {
@@ -88,6 +90,7 @@ export class Peek extends Module<PeekOptions> {
           size,
           partition: container.querySelector(`[${TAB_ID_ATTRIBUTE}="${request.tabId}"]`)?.getAttribute('partition') ?? null,
           scripts,
+          runner,
           token: this.#token,
           onCommand: (command) => this.#run(command),
           onConsoleMessage: (message) => this.#receive(message, request.tabId),

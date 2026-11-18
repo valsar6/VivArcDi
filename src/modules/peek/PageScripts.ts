@@ -64,4 +64,11 @@ export class PageScripts {
   public installKeys(token: string): string {
     return `${this.#keys}\n${KEYS_GLOBAL}.install(${JSON.stringify(token)});`;
   }
+
+  /**
+   * @returns Code that stops forwarding Peek keys from a page.
+   */
+  public uninstallKeys(): string {
+    return `globalThis.${KEYS_GLOBAL}?.uninstall();`;
+  }
 }
