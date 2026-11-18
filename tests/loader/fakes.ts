@@ -1,4 +1,6 @@
 import type { PayloadSource } from '../../src/core/boot/ResourceLoader.js';
+import { Notices } from '../../src/core/dom/Notices.js';
+import type { ToastKind } from '../../src/core/dom/Toast.js';
 
 export class FakeLoader implements PayloadSource {
   #files: Record<string, unknown>;
@@ -83,3 +85,18 @@ export class SilentSink {
     this.lines.push(['error', ...args]);
   }
 }
+
+export class RecordingToast {
+  public shown: Array<{ text: string; kind: ToastKind | undefined }> = [];
+  public removed = 0;
+
+  public show(text: string, kind?: ToastKind): void {
+    this.shown.push({ text, kind });
+  }
+
+  public remove(): void {
+    this.removed += 1;
+  }
+}
+
+export const silentNotices = (): Notices => new Notices(new RecordingToast());
