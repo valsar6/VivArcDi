@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-18 |
 | Amends | [002 Peek](../002-peek/spec.md) (AC-15, design: `executeScript` failures) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -21,12 +21,13 @@ injected by `PeekPanel` into the Peek page only.
 The order of work approved by Tore on 2026-11-17 names this spec "page scripts and the uninstall of
 `peek-keys`". The details were not written down, so this spec reconstructs them from the code at
 `e5eb0b4` (0.59.3). Every finding below says whether it is **confirmed** in the code, with file and
-line, or **inferred**. Nothing here is visible to users today; the spec closes gaps that become bugs
-as soon as a module stops while pages are open, or when injection fails.
+line, **inferred**, or **probed** on Tore's Vivaldi (Q-4). Nothing here is visible to users today;
+the spec closes gaps that become bugs as soon as a module stops while pages are open, or when
+injection fails.
 
 The changes: `peek-keys` can be uninstalled like the other page scripts; the injector never installs
-a script after it was told to stop; injection failures are read and logged once instead of being lost;
-and the page scripts get tests.
+a script after it was told to stop; injection failures are read instead of being lost, a closed tab
+is traced at debug level and any other failure is warned once; and the page scripts get tests.
 
 ## User stories
 
@@ -76,7 +77,11 @@ Findings, confirmed in the code:
   callback (`PageScriptInjector.ts:121`, `PeekPanel.ts:137`). Only a synchronous throw is caught.
   `PageScriptInjector` logs that once per injector (`:119-128`); `PeekPanel` swallows it without a
   log (`PeekPanel.ts:136-140`), although the design of 002 says "Log once" for this case
-  (`specs/002-peek/design.md:77`).
+  (`specs/002-peek/design.md:77`). The probe of Q-4 shows what is lost: the only asynchronous
+  failure seen is `chrome.runtime.lastError` "The tab was closed.", on the webview of Vivaldi's own
+  settings page; ordinary pages, `about:blank`, `chrome://` pages and the Chrome Web Store accept the
+  script. Whether the console prints "Unchecked runtime.lastError" when no callback reads it is not
+  known: the probe passed a callback, and no console output was collected.
 - **F-5. No tests of the page side.** No test imports `src/page/`, and `PageScriptInjector` has no
   test of its own (`tests/core/browser/` has none); it is covered only through the module tests.
   `tests/modules/peek/PageScripts.test.ts:6-12` checks the generated strings only.
@@ -90,11 +95,19 @@ its own errors. So in a shipped build no page-script module stops while its wind
 to F-3 are latent: they show only in tests today, and will show once anything stops a module at run
 time (spec 039, or a later on/off switch).
 
-Inferred, not confirmed: when `executeScript` fails asynchronously (pages that refuse extension
-scripts, such as `vivaldi://`, `chrome://` and the Chrome Web Store), Chromium reports it through
-`chrome.runtime.lastError`, which nobody reads, so the console shows "Unchecked runtime.lastError" on
-every navigation of such a page, and the module never learns that the shortcut is missing there. To
-be checked on a lab Vivaldi (Q-4).
+Probed on Tore's Vivaldi on macOS (Q-4): pages do **not** refuse `executeScript` the way the draft
+inferred. A probe called `webview.executeScript({ code: '1' }, callback)` on each of the 11
+`<webview>` elements of `window.html` and read `chrome.runtime.lastError` in the callback; every
+callback fired within 0 to 2 ms. Normal `https` pages, `about:blank`, `chrome://inspect/#apps` and
+the Chrome Web Store (`https://chromewebstore.google.com/`, a background tab, not discarded) ran the
+script (result `[1]`) with no `lastError`. The one failure was the webview of Vivaldi's settings
+page, whose address is `chrome-extension://<id>/components/setting…` (an extension page, not
+`vivaldi://settings`): `lastError` "The tab was closed." after 0 ms. This is the message Chromium
+gives when a tab goes away while a script is on its way, the shape of F-2 and F-3. Since the
+settings page was open, it is probably also how this Vivaldi turns away a script in its own
+extension page (inferred); either way the page needs no VivArcDi script and there is nothing to do
+but go on. The draft's inference that `vivaldi://` pages and the Web Store fail with "Unchecked
+runtime.lastError" is therefore withdrawn.
 
 ### After
 
@@ -112,11 +125,17 @@ token replaces the first, and `PageScripts` offers the code to uninstall it.
 resolves later executes nothing. For each webview only the newest injection request is executed;
 an older one that resolves later is dropped.
 
-**Failures are read and logged once.** Both injection points pass a callback to `executeScript`, read
-`chrome.runtime.lastError`, and log the first failure of each purpose (for example `Peek links`,
-`Peek keys`) once per window session with `logger.warn`, as `PageScriptInjector` already does for a
-synchronous throw. The page goes on without the script; links and keys behave as without VivArcDi
-there. No toast: nothing is lost, and the interface shortcuts keep working (Q-5).
+**Failures are read, and only real ones are warned.** Both injection points pass a callback to
+`executeScript` and read `chrome.runtime.lastError` in it. This is a defensive measure: the probe of
+Q-4 found no page that refuses the script, but a callback that reads `lastError` costs nothing,
+keeps Chromium from reporting an unchecked error, and is the only way to learn of a refusal in a
+later Vivaldi. "The tab was closed.", and any `lastError` that arrives when the webview is no longer
+in the document, means the page went away: it is logged at debug level each time and is not a
+failure. Any other `lastError`, like a synchronous throw, is a failure: the first one of each
+purpose (for example `Peek links`, `Peek keys`) is logged once per window session with
+`logger.warn`, as `PageScriptInjector` already does for a synchronous throw. The page goes on
+without the script; links and keys behave as without VivArcDi there. No toast: nothing is lost, and
+the interface shortcuts keep working (Q-5).
 
 **One helper.** The install and uninstall registry lives once in `src/page/lib/`, and every page
 script uses it (Q-3).
@@ -136,8 +155,11 @@ script uses it (Q-3).
   `scriptFor` resolves.
 - **FR-6.** For one webview, an injection request that resolves after a newer request for the same
   webview is dropped.
-- **FR-7.** Every `executeScript` call reads `chrome.runtime.lastError`; the first failure of each
-  purpose is logged once per window session with `logger.warn`, including in `PeekPanel`.
+- **FR-7.** Every `executeScript` call passes a callback that reads `chrome.runtime.lastError`, as a
+  defensive measure (Q-4). A `lastError` of a page that went away ("The tab was closed.", or any
+  `lastError` once the webview has left the document) is logged at debug level and is not a failure.
+  Any other `lastError`, and a synchronous throw, is a failure: the first failure of each purpose is
+  logged once per window session with `logger.warn`, including in `PeekPanel`.
 - **FR-8.** The install and uninstall registry of the page scripts is written once, in
   `src/page/lib/`.
 
@@ -165,15 +187,16 @@ performs.
 | AC-6 | WHEN the Peek closes, THE panel SHALL run the uninstall code of `peek-keys` in its page before removing it | auto: `peek panel uninstalls its key script before closing` |
 | AC-7 | IF `scriptFor` resolves after the injector detached, THEN THE injector SHALL execute nothing in that page | auto: `injector installs nothing after detach` |
 | AC-8 | IF an older injection request for a webview resolves after a newer one, THEN THE injector SHALL drop it | auto: `injector keeps the newest request of a webview` |
-| AC-9 | IF `executeScript` reports a failure through `chrome.runtime.lastError`, THEN THE injector SHALL log one warning for its purpose per session | auto: `injector warns once when a page refuses the script` |
+| AC-9 | IF `executeScript` reports a `chrome.runtime.lastError` other than a closed tab, THEN THE injector SHALL log one warning for its purpose per session | auto: `injector warns once when a page refuses the script` |
 | AC-10 | IF injecting the Peek key script fails, THEN THE panel SHALL log one warning per session and the Peek SHALL stay usable with its buttons | auto: `peek panel warns once when its key script fails` |
 | AC-11 | WHEN the module stops with a Peek open, THE module SHALL remove the panel, its listeners and the page scripts of every tab | auto: `peek module cleans up on stop` |
 | AC-12 | WHEN Tore uses Esc, Cmd/Ctrl+W and Cmd/Ctrl+O inside a Peek, Cmd/Ctrl+W in a pinned tab, Cmd/Ctrl+Shift+C and Cmd/Ctrl+Shift+A in a page, on macOS and Debian, THE shortcuts SHALL work as before | manual |
-| AC-13 | WHEN Tore opens `vivaldi://settings` and the Chrome Web Store in tabs, THE interface console SHALL show at most one VivArcDi warning per page script and no "Unchecked runtime.lastError" | manual |
+| AC-13 | WHEN Tore opens `vivaldi://settings` and the Chrome Web Store in tabs, on macOS and Debian, THE page shortcuts of AC-12 SHALL keep working in the Web Store tab and in the other tabs, and THE interface console SHALL show no VivArcDi warning | manual |
+| AC-14 | IF `executeScript` reports "The tab was closed.", or any `chrome.runtime.lastError` after the webview left the document, THEN THE injector SHALL log it at debug level and SHALL NOT warn | auto: `injector logs a closed tab at debug level` |
 
-AC-11 is the existing test of 002/AC-15, extended to the Peek key script; it keeps its name. AC-12 and
-AC-13 are manual until the lab harness of 046 can send keys into a tab page and read the interface
-console (Q-7).
+AC-11 is the existing test of 002/AC-15, extended to the Peek key script; it keeps its name. AC-14
+was added after the probe of Q-4. AC-12 and AC-13 are manual until the lab harness of 046 can send
+keys into a tab page and read the interface console (Q-7).
 
 ## Out of scope
 
@@ -201,7 +224,15 @@ console (Q-7).
 - [x] **Q-4. What fails, and how.** It is inferred, not confirmed, that `vivaldi://` pages and the Web
   Store refuse `executeScript` asynchronously and print "Unchecked runtime.lastError". Recommendation:
   check it with a probe before the design and adjust FR-7 if Vivaldi behaves otherwise. Tore's
-  answer: a probe that Tore runs himself on his own Vivaldi, not `npm run live`.
+  answer: a probe that Tore runs himself on his own Vivaldi, not `npm run live`. **Answered by the
+  probe** (macOS, 2026-11-18): `webview.executeScript({ code: '1' }, callback)` on all 11 webviews
+  of `window.html`, reading `chrome.runtime.lastError` in the callback; callbacks in 0 to 2 ms.
+  `https` pages, `about:blank`, `chrome://inspect/#apps` and the Chrome Web Store (background tab, not
+  discarded) returned `[1]` with no `lastError`. Only the webview of Vivaldi's settings page
+  (`chrome-extension://<id>/components/setting…`) failed, with "The tab was closed." after 0 ms. The
+  inference is withdrawn; FR-7 now reads `lastError` defensively and treats a closed tab as a debug
+  event (AC-14). Still unknown: whether the console prints "Unchecked runtime.lastError" when the
+  callback is missing, since no console output was collected.
 - [x] **Q-5. Toast.** Should a page script that cannot be injected anywhere show a notice of 041?
   Recommendation: no; nothing is lost, the interface shortcuts still work, and a toast on every
   `vivaldi://` page would be noise. 039 can decide on a toast if no page at all accepts scripts.
