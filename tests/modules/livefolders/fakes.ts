@@ -104,6 +104,7 @@ export const recordingLogger = (): { logger: Logger; sink: RecordingSink } => {
 };
 
 export class MemoryStorage {
+  public readonly mode = 'persistent';
   public items = new Map<string, string>();
   public writes: string[] = [];
 
@@ -114,6 +115,11 @@ export class MemoryStorage {
   public setItem(key: string, value: string): void {
     this.items.set(key, value);
     this.writes.push(value);
+  }
+
+  public save(key: string, value: string): Promise<'saved'> {
+    this.setItem(key, value);
+    return Promise.resolve('saved');
   }
 }
 

@@ -1,4 +1,6 @@
 import type { Logger } from '../support/Logger.js';
+import { LocalSavingStorage } from './LocalSavingStorage.js';
+import type { SaveOutcome, SavingStorage, StorageMode } from './SavingStorage.js';
 
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
@@ -26,7 +28,8 @@ export interface StorageHost {
 const KEY_PREFIX = 'vivarcdi.';
 const PROBE_KEY = 'vivarcdi.probe';
 
-export class PersistentStorage implements KeyValueStorage {
+export class PersistentStorage implements SavingStorage {
+  public readonly mode: StorageMode;
   #cache: Map<string, string>;
   #area: StorageArea | null;
   #host: StorageHost | undefined;
@@ -48,6 +51,7 @@ export class PersistentStorage implements KeyValueStorage {
    */
   constructor(initial: Map<string, string>, area: StorageArea | null, host: StorageHost | undefined, logger: Logger) {
     this.#cache = initial;
+    this.mode = area === null ? 'memory' : 'persistent';
     this.#area = area;
     this.#host = host;
     this.#logger = logger;
@@ -66,10 +70,10 @@ export class PersistentStorage implements KeyValueStorage {
    * @param logger Logger for failures.
    * @returns The storage to give to modules.
    */
-  public static async open(document: Document, chromeApi: StorageHost | undefined, logger: Logger): Promise<KeyValueStorage> {
+  public static async open(document: Document, chromeApi: StorageHost | undefined, logger: Logger): Promise<SavingStorage> {
     const local = PersistentStorage.#workingLocalStorage(document);
     if (local !== null) {
-      return local;
+      return new LocalSavingStorage(local, logger);
     }
     const area = chromeApi?.storage?.local ?? null;
     if (area === null) {
@@ -94,18 +98,46 @@ export class PersistentStorage implements KeyValueStorage {
   }
 
   /**
-   * Saves a text: in memory now, in `chrome.storage.local` right after.
+   * Saves a text, ignoring the outcome: in memory now, in `chrome.storage.local` right after.
    *
    * @param key A key.
    * @param value The text.
    */
   public setItem(key: string, value: string): void {
+    void this.save(key, value);
+  }
+
+  /**
+   * Saves a text: in memory now, in `chrome.storage.local` right after. A failed write keeps the
+   * value in memory.
+   *
+   * @param key A key.
+   * @param value The text.
+   * @returns `saved` when the write is confirmed, `failed` when it is refused or throws, `memory`
+   * when there is no area; never rejects.
+   */
+  public save(key: string, value: string): Promise<SaveOutcome> {
     this.#cache.set(key, value);
-    try {
-      this.#area?.set({ [key]: value }, () => this.#checkWrite());
-    } catch (error) {
-      this.#warn(error);
+    const area = this.#area;
+    if (area === null) {
+      return Promise.resolve('memory');
     }
+    return new Promise((resolve) => {
+      try {
+        area.set({ [key]: value }, () => {
+          const error = this.#host?.runtime?.lastError;
+          if (error) {
+            this.#warn(new Error(error.message));
+            resolve('failed');
+            return;
+          }
+          resolve('saved');
+        });
+      } catch (error) {
+        this.#warn(error);
+        resolve('failed');
+      }
+    });
   }
 
   static #workingLocalStorage(document: Document): Storage | null {
@@ -146,13 +178,6 @@ export class PersistentStorage implements KeyValueStorage {
       } else if (typeof change.newValue === 'string') {
         this.#cache.set(key, change.newValue);
       }
-    }
-  }
-
-  #checkWrite(): void {
-    const error = this.#host?.runtime?.lastError;
-    if (error) {
-      this.#warn(new Error(error.message));
     }
   }
 
