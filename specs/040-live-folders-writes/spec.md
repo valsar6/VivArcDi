@@ -97,7 +97,7 @@ the next draw.
 - **FR-6.** A folder that is no longer saved is never written back by a change, a refresh or a menu
   action.
 - **FR-7.** If the saved value cannot be read, the store treats it as empty and logs one warning per
-  window session, not one per read.
+  window session, not one per read. Spec 037 also keeps a recovery copy of the unreadable value.
 
 ### Non-functional
 
