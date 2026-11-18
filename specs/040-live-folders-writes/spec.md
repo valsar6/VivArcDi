@@ -145,20 +145,20 @@ Q-3).
 
 ## Open questions
 
-- [ ] **Q-1. Scope: `lastOpened` and `openFolders`.** The review plans findings 1b and 1c as
+- [x] **Q-1. Scope: `lastOpened` and `openFolders`.** The review plans findings 1b and 1c as
   "040 (later)": the same session-copy problem, low severity. Recommendation: keep this spec to the
   live folders, the high-severity finding, and handle 1b and 1c in a later amendment of 040 or a
   spec of their own once this one has shown the pattern.
-- [ ] **Q-2. Write outcome.** Should the live folders use the reporting write of 041 and, for
+- [x] **Q-2. Write outcome.** Should the live folders use the reporting write of 041 and, for
   example, keep a new folder off the tab bar when it is not saved? Recommendation: no. Rows come
   back from GitHub at the next refresh, and 041 already shows one toast per session when saving
   fails; `setItem` is enough here.
-- [ ] **Q-3. Live scenario.** The lab harness of 046 drives one `window.html`. A `live:` scenario
+- [x] **Q-3. Live scenario.** The lab harness of 046 drives one `window.html`. A `live:` scenario
   could simulate the other window by writing `chrome.storage.local` directly, then rename the folder
   in the lab window and read the stored value, without GitHub. Recommendation: keep AC-1 to AC-8 as
   `auto` and AC-9 as `manual` in this spec; add a live scenario only when the harness can open a
   second window, since a direct write proves no more than the tests do.
-- [ ] **Q-4. Deleted folder still shown.** A folder deleted in another window stays visible here
+- [x] **Q-4. Deleted folder still shown.** A folder deleted in another window stays visible here
   until the next draw (at most one refresh interval). Recommendation: accept it, as Tore did for
   stale rows; optionally, when a change finds no saved folder (FR-3, FR-4), redraw the live folders
   at once so it disappears on the click that found it gone.
