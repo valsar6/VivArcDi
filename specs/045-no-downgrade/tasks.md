@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -24,6 +24,6 @@ with them once T1 is merged.
 - [x] **T6. Debian package.** `--allow-downgrade` in `postinst`. Satisfies AC-9.
 - [x] **T7. Docs and version.** The option and the refusal in the installer section of `README.md`; patch
   bump checked with `npm run release -- check --base origin/main --branch fix/no-downgrade`.
-- [ ] **T8. Manual check.** Italian checklist for AC-12 and AC-13 under
+- [x] **T8. Manual check.** Italian checklist for AC-12 and AC-13 under
   `~/Desktop/sonde-vivarci/045-no-downgrade/`, macOS and Debian. When it is green the spec becomes
   `Implemented`.
