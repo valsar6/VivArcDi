@@ -1,7 +1,8 @@
 import { DomQuery } from "../../core/dom/DomQuery.js";
+import { HIDDEN_ATTRIBUTE } from "./HiddenAttribute.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
+import { StripGapCloser } from "./StripGapCloser.js";
 import { TabSlot } from "../../core/tabs/TabSlot.js";
-const HIDDEN_ATTRIBUTE = "data-vivarcdi-hidden";
 const watchSubtree = (target, onChange) => {
   const observer = new MutationObserver(onChange);
   observer.observe(target, { childList: true, subtree: true });
@@ -13,6 +14,7 @@ class HiddenTabMarker {
   #hidden;
   #watch;
   #task;
+  #closer;
   #stops = [];
   #collapsed = /* @__PURE__ */ new WeakSet();
   /**
@@ -25,13 +27,14 @@ class HiddenTabMarker {
    * @param document The browser window document.
    * @param selectors Needs `browser`, `tabStrip` and `tabWrapper`; with `pinnedGroup`, the slots inside Vivaldi's groups of pinned tabs, wherever they sit in the window, are marked too, and a group is collapsed when all of them are hidden.
    * @param hidden The tabs to hide.
-   * @param options Replaceable watching and frame scheduling, for tests.
+   * @param options Replaceable watching, frame scheduling and gap closer, for tests.
    */
-  constructor(document, selectors, hidden, { watch = watchSubtree, timing = {} } = {}) {
+  constructor(document, selectors, hidden, { watch = watchSubtree, timing = {}, closer = StripGapCloser.of(document, selectors) } = {}) {
     this.#document = document;
     this.#selectors = selectors;
     this.#hidden = hidden;
     this.#watch = watch;
+    this.#closer = closer;
     this.#task = new FrameTask(() => this.apply(), timing);
   }
   /**
@@ -42,6 +45,7 @@ class HiddenTabMarker {
   start() {
     const root = DomQuery.require(this.#document, this.#selectors.get("browser"));
     this.#stops = [this.#watch(root, () => this.#task.request()), this.#hidden.onChange(() => this.apply())];
+    this.#closer.acquire();
     this.apply();
   }
   /**
@@ -52,6 +56,7 @@ class HiddenTabMarker {
     this.#task.cancel();
     this.#stops.forEach((stop) => stop());
     this.#stops = [];
+    this.#closer.release();
   }
   /**
    * Marks and collapses the slots of hidden tabs and restores the others.
@@ -70,6 +75,7 @@ class HiddenTabMarker {
     if (group !== null) {
       this.#document.querySelectorAll(group).forEach((element) => this.#markGroup(element));
     }
+    this.#closer.request();
   }
   #markGroup(group) {
     const slots = [...group.children];
