@@ -80,7 +80,7 @@ Nothing changes when no slot is hidden.
 | AC-6 | WHEN a pinned tab becomes visible THE module SHALL show the separator again | auto: `shows the separator when a pinned tab is visible` |
 | AC-7 | WHILE a tab is being dragged THE module SHALL leave Vivaldi's offsets as they are | auto: `leaves the offsets alone during a drag` |
 | AC-8 | IF the strip does not match the selectors THEN THE module SHALL leave it untouched and log a warning | auto: `leaves the strip untouched when the selectors do not match` |
-| AC-9 | WHEN a link tab is hidden and no pinned tab is visible THE first Today tab SHALL start right under the New Tab row | live: `no gap above the first Today tab` |
+| AC-9 | WHEN a link tab is hidden and no pinned tab is visible THE first Today tab SHALL start right under the New Tab row | manual until T7, then live: the scenario `no gap above the first Today tab` |
 | AC-10 | WHEN I drag a Today tab to another place and drop it THE order SHALL change as in Vivaldi with no gap | manual |
 | AC-11 | WHEN no slot is hidden THE function SHALL return a zero shift for every slot and a zero hidden height | auto: `returns no shift when no slot is hidden` |
 | AC-12 | WHEN the first slot is hidden THE function SHALL shift every visible slot by its height | auto: `shifts every visible slot when the first slot is hidden` |

@@ -34,8 +34,9 @@ before opening the pull request.
 - [ ] **T6.** Stylesheet `transform` with the shift in `src/styles/hidden-tabs.scss`; wire the closer
   into `HiddenTabMarker.start()`, `stop()` and `apply()`. Done when the existing marker tests and
   the style tests pass.
-- [ ] **T7.** Live scenario `no gap above the first Today tab` in `tests/live/scenarios/`. Satisfies
-  AC-9. Done when `npm run live` passes it on the lab copy.
+- [ ] **T7.** Live scenario `no gap above the first Today tab` in `tests/live/scenarios/`, and in the
+  same commit the `Check` of AC-9 becomes `live: \`no gap above the first Today tab\``, since the
+  test `every live check has a scenario` fails for a `live:` check without a file. Satisfies AC-9. Done when `npm run live` passes it on the lab copy.
 - [ ] **T8.** Version bump (patch), `docs/manual` note if the tab bar page mentions the gap, tasks
   ticked, spec `Implemented` after Tore's manual check.
 - [ ] **T9.** Write the manual verification checklist for Tore from the `manual` criterion (AC-10),
