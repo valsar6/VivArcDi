@@ -14,7 +14,7 @@ Order and parallel work: T1 changes `BrowserTabs`, `TabDataWriter` and the share
 fake, so it runs alone. T2, T3, T4 and T5 touch different files and can run in parallel, each in
 its own `vivarcdi-implementer` worktree from the commit that has T1. T6 and T7 come last.
 
-- [ ] **T1. Window id and guard.** `BrowserTabs.ownWindowId`; `TabDataWriter` with the optional
+- [x] **T1. Window id and guard.** `BrowserTabs.ownWindowId`; `TabDataWriter` with the optional
   `ownWindowId`, the logger and the guard in `#apply`; `FolderTabs` in `tests/modules/folders/fakes.ts`
   gains `windowId`, `ownWindowId` and a `query` that honors `currentWindow`. Satisfies AC-1 to AC-5
   in `tests/core/tabs/TabDataWriter.test.ts`: `writes the tab of its own window`,
