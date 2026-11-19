@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -15,9 +15,13 @@ before opening the pull request.
   AC-7. Done when the design's two open details are filled in.
 - [ ] **T2.** Add the `separator` and `tabStripFrame` selectors to `src/selectors/8.1.json` and to
   `tests/live/selector-states.json`. Satisfies AC-8. Done when the selector check passes.
-- [ ] **T3.** `GapShifts`: the arithmetic of shifts and hidden height. Satisfies AC-1, AC-2. Done when
-  `offsets the visible slots by the heights of the hidden slots before them` and
-  `shrinks the strip by the heights of the hidden slots` pass.
+- [ ] **T3.** `GapShifts`, test first. Satisfies AC-1, AC-2, AC-11 to AC-20.
+  1. Write the signature and an empty body that returns nothing useful, and the ten failing tests
+     with the names of the criteria; see each one fail for the right reason.
+  2. Make them pass one at a time, in the order AC-11, AC-1, AC-12, AC-13, AC-14, AC-15, AC-2, AC-16,
+     AC-17, AC-20, AC-18, AC-19, with the smallest code each time.
+  3. Refactor with the tests green.
+  Done when all twelve tests pass and `GapShifts.ts` has no DOM access.
 - [ ] **T4.** `StripGapCloser`: reads the strip, writes the shifts and the frame `max-height`,
   restores them, one pass per frame, leaves the strip when selectors do not match, skips a drag.
   Satisfies AC-3, AC-4, AC-7, AC-8. Done when the four matching tests pass.

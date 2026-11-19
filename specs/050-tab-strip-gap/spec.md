@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4) |
+| Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4); FR-6 and AC-11 to AC-20 added at Tore's request the same day |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -52,6 +52,10 @@ Nothing changes when no slot is hidden.
   again as soon as one is.
 - **FR-5.** Dragging, dropping and reordering tabs SHALL keep working: Vivaldi's own values are never
   overwritten, only read, and the corrections are removed while a drag is in progress.
+- **FR-6.** The offsets and heights SHALL be computed by a pure function of the slots (offset, height,
+  hidden), developed test first, with no DOM: slots are ordered by their offset, not by their place in
+  the document; slots that share an offset form a row, and a row closes only when all its slots are
+  hidden; the function never changes its input.
 
 ### Non-functional
 
@@ -75,6 +79,16 @@ Nothing changes when no slot is hidden.
 | AC-8 | IF the strip does not match the selectors THEN THE module SHALL leave it untouched and log a warning | auto: `leaves the strip untouched when the selectors do not match` |
 | AC-9 | WHEN a link tab is hidden and no pinned tab is visible THE first Today tab SHALL start right under the New Tab row | live: `no gap above the first Today tab` |
 | AC-10 | WHEN I drag a Today tab to another place and drop it THE order SHALL change as in Vivaldi with no gap | manual |
+| AC-11 | WHEN no slot is hidden THE function SHALL return a zero shift for every slot and a zero hidden height | auto: `returns no shift when no slot is hidden` |
+| AC-12 | WHEN the first slot is hidden THE function SHALL shift every visible slot by its height | auto: `shifts every visible slot when the first slot is hidden` |
+| AC-13 | WHEN several slots in a row are hidden THE function SHALL add their heights | auto: `adds the heights of consecutive hidden slots` |
+| AC-14 | WHEN a hidden slot is the last one THE function SHALL shift no slot and still count its height in the hidden total | auto: `counts a trailing hidden slot without shifting any slot` |
+| AC-15 | WHEN every slot is hidden THE function SHALL return no visible slot and the total of all heights | auto: `closes the whole strip when every slot is hidden` |
+| AC-16 | WHEN the slots are not in the order of their offsets THE function SHALL order them by offset before it counts | auto: `orders the slots by offset, not by document order` |
+| AC-17 | WHEN slots share an offset THE function SHALL close their row only if all of them are hidden | auto: `closes a row only when all its slots are hidden` |
+| AC-18 | WHEN the offset or the height of a slot is missing or not a number THE function SHALL leave the strip as it is | auto: `leaves the strip as it is when a slot has no valid offset or height` |
+| AC-19 | WHEN the function runs THE function SHALL NOT change its input | auto: `does not change the slots it is given` |
+| AC-20 | WHEN offsets and heights are fractional THE function SHALL keep the fraction | auto: `keeps fractional offsets and heights` |
 
 ## Out of scope
 

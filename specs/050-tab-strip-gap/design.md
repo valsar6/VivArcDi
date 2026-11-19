@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
@@ -27,7 +27,12 @@ and adds a correction next to them:
 4. It runs once per animation frame (`FrameTask`) after each pass of `HiddenTabMarker`.
 
 The correction is a pure calculation (slots in, shifts out) kept apart from the DOM writing, so the
-tests check the arithmetic without a browser.
+tests check the arithmetic without a browser, and it is built test first (FR-6): each AC-1, AC-2 and
+AC-11 to AC-20 is a failing test before the code that passes it. Rules of the function: slots are
+ordered by offset and not by document order; slots that share an offset form a row (horizontal
+tiles), and the row closes only when all its slots are hidden; the shift of a slot is the sum of the
+heights of the closed rows above it; a slot with an offset or height that is missing or not a number
+makes the function return no correction at all; the input is never changed.
 
 **Separator.** The separator is a slot of the strip like the others. It counts as hidden while the
 strip has no visible pinned tab, which `StripGapCloser` decides from the pinned-tab selector, and then
