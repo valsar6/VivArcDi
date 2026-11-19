@@ -12,6 +12,8 @@ Rules that are easy to miss:
 
 - Implement only what an `Approved` spec describes. If the request is not covered, write or update
   the spec and stop for approval.
+- Work in your own worktree and claim a spec number with its Draft pull request: see
+  [Working in parallel](CONTRIBUTING.md#working-in-parallel).
 - Keep test names identical to the `auto:` checks of the acceptance criteria, and scenario names
   identical to the `live:` checks.
 - `npm run live` runs a lab copy of Vivaldi on a throwaway profile; run it only on a machine with
