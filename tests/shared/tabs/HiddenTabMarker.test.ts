@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HiddenTabMarker } from '../../../src/shared/tabs/HiddenTabMarker.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import type { StripGapCloser } from '../../../src/shared/tabs/StripGapCloser.js';
 import { FakeNode, selectors } from '../../modules/favorites/fakes.js';
 
 const slot = (id: number): FakeNode => {
@@ -122,4 +123,36 @@ test('collapses a group of pinned tabs that sits outside the tab strip', () => {
     [group, ...pinned].map((node) => node.properties.get('display')),
     ['none', 'none', 'none'],
   );
+});
+
+function spyCloser(): { calls: string[]; closer: StripGapCloser } {
+  const calls: string[] = [];
+  const closer = { acquire: (): number => calls.push('acquire'), release: (): number => calls.push('release'), request: (): number => calls.push('request') };
+  return { calls, closer: closer as unknown as StripGapCloser };
+}
+
+test('takes a use of the gap closer when it starts and gives it back when it stops', () => {
+  const { calls, closer } = spyCloser();
+  const strip = new FakeNode(['strip'], []);
+  const root = new FakeNode(['#browser']);
+  const document = {
+    querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : selector === '#browser' ? root : null),
+    querySelectorAll: (): FakeNode[] => [],
+  } as unknown as Document;
+  const marker = new HiddenTabMarker(document, selectors, new HiddenTabs(), { watch: (): (() => void) => () => undefined, closer });
+  marker.start();
+  assert.equal(calls[0], 'acquire');
+  marker.stop();
+  assert.equal(calls.at(-1), 'release');
+});
+
+test('asks the gap closer for a pass after it marks the slots', () => {
+  const { calls, closer } = spyCloser();
+  const strip = new FakeNode(['strip'], [slot(1)]);
+  const document = {
+    querySelector: (selector: string): FakeNode | null => (selector === 'strip' ? strip : null),
+    querySelectorAll: (): FakeNode[] => [],
+  } as unknown as Document;
+  new HiddenTabMarker(document, selectors, new HiddenTabs(), { closer }).apply();
+  assert.deepEqual(calls, ['request']);
 });

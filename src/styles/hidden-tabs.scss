@@ -3,3 +3,7 @@
 #{$root} #{$hidden-slot} {
   display: none !important;
 }
+
+#{$root} #tabs-container .tab-strip .tab-position {
+  transform: translateX(var(--PositionX)) translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px))) !important;
+}

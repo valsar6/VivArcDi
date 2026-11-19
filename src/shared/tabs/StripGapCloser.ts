@@ -2,7 +2,7 @@ import { FrameTask } from '../../core/support/FrameTask.js';
 import type { FrameTiming } from '../../core/support/FrameTask.js';
 import { GapShifts } from './GapShifts.js';
 import type { GapSlot } from './GapShifts.js';
-import { HIDDEN_ATTRIBUTE } from './HiddenTabMarker.js';
+import { HIDDEN_ATTRIBUTE } from './HiddenAttribute.js';
 import { Logger } from '../../core/support/Logger.js';
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import { StripDragWatch } from './StripDragWatch.js';
@@ -33,7 +33,8 @@ export class StripGapCloser {
   #frame: HTMLElement | null = null;
   #original: { value: string; priority: string } | null = null;
   #written: string | null = null;
-  #collapsed = new WeakSet<HTMLElement>();
+  #collapsed = new Set<HTMLElement>();
+  #shifted = new Set<HTMLElement>();
 
   /**
    * Closes the space that hidden slots leave in Vivaldi's tab strip. Vivaldi places every slot with
@@ -101,7 +102,9 @@ export class StripGapCloser {
    * Asks for a pass on the next frame. Extra requests before then are merged.
    */
   public request(): void {
-    this.#task.request();
+    if (this.#users > 0) {
+      this.#task.request();
+    }
   }
 
   #pass(): void {
@@ -124,7 +127,7 @@ export class StripGapCloser {
       this.#clear();
       return;
     }
-    slots.forEach((slot, index) => StripGapCloser.#shift(slot, correction.shifts[index] ?? null));
+    slots.forEach((slot, index) => this.#shift(slot, correction.shifts[index] ?? null));
     this.#shrink(frame, correction.hiddenHeight);
   }
 
@@ -204,11 +207,8 @@ export class StripGapCloser {
   }
 
   #clear(): void {
-    const strip = this.#element(this.#selector('tabStrip'));
-    [...(strip?.children ?? [])].forEach((slot) => {
-      StripGapCloser.#shift(slot as HTMLElement, null);
-      this.#collapse(slot as HTMLElement, false);
-    });
+    [...this.#shifted].forEach((slot) => this.#shift(slot, null));
+    [...this.#collapsed].forEach((slot) => this.#collapse(slot, false));
     this.#restoreFrame();
   }
 
@@ -220,11 +220,14 @@ export class StripGapCloser {
     };
   }
 
-  static #shift(slot: HTMLElement, shift: number | null): void {
+  #shift(slot: HTMLElement, shift: number | null): void {
     if (shift === null || shift === 0) {
-      slot.style.removeProperty(SHIFT_PROPERTY);
+      if (this.#shifted.delete(slot)) {
+        slot.style.removeProperty(SHIFT_PROPERTY);
+      }
     } else {
       slot.style.setProperty(SHIFT_PROPERTY, `${shift}px`);
+      this.#shifted.add(slot);
     }
   }
 }

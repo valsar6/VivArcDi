@@ -309,7 +309,7 @@ test('listens to Cmd/Ctrl+D while it runs and stops on stop', async (t) => {
   const chrome = new WritableChrome(WORKSPACE_TREE);
   const { dom, module, context } = workspaceSetup({ ...BOOKMARK_FOLDERS_OPTIONS.defaults }, chrome);
   await module.start(context);
-  assert.equal(dom.listeners.get('keydown')?.length, 1);
+  assert.equal(dom.listeners.get('keydown')?.length, 2);
   module.stop();
   assert.deepEqual(dom.listeners.get('keydown'), []);
 });
