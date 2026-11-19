@@ -21,21 +21,21 @@ its own `vivarcdi-implementer` worktree from the commit that has T1. T6 and T7 c
   `skips a tab of another window`, `judges the window from the tab as just read`,
   `writes as before when the window is unknown`, `two windows never both write the same tab`; and
   the two `BrowserTabs.ownWindowId` tests of the design.
-- [ ] **T2. Pin watcher.** `PinWatcher` and the tabs fake of `tests/modules/pinned/`. Satisfies
+- [x] **T2. Pin watcher.** `PinWatcher` and the tabs fake of `tests/modules/pinned/`. Satisfies
   AC-6 to AC-8 in `tests/modules/pinned/PinnedTabs.test.ts`:
   `does not save the own page of a tab pinned in another window`,
   `does not forget the own page of a tab unpinned in another window`,
   `saves at start only the pinned tabs of its own window`.
-- [ ] **T3. Folder links.** `LinkTabAdopter` and `TabLinks.unlinkExcept`. Satisfies AC-9 and AC-11:
+- [x] **T3. Folder links.** `LinkTabAdopter` and `TabLinks.unlinkExcept`. Satisfies AC-9 and AC-11:
   `does not adopt a new tab of another window` in `LinkTabAdopter.test.ts`,
   `unlinks only the tabs of its own window` in `TabLinks.test.ts`.
-- [ ] **T4. Favorites and stamps.** `LinkedTabs.sync` and `ActivityStamps` with their test fakes.
+- [x] **T4. Favorites and stamps.** `LinkedTabs.sync` and `ActivityStamps` with their test fakes.
   Satisfies AC-10 and AC-13: `syncs only the tabs of its own window`,
   `stamps only tabs of its own window before it knows the window`.
-- [ ] **T5. Folder relocation.** `FolderLinkTabs.ownTabsOf` and `FolderRelocation`; `tabsOf` and
+- [x] **T5. Folder relocation.** `FolderLinkTabs.ownTabsOf` and `FolderRelocation`; `tabsOf` and
   `FolderDeletion` stay. Satisfies AC-12 in `FolderRelocation.test.ts`:
   `moves only the tabs of its own window with the folder`.
-- [ ] **T6. Docs and version (lead).** `docs/architecture.md`: `TabDataWriter` writes only tabs of
+- [x] **T6. Docs and version (lead).** `docs/architecture.md`: `TabDataWriter` writes only tabs of
   its own window, and `BrowserTabs.ownWindowId`. Patch version bump after 0.59.5, checked with
   `npm run release -- check --base origin/main --branch fix/vivextdata-owner`.
 - [ ] **T7. Manual check.** Italian checklist for AC-14 under
