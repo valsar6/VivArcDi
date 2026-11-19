@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { silentNotices } from '../../loader/fakes.js';
 import { ConnectFlow } from '../../../src/modules/livefolders/ConnectFlow.js';
 import type { ConnectState } from '../../../src/modules/livefolders/ConnectFlow.js';
 import { CONNECTION_STORAGE_KEY, GithubConnection } from '../../../src/modules/livefolders/GithubConnection.js';
@@ -28,7 +29,7 @@ test('stores the token and refreshes after authorization', async () => {
   const { logger } = recordingLogger();
   const store = new LiveFolderStore(storage, logger, () => 'f1');
   store.add('5');
-  const refresher = new LiveFolderRefresher({ store, github: new GithubPullRequests(github.fetch), connection, changed: (): void => undefined, ticker: new ManualTicker(), intervalMs: 1, logger });
+  const refresher = new LiveFolderRefresher({ store, github: new GithubPullRequests(github.fetch), connection, notices: silentNotices(), changed: (): void => undefined, ticker: new ManualTicker(), intervalMs: 1, logger });
   connection.onChange(() => refresher.refreshAll());
   await refresher.idle();
   assert.deepEqual(store.find('f1')?.rows, []);
