@@ -1,7 +1,7 @@
 import { mock, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TOAST_ATTRIBUTE } from '../../src/core/dom/Toast.js';
-import { createApp, linesOf, summaryOf } from './boot.js';
+import { KIND_ATTRIBUTE, TOAST_ATTRIBUTE } from '../../src/core/dom/Toast.js';
+import { BrokenMarker, createApp, linesOf, summaryOf } from './boot.js';
 import type { AppOptions } from './boot.js';
 import type { FakeElement, SilentSink } from './fakes.js';
 
@@ -140,4 +140,44 @@ test('names the stage where startup failed', async () => {
     mock.timers.reset();
     globalThis.MutationObserver = original;
   }
+});
+
+test('shows the boot notice when two modules fail', async () => {
+  const { app, browser, sink } = createApp({ modules: { broken: { enabled: true }, 'also-broken': { enabled: true }, ...MARKER } });
+  await app.start();
+  const toasts = toastsOf(browser);
+  assert.equal(toasts.length, 1);
+  assert.equal(toasts[0]?.attributes[KIND_ATTRIBUTE], 'error');
+  assert.equal(toasts[0]?.textContent, 'VivArcDi could not start 2 of 3 features: details are in the console');
+  assert.equal(summaryOf(sink)?.level, 'error');
+  await app.stop();
+  assert.equal(toastsOf(browser).length, 0);
+});
+
+test('keeps a single failure in the console', async () => {
+  const { app, browser, sink } = createApp({ modules: { broken: { enabled: true }, ...MARKER } });
+  await app.start();
+  assert.equal(toastsOf(browser).length, 0);
+  assert.equal(summaryOf(sink)?.level, 'warn');
+  await app.stop();
+});
+
+test('shows no boot notice without the activation mark', async () => {
+  const { app, browser, sink } = createApp({
+    marker: BrokenMarker,
+    modules: { broken: { enabled: true }, 'also-broken': { enabled: true }, ...MARKER },
+  });
+  await app.start();
+  assert.equal(textsOf(sink, '[test:activation-marker]', 'error').length, 1);
+  assert.equal(summaryOf(sink)?.level, 'error');
+  assert.equal(toastsOf(browser).length, 0);
+  await app.stop();
+});
+
+test('shows no boot notice after a clean start', async () => {
+  const { app, browser, sink } = createApp({ modules: { follower: { enabled: true }, ...MARKER } });
+  await app.start();
+  assert.equal(toastsOf(browser).length, 0);
+  assert.equal(summaryOf(sink)?.level, 'info');
+  await app.stop();
 });

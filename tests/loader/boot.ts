@@ -20,6 +20,22 @@ export class Broken extends Module {
   }
 }
 
+export class AlsoBroken extends Module {
+  public static override id = 'also-broken';
+
+  public override start(): void {
+    throw new Error('boom');
+  }
+}
+
+export class BrokenMarker extends Module {
+  public static override id = 'activation-marker';
+
+  public override start(): void {
+    throw new Error('boom');
+  }
+}
+
 export class Hidden extends Module {
   public static override id = 'hidden';
 
@@ -73,6 +89,7 @@ export interface AppOptions {
   modules?: Record<string, ModuleOptions>;
   missing?: string[];
   browser?: boolean;
+  marker?: typeof Module;
 }
 
 function payloadFiles(vivaldiVersion: string, modules: Record<string, ModuleOptions> | undefined, missing: string[]): Record<string, unknown> {
@@ -89,6 +106,11 @@ function payloadFiles(vivaldiVersion: string, modules: Record<string, ModuleOpti
   return files;
 }
 
+function documentOf(hasBrowser: boolean): { browser: FakeElement; document: FakeDocument } {
+  const browser = new FakeElement();
+  return { browser, document: new FakeDocument(hasBrowser ? { '#browser': browser } : {}) };
+}
+
 export function createApp({
   vivaldiVersion = '8.1.3740.12',
   modules,
@@ -96,17 +118,17 @@ export function createApp({
   storage = savingStorage('persistent'),
   missing = [],
   browser: hasBrowser = true,
+  marker = ActivationMarker,
 }: AppOptions = {}): {
   app: VivArcDi;
   browser: FakeElement;
   document: FakeDocument;
   sink: SilentSink;
 } {
-  const browser = new FakeElement();
-  const document = new FakeDocument(hasBrowser ? { '#browser': browser } : {});
+  const { browser, document } = documentOf(hasBrowser);
   const sink = new SilentSink();
   const loader = new FakeLoader(payloadFiles(vivaldiVersion, modules, missing));
-  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken).register(Hidden).register(Private).register(Configured).register(Follower).register(Asker);
+  const registry = new ModuleRegistry().register(marker).register(Broken).register(AlsoBroken).register(Hidden).register(Private).register(Configured).register(Follower).register(Asker);
   const app = new VivArcDi({
     loader,
     registry,

@@ -168,7 +168,8 @@ export class VivArcDi {
 
   /**
    * Starts VivArcDi and logs one self-check summary. Never rejects: a failure is
-   * logged as `Startup failed` and named in the summary. Does nothing beyond a
+   * logged as `Startup failed` and named in the summary, and a severe start shows one
+   * notice. Does nothing beyond a
    * warning when no selector catalog fits the running Vivaldi.
    */
   public async start(): Promise<void> {
@@ -181,6 +182,7 @@ export class VivArcDi {
       outcome = 'failed';
     }
     report.summarize(outcome);
+    report.notify(outcome, this.#notices);
   }
 
   async #run(report: BootReport): Promise<'active' | 'inactive'> {
