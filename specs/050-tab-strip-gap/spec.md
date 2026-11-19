@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -84,16 +84,18 @@ Nothing changes when no slot is hidden.
 
 ## Open questions
 
-- [ ] **Q-1.** How to close the gap. Proposed: correct the offsets (option A), because it keeps
-  Vivaldi's layout and its drag and reorder code. Option B, `position: static` on the rows, frees the
-  space with plain CSS but puts Vivaldi's drag and reorder at risk. Decide after the probe in Q-2.
-- [ ] **Q-2.** Which property does Vivaldi read for the offset, `transform` or `top`? Proposed: a
-  read-only probe (`npm run live -- --probe`) on the lab copy, before the design; the design follows its
-  answer.
-- [ ] **Q-3.** Does the separator belong to this spec or to 028? Proposed: here, since it is the same
-  gap and the same strip.
-- [ ] **Q-4.** Where do the corrections live? Proposed: in `HiddenTabMarker`, since it already marks
-  the hidden slots and observes the strip, so no second observer.
+- [x] **Q-1.** How to close the gap. Decided: correct the offsets, keeping Vivaldi's layout and its
+  drag and reorder code. The normal-flow option (`position: static`) is dropped as riskier.
+- [x] **Q-2.** Which property does Vivaldi read for the offset? Answered by a probe on the lab copy
+  (Vivaldi 8.2, 2026-11-19): `.tab-position` is `position: absolute` with `top: 0`, drawn by
+  `transform: translateX(var(--PositionX)) translateY(var(--PositionY))`, so the offset is the inline
+  variable `--PositionY`. The height of the strip comes from its parent `.resize`, whose inline
+  `max-height` Vivaldi writes from the full list. The design reads and corrects these two values
+  without overwriting Vivaldi's inline values.
+- [x] **Q-3.** The separator belongs here, since it is the same gap and the same strip.
+- [x] **Q-4.** The corrections are driven by the observer that already marks the hidden slots, but
+  live in a class of their own: `HiddenTabMarker` keeps marking and hiding, the new class only
+  computes and applies the offsets (single responsibility).
 
 ## References
 

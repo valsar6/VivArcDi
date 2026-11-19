@@ -57,7 +57,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [047 Snapshot watch](047-snapshot-watch/spec.md) | Tooling | Approved |
 | [048 GitHub token refused](048-github-token-refused/spec.md) | 3 | Implemented |
 | [049 Review wait](049-review-wait/spec.md) | Tooling | Implemented |
-| [050 Tab strip gap](050-tab-strip-gap/spec.md) | 3 | Draft |
+| [050 Tab strip gap](050-tab-strip-gap/spec.md) | 3 | Approved |
 
 ## Layout
 
