@@ -2,13 +2,14 @@ import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { Logger } from '../../core/support/Logger.js';
 import { SavedAddresses } from './SavedAddresses.js';
 
-export type PinWatcherTabs = Pick<BrowserTabs, 'query' | 'onUpdated'>;
+export type PinWatcherTabs = Pick<BrowserTabs, 'query' | 'onUpdated' | 'ownWindowId'>;
 
 export class PinWatcher {
   #tabs: PinWatcherTabs;
   #addresses: Pick<SavedAddresses, 'save' | 'forget'>;
   #logger: Logger;
   #unsubscribe: (() => void) | null = null;
+  #windowId: number | null = null;
 
   /**
    * Gives pinned tabs their own page: the page they show when they are pinned, or when the
@@ -25,11 +26,12 @@ export class PinWatcher {
   }
 
   /**
-   * Saves the own page of pinned tabs that have none and starts following pins.
+   * Saves the own page of the pinned tabs of this window that have none and starts following pins.
    */
   public async start(): Promise<void> {
+    this.#windowId = await this.#tabs.ownWindowId();
     this.#unsubscribe = this.#tabs.onUpdated((tabId, change, tab) => void this.#follow(tabId, change, tab));
-    const pinned = await this.#tabs.query({ pinned: true });
+    const pinned = await this.#tabs.query({ pinned: true, currentWindow: true });
     await Promise.all(pinned.filter((tab) => SavedAddresses.needsAddress(tab)).map((tab) => this.#save(tab)));
   }
 
@@ -42,6 +44,9 @@ export class PinWatcher {
   }
 
   async #follow(tabId: number, change: chrome.tabs.OnUpdatedInfo, tab: chrome.tabs.Tab): Promise<void> {
+    if (this.#windowId !== null && tab.windowId !== this.#windowId) {
+      return;
+    }
     try {
       if (change.pinned === true && SavedAddresses.needsAddress(tab)) {
         await this.#save(tab);
