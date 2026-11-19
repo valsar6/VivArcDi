@@ -55,7 +55,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   `unknown` and `none`), `summary level follows the problems` (the table of the design),
   `boot notice needs two failures and the activation mark`. Nothing uses it yet. Prepares FR-1,
   FR-2, FR-4, FR-7 to FR-10.
-- [ ] **T5. Summary at every start.** `VivArcDi.start` creates the report, runs `#run(report)` with the
+- [x] **T5. Summary at every start.** `VivArcDi.start` creates the report, runs `#run(report)` with the
   stage calls of the design, catches and logs `Startup failed` itself, and calls `summarize` once;
   `boot` loses its `try`/`catch`. `ModuleStarter.start` returns `ModuleOutcome` and logs
   `stays off: invalid options` at `warn`; `VivArcDi` records every outcome. Tests: the boot fixture
