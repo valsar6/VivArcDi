@@ -18,6 +18,13 @@ export interface ModuleClass {
   privateWindows: PrivateWindowPolicy;
 }
 
+export interface SkippedModules {
+  /** Registered modules named in `config.json` whose `enabled` is not `true`. */
+  config: number;
+  /** Enabled modules whose `privateWindows` policy does not fit the window. */
+  window: number;
+}
+
 const FITS: Record<PrivateWindowPolicy, (privateWindow: boolean) => boolean> = {
   never: (privateWindow) => !privateWindow,
   allowed: () => true,
@@ -69,28 +76,36 @@ export class ModuleRegistry implements SchemaSource {
    *
    * @param settings The `modules` section of `config.json`.
    * @param privateWindow Whether the window is a private window.
-   * @returns The new instances, and the enabled ids that no module matches.
+   * @returns The new instances, the enabled ids that no module matches, and how many registered
+   * modules were left out because of `config.json` or because of the window.
    */
   public createEnabled(settings: Record<string, ModuleOptions>, privateWindow = false): {
     modules: EnabledModule[];
     unknown: string[];
+    skipped: SkippedModules;
   } {
     const modules: EnabledModule[] = [];
     const unknown: string[] = [];
+    const skipped: SkippedModules = { config: 0, window: 0 };
     for (const [id, options] of Object.entries(settings)) {
-      if (options?.enabled !== true) {
+      const moduleClass = this.#classes.get(id);
+      const enabled = options?.enabled === true;
+      if (moduleClass === undefined) {
+        if (enabled) {
+          unknown.push(id);
+        }
         continue;
       }
-      const moduleClass = this.#classes.get(id);
-      if (moduleClass === undefined) {
-        unknown.push(id);
+      if (!enabled) {
+        skipped.config += 1;
         continue;
       }
       if (!FITS[moduleClass.privateWindows](privateWindow)) {
+        skipped.window += 1;
         continue;
       }
       modules.push({ id, module: new moduleClass() });
     }
-    return { modules, unknown };
+    return { modules, unknown, skipped };
   }
 }
