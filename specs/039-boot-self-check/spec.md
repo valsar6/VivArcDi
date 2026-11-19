@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-19 |
 | Amends | [000 Foundations](../000-foundations/spec.md) (boot logging, AC-14, AC-15) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -207,38 +207,38 @@ cover them. Existing criteria 000/AC-14, 000/AC-15 and 000/AC-17 keep their chec
 
 ## Open questions
 
-- [ ] **Q-1. A separate summary line, or a longer active line?** The active line already holds the
-  versions and the started ids. Recommendation: a separate `VivArcDi:boot` line after it; the active
+- [x] **Q-1. A separate summary line, or a longer active line?** The active line already holds the
+  versions and the started ids. Answered (Tore, 2026-11-19): a separate `VivArcDi:boot` line after it; the active
   line is read by 000/AC-17, the live boot check and the user manual, and a second line can change
   level (`warn`, `error`) without touching that contract.
-- [ ] **Q-2. Severity boundary.** The recorded decision says "toast only for severe failures". The
+- [x] **Q-2. Severity boundary.** The recorded decision says "toast only for severe failures". The
   code shows that the worst cases (no configuration, no catalog, no `#browser`, `activation-marker`
   down) happen before the toast exists or without its styles. Options: (a) severe = two or more
   modules failed, toast only when `activation-marker` runs, everything else console only; (b) as
   (a), plus a fallback toast with its own inline styles for pre-notice failures; (c) severe = at
-  least half the tried modules failed. Recommendation: (a). Two failures in one start almost always
+  least half the tried modules failed. Answered (Tore, 2026-11-19): (a). Two failures in one start almost always
   share a cause (a Vivaldi update that moved the interface), while one failure leaves the rest of
   VivArcDi working; (b) would put an unstyled or self-styled element into a Vivaldi that VivArcDi
   could not read, against "an unsupported version is left untouched"; (c) waits until 7 of 15
   features are gone.
-- [ ] **Q-3. Missing selectors.** Recommendation: count only names asked for with `get` that the
+- [x] **Q-3. Missing selectors.** Answered (Tore, 2026-11-19): count only names asked for with `get` that the
   catalog does not define (FR-7), and leave DOM presence to the live selector check of 046/047,
   which knows the states a selector needs. A boot-time DOM check would report state-dependent
   selectors such as `workspacePopup` as missing on every start.
-- [ ] **Q-4. Toast text.** Recommendation:
+- [x] **Q-4. Toast text.** Answered (Tore, 2026-11-19):
   `VivArcDi could not start 3 of 15 features: details are in the console`, in English like the
   notices of 041, "features" rather than "modules" because that is the user's word.
-- [ ] **Q-5. Stop failed modules?** 038 left "what happens after a failed self-check" to this spec.
+- [x] **Q-5. Stop failed modules?** 038 left "what happens after a failed self-check" to this spec.
   Calling `stop()` on a module whose `start` threw half way is untested for all fifteen modules and
-  `TodayArchive` already does it for itself (`TodayArchive.ts:74-76`). Recommendation: report only
+  `TodayArchive` already does it for itself (`TodayArchive.ts:74-76`). Answered (Tore, 2026-11-19): report only
   (FR-11); a later spec can stop failed modules once each one has a test for a stop after a partial
   start.
-- [ ] **Q-6. Live check.** The summary could be checked on a lab Vivaldi by extending the live boot
-  check of 046 to require an `info` summary. Recommendation: not in this spec; keep AC-14 manual and
+- [x] **Q-6. Live check.** The summary could be checked on a lab Vivaldi by extending the live boot
+  check of 046 to require an `info` summary. Answered (Tore, 2026-11-19): not in this spec; keep AC-14 manual and
   extend `BootCheck` in a `docs/` or tooling branch afterwards, so this `fix/` branch touches only
   the payload.
-- [ ] **Q-7. One notice per window.** Each window, including private and Little Arc windows, boots on
-  its own, so a severe start shows the notice once in each new window. Recommendation: accept it; it
+- [x] **Q-7. One notice per window.** Each window, including private and Little Arc windows, boots on
+  its own, so a severe start shows the notice once in each new window. Answered (Tore, 2026-11-19): accept it; it
   matches 041 and needs no storage key.
 
 ## References
