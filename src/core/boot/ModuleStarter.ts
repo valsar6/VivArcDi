@@ -7,6 +7,7 @@ import type { BrowserSearch } from '../browser/BrowserSearch.js';
 import type { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { BrowserWindows } from '../browser/BrowserWindows.js';
 import type { Logger } from '../support/Logger.js';
+import type { ModuleOutcome } from './BootReport.js';
 import type { EnabledModule } from './ModuleRegistry.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { StartServices } from './WindowServices.js';
@@ -54,15 +55,16 @@ export class ModuleStarter {
    *
    * @param entry The module to start.
    * @param start The services of this window and the checked settings.
-   * @returns True when the module started.
+   * @returns How the module ended: started, failed, or off by invalid options.
    */
-  public async start(entry: EnabledModule, start: StartServices): Promise<boolean> {
+  public async start(entry: EnabledModule, start: StartServices): Promise<ModuleOutcome> {
     const { settings, selectors, build, storage, notices } = start;
     const options = settings.optionsOf(entry.id);
-    if (options === null) {
-      return false;
-    }
     const logger = this.#logger.child(entry.id);
+    if (options === null) {
+      logger.warn('stays off: invalid options');
+      return 'invalid-options';
+    }
     try {
       await entry.module.start({
         ...this.#services,
@@ -74,10 +76,10 @@ export class ModuleStarter {
         storage,
         notices,
       });
-      return true;
+      return 'started';
     } catch (error) {
       logger.error('Failed to start', error);
-      return false;
+      return 'failed';
     }
   }
 }

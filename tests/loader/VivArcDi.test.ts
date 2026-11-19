@@ -1,110 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Logger } from '../../src/core/support/Logger.js';
-import type { BrowserRuntime } from '../../src/core/browser/BrowserRuntime.js';
-import { Module } from '../../src/core/boot/Module.js';
-import type { ModuleContext, PrivateWindowPolicy } from '../../src/core/boot/Module.js';
-import { Option } from '../../src/core/boot/options/Option.js';
-import { OptionSchema } from '../../src/core/boot/options/OptionSchema.js';
-import type { OptionValues } from '../../src/core/boot/options/OptionSchema.js';
-import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
-import type { ModuleOptions } from '../../src/core/boot/types.js';
-import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
-import { ActivationMarker } from '../../src/modules/ActivationMarker.js';
-import type { SaveOutcome, SavingStorage, StorageMode } from '../../src/core/browser/SavingStorage.js';
 import { TOAST_ATTRIBUTE } from '../../src/core/dom/Toast.js';
-import { FakeDocument, FakeElement, FakeLoader, SilentSink } from './fakes.js';
-
-class Broken extends Module {
-  public static override id = 'broken';
-
-  public override start(): void {
-    throw new Error('boom');
-  }
-}
-
-class Hidden extends Module {
-  public static override id = 'hidden';
-
-  public override start(): void {}
-}
-
-class Private extends Module {
-  public static override id = 'private';
-  public static override privateWindows: PrivateWindowPolicy = 'only';
-
-  public override start(): void {}
-}
-
-const CONFIGURED_OPTIONS = OptionSchema.of({
-  clientId: Option.requiredText({ nonEmpty: true }),
-  size: Option.number(3, { min: 1, max: 9 }),
-});
-
-const seen: Array<ModuleContext<object>> = [];
-
-class Configured extends Module<OptionValues<typeof CONFIGURED_OPTIONS>> {
-  public static override id = 'configured';
-  public static override options = CONFIGURED_OPTIONS;
-
-  public override start(context: ModuleContext<OptionValues<typeof CONFIGURED_OPTIONS>>): void {
-    seen.push(context);
-  }
-}
-
-class Follower extends Module {
-  public static override id = 'follower';
-
-  public override start(context: ModuleContext): void {
-    seen.push(context);
-  }
-}
-
-const runtimeAnswering = (answer: () => Promise<boolean>): BrowserRuntime => ({ isPrivateWindow: answer }) as unknown as BrowserRuntime;
-
-const savingStorage = (mode: StorageMode): SavingStorage => ({
-  mode,
-  getItem: () => null,
-  setItem: () => undefined,
-  save: async (): Promise<SaveOutcome> => (mode === 'memory' ? 'memory' : 'saved'),
-});
-
-interface AppOptions {
-  storage?: SavingStorage;
-  runtime?: BrowserRuntime;
-  vivaldiVersion?: string;
-  modules?: Record<string, ModuleOptions>;
-}
-
-function createApp({ vivaldiVersion = '8.1.3740.12', modules, runtime, storage = savingStorage('persistent') }: AppOptions = {}): {
-  app: VivArcDi;
-  browser: FakeElement;
-  document: FakeDocument;
-  sink: SilentSink;
-} {
-  const browser = new FakeElement();
-  const document = new FakeDocument({ '#browser': browser });
-  const sink = new SilentSink();
-  const loader = new FakeLoader({
-    'config.json': {
-      styles: ['styles/base.css'],
-      modules: modules ?? { 'activation-marker': { enabled: true } },
-    },
-    'build.json': { vivarcdiVersion: '0.1.0', vivaldiVersion },
-    'selectors/index.json': { versions: ['8.1'] },
-    'selectors/8.1.json': { browser: '#browser' },
-  });
-  const registry = new ModuleRegistry().register(ActivationMarker).register(Broken).register(Hidden).register(Private).register(Configured).register(Follower);
-  const app = new VivArcDi({
-    loader,
-    registry,
-    logger: new Logger('test', sink),
-    document: document as unknown as Document,
-    storage,
-    ...(runtime === undefined ? {} : { runtime }),
-  });
-  return { app, browser, document, sink };
-}
+import { createApp, runtimeAnswering, savingStorage, seen } from './boot.js';
+import type { FakeElement, SilentSink } from './fakes.js';
+import type { ModuleOptions } from '../../src/core/boot/types.js';
 
 test('start injects styles and starts enabled modules', async () => {
   const { app, browser, document } = createApp();
@@ -181,7 +80,10 @@ test('module without a required option stays off with a warning', async () => {
   const { app, sink } = createApp({ modules: { configured: { enabled: true, size: 4 } } });
   await app.start();
   assert.deepEqual(app.startedModules, []);
-  assert.deepEqual(warningsOf(sink, '[test:configured]'), ['option "clientId" is required and missing: the module stays off']);
+  assert.deepEqual(warningsOf(sink, '[test:configured]'), [
+    'option "clientId" is required and missing: the module stays off',
+    'stays off: invalid options',
+  ]);
 });
 
 test('module starts only when enabled is true', async () => {

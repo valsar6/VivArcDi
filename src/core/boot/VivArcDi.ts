@@ -8,6 +8,8 @@ import { BrowserSearch } from '../browser/BrowserSearch.js';
 import { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { ChromeApi } from '../browser/BrowserTabs.js';
 import { BrowserWindows } from '../browser/BrowserWindows.js';
+import { BootReport } from './BootReport.js';
+import type { BootOutcome } from './BootReport.js';
 import { Logger } from '../support/Logger.js';
 import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
 import { ModuleStarter } from './ModuleStarter.js';
@@ -132,11 +134,7 @@ export class VivArcDi {
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger),
     });
-    try {
-      await app.start();
-    } catch (error) {
-      app.#logger.error('Startup failed', error);
-    }
+    await app.start();
     return app;
   }
 
@@ -169,30 +167,51 @@ export class VivArcDi {
   }
 
   /**
-   * Starts VivArcDi. Does nothing beyond a warning when no selector catalog
-   * fits the running Vivaldi, so an unsupported version is left untouched.
+   * Starts VivArcDi and logs one self-check summary. Never rejects: a failure is
+   * logged as `Startup failed` and named in the summary. Does nothing beyond a
+   * warning when no selector catalog fits the running Vivaldi.
    */
   public async start(): Promise<void> {
+    const report = new BootReport(this.#logger.child('boot'));
+    let outcome: BootOutcome;
+    try {
+      outcome = await this.#run(report);
+    } catch (error) {
+      this.#logger.error('Startup failed', error);
+      outcome = 'failed';
+    }
+    report.summarize(outcome);
+  }
+
+  async #run(report: BootReport): Promise<'active' | 'inactive'> {
     const [config, build] = await Promise.all([
       this.#loader.json<Config>('config.json'),
       this.#loader.json<BuildInfo>('build.json'),
     ]);
+    report.useBuild(build);
+    report.enter('selectors');
     const selectors = await SelectorCatalog.load(this.#loader, build.vivaldiVersion);
+    report.useCatalog(selectors);
     if (selectors.version === null) {
       this.#logger.warn(`No selectors for Vivaldi ${build.vivaldiVersion}, staying inactive`);
-      return;
+      return 'inactive';
     }
 
+    report.enter('interface');
     await new UiReadiness(this.#document).waitFor(selectors.get('browser'));
     config.styles.forEach((path) => this.#styles.inject(path));
     const services = WindowServices.open(this.#document, selectors, this.#storage, this.#logger);
     this.#notices = services.notices;
 
+    report.enter('modules');
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
-    const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
+    const { modules, unknown, skipped } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
+    report.skip(skipped.config, skipped.window);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      if (await this.#starter.start(entry, { settings, selectors, build, ...services })) {
+      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services });
+      report.record(entry.id, outcome);
+      if (outcome === 'started') {
         this.#started.push(entry);
       }
     }
@@ -201,6 +220,7 @@ export class VivArcDi {
       `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
       `(selectors ${selectors.version}, modules: ${this.startedModules.join(', ') || 'none'})`,
     );
+    return 'active';
   }
 
   /**
