@@ -2,9 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
+| Approved | 2026-11-19 |
 | Amends | [026 Live folders](../026-live-folders/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -132,17 +133,17 @@ tests with a fake GitHub.
 
 ## Open questions
 
-- [ ] **Q-1. Toast text and duration.** Recommendation: `GitHub refused the connection: sign in
+- [x] **Q-1. Toast text and duration.** Recommendation: `GitHub refused the connection: sign in
   again to use the live folders`, kind `error`, `NOTICE_MS` (8 s) from the shared notices, no new
-  duration.
-- [ ] **Q-2. Notice at startup.** Should a window opened when the persisted state says refused also
+  duration. Answered (Tore, 2026-11-19): as recommended.
+- [x] **Q-2. Notice at startup.** Should a window opened when the persisted state says refused also
   show it? Recommendation: no. After the change the state is simply "not connected", and the
-  `Connect GitHub` row is the notice; the toast is for the moment of the refusal.
-- [ ] **Q-3. Narrow the scope `repo`.** Recommendation: out of scope; a separate spec, since it
-  changes what the user authorizes on GitHub.
-- [ ] **Q-4. Rows after the discard.** The existing disconnected path empties the folder rows, so
+  `Connect GitHub` row is the notice; the toast is for the moment of the refusal. Answered (Tore, 2026-11-19): no notice at startup.
+- [x] **Q-3. Narrow the scope `repo`.** Recommendation: out of scope; a separate spec, since it
+  changes what the user authorizes on GitHub. Answered (Tore, 2026-11-19): out of scope.
+- [x] **Q-4. Rows after the discard.** The existing disconnected path empties the folder rows, so
   the last rows are not kept. Recommendation: accept it (same as `Disconnect GitHub`); the rows come
-  back at the next connection.
+  back at the next connection. Answered (Tore, 2026-11-19): accepted.
 
 ## References
 
