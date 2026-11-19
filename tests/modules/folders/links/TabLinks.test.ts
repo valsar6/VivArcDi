@@ -33,3 +33,13 @@ test('keeps the tabs of the links that the caller says to keep', async () => {
   assert.deepEqual(tabs.actions().filter(([name]) => name === 'update').map(([, id]) => id), [3, 4]);
   assert.deepEqual(tabs.extData(2), { workspaceId: 7, group: 'g', vivarcdi: { bookmarkId: 'live:f1:7', lastActive: 5 } });
 });
+
+test('unlinks only the tabs of its own window', async () => {
+  const tabs = new LinkingTabs([
+    { id: 2, vivExtData: linkedTo('11') },
+    { id: 3, windowId: 2, vivExtData: linkedTo('11') },
+  ]);
+  await new TabLinks(tabs).unlinkExcept(new Set());
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'update').map(([, id]) => id), [2]);
+  assert.deepEqual(tabs.extData(3), { workspaceId: 7, group: 'g', vivarcdi: { bookmarkId: '11', lastActive: 5 } });
+});
