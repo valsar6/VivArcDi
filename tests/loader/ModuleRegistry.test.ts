@@ -48,6 +48,10 @@ class Only extends Module {
   public static override privateWindows: PrivateWindowPolicy = 'only';
 }
 
+class Quiet extends Module {
+  public static override id = 'quiet';
+}
+
 test('createEnabled keeps modules out of private windows unless they opt in', () => {
   const registry = new ModuleRegistry().register(Alpha).register(Allowed).register(Only);
   const settings = { alpha: { enabled: true }, allowed: { enabled: true }, only: { enabled: true } };
@@ -64,4 +68,18 @@ test('skips spaces, favorites and folders in a private window', () => {
   assert.deepEqual(ids(true), ['activation-marker', 'peek', 'copy-url', 'incognito']);
   assert.equal(ids(false).length, 10);
   assert.equal(ids(false).includes('incognito'), false);
+});
+
+test('createEnabled counts the modules it leaves out', () => {
+  const registry = new ModuleRegistry().register(Alpha).register(Allowed).register(Only).register(Quiet);
+  const { modules, unknown, skipped } = registry.createEnabled({
+    alpha: { enabled: false },
+    allowed: { enabled: 'yes' as unknown as boolean },
+    only: { enabled: true },
+    quiet: { enabled: true },
+    ghost: { enabled: false },
+  });
+  assert.deepEqual(modules.map(({ id }) => id), ['quiet']);
+  assert.deepEqual(unknown, []);
+  assert.deepEqual(skipped, { config: 2, window: 1 });
 });
