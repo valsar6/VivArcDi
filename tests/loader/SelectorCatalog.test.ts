@@ -37,3 +37,19 @@ test('get throws for an undefined selector', () => {
   const catalog = new SelectorCatalog({}, '8.1');
   assert.throws(() => catalog.get('missing'), /not defined/);
 });
+
+test('get records the names it does not define', () => {
+  const catalog = new SelectorCatalog({}, '8.1');
+  assert.throws(() => catalog.get('missing'), /not defined/);
+  assert.throws(() => catalog.get('missing'), /not defined/);
+  assert.equal(catalog.has('other'), false);
+  assert.deepEqual(catalog.undefinedNames, ['missing']);
+});
+
+test('standsInFor tells an older catalog from a matching one', () => {
+  const catalog = new SelectorCatalog({}, '8.1');
+  assert.equal(catalog.standsInFor('8.3.1.1'), true);
+  assert.equal(catalog.standsInFor('unknown'), true);
+  assert.equal(catalog.standsInFor('8.1.3740.12'), false);
+  assert.equal(new SelectorCatalog({}, null).standsInFor('8.3.1.1'), false);
+});

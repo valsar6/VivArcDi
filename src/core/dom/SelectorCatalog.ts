@@ -6,6 +6,7 @@ type VersionPair = [number, number];
 export class SelectorCatalog {
   #selectors: Readonly<Record<string, string>>;
   #version: string | null;
+  #undefined = new Set<string>();
 
   /**
    * Holds the CSS selectors of Vivaldi's interface for one Vivaldi version.
@@ -60,6 +61,25 @@ export class SelectorCatalog {
   }
 
   /**
+   * @returns The names `get` was asked for and does not define, each once, in the order first asked.
+   * `has` returning false is not recorded.
+   */
+  public get undefinedNames(): string[] {
+    return [...this.#undefined];
+  }
+
+  /**
+   * @param vivaldiVersion Full Vivaldi version, or `unknown`.
+   * @returns Whether this catalog is an older one used in place of the running Vivaldi's own.
+   */
+  public standsInFor(vivaldiVersion: string): boolean {
+    if (this.#version === null) {
+      return false;
+    }
+    return parseVersion(vivaldiVersion) === null || compareVersions(this.#version, vivaldiVersion) < 0;
+  }
+
+  /**
    * @param name Selector name.
    * @returns Whether the catalog defines that selector.
    */
@@ -75,6 +95,7 @@ export class SelectorCatalog {
   public get(name: string): string {
     const selector = this.#selectors[name];
     if (selector === undefined || !this.has(name)) {
+      this.#undefined.add(name);
       throw new Error(`Selector "${name}" is not defined for Vivaldi ${this.#version}`);
     }
     return selector;
