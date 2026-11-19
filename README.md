@@ -1,4 +1,10 @@
-# VivArcDi
+<p align="center">
+  <img src="docs/assets/vivarcdi-icon.png" alt="VivArcDi icon: the Arc icon stuck like a plaster on the Vivaldi icon" width="200">
+</p>
+
+<h1 align="center">VivArcDi</h1>
+
+<p align="center">Arc features, stuck on Vivaldi.</p>
 
 Make [Vivaldi](https://vivaldi.com) behave like the late [Arc](https://arc.net) browser.
 
@@ -19,14 +25,22 @@ which Arc features come next.
 
 ## Status
 
-Version 0.15.0 brings the downloadable app (macOS) and package (Debian): no terminal and no Python needed.
+VivArcDi is under active development and ships downloadable packages: an app for macOS and a package
+for Debian, with no terminal and no Python needed.
 
-Phase 4 of the [roadmap](#roadmap) brings the [Today archive](#today-archive) and
-[copy URL](#copy-url), after phase 3 with [reopening pinned tabs](#reopen-pinned-tabs),
-[bookmark folders in the tab bar](#bookmark-folders), [Favorites from a bookmark folder](#favorites)
-and [pinned tabs that reset and unload](#pinned-tabs), after
-[Peek](#peek) of phase 2, the [Favorites grid](#favorites) of phase 1
-and the module loader, the installer and the [native settings guide](docs/native-settings.md) of phase 0.
+What works today:
+
+- [Favorites grid](#favorites) and [pinned tabs](#pinned-tabs) that reset and unload, with
+  [reopening](#reopen-pinned-tabs) instead of duplicating.
+- [Peek](#peek), a real overlay for links, and [Little Arc](#little-arc).
+- [Bookmark folders in the tab bar](#bookmark-folders), the [folder panel](#folder-panel) and
+  [live folders](#live-folders).
+- [Space header](#space-header), [workspace sync](#workspace-sync), the [sidebar look](#sidebar-look)
+  and the [compact tab bar](docs/manual/tab-bar.md).
+- The [Today archive](#today-archive), [copy URL](#copy-url) and [incognito mode](#incognito-mode).
+
+The [roadmap](#roadmap) lists the phases, and the [user manual](docs/manual/README.md) shows each
+feature with pictures.
 
 Tested against the Vivaldi 8.1 interface. Other versions stay untouched until they get a
 [selector file](docs/architecture.md#selectors).
