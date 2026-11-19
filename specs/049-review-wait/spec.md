@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | Tooling |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-19 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -35,8 +35,9 @@ rules for working in parallel.
 belong to a spec, and prints a markdown report on the terminal and saves it as a dated file. It never
 writes to GitHub.
 
-A pull request belongs to a spec when it changes files under `specs/NNN-*/`. Its stage follows from
-what it changes:
+A pull request belongs to every spec whose files it changes under `specs/NNN-*/`, so a pull request
+that marks six specs as implemented shows up in the row of each. Its stage follows from what it
+changes:
 
 | Stage | The pull request |
 |---|---|
@@ -69,8 +70,9 @@ says so in its header.
 
 - **FR-1.** The command lists merged pull requests with their opening time, merge time, title, branch
   and changed files, through `gh pr list` and `gh pr view`, and never calls a write endpoint.
-- **FR-2.** A pull request is assigned to a spec by the first `specs/NNN-*/` path it changes, and to a
-  stage by the table above.
+- **FR-2.** A pull request is assigned to every spec whose `specs/NNN-*/` folder it changes, and to a
+  stage by the table above. In the per-stage summary it counts once; in the per-spec table it counts
+  in the row of each of its specs.
 - **FR-3.** The report has the per-stage summary, the per-spec table, the cycle of each spec and the
   wait of its manual checks.
 - **FR-4.** `--since <date>` filters on the merge time.
@@ -95,7 +97,7 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHEN a pull request changes files of one spec, THE report SHALL assign it to that spec | auto: `assigns a pull request to the spec whose folder it changes` |
+| AC-1 | WHEN a pull request changes files of several specs, THE report SHALL assign it to each of them | auto: `assigns a pull request to every spec whose folder it changes` |
 | AC-2 | WHEN a pull request adds spec.md, design.md or code, THE report SHALL classify it as spec, design or code | auto: `classifies a pull request by what it changes` |
 | AC-3 | WHEN a pull request changes only the status and the index, THE report SHALL classify it as implemented | auto: `classifies a status-only pull request as implemented` |
 | AC-4 | THE report SHALL compute the wait of a pull request from its opening to its merge | auto: `computes the wait from opening to merge` |
