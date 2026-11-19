@@ -33,6 +33,7 @@ export class StripGapCloser {
   #frame: HTMLElement | null = null;
   #original: { value: string; priority: string } | null = null;
   #written: string | null = null;
+  #collapsed = new WeakSet<HTMLElement>();
 
   /**
    * Closes the space that hidden slots leave in Vivaldi's tab strip. Vivaldi places every slot with
@@ -115,7 +116,10 @@ export class StripGapCloser {
       return;
     }
     const slots = [...strip.children] as HTMLElement[];
-    const correction = GapShifts.compute(slots.map((slot) => StripGapCloser.#read(slot)));
+    const pinned = this.#pinnedVisible();
+    const separators = slots.map((slot) => !pinned && this.#isSeparator(slot));
+    slots.forEach((slot, index) => this.#collapse(slot, separators[index] ?? false));
+    const correction = GapShifts.compute(slots.map((slot, index) => StripGapCloser.#read(slot, separators[index] ?? false)));
     if (correction === null) {
       this.#clear();
       return;
@@ -135,6 +139,28 @@ export class StripGapCloser {
   #isSlot(target: EventTarget | null): boolean {
     const selector = this.#selector('tabStrip');
     return selector !== null && (target as Element | null)?.closest?.(selector) != null;
+  }
+
+  #isSeparator(slot: HTMLElement): boolean {
+    const selector = this.#selector('separator');
+    return selector !== null && slot.matches(selector);
+  }
+
+  #pinnedVisible(): boolean {
+    const selector = this.#selector('pinnedTab');
+    if (selector === null) {
+      return true;
+    }
+    return [...this.#document.querySelectorAll(selector)].some((tab) => tab.closest(`[${HIDDEN_ATTRIBUTE}]`) === null);
+  }
+
+  #collapse(slot: HTMLElement, collapsed: boolean): void {
+    if (collapsed) {
+      slot.style.setProperty('display', 'none', 'important');
+      this.#collapsed.add(slot);
+    } else if (this.#collapsed.delete(slot)) {
+      slot.style.removeProperty('display');
+    }
   }
 
   #selector(name: string): string | null {
@@ -179,15 +205,18 @@ export class StripGapCloser {
 
   #clear(): void {
     const strip = this.#element(this.#selector('tabStrip'));
-    [...(strip?.children ?? [])].forEach((slot) => StripGapCloser.#shift(slot as HTMLElement, null));
+    [...(strip?.children ?? [])].forEach((slot) => {
+      StripGapCloser.#shift(slot as HTMLElement, null);
+      this.#collapse(slot as HTMLElement, false);
+    });
     this.#restoreFrame();
   }
 
-  static #read(slot: HTMLElement): GapSlot {
+  static #read(slot: HTMLElement, collapsed: boolean): GapSlot {
     return {
       offset: Number.parseFloat(slot.style.getPropertyValue(OFFSET_PROPERTY)),
       height: Number.parseFloat(slot.style.getPropertyValue(HEIGHT_PROPERTY)),
-      hidden: slot.hasAttribute(HIDDEN_ATTRIBUTE),
+      hidden: collapsed || slot.hasAttribute(HIDDEN_ATTRIBUTE),
     };
   }
 

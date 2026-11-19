@@ -37,13 +37,20 @@ class FakeElement {
   }
 
   public closest(selector: string): FakeElement | null {
-    return selector === 'strip' ? this : null;
+    const marked = selector === `[${HIDDEN_ATTRIBUTE}]` && this.attributes.has(HIDDEN_ATTRIBUTE);
+    return selector === 'strip' || marked ? this : null;
   }
 }
 
 class FakeDocument extends EventTarget {
+  public pinned: FakeElement[] = [];
+
   constructor(private elements: Record<string, FakeElement | undefined>) {
     super();
+  }
+
+  public querySelectorAll(selector: string): FakeElement[] {
+    return selector === 'pinned' ? this.pinned : [];
   }
 
   public querySelector(selector: string): FakeElement | null {
@@ -72,12 +79,13 @@ interface Setup {
   warnings: unknown[][];
 }
 
-function setUp(slots: FakeElement[], { withFrame = true } = {}): Setup {
+function setUp(slots: FakeElement[], { withFrame = true, pinned = [] as FakeElement[] } = {}): Setup {
   const strip = new FakeElement('strip');
   strip.children = slots;
   const frame = new FakeElement('frame');
   frame.style.setProperty('max-height', '120px');
   const document = new FakeDocument({ strip, frame: withFrame ? frame : undefined });
+  document.pinned = pinned;
   const queue: Array<() => void> = [];
   const warnings: unknown[][] = [];
   const log = new Logger('test', { info: (): void => undefined, error: (): void => undefined, warn: (...message: unknown[]): void => void warnings.push(message) });
@@ -190,4 +198,38 @@ test('shares one closer per document', () => {
   const first = StripGapCloser.of(document as unknown as Document, selectors);
   assert.equal(StripGapCloser.of(document as unknown as Document, selectors), first);
   assert.notEqual(StripGapCloser.of(new FakeDocument({}) as unknown as Document, selectors), first);
+});
+
+function separator(offset: number, height: number): FakeElement {
+  const element = slot(offset, height);
+  element.selectorName = 'separator';
+  return element;
+}
+
+test('hides the separator while no pinned tab is visible', () => {
+  const { closer, frame, frameRun, slots } = setUp([separator(0, 20), slot(20, 40)]);
+  closer.request();
+  frameRun();
+  assert.deepEqual([slots[0]?.values.get('display'), slots[0]?.priorities.get('display')], ['none', 'important']);
+  assert.deepEqual([slots[1]?.values.get(SHIFT), frame.values.get('max-height')], ['20px', '100px']);
+});
+
+test('shows the separator when a pinned tab is visible', () => {
+  const { closer, document, frame, frameRun, slots } = setUp([separator(0, 20), slot(20, 40)]);
+  closer.request();
+  frameRun();
+  document.pinned = [new FakeElement('pinned')];
+  closer.request();
+  frameRun();
+  assert.equal(slots[0]?.values.has('display'), false);
+  assert.deepEqual([slots[1]?.values.has(SHIFT), frame.values.get('max-height')], [false, '120px']);
+});
+
+test('keeps the separator hidden when the only pinned tab is hidden', () => {
+  const hiddenPinned = new FakeElement('pinned');
+  hiddenPinned.attributes.add(HIDDEN_ATTRIBUTE);
+  const { closer, frameRun, slots } = setUp([separator(0, 20), slot(20, 40)], { pinned: [hiddenPinned] });
+  closer.request();
+  frameRun();
+  assert.equal(slots[0]?.values.get('display'), 'none');
 });
