@@ -38,7 +38,7 @@ its own `vivarcdi-implementer` worktree from the commit that has T1. T6 and T7 c
 - [x] **T6. Docs and version (lead).** `docs/architecture.md`: `TabDataWriter` writes only tabs of
   its own window, and `BrowserTabs.ownWindowId`. Patch version bump after 0.59.5, checked with
   `npm run release -- check --base origin/main --branch fix/vivextdata-owner`.
-- [ ] **T7. Manual check.** Italian checklist for AC-14 under
+- [x] **T7. Manual check.** Italian checklist for AC-14 under
   `~/Desktop/sonde-vivarci/042-vivextdata-owner/`: with two windows open, pin a tab, tile two tabs
   and link a tab to a folder in one window, restart Vivaldi, and see that the tabs keep their own
   page, tiling, link and workspace; also drag a folder to another workspace while a tab of it is
