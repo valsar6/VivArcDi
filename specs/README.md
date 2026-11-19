@@ -44,13 +44,13 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [033 Folder menu](033-folder-menu/spec.md) | 3 | Approved |
 | [034 Module boundaries](034-module-boundaries/spec.md) | 0 | Approved |
 | [035 Core layout](035-core-layout/spec.md) | 0 | Implemented |
-| [036 Module options](036-module-options/spec.md) | 0 | Approved |
-| [037 Versioned storage](037-versioned-storage/spec.md) | 0 | Approved |
-| [038 Page scripts](038-page-scripts/spec.md) | 0 | Approved |
-| [039 Boot self-check](039-boot-self-check/spec.md) | 0 | Approved |
-| [040 Live folders writes](040-live-folders-writes/spec.md) | 3 | Approved |
-| [041 Write outcome](041-write-outcome/spec.md) | 0 | Approved |
-| [042 vivExtData owner](042-vivextdata-owner/spec.md) | 0 | Approved |
+| [036 Module options](036-module-options/spec.md) | 0 | Implemented |
+| [037 Versioned storage](037-versioned-storage/spec.md) | 0 | Implemented |
+| [038 Page scripts](038-page-scripts/spec.md) | 0 | Implemented |
+| [039 Boot self-check](039-boot-self-check/spec.md) | 0 | Implemented |
+| [040 Live folders writes](040-live-folders-writes/spec.md) | 3 | Implemented |
+| [041 Write outcome](041-write-outcome/spec.md) | 0 | Implemented |
+| [042 vivExtData owner](042-vivextdata-owner/spec.md) | 0 | Implemented |
 | [043 Sync robustness](043-sync-robustness/spec.md) | 3 | Implemented |
 | [045 No downgrade](045-no-downgrade/spec.md) | 0 | Implemented |
 | [046 Live verification](046-live-verification/spec.md) | Tooling | Implemented |
