@@ -104,7 +104,7 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 | AC-7 | WHEN a pull request belongs to no spec, THE report SHALL count it apart from the stages | auto: `keeps pull requests without a spec out of the stages` |
 | AC-8 | WHEN given `--since`, THE report SHALL ignore pull requests merged before that day | auto: `ignores pull requests merged before since` |
 | AC-9 | THE command SHALL call only read commands of `gh` | auto: `calls only read commands of gh` |
-| AC-10 | WHEN given no `--out`, THE command SHALL save the report in `.claude/review-wait/` if that folder's parent exists, else in `build/review-wait/` | auto: `saves the report in the private folder when there is one` |
+| AC-10 | WHEN given no `--out`, THE command SHALL save the report in `.claude/review-wait/` if `.claude/` exists, else in `build/review-wait/` | auto: `saves the report in the private folder when there is one` |
 | AC-11 | WHEN given `--out`, THE command SHALL save the report there | auto: `saves the report in the folder given by out` |
 | AC-12 | WHEN Tore runs the command on the repository, THE report SHALL list specs 036 to 048 with plausible waits and finish within a minute (last double check) | manual |
 
