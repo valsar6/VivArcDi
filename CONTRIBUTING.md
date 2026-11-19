@@ -23,6 +23,29 @@ feature does, and code follows it. No code is written for a behavior that no app
 - **Each acceptance criterion has a check**: an automated test with the same name, a live scenario
   with the same name, or a manual step.
 
+## Working in parallel
+
+Several sessions, or several people, may work on different specs at the same time. These rules keep
+them from overwriting one another and keep the review queue short.
+
+- **One worktree per session.** Work in `git worktree add <dir> -b <branch> origin/main`, never in
+  a checkout another session uses: a branch switched under you lands your commits on the wrong
+  branch. Run `git branch --show-current` before every commit. Remove the worktree and delete the
+  branch once the pull request is merged.
+- **A spec number is claimed by its Draft pull request.** Right before creating the folder, list
+  `specs/` on `origin/main` and the open pull requests, take the next free number and open the Draft
+  pull request at once. If two drafts collide, the later one renumbers before it is approved.
+- **Own files only.** Do not commit, edit or reformat what another session changed, and do not touch
+  its pull requests. If its files break a check, run the checks on yours and say so.
+- **Versions are read late.** Read the version on `main` right before bumping it. Pull requests that
+  bump the version merge one at a time; after a merge, the next one merges `origin/main`, bumps again
+  and pushes. The index in `specs/README.md` is the usual conflict: keep every row.
+- **Never rebase or force-push** a shared branch. Align with `git merge origin/main`.
+- **Subtasks of one design** may run in parallel, each in its own worktree from the same base commit,
+  and are integrated into the feature branch with `git cherry-pick`.
+- **Merging is Tore's.** Check what reached `main` (`gh pr view <n> --json state,mergeCommit`) before
+  building on a pull request: it can be merged before its last commits are pushed.
+
 ## Principles
 
 - **Design patterns.** Reach for the catalog at [refactoring.guru](https://refactoring.guru/design-patterns)
