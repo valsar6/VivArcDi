@@ -8,13 +8,15 @@ export const READ_COMMANDS: ReadonlyArray<readonly [string, string]> = [
   ['pr', 'view'],
 ];
 
+export const LIST_LIMIT = 1000;
+
 const MERGED_ARGS: string[] = [
   'pr',
   'list',
   '--state',
   'merged',
   '--limit',
-  '1000',
+  String(LIST_LIMIT),
   '--json',
   'number,title,createdAt,mergedAt,headRefName,files',
 ];

@@ -15,7 +15,8 @@
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "release": "tsx scripts/release/cli.ts",
     "live": "npm run build && tsx scripts/live/cli.ts",
-    "watch": "tsx scripts/watch/cli.ts"
+    "watch": "tsx scripts/watch/cli.ts",
+    "review-wait": "tsx scripts/review-wait/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
