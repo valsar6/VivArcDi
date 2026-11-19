@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | Tooling |
 | Owner | Tore |
 | Approved | Tore, 2026-11-19 |
