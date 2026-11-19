@@ -12,6 +12,9 @@ export class FakeElement {
   public listeners = new Map<string, Set<Listener>>();
   public properties = new Map<string, string>();
   public executed: string[] = [];
+  public callbacks: Array<(results: unknown) => void> = [];
+  public connectedAtRun: boolean[] = [];
+  public throwOnExecute = false;
   public style = {
     setProperty: (name: string, value: string): Map<string, string> => this.properties.set(name, value),
   };
@@ -83,8 +86,15 @@ export class FakeElement {
     return [...this.listeners.values()].reduce((count, set) => count + set.size, 0);
   }
 
-  public executeScript({ code }: { code: string }): void {
+  public executeScript({ code }: { code: string }, callback?: (results: unknown) => void): void {
+    if (this.throwOnExecute) {
+      throw new Error('executeScript failed');
+    }
     this.executed.push(code);
+    this.connectedAtRun.push(this.isConnected);
+    if (callback) {
+      this.callbacks.push(callback);
+    }
   }
 
   public focus(): void {}
@@ -104,6 +114,20 @@ export class FakeElement {
         ? element.tagName === 'webview' && element.hasAttribute('tab_id')
         : element.getAttribute('tab_id') === tabId,
     );
+  }
+}
+
+export function answer(
+  webview: FakeElement,
+  host: { runtime: { lastError?: { message: string } | undefined } },
+  message?: string,
+): void {
+  const callback = webview.callbacks.shift();
+  host.runtime.lastError = message === undefined ? undefined : { message };
+  try {
+    callback?.(undefined);
+  } finally {
+    host.runtime.lastError = undefined;
   }
 }
 

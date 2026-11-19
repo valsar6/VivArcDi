@@ -1,4 +1,6 @@
 import type { Logger } from '../support/Logger.js';
+import { ScriptRunner } from './ScriptRunner.js';
+import type { LastErrorSource } from './ScriptRunner.js';
 import { tabIdOf } from './Webview.js';
 import type { ConsoleMessageEvent, LoadCommitEvent, WebviewElement } from './Webview.js';
 
@@ -15,6 +17,8 @@ export interface InjectorDependencies {
   purpose: string;
   /** Receives console lines of tab pages, with the tab id. */
   onConsoleMessage: (message: string, tabId: number) => void;
+  /** Reads `chrome.runtime.lastError` after each injection. */
+  errors: LastErrorSource;
   /** Reports failures. */
   logger: Logger;
 }
@@ -22,13 +26,15 @@ export interface InjectorDependencies {
 interface Tracked {
   loadCommit: (event: Event) => void;
   consoleMessage: (event: Event) => void;
+  request: number;
 }
 
 export class PageScriptInjector {
   #deps: InjectorDependencies;
   #tracked = new Map<WebviewElement, Tracked>();
   #observer: MutationObserver | null = null;
-  #warned = false;
+  #runner: ScriptRunner;
+  #requests = 0;
 
   /**
    * Keeps a script in the pages of tabs: injects it into each tab webview, again after
@@ -38,6 +44,7 @@ export class PageScriptInjector {
    */
   constructor(dependencies: InjectorDependencies) {
     this.#deps = dependencies;
+    this.#runner = new ScriptRunner(dependencies.purpose, dependencies.errors, dependencies.logger);
   }
 
   /**
@@ -67,7 +74,7 @@ export class PageScriptInjector {
     this.#tracked.forEach((listeners, webview) => {
       webview.removeEventListener('loadcommit', listeners.loadCommit);
       webview.removeEventListener('consolemessage', listeners.consoleMessage);
-      this.#execute(webview, this.#deps.uninstallScript);
+      this.#runner.run(webview, this.#deps.uninstallScript);
     });
     this.#tracked.clear();
   }
@@ -87,6 +94,7 @@ export class PageScriptInjector {
 
   #track(webview: WebviewElement): void {
     const listeners: Tracked = {
+      request: 0,
       loadCommit: (event) => {
         if ((event as LoadCommitEvent).isTopLevel) {
           this.#inject(webview);
@@ -107,23 +115,22 @@ export class PageScriptInjector {
 
   #inject(webview: WebviewElement): void {
     const tabId = tabIdOf(webview);
-    if (tabId === null) {
+    const entry = this.#tracked.get(webview);
+    if (tabId === null || entry === undefined) {
       return;
     }
+    this.#requests += 1;
+    const request = this.#requests;
+    entry.request = request;
     this.#deps
       .scriptFor(tabId)
-      .then((code) => this.#execute(webview, code ?? this.#deps.uninstallScript))
+      .then((code) => this.#runLatest(webview, request, code ?? this.#deps.uninstallScript))
       .catch((error: unknown) => this.#deps.logger.error(`Could not prepare ${this.#deps.purpose} for tab ${tabId}`, error));
   }
 
-  #execute(webview: WebviewElement, code: string): void {
-    try {
-      webview.executeScript({ code });
-    } catch (error) {
-      if (!this.#warned) {
-        this.#warned = true;
-        this.#deps.logger.warn(`Cannot inject into pages: ${this.#deps.purpose} are off`, error);
-      }
+  #runLatest(webview: WebviewElement, request: number, code: string): void {
+    if (this.#tracked.get(webview)?.request === request) {
+      this.#runner.run(webview, code);
     }
   }
 }

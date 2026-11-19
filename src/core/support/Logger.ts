@@ -1,4 +1,4 @@
-export type LogSink = Pick<Console, 'info' | 'warn' | 'error'>;
+export type LogSink = Pick<Console, 'info' | 'warn' | 'error'> & Partial<Pick<Console, 'debug'>>;
 
 export class Logger {
   #prefix: string;
@@ -23,6 +23,15 @@ export class Logger {
    */
   public child(name: string): Logger {
     return new Logger(`${this.#prefix}:${name}`, this.#sink);
+  }
+
+  /**
+   * Writes a trace line; sinks without a debug level drop it.
+   *
+   * @param message Values to log.
+   */
+  public debug(...message: unknown[]): void {
+    this.#sink.debug?.(this.#tag, ...message);
   }
 
   /**

@@ -79,6 +79,7 @@ export class CopyUrl extends Module<CopyUrlOptions> {
       uninstallScript: `globalThis.${KEYS_GLOBAL}?.uninstall();`,
       purpose: 'copy address shortcuts',
       onConsoleMessage: (message): void => this.#receive(message),
+      errors: runtime,
       logger,
     });
     if (runtime.messagesAvailable) {

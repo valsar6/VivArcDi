@@ -1,3 +1,4 @@
+import type { ScriptRunner } from '../../core/browser/ScriptRunner.js';
 import type { PageScripts } from './PageScripts.js';
 import { shortcutLabels } from './PeekKeyMap.js';
 import type { ConsoleMessageEvent, LoadCommitEvent, NewWindowEvent, WebviewElement } from '../../core/browser/Webview.js';
@@ -26,6 +27,8 @@ export interface PanelDependencies {
   partition: string | null;
   /** Code injected into the panel page. */
   scripts: PageScripts;
+  /** Runs the Peek key script in the panel page. */
+  runner: Pick<ScriptRunner, 'run'>;
   /** Secret given to the injected code. */
   token: string;
   /** Called when a button or the backdrop is used. */
@@ -77,6 +80,7 @@ export class PeekPanel {
    * Removes the panel and its page.
    */
   public remove(): void {
+    this.#deps.runner.run(this.#webview, this.#deps.scripts.uninstallKeys());
     this.#backdrop.remove();
     this.#panel.remove();
     this.#actions.remove();
@@ -133,11 +137,7 @@ export class PeekPanel {
       return;
     }
     this.#url = event.url;
-    try {
-      this.#webview.executeScript({ code: this.#deps.scripts.installKeys(this.#deps.token) });
-    } catch {
-      return;
-    }
+    this.#deps.runner.run(this.#webview, this.#deps.scripts.installKeys(this.#deps.token));
   }
 
   #element(tagName: string, className: string): HTMLElement {

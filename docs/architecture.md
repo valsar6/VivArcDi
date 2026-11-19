@@ -20,6 +20,9 @@ The scripts are not bundled because the loader resolves its files by URL at runt
 Page scripts are the exception: they run inside web pages, injected with `webview.executeScript`,
 where payload URLs cannot be imported. `peek-links.ts` becomes `dist/page/peek-links.js`, which
 defines the global `VivArcDiPeekLinks` with the file's exports.
+Every page script exports `install` and `uninstall`, built on `src/page/lib/PageInstall.ts`. The
+interface runs them through `ScriptRunner`, which reads `chrome.runtime.lastError`, logs a closed tab at
+debug level and warns once per purpose (spec 038).
 The installer never runs Node. CI commits `dist/` and `installer/` on top of the `dist` branch, see the
 README.
 

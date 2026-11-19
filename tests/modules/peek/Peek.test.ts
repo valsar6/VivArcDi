@@ -188,8 +188,10 @@ test('peek module cleans up on stop', async () => {
     }),
   );
   assert.equal(container.children.length, 4);
+  const panelWebview = container.descendants().find((element) => element.className === 'vivarcdi-peek-page') as FakeElement;
   peek.stop();
   assert.deepEqual(container.children, [webview]);
+  assert.equal(panelWebview.executed.at(-1), 'globalThis.VivArcDiPeekKeys?.uninstall();');
   assert.equal(container.hasAttribute(OPEN_ATTRIBUTE), false);
   assert.equal(webview.listenerCount(), 0);
   assert.equal(webview.executed.at(-1), 'globalThis.VivArcDiPeekLinks?.uninstall();');

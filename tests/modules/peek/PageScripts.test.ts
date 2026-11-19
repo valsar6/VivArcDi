@@ -9,4 +9,5 @@ test('page scripts call the bundle globals after the bundles', async () => {
   assert.equal(scripts.installLinks(policy), `L\nVivArcDiPeekLinks.install(${JSON.stringify(policy)});`);
   assert.equal(scripts.uninstallLinks(), 'globalThis.VivArcDiPeekLinks?.uninstall();');
   assert.equal(scripts.installKeys('t'), 'K\nVivArcDiPeekKeys.install("t");');
+  assert.equal(scripts.uninstallKeys(), 'globalThis.VivArcDiPeekKeys?.uninstall();');
 });

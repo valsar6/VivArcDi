@@ -1,4 +1,5 @@
 import type { ChromeApi, ChromeEvent, RuntimeMessageListener } from './BrowserTabs.js';
+import type { LastErrorSource } from './ScriptRunner.js';
 
 export interface WindowInfo {
   id?: number | undefined;
@@ -7,7 +8,7 @@ export interface WindowInfo {
 
 type ChromeWindows = NonNullable<ChromeApi['windows']>;
 
-export class BrowserRuntime {
+export class BrowserRuntime implements LastErrorSource {
   #chrome: ChromeApi | undefined;
   #onMessage: ChromeEvent<RuntimeMessageListener> | null;
   #windows: ChromeWindows | null;
@@ -28,6 +29,16 @@ export class BrowserRuntime {
    */
   public get messagesAvailable(): boolean {
     return this.#onMessage !== null;
+  }
+
+  /**
+   * The error of the last `chrome` call. Read it only inside the callback of that call.
+   *
+   * @returns The message of `chrome.runtime.lastError`, or null when there is no error.
+   */
+  public get lastError(): string | null {
+    const error = this.#chrome?.runtime?.lastError;
+    return error ? (error.message ?? 'unknown error') : null;
   }
 
   /**
