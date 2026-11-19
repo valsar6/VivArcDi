@@ -126,3 +126,13 @@ test('unlinks tabs of a removed favorite', async () => {
   assert.deepEqual(tabs.extData(2), { workspaceId: 7, vivarcdi: { pinnedUrl: reddit.url } });
   assert.deepEqual(tabs.extData(3), { workspaceId: 7, vivarcdi: { favoriteId: 'w', pinnedUrl: whatsapp.url } });
 });
+
+test('syncs only the tabs of its own window', async () => {
+  const tabs = new LinkingTabs([
+    { id: 2, pinned: true, url: reddit.url, vivExtData: own({ workspaceId: 7 }, 'r', reddit.url) },
+    { id: 3, pinned: true, windowId: 2, url: reddit.url, vivExtData: own({ workspaceId: 7 }, 'r', reddit.url) },
+  ]);
+  await new LinkedTabs(tabs).sync([]);
+  assert.deepEqual(tabs.extData(2), { workspaceId: 7, vivarcdi: { pinnedUrl: reddit.url } });
+  assert.deepEqual(tabs.extData(3), { workspaceId: 7, vivarcdi: { favoriteId: 'r', pinnedUrl: reddit.url } });
+});

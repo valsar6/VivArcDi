@@ -6,7 +6,7 @@ import { TabData } from '../../../core/tabs/TabData.js';
 import type { LinkEntry } from '../../../shared/links/FolderEntries.js';
 import type { TabLinks } from './TabLinks.js';
 
-export type AdopterTabs = Pick<BrowserTabs, 'query' | 'get' | 'onCreated' | 'onUpdated' | 'onRemoved'>;
+export type AdopterTabs = Pick<BrowserTabs, 'query' | 'get' | 'ownWindowId' | 'onCreated' | 'onUpdated' | 'onRemoved'>;
 
 export class LinkTabAdopter {
   #tabs: AdopterTabs;
@@ -98,6 +98,10 @@ export class LinkTabAdopter {
 
   async #adoptNew(tabId: number, key: string): Promise<void> {
     const tab = await this.#tabs.get(tabId);
+    const own = await this.#tabs.ownWindowId();
+    if (own !== null && tab.windowId !== own) {
+      return;
+    }
     const sameWindow = await this.#tabs.query({ windowId: tab.windowId });
     await this.#adopt(tab, key, LinkTabAdopter.#claimsOf(sameWindow));
   }

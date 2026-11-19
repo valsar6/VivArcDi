@@ -77,6 +77,7 @@ export class FolderTabs {
   public tabs = new Map<number, FolderTab>();
   public calls: Array<[string, ...unknown[]]> = [];
   public nextId = 100;
+  public windowId = 1;
   public failing = new Set<string>();
   public created = new Set<TabCreatedListener>();
   public updated = new Set<TabUpdateListener>();
@@ -87,10 +88,14 @@ export class FolderTabs {
     tabs.forEach((tab) => this.tabs.set(tab.id, { windowId: 1, ...tab }));
   }
 
+  public ownWindowId = async (): Promise<number | null> => this.windowId;
+
   public async query(info: Record<string, unknown>): Promise<chrome.tabs.Tab[]> {
     const rest = Object.fromEntries(Object.entries(info).filter(([key]) => key !== 'currentWindow'));
-    return [...this.tabs.values()].filter((tab) =>
-      Object.entries(rest).every(([key, value]) => (tab as Record<string, unknown>)[key] === value),
+    return [...this.tabs.values()].filter(
+      (tab) =>
+        (info['currentWindow'] !== true || tab.windowId === this.windowId) &&
+        Object.entries(rest).every(([key, value]) => (tab as Record<string, unknown>)[key] === value),
     ) as chrome.tabs.Tab[];
   }
 

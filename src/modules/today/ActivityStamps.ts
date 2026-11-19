@@ -3,7 +3,7 @@ import type { Logger } from '../../core/support/Logger.js';
 import { TabDataWriter } from '../../core/tabs/TabDataWriter.js';
 import { TabData } from '../../core/tabs/TabData.js';
 
-export type StampTabs = Pick<BrowserTabs, 'get' | 'query' | 'update' | 'onActivated' | 'onCreated' | 'onRemoved'>;
+export type StampTabs = Pick<BrowserTabs, 'get' | 'query' | 'update' | 'ownWindowId' | 'onActivated' | 'onCreated' | 'onRemoved'>;
 
 export class ActivityStamps {
   #tabs: StampTabs;
@@ -34,9 +34,9 @@ export class ActivityStamps {
    * Stamps the active tab of this window and starts following activations and new tabs.
    */
   public async start(): Promise<void> {
+    this.#windowId = await this.#tabs.ownWindowId();
     const [active] = await this.#tabs.query({ active: true, currentWindow: true });
     if (active?.id !== undefined) {
-      this.#windowId = active.windowId;
       this.#active.set(active.windowId, active.id);
       await this.stamp(active.id);
     }

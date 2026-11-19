@@ -113,3 +113,39 @@ test('FrameTask merges requests into one run per frame', () => {
   task.cancel();
   assert.equal(task.pending, false);
 });
+
+function windowChrome(answers: Array<{ id?: number } | undefined>): { api: ChromeApi; reads: () => number } {
+  let reads = 0;
+  const runtime: { lastError: { message: string } | undefined } = { lastError: undefined };
+  const api = {
+    runtime,
+    tabs: { onUpdated: { addListener: (): void => {}, removeListener: (): void => {} } },
+    windows: {
+      create: (): void => {},
+      getCurrent: (callback: Callback): void => {
+        const answer = answers[reads];
+        reads += 1;
+        runtime.lastError = answer === undefined ? { message: 'no window' } : undefined;
+        callback(answer);
+        runtime.lastError = undefined;
+      },
+    },
+  } as unknown as ChromeApi;
+  return { api, reads: () => reads };
+}
+
+test('reads the window id once', async () => {
+  const { api, reads } = windowChrome([{ id: 7 }]);
+  const tabs = new BrowserTabs(api);
+  assert.equal(await tabs.ownWindowId(), 7);
+  assert.equal(await tabs.ownWindowId(), 7);
+  assert.equal(reads(), 1);
+});
+
+test('resolves null when the window id cannot be read', async () => {
+  const { api } = windowChrome([undefined, { id: 3 }]);
+  const tabs = new BrowserTabs(api);
+  assert.equal(await tabs.ownWindowId(), null);
+  assert.equal(await tabs.ownWindowId(), 3);
+  assert.equal(await new BrowserTabs(undefined).ownWindowId(), null);
+});

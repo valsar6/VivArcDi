@@ -35,6 +35,18 @@ test('adopts a new tab that opens the address of a link', async () => {
   assert.equal(tabs.listenerCount(), 0);
 });
 
+test('does not adopt a new tab of another window', async () => {
+  const tabs = new LinkingTabs([HOME]);
+  const adopter = setup(tabs);
+  adopter.start();
+  tabs.open({ id: 5, windowId: 2, url: 'chrome://vivaldi-webui/startpage', vivExtData: WORK });
+  tabs.navigate(5, MAHJONG);
+  await settle();
+  assert.equal(bookmarkOf(tabs, 5), undefined);
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'update'), []);
+  adopter.stop();
+});
+
 test('never adopts a tab that already showed a web page', async () => {
   const tabs = new LinkingTabs([HOME]);
   const adopter = setup(tabs);

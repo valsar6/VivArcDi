@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { TabDataWriter } from '../../../src/core/tabs/TabDataWriter.js';
 import { TabData } from '../../../src/core/tabs/TabData.js';
 import { FolderTabs } from '../../modules/folders/fakes.js';
+import { SilentSink } from '../../loader/fakes.js';
+import { Logger } from '../../../src/core/support/Logger.js';
 
 class SlowTabs extends FolderTabs {
   public override async get(tabId: number): Promise<chrome.tabs.Tab> {
@@ -71,6 +73,51 @@ test('keeps writing after an update failed', async () => {
   tabs.failing.delete('update');
   await writer.write(1, () => '{"a":2}');
   assert.equal(tabs.tabs.get(1)?.vivExtData, '{"a":2}');
+});
+
+test('writes the tab of its own window', async () => {
+  const tabs = new FolderTabs([{ id: 1 }, { id: 2, windowId: 2 }]);
+  await new TabDataWriter(tabs).write(1, () => '{"a":1}');
+  assert.equal(tabs.tabs.get(1)?.vivExtData, '{"a":1}');
+});
+
+test('skips a tab of another window', async () => {
+  const tabs = new FolderTabs([{ id: 1 }, { id: 2, windowId: 2 }]);
+  await new TabDataWriter(tabs).write(2, () => '{"a":1}');
+  assert.deepEqual(tabs.calls, []);
+});
+
+test('judges the window from the tab as just read', async () => {
+  const tabs = new SlowTabs([{ id: 1 }]);
+  const writer = new TabDataWriter(tabs);
+  const queued = writer.write(1, () => '{"a":1}');
+  tabs.tabs.set(1, { id: 1, windowId: 2 });
+  await queued;
+  assert.deepEqual(tabs.calls, []);
+});
+
+test('writes as before when the window is unknown', async () => {
+  const tabs = new FolderTabs([{ id: 1, windowId: 2 }]);
+  tabs.ownWindowId = async (): Promise<number | null> => null;
+  const sink = new SilentSink();
+  const writer = new TabDataWriter(tabs, new Logger('test', sink));
+  await writer.write(1, () => '{"a":1}');
+  await writer.write(1, () => '{"a":2}');
+  assert.equal(tabs.tabs.get(1)?.vivExtData, '{"a":2}');
+  assert.equal(sink.lines.filter(([level]) => level === 'warn').length, 1);
+});
+
+test('two windows never both write the same tab', async () => {
+  const first = new SlowTabs([{ id: 1, vivExtData: '{"kept":true}' }]);
+  const second = new SlowTabs();
+  second.tabs = first.tabs;
+  second.windowId = 2;
+  await Promise.all([
+    new TabDataWriter(first).write(1, () => '{"window":1}'),
+    new TabDataWriter(second).write(1, () => '{"window":2}'),
+  ]);
+  assert.equal(first.tabs.get(1)?.vivExtData, '{"window":1}');
+  assert.deepEqual(second.calls, []);
 });
 
 test('writes nothing when the change returns null', async () => {

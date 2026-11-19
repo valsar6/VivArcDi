@@ -63,6 +63,34 @@ test('saves the address of a pinned tab seen for the first time', async () => {
   assert.deepEqual(tabs.extData(4), {});
 });
 
+test('does not save the own page of a tab pinned in another window', async () => {
+  const tabs = new LinkingTabs([{ id: 4, windowId: 2, pinned: false, url: 'https://mail.example/inbox' }]);
+  await watch(tabs);
+  pin(tabs, 4, true);
+  await settle();
+  assert.deepEqual(tabs.extData(4), {});
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'update'), []);
+});
+
+test('does not forget the own page of a tab unpinned in another window', async () => {
+  const data = own({ workspaceId: 7 }, 'w', 'https://web.whatsapp.com/');
+  const tabs = new LinkingTabs([{ id: 2, windowId: 2, pinned: true, url: 'https://web.whatsapp.com/', vivExtData: data }]);
+  await watch(tabs);
+  pin(tabs, 2, false);
+  await settle();
+  assert.deepEqual(tabs.extData(2), JSON.parse(data));
+});
+
+test('saves at start only the pinned tabs of its own window', async () => {
+  const tabs = new LinkingTabs([
+    { id: 1, pinned: true, url: 'https://docs.example/a' },
+    { id: 2, windowId: 2, pinned: true, url: 'https://docs.example/b' },
+  ]);
+  await watch(tabs);
+  assert.deepEqual(tabs.extData(1), { vivarcdi: { pinnedUrl: 'https://docs.example/a' } });
+  assert.deepEqual(tabs.extData(2), {});
+});
+
 test('forgets the address of an unpinned tab', async () => {
   const tabs = new LinkingTabs([{ id: 2, pinned: true, url: 'https://web.whatsapp.com/', vivExtData: own({ workspaceId: 7 }, 'w', 'https://web.whatsapp.com/') }]);
   const watcher = await watch(tabs);

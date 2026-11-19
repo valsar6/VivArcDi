@@ -29,11 +29,23 @@ export class FolderLinkTabs {
 
   /**
    * @param linkIds Bookmark ids of links.
-   * @returns The ids of the tabs linked to them.
+   * @returns The ids of the tabs linked to them, in every window.
    */
   public async tabsOf(linkIds: string[]): Promise<number[]> {
+    return this.#linked(linkIds, {});
+  }
+
+  /**
+   * @param linkIds Bookmark ids of links.
+   * @returns The ids of the tabs linked to them, in the window of this document only.
+   */
+  public async ownTabsOf(linkIds: string[]): Promise<number[]> {
+    return this.#linked(linkIds, { currentWindow: true });
+  }
+
+  async #linked(linkIds: string[], info: chrome.tabs.QueryInfo): Promise<number[]> {
     const wanted = new Set(linkIds);
-    return (await this.#tabs.query({})).flatMap((tab) => {
+    return (await this.#tabs.query(info)).flatMap((tab) => {
       const { bookmarkId } = TabData.ownOf(tab);
       return tab.id !== undefined && bookmarkId !== undefined && wanted.has(bookmarkId) ? [tab.id] : [];
     });
