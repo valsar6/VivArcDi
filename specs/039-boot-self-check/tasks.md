@@ -67,7 +67,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   `lists selectors the catalog does not define`, `says which catalog stands in for a newer Vivaldi`,
   `summarizes an inactive start without a toast`, `names the stage where startup failed`. FR-1 to
   FR-8, FR-11.
-- [ ] **T6. Boot notice.** `VivArcDi.start` ends with `report.notify(outcome, this.#notices)`. Fixture:
+- [x] **T6. Boot notice.** `VivArcDi.start` ends with `report.notify(outcome, this.#notices)`. Fixture:
   the `marker` option of `createApp`, the `AlsoBroken` and `BrokenMarker` modules in
   `tests/loader/boot.ts`. Satisfies AC-10 to AC-13 in `tests/loader/BootSelfCheck.test.ts`:
   `shows the boot notice when two modules fail`, `keeps a single failure in the console`,
@@ -81,7 +81,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   look for `[VivArcDi:boot] self-check: active, …` and send it with any bug report. `specs/README.md`:
   no change until the spec is `Implemented`. Patch version bump to 0.59.5, checked with
   `npm run release -- check --base origin/main --branch fix/boot-self-check`.
-- [ ] **T8. Manual check.** Italian checklist for AC-14 under
+- [x] **T8. Manual check.** Italian checklist for AC-14 under
   `~/Desktop/sonde-vivarci/039-boot-self-check/`, on macOS and Debian with 0.59.5 installed and Vivaldi
   restarted, shipped `config.json`. Open `vivaldi://inspect/#apps`, *inspect* under `vivaldi`, and
   check, for a normal window: the active line; on Vivaldi 8.3, the `info` line
