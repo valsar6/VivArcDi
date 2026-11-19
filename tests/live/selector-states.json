@@ -6,5 +6,8 @@
   "workspaceRow": "workspace-popup",
   "workspaceTitle": "workspace-editor",
   "workspaceForm": "workspace-editor",
-  "workspaceSave": "workspace-editor"
+  "workspaceSave": "workspace-editor",
+  "separator": {
+    "notChecked": "needs a pinned tab and a normal tab at once"
+  }
 }
