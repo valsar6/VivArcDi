@@ -81,3 +81,19 @@ test('sends the token only in GET requests to api.github.com', async () => {
   assert.ok(carrying.every((request) => request.method === 'GET' && request.url.startsWith('https://api.github.com/')));
   assert.ok(device.requests.every((request) => request.url.startsWith('https://github.com/login/') && !JSON.stringify(request.fields).includes(TOKEN)));
 });
+
+test('forgets only the token it is given', async () => {
+  const { connection, storage } = setup();
+  let changes = 0;
+  connection.onChange(() => void (changes += 1));
+  assert.equal(connection.forgetIf(TOKEN), false);
+  await connection.save(TOKEN);
+  changes = 0;
+  const stored = storage.getItem(CONNECTION_STORAGE_KEY);
+  assert.equal(connection.forgetIf('gho_other'), false);
+  assert.deepEqual([connection.token, storage.getItem(CONNECTION_STORAGE_KEY), changes], [TOKEN, stored, 0]);
+  assert.equal(connection.forgetIf(TOKEN), true);
+  assert.deepEqual([connection.token, connection.connected, changes], [null, false, 1]);
+  assert.equal(connection.forgetIf(TOKEN), false);
+  assert.equal(changes, 1);
+});
