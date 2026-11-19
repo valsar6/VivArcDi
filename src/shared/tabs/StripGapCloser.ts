@@ -154,7 +154,7 @@ export class StripGapCloser {
     if (selector === null) {
       return true;
     }
-    return [...this.#document.querySelectorAll(selector)].some((tab) => tab.closest(`[${HIDDEN_ATTRIBUTE}]`) === null);
+    return [...this.#document.querySelectorAll(selector)].some((tab) => tab.getClientRects().length > 0);
   }
 
   #collapse(slot: HTMLElement, collapsed: boolean): void {
@@ -213,9 +213,10 @@ export class StripGapCloser {
   }
 
   static #read(slot: HTMLElement, collapsed: boolean): GapSlot {
+    const placed = slot.style.getPropertyValue(OFFSET_PROPERTY) === '' ? ((slot.firstElementChild as HTMLElement | null) ?? slot) : slot;
     return {
-      offset: Number.parseFloat(slot.style.getPropertyValue(OFFSET_PROPERTY)),
-      height: Number.parseFloat(slot.style.getPropertyValue(HEIGHT_PROPERTY)),
+      offset: Number.parseFloat(placed.style.getPropertyValue(OFFSET_PROPERTY)),
+      height: Number.parseFloat(placed.style.getPropertyValue(HEIGHT_PROPERTY)),
       hidden: collapsed || slot.hasAttribute(HIDDEN_ATTRIBUTE),
     };
   }

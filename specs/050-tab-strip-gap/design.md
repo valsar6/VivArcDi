@@ -86,6 +86,12 @@ During the drag Vivaldi writes uncorrected positions, so the closer removes its 
 `max-height` until the release, then applies them again. A press without a move is a click and keeps
 the corrections, so a click does not flicker.
 
+In Vivaldi 8.3 (live run, 2026-11-19) every tab slot is wrapped in a `<span>` that is the child of the
+strip: the marker marks and collapses the wrapper, and the offsets sit on the `.tab-position` inside
+it, so the closer reads them from the wrapper's first child when the wrapper has none and writes the
+shift on the wrapper, which the slot inherits. The group of pinned tabs sits in its own `.resize`
+and is collapsed with `display: none`, so a pinned tab counts as visible only when it has a box.
+
 The separator is `<div class="separator">` directly in the strip, with the same inline variables as
 a tab slot (`--PositionX`, `--PositionY`, `--Height`). While a drop is expected, Vivaldi also adds a
 slot `div.tab-position.tab-yield-space`; it is a visible slot and counts as one.

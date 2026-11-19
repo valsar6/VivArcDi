@@ -28,6 +28,16 @@ class FakeElement {
 
   constructor(public selectorName = '') {}
 
+  public shown = true;
+
+  public get firstElementChild(): FakeElement | null {
+    return this.children[0] ?? null;
+  }
+
+  public getClientRects(): unknown[] {
+    return this.shown ? [{}] : [];
+  }
+
   public hasAttribute(name: string): boolean {
     return this.attributes.has(name);
   }
@@ -225,10 +235,26 @@ test('shows the separator when a pinned tab is visible', () => {
   assert.deepEqual([slots[1]?.values.has(SHIFT), frame.values.get('max-height')], [false, '120px']);
 });
 
-test('keeps the separator hidden when the only pinned tab is hidden', () => {
-  const hiddenPinned = new FakeElement('pinned');
-  hiddenPinned.attributes.add(HIDDEN_ATTRIBUTE);
-  const { closer, frameRun, slots } = setUp([separator(0, 20), slot(20, 40)], { pinned: [hiddenPinned] });
+function wrapped(offset: number, height: number, hidden = false): FakeElement {
+  const wrapper = new FakeElement();
+  wrapper.children = [slot(offset, height)];
+  if (hidden) {
+    wrapper.attributes.add(HIDDEN_ATTRIBUTE);
+  }
+  return wrapper;
+}
+
+test('reads the offsets from the slot inside a wrapper', () => {
+  const { closer, frame, frameRun, slots } = setUp([wrapped(0, 40, true), wrapped(40, 40)]);
+  closer.request();
+  frameRun();
+  assert.deepEqual([slots[0]?.values.has(SHIFT), slots[1]?.values.get(SHIFT), frame.values.get('max-height')], [false, '40px', '80px']);
+});
+
+test('counts a pinned tab inside a collapsed group as not visible', () => {
+  const collapsed = new FakeElement('pinned');
+  collapsed.shown = false;
+  const { closer, frameRun, slots } = setUp([separator(0, 20), slot(20, 40)], { pinned: [collapsed] });
   closer.request();
   frameRun();
   assert.equal(slots[0]?.values.get('display'), 'none');
