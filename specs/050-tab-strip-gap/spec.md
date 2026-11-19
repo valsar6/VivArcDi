@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4); FR-6 and AC-11 to AC-20 added at Tore's request the same day; AC-21 and AC-22 added after reading Vivaldi's bundle (T1) |
