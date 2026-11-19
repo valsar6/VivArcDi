@@ -73,7 +73,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   `shows the boot notice when two modules fail`, `keeps a single failure in the console`,
   `shows no boot notice without the activation mark`, `shows no boot notice after a clean start`.
   FR-9, FR-10.
-- [ ] **T7. Docs and version.** `docs/architecture.md`, boot list: a seventh step "logs a self-check
+- [x] **T7. Docs and version.** `docs/architecture.md`, boot list: a seventh step "logs a self-check
   summary on `VivArcDi:boot` and, when two or more modules failed and `activation-marker` started,
   shows one notice (spec 039)"; the paragraph after the list adds that the summary is `info`, `warn`
   or `error`, lists the failed ids and the counts of modules off, and that undefined selectors and a
