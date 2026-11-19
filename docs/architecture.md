@@ -48,10 +48,15 @@ boots `VivArcDi` (`src/core/boot/VivArcDi.ts`) with it, which:
 3. waits for Vivaldi's interface to exist;
 4. injects the stylesheets listed in the configuration;
 5. checks the options of every module against its schema (see below);
-6. creates and starts every module whose `enabled` is `true`.
+6. creates and starts every module whose `enabled` is `true`;
+7. logs a self-check summary on `VivArcDi:boot` and, when two or more modules failed and
+   `activation-marker` started, shows one notice (spec 039).
 
 A module that fails to start is logged and skipped; the others keep running, and Vivaldi itself is
-never blocked.
+never blocked. The summary is `info`, `warn` or `error`; it lists the failed module ids and the
+counts of modules that are off in the configuration, for this window or because of their options.
+Selectors the catalog does not define and a catalog that stands in for a newer Vivaldi get their own
+lines.
 
 ### Modules
 

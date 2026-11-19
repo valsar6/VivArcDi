@@ -1,6 +1,7 @@
 class SelectorCatalog {
   #selectors;
   #version;
+  #undefined = /* @__PURE__ */ new Set();
   /**
    * Holds the CSS selectors of Vivaldi's interface for one Vivaldi version.
    * Modules ask the catalog for selectors by name instead of hard-coding them,
@@ -50,6 +51,23 @@ class SelectorCatalog {
     return this.#version;
   }
   /**
+   * @returns The names `get` was asked for and does not define, each once, in the order first asked.
+   * `has` returning false is not recorded.
+   */
+  get undefinedNames() {
+    return [...this.#undefined];
+  }
+  /**
+   * @param vivaldiVersion Full Vivaldi version, or `unknown`.
+   * @returns Whether this catalog is an older one used in place of the running Vivaldi's own.
+   */
+  standsInFor(vivaldiVersion) {
+    if (this.#version === null) {
+      return false;
+    }
+    return parseVersion(vivaldiVersion) === null || compareVersions(this.#version, vivaldiVersion) < 0;
+  }
+  /**
    * @param name Selector name.
    * @returns Whether the catalog defines that selector.
    */
@@ -64,6 +82,7 @@ class SelectorCatalog {
   get(name) {
     const selector = this.#selectors[name];
     if (selector === void 0 || !this.has(name)) {
+      this.#undefined.add(name);
       throw new Error(`Selector "${name}" is not defined for Vivaldi ${this.#version}`);
     }
     return selector;

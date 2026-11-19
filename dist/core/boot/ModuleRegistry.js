@@ -44,26 +44,33 @@ class ModuleRegistry {
    *
    * @param settings The `modules` section of `config.json`.
    * @param privateWindow Whether the window is a private window.
-   * @returns The new instances, and the enabled ids that no module matches.
+   * @returns The new instances, the enabled ids that no module matches, and how many registered
+   * modules were left out because of `config.json` or because of the window.
    */
   createEnabled(settings, privateWindow = false) {
     const modules = [];
     const unknown = [];
+    const skipped = { config: 0, window: 0 };
     for (const [id, options] of Object.entries(settings)) {
-      if (options?.enabled !== true) {
+      const moduleClass = this.#classes.get(id);
+      const enabled = options?.enabled === true;
+      if (moduleClass === void 0) {
+        if (enabled) {
+          unknown.push(id);
+        }
         continue;
       }
-      const moduleClass = this.#classes.get(id);
-      if (moduleClass === void 0) {
-        unknown.push(id);
+      if (!enabled) {
+        skipped.config += 1;
         continue;
       }
       if (!FITS[moduleClass.privateWindows](privateWindow)) {
+        skipped.window += 1;
         continue;
       }
       modules.push({ id, module: new moduleClass() });
     }
-    return { modules, unknown };
+    return { modules, unknown, skipped };
   }
 }
 export {

@@ -6,7 +6,9 @@ import { BrowserHistory } from "../browser/BrowserHistory.js";
 import { BrowserSearch } from "../browser/BrowserSearch.js";
 import { BrowserTabs } from "../browser/BrowserTabs.js";
 import { BrowserWindows } from "../browser/BrowserWindows.js";
+import { BootReport } from "./BootReport.js";
 import { Logger } from "../support/Logger.js";
+import { ModuleStarter } from "./ModuleStarter.js";
 import { ModuleSettings } from "./ModuleSettings.js";
 import { PersistentStorage } from "../browser/PersistentStorage.js";
 import { WindowServices } from "./WindowServices.js";
@@ -19,17 +21,11 @@ class VivArcDi {
   #registry;
   #logger;
   #document;
-  #tabs;
-  #bookmarks;
-  #bookmarkWriter;
   #runtime;
-  #windows;
-  #search;
-  #history;
-  #prefs;
   #storage;
   #notices = null;
   #styles;
+  #starter;
   #started = [];
   /**
    * The application: reads the configuration, waits for Vivaldi's interface,
@@ -56,15 +52,14 @@ class VivArcDi {
     this.#registry = registry;
     this.#logger = logger;
     this.#document = document;
-    this.#tabs = tabs;
-    this.#bookmarks = bookmarks;
-    this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
-    this.#windows = windows;
-    this.#search = search;
-    this.#history = history;
-    this.#prefs = prefs;
     this.#storage = storage;
+    this.#starter = VivArcDi.#starterOf(
+      { document, tabs, bookmarks, bookmarkWriter, runtime, history, prefs, payload: loader },
+      windows,
+      search,
+      logger
+    );
     this.#styles = new StyleInjector(document, loader);
   }
   /**
@@ -94,12 +89,18 @@ class VivArcDi {
       prefs: new BrowserPrefs(VivArcDi.#prefsApi(chromeApi)),
       storage: await PersistentStorage.open(document, chromeApi, logger)
     });
-    try {
-      await app.start();
-    } catch (error) {
-      app.#logger.error("Startup failed", error);
-    }
+    await app.start();
     return app;
+  }
+  static #starterOf(services, windows, search, logger) {
+    return new ModuleStarter(
+      {
+        ...services,
+        windows: windows ?? new BrowserWindows(void 0),
+        search: search ?? new BrowserSearch(void 0)
+      },
+      logger
+    );
   }
   static #prefsApi(chromeApi) {
     const vivaldi = globalThis.vivaldi;
@@ -112,33 +113,58 @@ class VivArcDi {
     return this.#started.map(({ id }) => id);
   }
   /**
-   * Starts VivArcDi. Does nothing beyond a warning when no selector catalog
-   * fits the running Vivaldi, so an unsupported version is left untouched.
+   * Starts VivArcDi and logs one self-check summary. Never rejects: a failure is
+   * logged as `Startup failed` and named in the summary, and a severe start shows one
+   * notice. Does nothing beyond a
+   * warning when no selector catalog fits the running Vivaldi.
    */
   async start() {
+    const report = new BootReport(this.#logger.child("boot"));
+    let outcome;
+    try {
+      outcome = await this.#run(report);
+    } catch (error) {
+      this.#logger.error("Startup failed", error);
+      outcome = "failed";
+    }
+    report.summarize(outcome);
+    report.notify(outcome, this.#notices);
+  }
+  async #run(report) {
     const [config, build] = await Promise.all([
       this.#loader.json("config.json"),
       this.#loader.json("build.json")
     ]);
+    report.useBuild(build);
+    report.enter("selectors");
     const selectors = await SelectorCatalog.load(this.#loader, build.vivaldiVersion);
+    report.useCatalog(selectors);
     if (selectors.version === null) {
       this.#logger.warn(`No selectors for Vivaldi ${build.vivaldiVersion}, staying inactive`);
-      return;
+      return "inactive";
     }
+    report.enter("interface");
     await new UiReadiness(this.#document).waitFor(selectors.get("browser"));
     config.styles.forEach((path) => this.#styles.inject(path));
     const services = WindowServices.open(this.#document, selectors, this.#storage, this.#logger);
     this.#notices = services.notices;
+    report.enter("modules");
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
-    const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
+    const { modules, unknown, skipped } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
+    report.skip(skipped.config, skipped.window);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, { settings, selectors, build, ...services });
+      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services });
+      report.record(entry.id, outcome);
+      if (outcome === "started") {
+        this.#started.push(entry);
+      }
     }
     this.#logger.info(
       `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
       `(selectors ${selectors.version}, modules: ${this.startedModules.join(", ") || "none"})`
     );
+    return "active";
   }
   /**
    * Stops the started modules in reverse order and removes the stylesheets.
@@ -161,38 +187,6 @@ class VivArcDi {
     } catch (error) {
       this.#logger.warn("Cannot tell if this is a private window, treating it as a normal window", error);
       return false;
-    }
-  }
-  async #startModule(entry, start) {
-    const { settings, selectors, build, storage, notices } = start;
-    const options = settings.optionsOf(entry.id);
-    if (options === null) {
-      return;
-    }
-    const logger = this.#logger.child(entry.id);
-    try {
-      await entry.module.start({
-        document: this.#document,
-        selectors,
-        logger,
-        options,
-        build,
-        tabs: this.#tabs,
-        bookmarks: this.#bookmarks,
-        bookmarkWriter: this.#bookmarkWriter,
-        modules: settings.all,
-        runtime: this.#runtime,
-        windows: this.#windows ?? new BrowserWindows(void 0),
-        search: this.#search ?? new BrowserSearch(void 0),
-        history: this.#history,
-        prefs: this.#prefs,
-        storage,
-        notices,
-        payload: this.#loader
-      });
-      this.#started.push(entry);
-    } catch (error) {
-      logger.error("Failed to start", error);
     }
   }
 }
