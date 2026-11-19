@@ -43,7 +43,8 @@ the [README](../../README.md#install).
 - With the tab bar on the left, the Favorites grid appears at the top of the tab bar once a bookmark
   folder named `Favorites` exists, or shows your first pinned tabs as tiles.
 - For details, open `vivaldi://inspect/#apps`, click *inspect* under `vivaldi`, and look for
-  `[VivArcDi] <version> active on Vivaldi …` in the console.
+  `[VivArcDi] <version> active on Vivaldi …` in the console, followed by
+  `[VivArcDi:boot] self-check: active, …`. Send that line with any bug report.
 
 ## Updates
 
