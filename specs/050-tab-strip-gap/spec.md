@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4); FR-6 and AC-11 to AC-20 added at Tore's request the same day |
+| Approved | Tore, 2026-11-19 (answers to Q-1 to Q-4); FR-6 and AC-11 to AC-20 added at Tore's request the same day; AC-21 and AC-22 added after reading Vivaldi's bundle (T1) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -52,6 +52,9 @@ Nothing changes when no slot is hidden.
   again as soon as one is.
 - **FR-5.** Dragging, dropping and reordering tabs SHALL keep working: Vivaldi's own values are never
   overwritten, only read, and the corrections are removed while a drag is in progress.
+- **FR-7.** A drag SHALL be detected from the pointer, not from a Vivaldi class: Vivaldi drags tabs with
+  `mousedown` on a slot, then `mousemove` and `mouseup` on the window, and sets no state on the strip.
+  A press without a move is a click and SHALL keep the corrections.
 - **FR-6.** The offsets and heights SHALL be computed by a pure function of the slots (offset, height,
   hidden), developed test first, with no DOM: slots are ordered by their offset, not by their place in
   the document; slots that share an offset form a row, and a row closes only when all its slots are
@@ -77,7 +80,7 @@ Nothing changes when no slot is hidden.
 | AC-6 | WHEN a pinned tab becomes visible THE module SHALL show the separator again | auto: `shows the separator when a pinned tab is visible` |
 | AC-7 | WHILE a tab is being dragged THE module SHALL leave Vivaldi's offsets as they are | auto: `leaves the offsets alone during a drag` |
 | AC-8 | IF the strip does not match the selectors THEN THE module SHALL leave it untouched and log a warning | auto: `leaves the strip untouched when the selectors do not match` |
-| AC-9 | WHEN a link tab is hidden and no pinned tab is visible THE first Today tab SHALL start right under the New Tab row | live: `no gap above the first Today tab` |
+| AC-9 | WHEN a link tab is hidden and no pinned tab is visible THE first Today tab SHALL start right under the New Tab row | manual until T7, then live: the scenario `no gap above the first Today tab` |
 | AC-10 | WHEN I drag a Today tab to another place and drop it THE order SHALL change as in Vivaldi with no gap | manual |
 | AC-11 | WHEN no slot is hidden THE function SHALL return a zero shift for every slot and a zero hidden height | auto: `returns no shift when no slot is hidden` |
 | AC-12 | WHEN the first slot is hidden THE function SHALL shift every visible slot by its height | auto: `shifts every visible slot when the first slot is hidden` |
@@ -89,6 +92,8 @@ Nothing changes when no slot is hidden.
 | AC-18 | WHEN the offset or the height of a slot is missing or not a number THE function SHALL leave the strip as it is | auto: `leaves the strip as it is when a slot has no valid offset or height` |
 | AC-19 | WHEN the function runs THE function SHALL NOT change its input | auto: `does not change the slots it is given` |
 | AC-20 | WHEN offsets and heights are fractional THE function SHALL keep the fraction | auto: `keeps fractional offsets and heights` |
+| AC-21 | WHEN the pointer moves with the button down on a slot THE module SHALL report a drag until the button is released | auto: `reports a drag from the first pointer move until the release` |
+| AC-22 | WHEN the button goes down and up on a slot without a move THE module SHALL NOT report a drag | auto: `does not report a drag for a click` |
 
 ## Out of scope
 
