@@ -75,7 +75,7 @@ class LiveFolders extends Module {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
   }
-  #build({ document, selectors, tabs, storage, options, logger }) {
+  #build({ document, selectors, tabs, storage, options, logger, notices }) {
     const clientId = options.githubClientId;
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
@@ -91,6 +91,7 @@ class LiveFolders extends Module {
       store,
       github: new GithubPullRequests(sendWithFetch),
       connection,
+      notices,
       changed: () => this.#stopped ? void 0 : publisher.publish(),
       ticker: defaultTicker,
       intervalMs: options.refreshMinutes * MS_PER_MINUTE,

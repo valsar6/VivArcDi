@@ -66,6 +66,21 @@ class GithubConnection {
     this.#notify();
   }
   /**
+   * Forgets the token only when it is the one stored now, in one synchronous step, so that a
+   * token saved meanwhile in another window is not erased. When it differs, or none is stored,
+   * nothing is written and nobody is told.
+   *
+   * @param token The token that was used and refused.
+   * @returns Whether it was forgotten; false when the stored token differs or there is none.
+   */
+  forgetIf(token) {
+    if (this.token !== token) {
+      return false;
+    }
+    this.forget();
+    return true;
+  }
+  /**
    * @param listener Called after a token was saved or forgotten here.
    * @returns A function that removes the listener.
    */
