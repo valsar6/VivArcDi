@@ -5,6 +5,8 @@
   "verticalTabBar": "#tabs-tabbar-container:is(.left, .right)",
   "tabListHost": "#tabs-container > :has(> .tab-strip)",
   "tabStrip": "#tabs-container .tab-strip",
+  "tabStripFrame": "#tabs-container .resize:has(> .tab-strip)",
+  "separator": "#tabs-container .tab-strip .separator",
   "pinnedTab": ".tab-position.is-pinned",
   "pinnedGroup": ".pinned-group",
   "tabWrapper": ".tab-wrapper",

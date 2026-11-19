@@ -1,8 +1,10 @@
 import { DomQuery } from '../../core/dom/DomQuery.js';
+import { HIDDEN_ATTRIBUTE } from './HiddenAttribute.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
 import type { FrameTiming } from '../../core/support/FrameTask.js';
 import type { HiddenTabs } from './HiddenTabs.js';
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
+import { StripGapCloser } from './StripGapCloser.js';
 import { TabSlot } from '../../core/tabs/TabSlot.js';
 
 export type StripWatcher = (target: Node, onChange: () => void) => () => void;
@@ -12,9 +14,11 @@ export interface MarkerOptions {
   watch?: StripWatcher;
   /** Frame scheduling for the repeats, replaceable in tests. */
   timing?: FrameTiming;
+  /** The closer of the gaps hidden slots leave, shared per document unless a test passes one. */
+  closer?: StripGapCloser;
 }
 
-export const HIDDEN_ATTRIBUTE = 'data-vivarcdi-hidden';
+export { HIDDEN_ATTRIBUTE };
 
 const watchSubtree: StripWatcher = (target, onChange) => {
   const observer = new MutationObserver(onChange);
@@ -28,6 +32,7 @@ export class HiddenTabMarker {
   #hidden: HiddenTabs;
   #watch: StripWatcher;
   #task: FrameTask;
+  #closer: StripGapCloser;
   #stops: Array<() => void> = [];
   #collapsed = new WeakSet<Element>();
 
@@ -41,13 +46,14 @@ export class HiddenTabMarker {
    * @param document The browser window document.
    * @param selectors Needs `browser`, `tabStrip` and `tabWrapper`; with `pinnedGroup`, the slots inside Vivaldi's groups of pinned tabs, wherever they sit in the window, are marked too, and a group is collapsed when all of them are hidden.
    * @param hidden The tabs to hide.
-   * @param options Replaceable watching and frame scheduling, for tests.
+   * @param options Replaceable watching, frame scheduling and gap closer, for tests.
    */
-  constructor(document: Document, selectors: SelectorCatalog, hidden: HiddenTabs, { watch = watchSubtree, timing = {} }: MarkerOptions = {}) {
+  constructor(document: Document, selectors: SelectorCatalog, hidden: HiddenTabs, { watch = watchSubtree, timing = {}, closer = StripGapCloser.of(document, selectors) }: MarkerOptions = {}) {
     this.#document = document;
     this.#selectors = selectors;
     this.#hidden = hidden;
     this.#watch = watch;
+    this.#closer = closer;
     this.#task = new FrameTask(() => this.apply(), timing);
   }
 
@@ -59,6 +65,7 @@ export class HiddenTabMarker {
   public start(): void {
     const root = DomQuery.require(this.#document, this.#selectors.get('browser'));
     this.#stops = [this.#watch(root, () => this.#task.request()), this.#hidden.onChange(() => this.apply())];
+    this.#closer.acquire();
     this.apply();
   }
 
@@ -70,6 +77,7 @@ export class HiddenTabMarker {
     this.#task.cancel();
     this.#stops.forEach((stop) => stop());
     this.#stops = [];
+    this.#closer.release();
   }
 
   /**
@@ -89,6 +97,7 @@ export class HiddenTabMarker {
     if (group !== null) {
       this.#document.querySelectorAll<HTMLElement>(group).forEach((element) => this.#markGroup(element));
     }
+    this.#closer.request();
   }
 
   #markGroup(group: HTMLElement): void {

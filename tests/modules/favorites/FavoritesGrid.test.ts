@@ -89,6 +89,6 @@ test('without chrome.tabs the grid still works and middle click is left alone', 
   const { context, document, strip, sink } = setUp({ available: false });
   await new FavoritesGrid().start(context);
   assert.ok(strip.children[0]?.hasAttribute(FAVORITE_ATTRIBUTE));
-  assert.equal(document.listeners.size, 0);
+  assert.equal(document.listeners.has('auxclick'), false);
   assert.match((sink.lines[0] ?? []).join(' '), /chrome.tabs is missing/);
 });

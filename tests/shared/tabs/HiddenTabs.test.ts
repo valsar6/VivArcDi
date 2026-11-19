@@ -2,8 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HiddenTabMarker, HIDDEN_ATTRIBUTE } from '../../../src/shared/tabs/HiddenTabMarker.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
+import type { StripGapCloser } from '../../../src/shared/tabs/StripGapCloser.js';
 import { FakeNode, selectors, tabSlot } from '../../modules/favorites/fakes.js';
 
+const closer = { acquire: (): void => undefined, release: (): void => undefined, request: (): void => undefined } as unknown as StripGapCloser;
 const immediate = { schedule: (run: () => void): void => run(), cancel: (): void => undefined };
 
 function setup(): { hidden: HiddenTabs; strip: FakeNode; marker: HiddenTabMarker; changed: () => void } {
@@ -16,7 +18,7 @@ function setup(): { hidden: HiddenTabs; strip: FakeNode; marker: HiddenTabMarker
     notify = onChange;
     return () => undefined;
   };
-  const marker = new HiddenTabMarker(document, selectors, hidden, { watch, timing: immediate });
+  const marker = new HiddenTabMarker(document, selectors, hidden, { watch, timing: immediate, closer });
   return { hidden, strip, marker, changed: () => notify() };
 }
 
