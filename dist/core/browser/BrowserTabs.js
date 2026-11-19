@@ -1,5 +1,8 @@
+import { BrowserWindows } from "./BrowserWindows.js";
 class BrowserTabs {
   #chrome;
+  #windows;
+  #windowId = null;
   /**
    * Promise-based access to the `chrome.tabs` API of Vivaldi's interface.
    * Uses callbacks underneath, so it works whether or not the API returns promises.
@@ -8,6 +11,22 @@ class BrowserTabs {
    */
   constructor(chromeApi) {
     this.#chrome = chromeApi?.tabs ? chromeApi : null;
+    this.#windows = new BrowserWindows(chromeApi);
+  }
+  /**
+   * @returns The id of the window of this document, read once and kept; null when it cannot be
+   * read, in which case a later call tries again. Never rejects.
+   */
+  async ownWindowId() {
+    if (this.#windowId !== null) {
+      return this.#windowId;
+    }
+    try {
+      this.#windowId = (await this.#windows.current()).id ?? null;
+    } catch {
+      this.#windowId = null;
+    }
+    return this.#windowId;
   }
   /**
    * @returns Whether `chrome.tabs` exists in this document.

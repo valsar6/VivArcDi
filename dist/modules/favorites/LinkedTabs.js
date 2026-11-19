@@ -57,13 +57,13 @@ class LinkedTabs {
   /**
    * Follows a change of the Favorites folder: tabs of removed Favorites are unlinked and show
    * again as pinned tabs, and tabs of a Favorite whose address changed take the new address
-   * as their own page.
+   * as their own page. Only the tabs of this window are changed.
    *
    * @param favorites The Favorites now in the folder.
    */
   async sync(favorites) {
     const byId = new Map(favorites.map((favorite) => [favorite.id, favorite]));
-    const tabs = await this.#tabs.query({});
+    const tabs = await this.#tabs.query({ currentWindow: true });
     for (const tab of tabs) {
       const { favoriteId, pinnedUrl } = TabData.ownOf(tab);
       if (favoriteId === void 0 || tab.id === void 0) {

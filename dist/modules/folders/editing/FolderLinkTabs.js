@@ -19,11 +19,21 @@ class FolderLinkTabs {
   }
   /**
    * @param linkIds Bookmark ids of links.
-   * @returns The ids of the tabs linked to them.
+   * @returns The ids of the tabs linked to them, in every window.
    */
   async tabsOf(linkIds) {
+    return this.#linked(linkIds, {});
+  }
+  /**
+   * @param linkIds Bookmark ids of links.
+   * @returns The ids of the tabs linked to them, in the window of this document only.
+   */
+  async ownTabsOf(linkIds) {
+    return this.#linked(linkIds, { currentWindow: true });
+  }
+  async #linked(linkIds, info) {
     const wanted = new Set(linkIds);
-    return (await this.#tabs.query({})).flatMap((tab) => {
+    return (await this.#tabs.query(info)).flatMap((tab) => {
       const { bookmarkId } = TabData.ownOf(tab);
       return tab.id !== void 0 && bookmarkId !== void 0 && wanted.has(bookmarkId) ? [tab.id] : [];
     });

@@ -4,6 +4,7 @@ class PinWatcher {
   #addresses;
   #logger;
   #unsubscribe = null;
+  #windowId = null;
   /**
    * Gives pinned tabs their own page: the page they show when they are pinned, or when the
    * module first sees them pinned. Unpinning forgets it.
@@ -18,11 +19,12 @@ class PinWatcher {
     this.#logger = logger;
   }
   /**
-   * Saves the own page of pinned tabs that have none and starts following pins.
+   * Saves the own page of the pinned tabs of this window that have none and starts following pins.
    */
   async start() {
+    this.#windowId = await this.#tabs.ownWindowId();
     this.#unsubscribe = this.#tabs.onUpdated((tabId, change, tab) => void this.#follow(tabId, change, tab));
-    const pinned = await this.#tabs.query({ pinned: true });
+    const pinned = await this.#tabs.query({ pinned: true, currentWindow: true });
     await Promise.all(pinned.filter((tab) => SavedAddresses.needsAddress(tab)).map((tab) => this.#save(tab)));
   }
   /**
@@ -33,6 +35,9 @@ class PinWatcher {
     this.#unsubscribe = null;
   }
   async #follow(tabId, change, tab) {
+    if (this.#windowId !== null && tab.windowId !== this.#windowId) {
+      return;
+    }
     try {
       if (change.pinned === true && SavedAddresses.needsAddress(tab)) {
         await this.#save(tab);

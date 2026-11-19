@@ -47,7 +47,7 @@ class FolderRelocation {
         return;
       }
       linkIds = linkTabs.linkIds(folder);
-      const tabIds = await linkTabs.tabsOf(linkIds);
+      const tabIds = await linkTabs.ownTabsOf(linkIds);
       closing.add(linkIds);
       await writer.move(folderId, { parentId: targetRootId });
       this.#deps.openFolders.forget(folderId);

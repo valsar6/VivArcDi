@@ -82,6 +82,10 @@ class LinkTabAdopter {
   }
   async #adoptNew(tabId, key) {
     const tab = await this.#tabs.get(tabId);
+    const own = await this.#tabs.ownWindowId();
+    if (own !== null && tab.windowId !== own) {
+      return;
+    }
     const sameWindow = await this.#tabs.query({ windowId: tab.windowId });
     await this.#adopt(tab, key, LinkTabAdopter.#claimsOf(sameWindow));
   }

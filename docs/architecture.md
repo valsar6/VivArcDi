@@ -71,6 +71,9 @@ toast per window (`show`, and `once(key, ...)` for a notice that appears once pe
 `storage` also has `read(key, format)` for JSON values: they carry a version, a value from a newer
 VivArcDi is read-only for the window session, and an unreadable value is copied to a recovery key
 before it is overwritten (spec 037).
+`tabs.ownWindowId()` resolves the id of the window that runs the payload, or `null` when it cannot be
+read. `TabDataWriter` writes `vivExtData` only to tabs of that window, so two windows never write the
+same tab (spec 042).
 
 A module with options declares them as a static `options` schema (`src/core/boot/options/`): for
 each option its kind, its default and the values it accepts. The boot checks the module's section of

@@ -27,9 +27,9 @@ class ActivityStamps {
    * Stamps the active tab of this window and starts following activations and new tabs.
    */
   async start() {
+    this.#windowId = await this.#tabs.ownWindowId();
     const [active] = await this.#tabs.query({ active: true, currentWindow: true });
     if (active?.id !== void 0) {
-      this.#windowId = active.windowId;
       this.#active.set(active.windowId, active.id);
       await this.stamp(active.id);
     }
