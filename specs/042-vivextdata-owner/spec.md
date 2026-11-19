@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 0 |
 | Owner | Tore |
-| Approved | |
+| Approved | 2026-11-19 |
 | Amends | [003 Pinned tabs and folders](../003-pinned-tabs-and-folders/spec.md), [009 Bookmark folders in the tab bar](../009-bookmark-folders-in-tab-bar/spec.md) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -150,24 +150,29 @@ Vivaldi's own writes (probe T3), so the tests cover the rule and Tore confirms t
 
 ## Open questions
 
-- [ ] **Q-1. Where the rule lives.** The guard in `TabDataWriter` for every writer plus filters in
+- [x] **Q-1. Where the rule lives.** The guard in `TabDataWriter` for every writer plus filters in
   the scanners, or only filters in each module? Recommendation: both. The guard keeps a new writer
   from breaking the rule; the filters stop wasted reads and make the module's intent plain.
-- [ ] **Q-2. Window id source.** The writer needs the id of its window. Recommendation: read it once
+  Answered (Tore, 2026-11-19): both, as recommended.
+- [x] **Q-2. Window id source.** The writer needs the id of its window. Recommendation: read it once
   from `chrome.windows.getCurrent` through `BrowserWindows` and keep it; it never changes for a
   window.
-- [ ] **Q-3. Folder moved with tabs in other windows.** Moving a folder to another workspace changes
+  Answered (Tore, 2026-11-19): read once from `chrome.windows.getCurrent` through `BrowserWindows`, as recommended.
+- [x] **Q-3. Folder moved with tabs in other windows.** Moving a folder to another workspace changes
   the workspace of its tabs, but tabs in other windows are not ours to write. Recommendation: skip
   them. The tab stays linked to its row and out of the tab list in both windows; only its workspace
   stays as it was. A message to the owning window (`runtime.sendMessage`) would fix it but adds a
   protocol; do it later if Tore sees it matter.
-- [ ] **Q-4. New tab in a window with no VivArcDi running.** The adopter skips tabs of other
+  Answered (Tore, 2026-11-19): skip the tabs of other windows, as recommended.
+- [x] **Q-4. New tab in a window with no VivArcDi running.** The adopter skips tabs of other
   windows; if their window has the module disabled or failed to start, those tabs are not adopted.
   Recommendation: accept; adoption is a convenience and `adoptOpenTabs` runs at that window's
   start.
-- [ ] **Q-5. A tab that moves during a write.** The check and the `update` are two calls; a tab
+  Answered (Tore, 2026-11-19): accept, as recommended.
+- [x] **Q-5. A tab that moves during a write.** The check and the `update` are two calls; a tab
   moved between them can still be written by the old window once. Recommendation: accept; the
   window is milliseconds, one write, and Vivaldi's own move writes at about the same time.
+  Answered (Tore, 2026-11-19): accept, as recommended.
 
 ## References
 

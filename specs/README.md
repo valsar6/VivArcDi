@@ -50,7 +50,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [039 Boot self-check](039-boot-self-check/spec.md) | 0 | Approved |
 | [040 Live folders writes](040-live-folders-writes/spec.md) | 3 | Approved |
 | [041 Write outcome](041-write-outcome/spec.md) | 0 | Approved |
-| [042 vivExtData owner](042-vivextdata-owner/spec.md) | 0 | Draft |
+| [042 vivExtData owner](042-vivextdata-owner/spec.md) | 0 | Approved |
 | [043 Sync robustness](043-sync-robustness/spec.md) | 3 | Implemented |
 | [045 No downgrade](045-no-downgrade/spec.md) | 0 | Implemented |
 | [046 Live verification](046-live-verification/spec.md) | Tooling | Implemented |
