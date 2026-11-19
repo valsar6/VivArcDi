@@ -56,6 +56,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [046 Live verification](046-live-verification/spec.md) | Tooling | Implemented |
 | [047 Snapshot watch](047-snapshot-watch/spec.md) | Tooling | Approved |
 | [048 GitHub token refused](048-github-token-refused/spec.md) | 3 | Implemented |
+| [049 Review wait](049-review-wait/spec.md) | Tooling | Draft |
 
 ## Layout
 
