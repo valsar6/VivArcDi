@@ -69,6 +69,7 @@ ${KEYS_GLOBAL}.install(${JSON.stringify({ token: this.#token, tabId })});`),
       uninstallScript: `globalThis.${KEYS_GLOBAL}?.uninstall();`,
       purpose: "copy address shortcuts",
       onConsoleMessage: (message) => this.#receive(message),
+      errors: runtime,
       logger
     });
     if (runtime.messagesAvailable) {

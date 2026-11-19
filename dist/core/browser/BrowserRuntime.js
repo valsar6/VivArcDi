@@ -19,6 +19,15 @@ class BrowserRuntime {
     return this.#onMessage !== null;
   }
   /**
+   * The error of the last `chrome` call. Read it only inside the callback of that call.
+   *
+   * @returns The message of `chrome.runtime.lastError`, or null when there is no error.
+   */
+  get lastError() {
+    const error = this.#chrome?.runtime?.lastError;
+    return error ? error.message ?? "unknown error" : null;
+  }
+  /**
    * Listens to messages sent with `chrome.runtime.sendMessage`.
    *
    * @param listener Called with each message.

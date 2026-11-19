@@ -204,8 +204,40 @@ var VivArcDiPeekLinks = (() => {
     }
   }
 
+  // src/page/lib/PageInstall.ts
+  var PageInstall = class {
+    #key;
+    constructor(key) {
+      this.#key = Symbol.for(key);
+    }
+    /**
+     * Detaches the previous hook, attaches the new one and keeps it.
+     *
+     * @param hook What to attach to the page.
+     */
+    replace(hook) {
+      this.remove();
+      hook.attach();
+      this.#slot()[this.#key] = hook;
+    }
+    /**
+     * Detaches the kept hook, if any, and forgets it.
+     */
+    remove() {
+      const slot = this.#slot();
+      const hook = slot[this.#key];
+      if (typeof hook?.detach === "function") {
+        hook.detach();
+      }
+      slot[this.#key] = void 0;
+    }
+    #slot() {
+      return globalThis;
+    }
+  };
+
   // src/page/peek-links.ts
-  var INSTANCE_KEY = /* @__PURE__ */ Symbol.for("vivarcdi.peek.links");
+  var INSTALL = new PageInstall("vivarcdi.peek.links");
   var PeekLinkListener = class {
     #policy;
     #classifier;
@@ -246,15 +278,10 @@ var VivArcDiPeekLinks = (() => {
     }
   };
   function install(policy) {
-    uninstall();
-    const listener = new PeekLinkListener(policy);
-    listener.attach();
-    globalThis[INSTANCE_KEY] = listener;
+    INSTALL.replace(new PeekLinkListener(policy));
   }
   function uninstall() {
-    const registry = globalThis;
-    registry[INSTANCE_KEY]?.detach();
-    registry[INSTANCE_KEY] = void 0;
+    INSTALL.remove();
   }
   return __toCommonJS(peek_links_exports);
 })();

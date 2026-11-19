@@ -21,6 +21,14 @@ class Logger {
     return new Logger(`${this.#prefix}:${name}`, this.#sink);
   }
   /**
+   * Writes a trace line; sinks without a debug level drop it.
+   *
+   * @param message Values to log.
+   */
+  debug(...message) {
+    this.#sink.debug?.(this.#tag, ...message);
+  }
+  /**
    * @param message Values to log.
    */
   info(...message) {

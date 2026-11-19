@@ -64,6 +64,7 @@ ${KEYS_GLOBAL}.install(${JSON.stringify({ token: this.#token, tabId })});` : nul
       uninstallScript: `globalThis.${KEYS_GLOBAL}?.uninstall();`,
       purpose: "pinned tab shortcuts",
       onConsoleMessage: (message) => this.#receive(message),
+      errors: runtime,
       logger
     });
     if (runtime.messagesAvailable) {

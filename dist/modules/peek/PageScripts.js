@@ -46,6 +46,12 @@ ${LINKS_GLOBAL}.install(${JSON.stringify(policy)});`;
     return `${this.#keys}
 ${KEYS_GLOBAL}.install(${JSON.stringify(token)});`;
   }
+  /**
+   * @returns Code that stops forwarding Peek keys from a page.
+   */
+  uninstallKeys() {
+    return `globalThis.${KEYS_GLOBAL}?.uninstall();`;
+  }
 }
 export {
   PageScripts

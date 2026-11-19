@@ -1,9 +1,11 @@
+import { ScriptRunner } from "./ScriptRunner.js";
 import { tabIdOf } from "./Webview.js";
 class PageScriptInjector {
   #deps;
   #tracked = /* @__PURE__ */ new Map();
   #observer = null;
-  #warned = false;
+  #runner;
+  #requests = 0;
   /**
    * Keeps a script in the pages of tabs: injects it into each tab webview, again after
    * every top-level navigation, and removes it on detach. The script is chosen per tab.
@@ -12,6 +14,7 @@ class PageScriptInjector {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
+    this.#runner = new ScriptRunner(dependencies.purpose, dependencies.errors, dependencies.logger);
   }
   /**
    * Starts following the tab webviews.
@@ -38,7 +41,7 @@ class PageScriptInjector {
     this.#tracked.forEach((listeners, webview) => {
       webview.removeEventListener("loadcommit", listeners.loadCommit);
       webview.removeEventListener("consolemessage", listeners.consoleMessage);
-      this.#execute(webview, this.#deps.uninstallScript);
+      this.#runner.run(webview, this.#deps.uninstallScript);
     });
     this.#tracked.clear();
   }
@@ -56,6 +59,7 @@ class PageScriptInjector {
   }
   #track(webview) {
     const listeners = {
+      request: 0,
       loadCommit: (event) => {
         if (event.isTopLevel) {
           this.#inject(webview);
@@ -75,19 +79,18 @@ class PageScriptInjector {
   }
   #inject(webview) {
     const tabId = tabIdOf(webview);
-    if (tabId === null) {
+    const entry = this.#tracked.get(webview);
+    if (tabId === null || entry === void 0) {
       return;
     }
-    this.#deps.scriptFor(tabId).then((code) => this.#execute(webview, code ?? this.#deps.uninstallScript)).catch((error) => this.#deps.logger.error(`Could not prepare ${this.#deps.purpose} for tab ${tabId}`, error));
+    this.#requests += 1;
+    const request = this.#requests;
+    entry.request = request;
+    this.#deps.scriptFor(tabId).then((code) => this.#runLatest(webview, request, code ?? this.#deps.uninstallScript)).catch((error) => this.#deps.logger.error(`Could not prepare ${this.#deps.purpose} for tab ${tabId}`, error));
   }
-  #execute(webview, code) {
-    try {
-      webview.executeScript({ code });
-    } catch (error) {
-      if (!this.#warned) {
-        this.#warned = true;
-        this.#deps.logger.warn(`Cannot inject into pages: ${this.#deps.purpose} are off`, error);
-      }
+  #runLatest(webview, request, code) {
+    if (this.#tracked.get(webview)?.request === request) {
+      this.#runner.run(webview, code);
     }
   }
 }

@@ -78,27 +78,67 @@ var VivArcDiArchiveKeys = (() => {
     }
   }
 
-  // src/page/archive-keys.ts
-  var INSTANCE_KEY = /* @__PURE__ */ Symbol.for("vivarcdi.archive.keys");
-  function install(token) {
-    uninstall();
-    const listener = (event) => {
-      if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, "a")) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action: "open" }, ARCHIVE_CONSOLE_PREFIX);
+  // src/page/lib/PageInstall.ts
+  var PageListener = class {
+    #type;
+    #listener;
+    constructor(type, listener) {
+      this.#type = type;
+      this.#listener = listener;
+    }
+    attach() {
+      globalThis.addEventListener(this.#type, this.#listener, true);
+    }
+    detach() {
+      globalThis.removeEventListener(this.#type, this.#listener, true);
+    }
+  };
+  var PageInstall = class {
+    #key;
+    constructor(key) {
+      this.#key = Symbol.for(key);
+    }
+    /**
+     * Detaches the previous hook, attaches the new one and keeps it.
+     *
+     * @param hook What to attach to the page.
+     */
+    replace(hook) {
+      this.remove();
+      hook.attach();
+      this.#slot()[this.#key] = hook;
+    }
+    /**
+     * Detaches the kept hook, if any, and forgets it.
+     */
+    remove() {
+      const slot = this.#slot();
+      const hook = slot[this.#key];
+      if (typeof hook?.detach === "function") {
+        hook.detach();
       }
-    };
-    globalThis.addEventListener("keydown", listener, true);
-    globalThis[INSTANCE_KEY] = listener;
+      slot[this.#key] = void 0;
+    }
+    #slot() {
+      return globalThis;
+    }
+  };
+
+  // src/page/archive-keys.ts
+  var INSTALL = new PageInstall("vivarcdi.archive.keys");
+  function install(token) {
+    INSTALL.replace(
+      new PageListener("keydown", (event) => {
+        if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, "a")) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action: "open" }, ARCHIVE_CONSOLE_PREFIX);
+        }
+      })
+    );
   }
   function uninstall() {
-    const registry = globalThis;
-    const listener = registry[INSTANCE_KEY];
-    if (listener !== void 0) {
-      globalThis.removeEventListener("keydown", listener, true);
-    }
-    registry[INSTANCE_KEY] = void 0;
+    INSTALL.remove();
   }
   return __toCommonJS(archive_keys_exports);
 })();

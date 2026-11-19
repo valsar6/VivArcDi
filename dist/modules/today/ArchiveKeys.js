@@ -56,6 +56,7 @@ ${KEYS_GLOBAL}.install(${JSON.stringify(this.#token)});`;
       uninstallScript: `globalThis.${KEYS_GLOBAL}?.uninstall();`,
       purpose: "archive shortcuts",
       onConsoleMessage: (message) => this.#receive(message),
+      errors: runtime,
       logger
     });
     if (runtime.messagesAvailable) {

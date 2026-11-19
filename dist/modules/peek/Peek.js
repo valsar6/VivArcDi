@@ -3,6 +3,7 @@ import { KeptTab } from "../../shared/tabs/KeptTab.js";
 import { Module } from "../../core/boot/Module.js";
 import { LinkOpener } from "./LinkOpener.js";
 import { PageScriptInjector } from "../../core/browser/PageScriptInjector.js";
+import { ScriptRunner } from "../../core/browser/ScriptRunner.js";
 import { PageScripts } from "./PageScripts.js";
 import { PeekController } from "./PeekController.js";
 import { PEEK_OPTIONS } from "./PeekOptions.js";
@@ -66,6 +67,7 @@ class Peek extends Module {
   }
   #createController({ document, tabs, runtime, logger }, size, scripts) {
     const container = this.#container;
+    const runner = new ScriptRunner("Peek keys", runtime, logger);
     return new PeekController({
       createPanel: (request) => new PeekPanel(request.url, {
         document,
@@ -73,6 +75,7 @@ class Peek extends Module {
         size,
         partition: container.querySelector(`[${TAB_ID_ATTRIBUTE}="${request.tabId}"]`)?.getAttribute("partition") ?? null,
         scripts,
+        runner,
         token: this.#token,
         onCommand: (command) => this.#run(command),
         onConsoleMessage: (message) => this.#receive(message, request.tabId)
@@ -83,7 +86,7 @@ class Peek extends Module {
       onChange: (open) => container.toggleAttribute(OPEN_ATTRIBUTE, open)
     });
   }
-  #createInjector({ selectors, tabs, logger }, triggers, scripts) {
+  #createInjector({ selectors, tabs, runtime, logger }, triggers, scripts) {
     const { shiftClick, pinnedCrossSite, anyCrossSite, pinnedNewTab, anyNewTab } = triggers;
     return new PageScriptInjector({
       container: this.#container,
@@ -97,6 +100,7 @@ class Peek extends Module {
       uninstallScript: scripts.uninstallLinks(),
       purpose: "Peek links",
       onConsoleMessage: (message, tabId) => this.#receive(message, tabId),
+      errors: runtime,
       logger
     });
   }

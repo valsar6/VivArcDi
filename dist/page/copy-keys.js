@@ -78,28 +78,68 @@ var VivArcDiCopyKeys = (() => {
     }
   }
 
+  // src/page/lib/PageInstall.ts
+  var PageListener = class {
+    #type;
+    #listener;
+    constructor(type, listener) {
+      this.#type = type;
+      this.#listener = listener;
+    }
+    attach() {
+      globalThis.addEventListener(this.#type, this.#listener, true);
+    }
+    detach() {
+      globalThis.removeEventListener(this.#type, this.#listener, true);
+    }
+  };
+  var PageInstall = class {
+    #key;
+    constructor(key) {
+      this.#key = Symbol.for(key);
+    }
+    /**
+     * Detaches the previous hook, attaches the new one and keeps it.
+     *
+     * @param hook What to attach to the page.
+     */
+    replace(hook) {
+      this.remove();
+      hook.attach();
+      this.#slot()[this.#key] = hook;
+    }
+    /**
+     * Detaches the kept hook, if any, and forgets it.
+     */
+    remove() {
+      const slot = this.#slot();
+      const hook = slot[this.#key];
+      if (typeof hook?.detach === "function") {
+        hook.detach();
+      }
+      slot[this.#key] = void 0;
+    }
+    #slot() {
+      return globalThis;
+    }
+  };
+
   // src/page/copy-keys.ts
-  var INSTANCE_KEY = /* @__PURE__ */ Symbol.for("vivarcdi.copy.keys");
+  var INSTALL = new PageInstall("vivarcdi.copy.keys");
   var SHORTCUT_LETTER = "c";
   function install({ token, tabId }) {
-    uninstall();
-    const listener = (event) => {
-      if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, SHORTCUT_LETTER)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        sendToInterface({ type: COPY_MESSAGE_TYPE, token, tabId, action: "copy" }, COPY_CONSOLE_PREFIX);
-      }
-    };
-    globalThis.addEventListener("keydown", listener, true);
-    globalThis[INSTANCE_KEY] = listener;
+    INSTALL.replace(
+      new PageListener("keydown", (event) => {
+        if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, SHORTCUT_LETTER)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          sendToInterface({ type: COPY_MESSAGE_TYPE, token, tabId, action: "copy" }, COPY_CONSOLE_PREFIX);
+        }
+      })
+    );
   }
   function uninstall() {
-    const registry = globalThis;
-    const listener = registry[INSTANCE_KEY];
-    if (listener !== void 0) {
-      globalThis.removeEventListener("keydown", listener, true);
-    }
-    registry[INSTANCE_KEY] = void 0;
+    INSTALL.remove();
   }
   return __toCommonJS(copy_keys_exports);
 })();

@@ -41,6 +41,7 @@ class PeekPanel {
    * Removes the panel and its page.
    */
   remove() {
+    this.#deps.runner.run(this.#webview, this.#deps.scripts.uninstallKeys());
     this.#backdrop.remove();
     this.#panel.remove();
     this.#actions.remove();
@@ -93,11 +94,7 @@ class PeekPanel {
       return;
     }
     this.#url = event.url;
-    try {
-      this.#webview.executeScript({ code: this.#deps.scripts.installKeys(this.#deps.token) });
-    } catch {
-      return;
-    }
+    this.#deps.runner.run(this.#webview, this.#deps.scripts.installKeys(this.#deps.token));
   }
   #element(tagName, className) {
     const element = this.#deps.document.createElement(tagName);

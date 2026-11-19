@@ -21,7 +21,8 @@ var VivArcDiPeekKeys = (() => {
   // src/page/peek-keys.ts
   var peek_keys_exports = {};
   __export(peek_keys_exports, {
-    install: () => install
+    install: () => install,
+    uninstall: () => uninstall
   });
 
   // src/modules/peek/PeekKeyMap.ts
@@ -63,26 +64,68 @@ var VivArcDiPeekKeys = (() => {
     }
   }
 
-  // src/page/peek-keys.ts
-  var INSTANCE_KEY = /* @__PURE__ */ Symbol.for("vivarcdi.peek.keys");
-  function install(token) {
-    const registry = globalThis;
-    if (registry[INSTANCE_KEY]) {
-      return;
+  // src/page/lib/PageInstall.ts
+  var PageListener = class {
+    #type;
+    #listener;
+    constructor(type, listener) {
+      this.#type = type;
+      this.#listener = listener;
     }
-    registry[INSTANCE_KEY] = true;
-    globalThis.addEventListener(
-      "keydown",
-      (event) => {
+    attach() {
+      globalThis.addEventListener(this.#type, this.#listener, true);
+    }
+    detach() {
+      globalThis.removeEventListener(this.#type, this.#listener, true);
+    }
+  };
+  var PageInstall = class {
+    #key;
+    constructor(key) {
+      this.#key = Symbol.for(key);
+    }
+    /**
+     * Detaches the previous hook, attaches the new one and keeps it.
+     *
+     * @param hook What to attach to the page.
+     */
+    replace(hook) {
+      this.remove();
+      hook.attach();
+      this.#slot()[this.#key] = hook;
+    }
+    /**
+     * Detaches the kept hook, if any, and forgets it.
+     */
+    remove() {
+      const slot = this.#slot();
+      const hook = slot[this.#key];
+      if (typeof hook?.detach === "function") {
+        hook.detach();
+      }
+      slot[this.#key] = void 0;
+    }
+    #slot() {
+      return globalThis;
+    }
+  };
+
+  // src/page/peek-keys.ts
+  var INSTALL = new PageInstall("vivarcdi.peek.keys");
+  function install(token) {
+    INSTALL.replace(
+      new PageListener("keydown", (event) => {
         const command = commandFor(event);
         if (command !== null) {
           event.preventDefault();
           event.stopImmediatePropagation();
           sendToInterface({ type: PEEK_MESSAGE_TYPE, token, action: "command", command });
         }
-      },
-      true
+      })
     );
+  }
+  function uninstall() {
+    INSTALL.remove();
   }
   return __toCommonJS(peek_keys_exports);
 })();
