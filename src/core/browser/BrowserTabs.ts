@@ -1,6 +1,7 @@
 import type { PrefsApi } from './BrowserPrefs.js';
 import type { StorageHost } from './PersistentStorage.js';
 import type { BookmarksHost } from './bookmarks/BrowserBookmarks.js';
+import { BrowserWindows } from './BrowserWindows.js';
 
 export type TabsMethod = 'get' | 'query' | 'create' | 'update' | 'discard' | 'reload' | 'remove' | 'move' | 'goBack';
 
@@ -64,6 +65,8 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
 
 export class BrowserTabs {
   #chrome: ChromeApi | null;
+  #windows: BrowserWindows;
+  #windowId: number | null = null;
 
   /**
    * Promise-based access to the `chrome.tabs` API of Vivaldi's interface.
@@ -73,6 +76,23 @@ export class BrowserTabs {
    */
   constructor(chromeApi: ChromeApi | undefined) {
     this.#chrome = chromeApi?.tabs ? chromeApi : null;
+    this.#windows = new BrowserWindows(chromeApi);
+  }
+
+  /**
+   * @returns The id of the window of this document, read once and kept; null when it cannot be
+   * read, in which case a later call tries again. Never rejects.
+   */
+  public async ownWindowId(): Promise<number | null> {
+    if (this.#windowId !== null) {
+      return this.#windowId;
+    }
+    try {
+      this.#windowId = (await this.#windows.current()).id ?? null;
+    } catch {
+      this.#windowId = null;
+    }
+    return this.#windowId;
   }
 
   /**

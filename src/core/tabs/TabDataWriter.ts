@@ -1,6 +1,7 @@
 import type { BrowserTabs } from '../browser/BrowserTabs.js';
+import { Logger } from '../support/Logger.js';
 
-export type TabDataTabs = Pick<BrowserTabs, 'get' | 'update'>;
+export type TabDataTabs = Pick<BrowserTabs, 'get' | 'update'> & Partial<Pick<BrowserTabs, 'ownWindowId'>>;
 
 export type TabDataChange = (tab: chrome.tabs.Tab) => string | null;
 
@@ -8,16 +9,22 @@ export class TabDataWriter {
   static #instances = new WeakMap<object, TabDataWriter>();
 
   #tabs: TabDataTabs;
+  #logger: Logger;
+  #warned = false;
   #queues = new Map<number, Promise<void>>();
 
   /**
    * Writes the `vivExtData` of tabs one write at a time for each tab, so that two modules never
    * overwrite each other's keys with a copy of the tab that went stale while they waited.
    *
+   * A tab that belongs to another window is left alone, so two windows never both write it.
+   *
    * @param tabs Tabs API.
+   * @param logger Where skipped writes and an unreadable window id are reported.
    */
-  constructor(tabs: TabDataTabs) {
+  constructor(tabs: TabDataTabs, logger: Logger = new Logger('VivArcDi:tab-data')) {
     this.#tabs = tabs;
+    this.#logger = logger;
   }
 
   /**
@@ -57,9 +64,26 @@ export class TabDataWriter {
 
   async #apply(tabId: number, change: TabDataChange): Promise<void> {
     const tab = await this.#tabs.get(tabId);
+    const own = await this.#own();
+    if (own !== null && tab.windowId !== own) {
+      this.#logger.debug(`skipped tab ${tabId}: it belongs to window ${tab.windowId}`);
+      return;
+    }
     const data = change(tab);
     if (data !== null) {
       await this.#tabs.update(tabId, { vivExtData: data });
     }
+  }
+
+  async #own(): Promise<number | null> {
+    if (this.#tabs.ownWindowId === undefined) {
+      return null;
+    }
+    const own = await this.#tabs.ownWindowId();
+    if (own === null && !this.#warned) {
+      this.#warned = true;
+      this.#logger.warn('cannot read the window id: writing tabs of any window');
+    }
+    return own;
   }
 }
