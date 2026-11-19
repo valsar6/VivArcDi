@@ -10,12 +10,13 @@ import type { ChromeApi } from '../browser/BrowserTabs.js';
 import { BrowserWindows } from '../browser/BrowserWindows.js';
 import { Logger } from '../support/Logger.js';
 import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
+import { ModuleStarter } from './ModuleStarter.js';
+import type { ModuleServices } from './ModuleStarter.js';
 import { ModuleSettings } from './ModuleSettings.js';
 import { PersistentStorage } from '../browser/PersistentStorage.js';
 import type { SavingStorage } from '../browser/SavingStorage.js';
 import type { Notices } from '../dom/Notices.js';
 import { WindowServices } from './WindowServices.js';
-import type { StartServices } from './WindowServices.js';
 import { ResourceLoader } from './ResourceLoader.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import { SelectorCatalog } from '../dom/SelectorCatalog.js';
@@ -57,17 +58,11 @@ export class VivArcDi {
   #registry: ModuleRegistry;
   #logger: Logger;
   #document: Document;
-  #tabs: BrowserTabs;
-  #bookmarks: BrowserBookmarks;
-  #bookmarkWriter: BookmarkWriter;
   #runtime: BrowserRuntime;
-  #windows: BrowserWindows | undefined;
-  #search: BrowserSearch | undefined;
-  #history: BrowserHistory;
-  #prefs: BrowserPrefs;
   #storage: SavingStorage;
   #notices: Notices | null = null;
   #styles: StyleInjector;
+  #starter: ModuleStarter;
   #started: EnabledModule[] = [];
 
   /**
@@ -95,15 +90,14 @@ export class VivArcDi {
     this.#registry = registry;
     this.#logger = logger;
     this.#document = document;
-    this.#tabs = tabs;
-    this.#bookmarks = bookmarks;
-    this.#bookmarkWriter = bookmarkWriter;
     this.#runtime = runtime;
-    this.#windows = windows;
-    this.#search = search;
-    this.#history = history;
-    this.#prefs = prefs;
     this.#storage = storage;
+    this.#starter = VivArcDi.#starterOf(
+      { document, tabs, bookmarks, bookmarkWriter, runtime, history, prefs, payload: loader },
+      windows,
+      search,
+      logger,
+    );
     this.#styles = new StyleInjector(document, loader);
   }
 
@@ -146,6 +140,22 @@ export class VivArcDi {
     return app;
   }
 
+  static #starterOf(
+    services: Omit<ModuleServices, 'windows' | 'search'>,
+    windows: BrowserWindows | undefined,
+    search: BrowserSearch | undefined,
+    logger: Logger,
+  ): ModuleStarter {
+    return new ModuleStarter(
+      {
+        ...services,
+        windows: windows ?? new BrowserWindows(undefined),
+        search: search ?? new BrowserSearch(undefined),
+      },
+      logger,
+    );
+  }
+
   static #prefsApi(chromeApi: ChromeApi | undefined): PrefsApi | undefined {
     const vivaldi = (globalThis as { vivaldi?: { prefs?: PrefsApi } }).vivaldi;
     return vivaldi?.prefs ?? chromeApi?.vivaldiPrivate?.prefs;
@@ -182,7 +192,9 @@ export class VivArcDi {
     const { modules, unknown } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      await this.#startModule(entry, { settings, selectors, build, ...services });
+      if (await this.#starter.start(entry, { settings, selectors, build, ...services })) {
+        this.#started.push(entry);
+      }
     }
 
     this.#logger.info(
@@ -213,39 +225,6 @@ export class VivArcDi {
     } catch (error) {
       this.#logger.warn('Cannot tell if this is a private window, treating it as a normal window', error);
       return false;
-    }
-  }
-
-  async #startModule(entry: EnabledModule, start: StartServices): Promise<void> {
-    const { settings, selectors, build, storage, notices } = start;
-    const options = settings.optionsOf(entry.id);
-    if (options === null) {
-      return;
-    }
-    const logger = this.#logger.child(entry.id);
-    try {
-      await entry.module.start({
-        document: this.#document,
-        selectors,
-        logger,
-        options,
-        build,
-        tabs: this.#tabs,
-        bookmarks: this.#bookmarks,
-        bookmarkWriter: this.#bookmarkWriter,
-        modules: settings.all,
-        runtime: this.#runtime,
-        windows: this.#windows ?? new BrowserWindows(undefined),
-        search: this.#search ?? new BrowserSearch(undefined),
-        history: this.#history,
-        prefs: this.#prefs,
-        storage,
-        notices,
-        payload: this.#loader,
-      });
-      this.#started.push(entry);
-    } catch (error) {
-      logger.error('Failed to start', error);
     }
   }
 }
