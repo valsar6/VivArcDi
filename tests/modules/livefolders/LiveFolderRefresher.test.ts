@@ -1,22 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Logger } from '../../../src/core/support/Logger.js';
+import { Notices } from '../../../src/core/dom/Notices.js';
 import { GithubPullRequests } from '../../../src/modules/livefolders/GithubPullRequests.js';
 import { LiveEntries, CONNECT_TITLE, NOT_SET_UP_TITLE, RECONNECT_TITLE } from '../../../src/modules/livefolders/LiveEntries.js';
 import type { ConnectionState } from '../../../src/modules/livefolders/LiveEntries.js';
-import { LiveFolderRefresher } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
+import { LiveFolderRefresher, REFUSED_NOTICE } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
 import { LiveFolderStore } from '../../../src/modules/livefolders/LiveFolderStore.js';
 import type { LiveFolder } from '../../../src/modules/livefolders/LiveFolderStore.js';
-import { FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
+import { RecordingToast } from '../../loader/fakes.js';
+import { FakeConnection, FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 
 const TOKEN = 'ghp_never_stored_anywhere';
+const OTHER_TOKEN = 'ghp_renewed_elsewhere';
 const FIVE_MINUTES = 300_000;
 
 const CONNECTED: ConnectionState = { configured: true, connected: true };
 const NOT_CONNECTED: ConnectionState = { configured: true, connected: false };
 
 interface Setup {
-  connection: { token: string | null };
+  connection: FakeConnection;
+  toasts: RecordingToast;
   github: FakeGithub;
   store: LiveFolderStore;
   logger: Logger;
@@ -28,7 +32,7 @@ interface Setup {
   logged: () => string;
 }
 
-function setup(token: string | null = TOKEN, held?: HeldGithub): Setup {
+function setup(token: string | null = TOKEN, held?: Pick<GithubPullRequests, 'list'>): Setup {
   const github = new FakeGithub([pullRequest(1, { title: 'First' }), pullRequest(2, { title: 'Second', reviewRequested: true })]);
   const storage = new MemoryStorage();
   const { logger, sink } = recordingLogger();
@@ -36,19 +40,21 @@ function setup(token: string | null = TOKEN, held?: HeldGithub): Setup {
   const store = new LiveFolderStore(storage, logger, () => `f${(next += 1)}`);
   const folder = store.add('5');
   const ticker = new ManualTicker();
-  const connection = { token };
+  const connection = new FakeConnection(token);
+  const toasts = new RecordingToast();
   let changed = 0;
   const refresher = new LiveFolderRefresher({
     store,
     github: held ?? new GithubPullRequests(github.fetch),
     connection,
+    notices: new Notices(toasts),
     changed: (): void => void (changed += 1),
     ticker,
     intervalMs: FIVE_MINUTES,
     logger,
     now: (): number => 1234,
   });
-  return { connection, github, store, logger, storage, refresher, ticker, folder, changes: (): number => changed, logged: (): string => sink.lines.join('\n') };
+  return { connection, toasts, github, store, logger, storage, refresher, ticker, folder, changes: (): number => changed, logged: (): string => sink.lines.join('\n') };
 }
 
 const refreshed = async ({ refresher, folder }: Setup): Promise<void> => {
@@ -121,22 +127,126 @@ test('never logs the token', async () => {
   assert.ok(!context.logged().includes('Bearer'));
 });
 
-test('offers to reconnect when the token is refused', async () => {
+test('forgets the token when GitHub refuses it', async () => {
   const context = setup();
   await refreshed(context);
-  const rowsBefore = context.store.find('f1')?.rows ?? [];
   context.github.status = 401;
   await refreshed(context);
   const refused = context.store.find('f1') as LiveFolder;
-  assert.deepEqual(refused.rows, rowsBefore);
-  assert.equal(refused.needsReconnect, true);
-  const entry = LiveEntries.folder(refused, CONNECTED);
-  assert.equal(entry.warning, 'GitHub refused the connection');
-  assert.deepEqual(entry.children.map((child) => child.title), [RECONNECT_TITLE, 'Second', 'First']);
-  context.github.status = 200;
+  assert.equal(context.connection.token, null);
+  assert.deepEqual(refused.rows, []);
+  assert.equal(refused.needsReconnect, false);
+  assert.deepEqual(LiveEntries.folder(refused, NOT_CONNECTED).children.map((child) => child.title), [CONNECT_TITLE]);
+});
+
+test('stops calling GitHub after the token is refused', async () => {
+  const context = setup();
+  context.github.status = 401;
+  context.refresher.start();
+  await context.refresher.idle();
+  const sent = context.github.requests.length;
+  assert.equal(sent, 2);
+  await refreshed(context);
+  context.ticker.tick();
+  await context.refresher.idle();
+  assert.equal(context.github.requests.length, sent);
+  context.connection.token = OTHER_TOKEN;
+  await refreshed(context);
+  assert.ok(context.github.requests.length > sent);
+});
+
+test('keeps the token on a rate limit', async () => {
+  const context = setup();
+  await refreshed(context);
+  const rowsBefore = context.store.find('f1')?.rows ?? [];
+  for (const status of [403, 429]) {
+    context.github.status = status;
+    await refreshed(context);
+    assert.equal(context.connection.token, TOKEN);
+    assert.equal(context.connection.forgets, 0);
+    assert.equal(context.toasts.shown.length, 0);
+    assert.deepEqual(context.store.find('f1')?.rows, rowsBefore);
+    assert.equal(context.store.find('f1')?.warning, "GitHub's rate limit, retrying later");
+  }
+});
+
+test('keeps a token renewed in another window', async () => {
+  const github = new FakeGithub([pullRequest(1)]);
+  const real = new GithubPullRequests(github.fetch);
+  const renewing: Pick<GithubPullRequests, 'list'> = {
+    list: async (filters, token) => {
+      if (token === TOKEN) {
+        context.connection.token = OTHER_TOKEN;
+      }
+      try {
+        return await real.list(filters, token);
+      } finally {
+        github.status = 200;
+      }
+    },
+  };
+  const context = setup(TOKEN, renewing);
+  github.status = 401;
+  context.refresher.start();
+  await context.refresher.idle();
+  assert.equal(context.connection.token, OTHER_TOKEN);
+  assert.equal(context.toasts.shown.length, 0);
+  assert.equal(context.connection.forgets, 1);
+  assert.deepEqual([...new Set(github.requests.map((request) => request.headers['Authorization']))], [`Bearer ${TOKEN}`, `Bearer ${OTHER_TOKEN}`]);
+  assert.equal(context.store.find('f1')?.rows.length, 1);
+});
+
+test('tells the user once when GitHub refuses the token', async () => {
+  const context = setup();
+  context.store.add('9');
+  context.github.status = 401;
+  context.refresher.refreshAll();
+  await context.refresher.idle();
+  assert.equal(context.github.requests.length, 2);
+  assert.deepEqual(context.toasts.shown, [{ text: REFUSED_NOTICE, kind: 'error' }]);
+  assert.ok(!context.toasts.shown.some((shown) => shown.text.includes(TOKEN)));
+  assert.ok(!context.logged().includes(TOKEN));
+});
+
+test('tells the user again after a new refusal', async () => {
+  const context = setup();
+  context.github.status = 401;
+  await refreshed(context);
+  context.connection.token = OTHER_TOKEN;
+  await refreshed(context);
+  assert.equal(context.connection.token, null);
+  assert.deepEqual(context.toasts.shown, [
+    { text: REFUSED_NOTICE, kind: 'error' },
+    { text: REFUSED_NOTICE, kind: 'error' },
+  ]);
+});
+
+test('discards the token on a refresh from the menu', async () => {
+  const timer = setup();
+  timer.refresher.start();
+  await timer.refresher.idle();
+  timer.github.status = 401;
+  timer.ticker.tick();
+  await timer.refresher.idle();
+  const menu = setup();
+  menu.github.status = 401;
+  await refreshed(menu);
+  for (const context of [timer, menu]) {
+    assert.equal(context.connection.token, null);
+    assert.equal(context.toasts.shown.length, 1);
+  }
+});
+
+test('clears the old reconnect flag on success', async () => {
+  const context = setup();
+  context.store.update('f1', { needsReconnect: true });
+  const before = LiveEntries.folder(context.store.find('f1') as LiveFolder, CONNECTED);
+  assert.equal(before.children[0]?.title, RECONNECT_TITLE);
   await refreshed(context);
   assert.equal(context.store.find('f1')?.needsReconnect, false);
   assert.equal(context.store.find('f1')?.warning, null);
+  assert.equal(context.toasts.shown.length, 0);
+  assert.equal(context.connection.forgets, 0);
 });
 
 test('keeps an archived pull request hidden until it is updated on GitHub', async () => {

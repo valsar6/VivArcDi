@@ -16,10 +16,10 @@ the refresher, its fakes and `LiveFolders`, which T1 does not touch but depends 
 in its own `vivarcdi-implementer` worktree, T2 from the commit of T1. T3 and T4 are the lead's, T5
 comes last.
 
-- [ ] **T1. Conditional forget.** `GithubConnection.forgetIf(token)` with its JSDoc. Test
+- [x] **T1. Conditional forget.** `GithubConnection.forgetIf(token)` with its JSDoc. Test
   `forgets only the token it is given` in `tests/modules/livefolders/GithubConnection.test.ts`.
   Small; it runs alone and first.
-- [ ] **T2. Refresher discards and wiring.** `LiveFolderRefresher.ts`: `REFUSED_NOTICE`, the
+- [x] **T2. Refresher discards and wiring.** `LiveFolderRefresher.ts`: `REFUSED_NOTICE`, the
   `notices` and `connection` dependency types, `#active`, `#empty`, `#refused`, the new `catch` in
   `#load`, the JSDoc. `LiveFolders.#build` passes `context.notices` to the refresher.
   `FakeConnection` in `tests/modules/livefolders/fakes.ts`; the `setup` of
@@ -31,10 +31,10 @@ comes last.
   a new refusal`, `discards the token on a refresh from the menu`, `clears the old reconnect flag
   on success`. Also `shows the refusal notice through the module context` in
   `tests/modules/livefolders/LiveFolders.test.ts`. Runs alone, from the commit of T1.
-- [ ] **T3. Review pass.** Not an implementation task: the lead runs `make check`, reads the diff
+- [x] **T3. Review pass.** Not an implementation task: the lead runs `make check`, reads the diff
   against the design (no token in logs or toast, the 200-line and complexity limits, no other
   `needsReconnect` writer).
-- [ ] **T4. Docs and version.** Owned by the lead: the 026 paragraph and AC-23 row, 026 design
+- [x] **T4. Docs and version.** Owned by the lead: the 026 paragraph and AC-23 row, 026 design
   l. 204-206, `docs/manual/live-folders.md` `### Reconnect`, the patch bump checked with
   `npm run release -- check --base origin/main --branch fix/token-refused`.
 - [ ] **T5. Manual check.** Italian checklist for AC-9 under

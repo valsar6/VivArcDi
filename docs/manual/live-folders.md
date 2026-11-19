@@ -48,9 +48,10 @@ OAuth Apps**, find **VivArcDi** and choose **Revoke**.
 
 ### Reconnect
 
-If you revoke VivArcDi on GitHub, or GitHub stops accepting the connection, the folder keeps its last
-rows, shows the warning mark, and its first row becomes **Reconnect GitHub**. Click it and follow the
-same steps as above. A passing GitHub problem, such as no network, does not disconnect you.
+If you revoke VivArcDi on GitHub, or GitHub stops accepting the connection, VivArcDi forgets the
+connection and shows a notice: *GitHub refused the connection: sign in again to use the live folders*.
+Every live folder then shows **Connect GitHub**. Click it and follow the same steps as above. A
+passing GitHub problem, such as no network or a rate limit, does not disconnect you.
 
 ## Create a live folder
 

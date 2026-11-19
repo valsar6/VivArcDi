@@ -1,3 +1,4 @@
+import type { NoticeBoard } from '../../core/dom/Notices.js';
 import type { Logger } from '../../core/support/Logger.js';
 import { SerialTask } from '../../core/support/SerialTask.js';
 import { GithubFailure, UNREACHABLE_REASON } from './GithubPullRequests.js';
@@ -14,7 +15,9 @@ export interface Ticker {
 export interface RefresherDependencies {
   store: LiveFolderStore;
   github: Pick<GithubPullRequests, 'list'>;
-  connection: Pick<GithubConnection, 'token'>;
+  connection: Pick<GithubConnection, 'token' | 'forgetIf'>;
+  /** Tells the user, once per discarded token, that GitHub refused the connection. */
+  notices: Pick<NoticeBoard, 'show'>;
   /** Called after a folder changed, so that its rows are drawn again. */
   changed: () => void;
   ticker: Ticker;
@@ -22,6 +25,8 @@ export interface RefresherDependencies {
   logger: Logger;
   now?: () => number;
 }
+
+export const REFUSED_NOTICE = 'GitHub refused the connection: sign in again to use the live folders';
 
 export const defaultTicker: Ticker = {
   every: (run, intervalMs) => {
@@ -35,6 +40,7 @@ export class LiveFolderRefresher {
   #task: SerialTask;
   #pending = new Set<string>();
   #refreshAll = false;
+  #active = false;
   #stopTicker: (() => void) | null = null;
 
   /**
@@ -42,8 +48,8 @@ export class LiveFolderRefresher {
    * for one folder because the user opened it or changed its filters. Refreshes run one at a time,
    * so a timer and a click never race. Without a connection a folder is emptied and no request is
    * sent. A failed refresh keeps the rows and sets the warning to the reason, which is logged
-   * without any header; when GitHub refused the token the folder is marked to offer
-   * `Reconnect GitHub`. Pull requests the user archived stay hidden until GitHub says they changed.
+   * without any header; when GitHub refused the token it is forgotten, the folders show
+   * `Connect GitHub` and the window shows one notice. Pull requests the user archived stay hidden until GitHub says they changed.
    * A refresh changes only the rows, the archived rows, the warning and the refresh time, as saved
    * when GitHub answers, so a rename or an archive made in another window stays.
    *
@@ -61,6 +67,7 @@ export class LiveFolderRefresher {
    * Refreshes every folder now and then every interval.
    */
   public start(): void {
+    this.#active = true;
     this.refreshAll();
     this.#stopTicker = this.#deps.ticker.every(() => this.refreshAll(), this.#deps.intervalMs);
   }
@@ -69,6 +76,7 @@ export class LiveFolderRefresher {
    * Stops the timer. A refresh that is running ends on its own.
    */
   public stop(): void {
+    this.#active = false;
     this.#stopTicker?.();
     this.#stopTicker = null;
     this.#pending.clear();
@@ -118,7 +126,7 @@ export class LiveFolderRefresher {
     }
     const secret = connection.token;
     if (secret === null) {
-      store.update(id, { rows: [], warning: null, needsReconnect: false, archived: {} });
+      this.#empty(id);
     } else {
       await this.#load(folder, secret);
     }
@@ -132,9 +140,29 @@ export class LiveFolderRefresher {
       const { rows, archived } = ArchivedPullRequests.apply(found, store.find(id)?.archived ?? {});
       store.update(id, { rows, archived, warning: null, needsReconnect: false, refreshedAt: now() });
     } catch (error) {
+      if (error instanceof GithubFailure && error.refused) {
+        this.#refused(id, secret);
+        return;
+      }
       const reason = LiveFolderRefresher.#reasonOf(error);
-      store.update(id, { warning: reason, needsReconnect: error instanceof GithubFailure && error.refused });
+      store.update(id, { warning: reason, needsReconnect: false });
       logger.warn('could not refresh a live folder', reason);
+    }
+  }
+
+  #empty(id: string): void {
+    this.#deps.store.update(id, { rows: [], warning: null, needsReconnect: false, archived: {} });
+  }
+
+  #refused(id: string, secret: string): void {
+    const { connection, notices, logger } = this.#deps;
+    if (connection.forgetIf(secret)) {
+      this.#empty(id);
+      logger.warn('GitHub refused the token: it was forgotten');
+      notices.show(REFUSED_NOTICE, 'error');
+    } else if (this.#active) {
+      logger.warn('GitHub refused a token that is no longer the stored one: refreshing again');
+      this.refresh(id);
     }
   }
 

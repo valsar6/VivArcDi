@@ -18,7 +18,9 @@ import { FolderTabs, WritableChrome, bookmarkTree, link } from '../folders/fakes
 import { settle } from '../reopen/fakes.js';
 import { CODE_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import { FakeDeviceGithub, FakeGithub, ME, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
-import { silentNotices } from '../../loader/fakes.js';
+import { Notices } from '../../../src/core/dom/Notices.js';
+import { RecordingToast } from '../../loader/fakes.js';
+import { REFUSED_NOTICE } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
 
 const TOKEN = 'ghp_module_token';
 const WORKSPACE = '5';
@@ -32,6 +34,7 @@ interface Setup {
   github: FakeGithub;
   bookmarks: WritableChrome;
   virtual: VirtualFolders;
+  toasts: RecordingToast;
   lines: () => string[];
 }
 
@@ -49,6 +52,7 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     }
     return hang ? new Promise(() => undefined) : github.fetch(url, init);
   }) as unknown as typeof fetch;
+  const toasts = new RecordingToast();
   const { logger, sink } = recordingLogger();
   const bookmarks = new WritableChrome(bookmarkTree([link('10', 'Docs', 'https://docs.example/')]));
   const module = new LiveFolders();
@@ -65,9 +69,9 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     storage,
     bookmarks: bookmarks.reader,
     bookmarkWriter: bookmarks.writer,
-    notices: silentNotices(),
+    notices: new Notices(toasts),
   } as unknown as ModuleContext<LiveFoldersOptions>;
-  return { dom, module, context, storage, github, bookmarks, virtual: VirtualFolders.of(dom), lines: (): string[] => sink.lines };
+  return { dom, module, context, storage, github, bookmarks, virtual: VirtualFolders.of(dom), toasts, lines: (): string[] => sink.lines };
 }
 
 const menuItems = (dom: DomDocument): DomNode[] => dom.created.findLast((node) => node.hasAttribute(MENU_ATTRIBUTE) && node.parentElement !== null)?.children ?? [];
@@ -245,4 +249,15 @@ test('stays off without chrome.tabs', async (t) => {
   assert.equal(spaceItem(context.dom, 'Live Folders'), undefined);
   assert.equal(context.virtual.ready, false);
   assert.ok(context.lines().some((line) => line.includes('live folders are off')));
+});
+
+test('shows the refusal notice through the module context', async (t) => {
+  const context = setup(t);
+  context.github.status = 401;
+  await context.module.start(context.context);
+  createFolder(context.dom);
+  await settle();
+  await settle();
+  assert.deepEqual(context.toasts.shown, [{ text: REFUSED_NOTICE, kind: 'error' }]);
+  assert.ok(!context.toasts.shown.some((shown) => shown.text.includes(TOKEN)));
 });

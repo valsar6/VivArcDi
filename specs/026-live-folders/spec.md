@@ -78,8 +78,8 @@ the browser, with no terminal and no token to copy:
 
 The live folder's menu gains `Disconnect GitHub`, which forgets the connection; every live folder then
 shows `Connect GitHub` again. When GitHub refuses the connection (the user revoked VivArcDi in GitHub's
-settings), the folder keeps its last rows, shows the warning, and the first row becomes
-`Reconnect GitHub`, which starts the same steps.
+settings), the connection is forgotten as with `Disconnect GitHub`, the window shows a notice and
+every live folder shows `Connect GitHub` ([048](../048-github-token-refused/spec.md)).
 
 The access asked is `repo`, the only scope of GitHub that lets an app read pull requests of private
 repositories. VivArcDi only reads; the manual says so and explains how to revoke it on GitHub.
@@ -162,7 +162,7 @@ touched, because a live folder is not a bookmark folder.
 | AC-20 | WHEN GitHub returns a token, THE module SHALL store it, show `Connected as <login>` and refresh every live folder. | auto: `stores the token and refreshes after authorization` |
 | AC-21 | IF the code expires or the user denies access, THEN THE panel SHALL say so and offer `Try again`, and nothing SHALL be stored. | auto: `stores nothing when the code expires or is denied` |
 | AC-22 | WHEN the user chooses `Disconnect GitHub`, THE token SHALL be forgotten and every live folder SHALL show `Connect GitHub`. | auto: `forgets the token on disconnect` |
-| AC-23 | IF GitHub answers 401 to a refresh, THEN THE folder SHALL keep its rows, show the warning and offer `Reconnect GitHub`. | auto: `offers to reconnect when the token is refused` |
+| AC-23 | Superseded by [048](../048-github-token-refused/spec.md) AC-1: IF GitHub answers 401 to a refresh, THEN THE module SHALL forget the token and every folder SHALL show `Connect GitHub`. | auto: `forgets the token when GitHub refuses it` |
 | AC-24 | WHEN the installer runs, THE old token file and the `live-folders token` command SHALL be gone. | auto: `removes the old token file` |
 | AC-25 | WHEN the user presses `Copy code and open GitHub`, THE module SHALL show the toast `Code copied, paste it on GitHub`. | auto: `confirms the copied code with a toast` |
 | AC-26 | WHEN the user presses `Cancel` in the connect panel, THE flow SHALL stop and the toast `GitHub connection cancelled` SHALL appear. | auto: `confirms a cancelled connection with a toast` |

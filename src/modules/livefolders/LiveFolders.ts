@@ -103,7 +103,7 @@ export class LiveFolders extends Module<LiveFoldersOptions> {
     this.#stops = [];
   }
 
-  #build({ document, selectors, tabs, storage, options, logger }: ModuleContext<LiveFoldersOptions>): Parts {
+  #build({ document, selectors, tabs, storage, options, logger, notices }: ModuleContext<LiveFoldersOptions>): Parts {
     const clientId = options.githubClientId;
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
@@ -119,6 +119,7 @@ export class LiveFolders extends Module<LiveFoldersOptions> {
       store,
       github: new GithubPullRequests(sendWithFetch),
       connection,
+      notices,
       changed: (): void => (this.#stopped ? undefined : publisher.publish()),
       ticker: defaultTicker,
       intervalMs: options.refreshMinutes * MS_PER_MINUTE,

@@ -226,3 +226,22 @@ export class ManualTimers {
     await settle();
   }
 }
+
+/** A connection that holds a token and forgets it only when asked for that very token. */
+export class FakeConnection {
+  public token: string | null;
+  public forgets = 0;
+
+  constructor(token: string | null) {
+    this.token = token;
+  }
+
+  public forgetIf(token: string): boolean {
+    this.forgets += 1;
+    if (this.token !== token) {
+      return false;
+    }
+    this.token = null;
+    return true;
+  }
+}

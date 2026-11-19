@@ -5,8 +5,8 @@ import { PullRequestFilters } from '../../../src/modules/livefolders/PullRequest
 import type { CommandItem, MenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { LiveFolderRefresher } from '../../../src/modules/livefolders/LiveFolderRefresher.js';
 import { LiveRowMenu } from '../../../src/modules/livefolders/LiveRowMenu.js';
-import { guarded } from '../../loader/fakes.js';
-import { FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
+import { guarded, silentNotices } from '../../loader/fakes.js';
+import { FakeConnection, FakeGithub, HeldGithub, ManualTicker, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 
 const ROW = { id: '1', title: 'Fix', url: 'https://github.com/a/b/pull/1', subtitle: 'ada · a/b', updatedAt: '2026-11-01T00:00:00Z' };
 
@@ -138,7 +138,7 @@ test('does not bring back a folder deleted in another window', async () => {
   assert.deepEqual(savedIds(storage), { 5: ['f2'] });
   first.update('f2', { rows: [ROW] });
   const held = new HeldGithub(new FakeGithub([pullRequest(1)]));
-  const refresher = new LiveFolderRefresher({ store: first, github: held, connection: { token: 'secret' }, changed: (): void => undefined, ticker: new ManualTicker(), intervalMs: 1, logger: recordingLogger().logger });
+  const refresher = new LiveFolderRefresher({ store: first, github: held, connection: new FakeConnection('secret'), notices: silentNotices(), changed: (): void => undefined, ticker: new ManualTicker(), intervalMs: 1, logger: recordingLogger().logger });
   let opened: MenuItem[] = [];
   const menu = new LiveRowMenu({
     menu: { open: (items): void => void (opened = items) },
