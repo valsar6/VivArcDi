@@ -1,0 +1,18 @@
+Package: vivarcdi
+Version: 0.59.8
+Architecture: all
+Maintainer: Salvatore <25297596+valsar6@users.noreply.github.com>
+Depends: python3 (>= 3.9), python3-tk
+Section: web
+Priority: optional
+Homepage: https://github.com/valsar6/VivArcDi
+Description: Make Vivaldi behave like Arc
+ VivArcDi adds Arc-style tabs, sidebar and shortcuts to Vivaldi without
+ modifying its browser engine. It patches Vivaldi's window.html, applies
+ itself again after every Vivaldi update and can be removed at any time.
+Filename: pool/main/v/vivarcdi/vivarcdi_0.59.8_all.deb
+Size: 186832
+MD5sum: 7167097698a43436b202a0375247baf2
+SHA1: 915a0431305dc2d68cfc53f3935ec19bd5f25ebf
+SHA256: 6032009ff842f80816ef229daf8cbe14a8737d1cabf3322ee4427d943da60806
+

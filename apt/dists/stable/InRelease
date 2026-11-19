@@ -1,0 +1,21 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: VivArcDi
+Label: VivArcDi
+Suite: stable
+Codename: stable
+Date: Thu, 19 Nov 2026 22:09:48 GMT
+Architectures: all
+Components: main
+Description: VivArcDi apt repository
+SHA256:
+ 0b54f8c68ac5bfe131d6ec529dfb9c2717f083ffdad98f6a0d2455de2aab5328              724 main/binary-all/Packages
+ d5be6a766398acd1cb2d6419f8935c2900b38843e6882c513ce1444449f78462              509 main/binary-all/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQQU8mSYo3NNkPdkp71L62i+x7QcjwUCav96ngAKCRBL62i+x7Qc
+j7Z4AQCfqer2hjoXuwKdnJ2fTkUAVzdBj73WpHeGw/7twiJO6gEAmeAOuFxdFVdZ
+5by1L39oE53yfI3/LSyKbUMvi5s22Qs=
+=alF0
+-----END PGP SIGNATURE-----
