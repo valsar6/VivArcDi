@@ -32,8 +32,8 @@ rules for working in parallel.
 ## Expected behavior
 
 `npm run review-wait` reads the merged pull requests of the repository with `gh`, groups the ones that
-belong to a spec, and prints a markdown report on the terminal and into `build/review-wait/report.md`.
-It never writes to GitHub.
+belong to a spec, and prints a markdown report on the terminal and saves it as a dated file. It never
+writes to GitHub.
 
 A pull request belongs to a spec when it changes files under `specs/NNN-*/`. Its stage follows from
 what it changes:
@@ -54,6 +54,11 @@ into the stages.
 
 `--since <date>` limits the report to pull requests merged from that day on.
 
+The report is saved as `<out>/<YYYY-MM-DD>.md`. `<out>` is `--out <dir>` when given; otherwise it is
+the private `.claude/review-wait/` of the project, where the reports are versioned with the rest of
+the private notes, and `build/review-wait/` when there is no `.claude/` (another contributor, a CI
+runner). The command is a plain npm script, so a pipeline can run it too.
+
 GitHub cannot tell Tore from the agent: every pull request, comment and merge goes through the same
 account. The report therefore uses only the times of opening and merge, never who commented, and it
 says so in its header.
@@ -69,12 +74,14 @@ says so in its header.
 - **FR-3.** The report has the per-stage summary, the per-spec table, the cycle of each spec and the
   wait of its manual checks.
 - **FR-4.** `--since <date>` filters on the merge time.
-- **FR-5.** The report is printed on stdout and written to `build/review-wait/report.md`.
+- **FR-5.** The report is printed on stdout and written to `<out>/<YYYY-MM-DD>.md`, where `<out>` is
+  `--out`, else `.claude/review-wait/` if `.claude/` exists, else `build/review-wait/`.
 - **FR-6.** Durations are shown in hours and days, rounded to the hour.
 
 ### Non-functional
 
-- **NFR-1.** The command needs only `gh`, already authenticated, and no secret of its own.
+- **NFR-1.** The command needs only `gh`, already authenticated, and no secret of its own; it runs
+  the same on a developer machine and in a pipeline.
 - **NFR-2.** `make check` stays offline: the stage rules, the grouping and the statistics are unit
   tested on a fixed list of pull requests; `gh` is behind a small interface with a fake.
 - **NFR-3.** The report of the repository (about two hundred pull requests) is produced in under a
@@ -97,7 +104,9 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 | AC-7 | WHEN a pull request belongs to no spec, THE report SHALL count it apart from the stages | auto: `keeps pull requests without a spec out of the stages` |
 | AC-8 | WHEN given `--since`, THE report SHALL ignore pull requests merged before that day | auto: `ignores pull requests merged before since` |
 | AC-9 | THE command SHALL call only read commands of `gh` | auto: `calls only read commands of gh` |
-| AC-10 | WHEN Tore runs the command on the repository, THE report SHALL list specs 036 to 048 with plausible waits and finish within a minute | manual |
+| AC-10 | WHEN given no `--out`, THE command SHALL save the report in `.claude/review-wait/` if that folder's parent exists, else in `build/review-wait/` | auto: `saves the report in the private folder when there is one` |
+| AC-11 | WHEN given `--out`, THE command SHALL save the report there | auto: `saves the report in the folder given by out` |
+| AC-12 | WHEN Tore runs the command on the repository, THE report SHALL list specs 036 to 048 with plausible waits and finish within a minute (last double check) | manual |
 
 ## Out of scope
 
@@ -110,14 +119,17 @@ Written in [EARS](../README.md#acceptance-criteria) and verifiable one by one. `
 
 ## Open questions
 
-- [ ] **Raw or working time.** Proposed: raw elapsed time, because the nights and weekends are part of
+- [x] **Raw or working time.** Decided: raw elapsed time, because the nights and weekends are part of
   what a pull request waits; the median keeps a single weekend from dominating.
-- [ ] **Where the report goes.** Proposed: stdout and `build/review-wait/report.md`, which is
-  git-ignored. Alternative: a pinned GitHub issue, which would need a write endpoint.
-- [ ] **Name of the command.** Proposed: `npm run review-wait`, a script in `scripts/review-wait/`
-  like `scripts/watch/`.
-- [ ] **Manual checks.** Proposed: measured only through the proxy of AC-5. Measuring the chat round
-  trips would need Tore to log them by hand, which costs more time than it reveals.
+- [x] **Where the report goes.** Decided: stdout and a dated file in the private `.claude/review-wait/`
+  of the project, so the reports are versioned privately; `build/review-wait/` where there is no
+  `.claude/`, because nothing in `.claude/` may be required by the codebase. Alternative: a pinned
+  GitHub issue, which would need a write endpoint.
+- [x] **Name of the command.** Decided: `npm run review-wait`, a script in `scripts/review-wait/` like
+  `scripts/watch/`, so it is easy to run by hand and from a pipeline.
+- [x] **Manual checks.** Decided: measured only through the proxy of AC-5. Measuring the chat round
+  trips would need Tore to log them by hand, which costs more time than it reveals. Less manual work, more automation: the one manual criterion
+  (AC-12) stays as the last double check, after the automated ones.
 
 ## References
 
