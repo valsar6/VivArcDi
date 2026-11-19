@@ -15,7 +15,7 @@ export const MOVE_TO_LABEL = 'Move to';
 
 export interface FolderRelocationDependencies {
   writer: Pick<BookmarkWriter, 'subTree' | 'move' | 'ensurePath'>;
-  linkTabs: Pick<FolderLinkTabs, 'linkIds' | 'tabsOf'>;
+  linkTabs: Pick<FolderLinkTabs, 'linkIds' | 'ownTabsOf'>;
   tabData: Pick<TabDataWriter, 'write'>;
   names: Pick<WorkspaceNames, 'entries'>;
   active: Pick<ActiveWorkspace, 'current'>;
@@ -77,7 +77,7 @@ export class FolderRelocation {
         return;
       }
       linkIds = linkTabs.linkIds(folder);
-      const tabIds = await linkTabs.tabsOf(linkIds);
+      const tabIds = await linkTabs.ownTabsOf(linkIds);
       closing.add(linkIds);
       await writer.move(folderId, { parentId: targetRootId });
       this.#deps.openFolders.forget(folderId);

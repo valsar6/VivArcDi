@@ -139,3 +139,10 @@ test('moves the other tabs when one tab fails', async () => {
   assert.deepEqual([1, 2].map((id) => workspaceOf(tabs, id)), [7, 8]);
   assert.deepEqual(toasts, [['Moved "Hobbies" to Lavoro', undefined]]);
 });
+
+test('moves only the tabs of its own window with the folder', async () => {
+  const { tabs, relocation } = setup();
+  tabs.tabs.set(4, { id: 4, windowId: 2, vivExtData: linkedTo(7, '11') });
+  await relocation.move('10', workspaces[1] as WorkspaceListing);
+  assert.deepEqual([1, 2, 3, 4].map((id) => workspaceOf(tabs, id)), [8, 8, 7, 7]);
+});
