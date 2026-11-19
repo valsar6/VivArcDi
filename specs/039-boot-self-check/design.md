@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 ## Approach
@@ -94,7 +94,7 @@ export class ModuleStarter {
   from the services and from `start`, and awaits `entry.module.start(context)`.
 - In T1 it returns `Promise<boolean>` (`true` when the module started), so the extraction changes
   nothing. In T5 it returns `ModuleOutcome` (type from `BootReport.ts`): `invalid-options` after
-  logging `logger.info('stays off: invalid options')` on the module logger (FR-6, AC-5); `failed`
+  logging `logger.warn('stays off: invalid options')` on the module logger (FR-6, AC-5); `failed`
   after the existing `logger.error('Failed to start', error)` (AC-3); `started` otherwise.
 - `VivArcDi` builds it in its constructor with the services it receives (`windows` and `search`
   defaulting to `new BrowserWindows(undefined)` and `new BrowserSearch(undefined)` there, as
@@ -281,15 +281,16 @@ Lines at the end of a start, in order:
 | Clean | `[VivArcDi]` active line (info), `[VivArcDi:boot]` summary (info) |
 | Catalog stands in | `[VivArcDi:boot]` stand-in (info) right after the catalog is read, …, summary (info) |
 | One module fails | `[VivArcDi:<id>] Failed to start` (error), active line, summary (warn) |
-| Invalid options | the 036 warnings, `[VivArcDi:<id>] stays off: invalid options` (info), active line, summary (warn) |
+| Invalid options | the 036 warnings, `[VivArcDi:<id>] stays off: invalid options` (warn), active line, summary (warn) |
 | Undefined selector | active line, `selector "x" is not defined in catalog 8.1` (warn), summary (warn) |
 | Two modules fail | two `Failed to start` (error), active line, summary (error), boot notice |
 | Inactive | `No selectors for Vivaldi …, staying inactive` (warn), summary `inactive` (warn) |
 | Failed | `[VivArcDi] Startup failed <error>` (error), summary `failed at <stage>` (error) |
 
-`stays off: invalid options` is `info`: the warnings of 036 already carry the problem at `warn` on the
-same logger, and the existing test `module without a required option stays off with a warning`
-expects exactly one warning there.
+`stays off: invalid options` is `warn`, as Tore decided: the module is off because of a problem, and
+the summary turns `warn` for the same reason. The existing test
+`module without a required option stays off with a warning` changes its body, not its name: it
+expects two warnings on `[test:configured]` (the 036 warning and `stays off: invalid options`).
 
 ## Tests
 
@@ -336,7 +337,7 @@ does.
 - **AC-4** with `hidden` off, `private` enabled in a normal window, `configured` enabled without
   `clientId`, and the marker: `off: 1 in config, 1 for this window, 1 by options`, and
   `1 of 1 modules started`.
-- **AC-5** with `configured` enabled without `clientId`: one `info` line `stays off: invalid options`
+- **AC-5** with `configured` enabled without `clientId`: one `warn` line `stays off: invalid options`
   on `[test:configured]`, after its 036 warning; `startedModules` is empty.
 - **AC-6** with `asker` and the marker: one `warn` line
   `selector "missing" is not defined in catalog 8.1` on `[test:boot]`, before the summary, which is
@@ -383,8 +384,8 @@ Existing tests:
   nothing.
 - `treats an unreadable window as normal` still counts one warning: `private` off for a normal window
   is not a problem, so the summary is `info`.
-- `module without a required option stays off with a warning` still finds one warning on
-  `[test:configured]`, since `stays off` is `info`.
+- `module without a required option stays off with a warning` changes its body (not its name) to
+  expect two warnings on `[test:configured]`: the 036 warning and `stays off: invalid options`.
 - `tests/loader/PrivateWindow.test.ts` boots the real registry over a catalog with `browser` only, so
   most modules fail and the normal-window run is severe: it now logs an `error` summary and shows the
   boot notice, which `app.stop()` removes with its timer. Its three tests read storage attempts, the
@@ -423,10 +424,7 @@ None. No option, no storage key (NFR-3).
 
 ## Open questions
 
-- [ ] **Level of `stays off: invalid options`.** The spec names the line but not its level. The
-  design uses `info`, because the 036 warning on the same logger already says `the module stays off`
-  at `warn`, and the summary turns `warn`. Alternative: `warn`, which needs the body of
-  `module without a required option stays off with a warning` changed to expect two warnings.
-- [ ] **Level of an inactive summary.** The spec does not say whether `inactive` is a problem. The
-  design uses `warn`, matching the existing `staying inactive` warning. Alternative: `info`, since
-  000/AC-14 makes inactivity deliberate.
+- [x] **Level of `stays off: invalid options`.** Answered (Tore, 2026-11-19): `warn`, and the body of
+  `module without a required option stays off with a warning` changes to expect two warnings.
+- [x] **Level of an inactive summary.** Answered (Tore, 2026-11-19): `warn`, matching the existing
+  `staying inactive` warning.

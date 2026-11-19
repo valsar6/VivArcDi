@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 | Design | [design.md](design.md) |
 
@@ -58,9 +58,9 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
 - [ ] **T5. Summary at every start.** `VivArcDi.start` creates the report, runs `#run(report)` with the
   stage calls of the design, catches and logs `Startup failed` itself, and calls `summarize` once;
   `boot` loses its `try`/`catch`. `ModuleStarter.start` returns `ModuleOutcome` and logs
-  `stays off: invalid options` at `info`; `VivArcDi` records every outcome. Tests: the boot fixture
+  `stays off: invalid options` at `warn`; `VivArcDi` records every outcome. Tests: the boot fixture
   moves to `tests/loader/boot.ts` with the `missing` and `browser` options and the `Asker` module;
-  `tests/loader/VivArcDi.test.ts` only imports it. Satisfies AC-1 to AC-9 in
+  `tests/loader/VivArcDi.test.ts` only imports it, and `module without a required option stays off with a warning` changes its body to expect two warnings. Satisfies AC-1 to AC-9 in
   `tests/loader/BootSelfCheck.test.ts` (new): `summarizes a clean start in one line`,
   `keeps the active line as it is`, `names failed modules in the summary`,
   `counts the modules that stay off`, `says when invalid options keep a module off`,
