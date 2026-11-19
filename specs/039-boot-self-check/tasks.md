@@ -26,7 +26,7 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   parallel with any task.
 - **T8** comes last.
 
-- [ ] **T1. Module starter.** `src/core/boot/ModuleStarter.ts` (new): `ModuleServices` and
+- [x] **T1. Module starter.** `src/core/boot/ModuleStarter.ts` (new): `ModuleServices` and
   `ModuleStarter` with `start(entry, start): Promise<boolean>`, the body of today's
   `VivArcDi.#startModule` moved without a change in behavior or log text. `VivArcDi.ts` builds one
   starter in its constructor (`windows` and `search` defaulted there, `payload: loader`), drops
@@ -34,18 +34,18 @@ Order and parallel work, for `vivarcdi-implementer` agents (one base commit and 
   when `start` returns `true`. `VivArcDiDependencies` is unchanged. No new test: every test in
   `tests/loader/` and `tests/modules/` keeps passing unchanged. `VivArcDi.ts` drops to about 165
   counted lines. No AC; it makes room for T5 and T6.
-- [ ] **T2. Catalog facts.** `src/core/dom/SelectorCatalog.ts`: the private `#undefined` set filled by
+- [x] **T2. Catalog facts.** `src/core/dom/SelectorCatalog.ts`: the private `#undefined` set filled by
   `get` before it throws, the `undefinedNames` getter, `standsInFor(vivaldiVersion)`. Tests in
   `tests/loader/SelectorCatalog.test.ts`: `get records the names it does not define` (two `get` of
   the same name and one `has` give one name) and `standsInFor tells an older catalog from a matching
   one` (8.1 for 8.3.x and for `unknown` is true; 8.1 for 8.1.x and an empty catalog are false).
   Prepares FR-7, FR-8.
-- [ ] **T3. Skipped modules.** `src/core/boot/ModuleRegistry.ts`: `SkippedModules`, `createEnabled`
+- [x] **T3. Skipped modules.** `src/core/boot/ModuleRegistry.ts`: `SkippedModules`, `createEnabled`
   returns `skipped` with the `config` and `window` counts; `modules` and `unknown` unchanged. Test in
   `tests/loader/ModuleRegistry.test.ts`: `createEnabled counts the modules it leaves out` (one off,
   one with `enabled: "yes"`, one private-only in a normal window, one unknown and disabled: `config`
   2, `window` 1). Prepares FR-5.
-- [ ] **T4. Boot report.** `src/core/boot/BootReport.ts` (new): `BootStage`, `BootOutcome`,
+- [x] **T4. Boot report.** `src/core/boot/BootReport.ts` (new): `BootStage`, `BootOutcome`,
   `ModuleOutcome`, `CatalogFacts`, `BOOT_NOTICE_KEY`, `MARKING_MODULE`, `SEVERE_FAILURES`,
   `bootNoticeText`, and `BootReport` with `enter`, `useBuild`, `useCatalog` (the stand-in line),
   `skip`, `record`, `summarize` (selector warnings, then the summary line at its level) and
