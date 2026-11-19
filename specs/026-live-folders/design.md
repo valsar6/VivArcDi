@@ -201,9 +201,9 @@ the token from it. The token goes only into the `Authorization` header of reques
 - Connected: every live folder refreshes on `onChange` (AC-20).
 - `Disconnect GitHub` in the folder menu calls `forget()`; every folder shows `Connect GitHub`
   (AC-22).
-- A 401 on a refresh keeps the rows, sets the warning `GitHub refused the connection` and the flag
-  `needsReconnect`; `LiveEntries` then puts a `Reconnect GitHub` row first (AC-23). The token is kept
-  until the user reconnects or disconnects, so a passing GitHub error never logs the user out.
+- A 401 on a refresh forgets the token and shows a notice, so every folder shows `Connect GitHub`
+  (AC-23, replaced by [048](../048-github-token-refused/design.md)). Other GitHub errors keep the
+  token, so a passing error never logs the user out.
 
 ### Connect panel (AC-18)
 
