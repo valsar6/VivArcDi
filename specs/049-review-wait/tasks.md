@@ -15,7 +15,7 @@ of T1. T4 and T5 are the lead's and come after.
 
 - [ ] **T1. Types, stage rules and statistics.** `scripts/review-wait/PullRequestSource.ts`
   (`MergedPullRequest`, `PullRequestSource`), `StageRules.ts`, `WaitStatistics.ts`;
-  `tests/review-wait/builders.ts` and `StageRules.test.ts`: `assigns a pull request to the spec whose
+  `tests/review-wait/builders.ts` and `StageRules.test.ts`: `assigns a pull request to every spec whose
   folder it changes`, `classifies a pull request by what it changes`, `classifies a status-only pull
   request as implemented`. Small; it runs alone and first.
 - [ ] **T2. Timeline and text.** `SpecTimeline.ts` and `ReportText.ts` with

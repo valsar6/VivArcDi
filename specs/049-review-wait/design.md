@@ -24,10 +24,10 @@ markdown; `ReportFolder` says where it goes; `cli.ts` joins them and writes the 
 
 ### Classification
 
-`StageRules.classify(files)` returns `{ spec: string | null; stage: Stage | null }`.
+`StageRules.classify(files)` returns `{ specs: string[]; stage: Stage | null }`.
 
-- **Spec.** The first path matching `^specs/(\d{3}-[a-z0-9-]+)/` gives the spec folder, e.g.
-  `049-review-wait` (FR-2). No such path: `spec` is `null`.
+- **Specs.** Every distinct folder matched by `^specs/(\d{3}-[a-z0-9-]+)/`, e.g. `049-review-wait`,
+  in path order (FR-2). No such path: the list is empty.
 - **Stage**, first rule that matches:
   1. `code`: a path under `src/`, `installer/`, `packaging/`, `scripts/` or `tests/`.
   2. `design`: `design.md` or `tasks.md` with `changeType` `ADDED`.
@@ -90,8 +90,8 @@ An empty list gives zeros.
 
 `SpecTimeline.build(pullRequests: MergedPullRequest[], since: Date | null)` returns
 `{ stages: Record<Stage, StageSummary>, specs: SpecRow[], apart: number }`:
-filters on `mergedAt >= since` (AC-8), classifies each pull request, groups by spec, and counts
-apart the ones with no spec or no stage (AC-7). `SpecRow` is `{ spec, waits: Partial<Record<Stage,
+filters on `mergedAt >= since` (AC-8), classifies each pull request, adds it to the row of each of its
+specs, counts it once in its stage, and counts apart the ones with no spec or no stage (AC-7). `SpecRow` is `{ spec, waits: Partial<Record<Stage,
 number>>, cycle, manual }`; with several pull requests of the same stage in one spec the row shows
 the longest wait.
 
@@ -126,7 +126,7 @@ Names identical to the `auto:` checks, in `tests/review-wait/`. A `builders.ts` 
 
 | AC | Test | File |
 |---|---|---|
-| AC-1 | `assigns a pull request to the spec whose folder it changes` | `StageRules.test.ts` |
+| AC-1 | `assigns a pull request to every spec whose folder it changes` | `StageRules.test.ts` |
 | AC-2 | `classifies a pull request by what it changes` | `StageRules.test.ts` |
 | AC-3 | `classifies a status-only pull request as implemented` | `StageRules.test.ts` |
 | AC-4 | `computes the wait from opening to merge` | `SpecTimeline.test.ts` |
@@ -162,7 +162,7 @@ None. No option, no storage key, no secret.
 
 | Risk | Mitigation |
 |---|---|
-| One pull request touching several specs (the bulk `Implemented` pull request #212) is assigned to the first one only (FR-2) | Known and accepted by the approved spec; the report counts it once. If the numbers mislead, the fix is a spec amendment: assign it to each spec it touches |
+| A pull request touching several specs (the bulk `Implemented` pull request #212) | It is assigned to each spec (FR-2, amended 2026-11-19 on Tore's decision) and counts once in the stage summary, so the stage numbers are not inflated |
 | The `gh` JSON drops files beyond the first 100 of a pull request | Stage and spec are decided by the first matching paths; a pull request that big is a code pull request anyway |
 | 1000 merged pull requests is a ceiling | The repository has about 215; the report prints a line when the list reached the ceiling |
 | Waits include nights and weekends | Decided in the spec (raw time); the median keeps one weekend from dominating |
