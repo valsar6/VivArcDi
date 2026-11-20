@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-20 (the proposed answers to Q-1 to Q-5; Q-1 to Q-3 are checked by the probes of task T1 before any code) |
