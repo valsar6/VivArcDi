@@ -25,15 +25,15 @@ just before opening the pull request.
 - [x] **T4.** Module `ColumnScroll`: puts and removes the mark, stays off and logs a warning when the
   selectors do not match; register it and enable it. Satisfies AC-11. Done when
   `leaves the column untouched when the selectors do not match` passes.
-- [ ] **T5.** Live scenarios in `tests/live/scenarios/`: `one scroller for the whole column`,
+- [x] **T5.** Live scenarios in `tests/live/scenarios/`: `one scroller for the whole column`,
   `a long folder does not squeeze Today's tabs`, `favorites and footer stay fixed while the column scrolls`,
   `the active tab scrolls into view`, `no scroll when the list fits`; `no gap above the first Today tab with the single scroll`
   (spec 050's own scenario keeps its name). Satisfies AC-3 to AC-6, AC-8, AC-9. Done when `npm run live`
   passes them on the lab copy.
-- [ ] **T6.** Only if T1 requires it: `ColumnScrollSync`, test first, with its own `auto:` criteria
+- [x] **T6.** Only if T1 requires it: `ColumnScrollSync`, test first, with its own `auto:` criteria
   added to the spec and approved before the code. Done when the matching tests and AC-6 pass.
-- [ ] **T7.** Version bump (minor) in `package.json` and `installer/vivarcdi/__init__.py`;
+- [x] **T7.** Version bump (minor) in `package.json` and `installer/vivarcdi/__init__.py`;
   `docs/manual` note on the tab bar; `specs/009` design point 7 and FR-11 note that this spec
   replaced the compromise; tasks ticked.
-- [ ] **T8.** Write the manual verification checklist for Tore from the `manual` criteria (AC-7,
+- [x] **T8.** Write the manual verification checklist for Tore from the `manual` criteria (AC-7,
   AC-10, AC-13), in Italian.

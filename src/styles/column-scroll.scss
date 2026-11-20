@@ -10,7 +10,7 @@
 
   .resize:has(> .tab-strip) {
     flex: 0 0 $frame-basis !important;
-    margin-bottom: var(--vivarcdi-strip-overflow, 0px);
+    margin-bottom: var(--vivarcdi-strip-overflow, 0);
   }
 
   .tab-strip {

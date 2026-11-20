@@ -116,7 +116,8 @@ Favorite.
   folder that matches is used. IF no folder matches, THEN the section stays hidden and the reason is logged.
 - **FR-11.** WHEN the section is taller than the room the tab bar leaves it, THEN the tab list below
   stays reachable: Tore wants the whole column to scroll as one, as in Arc; the design says what
-  Vivaldi's layout allows.
+  Vivaldi's layout allows. Replaced by [053 Single scroll](../053-single-scroll/spec.md): the whole
+  column scrolls as one and `maxHeightPercent` no longer exists.
 - **FR-12.** The tab of a link is marked as hidden in Vivaldi's tab list, as the tabs of the
   Favorites are in 003; the link row shows its state (open, active, unloaded) and has a close button.
 - **FR-13.** A tab opened from a link, or adopted as the tab of a link, stores the bookmark id in its

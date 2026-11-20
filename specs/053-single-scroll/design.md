@@ -46,9 +46,17 @@ Rejected:
 | `src/modules/index.ts`, `src/config.json` | Register and enable `column-scroll`; add `styles/column-scroll.css` to `styles` | – |
 | `tests/live/scenarios/*.live.ts` | The six `live:` scenarios of the spec | – |
 
-If T1 shows that Vivaldi rewrites `max-height` or scrolls the strip itself, a second class,
-`ColumnScrollSync`, joins the module: one `FrameTask` pass per frame that re-applies the frame height
-or forwards the strip's `scrollTop` to the column. It is written only if a probe proves it is needed.
+The live run showed that Vivaldi caps the frame at the room left (inline `max-height`, 658 px with 40
+tabs) and that the slots are absolutely placed, so the frame cannot grow by styles. The second class,
+`StripOverflow` (AC-14, AC-15), joins the module instead of `ColumnScrollSync`: on each frame
+(`FrameTask`) it measures `scrollHeight - clientHeight` of the tab strip and writes it as
+`--vivarcdi-strip-overflow` on the column. Under the mark the strip has `overflow: visible`, so it
+does not scroll and its slots show beyond the frame, and the frame has `margin-bottom` of that
+height, so the column is as tall as the tabs. Vivaldi's `max-height` and 050's correction of it are
+never written. The `flex: 0 0 100000px` basis of the frame stops it from shrinking.
+
+`folders.scss` keeps a fixed fallback, `max-height: max(120px, 60vh)` with its own scroll, for when the
+mark is absent (NFR-2): without it a mismatch of selectors would leave the Today list squeezed.
 
 ## Vivaldi interface
 

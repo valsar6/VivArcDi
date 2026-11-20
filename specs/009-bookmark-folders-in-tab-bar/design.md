@@ -40,7 +40,8 @@ inside the tab strip is moved by Vivaldi's rebuilds. That spot is the shared `Ta
    `TabTargets`, which tries its finders in order: `PinnedTabFinder` of 007, then `LinkedTabFinder`,
    which looks for a tab whose address key is in the `LinkKeyIndex`. `ActivationRecorder` records a
    date for a tab that is pinned or whose key is in the index.
-7. **Scroll (FR-11, AC-16).** Vivaldi's tab list scrolls by itself inside its box, so a taller section
+7. **Scroll (FR-11, AC-16).** Replaced by [053](../053-single-scroll/design.md): the whole column
+   scrolls as one and `maxHeightPercent` is gone. What follows is the first version. Vivaldi's tab list scrolls by itself inside its box, so a taller section
    above it would push the list out of view. The first version limits the section to
    `maxHeightPercent` of the tab bar (60 by default) and scrolls inside itself, so the tab list always
    keeps room. Tore prefers one scroll for the whole column as in Arc; that means changing how
