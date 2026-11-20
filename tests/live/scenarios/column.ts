@@ -34,6 +34,7 @@ export async function openLongFolder(driver: Driver, rows = MANY_TABS): Promise<
     for (let index = 0; index < ${rows}; index += 1) {
       const row = document.createElement('div');
       row.setAttribute('role', 'treeitem');
+      row.setAttribute('data-live-row', '');
       row.textContent = 'Row ' + index;
       section.append(row);
     }
@@ -42,7 +43,11 @@ export async function openLongFolder(driver: Driver, rows = MANY_TABS): Promise<
 }
 
 export function scrollers(driver: Driver): Promise<string[]> {
-  return driver.evaluate<string[]>(`(() => [...document.querySelectorAll(${JSON.stringify(driver.selector('tabBar'))} *)]
+  return driver.evaluate<string[]>(`(() => [...document.querySelectorAll(${JSON.stringify(driver.selector('tabBar') + ' *')})]
     .filter((element) => /auto|scroll/.test(getComputedStyle(element).overflowY) && element.scrollHeight > element.clientHeight + ${TOLERANCE})
-    .map((element) => element.id || element.getAttribute('data-vivarcdi-folders') !== null && 'folders' || element.className))()`);
+    .map((element) => element.id || (element.hasAttribute('data-vivarcdi-folders') ? 'folders' : element.className)))()`);
+}
+
+export async function removeLongFolder(driver: Driver): Promise<void> {
+  await driver.evaluate(`document.querySelectorAll('[data-live-row]').forEach((row) => row.remove())`);
 }
