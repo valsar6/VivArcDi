@@ -88,7 +88,7 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
   probe, and NFR-1 is the fallback.
 - [ ] **2. Which URL identifies "already a panel"?** Proposed: the same URL after dropping the fragment
   and a trailing slash.
-- [ ] **3. Which text, "Open as web panel" or Italian-style "Add as panel"?** Proposed: **Open as web
+- [ ] **3. Which text, "Open as web panel" or "Add as panel"?** Proposed: **Open as web
   panel**, Vivaldi's own words.
 
 ## References
