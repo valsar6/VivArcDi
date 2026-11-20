@@ -70,6 +70,18 @@ equal to its content. 050 writes that `max-height` too, so the new rule uses `!i
 stay compatible: 050 keeps computing the strip's height from its slots, and the frame follows the
 strip because it no longer has a maximum.
 
+Read in Vivaldi 8.3's `bundle.js` (T1, static, nothing launched):
+
+- **Wheel.** The strip's `handleWheel` returns at once unless horizontal scrolling is on, so a vertical
+  strip scrolls with the browser's own scroll, not with Vivaldi code.
+- **Overflow class.** Vivaldi adds the class `overflow` to the strip when its `clientHeight` is smaller
+  than its `scrollHeight`, and the stylesheet of Vivaldi lets the strip scroll then. With a `.resize`
+  that does not shrink the strip never overflows, so it never scrolls by itself.
+- **Active tab.** Vivaldi calls `scrollIntoViewIfNeeded()` on `.tab.active`, a native call that scrolls
+  every scrollable ancestor, so it reaches `#tabs-container` (answer to Q-3 for AC-6).
+- **Drag.** The strip's own code scrolls only horizontally (`scrollBy(t, 0)`); how a vertical drag
+  scrolls near the edge is not found in the static read and is left to the scenario and AC-7.
+
 ## Configuration
 
 `maxHeightPercent` leaves the options of `bookmark-folders` and `config.json` (FR-8). A new module
@@ -80,7 +92,7 @@ strip because it no longer has a maximum.
 | Risk | Mitigation |
 |---|---|
 | Vivaldi writes `max-height` on `.resize` again after a change | `!important` in the stylesheet beats an inline value; T1 checks it with many tabs (Q-2) |
-| Vivaldi scrolls to the active tab or during a drag by `scrollTop` of the strip, which no longer scrolls | T1 reads the bundle and probes both; if confirmed, `ColumnScrollSync` forwards the scroll (Q-3) |
+| Vivaldi scrolls during a drag by `scrollTop` of the strip, which no longer scrolls (the active tab does not: native `scrollIntoViewIfNeeded`) | The `the active tab scrolls into view` scenario and manual AC-7; if the drag does not scroll, `ColumnScrollSync` forwards it (Q-3) |
 | With `.resize` unbounded, 050's offsets and the strip's height disagree | A live scenario runs both together (AC-9); the strip's height stays Vivaldi's, corrected by 050 |
 | The Favorites group sits inside the scrolling area on the lab copy | T1 probes with pinned tabs (Q-1); if so the group is lifted with `position: sticky` and a background, or the tiles are moved to the host above the scroller |
 | Arc-like sticky footer hides the last rows | The scroller gets `padding-bottom` equal to the footer's height |

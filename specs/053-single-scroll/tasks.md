@@ -10,11 +10,11 @@ Ordered, small and independently reviewable. Each task names the acceptance crit
 and is done when its check passes. Branch `features/single-scroll` (minor), version read from `main`
 just before opening the pull request.
 
-- [ ] **T1.** Answer Q-1 to Q-3 with probes on the lab copy (`npm run live -- --probe`), read only:
-  the pinned group with pinned tabs and its place in the column; `.resize` and `.tab-strip` with many
-  tabs and a long open folder, to see whether Vivaldi writes `max-height` again; and Vivaldi's
-  `bundle.js` for how it scrolls to the active tab and during a drag. Done when the design records
-  the three answers and says whether `ColumnScrollSync` is needed.
+- [x] **T1.** Read Vivaldi 8.3's `bundle.js` (static, nothing launched): the vertical strip scrolls
+  natively, the `overflow` class follows `clientHeight < scrollHeight`, and the active tab is shown
+  with `scrollIntoViewIfNeeded()`. Satisfies Q-3 for AC-6. Done: the design records it. What is left of
+  Q-1 and Q-2 (pinned group, `max-height` rewritten) is answered by the scenarios of T5, which run
+  with the stylesheet of T3; the drag edge scroll stays with AC-7.
 - [ ] **T2.** Remove `maxHeightPercent`: option, `FolderSection`, `FolderSectionView`, the CSS
   variable, `config.json` and their tests. Satisfies AC-12. Done when `has no maxHeightPercent option`
   passes and no reference is left.
