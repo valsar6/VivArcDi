@@ -34,8 +34,8 @@ gradient mode; the bars that slide in (`.auto-hide-wrapper`) keep their own back
 may rewrite attributes of `#browser` when the mode toggles. The design therefore adds two things,
 both confirmed by the probe of T1 before they are written:
 
-- the stylesheet makes the revealed wrappers transparent in gradient mode, or gives them the space
-  color in flat mode, with the same ink and pill;
+- the stylesheet gives the revealed wrappers the space color of the palette in both modes, because they
+  slide over the page and a transparent bar would show it; ink and pill stay those of the palette;
 - `LookMarks` re-applies the marks and the variables when a `MutationObserver` on `#browser` sees them
   removed, so a Vivaldi redraw cannot strip the look. It is the only observer and it stops with the
   module.
