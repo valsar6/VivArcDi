@@ -83,6 +83,12 @@ Follow-up, 2026-11-20:
   videos. Neither is exposed to modules. What is open: whether that site setting, set to Allow for
   `meet.google.com`, makes Chromium invoke the action (T1b).
 
+- Second real Meet check, 2026-11-20: with "Automatic Picture-in-picture" set to Allow for
+  `meet.google.com`, switching tab still opens no PiP. Vivaldi does not invoke the media session action
+  on tab switch. Way (1) is closed too; no gesture-less way to open PiP is left.
+- `DOCUMENT_PICTURE_IN_PICTURE` is an item of the video context menu, run by the browser on the video
+  under the right click; a module cannot call it.
+
 ### Rejected alternatives
 
 - **A browser extension API that opens PiP for a tab.** None exists for extensions in Vivaldi 8.1;
