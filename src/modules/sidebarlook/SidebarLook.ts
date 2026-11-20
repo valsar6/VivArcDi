@@ -1,3 +1,4 @@
+import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
 import { AddressField } from '../../shared/newtab/AddressField.js';
 import { DomQuery } from '../../core/dom/DomQuery.js';
 import { Module } from '../../core/boot/Module.js';
@@ -5,16 +6,14 @@ import type { ModuleContext } from '../../core/boot/Module.js';
 import { NewTabOpener } from '../../shared/newtab/NewTabOpener.js';
 import { NewTabRow } from '../../shared/newtab/NewTabRow.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
+import { LookMarks } from './LookMarks.js';
 import { Palettes } from './Palettes.js';
-import type { Palette } from './Palettes.js';
 import { ScrollMark } from './ScrollMark.js';
 import { SIDEBAR_LOOK_OPTIONS } from './SidebarLookOptions.js';
 import type { SidebarLookOptions } from './SidebarLookOptions.js';
+import { ThemePalettes } from './ThemePalettes.js';
 
-export const LOOK_ATTRIBUTE = 'data-vivarcdi-look';
-export const PALETTE_ATTRIBUTE = 'data-vivarcdi-palette';
-export const GRADIENT_ATTRIBUTE = 'data-vivarcdi-gradient';
-const GRADIENT_PROPERTY = '--vivarcdi-gradient';
+const THEME_KEY = 'vivaldi.themes.current';
 const NEW_TAB_ORDER = 30;
 
 export class SidebarLook extends Module<SidebarLookOptions> {
@@ -26,16 +25,18 @@ export class SidebarLook extends Module<SidebarLookOptions> {
 
   /**
    * Gives the vertical tab bar Arc's look: marks Vivaldi's root so that `sidebar-look.css` applies,
-   * sets the colors of the chosen palette, marks the tab list while it scrolls and adds a
-   * `+ New Tab` row before today's tabs. Everything is removed on stop, and nothing is touched
-   * while the module is disabled.
+   * sets the colors of the palette of the selected VivArcDi theme (else the `palette` option) and
+   * follows a change of theme, marks the tab list while it scrolls and adds a `+ New Tab` row before
+   * today's tabs. Everything is removed on stop, and nothing is touched while the module is disabled.
    *
    * @param context What the module may use.
    */
-  public override start({ document, selectors, options, tabs, runtime, logger }: ModuleContext<SidebarLookOptions>): void {
-    const browser = DomQuery.require(document, selectors.get('browser'));
-    const palette = Palettes.byName(options.palette);
-    this.#paint(browser, palette);
+  public override async start({ document, selectors, options, prefs, tabs, runtime, logger }: ModuleContext<SidebarLookOptions>): Promise<void> {
+    const marks = new LookMarks(DomQuery.require(document, selectors.get('browser')));
+    this.#stops.push(() => marks.remove());
+    const paint = async (): Promise<void> => marks.apply(Palettes.byName(await this.#paletteName(prefs, options.palette)));
+    await paint();
+    this.#follow(prefs, () => void paint().catch((error: unknown) => logger.warn('the palette could not follow the theme', error)));
 
     const scroll = new ScrollMark(document, selectors.get('tabBar'));
     scroll.start();
@@ -60,23 +61,16 @@ export class SidebarLook extends Module<SidebarLookOptions> {
     this.#stops = [];
   }
 
-  #paint(browser: HTMLElement, palette: Palette): void {
-    const colors = { space: palette.space, pill: palette.pill, ink: palette.ink };
-    browser.setAttribute(LOOK_ATTRIBUTE, '');
-    browser.setAttribute(PALETTE_ATTRIBUTE, palette.name);
-    for (const [name, value] of Object.entries(colors)) {
-      browser.style.setProperty(`--vivarcdi-${name}`, value);
+  async #paletteName(prefs: BrowserPrefs, fallback: string): Promise<string> {
+    if (!prefs.available) {
+      return fallback;
     }
-    if (palette.gradient) {
-      browser.setAttribute(GRADIENT_ATTRIBUTE, '');
-      browser.style.setProperty(GRADIENT_PROPERTY, Palettes.css(palette.gradient));
+    return ThemePalettes.paletteFor(await prefs.get(THEME_KEY)) ?? fallback;
+  }
+
+  #follow(prefs: BrowserPrefs, repaint: () => void): void {
+    if (prefs.available && prefs.canFollow) {
+      this.#stops.push(prefs.onChange(THEME_KEY, repaint));
     }
-    this.#stops.push(() => {
-      browser.removeAttribute(LOOK_ATTRIBUTE);
-      browser.removeAttribute(PALETTE_ATTRIBUTE);
-      browser.removeAttribute(GRADIENT_ATTRIBUTE);
-      Object.keys(colors).forEach((name) => browser.style.removeProperty(`--vivarcdi-${name}`));
-      browser.style.removeProperty(GRADIENT_PROPERTY);
-    });
   }
 }
