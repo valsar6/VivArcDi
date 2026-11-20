@@ -92,7 +92,7 @@ jobs:
           git -C "${tap}" init --quiet
           python3 packaging/homebrew/cask.py --version "${version}" --sha256 "$(printf '0%.0s' $(seq 64))" --out "${tap}/Casks/vivarcdi.rb"
           ruby -c "${tap}/Casks/vivarcdi.rb"
-          brew style --cask "${tap}/Casks/vivarcdi.rb"
+          brew style "${tap}/Casks/vivarcdi.rb"
       - name: Check the app bundle
         env:
           VIVARCDI_APP_BUNDLE: ${{ github.workspace }}/build/pyinstaller/dist/VivArcDi.app
