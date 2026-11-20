@@ -79,6 +79,20 @@ test('injector installs nothing after detach', async () => {
   assert.deepEqual(webviews[0]?.executed, ['UNINSTALL']);
 });
 
+test('injector runs code in the page of a followed tab only', async () => {
+  const { injector, webviews, requests } = setUp(2);
+  injector.attach();
+  requests.forEach((request) => request.resolve('INSTALL'));
+  await settle();
+  injector.run(2, 'COMMAND');
+  injector.run(9, 'COMMAND');
+  assert.deepEqual(webviews[0]?.executed, ['INSTALL']);
+  assert.deepEqual(webviews[1]?.executed, ['INSTALL', 'COMMAND']);
+  injector.detach();
+  injector.run(2, 'LATE');
+  assert.equal(webviews[1]?.executed.includes('LATE'), false);
+});
+
 test('injector keeps the newest request of a webview', async () => {
   const { injector, webviews, requests } = setUp();
   injector.attach();

@@ -23,7 +23,8 @@ export class CallPip extends Module<CallPipOptions> {
 
   /**
    * Injects the page script into the pages of the enabled call sites. The script floats the call in
-   * Picture in Picture when the user presses the shortcut. Without `chrome.tabs` the module stays off.
+   * Picture in Picture when the user presses the shortcut, and the module closes the window when the
+   * tab becomes active again. Without `chrome.tabs` the module stays off.
    *
    * @param context What the module may use.
    */
@@ -50,6 +51,7 @@ export class CallPip extends Module<CallPipOptions> {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message)));
     }
     this.#injector.attach();
+    this.#unsubscribe.push(tabs.onActivated(({ tabId }) => this.#injector?.run(tabId, `globalThis.${SCRIPT_GLOBAL}?.close();`)));
   }
 
   /**
