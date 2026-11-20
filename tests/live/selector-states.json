@@ -12,5 +12,8 @@
   },
   "autoHideWrapper": {
     "notChecked": "needs Automatically hide UI on"
+  },
+  "callMeetInCall": {
+    "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
   }
 }
