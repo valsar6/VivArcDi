@@ -46,9 +46,17 @@ Rejected:
 | `src/modules/index.ts`, `src/config.json` | Register and enable `column-scroll`; add `styles/column-scroll.css` to `styles` | – |
 | `tests/live/scenarios/*.live.ts` | The six `live:` scenarios of the spec | – |
 
-If T1 shows that Vivaldi rewrites `max-height` or scrolls the strip itself, a second class,
-`ColumnScrollSync`, joins the module: one `FrameTask` pass per frame that re-applies the frame height
-or forwards the strip's `scrollTop` to the column. It is written only if a probe proves it is needed.
+The live run showed that Vivaldi caps the frame at the room left (inline `max-height`, 658 px with 40
+tabs) and that the slots are absolutely placed, so the frame cannot grow by styles. The second class,
+`StripOverflow` (AC-14, AC-15), joins the module instead of `ColumnScrollSync`: on each frame
+(`FrameTask`) it measures `scrollHeight - clientHeight` of the tab strip and writes it as
+`--vivarcdi-strip-overflow` on the column. Under the mark the strip has `overflow: visible`, so it
+does not scroll and its slots show beyond the frame, and the frame has `margin-bottom` of that
+height, so the column is as tall as the tabs. Vivaldi's `max-height` and 050's correction of it are
+never written. The `flex: 0 0 100000px` basis of the frame stops it from shrinking.
+
+`folders.scss` keeps a fixed fallback, `max-height: max(120px, 60vh)` with its own scroll, for when the
+mark is absent (NFR-2): without it a mismatch of selectors would leave the Today list squeezed.
 
 ## Vivaldi interface
 
@@ -70,6 +78,18 @@ equal to its content. 050 writes that `max-height` too, so the new rule uses `!i
 stay compatible: 050 keeps computing the strip's height from its slots, and the frame follows the
 strip because it no longer has a maximum.
 
+Read in Vivaldi 8.3's `bundle.js` (T1, static, nothing launched):
+
+- **Wheel.** The strip's `handleWheel` returns at once unless horizontal scrolling is on, so a vertical
+  strip scrolls with the browser's own scroll, not with Vivaldi code.
+- **Overflow class.** Vivaldi adds the class `overflow` to the strip when its `clientHeight` is smaller
+  than its `scrollHeight`, and the stylesheet of Vivaldi lets the strip scroll then. With a `.resize`
+  that does not shrink the strip never overflows, so it never scrolls by itself.
+- **Active tab.** Vivaldi calls `scrollIntoViewIfNeeded()` on `.tab.active`, a native call that scrolls
+  every scrollable ancestor, so it reaches `#tabs-container` (answer to Q-3 for AC-6).
+- **Drag.** The strip's own code scrolls only horizontally (`scrollBy(t, 0)`); how a vertical drag
+  scrolls near the edge is not found in the static read and is left to the scenario and AC-7.
+
 ## Configuration
 
 `maxHeightPercent` leaves the options of `bookmark-folders` and `config.json` (FR-8). A new module
@@ -80,7 +100,7 @@ strip because it no longer has a maximum.
 | Risk | Mitigation |
 |---|---|
 | Vivaldi writes `max-height` on `.resize` again after a change | `!important` in the stylesheet beats an inline value; T1 checks it with many tabs (Q-2) |
-| Vivaldi scrolls to the active tab or during a drag by `scrollTop` of the strip, which no longer scrolls | T1 reads the bundle and probes both; if confirmed, `ColumnScrollSync` forwards the scroll (Q-3) |
+| Vivaldi scrolls during a drag by `scrollTop` of the strip, which no longer scrolls (the active tab does not: native `scrollIntoViewIfNeeded`) | The `the active tab scrolls into view` scenario and manual AC-7; if the drag does not scroll, `ColumnScrollSync` forwards it (Q-3) |
 | With `.resize` unbounded, 050's offsets and the strip's height disagree | A live scenario runs both together (AC-9); the strip's height stays Vivaldi's, corrected by 050 |
 | The Favorites group sits inside the scrolling area on the lab copy | T1 probes with pinned tabs (Q-1); if so the group is lifted with `position: sticky` and a background, or the tiles are moved to the host above the scroller |
 | Arc-like sticky footer hides the last rows | The scroller gets `padding-bottom` equal to the footer's height |
