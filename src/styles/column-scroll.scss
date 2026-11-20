@@ -10,6 +10,11 @@
 
   .resize:has(> .tab-strip) {
     flex: 0 0 $frame-basis !important;
+    margin-bottom: var(--vivarcdi-strip-overflow, 0px);
+  }
+
+  .tab-strip {
+    overflow: visible !important;
   }
 
   #{$archive-footer} {

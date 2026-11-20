@@ -67,6 +67,10 @@ Vivaldi scrolls its strip from code, not with the browser's own scroll, so how i
   scrolling.
 - **FR-8.** The option `maxHeightPercent` of [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-10
   SHALL be removed from `config.json` and from the module's options, since nothing reads it.
+- **FR-10.** Vivaldi caps the frame of the tab strip at the room left and the slots are absolutely
+  placed, so styles alone cannot grow it: the module SHALL measure how far the tabs overflow the
+  strip and give that height to the column as a CSS variable, which the stylesheet reserves under
+  the frame (AC-14, AC-15).
 - **FR-9.** The corrections of [050](../050-tab-strip-gap/spec.md) SHALL keep working: the strip's
   height is its visible slots, and `.resize` follows it.
 
@@ -96,6 +100,8 @@ Vivaldi scrolls its strip from code, not with the browser's own scroll, so how i
 | AC-11 | IF the column does not match the selectors THEN THE module SHALL leave it untouched and log a warning | auto: `leaves the column untouched when the selectors do not match` |
 | AC-12 | THE folders options SHALL NOT include `maxHeightPercent` | auto: `has no maxHeightPercent option` |
 | AC-13 | WHEN the tab bar is on the right THE column SHALL scroll the same way | manual |
+| AC-14 | WHILE the single scroll is on THE column SHALL reserve below the tab strip frame the height of the tabs that overflow it, and THE tab strip SHALL NOT scroll | auto: `sets the strip height on the column` |
+| AC-15 | WHEN tabs are added, removed, hidden or reordered THE reserved height SHALL follow, and SHALL be removed when the module stops | auto: `updates the strip height when the tabs change` |
 
 ## Out of scope
 

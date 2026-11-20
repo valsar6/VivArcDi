@@ -25,6 +25,12 @@ test('keeps the tab strip frame at the height of its content', () => {
   assert.doesNotMatch(declarations, /max-height/);
 });
 
+test('reserves the height of the overflowing tabs under the tab strip frame', () => {
+  const css = compiled();
+  assert.match(declarationsOf(css, `${MARK} .resize:has(> .tab-strip)`), /margin-bottom:\s*var\(--vivarcdi-strip-overflow, 0px\)/);
+  assert.match(declarationsOf(css, `${MARK} .tab-strip`), /overflow:\s*visible\s*!important/);
+});
+
 test('every column scroll rule applies only under the mark', () => {
   const selectors = [...compiled().matchAll(/^([^\s@}][^{]*)\{/gm)].flatMap(([, list]) => (list ?? '').split(/,\n/)).map((selector) => selector.trim());
   assert.ok(selectors.length > 0);

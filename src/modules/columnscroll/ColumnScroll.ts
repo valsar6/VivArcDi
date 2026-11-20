@@ -1,11 +1,13 @@
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { ColumnMark } from './ColumnMark.js';
+import { StripOverflow } from './StripOverflow.js';
 
 export class ColumnScroll extends Module {
   public static override id = 'column-scroll';
 
   #mark: ColumnMark | null = null;
+  #overflow: StripOverflow | null = null;
 
   /**
    * Makes the sidebar below the Favorites scroll as one list, as in Arc: marks the column of the
@@ -16,18 +18,22 @@ export class ColumnScroll extends Module {
    * @param context What the module may use.
    */
   public override start({ document, selectors, logger }: ModuleContext): void {
-    if (!selectors.has('tabsContainer') || !selectors.has('verticalTabBar')) {
+    if (!selectors.has('tabsContainer') || !selectors.has('verticalTabBar') || !selectors.has('tabStrip')) {
       logger.warn('the column selectors are missing: the single scroll is off');
       return;
     }
     this.#mark = new ColumnMark(document, { column: selectors.get('tabsContainer'), verticalBar: selectors.get('verticalTabBar') });
     this.#mark.start();
+    this.#overflow = new StripOverflow(document, { column: selectors.get('tabsContainer'), strip: selectors.get('tabStrip') });
+    this.#overflow.start();
   }
 
   /**
    * Removes the mark and stops following Vivaldi's redraws.
    */
   public override stop(): void {
+    this.#overflow?.stop();
+    this.#overflow = null;
     this.#mark?.stop();
     this.#mark = null;
   }
