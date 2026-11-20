@@ -1,4 +1,22 @@
 Package: vivarcdi
+Version: 0.63.0
+Architecture: all
+Maintainer: Salvatore <25297596+valsar6@users.noreply.github.com>
+Depends: python3 (>= 3.9), python3-tk
+Section: web
+Priority: optional
+Homepage: https://github.com/valsar6/VivArcDi
+Description: Make Vivaldi behave like Arc
+ VivArcDi adds Arc-style tabs, sidebar and shortcuts to Vivaldi without
+ modifying its browser engine. It patches Vivaldi's window.html, applies
+ itself again after every Vivaldi update and can be removed at any time.
+Filename: pool/main/v/vivarcdi/vivarcdi_0.63.0_all.deb
+Size: 192218
+MD5sum: 93252ffccbfed916201824052e83a61e
+SHA1: a696ad0f8016e21b1f285370f6468ff6e47bea79
+SHA256: 5d82b0c1f59292f377d665fd793618a64135bfa52fec1500d4c1cdd6beccd564
+
+Package: vivarcdi
 Version: 0.62.1
 Architecture: all
 Maintainer: Salvatore <25297596+valsar6@users.noreply.github.com>
@@ -33,22 +51,4 @@ Size: 191538
 MD5sum: 1db5d32ca5ddfe6d4336da42c23ff1e3
 SHA1: 9fcee24a9294fd7784aa9c946132970e9756d612
 SHA256: 797d63c607837a06f2f13d24a00907ae926cb73dce95087420c69b9b0541a904
-
-Package: vivarcdi
-Version: 0.61.1
-Architecture: all
-Maintainer: Salvatore <25297596+valsar6@users.noreply.github.com>
-Depends: python3 (>= 3.9), python3-tk
-Section: web
-Priority: optional
-Homepage: https://github.com/valsar6/VivArcDi
-Description: Make Vivaldi behave like Arc
- VivArcDi adds Arc-style tabs, sidebar and shortcuts to Vivaldi without
- modifying its browser engine. It patches Vivaldi's window.html, applies
- itself again after every Vivaldi update and can be removed at any time.
-Filename: pool/main/v/vivarcdi/vivarcdi_0.61.1_all.deb
-Size: 189658
-MD5sum: c66648fba55236096beea013db3b0753
-SHA1: a969383e5c0133e9fafe5448fd5b86298eece0ca
-SHA256: 3a7b83aca9ce19f0a0af2c1c2be15a94c0c925f3bb1c612a026aba575b602cf3
 
