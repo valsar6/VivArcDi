@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
-import type { RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
+import type { RuntimeMessageListener, TabActivatedListener } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
@@ -45,6 +45,7 @@ interface Setup {
   context: ModuleContext<CallPipOptions>;
   webviews: FakeElement[];
   messages: FakeEvent<RuntimeMessageListener>;
+  activated: Set<TabActivatedListener>;
   sink: SilentSink;
 }
 
@@ -55,7 +56,13 @@ function setUp(urls: string[], options: Partial<CallPipOptions> = {}): Setup {
   const document = new CopyDocument({ '#browser': new FakeElement('div'), '#webview-container': container });
   const messages = new FakeEvent<RuntimeMessageListener>();
   const sink = new SilentSink();
-  const tabs = new FakeTabs(urls.map((url, index) => ({ id: index + 1, active: index === 0, currentWindow: true, url })));
+  const activated = new Set<TabActivatedListener>();
+  const tabs = Object.assign(new FakeTabs(urls.map((url, index) => ({ id: index + 1, active: index === 0, currentWindow: true, url }))), {
+    onActivated: (listener: TabActivatedListener): (() => void) => {
+      activated.add(listener);
+      return () => activated.delete(listener);
+    },
+  });
   const context = {
     document,
     selectors,
@@ -66,7 +73,7 @@ function setUp(urls: string[], options: Partial<CallPipOptions> = {}): Setup {
     payload: new FakeLoader({ 'page/call-pip.js': 'CALL' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
   } as unknown as ModuleContext<CallPipOptions>;
-  return { context, webviews, messages, sink };
+  return { context, webviews, messages, activated, sink };
 }
 
 async function started(urls: string[], options: Partial<CallPipOptions> = {}): Promise<Setup & { module: CallPip }> {
@@ -125,9 +132,17 @@ test('logs a warning for messages with its token only', async () => {
   module.stop();
 });
 
-test('removes the page script and the listeners on stop', async () => {
-  const { module, webviews, messages } = await started([MEET]);
+test('closes the call PiP when the tab is shown again', async () => {
+  const { module, webviews, activated } = await started([MEET, 'https://example.com/']);
+  activated.forEach((listener) => listener({ tabId: 1, windowId: 1 }));
+  assert.equal(webviews[0]?.executed.at(-1), 'globalThis.VivArcDiCallPip?.close();');
   module.stop();
+});
+
+test('removes the page script and the listeners on stop', async () => {
+  const { module, webviews, messages, activated } = await started([MEET]);
+  module.stop();
+  assert.equal(activated.size, 0);
   assert.equal(webviews[0]?.listenerCount(), 0);
   assert.equal(webviews[0]?.executed.at(-1), 'globalThis.VivArcDiCallPip?.uninstall();');
   assert.equal(messages.listeners.size, 0);

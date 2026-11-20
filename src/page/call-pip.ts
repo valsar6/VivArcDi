@@ -30,3 +30,13 @@ export function install(policy: CallPagePolicy): void {
 export function uninstall(): void {
   INSTALL.remove();
 }
+
+/**
+ * Closes the Picture in Picture window of the page, if one is open. The interface calls it when the
+ * tab becomes active again.
+ */
+export function close(): void {
+  if (document.pictureInPictureElement !== null) {
+    document.exitPictureInPicture().catch(() => undefined);
+  }
+}
