@@ -30,7 +30,6 @@ export class BookmarkFolders extends Module<BookmarkFoldersOptions> {
     this.#section = new FolderSection(context, {
       roots: new WorkspaceRoots(options),
       maxDepth: options.maxDepth,
-      maxHeightPercent: options.maxHeightPercent,
     });
     try {
       await this.#section.start();

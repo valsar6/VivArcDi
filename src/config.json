@@ -48,8 +48,7 @@
       "root": "",
       "workspaces": {},
       "workspacesBase": "VivArcDi",
-      "maxDepth": 3,
-      "maxHeightPercent": 60
+      "maxDepth": 3
     },
     "live-folders": {
       "enabled": true,

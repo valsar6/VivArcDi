@@ -15,7 +15,7 @@ just before opening the pull request.
   with `scrollIntoViewIfNeeded()`. Satisfies Q-3 for AC-6. Done: the design records it. What is left of
   Q-1 and Q-2 (pinned group, `max-height` rewritten) is answered by the scenarios of T5, which run
   with the stylesheet of T3; the drag edge scroll stays with AC-7.
-- [ ] **T2.** Remove `maxHeightPercent`: option, `FolderSection`, `FolderSectionView`, the CSS
+- [x] **T2.** Remove `maxHeightPercent`: option, `FolderSection`, `FolderSectionView`, the CSS
   variable, `config.json` and their tests. Satisfies AC-12. Done when `has no maxHeightPercent option`
   passes and no reference is left.
 - [ ] **T3.** Stylesheet `src/styles/column-scroll.scss` under the mark, with the folder section

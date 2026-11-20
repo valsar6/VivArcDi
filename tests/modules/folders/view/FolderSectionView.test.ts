@@ -32,7 +32,6 @@ async function setup(tabs: FolderTabs): Promise<{ document: DomDocument; view: F
       onRename: (id, name): void => void clicks.push(`rename ${id} ${name}`),
       onMenu: (id, x, y): void => void clicks.push(`menu ${id} ${x} ${y}`),
     },
-    60,
     timers,
   );
   return { document, view, clicks, timers };
