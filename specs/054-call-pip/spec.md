@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Draft |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-20 (the proposed answers to Q-1 to Q-6; Q-1 and Q-2 are checked by the probes of task T1 before any code) |
+| Approved | – (first version approved 2026-11-20 and withdrawn the same day: Vivaldi cannot open PiP on tab switch; this version follows Tore's choice of the shortcut, option A) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -13,38 +13,38 @@ Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/RE
 
 In Arc, joining a Google Meet call and then switching to another tab minimizes the call into a
 floating Picture in Picture (PiP) window that can be dragged and resized
-([Arc: Google Meet integration](https://arc.net/integrations/google-meet)). This spec brings the same
-behavior to Vivaldi for the four calling sites people use most: Google Meet, Zoom, Discord and
-Microsoft Teams, so that leaving the call tab never means losing sight of the call.
+([Arc: Google Meet integration](https://arc.net/integrations/google-meet)). Vivaldi cannot do this on
+its own: it never invokes the page's PiP action when a tab is left, even with "Automatic
+Picture-in-picture" allowed for the site, and a page cannot open PiP without a user gesture (probes of
+2026-11-20, see [design.md](design.md)). This spec gets as close as a gesture allows: a shortcut,
+pressed in the call page, floats the call over the other tabs, on Google Meet, Zoom, Discord and
+Microsoft Teams.
 
 ## User stories
 
-- **US-1.** As a user in a video call, I want the call to float over my other tabs when I switch away
-  from it, so that I can read or take notes while I keep seeing the people I talk to.
+- **US-1.** As a user in a video call, I want one shortcut that floats the call over my other tabs,
+  so that I can read or take notes while I keep seeing the people I talk to.
 - **US-2.** As a user, I want the floating window to go away when I come back to the call tab, so that
   I never see the same call twice.
-- **US-3.** As a user, I want the same behavior on Meet, Zoom, Discord and Teams, so that I do not
-  have to remember which site supports it.
-- **US-4.** As a user, I want to turn it off, for all sites or for one, when I prefer the call to stay
-  in its tab.
+- **US-3.** As a user, I want the same shortcut on Meet, Zoom, Discord and Teams.
+- **US-4.** As a user, I want to turn it off, for all sites or for one, and to choose the key.
 
 ## Expected behavior
 
-While a call is running in a tab, switching to another tab opens a PiP window with the call video.
-The window floats above every other window, can be moved to any corner and resized, and shows the
-participants as the site's own PiP does. Switching back to the call tab closes the window and the
-call is in its tab again. Leaving the call, or closing the tab, closes the window too.
+In a tab with a call in progress, Cmd/Ctrl+Shift+P opens a PiP window with the call video; the same
+shortcut, pressed again in the call tab, closes it. The window floats above every other window, can
+be moved and resized, and is the browser's own PiP. Then the user switches tab as usual and the call
+stays visible. Switching back to the call tab closes the window. Leaving the call, or closing the
+tab, closes it too.
 
-Nothing happens on pages that are not a call: a Meet landing page, a Zoom sign-in page or a Discord
-text channel do not open a PiP window. A call tab that is already shown in PiP is not opened twice.
+On a supported page without a call (a Meet landing page, a Zoom sign-in, a Discord text channel) the
+shortcut does nothing and is not consumed, so the key keeps whatever meaning it has there. When a
+call shows several videos, the largest playing video with a live track is floated.
 
-Where Arc and VivArcDi deliberately differ: Arc has a built-in integration for Meet only; here the
-four sites share one module and one list of sites in `config.json`, so a fifth site is a line of
-configuration plus its selectors, not new code.
-
-What the call video is differs by site, and the design must probe it before any code (see Q-1 to
-Q-3): the site's own media session handler, a page script that asks for PiP, or the Document
-Picture-in-Picture window that Meet and Teams already use.
+Where Arc and VivArcDi deliberately differ: Arc floats the call on its own when the tab is left; here
+the user presses a key first, because Vivaldi gives a page no other way to open PiP. The shortcut
+works while the focus is in the call page; with the focus in Vivaldi's own interface the key is not
+seen by the page and nothing happens. The four sites share one module and one list in `config.json`.
 
 ## Requirements
 
@@ -53,81 +53,73 @@ Picture-in-Picture window that Meet and Teams already use.
 - **FR-1.** The module SHALL support Google Meet (`meet.google.com`), Zoom web client
   (`app.zoom.us` and `*.zoom.us/wc`), Discord (`discord.com/channels`) and Microsoft Teams
   (`teams.microsoft.com`, `teams.live.com`, `teams.cloud.microsoft`).
-- **FR-2.** WHEN the active tab changes away from a tab that has a call in progress, the module SHALL
-  open the PiP window for that call.
-- **FR-3.** WHEN the call tab becomes the active tab again, the module SHALL close the PiP window it
+- **FR-2.** WHEN the shortcut is pressed in a tab with a call in progress and no PiP window, the
+  module SHALL open the PiP window with the call video.
+- **FR-3.** WHEN the shortcut is pressed while that tab's PiP window is open, the module SHALL close
+  it.
+- **FR-4.** WHEN the call tab becomes the active tab again, the module SHALL close the PiP window it
   opened.
-- **FR-4.** WHEN the call ends or its tab closes, the module SHALL close the PiP window.
-- **FR-5.** A page that is on a supported site but has no call in progress SHALL NOT open a PiP
-  window.
-- **FR-6.** The sites SHALL be listed in `config.json` as options of the module, each with an
-  `enabled` flag, and a disabled site SHALL behave as if it were not supported.
-- **FR-7.** The module SHALL NOT take the PiP window from a call that the user closed by hand: after
-  the user closes it, it SHALL NOT reopen until the user leaves the call tab again.
+- **FR-5.** WHEN the call ends or its tab closes, the module SHALL close the PiP window.
+- **FR-6.** A page on a supported site with no call in progress SHALL NOT open a PiP window and SHALL
+  NOT have the shortcut consumed.
+- **FR-7.** The sites SHALL be options of the module in `config.json`, each with an `enabled` flag, and
+  the shortcut letter SHALL be an option, default `p`; the modifiers are Cmd/Ctrl+Shift as in the
+  other shortcuts of VivArcDi. A disabled site SHALL behave as if it were not supported.
 - **FR-8.** Page code SHALL run as a page script built as an IIFE bundle, as described in
-  [038](../038-page-scripts/spec.md), and SHALL be injected only on the listed sites.
+  [038](../038-page-scripts/spec.md), and SHALL be injected only on the enabled sites.
 
 ### Non-functional
 
 - **NFR-1.** The module SHALL never block the window or the call: a site whose page does not match
   what the module expects is left as it is, with a warning in the log.
 - **NFR-2.** The module SHALL NOT read, store or send call content, participant names or chat; it only
-  asks for the PiP window.
+  floats the video.
 - **NFR-3.** Same behavior on macOS and Debian.
-- **NFR-4.** Selectors for call detection go in `src/selectors/<version>.json` or in the per-site
-  configuration, none inline in the code.
-- **NFR-5.** The module SHALL NOT run in private windows, since it works on calls the user did not
-  choose to share ([013](../013-incognito-mode/spec.md)).
+- **NFR-4.** Selectors for call detection go in `src/selectors/<version>.json`, none inline.
+- **NFR-5.** The module SHALL NOT run in private windows ([013](../013-incognito-mode/spec.md)).
 
 ## Acceptance criteria
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHEN the active tab changes away from a call tab THE module SHALL ask the page to open the PiP window | auto: `opens the call PiP when the tab is left` |
-| AC-2 | WHEN the call tab becomes active again THE module SHALL close the PiP window | auto: `closes the call PiP when the tab is shown again` |
-| AC-3 | WHEN the call ends or the tab closes THE module SHALL close the PiP window | auto: `closes the call PiP when the call ends` |
-| AC-4 | WHEN a supported page has no call in progress THE module SHALL NOT open a PiP window | auto: `does not open a PiP window without a call` |
-| AC-5 | WHEN a call is already in PiP THE module SHALL NOT open a second window | auto: `does not open the call PiP twice` |
-| AC-6 | WHEN the user closes the PiP window by hand THE module SHALL NOT reopen it until the user leaves the call tab again | auto: `does not reopen a PiP window closed by the user` |
+| AC-1 | WHEN the shortcut is pressed in a call tab THE page script SHALL open the PiP window with the call video | auto: `opens the call PiP on the shortcut` |
+| AC-2 | WHEN the shortcut is pressed while the PiP window is open THE page script SHALL close it | auto: `closes the call PiP on the shortcut` |
+| AC-3 | WHEN the call tab becomes active again THE module SHALL close the PiP window | auto: `closes the call PiP when the tab is shown again` |
+| AC-4 | WHEN the call ends or the tab closes THE module SHALL close the PiP window | auto: `closes the call PiP when the call ends` |
+| AC-5 | WHEN a supported page has no call in progress THE page script SHALL NOT open PiP and SHALL NOT consume the shortcut | auto: `ignores the shortcut without a call` |
+| AC-6 | WHEN a call shows several videos THE page script SHALL float the largest playing one with a live track | auto: `floats the largest live video` |
 | AC-7 | WHEN a site is disabled in the options THE module SHALL NOT inject its page script | auto: `skips a disabled site` |
 | AC-8 | THE page script SHALL be injected on Meet, Zoom, Discord and Teams pages only | auto: `injects the call script on the four sites only` |
-| AC-9 | IF the page does not match what the module expects THEN THE module SHALL leave the page untouched and log a warning | auto: `leaves an unexpected call page untouched` |
-| AC-10 | THE module SHALL NOT start in a private window | auto: `does not run in private windows` |
-| AC-11 | WHEN I join a Google Meet call and switch to another tab THE call SHALL float in a PiP window that I can drag and resize | manual |
-| AC-12 | WHEN I do the same on Zoom, Discord and Teams THE call SHALL float the same way | manual |
-| AC-13 | WHEN I come back to the call tab THE PiP window SHALL close | manual |
+| AC-9 | WHEN the shortcut letter option changes THE page script SHALL answer the new letter only | auto: `uses the configured shortcut letter` |
+| AC-10 | IF the page does not match what the module expects THEN THE module SHALL leave the page untouched and log a warning | auto: `leaves an unexpected call page untouched` |
+| AC-11 | THE module SHALL NOT start in a private window | auto: `does not run in private windows` |
+| AC-12 | WHEN I join a Google Meet call and press the shortcut THE call SHALL float in a PiP window that I can drag and resize, and stay visible when I switch tab | manual |
+| AC-13 | WHEN I do the same on Zoom, Discord and Teams THE call SHALL float the same way | manual |
+| AC-14 | WHEN I come back to the call tab THE PiP window SHALL close | manual |
 
 ## Out of scope
 
+- Opening PiP by itself when the tab is left: Vivaldi gives no way (probes in `design.md`). If a
+  future Vivaldi invokes the page's `enterpictureinpicture` action, a new spec can use it.
+- A shortcut or command panel entry used while the focus is in Vivaldi's interface; the page sees no
+  key then.
 - Calls in native apps (Zoom, Teams and Discord desktop clients); only the web versions in a tab.
-- Screen-sharing windows and chat in the PiP window, beyond what the site's own PiP shows.
-- PiP for ordinary videos (YouTube, Vimeo): Vivaldi already has its own button for them.
-- Controls on the PiP window that the site does not provide, such as a mute button of our own.
-- Sites other than the four listed; the configuration allows them later but this spec does not
-  promise them.
+- Screen-sharing windows and chat in the PiP window, beyond what the browser's PiP shows.
+- PiP for ordinary videos: Vivaldi already has its own button for them.
+- Sites other than the four listed.
 
 ## Open questions
 
-- [x] **Q-1.** How does PiP open on tab switch? Decided: Chromium opens PiP by itself when a site
-  registers the media session action `enterpictureinpicture` and the site has the permission
-  "Automatic picture-in-picture"; Meet and Teams do register it. Probe on the lab copy (Vivaldi 8.2)
-  whether Vivaldi honors it; if it does, the module only grants the permission on the four sites and
-  no page script is needed for them.
-- [x] **Q-2.** Zoom web and Discord do not register that action, and a page cannot open PiP without a
-  user gesture. Decided: the page script registers `enterpictureinpicture` itself and hands the
-  call `<video>` to PiP; if Vivaldi refuses without a gesture, fall back to the extension API that
-  opens PiP for a tab, and if there is none, ship Meet and Teams first and mark Zoom and Discord as a
-  follow-up spec.
-- [x] **Q-3.** What is "a call in progress" on each site? Decided: a live `<video>` or
-  `MediaStreamTrack` that is playing and not muted, plus a per-site selector for the in-call view,
-  verified by a probe in a real call (T1 of the design).
-- [x] **Q-4.** Should PiP also open when I switch to another application, not only to another tab?
-  Decided: no, tab switch only, as in Arc.
-- [x] **Q-5.** Default state: on for all four sites? Decided: yes, each site can be disabled
-  (FR-6); no global shortcut.
-- [x] **Q-6.** Can the live check join a real call? Decided: no; the lab Vivaldi cannot sign in, so
-  AC-11 to AC-13 stay `manual` and the automated tests use a fake page that registers the media
-  session action.
+- [ ] **Q-1.** Is Cmd/Ctrl+Shift+P free in the four sites and in Vivaldi? Proposed: yes by default,
+  and the letter is an option (FR-7) so a clash is a configuration change; Tore confirms in the manual
+  check.
+- [ ] **Q-2.** What is "a call in progress" on each site? Proposed: a live video track in a playing
+  `<video>` plus a per-site selector for the in-call view, verified in a real call (T1 of the
+  design).
+- [ ] **Q-3.** Should the page script also register the `enterpictureinpicture` media session action,
+  so that a future Vivaldi opens PiP on tab switch by itself? Proposed: no, nothing to prove it works
+  and it would hide the day Vivaldi does it on its own.
+- [ ] **Q-4.** Default state: on for all four sites? Proposed: yes, each can be disabled.
 
 ## References
 
@@ -136,5 +128,5 @@ Picture-in-Picture window that Meet and Teams already use.
   around and re-size it."
 - [038 Page scripts](../038-page-scripts/spec.md), how page code is built and injected.
 - [013 Incognito mode](../013-incognito-mode/spec.md), private windows.
-- [Google Workspace Updates: picture-in-picture in Meet on tab switch](https://workspaceupdates.googleblog.com/2024/08/picture-in-picture-in-google-meet-will-open-when-switching-tabs.html)
+- [014 Arc shortcuts](../014-arc-shortcuts/spec.md), the shortcut conventions.
 - [Arc analysis](https://claude.ai/artifact/DatMo1dCfNV89fWfFSjVyr)
