@@ -21,6 +21,9 @@
 #browser[data-vivarcdi-look][data-vivarcdi-gradient] #switch {
   background-color: transparent !important;
 }
+#browser[data-vivarcdi-look].auto-hide .auto-hide-wrapper {
+  background-color: var(--vivarcdi-space) !important;
+}
 #browser[data-vivarcdi-look] #tabs-tabbar-container:is(.left, .right) :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
   display: none !important;
 }

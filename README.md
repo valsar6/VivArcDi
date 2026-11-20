@@ -250,7 +250,7 @@ installer stops and tells you to download a release build or to run `make build`
 | `uninstall` | Removes the patch, the payload and the hook; keeps the backups |
 | `status` | Shows which builds are patched, with their VivArcDi version, the version of the staged copy, and whether the hook is active |
 | `shortcuts apply\|restore\|status` | Sets Arc's keyboard shortcuts and Quick Commands "Open Links In New Tab" in the Vivaldi profile, backs it up first and restores it on request |
-| `theme apply\|restore\|status` | Adds the "VivArcDi Light" theme to the Vivaldi profile and selects it, backs it up first; `restore` selects the previous theme again; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
+| `theme apply\|list\|restore\|status` | `apply` adds the five VivArcDi themes (Light, Pink, Green, Dark, Pure Dark) to the Vivaldi profile and selects one, backs it up first; `apply --theme vivarcdi-pink` picks the one to start with (default: Light); `list` prints the themes with their credit; `restore` selects the previous theme again and removes the VivArcDi ones; `apply --dry-run` lists the changes; `status --keys` prints the theme key names and ids |
 | `window` | Opens the VivArcDi window, the same one as in the app and the package |
 
 Add `--quiet` to print only warnings and errors. On Debian, every command but `status`, `shortcuts` and `theme` needs `sudo`; `shortcuts` and `theme` refuse it.
@@ -258,7 +258,7 @@ Add `--quiet` to print only warnings and errors. On Debian, every command but `s
 `--mode cli|app|deb` says who manages VivArcDi. The default is `cli`. The app and the package pass
 `app` and `deb` themselves, so you do not need it. `window` needs a desktop and Tkinter.
 
-At the end of `install` you are asked "Apply the VivArcDi Light theme? [Y/n]" (default yes; Vivaldi must be closed, otherwise run `theme apply` later). `install --yes` applies it without asking, `install --no-theme` skips it. The question is never asked by the update hook, the window or under `sudo`.
+At the end of `install` the five VivArcDi themes are added to Vivaldi and you are asked "Which theme should Vivaldi start with?" (a number, Enter for Light; Vivaldi must be closed, otherwise run `theme apply` later). `install --yes` starts with Light without asking, `install --theme vivarcdi-dark` answers for you, `install --no-theme` adds nothing. The question is never asked by the update hook, the window or under `sudo`. The others stay in Vivaldi's Settings > Themes, and the tab bar follows the one you select.
 
 `shortcuts` is never part of `install`: quit Vivaldi, run `python3 installer shortcuts apply --dry-run` to see the differences, then `python3 installer shortcuts apply`. `shortcuts apply` also frees Cmd+Opt+N (Ctrl+Alt+N on Debian) for [Little Arc](#little-arc), taking it away from Vivaldi's Notes panel. `python3 installer shortcuts restore` puts the saved settings back, and `uninstall --restore-shortcuts` does the same while uninstalling.
 
@@ -695,7 +695,7 @@ Vivaldi's own `+` button in the tab bar is hidden.
 | Option | Default | Meaning |
 |---|---|---|
 | `enabled` | `true` | Set to `false` and Vivaldi looks as it does without the module |
-| `palette` | `arclight` | Colors of a workspace without a color of its own: `arclight` (a coral-to-aqua gradient behind the tab bar and around the page, with white pill and dark text), `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon` |
+| `palette` | `arclight` | Colors used while no VivArcDi theme is selected: `arclight` (a coral-to-aqua gradient behind the tab bar and around the page, with white pill and dark text), `arcpink`, `arcgreen`, `arcdark`, `arcdarkpure`, `sky`, `ice`, `powder`, `aqua`, `mist` or `lagoon`. A selected VivArcDi theme wins over this option, also while Automatically hide UI is on |
 
 ## Workspace sync
 
@@ -752,6 +752,17 @@ and version rules, [specs/](specs/README.md) for what each feature must do, and
 
 Inspired by [VivalArc](https://github.com/tovifun/VivalArc) by tovifun and by the mods collected in
 [Awesome-Vivaldi](https://github.com/PaRr0tBoY/Awesome-Vivaldi). VivArcDi does not include their code.
+
+The themes are drawn from scratch with colors read from the public screenshots of
+[VivalArc](https://github.com/tovifun/VivalArc) by tovifun; none of its theme files or pictures is copied.
+
+| VivArcDi theme | Id | Inspired by |
+|---|---|---|
+| VivArcDi Light | `vivarcdi-light` | ArcLight, VivalArc by tovifun |
+| VivArcDi Pink | `vivarcdi-pink` | Reflect Pink, VivalArc by tovifun |
+| VivArcDi Green | `vivarcdi-green` | Reflect Green, VivalArc by tovifun |
+| VivArcDi Dark | `vivarcdi-dark` | ArcDark, VivalArc by tovifun |
+| VivArcDi Pure Dark | `vivarcdi-pure-dark` | ArcDarkPure, VivalArc by tovifun |
 
 ## License
 

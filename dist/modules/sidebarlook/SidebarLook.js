@@ -4,13 +4,12 @@ import { Module } from "../../core/boot/Module.js";
 import { NewTabOpener } from "../../shared/newtab/NewTabOpener.js";
 import { NewTabRow } from "../../shared/newtab/NewTabRow.js";
 import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
+import { LookMarks } from "./LookMarks.js";
 import { Palettes } from "./Palettes.js";
 import { ScrollMark } from "./ScrollMark.js";
 import { SIDEBAR_LOOK_OPTIONS } from "./SidebarLookOptions.js";
-const LOOK_ATTRIBUTE = "data-vivarcdi-look";
-const PALETTE_ATTRIBUTE = "data-vivarcdi-palette";
-const GRADIENT_ATTRIBUTE = "data-vivarcdi-gradient";
-const GRADIENT_PROPERTY = "--vivarcdi-gradient";
+import { ThemePalettes } from "./ThemePalettes.js";
+const THEME_KEY = "vivaldi.themes.current";
 const NEW_TAB_ORDER = 30;
 class SidebarLook extends Module {
   static id = "sidebar-look";
@@ -18,16 +17,18 @@ class SidebarLook extends Module {
   #stops = [];
   /**
    * Gives the vertical tab bar Arc's look: marks Vivaldi's root so that `sidebar-look.css` applies,
-   * sets the colors of the chosen palette, marks the tab list while it scrolls and adds a
-   * `+ New Tab` row before today's tabs. Everything is removed on stop, and nothing is touched
-   * while the module is disabled.
+   * sets the colors of the palette of the selected VivArcDi theme (else the `palette` option) and
+   * follows a change of theme, marks the tab list while it scrolls and adds a `+ New Tab` row before
+   * today's tabs. Everything is removed on stop, and nothing is touched while the module is disabled.
    *
    * @param context What the module may use.
    */
-  start({ document, selectors, options, tabs, runtime, logger }) {
-    const browser = DomQuery.require(document, selectors.get("browser"));
-    const palette = Palettes.byName(options.palette);
-    this.#paint(browser, palette);
+  async start({ document, selectors, options, prefs, tabs, runtime, logger }) {
+    const marks = new LookMarks(DomQuery.require(document, selectors.get("browser")));
+    this.#stops.push(() => marks.remove());
+    const paint = async () => marks.apply(Palettes.byName(await this.#paletteName(prefs, options.palette)));
+    await paint();
+    this.#follow(prefs, () => void paint().catch((error) => logger.warn("the palette could not follow the theme", error)));
     const scroll = new ScrollMark(document, selectors.get("tabBar"));
     scroll.start();
     this.#stops.push(() => scroll.stop());
@@ -48,29 +49,18 @@ class SidebarLook extends Module {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
   }
-  #paint(browser, palette) {
-    const colors = { space: palette.space, pill: palette.pill, ink: palette.ink };
-    browser.setAttribute(LOOK_ATTRIBUTE, "");
-    browser.setAttribute(PALETTE_ATTRIBUTE, palette.name);
-    for (const [name, value] of Object.entries(colors)) {
-      browser.style.setProperty(`--vivarcdi-${name}`, value);
+  async #paletteName(prefs, fallback) {
+    if (!prefs.available) {
+      return fallback;
     }
-    if (palette.gradient) {
-      browser.setAttribute(GRADIENT_ATTRIBUTE, "");
-      browser.style.setProperty(GRADIENT_PROPERTY, Palettes.css(palette.gradient));
+    return ThemePalettes.paletteFor(await prefs.get(THEME_KEY)) ?? fallback;
+  }
+  #follow(prefs, repaint) {
+    if (prefs.available && prefs.canFollow) {
+      this.#stops.push(prefs.onChange(THEME_KEY, repaint));
     }
-    this.#stops.push(() => {
-      browser.removeAttribute(LOOK_ATTRIBUTE);
-      browser.removeAttribute(PALETTE_ATTRIBUTE);
-      browser.removeAttribute(GRADIENT_ATTRIBUTE);
-      Object.keys(colors).forEach((name) => browser.style.removeProperty(`--vivarcdi-${name}`));
-      browser.style.removeProperty(GRADIENT_PROPERTY);
-    });
   }
 }
 export {
-  GRADIENT_ATTRIBUTE,
-  LOOK_ATTRIBUTE,
-  PALETTE_ATTRIBUTE,
   SidebarLook
 };

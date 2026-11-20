@@ -13,8 +13,8 @@ const GAMMA = 2.4;
 const CONTRAST_OFFSET = 0.05;
 class Palettes {
   /**
-   * `arclight`, the coral-to-aqua gradient of Arc's light theme, followed by the six palettes close to
-   * Arc's light blue.
+   * `arclight`, the coral-to-aqua gradient of Arc's light theme, the pink, green and dark themes
+   * (`arcpink`, `arcgreen`, `arcdark`, `arcdarkpure`), then the six palettes close to Arc's light blue.
    */
   static all = Object.freeze([
     {
@@ -24,6 +24,28 @@ class Palettes {
       pill: "#ffffff",
       ink: "#212121"
     },
+    {
+      name: "arcpink",
+      space: "#ead0dd",
+      gradient: { angle: 180, stops: ["#d8b5dd", "#ead0dd", "#f7e4d6"] },
+      pill: "#ffffff",
+      ink: "#212121"
+    },
+    {
+      name: "arcgreen",
+      space: "#b6d2d3",
+      gradient: { angle: 180, stops: ["#a0c1c8", "#b6d2d3", "#d1ddd1"] },
+      pill: "#ffffff",
+      ink: "#212121"
+    },
+    {
+      name: "arcdark",
+      space: "#501d3c",
+      gradient: { angle: 180, stops: ["#2e1141", "#501d3c", "#5f243a"] },
+      pill: "#672877",
+      ink: "#f2f2f2"
+    },
+    { name: "arcdarkpure", space: "#151515", pill: "#323232", ink: "#f2f2f2" },
     { name: "sky", space: "#a3cee0", pill: "#e9f3f7", ink: "#0f2129" },
     { name: "ice", space: "#b8dbe8", pill: "#eef6f9", ink: "#0f2129" },
     { name: "powder", space: "#9fc2dd", pill: "#e7eff6", ink: "#0f1f2c" },
