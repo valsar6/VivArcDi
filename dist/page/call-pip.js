@@ -23,6 +23,7 @@ var VivArcDiCallPip = (() => {
   __export(call_pip_exports, {
     close: () => close,
     install: () => install,
+    open: () => open,
     uninstall: () => uninstall
   });
 
@@ -142,26 +143,82 @@ var VivArcDiCallPip = (() => {
     }
   };
 
-  // src/page/lib/CallPipHook.ts
-  var CallPipHook = class {
-    #policy;
+  // src/page/lib/PipCommand.ts
+  var OpenPipCommand = class {
+    #environment;
+    #allowed;
+    /**
+     * Floats the call video in Picture in Picture.
+     *
+     * @param environment The page and what it knows about the call.
+     * @param allowed Whether the browser would honor the request now, such as a check for user activation.
+     */
+    constructor(environment, allowed) {
+      this.#environment = environment;
+      this.#allowed = allowed;
+    }
+    execute() {
+      const { document: document2, inCall, warn } = this.#environment;
+      if (document2.pictureInPictureElement !== null || !this.#allowed() || !inCall()) {
+        return false;
+      }
+      const video = CallVideo.pick(document2);
+      if (video === null) {
+        return false;
+      }
+      video.disablePictureInPicture = false;
+      video.requestPictureInPicture().catch(() => warn("request-failed"));
+      return true;
+    }
+  };
+  var ClosePipCommand = class {
     #document;
-    #warn;
+    /**
+     * Closes the Picture in Picture window of the page.
+     *
+     * @param document The document of the call page.
+     */
+    constructor(document2) {
+      this.#document = document2;
+    }
+    execute() {
+      if (this.#document.pictureInPictureElement === null) {
+        return false;
+      }
+      this.#document.exitPictureInPicture().catch(() => void 0);
+      return true;
+    }
+  };
+
+  // src/page/lib/CallPipHook.ts
+  function hasUserActivation() {
+    return globalThis.navigator.userActivation?.isActive === true;
+  }
+  var CallPipHook = class {
+    #document;
     #detector;
+    #letter;
+    #openFromKey;
+    #openOnTabSwitch;
+    #close;
     #warned = false;
     /**
-     * Floats the call of a page in Picture in Picture on Cmd/Ctrl+Shift and a letter, and closes the
-     * window when the tab is shown again or the call ends.
+     * Floats the call of a page in Picture in Picture on Cmd/Ctrl+Shift and a letter, or when the
+     * interface asks for it after a tab switch, and closes the window when the tab is shown again or
+     * the call ends. Each action is a command.
      *
      * @param policy The letter, the selector of the in-call view and the identity of the page.
      * @param document The document of the call page.
      * @param warn Tells the interface that something on the page is not as expected.
      */
     constructor(policy, document2, warn) {
-      this.#policy = policy;
       this.#document = document2;
-      this.#warn = warn;
-      this.#detector = new CallDetector(document2, policy.inCallSelector, (inCall) => this.#onCall(inCall));
+      this.#letter = policy.letter;
+      this.#close = new ClosePipCommand(document2);
+      this.#detector = new CallDetector(document2, policy.inCallSelector, (inCall) => !inCall && this.#close.execute());
+      const environment = { document: document2, inCall: () => this.#detector.inCall(), warn: (reason) => this.#warnOnce(reason, warn) };
+      this.#openFromKey = new OpenPipCommand(environment, () => true);
+      this.#openOnTabSwitch = new OpenPipCommand(environment, hasUserActivation);
     }
     attach() {
       globalThis.addEventListener("keydown", this.#onKey, true);
@@ -172,50 +229,45 @@ var VivArcDiCallPip = (() => {
       globalThis.removeEventListener("keydown", this.#onKey, true);
       this.#document.removeEventListener("visibilitychange", this.#onVisibility);
       this.#detector.stop();
-      this.#close();
+    }
+    /**
+     * Opens the window after a tab switch, when the browser still honors the user's last gesture.
+     */
+    openOnTabSwitch() {
+      this.#openOnTabSwitch.execute();
+    }
+    /**
+     * Closes the window, if one is open.
+     */
+    closeWindow() {
+      this.#close.execute();
     }
     #onKey = (event) => {
-      if (event.defaultPrevented || !ShortcutKeys.isCommandShift(event, this.#policy.letter)) {
+      if (event.defaultPrevented || !ShortcutKeys.isCommandShift(event, this.#letter)) {
         return;
       }
-      if (this.#document.pictureInPictureElement !== null) {
-        this.#consume(event);
-        this.#close();
+      const open2 = this.#document.pictureInPictureElement !== null;
+      if (event.repeat) {
+        this.#consumeIf(event, open2 || this.#detector.inCall());
         return;
       }
-      const video = this.#detector.inCall() ? CallVideo.pick(this.#document) : null;
-      if (video !== null) {
-        this.#consume(event);
-        this.#open(video);
-      }
+      this.#consumeIf(event, open2 ? this.#close.execute() : this.#openFromKey.execute());
     };
     #onVisibility = () => {
       if (!this.#document.hidden) {
-        this.#close();
+        this.#close.execute();
       }
     };
-    #onCall(inCall) {
-      if (!inCall) {
-        this.#close();
+    #consumeIf(event, handled) {
+      if (handled) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
       }
     }
-    #consume(event) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    }
-    #open(video) {
-      video.disablePictureInPicture = false;
-      video.requestPictureInPicture().catch(() => this.#warnOnce("request-failed"));
-    }
-    #close() {
-      if (this.#document.pictureInPictureElement !== null) {
-        this.#document.exitPictureInPicture().catch(() => void 0);
-      }
-    }
-    #warnOnce(reason) {
+    #warnOnce(reason, warn) {
       if (!this.#warned) {
         this.#warned = true;
-        this.#warn(reason);
+        warn(reason);
       }
     }
   };
@@ -277,22 +329,28 @@ var VivArcDiCallPip = (() => {
 
   // src/page/call-pip.ts
   var INSTALL = new PageInstall("vivarcdi.call.pip");
+  var installed = null;
   function install(policy) {
     const warn = (reason) => sendToInterface({ type: CALL_MESSAGE_TYPE, token: policy.token, tabId: policy.tabId, reason }, CALL_CONSOLE_PREFIX);
     if (document.pictureInPictureEnabled !== true) {
       INSTALL.remove();
+      installed = null;
       warn("unsupported-page");
       return;
     }
-    INSTALL.replace(new CallPipHook(policy, document, warn));
+    installed = new CallPipHook(policy, document, warn);
+    INSTALL.replace(installed);
   }
   function uninstall() {
+    installed?.closeWindow();
+    installed = null;
     INSTALL.remove();
   }
+  function open() {
+    installed?.openOnTabSwitch();
+  }
   function close() {
-    if (document.pictureInPictureElement !== null) {
-      document.exitPictureInPicture().catch(() => void 0);
-    }
+    installed?.closeWindow();
   }
   return __toCommonJS(call_pip_exports);
 })();

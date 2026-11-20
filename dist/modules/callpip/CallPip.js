@@ -5,6 +5,8 @@ import { CALL_PIP_OPTIONS } from "./CallPipOptions.js";
 import { siteFor } from "./CallSites.js";
 const SCRIPT_PATH = "page/call-pip.js";
 const SCRIPT_GLOBAL = "VivArcDiCallPip";
+const OPEN_COMMAND = `${SCRIPT_GLOBAL}?.open();`;
+const CLOSE_COMMAND = `${SCRIPT_GLOBAL}?.close();`;
 class CallPip extends Module {
   static id = "call-pip";
   static privateWindows = "never";
@@ -13,10 +15,12 @@ class CallPip extends Module {
   #token = "";
   #injector = null;
   #unsubscribe = [];
+  #active = /* @__PURE__ */ new Map();
   /**
    * Injects the page script into the pages of the enabled call sites. The script floats the call in
-   * Picture in Picture when the user presses the shortcut, and the module closes the window when the
-   * tab becomes active again. Without `chrome.tabs` the module stays off.
+   * Picture in Picture when the user presses the shortcut. When the active tab changes, the module asks
+   * the tab that was left to open the window, which the browser honors after a recent interaction with
+   * the page, and the tab shown to close its own. Without `chrome.tabs` the module stays off.
    *
    * @param context What the module may use.
    */
@@ -43,7 +47,7 @@ class CallPip extends Module {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message)));
     }
     this.#injector.attach();
-    this.#unsubscribe.push(tabs.onActivated(({ tabId }) => this.#injector?.run(tabId, `globalThis.${SCRIPT_GLOBAL}?.close();`)));
+    await this.#followActiveTabs(context);
   }
   /**
    * Removes the page script from every page and every listener.
@@ -53,7 +57,21 @@ class CallPip extends Module {
     this.#unsubscribe = [];
     this.#injector?.detach();
     this.#injector = null;
+    this.#active.clear();
     this.#context = null;
+  }
+  async #followActiveTabs({ tabs }) {
+    this.#unsubscribe.push(tabs.onActivated((info) => this.#onActivated(info)));
+    const active = await tabs.query({ active: true });
+    active.forEach(({ id, windowId }) => id !== void 0 && !this.#active.has(windowId) && this.#active.set(windowId, id));
+  }
+  #onActivated({ tabId, windowId }) {
+    const previous = this.#active.get(windowId);
+    this.#active.set(windowId, tabId);
+    if (previous !== void 0 && previous !== tabId && this.#context?.options.openOnTabSwitch === true) {
+      this.#injector?.run(previous, `globalThis.${OPEN_COMMAND}`);
+    }
+    this.#injector?.run(tabId, `globalThis.${CLOSE_COMMAND}`);
   }
   async #scriptFor(script, tabId) {
     const context = this.#context;
