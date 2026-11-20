@@ -38,6 +38,21 @@ siteFor(url, options) ─ scriptFor ─▶ install({token, tabId, site, letter})
 logger.warn ◀── call-warning message ◀── unexpected page
 ```
 
+### T1 results, Google Meet (Tore, real call, 2026-11-20)
+
+- One `<video>` in the call: 782 x 441, playing, a `MediaStream` with one live video track,
+  `disablePictureInPicture` false and no attribute, so no `<canvas>` and no clearing needed on Meet.
+  `document.pictureInPictureEnabled` is true; `documentPictureInPicture` exists.
+- Neither candidate selector of Meet matches (`[data-call-ended="false"]`, `[data-meeting-title]`:
+  0). The leave button has `aria-label="Esci dalla chiamata"`, which depends on the language, and
+  obfuscated classes. A live video alone is not a call: the lobby preview is a live, playing video
+  too, so the in-call selector must tell them apart without relying on the language. Open until the
+  attributes of the leave button are read (`t1-meet-attributes.js`).
+- The page receives Cmd+Shift+P with `key` `p` and not handled (`defaultPrevented` false). Cmd+Option+P
+  arrives with `key` `π` on macOS, because Option changes the character; a Cmd+Option shortcut must
+  match `code` `KeyP`, as `ShortcutKeys.isCommandOption` does. Whether Vivaldi reacts to the keys is
+  not visible from the page; Tore saw nothing happen.
+
 ### Rejected alternatives
 
 - **Interface-side registry of tabs with calls, `onActivated` and `send(tabId, code)`.** The first
