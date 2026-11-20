@@ -49,9 +49,9 @@ class FolderSection {
    * section opens them, renames them and reports their clicks through `VirtualFolders`.
    *
    * @param context What the module may use.
-   * @param settings The root folders and the sizes.
+   * @param settings The root folders and how many levels are shown.
    */
-  constructor(context, { roots, maxDepth, maxHeightPercent }) {
+  constructor(context, { roots, maxDepth }) {
     const { document, selectors, tabs, bookmarks, prefs, logger } = context;
     const links = () => FolderTree.links(this.#source.entries);
     this.#context = context;
@@ -84,8 +84,7 @@ class FolderSection {
         onClose: (tabId) => void activator.close(tabId),
         onRename: (id, name) => void this.#editing.rename(id, name),
         onMenu: (id, x, y) => this.#virtual.openMenu(id, x, y)
-      },
-      maxHeightPercent
+      }
     );
     this.#editing = this.#createEditing();
   }

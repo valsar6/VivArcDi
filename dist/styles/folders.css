@@ -2,7 +2,7 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] {
   --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) 10%, transparent);
   box-sizing: border-box;
-  max-height: max(120px, var(--vivarcdi-folders-max-height, 60) * 1vh);
+  max-height: max(120px, 60vh);
   padding: 6px;
   max-width: 100%;
   overflow: hidden auto;

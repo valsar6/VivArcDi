@@ -84,6 +84,9 @@ You can point a workspace at any existing folder in `config.json` (see the
   below its folder when you close the folder, as in Arc. The tab is hidden from Vivaldi's own tab list,
   so the list holds only the pages you opened outside the Favorites, pinned tabs and folders.
 - **Close a link** with the `×` on hover or Cmd/Ctrl+W: the link goes back inside its folder.
+- **Scroll** the column as one list, as in Arc: the Favorites stay in place at the top, the Archive footer
+  at the bottom, and the folders and the Today tabs between them scroll together, however long the
+  folders are. The scroll bar is thin and shows only while you scroll.
 
 Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 

@@ -1,0 +1,29 @@
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll] {
+  overflow: hidden auto;
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll] [data-vivarcdi-folders] {
+  max-height: none;
+  overflow: visible;
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll] .resize:has(> .tab-strip) {
+  flex: 0 0 100000px !important;
+  margin-bottom: var(--vivarcdi-strip-overflow, 0);
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll] .tab-strip {
+  overflow: visible !important;
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll] [data-vivarcdi-archive-footer] {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--vivarcdi-space, transparent);
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll]::-webkit-scrollbar {
+  width: 6px;
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll]::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: transparent;
+}
+#browser[data-vivarcdi-active] #tabs-container[data-vivarcdi-column-scroll][data-vivarcdi-scrolling]::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--vivarcdi-ink) 35%, transparent);
+}

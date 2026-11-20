@@ -24,8 +24,7 @@ class BookmarkFolders extends Module {
     }
     this.#section = new FolderSection(context, {
       roots: new WorkspaceRoots(options),
-      maxDepth: options.maxDepth,
-      maxHeightPercent: options.maxHeightPercent
+      maxDepth: options.maxDepth
     });
     try {
       await this.#section.start();
