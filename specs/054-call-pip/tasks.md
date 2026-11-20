@@ -9,13 +9,17 @@
 Ordered, small and independently reviewable. Each task names the acceptance criteria it satisfies
 and is done when its check passes. Tests keep the names of the `auto:` checks.
 
-- [ ] **T1.** Probe on the lab copy, with Tore's agreement to run `npm run live -- --probe <file>`:
+- [x] **T1.** Probe on the lab copy, with Tore's agreement to run `npm run live -- --probe <file>`:
   (a) does Vivaldi 8.1 call a page's `enterpictureinpicture` media session action when the tab is
   left, and does it need a site permission; (b) does `requestPictureInPicture()` run from
   `executeScript` without a gesture; (c) is a handler registered by `executeScript` seen by the
   browser. Write the answers into `design.md` (the way each site opens, the fallback decision of
   Q-2). Selectors of Discord and Teams are confirmed by Tore in a real call. Satisfies Q-1 to Q-3.
   Done when the design names one way per site and the in-call selectors are real.
+- [ ] **T1b.** Tore joins a real Google Meet call in his Vivaldi (a call with camera or microphone on),
+  switches to another tab and says whether a PiP window opens by itself, and whether Vivaldi's site
+  settings list "Automatic picture-in-picture". Decides whether way (1) works at all. Satisfies Q-1.
+  Done when the answer is in `design.md`; a no stops the work and reopens the spec.
 - [ ] **T2.** `CallSites.ts`, `CallPipOptions.ts`, the four selector keys in `src/selectors/8.1.json`,
   the `call-pip` entry in `src/config.json`. Satisfies AC-7, AC-8. Done when
   `skips a disabled site` and `injects the call script on the four sites only` pass.

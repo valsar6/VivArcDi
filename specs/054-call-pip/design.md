@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was `Approved`. It says **how**; the spec says **what**.
@@ -48,6 +48,28 @@ CallDetector ── inCall changed ──▶ CallMessage ──────▶ C
 PipOpener  ◀── open / close ◀───── PageScriptInjector.send ◀── CallController ◀── tabs.onActivated
 PipOpener ── pip closed by user ──▶ CallMessage ──────▶ CallRegistry
 ```
+
+### Probe results (T1, lab Vivaldi 8.1, 2026-11-20)
+
+Run on a page served from `127.0.0.1` (a secure context) with a live video track from a canvas.
+
+- `requestPictureInPicture()` called from `executeScript` fails with `NotAllowedError: Must be handling
+  a user gesture`. The interface-driven way (2) cannot open PiP by itself: it is closed.
+- A handler for `enterpictureinpicture` registers without error, both from the page and from the
+  `executeScript` world. Leaving the tab (`hidden` becomes `true`) did not open PiP, and returning
+  left no window to close.
+- That negative is not conclusive: Chromium opens automatic PiP only for a tab that captures camera or
+  microphone (or shares the screen) and has the site permission. The probe's video came from a canvas,
+  and the lab cannot grant camera access. Vivaldi exposes no `autoPictureInPicture` content setting
+  (`chrome.contentSettings` has none) and no PiP key in `vivaldi.tabsPrivate`, so the module cannot
+  grant the permission either.
+- `chrome.settingsPrivate` and `vivaldi.prefs.getAll` are not available to the probe, so the site
+  permission could not be read.
+
+What this leaves: way (1) is the only way, and whether it works depends on Vivaldi honoring the action
+for a call tab. The check that decides it is a real Meet call (task T1b). If Vivaldi does not open PiP
+there, no gesture-less path exists and spec 054 has to change (a new decision for Tore), not the
+design.
 
 ### Rejected alternatives
 
