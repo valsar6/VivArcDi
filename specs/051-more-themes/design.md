@@ -94,6 +94,25 @@ Green…", "…ArcDark…", "…ArcDarkPure…"; Light keeps "…ArcLight…" (0
 | `#browser` marks and variables | Gradient and palette, also in hidden UI | `LookMarks` re-applies them |
 | `.auto-hide-wrapper` (and the other bars of hidden UI) | Made transparent or colored by the stylesheet | Found by the probe of T1; added to `src/selectors/8.1.json` and `tests/live/selector-states.json` |
 
+## Probe results (T1, 2026-11-20)
+
+Read-only probe on the lab Vivaldi (`npm run live -- --probe`, Vivaldi 8.3 installed, selectors 8.1) and
+a static read of its `bundle.js` and `prefs_definitions.json`; nothing was written.
+
+- `vivaldi.prefs.get('vivaldi.themes.current')` works from the window and returns the theme id
+  (`Vivaldi1` on a fresh profile); `vivaldi.prefs.onChanged` exists. The follow of the design stands.
+  `vivaldi.themes.user` is readable too (empty on a fresh profile).
+- Automatically hide UI is the preference `vivaldi.auto_hide.enabled` (with `tab_bar`, `panel`,
+  `address_bar`, `status_bar`, `bookmarks_bar`, all default true). `#browser` carries the class
+  `auto-hide` or `auto-hide-off` (plus `auto-hide-visible`), and each hidden bar sits in a
+  `div.auto-hide-wrapper.<position>` that gets `show` when revealed.
+- Vivaldi manages the `class` of `#browser`, not the `data-vivarcdi-*` attributes: they survive its
+  redraws in normal mode. Whether its `style` writes drop our inline variables when the mode toggles
+  could not be probed read-only (`prefs.set` is refused by the probe guard, correctly); `LookMarks`
+  keeps its observer as the safeguard and AC-16 is covered by its test.
+- The stylesheet therefore keys the hidden-UI rules on `#browser.auto-hide .auto-hide-wrapper`, and
+  `src/selectors/8.1.json` gets `autoHideWrapper: ".auto-hide-wrapper"`.
+
 ## Configuration
 
 No new option. `sidebar-look.palette` keeps its default `arclight` and its meaning: the palette used

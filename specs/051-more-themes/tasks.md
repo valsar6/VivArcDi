@@ -10,11 +10,11 @@ Ordered, small and independently reviewable. Each task names the acceptance crit
 and is done when its check passes. Branch `features/more-themes` (minor), version read from `main`
 just before opening the pull request. Tests are written first and keep the names of the criteria.
 
-- [ ] **T1.** Probe on a lab Vivaldi (`npm run live -- --probe <file>`, with Tore's agreement): is
+- [x] **T1.** Probe on a lab Vivaldi (`npm run live -- --probe <file>`, with Tore's agreement): is
   `vivaldi.themes.current` readable through `vivaldi.prefs` and does `onChanged` fire when the theme
   changes; which elements and classes carry the window and the bars while Automatically hide UI is
   on, and what happens to the marks of `#browser` when the mode toggles. Satisfies AC-9, AC-16.
-  Done when the design records the answers; if the preference is not readable, stop and update the spec.
+  Done: the design records the answers (preference readable, `onChanged` present, hidden-UI class and wrapper).
 - [ ] **T2.** Add the hidden-UI selectors found in T1 to `src/selectors/8.1.json` and
   `tests/live/selector-states.json`. Satisfies AC-16. Done when the selector check passes.
 - [ ] **T3.** `theme.json` as a catalog and `ThemeCatalog`; `ThemeService.apply(theme_id)` upserting
