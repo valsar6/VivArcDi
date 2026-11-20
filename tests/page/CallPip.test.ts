@@ -190,7 +190,7 @@ test('closes the call PiP on the shortcut', async () => {
   assert.ok(key.prevented && key.stopped);
 });
 
-test('closes the call PiP when the tab is shown again', async () => {
+test('closes the call PiP when the page becomes visible', async () => {
   await inCall();
   press({});
   page.hidden = true;
@@ -198,6 +198,16 @@ test('closes the call PiP when the tab is shown again', async () => {
   assert.equal(page.exits, 0);
   page.hidden = false;
   page.fire('visibilitychange');
+  assert.equal(page.exits, 1);
+});
+
+test('closes the open PiP window on request', async () => {
+  const script = (await load()) as PageScript & { close(): void };
+  await inCall();
+  press({});
+  script.close();
+  assert.equal(page.exits, 1);
+  script.close();
   assert.equal(page.exits, 1);
 });
 

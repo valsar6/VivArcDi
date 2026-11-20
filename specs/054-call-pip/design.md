@@ -19,8 +19,11 @@ ends. So the whole behavior lives in `call-pip`, modeled on `copy-keys`:
   When a call is in progress it consumes the key and calls `video.requestPictureInPicture()` on the
   call video inside the listener, so the browser sees the gesture (FR-2). When PiP is open it calls
   `document.exitPictureInPicture()` (FR-3). With no call it does not touch the event (FR-6).
-- A `visibilitychange` listener closes the PiP window when the document becomes visible again, which is
-  the call tab being activated again (FR-4). Closing needs no gesture.
+- The interface closes the window when the call tab is activated again (FR-4): `CallPip` listens to
+  `chrome.tabs.onActivated` and runs `VivArcDiCallPip.close()` in that tab, the way Vivaldi closes its
+  own PiP (`exitPictureInPicture` in its `bundle.js`). A `visibilitychange` listener in the page stays as
+  a second way, because Tore's recording of 0.62.0 showed the window staying open after the tab was
+  shown again, which `visibilitychange` alone did not close.
 - A `CallDetector` closes the window when the call ends, and the page unloading with the tab ends it
   too (FR-5).
 

@@ -66,6 +66,16 @@ export class PageScriptInjector {
   }
 
   /**
+   * Runs code in the page of a tab the injector follows, such as a command to a script it injected.
+   *
+   * @param tabId Tab id.
+   * @param code Code to run in the page.
+   */
+  public run(tabId: number, code: string): void {
+    [...this.#tracked.keys()].filter((webview) => tabIdOf(webview) === tabId).forEach((webview) => this.#runner.run(webview, code));
+  }
+
+  /**
    * Stops following the webviews and removes the script from their pages.
    */
   public detach(): void {
