@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Protocol
+from typing import Callable, Optional, Protocol
 
 from .handoff import ReapplyHandoff
 from .errors import PermissionDeniedError
@@ -26,7 +26,7 @@ from .takeover import LegacyTakeover
 THEME_ASK = "ask"
 THEME_APPLY = "apply"
 THEME_NEVER = "never"
-THEME_QUESTION = "Apply the VivArcDi Light theme?"
+THEME_QUESTION = "Which theme should Vivaldi start with?"
 
 
 @dataclass
@@ -55,6 +55,7 @@ class InstallerContext:
     theme_action: str = "status"
     show_keys: bool = False
     theme_choice: str = THEME_NEVER
+    theme_id: Optional[str] = None
     profile_is_yours: bool = True
     prompt: Prompt = field(default_factory=NeverPrompt)
     needs_reapply: bool = False
@@ -125,11 +126,15 @@ class InstallCommand(Command):
         if context.background or context.theme_choice == THEME_NEVER:
             return
         if not context.profile_is_yours:
-            context.reporter.info("To use the VivArcDi Light theme, run without sudo: python3 installer theme apply")
+            context.reporter.info("To use the VivArcDi themes, run without sudo: python3 installer theme apply")
             return
-        if context.theme_choice == THEME_APPLY or context.prompt.confirm(THEME_QUESTION):
-            if context.theme.apply() != 0:
-                context.reporter.warn("The theme was not applied: run python3 installer theme apply when Vivaldi is closed")
+        service = context.theme
+        chosen = context.theme_id
+        if context.theme_choice == THEME_ASK:
+            chosen = context.prompt.choose(THEME_QUESTION, service.options(), service.default_id)
+        if context.theme_choice == THEME_APPLY or chosen is not None:
+            if service.apply(chosen) != 0:
+                context.reporter.warn("The themes were not applied: run python3 installer theme apply when Vivaldi is closed")
 
 
 class ReapplyCommand(Command):
@@ -258,7 +263,7 @@ class ShortcutsCommand(Command):
     help = "apply, restore or check the Arc-style keyboard shortcuts"
     needs_root = False
     refuses_root = True
-    actions = ("apply", "restore", "status")
+    actions = ("apply", "list", "restore", "status")
 
     def execute(self, context: InstallerContext) -> int:
         service = context.shortcuts
@@ -270,10 +275,10 @@ class ShortcutsCommand(Command):
 
 
 class ThemeCommand(Command):
-    """Adds and selects the VivArcDi Light theme in Vivaldi, or puts the previous theme back."""
+    """Adds the VivArcDi themes to Vivaldi and selects one, lists them, or puts the previous theme back."""
 
     name = "theme"
-    help = "apply, restore or check the VivArcDi Light theme"
+    help = "apply, list, restore or check the VivArcDi themes"
     needs_root = False
     refuses_root = True
     actions = ("apply", "restore", "status")
@@ -281,7 +286,9 @@ class ThemeCommand(Command):
     def execute(self, context: InstallerContext) -> int:
         service = context.theme
         if context.theme_action == "apply":
-            return service.apply(dry_run=context.dry_run)
+            return service.apply(context.theme_id, dry_run=context.dry_run)
+        if context.theme_action == "list":
+            return service.list()
         if context.theme_action == "restore":
             return service.restore()
         return service.status(show_keys=context.show_keys)

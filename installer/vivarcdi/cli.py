@@ -21,7 +21,7 @@ from .reporter import Reporter
 from .running import ProcessGuard
 from .shortcuts import ShortcutService
 from .system import CommandRunner
-from .theme import ThemeDefinition, ThemeService
+from .theme import ThemeCatalog, ThemeService
 from .window_patch import WindowHtmlPatcher
 
 MODE_HELP = "who manages VivArcDi: the command line (cli), the macOS app (app) or the Debian package (deb)"
@@ -61,7 +61,7 @@ def build_context(
     )
     theme = ThemeService(
         ProfileLocator(platform.profile_roots()),
-        ThemeDefinition.load(),
+        ThemeCatalog.load(),
         PreferencesBackupStore(data_dir / "preferences-backups"),
         ProcessGuard(platform.process_names(), runner),
         reporter,
@@ -107,8 +107,9 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
                 "--needs-reapply", action="store_true", help="start with the message about a denied background reapply"
             )
         if isinstance(command, InstallCommand):
-            subparser.add_argument("--yes", action="store_true", help="apply the VivArcDi Light theme without asking")
-            subparser.add_argument("--no-theme", action="store_true", help="do not offer the VivArcDi Light theme")
+            subparser.add_argument("--yes", action="store_true", help="start with the VivArcDi Light theme without asking")
+            subparser.add_argument("--theme", help="start with this VivArcDi theme without asking")
+            subparser.add_argument("--no-theme", action="store_true", help="do not write or offer the VivArcDi themes")
             subparser.add_argument(
                 "--allow-downgrade", action="store_true", help="install even when a newer VivArcDi is already installed"
             )
@@ -116,6 +117,7 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
             subparser.add_argument("action", choices=command.actions, help="what to do with the theme")
             subparser.add_argument("--dry-run", action="store_true", help="print the changes and write nothing")
             subparser.add_argument("--keys", action="store_true", help="status: print the theme key names and ids")
+            subparser.add_argument("--theme", help="apply: the theme to select (default: the light theme)")
         if isinstance(command, ShortcutsCommand):
             subparser.add_argument("action", choices=command.actions, help="what to do with the shortcuts")
             subparser.add_argument("--dry-run", action="store_true", help="print the differences and change nothing")
@@ -123,10 +125,11 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
 
 
 def theme_choice(arguments: argparse.Namespace) -> str:
-    """What `install` does about the theme: never with --no-theme, apply with --yes, otherwise ask."""
+    """What `install` does about the themes: never with --no-theme, apply with --yes or --theme, otherwise ask."""
     if getattr(arguments, "no_theme", False):
         return THEME_NEVER
-    return THEME_APPLY if getattr(arguments, "yes", False) else THEME_ASK
+    answered = getattr(arguments, "yes", False) or getattr(arguments, "theme", None) is not None
+    return THEME_APPLY if answered else THEME_ASK
 
 
 def main(argv: list[str]) -> int:
@@ -156,6 +159,7 @@ def main(argv: list[str]) -> int:
         context.theme_action = context.shortcut_action
         context.show_keys = getattr(arguments, "keys", False)
         context.theme_choice = theme_choice(arguments)
+        context.theme_id = getattr(arguments, "theme", None)
         context.profile_is_yours = not is_root()
         context.prompt = ConsolePrompt()
         context.dry_run = getattr(arguments, "dry_run", False)

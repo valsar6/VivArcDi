@@ -12,21 +12,24 @@ from vivarcdi.platforms import MacOSPlatform
 from vivarcdi.prompt import ConsolePrompt
 from vivarcdi.reporter import Reporter
 from vivarcdi.system import CommandResult
-from vivarcdi.theme import ThemeDefinition
+from vivarcdi.theme import ThemeCatalog
 
 NOT_RUNNING = CommandResult(1, "", "")
 RUNNING = CommandResult(0, "1234", "")
 THEME_ID = "vivarcdi-light"
+THEME_IDS = ["vivarcdi-light", "vivarcdi-pink", "vivarcdi-green", "vivarcdi-dark", "vivarcdi-pure-dark"]
 
 
 class FakePrompt:
-    def __init__(self, answer):
-        self.answer = answer
+    def __init__(self, choice):
+        self.choice = choice
         self.questions = []
+        self.options = []
 
-    def confirm(self, question):
+    def choose(self, question, options, default):
         self.questions.append(question)
-        return self.answer
+        self.options = options
+        return self.choice
 
 
 def preferences_with(current="Vivaldi1", user=None):
@@ -54,33 +57,81 @@ class ThemeTest(unittest.TestCase):
     def read_themes(self):
         return json.loads(self.preferences.read_text())["vivaldi"]["themes"]
 
-    def context(self, action, dry_run=False, show_keys=False):
+    def context(self, action, dry_run=False, show_keys=False, theme_id=None):
         context = build_context(self.platform, self.reporter, repo_root=self.repo, runner=self.runner)
         context.theme_action = action
         context.dry_run = dry_run
         context.show_keys = show_keys
+        context.theme_id = theme_id
         return context
 
-    def run_theme(self, action, dry_run=False, show_keys=False):
-        return ThemeCommand().execute(self.context(action, dry_run, show_keys))
+    def run_theme(self, action, dry_run=False, show_keys=False, theme_id=None):
+        return ThemeCommand().execute(self.context(action, dry_run, show_keys, theme_id))
+
+    def read_preferences(self):
+        return json.loads(self.preferences.read_text())
 
     def backups(self):
         return list((self.platform.data_dir / "preferences-backups").rglob("Preferences.*"))
 
-    def test_applies_the_arc_light_theme_with_a_backup(self):
+    def test_applies_the_chosen_theme_with_a_backup(self):
         original = preferences_with()
         self.write_preferences(original)
-        self.assertEqual(self.run_theme("apply"), 0)
+        self.assertEqual(self.run_theme("apply", theme_id="vivarcdi-pink"), 0)
         themes = self.read_themes()
-        self.assertEqual(themes["current"], THEME_ID)
-        self.assertEqual([entry["id"] for entry in themes["user"]], ["mine", THEME_ID])
-        theme = themes["user"][1]
-        self.assertEqual(theme["name"], "VivArcDi Light")
-        self.assertEqual((theme["colorBg"], theme["colorFg"], theme["radius"]), ("#ffffff", "#212121", 14))
-        self.assertEqual(json.loads(self.preferences.read_text())["vivarcdi"]["theme"]["previous"], "Vivaldi1")
+        self.assertEqual(themes["current"], "vivarcdi-pink")
+        self.assertEqual([entry["id"] for entry in themes["user"]], ["mine", *THEME_IDS])
+        pink = themes["user"][2]
+        self.assertEqual((pink["name"], pink["colorWindowBg"], pink["radius"]), ("VivArcDi Pink", "#d8b5dd", 14))
+        self.assertTrue(all("credit" not in entry for entry in themes["user"]))
+        self.assertEqual(self.read_preferences()["vivarcdi"]["theme"]["previous"], "Vivaldi1")
         self.assertEqual(len(self.backups()), 1)
         self.assertEqual(json.loads(self.backups()[0].read_text()), original)
         self.assertIn("Vivaldi Sync", self.output.getvalue())
+
+    def test_applies_the_light_theme_by_default(self):
+        self.write_preferences(preferences_with())
+        self.assertEqual(self.run_theme("apply"), 0)
+        self.assertEqual(self.read_themes()["current"], THEME_ID)
+
+    def test_refuses_an_unknown_theme_id(self):
+        self.write_preferences(preferences_with())
+        before = self.preferences.read_text()
+        self.assertEqual(self.run_theme("apply", theme_id="vivarcdi-neon"), 1)
+        self.assertEqual(self.preferences.read_text(), before)
+        self.assertEqual(self.backups(), [])
+        for theme_id in THEME_IDS:
+            self.assertIn(theme_id, self.output.getvalue())
+
+    def test_installs_all_themes_and_selects_the_chosen_one(self):
+        self.write_preferences(preferences_with())
+        self.run_theme("apply", theme_id="vivarcdi-pure-dark")
+        themes = self.read_themes()
+        self.assertEqual(themes["current"], "vivarcdi-pure-dark")
+        self.assertEqual(sorted(entry["id"] for entry in themes["user"]), sorted(["mine", *THEME_IDS]))
+
+    def test_upserts_a_theme_that_is_already_installed(self):
+        stale = {"id": "vivarcdi-pink", "name": "Old", "colorBg": "#000000"}
+        self.write_preferences(preferences_with(user=[stale, {"id": "mine", "name": "Mine"}]))
+        self.run_theme("apply", theme_id="vivarcdi-pink")
+        user = self.read_themes()["user"]
+        self.assertEqual([entry["id"] for entry in user].count("vivarcdi-pink"), 1)
+        self.assertEqual(next(entry for entry in user if entry["id"] == "vivarcdi-pink")["name"], "VivArcDi Pink")
+
+    def test_lists_the_themes_with_their_credit(self):
+        self.assertEqual(self.run_theme("list"), 0)
+        text = self.output.getvalue()
+        for theme in ThemeCatalog.load().themes:
+            self.assertIn(theme["id"], text)
+            self.assertIn(theme["name"], text)
+            self.assertIn(theme["credit"], text)
+
+    def test_every_theme_credits_vivalarc(self):
+        themes = ThemeCatalog.load().themes
+        self.assertEqual([theme["id"] for theme in themes], THEME_IDS)
+        for theme in themes:
+            self.assertIn("VivalArc", theme["credit"])
+            self.assertIn("tovifun", theme["credit"])
 
     def test_apply_twice_keeps_one_theme_and_the_first_previous(self):
         self.write_preferences(preferences_with())
@@ -99,9 +150,10 @@ class ThemeTest(unittest.TestCase):
         self.assertEqual(self.backups(), [])
         self.assertIn("vivaldi.themes.current: Vivaldi1 -> vivarcdi-light", self.output.getvalue())
 
-    def test_restores_the_previous_theme(self):
+    def test_restores_the_theme_from_before_the_first_apply(self):
         self.write_preferences(preferences_with())
         self.run_theme("apply")
+        self.run_theme("apply", theme_id="vivarcdi-dark")
         self.assertEqual(self.run_theme("restore"), 0)
         data = json.loads(self.preferences.read_text())
         self.assertEqual(data["vivaldi"]["themes"]["current"], "Vivaldi1")
@@ -146,12 +198,14 @@ class ThemeTest(unittest.TestCase):
         self.assertEqual(self.backups(), [])
 
     def test_theme_file_matches_the_spec(self):
-        theme = ThemeDefinition.load()
-        self.assertEqual((theme.id, theme.name), (THEME_ID, "VivArcDi Light"))
-        self.assertEqual(theme.fields["colorHighlightBg"], "#4c7fd9")
-        self.assertEqual(theme.fields["colorWindowBg"], "#c9d8dc")
-        self.assertTrue(theme.fields["transparencyTabBar"])
-        self.assertFalse(theme.fields["accentFromPage"])
+        light = ThemeCatalog.load().get(THEME_ID)
+        self.assertEqual(light["name"], "VivArcDi Light")
+        self.assertEqual(light["colorHighlightBg"], "#4c7fd9")
+        self.assertEqual(light["colorWindowBg"], "#c9d8dc")
+        self.assertTrue(light["transparencyTabBar"])
+        self.assertFalse(light["accentFromPage"])
+        dark = ThemeCatalog.load().get("vivarcdi-dark")
+        self.assertEqual((dark["colorBg"], dark["colorFg"]), ("#1e1224", "#f2f2f2"))
 
 
 class InstallThemeTest(unittest.TestCase):
@@ -169,34 +223,47 @@ class InstallThemeTest(unittest.TestCase):
         self.preferences.write_text(json.dumps(preferences_with()))
         self.output = io.StringIO()
 
-    def install(self, choice, answer=True, background=False):
+    def install(self, choice, picked=THEME_ID, background=False, theme_id=None):
         reporter = Reporter(out=self.output, err=self.output)
         context = build_context(self.platform, reporter, repo_root=self.repo, runner=self.runner, background=background)
         context.theme_choice = choice
-        context.prompt = FakePrompt(answer)
+        context.theme_id = theme_id
+        context.prompt = FakePrompt(picked)
         self.assertEqual(InstallCommand().execute(context), 0)
         return context.prompt
 
     def current(self):
         return json.loads(self.preferences.read_text())["vivaldi"]["themes"]["current"]
 
-    def test_install_offers_the_arc_light_theme(self):
-        prompt = self.install(THEME_ASK, answer=True)
-        self.assertEqual(prompt.questions, ["Apply the VivArcDi Light theme?"])
-        self.assertEqual(self.current(), THEME_ID)
+    def installed_ids(self):
+        themes = json.loads(self.preferences.read_text())["vivaldi"]["themes"]["user"]
+        return [entry["id"] for entry in themes]
+
+    def test_install_asks_which_theme_starts_as_current(self):
+        prompt = self.install(THEME_ASK, picked="vivarcdi-green")
+        self.assertEqual(prompt.questions, ["Which theme should Vivaldi start with?"])
+        self.assertEqual([theme_id for theme_id, _ in prompt.options], THEME_IDS)
+        self.assertEqual(self.current(), "vivarcdi-green")
+        self.assertEqual(self.installed_ids(), ["mine", *THEME_IDS])
 
         self.preferences.write_text(json.dumps(preferences_with()))
-        prompt = self.install(THEME_ASK, answer=False)
+        prompt = self.install(THEME_ASK, picked=None)
         self.assertEqual(len(prompt.questions), 1)
         self.assertEqual(self.current(), "Vivaldi1")
+        self.assertEqual(self.installed_ids(), ["mine"])
 
         prompt = self.install(THEME_NEVER)
         self.assertEqual(prompt.questions, [])
         self.assertEqual(self.current(), "Vivaldi1")
+        self.assertEqual(self.installed_ids(), ["mine"])
 
-        prompt = self.install(THEME_APPLY, answer=False)
+        prompt = self.install(THEME_APPLY, picked=None)
         self.assertEqual(prompt.questions, [])
         self.assertEqual(self.current(), THEME_ID)
+
+        prompt = self.install(THEME_APPLY, theme_id="vivarcdi-dark")
+        self.assertEqual(prompt.questions, [])
+        self.assertEqual(self.current(), "vivarcdi-dark")
 
     def test_install_never_asks_in_the_background(self):
         prompt = self.install(THEME_ASK, background=True)
@@ -207,18 +274,22 @@ class InstallThemeTest(unittest.TestCase):
         self.runner.responses["pgrep"] = RUNNING
         self.install(THEME_APPLY)
         self.assertEqual(self.current(), "Vivaldi1")
-        self.assertIn("theme was not applied", self.output.getvalue())
+        self.assertIn("themes were not applied", self.output.getvalue())
 
     def test_flags_choose_what_install_does(self):
         self.assertEqual(theme_choice(parse_arguments(["install"])), THEME_ASK)
         self.assertEqual(theme_choice(parse_arguments(["install", "--yes"])), THEME_APPLY)
         self.assertEqual(theme_choice(parse_arguments(["install", "--no-theme"])), THEME_NEVER)
+        self.assertEqual(theme_choice(parse_arguments(["install", "--theme", "vivarcdi-pink"])), THEME_APPLY)
+        self.assertEqual(parse_arguments(["install", "--theme", "vivarcdi-pink"]).theme, "vivarcdi-pink")
 
-    def test_console_prompt_defaults_to_yes_and_never_asks_without_a_terminal(self):
-        self.assertTrue(ConsolePrompt(lambda text: "", lambda: True).confirm("Q?"))
-        self.assertTrue(ConsolePrompt(lambda text: "Yes", lambda: True).confirm("Q?"))
-        self.assertFalse(ConsolePrompt(lambda text: "n", lambda: True).confirm("Q?"))
-        self.assertFalse(ConsolePrompt(lambda text: "", lambda: False).confirm("Q?"))
+    def test_console_prompt_numbers_the_choices_and_defaults_to_the_first(self):
+        options = [("a", "Alpha"), ("b", "Beta")]
+        self.assertEqual(ConsolePrompt(lambda text: "", lambda: True, lambda text: None).choose("Q?", options, "a"), "a")
+        self.assertEqual(ConsolePrompt(lambda text: "2", lambda: True, lambda text: None).choose("Q?", options, "a"), "b")
+        self.assertEqual(ConsolePrompt(lambda text: "beta", lambda: True, lambda text: None).choose("Q?", options, "a"), "b")
+        self.assertIsNone(ConsolePrompt(lambda text: "9", lambda: True, lambda text: None).choose("Q?", options, "a"))
+        self.assertIsNone(ConsolePrompt(lambda text: "", lambda: False, lambda text: None).choose("Q?", options, "a"))
 
 
 if __name__ == "__main__":
