@@ -57,7 +57,7 @@ function setUp(urls: string[], options: Partial<CallPipOptions> = {}): Setup {
   const messages = new FakeEvent<RuntimeMessageListener>();
   const sink = new SilentSink();
   const activated = new Set<TabActivatedListener>();
-  const tabs = Object.assign(new FakeTabs(urls.map((url, index) => ({ id: index + 1, active: index === 0, currentWindow: true, url }))), {
+  const tabs = Object.assign(new FakeTabs(urls.map((url, index) => ({ id: index + 1, active: index === 0, currentWindow: true, windowId: 1, url }))), {
     onActivated: (listener: TabActivatedListener): (() => void) => {
       activated.add(listener);
       return () => activated.delete(listener);
@@ -132,10 +132,34 @@ test('logs a warning for messages with its token only', async () => {
   module.stop();
 });
 
+const OPEN = 'globalThis.VivArcDiCallPip?.open();';
+const CLOSE = 'globalThis.VivArcDiCallPip?.close();';
+
+function activate(activated: Set<TabActivatedListener>, tabId: number): void {
+  activated.forEach((listener) => listener({ tabId, windowId: 1 }));
+}
+
+test('asks the left tab to open the call PiP', async () => {
+  const { module, webviews, activated } = await started([MEET, MEET]);
+  activate(activated, 2);
+  assert.equal(webviews[0]?.executed.at(-1), OPEN);
+  assert.equal(webviews[1]?.executed.at(-1), CLOSE);
+  module.stop();
+});
+
 test('closes the call PiP when the tab is shown again', async () => {
   const { module, webviews, activated } = await started([MEET, 'https://example.com/']);
-  activated.forEach((listener) => listener({ tabId: 1, windowId: 1 }));
-  assert.equal(webviews[0]?.executed.at(-1), 'globalThis.VivArcDiCallPip?.close();');
+  activate(activated, 2);
+  activate(activated, 1);
+  assert.equal(webviews[0]?.executed.at(-1), CLOSE);
+  module.stop();
+});
+
+test('does not open the call PiP on a tab switch when the option is off', async () => {
+  const { module, webviews, activated } = await started([MEET, MEET], { openOnTabSwitch: false });
+  activate(activated, 2);
+  assert.equal(webviews[0]?.executed.includes(OPEN), false);
+  assert.equal(webviews[1]?.executed.at(-1), CLOSE);
   module.stop();
 });
 
@@ -164,9 +188,9 @@ test('reads call messages and refuses anything else', () => {
   assert.equal(parseCallMessage(null), null);
 });
 
-test('call settings default to Meet on and the letter p', () => {
+test('call settings default to Meet and the tab switch on, and the letter p', () => {
   const check = (raw: Record<string, unknown>): CallPipOptions | null => CALL_PIP_OPTIONS.check(raw, { warn: (): void => undefined });
-  assert.deepEqual(check({}), { meet: true, shortcutLetter: 'p' });
-  assert.deepEqual(check({ meet: false, shortcutLetter: 'k' }), { meet: false, shortcutLetter: 'k' });
-  assert.deepEqual(check({ shortcutLetter: '  ' }), { meet: true, shortcutLetter: 'p' });
+  assert.deepEqual(check({}), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p' });
+  assert.deepEqual(check({ meet: false, openOnTabSwitch: false, shortcutLetter: 'k' }), { meet: false, openOnTabSwitch: false, shortcutLetter: 'k' });
+  assert.deepEqual(check({ shortcutLetter: '  ' }), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p' });
 });
