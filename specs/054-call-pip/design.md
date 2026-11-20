@@ -11,35 +11,64 @@ the probes that closed it are kept below.
 
 ## Approach
 
-**One page script does everything; the interface only injects it.** The page of a call is the only
-place that has a user gesture, and it also knows when the tab is shown or hidden and when the call
-ends. So the whole behavior lives in `call-pip`, modeled on `copy-keys`:
+**One page script does the work; the interface decides when.** The page of a call is the only place
+that has a user gesture, and it knows when the tab is shown or hidden and when the call ends. So the
+behavior lives in `call-pip`, modeled on `copy-keys`, as two commands (Command pattern):
 
-- A capture-phase `keydown` listener answers Cmd/Ctrl+Shift+*letter* (`ShortcutKeys.isCommandShift`).
-  When a call is in progress it consumes the key and calls `video.requestPictureInPicture()` on the
-  call video inside the listener, so the browser sees the gesture (FR-2). When PiP is open it calls
-  `document.exitPictureInPicture()` (FR-3). With no call it does not touch the event (FR-6).
-- The interface closes the window when the call tab is activated again (FR-4): `CallPip` listens to
-  `chrome.tabs.onActivated` and runs `VivArcDiCallPip.close()` in that tab, the way Vivaldi closes its
-  own PiP (`exitPictureInPicture` in its `bundle.js`). A `visibilitychange` listener in the page stays as
-  a second way, because Tore's recording of 0.62.0 showed the window staying open after the tab was
-  shown again, which `visibilitychange` alone did not close.
-- A `CallDetector` closes the window when the call ends, and the page unloading with the tab ends it
-  too (FR-5).
+- `OpenPipCommand` floats the largest live video with `video.requestPictureInPicture()`; it does
+  nothing if a window is already open, if no call is in progress, or if its `allowed` check fails.
+- `ClosePipCommand` calls `document.exitPictureInPicture()` when a window is open.
 
-**The interface module** `CallPip` builds a `PageScriptInjector` like `CopyUrl`: `scriptFor(tabId)`
+Three invokers run them:
+
+- **The shortcut** (page): a capture-phase `keydown` listener answers Cmd/Ctrl+Shift+*letter*. Pressed
+  while a window is open it runs `ClosePipCommand`; otherwise `OpenPipCommand` with `allowed = true`,
+  because the key press is the gesture. The command's result decides whether the key is consumed, so
+  a page without a call keeps its key (FR-6). A key that repeats (`event.repeat`) acts once: it is
+  consumed while a call is in progress or a window is open and does nothing else (FR-11).
+- **The tab switch** (interface): `CallPip` follows `chrome.tabs.onActivated` and remembers the active
+  tab of each window. On a change it runs `VivArcDiCallPip?.open()` in the tab that was left, when the
+  option `openOnTabSwitch` is on, and `VivArcDiCallPip?.close()` in the tab shown (FR-9, FR-4). The
+  page runs `OpenPipCommand` with `allowed = navigator.userActivation.isActive`: the browser honors
+  `requestPictureInPicture()` for about five seconds after the user's last click or key in that page,
+  even when the page is already hidden (probes below). Without it the command returns false and says
+  nothing (AC-17).
+- **The page itself**: `visibilitychange` to visible, and the end of the call seen by `CallDetector`,
+  run `ClosePipCommand` (FR-4, FR-5).
+
+**The interface** `CallPip` also builds a `PageScriptInjector` like `CopyUrl`: `scriptFor(tabId)`
 reads the tab's address with `tabs.get`, asks `siteFor` for an enabled site, and returns the script
-plus `VivArcDiCallPip.install({ token, tabId, site, letter })`, or `null` for any other page
-(FR-7, FR-8). A message from the page (`call-warning`) is logged once with the logger.
+plus `VivArcDiCallPip.install({ token, tabId, letter, inCallSelector })`, or `null` for any other page
+(FR-7, FR-8). The page's `call-warning` message is logged with the logger.
+
+**Installing again does not close the window.** `PageScriptInjector` re-injects on every top-level
+`loadcommit`, which also fires for same-document navigations. `PageInstall.replace` detaches the old
+hook, and `detach()` no longer closes the window; only `uninstall()` does (FR-12).
 
 ```text
 interface (CallPip)                          page (call-pip.ts)
-siteFor(url, options) ─ scriptFor ─▶ install({token, tabId, site, letter})
-                                              ├─ keydown ─▶ CallVideo.pick() ─▶ requestPictureInPicture()
-                                              ├─ visibilitychange (visible) ─▶ exitPictureInPicture()
-                                              └─ CallDetector ─ call ended ─▶ exitPictureInPicture()
-logger.warn ◀── call-warning message ◀── unexpected page
+siteFor(url, options) ─ scriptFor ─▶ install({token, tabId, letter, inCallSelector})
+onActivated ─ left tab ─▶ run('…open()') ──▶ OpenPipCommand (needs user activation)
+            └ shown tab ─▶ run('…close()') ─▶ ClosePipCommand
+                                              keydown ─▶ OpenPipCommand | ClosePipCommand
+                                              visibilitychange, call end ─▶ ClosePipCommand
+logger.warn ◀── call-warning message ◀── unexpected page, refused request
 ```
+
+### Tab switch and user activation (lab Vivaldi 8.3, 2026-11-20)
+
+A trusted click in the interface does not lend a gesture to a page: `webview.executeScript` and
+`chrome.scripting.executeScript` right after it, and 0.3, 2 and 6 seconds after it, all fail with
+`NotAllowedError`. A trusted click **in the page** does: with the tab switched away right after, a
+request made from the interface 0.3, 2 and 4 seconds later opens PiP on the hidden page, and one made
+6 seconds later is refused (the transient user activation of about five seconds). End to end with the
+built payload in the lab: install the page script, click in the page, switch tab, and with no other
+call the module's `onActivated` listener opens the window; without the click nothing opens; returning
+to the tab closes it.
+
+Tore's 0.62.0 run (a recording and two probes) also showed three things the design follows: the
+window of the shortcut is a separate OS window that a one-window recording does not capture; a key held
+down repeats and toggles the window (FR-11); and re-injection closed the window (FR-12).
 
 ### T1 results, Google Meet (Tore, real call, 2026-11-20)
 
@@ -58,9 +87,8 @@ logger.warn ◀── call-warning message ◀── unexpected page
 
 ### Rejected alternatives
 
-- **Interface-side registry of tabs with calls, `onActivated` and `send(tabId, code)`.** The first
-  design needed it to open PiP from outside. Now the page closes its own window on `visibilitychange`,
-  so the interface keeps no state and `PageScriptInjector` stays as it is.
+- **A registry of which tabs have calls, kept in the interface.** The page already knows, and the
+  commands check it, so the interface only remembers the active tab of each window.
 - **Registering `enterpictureinpicture` as well**: Q-3, nothing proves Vivaldi would honor it.
 - **A button injected into the call page**: option B of the decision, rejected for the fragility of
   every site's DOM.
@@ -75,7 +103,9 @@ logger.warn ◀── call-warning message ◀── unexpected page
 | `src/modules/callpip/CallPipOptions.ts` | Options: `meet`, `zoom`, `discord`, `teams` (boolean), `shortcutLetter` (text, one letter) | – |
 | `src/modules/callpip/CallSites.ts` | The supported sites (Meet now): id, hosts, selector key of the in-call view; `siteFor(url, options, selectors)` | Registry |
 | `src/modules/callpip/CallMessage.ts` | The `call-warning` message and its parser, as `CopyMessage` | – |
-| `src/page/call-pip.ts` | Page script: `install`, `uninstall`; the three listeners above | – |
+| `src/page/call-pip.ts` | Page script: `install`, `uninstall`, `open`, `close` | Facade |
+| `src/page/lib/PipCommand.ts` | `PipCommand`, `OpenPipCommand`, `ClosePipCommand` | Command |
+| `src/page/lib/CallPipHook.ts` | Wires the commands to the shortcut, `visibilitychange` and the call end | Invoker |
 | `src/page/lib/CallDetector.ts` | Tells whether a call is in progress: a playing `<video>` with a live video track and the site's in-call selector; reports changes, coalesced to 250 ms | Observer |
 | `src/page/lib/CallVideo.ts` | Picks the largest playing video with a live track; clears `disablePictureInPicture` on it before the request | – |
 

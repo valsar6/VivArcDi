@@ -6,6 +6,8 @@ import { CallVideo } from '../../src/page/lib/CallVideo.js';
 interface PageScript {
   install(policy: CallPagePolicy): void;
   uninstall(): void;
+  open(): void;
+  close(): void;
 }
 
 interface Registered {
@@ -20,6 +22,7 @@ interface Pressed {
   shiftKey: boolean;
   altKey: boolean;
   defaultPrevented: boolean;
+  repeat: boolean;
   prevented: boolean;
   stopped: boolean;
   preventDefault(): void;
@@ -97,6 +100,7 @@ let live: Registered[] = [];
 let sent: Array<{ reason?: string; token?: string }> = [];
 let page = new FakeDocument();
 let saved: Array<[string, PropertyDescriptor | undefined]> = [];
+let activation = false;
 
 const policy = (letter = 'p'): CallPagePolicy => ({ token: 'tok', tabId: 7, letter, inCallSelector: IN_CALL });
 
@@ -112,6 +116,7 @@ function press(fields: Partial<Pressed>): Pressed {
     shiftKey: true,
     altKey: false,
     defaultPrevented: false,
+    repeat: false,
     prevented: false,
     stopped: false,
     preventDefault(): void {
@@ -133,7 +138,8 @@ beforeEach(() => {
   sent = [];
   page = new FakeDocument();
   const scope = globalThis as object;
-  saved = ['addEventListener', 'removeEventListener', 'chrome', 'document'].map((name) => [name, Object.getOwnPropertyDescriptor(scope, name)]);
+  activation = false;
+  saved = ['addEventListener', 'removeEventListener', 'chrome', 'document', 'navigator'].map((name) => [name, Object.getOwnPropertyDescriptor(scope, name)]);
   Reflect.defineProperty(scope, 'addEventListener', {
     configurable: true,
     value: (type: string, listener: (event: unknown) => void): void => void live.push({ type, listener }),
@@ -149,6 +155,7 @@ beforeEach(() => {
     value: { runtime: { sendMessage: (message: { reason?: string; token?: string }): void => void sent.push(message) } },
   });
   Reflect.defineProperty(scope, 'document', { configurable: true, value: page });
+  Reflect.defineProperty(scope, 'navigator', { configurable: true, value: { userActivation: { get isActive(): boolean { return activation; } } } });
   mock.timers.enable({ apis: ['setInterval'] });
 });
 
@@ -202,7 +209,7 @@ test('closes the call PiP when the page becomes visible', async () => {
 });
 
 test('closes the open PiP window on request', async () => {
-  const script = (await load()) as PageScript & { close(): void };
+  const script = await load();
   await inCall();
   press({});
   script.close();
@@ -280,4 +287,49 @@ test('ignores keys with other modifiers and keys already handled', async () => {
   const handled = press({ defaultPrevented: true });
   assert.equal(video.requested, 0);
   assert.ok([plain, withAlt, handled].every((key) => !key.prevented));
+});
+
+test('opens the call PiP on a tab switch after an interaction', async () => {
+  const video = await inCall();
+  page.hidden = true;
+  activation = true;
+  (await load()).open();
+  assert.equal(video.requested, 1);
+  assert.equal(page.pictureInPictureElement, video);
+  assert.deepEqual(sent, []);
+});
+
+test('does not open the call PiP on a tab switch without a recent interaction', async () => {
+  const video = await inCall();
+  page.hidden = true;
+  (await load()).open();
+  page.inCallView = false;
+  activation = true;
+  (await load()).open();
+  assert.equal(video.requested, 0);
+  assert.deepEqual(sent, []);
+});
+
+test('ignores a held shortcut', async () => {
+  const video = await inCall();
+  press({});
+  const held = [press({ repeat: true }), press({ repeat: true }), press({ repeat: true })];
+  assert.equal(video.requested, 1);
+  assert.equal(page.exits, 0);
+  assert.ok(held.every((key) => key.prevented && key.stopped));
+  page.inCallView = false;
+  page.pictureInPictureElement = null;
+  const outside = press({ repeat: true });
+  assert.equal(outside.prevented, false);
+});
+
+test('keeps the call PiP open when the script is installed again', async () => {
+  const video = await inCall();
+  press({});
+  (await load()).install(policy());
+  assert.equal(page.exits, 0);
+  assert.equal(page.pictureInPictureElement, video);
+  assert.equal(live.filter((entry) => entry.type === 'keydown').length, 1);
+  press({});
+  assert.equal(page.exits, 1);
 });

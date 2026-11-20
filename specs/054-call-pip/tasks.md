@@ -36,3 +36,13 @@ in `design.md`.
 - [ ] **T7.** Write the manual verification checklist for Tore from the `manual` criteria (AC-12 to
   AC-14), in Italian, for macOS and Debian: a real call on each site, the shortcut, switching tab,
   coming back.
+- [x] **T8.** Opening on a tab switch (FR-9, FR-10): `OpenPipCommand` and `ClosePipCommand`, the
+  `open` export of the page script, `CallPip` following `onActivated`, the option `openOnTabSwitch`.
+  Satisfies AC-15 to AC-18. Done when `asks the left tab to open the call PiP`,
+  `opens the call PiP on a tab switch after an interaction`,
+  `does not open the call PiP on a tab switch without a recent interaction` and
+  `does not open the call PiP on a tab switch when the option is off` pass.
+- [x] **T9.** A held shortcut acts once and installing again keeps the window open (FR-11, FR-12).
+  Satisfies AC-19, AC-20. Done when `ignores a held shortcut` and
+  `keeps the call PiP open when the script is installed again` pass.
+- [ ] **T10.** Manual checklist for AC-21 and the held key, from Tore's own call on Meet.

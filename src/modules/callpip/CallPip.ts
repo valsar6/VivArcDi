@@ -9,6 +9,8 @@ import { siteFor } from './CallSites.js';
 
 const SCRIPT_PATH = 'page/call-pip.js';
 const SCRIPT_GLOBAL = 'VivArcDiCallPip';
+const OPEN_COMMAND = `${SCRIPT_GLOBAL}?.open();`;
+const CLOSE_COMMAND = `${SCRIPT_GLOBAL}?.close();`;
 
 export class CallPip extends Module<CallPipOptions> {
   public static override id = 'call-pip';
@@ -20,11 +22,13 @@ export class CallPip extends Module<CallPipOptions> {
   #token = '';
   #injector: PageScriptInjector | null = null;
   #unsubscribe: Array<() => void> = [];
+  #active = new Map<number, number>();
 
   /**
    * Injects the page script into the pages of the enabled call sites. The script floats the call in
-   * Picture in Picture when the user presses the shortcut, and the module closes the window when the
-   * tab becomes active again. Without `chrome.tabs` the module stays off.
+   * Picture in Picture when the user presses the shortcut. When the active tab changes, the module asks
+   * the tab that was left to open the window, which the browser honors after a recent interaction with
+   * the page, and the tab shown to close its own. Without `chrome.tabs` the module stays off.
    *
    * @param context What the module may use.
    */
@@ -51,7 +55,7 @@ export class CallPip extends Module<CallPipOptions> {
       this.#unsubscribe.push(runtime.onMessage((message) => this.#receive(message)));
     }
     this.#injector.attach();
-    this.#unsubscribe.push(tabs.onActivated(({ tabId }) => this.#injector?.run(tabId, `globalThis.${SCRIPT_GLOBAL}?.close();`)));
+    await this.#followActiveTabs(context);
   }
 
   /**
@@ -62,7 +66,23 @@ export class CallPip extends Module<CallPipOptions> {
     this.#unsubscribe = [];
     this.#injector?.detach();
     this.#injector = null;
+    this.#active.clear();
     this.#context = null;
+  }
+
+  async #followActiveTabs({ tabs }: ModuleContext<CallPipOptions>): Promise<void> {
+    this.#unsubscribe.push(tabs.onActivated((info) => this.#onActivated(info)));
+    const active = await tabs.query({ active: true });
+    active.forEach(({ id, windowId }) => id !== undefined && !this.#active.has(windowId) && this.#active.set(windowId, id));
+  }
+
+  #onActivated({ tabId, windowId }: chrome.tabs.OnActivatedInfo): void {
+    const previous = this.#active.get(windowId);
+    this.#active.set(windowId, tabId);
+    if (previous !== undefined && previous !== tabId && this.#context?.options.openOnTabSwitch === true) {
+      this.#injector?.run(previous, `globalThis.${OPEN_COMMAND}`);
+    }
+    this.#injector?.run(tabId, `globalThis.${CLOSE_COMMAND}`);
   }
 
   async #scriptFor(script: string, tabId: number): Promise<string | null> {

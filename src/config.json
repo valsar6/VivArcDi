@@ -80,6 +80,7 @@
     "call-pip": {
       "enabled": true,
       "meet": true,
+      "openOnTabSwitch": true,
       "shortcutLetter": "p"
     },
     "incognito": {
