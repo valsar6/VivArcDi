@@ -30,6 +30,10 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     }
   }
 
+  &.auto-hide .auto-hide-wrapper {
+    background-color: var(--vivarcdi-space) !important;
+  }
+
   #{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
     display: none !important;
   }
