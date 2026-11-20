@@ -21,6 +21,7 @@ var VivArcDiCallPip = (() => {
   // src/page/call-pip.ts
   var call_pip_exports = {};
   __export(call_pip_exports, {
+    close: () => close,
     install: () => install,
     uninstall: () => uninstall
   });
@@ -287,6 +288,11 @@ var VivArcDiCallPip = (() => {
   }
   function uninstall() {
     INSTALL.remove();
+  }
+  function close() {
+    if (document.pictureInPictureElement !== null) {
+      document.exitPictureInPicture().catch(() => void 0);
+    }
   }
   return __toCommonJS(call_pip_exports);
 })();
