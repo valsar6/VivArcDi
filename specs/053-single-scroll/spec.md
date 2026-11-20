@@ -110,7 +110,7 @@ Vivaldi scrolls its strip from code, not with the browser's own scroll, so how i
   tiles stay where they are, above the scroller. To check on the lab copy with pinned tabs, because the
   probe profile had none.
 - [x] **Q-2.** Does Vivaldi keep `.resize` at the content height, or write a smaller `max-height` again
-  when the room changes? Decided: a scenario with many tabs answers it before the design; if it
+  when the room changes? Decided: a scenario with many tabs answers it before any code (T1); if it
   rewrites the value, a style with `!important` or the observer of 050 overrides it.
 - [x] **Q-3.** How does Vivaldi scroll to the active tab and while dragging, now that the strip has
   `overflow: hidden`? Decided: read Vivaldi's bundle as for 050 (T1) and probe a drag; if it
