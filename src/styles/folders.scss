@@ -4,7 +4,7 @@
   --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);
 
   box-sizing: border-box;
-  max-height: max(#{$folders-min-height}, calc(var(--vivarcdi-folders-max-height, 60) * 1vh));
+  max-height: max(#{$folders-min-height}, 60vh);
   padding: $folders-padding;
   max-width: 100%;
   overflow: hidden auto;

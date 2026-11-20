@@ -18,11 +18,11 @@ just before opening the pull request.
 - [x] **T2.** Remove `maxHeightPercent`: option, `FolderSection`, `FolderSectionView`, the CSS
   variable, `config.json` and their tests. Satisfies AC-12. Done when `has no maxHeightPercent option`
   passes and no reference is left.
-- [ ] **T3.** Stylesheet `src/styles/column-scroll.scss` under the mark, with the folder section
+- [x] **T3.** Stylesheet `src/styles/column-scroll.scss` under the mark, with the folder section
   without a maximum, the frame that does not shrink, the column as scroller, the sticky footer and the
   6 px scroll bar; list it in `config.json`. Satisfies AC-1, AC-2, AC-10. Done when
   `lets the folder section grow to its content` and `keeps the tab strip frame at the height of its content` pass.
-- [ ] **T4.** Module `ColumnScroll`: puts and removes the mark, stays off and logs a warning when the
+- [x] **T4.** Module `ColumnScroll`: puts and removes the mark, stays off and logs a warning when the
   selectors do not match; register it and enable it. Satisfies AC-11. Done when
   `leaves the column untouched when the selectors do not match` passes.
 - [ ] **T5.** Live scenarios in `tests/live/scenarios/`: `one scroller for the whole column`,

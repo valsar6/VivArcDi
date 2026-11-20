@@ -1,0 +1,33 @@
+@use 'tokens' as *;
+
+#{$root} #tabs-container#{$column-scroll} {
+  overflow: hidden auto;
+
+  #{$folders} {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .resize:has(> .tab-strip) {
+    flex: 0 0 $frame-basis !important;
+  }
+
+  #{$archive-footer} {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--vivarcdi-space, transparent);
+  }
+
+  &::-webkit-scrollbar {
+    width: $scrollbar-width;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: $scrollbar-width;
+    background-color: transparent;
+  }
+
+  &[data-vivarcdi-scrolling]::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--vivarcdi-ink) #{$scrollbar-thumb}, transparent);
+  }
+}
