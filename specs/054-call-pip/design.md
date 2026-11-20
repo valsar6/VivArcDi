@@ -70,7 +70,7 @@ logger.warn ◀── call-warning message ◀── unexpected page
 |---|---|---|
 | `src/modules/callpip/CallPip.ts` | The `Module`: builds the injector, logs warnings, stops | Facade |
 | `src/modules/callpip/CallPipOptions.ts` | Options: `meet`, `zoom`, `discord`, `teams` (boolean), `shortcutLetter` (text, one letter) | – |
-| `src/modules/callpip/CallSites.ts` | The four sites: id, hosts, path prefix, selector key of the in-call view; `siteFor(url, options)` | Registry |
+| `src/modules/callpip/CallSites.ts` | The supported sites (Meet now): id, hosts, selector key of the in-call view; `siteFor(url, options, selectors)` | Registry |
 | `src/modules/callpip/CallMessage.ts` | The `call-warning` message and its parser, as `CopyMessage` | – |
 | `src/page/call-pip.ts` | Page script: `install`, `uninstall`; the three listeners above | – |
 | `src/page/lib/CallDetector.ts` | Tells whether a call is in progress: a playing `<video>` with a live video track and the site's in-call selector; reports changes, coalesced to 250 ms | Observer |
@@ -80,11 +80,10 @@ logger.warn ◀── call-warning message ◀── unexpected page
 export interface CallSite {
   id: 'meet' | 'zoom' | 'discord' | 'teams';
   hosts: readonly string[];
-  pathPrefix: string;
-  inCallSelector: string;
+  selectorKey: string;
 }
 
-export function siteFor(url: string, options: CallPipOptions, selectors: SelectorCatalog): CallSite | null;
+export function siteFor(url: string | undefined, options: CallPipOptions, selectors: SelectorCatalog): { site: CallSite; inCallSelector: string } | null;
 
 export interface CallPagePolicy {
   token: string;
@@ -112,12 +111,12 @@ Selectors added to `src/selectors/8.1.json`, read through `context.selectors` (N
 
 | Key | Purpose | Initial value, to confirm in T1 |
 |---|---|---|
-| `callMeetInCall` | In-call view of Meet | `[data-call-ended="false"], [data-meeting-title]` |
+| `callMeetInCall` | In-call view of Meet: the leave button, found in T1 (the lobby has none) | `button[jsname="CQylAd"]` |
 | `callZoomInCall` | In-call view of Zoom web | `#wc-container-left, .meeting-client-inner` |
 | `callDiscordInCall` | Voice or video call panel | `[class*="callContainer"], [class*="wrapper"][class*="video"]` |
 | `callTeamsInCall` | In-call view of Teams | `[data-tid="calling-screen"], #calling-unified-bar` |
 
-The class names of Discord and Teams change often: the values above are the first to try, and T1
+Selectors of Meet's page are not Vivaldi's: `tests/live/selector-states.json` marks `callMeetInCall` as not checked by the live selector check. The class names of Discord and Teams change often: the values above are the first to try, and T1
 replaces them with what a real call shows. No private Vivaldi API is used beyond what `CopyUrl`
 already uses (`webview.executeScript`, `chrome.tabs.get`); the page side uses
 `HTMLVideoElement.requestPictureInPicture`, `document.exitPictureInPicture` and `visibilitychange`,

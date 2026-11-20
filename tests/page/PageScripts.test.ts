@@ -29,9 +29,10 @@ const CASES: Case[] = [
   { name: 'pinned-keys', event: 'keydown', argument: KEYED },
   { name: 'copy-keys', event: 'keydown', argument: KEYED },
   { name: 'archive-keys', event: 'keydown', argument: (token) => token },
+  { name: 'call-pip', event: 'keydown', argument: (token) => ({ token, tabId: 1, letter: 'p', inCallSelector: '.in-call' }) },
 ];
 
-const KEYS = ['vivarcdi.peek.links', 'vivarcdi.peek.keys', 'vivarcdi.pinned.keys', 'vivarcdi.copy.keys', 'vivarcdi.archive.keys'];
+const KEYS = ['vivarcdi.peek.links', 'vivarcdi.peek.keys', 'vivarcdi.pinned.keys', 'vivarcdi.copy.keys', 'vivarcdi.archive.keys', 'vivarcdi.call.pip'];
 const SCRIPT_FOLDER = fileURLToPath(new URL('../../src/page/', import.meta.url));
 
 let live: Registered[] = [];
@@ -46,7 +47,7 @@ beforeEach(() => {
   live = [];
   sent = [];
   const scope = globalThis as object;
-  saved = ['addEventListener', 'removeEventListener', 'chrome'].map((name) => [name, Object.getOwnPropertyDescriptor(scope, name)]);
+  saved = ['addEventListener', 'removeEventListener', 'chrome', 'document'].map((name) => [name, Object.getOwnPropertyDescriptor(scope, name)]);
   Reflect.defineProperty(scope, 'addEventListener', {
     configurable: true,
     value: (type: string, listener: (event: unknown) => void, capture: boolean): void => {
@@ -57,6 +58,18 @@ beforeEach(() => {
     configurable: true,
     value: (type: string, listener: (event: unknown) => void, capture: boolean): void => {
       live = live.filter((entry) => entry.type !== type || entry.listener !== listener || entry.capture !== capture);
+    },
+  });
+  Reflect.defineProperty(scope, 'document', {
+    configurable: true,
+    value: {
+      hidden: false,
+      pictureInPictureEnabled: true,
+      pictureInPictureElement: null,
+      querySelector: (): null => null,
+      querySelectorAll: (): never[] => [],
+      addEventListener: (): void => undefined,
+      removeEventListener: (): void => undefined,
     },
   });
   Reflect.defineProperty(scope, 'chrome', {

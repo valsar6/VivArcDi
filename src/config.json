@@ -77,6 +77,11 @@
       "enabled": true,
       "toastMs": 2000
     },
+    "call-pip": {
+      "enabled": true,
+      "meet": true,
+      "shortcutLetter": "p"
+    },
     "incognito": {
       "enabled": true
     },
