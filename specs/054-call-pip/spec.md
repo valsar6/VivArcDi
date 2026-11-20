@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-20 (the proposed answers to Q-1 to Q-6; Q-1 and Q-2 are checked by the probes of task T1 before any code) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -108,24 +108,24 @@ Picture-in-Picture window that Meet and Teams already use.
 
 ## Open questions
 
-- [ ] **Q-1.** How does PiP open on tab switch? Proposed: Chromium opens PiP by itself when a site
+- [x] **Q-1.** How does PiP open on tab switch? Decided: Chromium opens PiP by itself when a site
   registers the media session action `enterpictureinpicture` and the site has the permission
   "Automatic picture-in-picture"; Meet and Teams do register it. Probe on the lab copy (Vivaldi 8.2)
   whether Vivaldi honors it; if it does, the module only grants the permission on the four sites and
   no page script is needed for them.
-- [ ] **Q-2.** Zoom web and Discord do not register that action, and a page cannot open PiP without a
-  user gesture. Proposed: the page script registers `enterpictureinpicture` itself and hands the
+- [x] **Q-2.** Zoom web and Discord do not register that action, and a page cannot open PiP without a
+  user gesture. Decided: the page script registers `enterpictureinpicture` itself and hands the
   call `<video>` to PiP; if Vivaldi refuses without a gesture, fall back to the extension API that
   opens PiP for a tab, and if there is none, ship Meet and Teams first and mark Zoom and Discord as a
   follow-up spec.
-- [ ] **Q-3.** What is "a call in progress" on each site? Proposed: a live `<video>` or
+- [x] **Q-3.** What is "a call in progress" on each site? Decided: a live `<video>` or
   `MediaStreamTrack` that is playing and not muted, plus a per-site selector for the in-call view,
   verified by a probe in a real call (T1 of the design).
-- [ ] **Q-4.** Should PiP also open when I switch to another application, not only to another tab?
-  Proposed: no, tab switch only, as in Arc.
-- [ ] **Q-5.** Default state: on for all four sites? Proposed: yes, each site can be disabled
+- [x] **Q-4.** Should PiP also open when I switch to another application, not only to another tab?
+  Decided: no, tab switch only, as in Arc.
+- [x] **Q-5.** Default state: on for all four sites? Decided: yes, each site can be disabled
   (FR-6); no global shortcut.
-- [ ] **Q-6.** Can the live check join a real call? Proposed: no; the lab Vivaldi cannot sign in, so
+- [x] **Q-6.** Can the live check join a real call? Decided: no; the lab Vivaldi cannot sign in, so
   AC-11 to AC-13 stay `manual` and the automated tests use a fake page that registers the media
   session action.
 
