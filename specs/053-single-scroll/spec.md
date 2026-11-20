@@ -91,7 +91,7 @@ Vivaldi scrolls its strip from code, not with the browser's own scroll, so how i
 | AC-6 | WHEN a tab that is out of view becomes the active tab THE column SHALL scroll to show it | live: `the active tab scrolls into view` |
 | AC-7 | WHEN I drag a Today tab near the edge of the column THE column SHALL scroll and the drop SHALL change the order as in Vivaldi | manual |
 | AC-8 | WHEN the whole list fits in the window THE column SHALL NOT scroll and SHALL look as before | live: `no scroll when the list fits` |
-| AC-9 | WHEN a link tab is hidden THE gap closed by 050 SHALL stay closed with the single scroll on | live: `no gap above the first Today tab` |
+| AC-9 | WHEN a link tab is hidden THE gap closed by 050 SHALL stay closed with the single scroll on | live: `no gap above the first Today tab with the single scroll` |
 | AC-10 | WHEN the column scrolls THE scroll bar SHALL be thin and show only while scrolling | manual |
 | AC-11 | IF the column does not match the selectors THEN THE module SHALL leave it untouched and log a warning | auto: `leaves the column untouched when the selectors do not match` |
 | AC-12 | THE folders options SHALL NOT include `maxHeightPercent` | auto: `has no maxHeightPercent option` |
