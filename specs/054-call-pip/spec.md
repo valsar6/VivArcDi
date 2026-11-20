@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – (first version approved 2026-11-20 and withdrawn the same day: Vivaldi cannot open PiP on tab switch; this version follows Tore's choice of the shortcut, option A) |
+| Approved | Tore, 2026-11-20 (shortcut version, the proposed answers to Q-1 to Q-4; Q-1 with the rule that if Cmd/Ctrl+Shift+P clashes the default becomes Cmd/Ctrl+Option+P) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -110,16 +110,18 @@ seen by the page and nothing happens. The four sites share one module and one li
 
 ## Open questions
 
-- [ ] **Q-1.** Is Cmd/Ctrl+Shift+P free in the four sites and in Vivaldi? Proposed: yes by default,
+- [x] **Q-1.** Is Cmd/Ctrl+Shift+P free in the four sites and in Vivaldi? Decided: yes by default,
   and the letter is an option (FR-7) so a clash is a configuration change; Tore confirms in the manual
-  check.
-- [ ] **Q-2.** What is "a call in progress" on each site? Proposed: a live video track in a playing
+  check. Checked 2026-11-20: no shortcut of VivArcDi uses it, no source lists it as a Vivaldi default, so it
+  stays; Cmd+Option+P is Chrome's system print dialog on macOS and Vivaldi had a bug assigning it, so it is
+  the worse choice.
+- [x] **Q-2.** What is "a call in progress" on each site? Decided: a live video track in a playing
   `<video>` plus a per-site selector for the in-call view, verified in a real call (T1 of the
   design).
-- [ ] **Q-3.** Should the page script also register the `enterpictureinpicture` media session action,
-  so that a future Vivaldi opens PiP on tab switch by itself? Proposed: no, nothing to prove it works
+- [x] **Q-3.** Should the page script also register the `enterpictureinpicture` media session action,
+  so that a future Vivaldi opens PiP on tab switch by itself? Decided: no, nothing to prove it works
   and it would hide the day Vivaldi does it on its own.
-- [ ] **Q-4.** Default state: on for all four sites? Proposed: yes, each can be disabled.
+- [x] **Q-4.** Default state: on for all four sites? Decided: yes, each can be disabled.
 
 ## References
 
