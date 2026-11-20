@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-20 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -122,7 +122,7 @@ list`, a "Themes" table in the README Credits section, and the references of thi
 - [x] The installer writes the themes (upsert) and selects one as the current theme (Tore, 2026-11-19).
 - [x] Credits are enough; no request to the VivalArc author, since the themes are already in the community's hands (Tore, 2026-11-19).
 - [x] `install` writes all five themes and asks which one starts as current (Tore, 2026-11-20, replaces the choice of several).
-- [ ] How the tab bar palette follows the selected theme (FR-6): the installer writes `sidebar-look.palette` into the installed config, or the payload detects the native theme at runtime. The design checks what Vivaldi 8.2 allows (T1); it does not block approval of this spec.
+- [x] The payload reads the current theme at runtime and follows its changes; the design confirms the preference is readable in T1 (Tore, 2026-11-20, design proposal).
 - [ ] Which Vivaldi elements and selectors carry the window and the bars while the UI is hidden (FR-9): found with `npm run live -- --probe` in T1; the design lists them in `src/selectors/`.
 
 ## References
