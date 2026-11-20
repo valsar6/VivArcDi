@@ -52,7 +52,9 @@ seen by the page and nothing happens. The four sites share one module and one li
 
 - **FR-1.** The module SHALL support Google Meet (`meet.google.com`), Zoom web client
   (`app.zoom.us` and `*.zoom.us/wc`), Discord (`discord.com/channels`) and Microsoft Teams
-  (`teams.microsoft.com`, `teams.live.com`, `teams.cloud.microsoft`).
+  (`teams.microsoft.com`, `teams.live.com`, `teams.cloud.microsoft`). Tore decided on 2026-11-20 to
+  ship Meet first; each other site is added when its in-call selector is confirmed in a real call
+  (T1), and the spec is `Implemented` only when all four are in.
 - **FR-2.** WHEN the shortcut is pressed in a tab with a call in progress and no PiP window, the
   module SHALL open the PiP window with the call video.
 - **FR-3.** WHEN the shortcut is pressed while that tab's PiP window is open, the module SHALL close
@@ -89,7 +91,7 @@ seen by the page and nothing happens. The four sites share one module and one li
 | AC-5 | WHEN a supported page has no call in progress THE page script SHALL NOT open PiP and SHALL NOT consume the shortcut | auto: `ignores the shortcut without a call` |
 | AC-6 | WHEN a call shows several videos THE page script SHALL float the largest playing one with a live track | auto: `floats the largest live video` |
 | AC-7 | WHEN a site is disabled in the options THE module SHALL NOT inject its page script | auto: `skips a disabled site` |
-| AC-8 | THE page script SHALL be injected on Meet, Zoom, Discord and Teams pages only | auto: `injects the call script on the four sites only` |
+| AC-8 | THE page script SHALL be injected on the pages of the supported sites only | auto: `injects the call script on the supported sites only` |
 | AC-9 | WHEN the shortcut letter option changes THE page script SHALL answer the new letter only | auto: `uses the configured shortcut letter` |
 | AC-10 | IF the page does not match what the module expects THEN THE module SHALL leave the page untouched and log a warning | auto: `leaves an unexpected call page untouched` |
 | AC-11 | THE module SHALL NOT start in a private window | auto: `does not run in private windows` |

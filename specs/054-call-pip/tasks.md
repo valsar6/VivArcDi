@@ -13,12 +13,13 @@ in `design.md`.
 
 - [ ] **T1.** Real calls, by Tore: on Meet, Zoom, Discord and Teams, is the call a `<video>` with a
   live track, which selector is the in-call view, and does `disablePictureInPicture` appear? The probe is
-  `t1-probe.js`, pasted in the DevTools console of the call page. Records the answers in `design.md` and replaces the
+  `sonda-t1-call.js` (kept with Tore's probes, outside the repo, because lint covers every script in it),
+  pasted in the DevTools console of the call page. Records the answers in `design.md` and replaces the
   initial selectors. Satisfies Q-2. Done when each site has a confirmed selector or is moved out of
   the spec.
 - [ ] **T2.** `CallSites.ts`, `CallPipOptions.ts`, the four selector keys in `src/selectors/8.1.json`
   and the `call-pip` entry in `src/config.json`. Satisfies AC-7, AC-8, AC-9. Done when
-  `skips a disabled site`, `injects the call script on the four sites only` and
+  `skips a disabled site`, `injects the call script on the supported sites only` and
   `uses the configured shortcut letter` pass.
 - [ ] **T3.** `CallVideo.ts` and `CallDetector.ts` with tests in `tests/page`. Satisfies AC-5, AC-6.
   Done when `ignores the shortcut without a call` and `floats the largest live video` pass.
