@@ -61,6 +61,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [051 More Arc themes](051-more-themes/spec.md) | 3 | Approved |
 | [052 Title bar](052-title-bar/spec.md) | 3 | Draft |
 | [053 Single scroll](053-single-scroll/spec.md) | 3 | Implemented |
+| [054 Call Picture in Picture](054-call-pip/spec.md) | 5 | Draft |
 
 ## Layout
 
