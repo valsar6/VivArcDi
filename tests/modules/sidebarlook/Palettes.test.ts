@@ -5,7 +5,7 @@ import { Palettes } from '../../../src/modules/sidebarlook/Palettes.js';
 const READABLE = 4.5;
 
 test('palettes keep readable text', () => {
-  assert.equal(Palettes.all.length, 7);
+  assert.equal(Palettes.all.length, 11);
   for (const { name, space, pill, ink } of Palettes.all) {
     assert.ok(Palettes.contrast(ink, space) >= READABLE, `${name}: text on the space color`);
     assert.ok(Palettes.contrast(ink, pill) >= READABLE, `${name}: text on the active pill`);
@@ -33,8 +33,20 @@ test('the contrast of black on white is 21 and of a color with itself is 1', () 
   assert.equal(Palettes.contrast('#ffffff', '#000000'), 21);
 });
 
-test('the palettes are arclight and the six blues, and arclight is the default', () => {
-  assert.deepEqual(Palettes.all.map(({ name }) => name), ['arclight', 'sky', 'ice', 'powder', 'aqua', 'mist', 'lagoon']);
+test('the palettes are arclight, the four arc themes and the six blues, and arclight is the default', () => {
+  assert.deepEqual(Palettes.all.map(({ name }) => name), [
+    'arclight',
+    'arcpink',
+    'arcgreen',
+    'arcdark',
+    'arcdarkpure',
+    'sky',
+    'ice',
+    'powder',
+    'aqua',
+    'mist',
+    'lagoon',
+  ]);
   assert.deepEqual(Palettes.byName('sky'), { name: 'sky', space: '#a3cee0', pill: '#e9f3f7', ink: '#0f2129' });
   assert.equal(Palettes.byName(Palettes.defaultName).name, 'arclight');
 });
@@ -43,4 +55,22 @@ test('an unknown palette name gives the default palette', () => {
   assert.equal(Palettes.byName('neon').name, 'arclight');
   assert.equal(Palettes.byName(undefined).name, 'arclight');
   assert.equal(Palettes.byName('lagoon').space, '#8ec5cf');
+});
+
+test('arc theme palettes keep readable text', () => {
+  for (const name of ['arcpink', 'arcgreen', 'arcdark', 'arcdarkpure']) {
+    const { ink, space, pill, gradient } = Palettes.byName(name);
+    assert.equal(Palettes.byName(name).name, name);
+    for (const stop of gradient?.stops ?? [space]) {
+      assert.ok(Palettes.contrast(ink, stop) >= READABLE, `${name}: text on ${stop}`);
+    }
+    assert.ok(Palettes.contrast(ink, pill) >= READABLE, `${name}: text on the pill`);
+  }
+});
+
+test('the dark palettes use light text and the pure dark one is flat', () => {
+  assert.equal(Palettes.byName('arcdark').ink, '#f2f2f2');
+  assert.equal(Palettes.byName('arcdarkpure').ink, '#f2f2f2');
+  assert.equal(Palettes.byName('arcdarkpure').gradient, undefined);
+  assert.equal(Palettes.byName('arcpink').gradient?.stops.length, 3);
 });
