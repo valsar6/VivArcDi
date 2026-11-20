@@ -12,8 +12,8 @@ first version (can the interface open PiP, does Vivaldi open it on tab switch) a
 in `design.md`.
 
 - [ ] **T1.** Real calls, by Tore: on Meet, Zoom, Discord and Teams, is the call a `<video>` with a
-  live track, which selector is the in-call view, and does `disablePictureInPicture` appear? A probe
-  script for Tore to paste is written for it. Records the answers in `design.md` and replaces the
+  live track, which selector is the in-call view, and does `disablePictureInPicture` appear? The probe is
+  `t1-probe.js`, pasted in the DevTools console of the call page. Records the answers in `design.md` and replaces the
   initial selectors. Satisfies Q-2. Done when each site has a confirmed selector or is moved out of
   the spec.
 - [ ] **T2.** `CallSites.ts`, `CallPipOptions.ts`, the four selector keys in `src/selectors/8.1.json`
