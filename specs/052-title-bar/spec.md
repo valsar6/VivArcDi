@@ -68,7 +68,7 @@ field.
 | AC-4 | WHILE the address bar is hidden, WHEN the title bar is clicked, THE module SHALL show it first. | auto: `title bar click shows the hidden address bar` |
 | AC-5 | IF the address field is not found, THEN a click on the title bar SHALL do nothing and log a warning. | auto: `title bar click without address field does nothing` |
 | AC-6 | WHERE the option is off, THE module SHALL change nothing. | auto: `title bar option off changes nothing` |
-| AC-7 | THE title bar of a lab Vivaldi SHALL show the palette color of its theme. | live: `title bar shows the theme color` |
+| AC-7 | THE title bar of a lab Vivaldi SHALL show the palette color of its theme. | manual |
 | AC-8 | WHEN Tore uses each theme on macOS, THE top of the window SHALL look like one piece with the sidebar, with no default-colored band, also with Automatically hide UI. | manual |
 | AC-9 | WHEN Tore clicks the title at the top, THE address bar SHALL open ready to type, and the window SHALL still drag by the bar. | manual |
 
