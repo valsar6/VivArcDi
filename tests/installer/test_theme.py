@@ -103,6 +103,13 @@ class ThemeTest(unittest.TestCase):
         for theme_id in THEME_IDS:
             self.assertIn(theme_id, self.output.getvalue())
 
+    def test_readme_credits_the_vivalarc_themes(self):
+        readme = (Path(__file__).resolve().parents[2] / "README.md").read_text(encoding="utf-8")
+        self.assertIn("https://github.com/tovifun/VivalArc", readme)
+        for theme in ThemeCatalog.load().themes:
+            self.assertIn(theme["name"], readme)
+            self.assertIn(theme["credit"].removeprefix("Inspired by ").split(" from ")[0], readme)
+
     def test_installs_all_themes_and_selects_the_chosen_one(self):
         self.write_preferences(preferences_with())
         self.run_theme("apply", theme_id="vivarcdi-pure-dark")
