@@ -25,5 +25,6 @@
   "workspaceForm": ".WorkspacePopup form.Workspace-Editor",
   "workspaceSave": ".WorkspacePopup .actions input.primary",
   "workspaceRow": ".WorkspacePopup button.workspace-item-wrapper",
-  "popupHeader": ".toolbar-extensions, .toolbar-addressbar, .toolbar-mainbar, .UrlBar"
+  "popupHeader": ".toolbar-extensions, .toolbar-addressbar, .toolbar-mainbar, .UrlBar",
+  "callMeetInCall": "button[jsname=\"CQylAd\"]"
 }

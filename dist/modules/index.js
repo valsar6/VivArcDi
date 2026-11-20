@@ -1,5 +1,6 @@
 import { ModuleRegistry } from "../core/boot/ModuleRegistry.js";
 import { ActivationMarker } from "./ActivationMarker.js";
+import { CallPip } from "./callpip/CallPip.js";
 import { CopyUrl } from "./copyurl/CopyUrl.js";
 import { BookmarkFolders } from "./folders/BookmarkFolders.js";
 import { FavoritesGrid } from "./favorites/FavoritesGrid.js";
@@ -16,7 +17,7 @@ import { SpaceHeader } from "./spaceheader/SpaceHeader.js";
 import { TodayArchive } from "./today/TodayArchive.js";
 import { WorkspaceSync } from "./workspacesync/WorkspaceSync.js";
 function createDefaultRegistry() {
-  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(PinnedTabs).register(ReopenPinned).register(BookmarkFolders).register(LiveFolders).register(FolderPreview).register(TodayArchive).register(CopyUrl).register(SpaceHeader).register(Incognito).register(LittleArc).register(SidebarLook).register(ColumnScroll).register(WorkspaceSync);
+  return new ModuleRegistry().register(ActivationMarker).register(FavoritesGrid).register(Peek).register(PinnedTabs).register(ReopenPinned).register(BookmarkFolders).register(LiveFolders).register(FolderPreview).register(TodayArchive).register(CopyUrl).register(CallPip).register(SpaceHeader).register(Incognito).register(LittleArc).register(SidebarLook).register(ColumnScroll).register(WorkspaceSync);
 }
 export {
   createDefaultRegistry
