@@ -71,6 +71,18 @@ for a call tab. The check that decides it is a real Meet call (task T1b). If Viv
 there, no gesture-less path exists and spec 054 has to change (a new decision for Tore), not the
 design.
 
+Follow-up, 2026-11-20:
+
+- Tore joined a real Meet call in his Vivaldi and switched tab: no PiP opened. Way (1) does not work
+  with the default settings.
+- `chrome.scripting.executeScript`, in the isolated and in the main world, fails with the same
+  `NotAllowedError`: the interface has no user gesture to lend to a page. Vivaldi itself uses it only
+  to exit PiP (`exitPictureInPicture` in `bundle.js`, 8.3).
+- Vivaldi 8.3's `bundle.js` has a per-site setting "Automatic Picture-in-picture"
+  (`auto-picture-in-picture`) and a Vivaldi command `DOCUMENT_PICTURE_IN_PICTURE` that only works on
+  videos. Neither is exposed to modules. What is open: whether that site setting, set to Allow for
+  `meet.google.com`, makes Chromium invoke the action (T1b).
+
 ### Rejected alternatives
 
 - **A browser extension API that opens PiP for a tab.** None exists for extensions in Vivaldi 8.1;

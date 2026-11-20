@@ -20,6 +20,8 @@ and is done when its check passes. Tests keep the names of the `auto:` checks.
   switches to another tab and says whether a PiP window opens by itself, and whether Vivaldi's site
   settings list "Automatic picture-in-picture". Decides whether way (1) works at all. Satisfies Q-1.
   Done when the answer is in `design.md`; a no stops the work and reopens the spec.
+  First answer, 2026-11-20: no PiP with the default settings. Next: the site setting "Automatic
+  Picture-in-picture" set to Allow for `meet.google.com`.
 - [ ] **T2.** `CallSites.ts`, `CallPipOptions.ts`, the four selector keys in `src/selectors/8.1.json`,
   the `call-pip` entry in `src/config.json`. Satisfies AC-7, AC-8. Done when
   `skips a disabled site` and `injects the call script on the four sites only` pass.
