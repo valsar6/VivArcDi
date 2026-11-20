@@ -56,17 +56,15 @@ export class FolderSectionView {
    *
    * @param document The browser window document.
    * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, what a new name does, and what a right click on a live folder or one of its rows does.
-   * @param maxHeightPercent The most the section may take of the window's height before it scrolls.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(document: Document, handlers: SectionHandlers, maxHeightPercent: number, timers: ViewTimers = defaultTimers) {
+  constructor(document: Document, handlers: SectionHandlers, timers: ViewTimers = defaultTimers) {
     this.#handlers = handlers;
     this.#timers = timers;
     this.#editor = new FolderNameEditor(document, timers, (id, name) => this.#finished(id, name));
     this.#elements = new FolderRowElement(document, this.#editor);
     this.#element = document.createElement('div');
     this.#element.setAttribute('data-vivarcdi-folders', '');
-    this.#element.style.setProperty('--vivarcdi-folders-max-height', String(maxHeightPercent));
     this.#element.addEventListener('click', (event) => this.#click(event));
     this.#element.addEventListener('dblclick', (event) => this.#doubleClick(event));
     this.#element.addEventListener('contextmenu', (event) => this.#contextMenu(event as MouseEvent), true);

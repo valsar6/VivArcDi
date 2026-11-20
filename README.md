@@ -549,7 +549,6 @@ the console and leaves the section as it was.
 | `workspaces` | `{}` | The folder of each workspace: the name of the workspace (as in Vivaldi's workspace menu) and the path of its folder, written like `root` |
 | `workspacesBase` | `VivArcDi` | The folder that holds the default folder of each workspace, written like `root`. It is created the first time you write in a workspace |
 | `maxDepth` | `3` | How many levels of folders are shown (1 to 10) |
-| `maxHeightPercent` | `60` | The most the section takes of the window height before it scrolls (20 to 100) |
 
 Each workspace can show its own folders, as the spaces of Arc do:
 

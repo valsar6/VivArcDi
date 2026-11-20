@@ -14,7 +14,8 @@
     "styles/today.css",
     "styles/toast.css",
     "styles/sidebar-look.css",
-    "styles/compact-tab-bar.css"
+    "styles/compact-tab-bar.css",
+    "styles/column-scroll.css"
   ],
   "modules": {
     "activation-marker": {
@@ -48,8 +49,7 @@
       "root": "",
       "workspaces": {},
       "workspacesBase": "VivArcDi",
-      "maxDepth": 3,
-      "maxHeightPercent": 60
+      "maxDepth": 3
     },
     "live-folders": {
       "enabled": true,
@@ -88,6 +88,9 @@
       "idleCloseHours": 6,
       "widthPercent": 34,
       "heightPercent": 60
+    },
+    "column-scroll": {
+      "enabled": true
     },
     "sidebar-look": {
       "enabled": true,

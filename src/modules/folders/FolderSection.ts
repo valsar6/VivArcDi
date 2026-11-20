@@ -31,8 +31,6 @@ export interface SectionSettings {
   roots: WorkspaceRoots;
   /** How many levels of folders are shown. */
   maxDepth: number;
-  /** The most the section may take of the window's height, in percent. */
-  maxHeightPercent: number;
 }
 
 export class FolderSection {
@@ -65,9 +63,9 @@ export class FolderSection {
    * section opens them, renames them and reports their clicks through `VirtualFolders`.
    *
    * @param context What the module may use.
-   * @param settings The root folders and the sizes.
+   * @param settings The root folders and how many levels are shown.
    */
-  constructor(context: ModuleContext, { roots, maxDepth, maxHeightPercent }: SectionSettings) {
+  constructor(context: ModuleContext, { roots, maxDepth }: SectionSettings) {
     const { document, selectors, tabs, bookmarks, prefs, logger } = context;
     const links = (): LinkEntry[] => FolderTree.links(this.#source.entries);
     this.#context = context;
@@ -101,7 +99,6 @@ export class FolderSection {
         onRename: (id, name): void => void this.#editing.rename(id, name),
         onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },
-      maxHeightPercent,
     );
     this.#editing = this.#createEditing();
   }
