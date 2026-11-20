@@ -60,7 +60,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [050 Tab strip gap](050-tab-strip-gap/spec.md) | 3 | Approved |
 | [051 More Arc themes](051-more-themes/spec.md) | 3 | Approved |
 | [052 Title bar](052-title-bar/spec.md) | 3 | Draft |
-| [053 Single scroll](053-single-scroll/spec.md) | 3 | Draft |
+| [053 Single scroll](053-single-scroll/spec.md) | 3 | Approved |
 
 ## Layout
 

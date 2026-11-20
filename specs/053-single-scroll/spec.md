@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-20 (the proposed answers to Q-1 to Q-5; Q-1 to Q-3 are checked by the probes of task T1 before any code) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -106,20 +106,18 @@ Vivaldi scrolls its strip from code, not with the browser's own scroll, so how i
 
 ## Open questions
 
-- [ ] **Q-1.** The Favorites tiles are Vivaldi's pinned group, drawn as a grid. Proposed answer: the
+- [x] **Q-1.** The Favorites tiles are Vivaldi's pinned group, drawn as a grid. Decided: the
   tiles stay where they are, above the scroller. To check on the lab copy with pinned tabs, because the
   probe profile had none.
-- [ ] **Q-2.** Does Vivaldi keep `.resize` at the content height, or write a smaller `max-height` again
-  when the room changes? Proposed answer: a scenario with many tabs answers it before the design; if it
+- [x] **Q-2.** Does Vivaldi keep `.resize` at the content height, or write a smaller `max-height` again
+  when the room changes? Decided: a scenario with many tabs answers it before the design; if it
   rewrites the value, a style with `!important` or the observer of 050 overrides it.
-- [ ] **Q-3.** How does Vivaldi scroll to the active tab and while dragging, now that the strip has
-  `overflow: hidden`? Proposed answer: read Vivaldi's bundle as for 050 (T1) and probe a drag; if it
+- [x] **Q-3.** How does Vivaldi scroll to the active tab and while dragging, now that the strip has
+  `overflow: hidden`? Decided: read Vivaldi's bundle as for 050 (T1) and probe a drag; if it
   moves `scrollTop` of the strip, the design forwards that to the column scroller.
-- [ ] **Q-4.** Which element is the scroller: `#tabs-container` itself, or a new wrapper? Proposed
-  answer: `#tabs-container`, because a wrapper would put a VivArcDi element around Vivaldi's list, which
+- [x] **Q-4.** Which element is the scroller: `#tabs-container` itself, or a new wrapper? Decided: `#tabs-container`, because a wrapper would put a VivArcDi element around Vivaldi's list, which
   [009](../009-bookmark-folders-in-tab-bar/spec.md) rules out.
-- [ ] **Q-5.** Should the old limit stay as an option for people who prefer two scrolls? Proposed
-  answer: no; one behavior, `maxHeightPercent` is removed (FR-8).
+- [x] **Q-5.** Should the old limit stay as an option for people who prefer two scrolls? Decided: no; one behavior, `maxHeightPercent` is removed (FR-8).
 
 ## References
 
