@@ -52,5 +52,9 @@ The Favorites icon grid, Peek, bookmark folders in the tab bar and pinned tabs t
 Cmd/Ctrl+W and reset to their own page ship with VivArcDi (see the README), and so do the Today
 archive and copy URL with a toast.
 
+Out of reach for VivArcDi: the bar at the top of the window on macOS, with the traffic lights and the
+page title. It is drawn by the operating system, not by Vivaldi's `window.html` (checked on Vivaldi 8.3,
+2026-11-20), so the payload can neither color it nor make it clickable.
+
 Some setting names above come from release notes rather than the 8.1 interface itself. If one does not
 match, open an issue with the label you see.
