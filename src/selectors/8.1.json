@@ -1,5 +1,6 @@
 {
   "browser": "#browser",
+  "autoHideWrapper": ".auto-hide-wrapper",
   "tabBar": "#tabs-tabbar-container",
   "tabsContainer": "#tabs-container",
   "verticalTabBar": "#tabs-tabbar-container:is(.left, .right)",

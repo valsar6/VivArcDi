@@ -81,3 +81,8 @@ test('the space name and the rows below keep the row spacing', () => {
   assert.match(css, /\[data-vivarcdi-space-header\] \{[^}]*margin-block: 0 2px;/);
   assert.match(css, /\[data-vivarcdi-folders\] \{[^}]*padding-block: 0;/);
 });
+
+test('the bars revealed by Automatically hide UI keep the space color over the page', () => {
+  const css = compiled();
+  assert.match(css, /#browser\[data-vivarcdi-look\]\.auto-hide \.auto-hide-wrapper\s*\{\s*background-color: var\(--vivarcdi-space\) !important;/);
+});

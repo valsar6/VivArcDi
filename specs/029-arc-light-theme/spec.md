@@ -9,6 +9,8 @@
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
+> [051](../051-more-themes/spec.md) extends this spec: `theme apply` writes five themes and `install` asks which one starts as current, so the check of AC-1 is `applies the chosen theme with a backup` and the check of AC-8 is `install asks which theme starts as current`.
+
 ## Summary
 
 [028](../028-arc-sidebar-look/spec.md) colors the tab bar, but the rest of Vivaldi (address field,
@@ -84,13 +86,13 @@ text `#212121`). The page frame shows the gradient through Vivaldi's own frame o
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | WHEN `theme apply` runs on a closed Vivaldi, THE installer SHALL add and select "VivArcDi Light" after backing up `Preferences`. | auto: `applies the arc light theme with a backup` |
+| AC-1 | WHEN `theme apply` runs on a closed Vivaldi, THE installer SHALL add and select "VivArcDi Light" after backing up `Preferences`. | auto: `applies the chosen theme with a backup` (051) |
 | AC-2 | WHEN `theme apply --dry-run` runs, THE installer SHALL list the changes and write nothing. | auto: `dry run of the theme writes nothing` |
-| AC-3 | WHEN `theme restore` runs, THE previous theme SHALL be selected and "VivArcDi Light" removed. | auto: `restores the previous theme` |
+| AC-3 | WHEN `theme restore` runs, THE previous theme SHALL be selected and "VivArcDi Light" removed. | auto: `restores the theme from before the first apply` (051) |
 | AC-4 | IF Vivaldi is running, THEN `theme apply` SHALL stop and say so. | auto: `refuses to change the theme while vivaldi runs` |
 | AC-5 | THE `arclight` palette SHALL keep ink contrast of at least 4.5:1 on every stop and on the pill. | auto: `arclight palette keeps readable text` |
 | AC-6 | WHEN Tore runs `theme apply` and restarts Vivaldi, menus, address field and panels SHALL be light with dark text. | manual |
-| AC-8 | WHEN `install` ends and the user answers yes, THE installer SHALL run `theme apply`; WITH `--no-theme` it SHALL not ask. | auto: `install offers the arc light theme` |
+| AC-8 | WHEN `install` ends and the user answers yes, THE installer SHALL run `theme apply`; WITH `--no-theme` it SHALL not ask. | auto: `install asks which theme starts as current` (051) |
 | AC-9 | WHILE no palette is configured, THE sidebar look SHALL use `arclight`. | auto: `uses the arclight palette by default` |
 | AC-7 | WHILE the palette is `arclight`, THE tab bar and the window around the page SHALL show the coral-to-aqua gradient. | manual |
 
