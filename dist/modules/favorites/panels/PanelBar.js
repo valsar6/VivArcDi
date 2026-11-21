@@ -1,4 +1,5 @@
 const PANEL_SELECTOR_NAMES = ["panelAddButton", "panelAddressField", "panelAddSubmit", "webPanelButton"];
+const PRESS = ["pointerdown", "mousedown", "pointerup", "mouseup", "click"];
 class PanelBar {
   #document;
   #selectors;
@@ -42,7 +43,8 @@ class PanelBar {
     return [...this.#document.querySelectorAll(this.#selectors.panelButton)].map((button) => button.getAttribute("data-name") ?? "").filter((id) => id !== "");
   }
   /**
-   * Clicks the button that opens the form.
+   * Presses the button that opens the form. Vivaldi's buttons answer the pointer and mouse events of
+   * a real click, not a bare `click` event, so all of them are sent.
    *
    * @returns Whether the button was there.
    */
@@ -81,13 +83,28 @@ class PanelBar {
    */
   show(id) {
     const button = [...this.#document.querySelectorAll(this.#selectors.panelButton)].find((candidate) => candidate.getAttribute("data-name") === id);
-    button?.click();
-    return button !== void 0;
+    if (button === void 0) {
+      return false;
+    }
+    this.#press(button);
+    return true;
   }
   #click(selector) {
     const element = this.#document.querySelector(selector);
-    element?.click();
-    return element !== null;
+    if (element === null) {
+      return false;
+    }
+    this.#press(element);
+    return true;
+  }
+  #press(element) {
+    const view = this.#document.defaultView;
+    const { x, y, width, height } = element.getBoundingClientRect();
+    for (const type of PRESS) {
+      const Kind = (type.startsWith("pointer") ? view?.PointerEvent : view?.MouseEvent) ?? Event;
+      const buttons = type.endsWith("down") ? 1 : 0;
+      element.dispatchEvent(new Kind(type, { bubbles: true, cancelable: true, view, button: 0, buttons, clientX: x + width / 2, clientY: y + height / 2 }));
+    }
   }
 }
 export {
