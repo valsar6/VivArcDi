@@ -44,8 +44,9 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
 
 - **FR-1.** The menu of a tile has **Open as web panel** when its page is an `http` or `https` URL
   that is not yet a web panel.
-- **FR-2.** The command adds a web panel for the tile's URL, with the tile's title and icon, and shows
-  the side panel on it.
+- **FR-2.** The command adds an element to Vivaldi's web panel list (`vivaldi.panels.web.elements`)
+  for the tile's URL, with the tile's title and icon, in mobile mode like the panels Vivaldi makes, and
+  shows the side panel on it.
 - **FR-3.** When the tile's URL already is a web panel, the menu shows **Close web panel**, which
   removes that panel.
 - **FR-4.** The tile is never changed, moved or removed by these commands.
@@ -82,14 +83,18 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
 
 ## Open questions
 
-- [ ] **1. How does code add a web panel?** Vivaldi stores them in its preferences (a list of panel
-  elements with URL, title and icon); the exact key and whether it can be written from the window need
-  a read-only probe (`npm run live -- --probe <file>`) before the design. Proposed: task T1 is that
-  probe, and NFR-1 is the fallback.
-- [ ] **2. Which URL identifies "already a panel"?** Proposed: the same URL after dropping the fragment
-  and a trailing slash.
-- [ ] **3. Which text, "Open as web panel" or "Add as panel"?** Proposed: **Open as web
-  panel**, Vivaldi's own words.
+- [x] **1. How does code add a web panel?** Probed on a lab Vivaldi 8.2 (2026-11-21, read-only):
+  Vivaldi keeps the panels in the preference `vivaldi.panels.web.elements`, readable with
+  `vivaldi.prefs.get`. It is an array; each element has `id` (`WEBPANEL_<uuid>`), `url`, `title`,
+  `faviconUrl` (a data URL), `mobileMode` (`true`) and `zoom` (`1`). `chrome.sidePanel` is not exposed
+  in the window. Not yet known: whether writing the array with `vivaldi.prefs.set` makes the panel
+  appear in the panel bar, and how the side panel is shown on it. The read-only probe cannot test a
+  write, so task T1 of the design does it in the live scenario `tile-web-panel-added` on the throwaway
+  profile; NFR-1 is the fallback if the write does not take effect.
+- [x] **2. Which URL identifies "already a panel"?** The stored URLs differ in form (`https://social.vivaldi.net/`
+  and `https://wikipedia.org`), so a trailing slash cannot decide. Accepted by Tore, 2026-11-21: the
+  same URL after dropping the fragment and a trailing slash.
+- [x] **3. Which text?** **Open as web panel**, Vivaldi's own words (Tore, 2026-11-21).
 
 ## References
 
