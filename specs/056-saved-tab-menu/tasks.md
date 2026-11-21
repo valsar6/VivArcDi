@@ -53,7 +53,7 @@ A task edits only its files. A file in two columns is shared: the owner is named
 
 ## Tasks
 
-- [ ] **T1.** Probes, read-only, run by the lead with `npm run live -- --probe <file>` on the throwaway
+- [x] **T1.** Done 2026-11-21, findings in the design. Probes, read-only, run by the lead with `npm run live -- --probe <file>` on the throwaway
   profile, **only after Tore agrees**. Answers F-1 to F-7 of the design: how to tile two tabs from code
   (split view) and whether `TabTiler` is enough; how to open the address bar and catch the tab opened
   from it; how to create a workspace (New Space…) and whether `WorkspaceCreator` works from a menu
@@ -62,12 +62,12 @@ A task edits only its files. A file in two columns is shared: the owner is named
   into the "Probe findings" table of the design (a column "Finding" with the date and the Vivaldi
   version) and corrects the plan of T6 and T7b if a hypothesis failed. The probes stay outside the
   repository, as in 055.
-- [ ] **T2.** Core pieces: `ContextMenu` `disabled`, `Toast` click action, `PromptDialog`, their styles
+- [x] **T2.** Core pieces: `ContextMenu` `disabled`, `Toast` click action, `PromptDialog`, their styles
   and the `styles/dialog.css` entry. Tests first for each: a disabled row ignores a click and keeps the
   menu open; a toast with an action runs it once on click and a toast without one is unchanged; the
   dialog resolves the value on Enter and the confirm button, `null` on Esc and Cancel, and stays open
   with the field marked on an invalid value. Runs in parallel with T1 and T3.
-- [ ] **T3.** Menu skeleton: `LinkMenuItems` (groups in Arc's order, separators, a group left empty is
+- [x] **T3.** Menu skeleton: `LinkMenuItems` (groups in Arc's order, separators, a group left empty is
   dropped), `LinkedTab`, labels, `RowMenu` rewired to `items`, `FolderDragDrop` with `linkActions`,
   `FolderEditing.#linkActions(toast)` with the five slot methods returning `null`. Tests first: the
   order and separators with every slot present, the order with some missing, the menu of today

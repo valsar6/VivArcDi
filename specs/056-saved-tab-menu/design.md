@@ -61,6 +61,31 @@ The lead writes each finding here before the task that depends on it starts. Unt
 | F-6 | How the link-row menu is built | From the code: `RowMenu` builds items for `ContextMenu` on a `contextmenu` event of an element with `data-vivarcdi-link-id` (`LINK_ATTRIBUTE`); the probe checks that the attribute is on the rows of the lab window and that Vivaldi's menu does not open | - | T3 |
 | F-7 | Fields of a bookmark | `chrome.bookmarks.get` of a pinned link: whether it carries `vivExtData`, `nickname` or other Vivaldi fields besides `description`; `chrome.bookmarks.update(id, { url })` is a write, so it is covered by the scenario of T5 and the manual AC-13, not by a probe | `LinkExtras` stays a no-op (above) | T4, T5 |
 
+### Findings of the probes (T1, 2026-11-21, lab Vivaldi on the throwaway profile)
+
+Two read-only probes, kept outside the repository as in 055.
+
+| # | Finding | Effect on the plan |
+|---|---|---|
+| F-1 | Confirmed. Writing `tiling` `{ id, index, layout: 'row', type: 'selection' }` into the `vivExtData` of two tabs, as `TabTiler` does, draws the split: both webviews get class `tiled` (`mosaic-tile` in the DOM), 515 and 512 px wide side by side, index 0 on the left; selecting either tab keeps the split. In the first run, right after the window opened, the same write drew nothing for a while, so the code and the scenario must wait for the `tiled` class, not for a fixed delay. | `TabTiler` is enough. T6 waits for `tiled` in its scenario. |
+| F-2 | Confirmed. `chrome.tabs.create` of a blank tab leaves `pendingUrl: about:blank` and focuses the address field (`INPUT.UrlBar-UrlField`). Tiled at once with the row's tab, as in Tore's recording of 2026-11-21 15.10.39, the new tab is the right pane. The events of closing the field without a choice are not probed; T6 covers them with its tests and the manual AC-11. | As designed. |
+| F-3 | Not provable in the lab: the lab window has no `button[data-name="WorkspaceButton"]`. `vivaldi.prefs.get('vivaldi.workspaces.list')` works and lists `Lab One` and `Lab Two` (`id`, `name`, `icon`); `vivaldi.workspaces` does not exist. | T7 reuses `WorkspaceCreator`, which spec 030 already runs in Tore's Vivaldi; its deferred and failed results give the error toast. The manual AC-14 checks it. |
+| F-4 | Not probed: it is a write on tabs that only a workspace UI can show. It is the move that 033 `FolderRelocation` runs in Tore's Vivaldi. | As designed. |
+| F-5 | Not probed. | Use the fallback: the toast click activates the moved tab, which switches the workspace. |
+| F-6, F-7 | Inconclusive: the lab profile has no bookmarks, so no link row and no bookmark node to read. | `LinkExtras` stays a no-op, as designed. The scenarios of T8 build their own fixture. |
+
+### Deviations from the first design
+
+- **New classes in `src/modules/folders/editing/`, not in `src/shared/links/`.** The checks of spec 034
+  (`every shared file is used by two modules`, `every core file is used by core or by two modules`)
+  fail for a file that one module uses. `LinkMenuItems`, `LinkedTab` and `PromptDialog` live in
+  `src/modules/folders/editing/` until [057](../057-tile-menu/spec.md) gives them a second module; its T3 moves
+  them to `src/shared/` and `src/core/dom/`. The same for the classes of T4, T5, T6 and T7. `BookmarkCopier`
+  does not move.
+- **T7a and T7b are one task (T7).** Moving the workspace-menu drivers to `src/shared/spaces/` alone
+  leaves files used by one module, which fails the same check.
+- `FolderEditing.ts` passed the 200 lines limit; `#folderActions` moved to `FolderActionsFactory.ts`.
+
 ## The menu (FR-1)
 
 **`LinkMenuItems`** in `src/shared/links/` builds the items of a link row from a `LinkActions` object,
