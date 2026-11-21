@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 1 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-21 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -55,9 +55,9 @@ dialog, the disabled states and the address bar of an empty selection are those 
 | AC-5 | WHEN `Open in Split View` is chosen on a tile, THE page of the tile and the selected tab SHALL be tiled side by side. | manual |
 | AC-6 | WHEN Tore uses the new items on a tile, THE results SHALL be those of the saved tabs and show in every workspace. | manual |
 
-AC-5 becomes the `live:` scenario `opens a tile in split view` with the design, together with the
-scenario itself; until then it is `manual`, because the check of 046 fails on a `live:` name without a
-scenario.
+AC-5 becomes the `live:` scenario `opens a tile in split view` with the scenario itself, in the same
+pull request (see [design](design.md) and [tasks](tasks.md) T7); until then it is `manual`, because the
+check of 046 fails on a `live:` name without a scenario.
 
 ## Out of scope
 
