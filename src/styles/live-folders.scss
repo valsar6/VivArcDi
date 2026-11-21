@@ -219,10 +219,10 @@ $connect-pulse: vivarcdi-connect-pulse;
 
   button#{$connect-primary} {
     background-color: var(--colorHighlightBg, #{$accent-fallback});
-    color: $accent-ink;
+    color: var(--colorHighlightFg, #{$accent-ink});
 
     &:hover {
-      background-color: color-mix(in srgb, var(--colorHighlightBg, #{$accent-fallback}) #{100% - $tint-hover}, $accent-ink);
+      background-color: color-mix(in srgb, var(--colorHighlightBg, #{$accent-fallback}) #{100% - $tint-hover}, black);
     }
   }
 }
