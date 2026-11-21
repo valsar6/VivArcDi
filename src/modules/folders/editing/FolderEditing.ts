@@ -6,6 +6,7 @@ import { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { FolderCommands } from '../../../shared/links/FolderCommands.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import type { ModuleContext } from '../../../core/boot/Module.js';
+import { TextCopier } from '../../../shared/clipboard/TextCopier.js';
 import { TabMenuItems } from '../favoritelinks/TabMenuItems.js';
 import type { ContextMenuApi } from '../favoritelinks/TabMenuItems.js';
 import { Toast } from '../../../core/dom/Toast.js';
@@ -13,11 +14,15 @@ import type { ToastKind } from '../../../core/dom/Toast.js';
 import { TodayList } from '../../../shared/tabs/TodayList.js';
 import { VirtualFolders } from '../../../shared/links/VirtualFolders.js';
 import type { WorkspaceNames } from '../../../core/workspaces/WorkspaceNames.js';
+import { BookmarkCopier } from './BookmarkCopier.js';
 import type { ClosingLinks } from './ClosingLinks.js';
 import { CreatedLinks } from '../favoritelinks/CreatedLinks.js';
 import { FavoriteShortcut } from '../favoritelinks/FavoriteShortcut.js';
 import { FolderActionsFactory } from './FolderActionsFactory.js';
 import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
+import { LinkClipboard } from './LinkClipboard.js';
+import { LinkDuplication } from './LinkDuplication.js';
+import { LinkExtras } from './LinkExtras.js';
 import type { LinkActions } from './LinkMenuItems.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
@@ -155,18 +160,20 @@ export class FolderEditing {
     return () => shortcut.detach();
   }
 
-  #linkActions(_toast: (text: string, kind?: ToastKind) => void): Omit<LinkActions, 'removePin' | 'tileTab'> {
+  #linkActions(toast: (text: string, kind?: ToastKind) => void): Omit<LinkActions, 'removePin' | 'tileTab'> {
     return {
-      copyLink: (linkId): MenuItem | null => this.#copyLink(linkId),
+      copyLink: (linkId): MenuItem | null => this.#copyLink(linkId, toast),
       editPinnedPage: (linkId): Promise<MenuItem | null> => this.#editPinnedPage(linkId),
       openInSplitView: (linkId): Promise<MenuItem | null> => this.#openInSplitView(linkId),
-      duplicate: (linkId): MenuItem | null => this.#duplicate(linkId),
+      duplicate: (linkId): MenuItem | null => this.#duplicate(linkId, toast),
       moveTo: (linkId): MenuItem | null => this.#moveTo(linkId),
     };
   }
 
-  #copyLink(_linkId: string): MenuItem | null {
-    return null;
+  #copyLink(linkId: string, notify: (text: string, kind?: ToastKind) => void): MenuItem {
+    const { document, bookmarkWriter, logger } = this.#context;
+    const clipboard = new LinkClipboard({ writer: bookmarkWriter, copier: TextCopier.for(document, document.defaultView?.navigator.clipboard), notify, logger });
+    return { label: 'Copy Link', run: (): void => void clipboard.copy(linkId) };
   }
 
   #editPinnedPage(_linkId: string): Promise<MenuItem | null> {
@@ -177,8 +184,10 @@ export class FolderEditing {
     return Promise.resolve(null);
   }
 
-  #duplicate(_linkId: string): MenuItem | null {
-    return null;
+  #duplicate(linkId: string, notify: (text: string, kind?: ToastKind) => void): MenuItem {
+    const { bookmarkWriter, logger } = this.#context;
+    const duplication = new LinkDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), extras: new LinkExtras(), notify, logger });
+    return { label: 'Duplicate', run: (): void => void duplication.duplicate(linkId) };
   }
 
   #moveTo(_linkId: string): MenuItem | null {
