@@ -164,7 +164,7 @@
   height: 6px;
   border-radius: 50%;
   animation: vivarcdi-connect-pulse 1.2s ease-in-out infinite;
-  background-color: var(--colorHighlightBg, #4c7fd9);
+  background-color: var(--colorHighlightBg, #3159ab);
 }
 @media (prefers-reduced-motion: reduce) {
   #browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] > [data-vivarcdi-connect-status]::before {
@@ -193,9 +193,9 @@
   background-color: color-mix(in srgb, var(--colorFg, #212121) 6%, transparent);
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] button[data-vivarcdi-connect-primary] {
-  background-color: var(--colorHighlightBg, #4c7fd9);
-  color: #fff;
+  background-color: var(--colorHighlightBg, #3159ab);
+  color: var(--colorHighlightFg, #fff);
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-connect-panel] button[data-vivarcdi-connect-primary]:hover {
-  background-color: color-mix(in srgb, var(--colorHighlightBg, #4c7fd9) 86%, #fff);
+  background-color: color-mix(in srgb, var(--colorHighlightBg, #3159ab) 86%, black);
 }
