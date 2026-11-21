@@ -15,17 +15,21 @@ class Element {
   public getAttribute(): string | null {
     return this.name;
   }
-  public click(): void {
-    this.clicks += 1;
-    this.onClick();
+  public getBoundingClientRect(): { x: number; y: number; width: number; height: number } {
+    return { x: 10, y: 20, width: 4, height: 6 };
   }
   public dispatchEvent(event: Event): boolean {
     this.events.push(event.type);
+    if (event.type === 'click') {
+      this.clicks += 1;
+      this.onClick();
+    }
     return true;
   }
 }
 
 class Page {
+  public defaultView = null;
   public elements = new Map<string, Element[]>();
   public querySelector = (selector: string): Element | null => this.elements.get(selector)?.[0] ?? null;
   public querySelectorAll = (selector: string): Element[] => this.elements.get(selector) ?? [];
@@ -93,4 +97,22 @@ test('finds only a panel that has a button, and ignores unreadable elements', as
   assert.equal(await list.find('https://h.example/'), null);
   const broken = new WebPanelList({ prefs: { get: async (): Promise<unknown> => undefined }, bar: { panelIds: (): string[] => [], show: (): boolean => false, available: true } });
   assert.equal(await broken.find('https://a.example/'), null);
+});
+
+test('presses panel bar buttons like a real click', () => {
+  const page = new Page();
+  const add = new Element();
+  const panel = new Element('WEBPANEL_a');
+  const submit = new Element();
+  page.elements.set('add', [add]);
+  page.elements.set('panel', [panel]);
+  page.elements.set('submit', [submit]);
+  const bar = new PanelBar(page as never, SELECTORS);
+  bar.openForm();
+  bar.show('WEBPANEL_a');
+  bar.submit();
+  const sequence = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'];
+  assert.deepEqual(add.events, sequence);
+  assert.deepEqual(panel.events, sequence);
+  assert.deepEqual(submit.events, sequence);
 });

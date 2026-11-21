@@ -9,7 +9,9 @@ export interface PanelSelectors {
   panelButton: string;
 }
 
-export type PanelDocument = Pick<Document, 'querySelector' | 'querySelectorAll'>;
+export type PanelDocument = Pick<Document, 'querySelector' | 'querySelectorAll' | 'defaultView'>;
+
+const PRESS = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'] as const;
 
 export class PanelBar {
   #document: PanelDocument;
@@ -59,7 +61,8 @@ export class PanelBar {
   }
 
   /**
-   * Clicks the button that opens the form.
+   * Presses the button that opens the form. Vivaldi's buttons answer the pointer and mouse events of
+   * a real click, not a bare `click` event, so all of them are sent.
    *
    * @returns Whether the button was there.
    */
@@ -101,13 +104,29 @@ export class PanelBar {
    */
   public show(id: string): boolean {
     const button = [...this.#document.querySelectorAll<HTMLElement>(this.#selectors.panelButton)].find((candidate) => candidate.getAttribute('data-name') === id);
-    button?.click();
-    return button !== undefined;
+    if (button === undefined) {
+      return false;
+    }
+    this.#press(button);
+    return true;
   }
 
   #click(selector: string): boolean {
     const element = this.#document.querySelector<HTMLElement>(selector);
-    element?.click();
-    return element !== null;
+    if (element === null) {
+      return false;
+    }
+    this.#press(element);
+    return true;
+  }
+
+  #press(element: HTMLElement): void {
+    const view = this.#document.defaultView;
+    const { x, y, width, height } = element.getBoundingClientRect();
+    for (const type of PRESS) {
+      const Kind = (type.startsWith('pointer') ? view?.PointerEvent : view?.MouseEvent) ?? Event;
+      const buttons = type.endsWith('down') ? 1 : 0;
+      element.dispatchEvent(new Kind(type, { bubbles: true, cancelable: true, view, button: 0, buttons, clientX: x + width / 2, clientY: y + height / 2 }));
+    }
   }
 }

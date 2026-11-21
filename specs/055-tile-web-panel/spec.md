@@ -75,6 +75,7 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
 | AC-7 | IF the **Add web panel** form or the panel bar is not found, THEN THE menu SHALL NOT show the commands. | auto: `hides the web panel commands when the form is missing` |
 | AC-8 | WHEN a web panel is added, THE panel SHALL exist in Vivaldi's panel list of a lab Vivaldi. | live: `a tile becomes a web panel in the panel list` |
 | AC-9 | WHEN Tore chooses **Open as web panel** on a tile, THE side panel SHALL open on that site in its mobile layout, and **Show web panel** SHALL bring it up again. | manual |
+| AC-10 | WHEN the module presses a button of Vivaldi's panel bar, THE module SHALL send the pointer and mouse events of a real click, not only a `click` event. | auto: `presses panel bar buttons like a real click` |
 
 ## Out of scope
 
