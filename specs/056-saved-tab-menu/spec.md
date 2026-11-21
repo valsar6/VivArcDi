@@ -38,8 +38,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - **Duplicate** adds a copy of the bookmark with the same name, icon and address right below the row.
   In the recording the copy appears as a second `Rame Hetzner`.
 - **Move to ▸** lists the workspaces by name with a check on the current one, then `New Space…`. Choosing
-  another workspace moves the bookmark to the end of that workspace's root and moves its open tab there
-  (as 033 does for folders). A toast says `Tab moved! Click to go there.` and a click on it switches
+  another workspace moves the bookmark to the end of that workspace's root and moves its open tab there.
+  Only the tab the command is run on moves, never others. A toast says `Tab moved! Click to go there.` and a click on it switches
   to that workspace. `New Space…` asks for a name, creates the workspace and moves the tab into it.
 - **Edit Pinned Page ▸** has two items. `Replace Pinned URL with Current` takes the address of the open
   tab as the new saved address; it is disabled while the two are the same. `Edit…` opens a small dialog
@@ -48,6 +48,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
   address that is a valid URL and keeps the name and icon.
 - **Open in Split View** opens the page of the row beside the tab that is selected, in Vivaldi's tab
   tiling, as the selected tab and the row's page side by side. If the row has no open tab, it opens one.
+  Where no tab is selected, the item stays enabled: the address bar opens so that the user picks the
+  page to open as a new tab, and that tab is tiled with the page of the row.
 
 ## Requirements
 
@@ -61,6 +63,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - **FR-6.** `Edit…` saves a valid URL into the bookmark; an invalid one keeps the dialog open with the field marked. Name and icon (027) stay.
 - **FR-7.** `Replace Pinned URL with Current` sets the bookmark URL to the URL of the open tab and is disabled when equal or when the row has no open tab.
 - **FR-8.** Open in Split View tiles the page of the row with the selected tab; if they are already tiled together, or the row is the selected tab, the item is disabled.
+- **FR-9.** WHERE no tab is selected, Open in Split View opens the address bar; the page the user chooses opens as a new tab tiled with the page of the row. Esc in the address bar tiles nothing.
 
 ### Non-functional
 
@@ -82,6 +85,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 | AC-8 | WHEN `Replace Pinned URL with Current` is chosen, THE bookmark URL SHALL become the URL of the open tab. | auto: `replaces the pinned url with the current one` |
 | AC-9 | WHILE the open tab has the saved URL or there is no open tab, THE item `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace pinned url when equal` |
 | AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | live: `opens a saved tab in split view` |
+| AC-10b | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | live: `opens a saved tab in split view with a new tab` |
 | AC-11 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
 | AC-12 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
 | AC-13 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
@@ -93,13 +97,14 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - `Rename…` and `Change Icon…`: [027](../027-rename-pinned-tabs/spec.md).
 - The menu of tiles and of folders: [031](../031-pin-and-tile-commands/spec.md), [033](../033-folder-menu/spec.md).
 - Archive.
+- The same items on a Favorites tile: [057](../057-tile-menu/spec.md).
 
 ## Open questions
 
-- [ ] **Q-1. Move to and the open tab.** Proposal: as 033 FR-7, the open tab goes to the target workspace too.
-- [ ] **Q-2. Split View with nothing selected.** Proposal: the item is disabled when no web page tab is selected.
-- [ ] **Q-3. Duplicate and the open tab.** Proposal: the copy is closed, as in 033; Arc's recording does not show it.
-- [ ] **Q-4. The tiles.** Should the same new items appear in the menu of a Favorites tile? The recording shows only saved tabs. Proposal: no, a later spec.
+- [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it.
+- [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9).
+- [x] **Q-3. Duplicate and the open tab.** The copy is closed (Tore, 2026-11-21).
+- [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md) (Tore, 2026-11-21).
 
 ## References
 
