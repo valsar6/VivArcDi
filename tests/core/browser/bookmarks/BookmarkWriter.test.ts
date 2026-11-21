@@ -43,6 +43,13 @@ test('creates, renames and removes a link', async () => {
   assert.equal((await chrome.writer.children('10')).length, 1);
 });
 
+test('changes the url of a bookmark without changing its title', async () => {
+  const chrome = new WritableChrome(bookmarkTree([folder('10', 'Hobbies', [link('11', 'Old', 'https://a.example/')])]));
+  const changed = await chrome.writer.setUrl('11', 'https://b.example/');
+  assert.equal(changed.url, 'https://b.example/');
+  assert.equal(changed.title, 'Old');
+});
+
 test('describes a bookmark without changing its title', async () => {
   const chrome = new WritableChrome(bookmarkTree([folder('10', 'Hobbies', [link('11', 'Old', 'https://a.example/')])]));
   const described = await chrome.writer.describe('11', '{"themeColor":"#336699"}');

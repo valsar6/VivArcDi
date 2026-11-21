@@ -240,6 +240,7 @@ export class WritableChrome implements WriterHost {
           const node = findNode(this.tree, id) as BookmarkNode;
           node.title = changes.title ?? node.title;
           node.description = changes.description ?? node.description;
+          node.url = changes.url ?? node.url;
           return node;
         }),
       get: (id, callback): void => nodeAnswer('get', id, callback, (node) => ({ id: node.id, title: node.title, url: node.url, parentId: this.#parentOf(this.tree, node.id)?.id, index: this.#parentOf(this.tree, node.id)?.children?.findIndex((child) => child.id === node.id) })),

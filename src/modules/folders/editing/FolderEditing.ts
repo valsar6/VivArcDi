@@ -23,7 +23,10 @@ import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
 import { LinkClipboard } from './LinkClipboard.js';
 import { LinkDuplication } from './LinkDuplication.js';
 import { LinkExtras } from './LinkExtras.js';
+import { LinkedTab } from './LinkedTab.js';
 import type { LinkActions } from './LinkMenuItems.js';
+import { PinnedAddress } from './PinnedAddress.js';
+import { PromptDialog } from './PromptDialog.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 import { TabCommands } from '../favoritelinks/TabCommands.js';
@@ -63,6 +66,7 @@ export class FolderEditing {
   #sources: EditingSources;
   #favorites: WorkspaceFavorites;
   #stops: Array<() => void> = [];
+  #pinned: PinnedAddress | null = null;
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
@@ -163,7 +167,7 @@ export class FolderEditing {
   #linkActions(toast: (text: string, kind?: ToastKind) => void): Omit<LinkActions, 'removePin' | 'tileTab'> {
     return {
       copyLink: (linkId): MenuItem | null => this.#copyLink(linkId, toast),
-      editPinnedPage: (linkId): Promise<MenuItem | null> => this.#editPinnedPage(linkId),
+      editPinnedPage: (linkId): Promise<MenuItem | null> => this.#editPinnedPage(linkId, toast),
       openInSplitView: (linkId): Promise<MenuItem | null> => this.#openInSplitView(linkId),
       duplicate: (linkId): MenuItem | null => this.#duplicate(linkId, toast),
       moveTo: (linkId): MenuItem | null => this.#moveTo(linkId),
@@ -176,8 +180,16 @@ export class FolderEditing {
     return { label: 'Copy Link', run: (): void => void clipboard.copy(linkId) };
   }
 
-  #editPinnedPage(_linkId: string): Promise<MenuItem | null> {
-    return Promise.resolve(null);
+  async #editPinnedPage(linkId: string, notify: (text: string, kind?: ToastKind) => void): Promise<MenuItem | null> {
+    const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
+    this.#pinned ??= new PinnedAddress({
+      writer: bookmarkWriter,
+      linkedTab: new LinkedTab(tabs),
+      dialog: new PromptDialog({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
+      notify,
+      logger,
+    });
+    return this.#pinned.submenu(linkId);
   }
 
   #openInSplitView(_linkId: string): Promise<MenuItem | null> {
