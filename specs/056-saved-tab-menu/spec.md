@@ -46,9 +46,11 @@ each new item from the release that implements it. `Share` and `Mute` are not re
   titled `Edit Pinned URL`, with the text "This is what opens first when you click this tab or its
   favicon.", the address field already selected, `Cancel` (Esc) and `Save` (Enter); it saves an
   address that is a valid URL and keeps the name and icon.
-- **Open in Split View** opens the page of the row beside the tab that is selected, in Vivaldi's tab
-  tiling, as the selected tab and the row's page side by side. If the row has no open tab, it opens one.
-  Where no tab is selected, the item stays enabled. Seen in Arc (`Registrazione schermo 2026-11-21 alle
+- **Open in Split View** shows the page of the row, which asked for it, in the left pane of Vivaldi's tab
+  tiling. The right pane is the tab that is selected, when it is an ordinary tab; a tile of the Favorites
+  grid is not one. If the row has no open tab, it opens one. Where no ordinary tab is selected, the item stays
+  enabled and runs Vivaldi's New Tab command: the new tab is the right pane, empty, and the address bar is
+  focused so that the user picks its page (Tore, 2026-11-21). Seen in Arc (`Registrazione schermo 2026-11-21 alle
   15.10.39.mov`, 12 s): the split appears at once, with the page of the row on the left and an empty
   pane titled `Search or Enter URL…` on the right, and the search palette opens over it; what the user
   picks loads in the empty pane.
@@ -64,8 +66,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - **FR-5.** `New Space…` in Move to creates a workspace with the name typed and moves the tab into it; an empty name or Esc creates nothing.
 - **FR-6.** `Edit…` saves a valid URL into the bookmark; an invalid one keeps the dialog open with the field marked. Name and icon (027) stay.
 - **FR-7.** `Replace Pinned URL with Current` sets the bookmark URL to the URL of the open tab and is disabled when equal or when the row has no open tab.
-- **FR-8.** Open in Split View tiles the page of the row with the selected tab; if they are already tiled together, or the row is the selected tab, the item is disabled.
-- **FR-9.** WHERE no tab is selected, Open in Split View tiles the page of the row (left) with a new empty tab (right) at once and opens the address bar on it; the page the user chooses loads in that tab. IF the user closes the address bar without choosing, THEN the empty tab is closed and the split is undone.
+- **FR-8.** Open in Split View tiles the page of the row (left) with the selected ordinary tab (right); a tile of the Favorites grid is not an ordinary tab; if they are already tiled together, or the row is the selected tab, the item is disabled.
+- **FR-9.** WHERE no ordinary tab is selected, Open in Split View runs the New Tab command and tiles the page of the row (left) with the new empty tab (right) at once, with the address bar focused on it; the page the user chooses loads in that tab. IF the user closes the address bar without choosing, THEN the empty tab is closed and the split is undone.
 
 ### Non-functional
 
@@ -86,8 +88,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 | AC-7 | WHEN `Edit…` is saved with a valid URL, THE bookmark URL SHALL change and its name and icon SHALL stay; WHEN the URL is invalid, THE dialog SHALL stay open. | auto: `edits the pinned url of a saved tab` |
 | AC-8 | WHEN `Replace Pinned URL with Current` is chosen, THE bookmark URL SHALL become the URL of the open tab. | auto: `replaces the pinned url with the current one` |
 | AC-9 | WHILE the open tab has the saved URL or there is no open tab, THE item `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace pinned url when equal` |
-| AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | live: `opens a saved tab in split view` |
-| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL tile the page of the row with a new empty tab and open the address bar on it, and the page chosen SHALL load in that tab. | live: `opens a saved tab in split view with a new tab` |
+| AC-10 | WHEN `Open in Split View` is chosen with an ordinary tab selected, THE page of the row SHALL be the left pane and the selected tab the right one. | live: `opens a saved tab in split view` |
+| AC-11 | WHEN no ordinary tab is selected, or a tile of the Favorites grid is, and `Open in Split View` is chosen, THE module SHALL run the New Tab command, tile the page of the row (left) with the new empty tab (right) and focus the address bar on it, and the page chosen SHALL load in that tab. | live: `opens a saved tab in split view with a new tab` |
 | AC-12 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
 | AC-13 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
 | AC-14 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
