@@ -1,6 +1,6 @@
 import type { Logger } from '../../core/support/Logger.js';
 import type { LinkOpener, LinkRequest } from './LinkOpener.js';
-import type { TabTiler } from './TabTiler.js';
+import type { TabTiler } from '../../shared/tabs/TabTiler.js';
 
 export interface PanelHandle {
   /** The address the panel shows now. */

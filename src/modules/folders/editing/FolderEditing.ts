@@ -27,6 +27,7 @@ import { LinkedTab } from './LinkedTab.js';
 import type { LinkActions } from './LinkMenuItems.js';
 import { PinnedAddress } from './PinnedAddress.js';
 import { PromptDialog } from './PromptDialog.js';
+import { SplitView } from './SplitView.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 import { TabCommands } from '../favoritelinks/TabCommands.js';
@@ -67,6 +68,7 @@ export class FolderEditing {
   #favorites: WorkspaceFavorites;
   #stops: Array<() => void> = [];
   #pinned: PinnedAddress | null = null;
+  #split: SplitView | undefined;
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
@@ -168,7 +170,7 @@ export class FolderEditing {
     return {
       copyLink: (linkId): MenuItem | null => this.#copyLink(linkId, toast),
       editPinnedPage: (linkId): Promise<MenuItem | null> => this.#editPinnedPage(linkId, toast),
-      openInSplitView: (linkId): Promise<MenuItem | null> => this.#openInSplitView(linkId),
+      openInSplitView: (linkId): Promise<MenuItem | null> => this.#openInSplitView(linkId, toast),
       duplicate: (linkId): MenuItem | null => this.#duplicate(linkId, toast),
       moveTo: (linkId): MenuItem | null => this.#moveTo(linkId),
     };
@@ -192,8 +194,20 @@ export class FolderEditing {
     return this.#pinned.submenu(linkId);
   }
 
-  #openInSplitView(_linkId: string): Promise<MenuItem | null> {
-    return Promise.resolve(null);
+  #openInSplitView(linkId: string, notify: (text: string, kind?: ToastKind) => void): Promise<MenuItem | null> {
+    return this.#splitView(notify).item(linkId);
+  }
+
+  #splitView(notify: (text: string, kind?: ToastKind) => void): SplitView {
+    if (this.#split === undefined) {
+      const split = SplitView.of(this.#context, notify);
+      this.#stops.push(() => {
+        split.stop();
+        this.#split = undefined;
+      });
+      this.#split = split;
+    }
+    return this.#split;
   }
 
   #duplicate(linkId: string, notify: (text: string, kind?: ToastKind) => void): MenuItem {
