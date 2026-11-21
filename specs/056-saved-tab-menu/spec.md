@@ -65,7 +65,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - **FR-6.** `Edit…` saves a valid URL into the bookmark; an invalid one keeps the dialog open with the field marked. Name and icon (027) stay.
 - **FR-7.** `Replace Pinned URL with Current` sets the bookmark URL to the URL of the open tab and is disabled when equal or when the row has no open tab.
 - **FR-8.** Open in Split View tiles the page of the row with the selected tab; if they are already tiled together, or the row is the selected tab, the item is disabled.
-- **FR-9.** WHERE no tab is selected, Open in Split View tiles the page of the row (left) with a new empty tab (right) at once and opens the address bar on it; the page the user chooses loads in that tab. IF the user closes the address bar without choosing, THEN the empty tab is closed and the split is undone (Q-5).
+- **FR-9.** WHERE no tab is selected, Open in Split View tiles the page of the row (left) with a new empty tab (right) at once and opens the address bar on it; the page the user chooses loads in that tab. IF the user closes the address bar without choosing, THEN the empty tab is closed and the split is undone.
 
 ### Non-functional
 
@@ -111,7 +111,7 @@ pull request ([tasks.md](tasks.md) T8).
 
 - [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it. Answered (Tore, 2026-11-21).
 - [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9). Answered (Tore, 2026-11-21).
-- [ ] **Q-5. Closing the address bar without a choice.** The recording does not show it. Proposal: the empty tab closes and the split is undone.
+- [x] **Q-5. Closing the address bar without a choice.** The empty tab closes and the split is undone (Tore, 2026-11-21). Answered (Tore, 2026-11-21).
 - [x] **Q-3. Duplicate and the open tab.** The copy is closed. Answered (Tore, 2026-11-21).
 - [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md). Answered (Tore, 2026-11-21).
 
