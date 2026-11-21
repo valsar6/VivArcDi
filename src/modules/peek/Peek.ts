@@ -16,7 +16,7 @@ import { PeekKeys } from './PeekKeys.js';
 import { parsePeekMessage } from './PeekMessage.js';
 import { PeekPanel } from './PeekPanel.js';
 import type { PanelCommand, PanelSize } from './PeekPanel.js';
-import { TabTiler } from './TabTiler.js';
+import { TabTiler } from '../../shared/tabs/TabTiler.js';
 import { TAB_ID_ATTRIBUTE } from '../../core/browser/Webview.js';
 
 export const OPEN_ATTRIBUTE = 'data-vivarcdi-peek';

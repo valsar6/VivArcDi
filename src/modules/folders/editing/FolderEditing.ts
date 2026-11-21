@@ -1,17 +1,12 @@
 import type { ActiveWorkspace } from '../../../core/workspaces/ActiveWorkspace.js';
 import { ContextMenu } from '../../../core/dom/ContextMenu.js';
-import type { SubmenuItem } from '../../../core/dom/ContextMenu.js';
-import type { BookmarkNode } from '../../../core/browser/bookmarks/BookmarkNode.js';
 import { DragPill } from '../../../shared/dragdrop/DragPill.js';
 import { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { FolderCommands } from '../../../shared/links/FolderCommands.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import type { ModuleContext } from '../../../core/boot/Module.js';
-import { TabDataWriter } from '../../../core/tabs/TabDataWriter.js';
 import { TabMenuItems } from '../favoritelinks/TabMenuItems.js';
 import type { ContextMenuApi } from '../favoritelinks/TabMenuItems.js';
-import { BookmarkCopier } from './BookmarkCopier.js';
-import { BookmarkTrash } from './BookmarkTrash.js';
 import { Toast } from '../../../core/dom/Toast.js';
 import type { ToastKind } from '../../../core/dom/Toast.js';
 import { TodayList } from '../../../shared/tabs/TodayList.js';
@@ -20,12 +15,9 @@ import type { WorkspaceNames } from '../../../core/workspaces/WorkspaceNames.js'
 import type { ClosingLinks } from './ClosingLinks.js';
 import { CreatedLinks } from '../favoritelinks/CreatedLinks.js';
 import { FavoriteShortcut } from '../favoritelinks/FavoriteShortcut.js';
-import { FolderDeletion } from './FolderDeletion.js';
+import { FolderActionsFactory } from './FolderActionsFactory.js';
+import { SavedTabActions } from './SavedTabActions.js';
 import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
-import { FolderDuplication } from './FolderDuplication.js';
-import { FolderLinkTabs } from './FolderLinkTabs.js';
-import { FolderRelocation } from './FolderRelocation.js';
-import type { FolderActions } from './FolderMenuItems.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 import { TabCommands } from '../favoritelinks/TabCommands.js';
@@ -49,7 +41,7 @@ export interface EditingSources {
   /** The links whose tabs are about to close. */
   closing: ClosingLinks;
   /** The workspaces Vivaldi lists. */
-  names: Pick<WorkspaceNames, 'entries'>;
+  names: Pick<WorkspaceNames, 'entries' | 'names' | 'idOf' | 'refresh'>;
   /** The workspace the user is in. */
   active: Pick<ActiveWorkspace, 'current'>;
   /** The root folder of each workspace. */
@@ -65,6 +57,7 @@ export class FolderEditing {
   #sources: EditingSources;
   #favorites: WorkspaceFavorites;
   #stops: Array<() => void> = [];
+  #saved: SavedTabActions;
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
@@ -81,6 +74,7 @@ export class FolderEditing {
     this.#context = context;
     this.#view = view;
     this.#sources = sources;
+    this.#saved = new SavedTabActions(context, sources);
     this.#favorites = new WorkspaceFavorites({
       writer: context.bookmarkWriter,
       links: sources.tabLinks,
@@ -102,6 +96,7 @@ export class FolderEditing {
     const toast = this.#createToast();
     this.#stops.push(
       () => toast.remove(),
+      () => this.#saved.stop(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
       this.#startDrops((text, kind) => toast.show(text, kind)),
@@ -162,41 +157,6 @@ export class FolderEditing {
     return () => shortcut.detach();
   }
 
-  #folderActions(notify: (text: string, kind?: ToastKind) => void): FolderActions {
-    const { tabs, bookmarkWriter, logger } = this.#context;
-    const linkTabs = new FolderLinkTabs({ tabs });
-    const duplication = new FolderDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), notify, logger });
-    const relocation = new FolderRelocation({
-      writer: bookmarkWriter,
-      linkTabs,
-      tabData: TabDataWriter.of(tabs),
-      names: this.#sources.names,
-      active: this.#sources.active,
-      roots: this.#sources.roots,
-      openFolders: this.#sources.openFolders,
-      closing: this.#sources.closing,
-      notify,
-      logger,
-    });
-    const deletion = new FolderDeletion({
-      writer: bookmarkWriter,
-      linkTabs,
-      trash: new BookmarkTrash({ tree: (): Promise<BookmarkNode[]> => bookmarkWriter.tree() }),
-      tabs,
-      openFolders: this.#sources.openFolders,
-      closing: this.#sources.closing,
-      redraw: this.#sources.redraw,
-      notify,
-      logger,
-    });
-    return {
-      rename: (folderId): void => this.#view.edit(folderId),
-      duplicate: (folderId): void => void duplication.duplicate(folderId),
-      moveTo: (folderId): SubmenuItem | null => relocation.submenu(folderId),
-      remove: (folderId): void => void deletion.delete(folderId),
-    };
-  }
-
   #startDrops(notify: (text: string, kind?: ToastKind) => void): () => void {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
     const drops = new FolderDragDrop({
@@ -208,7 +168,8 @@ export class FolderEditing {
       menu: new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
       section: (): HTMLElement => this.#view.element,
       header: (): HTMLElement | null => document.querySelector<HTMLElement>(HEADER_SELECTOR),
-      folderActions: this.#folderActions(notify),
+      linkActions: this.#saved.create(notify),
+      folderActions: FolderActionsFactory.create({ context: this.#context, view: this.#view, sources: this.#sources, notify }),
       tabs,
       writer: bookmarkWriter,
       tabLinks: this.#sources.tabLinks,

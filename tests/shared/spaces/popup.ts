@@ -1,4 +1,4 @@
-import type { FakeNames } from './fakes.js';
+import type { FakeNames } from '../../modules/workspacesync/fakes.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { readFileSync } from 'node:fs';
 

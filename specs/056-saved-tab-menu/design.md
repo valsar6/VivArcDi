@@ -235,11 +235,11 @@ in `src/shared/links/`:
 
 - `item(linkId)` returns `Open in Split View`, or null when the probe F-1 found no way to tile (NFR-2:
   logged once, `Open in Split View is off: <reason>`). It is `disabled` when the selected tab is the tab
-  of the row, or both carry the same `tiling.id` (FR-8). It stays enabled when no tab is selected (FR-9).
+  of the row, or both carry the same `tiling.id` (FR-8). It stays enabled when no ordinary tab is selected (FR-9); a tile of the Favorites grid does not count as one (the tab is linked to a Favorites bookmark: `LinkedTabs` of the favorites module, or the same test the tile module uses; the implementer finds and cites it).
 - `open(linkId)`: with a selected tab, `LinkedTab.of(linkId)` or, when the row has no tab, a new
   tab opened from the bookmark url and linked to it with `WorkspaceTabs.open(url, workspaceId, { bookmarkId })`, as `LinkActivator.#open` does (`LinkActivator.ts` 70-73); T6 checks that it opens without taking the selection; then
-  `tiler.tile([selectedId, rowTabId])` (selected tab left, as in Arc).
-- Without a selected tab (FR-9), as in Arc's recording of 2026-11-21: the tab of the row and a new blank tab
+  `tiler.tile([rowTabId, selectedId])` (the tab that asked for the split is the left pane, Tore 2026-11-21).
+- Without a selected ordinary tab (FR-9), as in Arc's recording of 2026-11-21: Vivaldi's New Tab command runs, and the tab of the row and the new blank tab
   are tiled at once, `tiler.tile([rowTabId, newId])` (row left, blank right), and the address bar is opened
   on the blank tab (`NewTabOpener`); what the user chooses navigates that tab, so it loads in the right
   pane and nothing else is needed. When the blank tab is closed while still blank (Esc, a click elsewhere),

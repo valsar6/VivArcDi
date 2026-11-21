@@ -121,6 +121,11 @@
     }
   }
 
+  > [data-vivarcdi-disabled] {
+    opacity: $menu-disabled-opacity;
+    pointer-events: none;
+  }
+
   > [aria-haspopup] {
     justify-content: space-between;
 

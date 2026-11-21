@@ -4,7 +4,7 @@ import { Logger } from '../../../src/core/support/Logger.js';
 import type { LogSink } from '../../../src/core/support/Logger.js';
 import { WorkspaceTabs } from '../../../src/core/workspaces/WorkspaceTabs.js';
 import { LocalPinned } from '../../../src/modules/workspacesync/LocalPinned.js';
-import type { MenuResult } from '../../../src/modules/workspacesync/MenuCommand.js';
+import type { MenuResult } from '../../../src/shared/spaces/MenuCommand.js';
 import { MissingSpaces } from '../../../src/modules/workspacesync/MissingSpaces.js';
 import { PinnedApplier } from '../../../src/modules/workspacesync/PinnedApplier.js';
 import { SpaceBase } from '../../../src/modules/workspacesync/SpaceBase.js';

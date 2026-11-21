@@ -29,7 +29,15 @@ export class TabTiler {
     );
   }
 
-  async #mark(tabId: number, tiling: Record<string, unknown>): Promise<void> {
+  /**
+   * @param tabIds Tabs to take out of their tiling group.
+   * @returns Resolves once every tab is unmarked.
+   */
+  public async untile(tabIds: number[]): Promise<void> {
+    await Promise.all(tabIds.map((tabId) => this.#mark(tabId, undefined)));
+  }
+
+  async #mark(tabId: number, tiling: Record<string, unknown> | undefined): Promise<void> {
     await this.#writer.write(tabId, (tab) => TabData.with(tab, 'tiling', tiling));
   }
 }

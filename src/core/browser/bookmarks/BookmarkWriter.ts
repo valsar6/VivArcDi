@@ -15,6 +15,8 @@ export interface BookmarkChanges {
   title?: string;
   /** Vivaldi's free text of a bookmark. */
   description?: string;
+  /** The address a link opens. */
+  url?: string;
 }
 
 /** Where a bookmark goes: a folder and a position counted before the bookmark leaves its place; omitted, the end. */
@@ -88,6 +90,15 @@ export class BookmarkWriter {
    */
   public describe(id: string, description: string): Promise<BookmarkNode> {
     return this.#call((api, done) => api.update(id, { description }, done));
+  }
+
+  /**
+   * @param id The link.
+   * @param url The address it opens from now on; its title is left as it is.
+   * @returns The changed bookmark.
+   */
+  public setUrl(id: string, url: string): Promise<BookmarkNode> {
+    return this.#call((api, done) => api.update(id, { url }, done));
   }
 
   /**

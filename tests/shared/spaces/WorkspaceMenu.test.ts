@@ -1,17 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ElementGestures } from '../../../src/modules/workspacesync/ElementGestures.js';
-import type { ViewWindow } from '../../../src/modules/workspacesync/ElementGestures.js';
+import { ElementGestures } from '../../../src/shared/spaces/ElementGestures.js';
+import type { ViewWindow } from '../../../src/shared/spaces/ElementGestures.js';
 import { Logger } from '../../../src/core/support/Logger.js';
-import { ReactEditorOpener } from '../../../src/modules/workspacesync/EditorOpener.js';
-import type { MenuParts } from '../../../src/modules/workspacesync/MenuCommand.js';
-import { Poll } from '../../../src/modules/workspacesync/Poll.js';
-import { QuietMoment } from '../../../src/modules/workspacesync/QuietMoment.js';
-import { ReactInternals } from '../../../src/modules/workspacesync/ReactInternals.js';
-import { WorkspaceCreator } from '../../../src/modules/workspacesync/WorkspaceCreator.js';
-import { WorkspaceMenu } from '../../../src/modules/workspacesync/WorkspaceMenu.js';
+import { ReactEditorOpener } from '../../../src/shared/spaces/EditorOpener.js';
+import type { MenuParts } from '../../../src/shared/spaces/MenuCommand.js';
+import { Poll } from '../../../src/shared/spaces/Poll.js';
+import { QuietMoment } from '../../../src/shared/spaces/QuietMoment.js';
+import { ReactInternals } from '../../../src/shared/spaces/ReactInternals.js';
+import { WorkspaceCreator } from '../../../src/shared/spaces/WorkspaceCreator.js';
+import { WorkspaceMenu } from '../../../src/shared/spaces/WorkspaceMenu.js';
 import { DisabledRenamer, WorkspaceRenamer } from '../../../src/modules/workspacesync/WorkspaceRenamer.js';
-import { CountingSink, FakeNames } from './fakes.js';
+import { CountingSink, FakeNames } from '../../modules/workspacesync/fakes.js';
 import { FakeReactInternals, FakeVivaldiMenu, catalog, fakeView } from './popup.js';
 
 const instantPoll = (): Poll => {

@@ -1,3 +1,3 @@
 """VivArcDi installer: puts the VivArcDi payload into Vivaldi and keeps it there."""
 
-__version__ = "0.64.1"
+__version__ = "0.65.0"

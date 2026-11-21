@@ -1,0 +1,84 @@
+@use 'tokens' as *;
+
+#{$root} #{$dialog} {
+  position: fixed;
+  z-index: $dialog-layer;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $dialog-dim;
+  -webkit-app-region: no-drag;
+
+  #{$dialog-box} {
+    display: flex;
+    flex-direction: column;
+    gap: $dialog-gap;
+    box-sizing: border-box;
+    width: $dialog-width;
+    max-width: 90vw;
+    padding: $dialog-padding;
+    border-radius: $dialog-radius;
+    background-color: var(--colorBg, #{$surface-fallback});
+    box-shadow: $dialog-shadow;
+    color: var(--colorFg, #{$ink-fallback});
+  }
+
+  h2 {
+    margin: 0;
+    font-size: $dialog-title-size;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: $dialog-text-size;
+    opacity: 0.75;
+  }
+
+  label {
+    font-size: $dialog-text-size;
+    font-weight: 500;
+  }
+
+  input {
+    box-sizing: border-box;
+    height: $dialog-field-height;
+    padding: 0 $dialog-gap;
+    border: 1px solid color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $tint-separator, transparent);
+    border-radius: $menu-radius;
+    background: transparent;
+    color: inherit;
+
+    &[data-vivarcdi-invalid] {
+      border-color: $dialog-invalid-ink;
+    }
+  }
+
+  [role='alert'] {
+    min-height: 0;
+    color: $dialog-invalid-ink;
+    font-size: $dialog-text-size;
+  }
+
+  [data-vivarcdi-dialog-actions] {
+    display: flex;
+    justify-content: flex-end;
+    gap: $dialog-gap;
+  }
+
+  button {
+    height: $dialog-button-height;
+    padding: 0 $dialog-padding;
+    border: 0;
+    border-radius: $menu-radius;
+    background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) $tint-hover, transparent);
+    color: inherit;
+    cursor: default;
+  }
+
+  [data-vivarcdi-dialog-confirm] {
+    background-color: var(--colorHighlightBg, #{$accent-fallback});
+    color: var(--colorHighlightFg, #fff);
+  }
+}
