@@ -84,11 +84,16 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 | AC-7 | WHEN `Edit…` is saved with a valid URL, THE bookmark URL SHALL change and its name and icon SHALL stay; WHEN the URL is invalid, THE dialog SHALL stay open. | auto: `edits the pinned url of a saved tab` |
 | AC-8 | WHEN `Replace Pinned URL with Current` is chosen, THE bookmark URL SHALL become the URL of the open tab. | auto: `replaces the pinned url with the current one` |
 | AC-9 | WHILE the open tab has the saved URL or there is no open tab, THE item `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace pinned url when equal` |
-| AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | live: `opens a saved tab in split view` |
-| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | live: `opens a saved tab in split view with a new tab` |
+| AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | manual |
+| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | manual |
 | AC-12 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
 | AC-13 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
 | AC-14 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
+
+AC-10 and AC-11 read from the DOM and `chrome.tabs`, so the design turns them into `live:` scenarios
+(`opens a saved tab in split view`, `opens a saved tab in split view with a new tab`) with the
+scenarios themselves; until then they are `manual`, because the check of 046 fails on a `live:` name
+without a scenario.
 
 ## Out of scope
 
