@@ -1,5 +1,6 @@
 export const TOAST_ATTRIBUTE = 'data-vivarcdi-toast';
 export const VISIBLE_ATTRIBUTE = 'data-vivarcdi-visible';
+export const ACTIONABLE_ATTRIBUTE = 'data-vivarcdi-actionable';
 export const KIND_ATTRIBUTE = 'data-vivarcdi-toast-kind';
 
 export type ToastKind = 'ok' | 'neutral' | 'error';
@@ -30,6 +31,8 @@ export class Toast {
   #timers: ToastTimers;
   #element: HTMLElement | null = null;
   #pending: unknown = null;
+  #onClick: (() => void) | null = null;
+  #listening = false;
 
   /**
    * One short message at the bottom of the window, read out by screen readers. Showing a new
@@ -47,9 +50,16 @@ export class Toast {
    *
    * @param text The message, such as `Copied`.
    * @param kind The icon of the message: `ok` by default, `neutral` for a cancellation, `error` for a failure.
+   * @param onClick What a click on the toast does, once; the toast then hides. Without it the toast ignores the pointer.
    */
-  public show(text: string, kind: ToastKind = 'ok'): void {
+  public show(text: string, kind: ToastKind = 'ok', onClick?: () => void): void {
     const element = this.#ensureElement();
+    if (onClick !== undefined && !this.#listening) {
+      this.#listening = true;
+      element.addEventListener('click', () => this.#click());
+    }
+    this.#onClick = onClick ?? null;
+    element.toggleAttribute(ACTIONABLE_ATTRIBUTE, onClick !== undefined);
     element.textContent = text;
     element.setAttribute(KIND_ATTRIBUTE, kind);
     element.toggleAttribute(VISIBLE_ATTRIBUTE, true);
@@ -62,6 +72,8 @@ export class Toast {
    */
   public remove(): void {
     this.#cancel();
+    this.#listening = false;
+    this.#onClick = null;
     this.#element?.remove();
     this.#element = null;
   }
@@ -76,8 +88,19 @@ export class Toast {
     return this.#element;
   }
 
+  #click(): void {
+    const run = this.#onClick;
+    if (run !== null) {
+      this.#cancel();
+      this.#hide();
+      run();
+    }
+  }
+
   #hide(): void {
     this.#pending = null;
+    this.#element?.toggleAttribute(ACTIONABLE_ATTRIBUTE, false);
+    this.#onClick = null;
     this.#element?.toggleAttribute(VISIBLE_ATTRIBUTE, false);
   }
 

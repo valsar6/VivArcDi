@@ -194,3 +194,46 @@ test('draws a separator that cannot be clicked', () => {
   assert.deepEqual(ran, []);
   assert.notEqual(element?.parentElement, null);
 });
+
+function disabledSetup(): Setup {
+  const dom = new DomDocument();
+  dom.defaultView = { innerWidth: 400, innerHeight: 300 };
+  const ran: string[] = [];
+  const menu = new ContextMenu({ document: asDocument(dom), parent: (): Element => dom.parent as unknown as Element });
+  menu.open(
+    [
+      { label: 'Off', disabled: true, run: (): void => void ran.push('off') },
+      { label: 'On', disabled: false, run: (): void => void ran.push('on') },
+      { label: 'More', items: [{ label: 'Inner', run: (): void => void ran.push('inner') }] },
+    ],
+    50,
+    60,
+  );
+  const element = (): DomNode | undefined => dom.created.find((node) => node.hasAttribute(MENU_ATTRIBUTE));
+  return { dom, menu, ran, element, rows: (): DomNode[] => element()?.children ?? [] };
+}
+
+test('a disabled row is marked and ignores a click while the menu stays open', () => {
+  const { dom, rows, ran } = disabledSetup();
+  assert.equal(rows()[0]?.getAttribute('aria-disabled'), 'true');
+  assert.equal(rows()[0]?.hasAttribute('data-vivarcdi-disabled'), true);
+  rows()[0]?.click();
+  assert.deepEqual(ran, []);
+  assert.equal(menusOpen(dom), 1);
+});
+
+test('a row that is not disabled carries no disabled mark and still runs', () => {
+  const { rows, ran } = disabledSetup();
+  assert.equal(rows()[1]?.hasAttribute('aria-disabled'), false);
+  assert.equal(rows()[1]?.hasAttribute('data-vivarcdi-disabled'), false);
+  rows()[1]?.click();
+  assert.deepEqual(ran, ['on']);
+});
+
+test('a disabled row ignores hover and keeps an open submenu', () => {
+  const { dom, rows } = disabledSetup();
+  rows()[2]?.click();
+  assert.equal(menusOpen(dom), 2);
+  rows()[0]?.bubble({ type: 'mouseenter', target: rows()[0] } as unknown as Event);
+  assert.equal(menusOpen(dom), 2);
+});

@@ -13,6 +13,7 @@
     "styles/space-header.css",
     "styles/today.css",
     "styles/toast.css",
+    "styles/dialog.css",
     "styles/sidebar-look.css",
     "styles/compact-tab-bar.css",
     "styles/column-scroll.css"

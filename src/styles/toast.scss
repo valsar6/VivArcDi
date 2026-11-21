@@ -80,6 +80,11 @@ $toast-hidden-transform: translate(-50%, $toast-shift) scale($toast-scale);
     }
   }
 
+  &[data-vivarcdi-actionable] {
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
   &#{$toast-visible} {
     opacity: 1;
     transform: translate(-50%, 0);

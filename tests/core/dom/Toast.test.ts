@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { KIND_ATTRIBUTE, Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../../src/core/dom/Toast.js';
+import { ACTIONABLE_ATTRIBUTE, KIND_ATTRIBUTE, Toast, TOAST_ATTRIBUTE, VISIBLE_ATTRIBUTE } from '../../../src/core/dom/Toast.js';
 import { FakeElement } from '../../modules/peek/fakes.js';
 import { asDocument, CopyDocument, ManualTimers } from '../../modules/copyurl/fakes.js';
 
@@ -53,4 +53,36 @@ test('toast marks its kind and defaults to ok', () => {
   assert.equal(parent.children[0]?.getAttribute(KIND_ATTRIBUTE), 'neutral');
   toast.show('Failed', 'error');
   assert.equal(parent.children[0]?.getAttribute(KIND_ATTRIBUTE), 'error');
+});
+
+test('a toast with an action runs it once on click and hides', () => {
+  const { toast, parent } = setUp();
+  const ran: string[] = [];
+  toast.show('Tab moved!', 'ok', () => void ran.push('go'));
+  const element = parent.children[0];
+  assert.ok(element?.hasAttribute(ACTIONABLE_ATTRIBUTE));
+  element?.dispatch('click');
+  element?.dispatch('click');
+  assert.deepEqual(ran, ['go']);
+  assert.equal(element?.hasAttribute(VISIBLE_ATTRIBUTE), false);
+});
+
+test('a toast without an action is not actionable and a click does nothing', () => {
+  const { toast, parent } = setUp();
+  toast.show('Copied');
+  const element = parent.children[0];
+  assert.equal(element?.hasAttribute(ACTIONABLE_ATTRIBUTE), false);
+  element?.dispatch('click');
+  assert.ok(element?.hasAttribute(VISIBLE_ATTRIBUTE));
+});
+
+test('a toast shown after an actionable one drops the action', () => {
+  const { toast, parent } = setUp();
+  const ran: string[] = [];
+  toast.show('Tab moved!', 'ok', () => void ran.push('go'));
+  toast.show('Copied');
+  const element = parent.children[0];
+  assert.equal(element?.hasAttribute(ACTIONABLE_ATTRIBUTE), false);
+  element?.dispatch('click');
+  assert.deepEqual(ran, []);
 });
