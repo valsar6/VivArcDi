@@ -63,6 +63,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [053 Single scroll](053-single-scroll/spec.md) | 3 | Implemented |
 | [054 Call Picture in Picture](054-call-pip/spec.md) | 5 | Approved |
 | [055 Open a tile as a web panel](055-tile-web-panel/spec.md) | 3 | Approved |
+| [056 Menu of a saved tab](056-saved-tab-menu/spec.md) | 3 | Draft |
 
 ## Layout
 
