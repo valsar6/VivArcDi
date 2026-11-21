@@ -54,7 +54,7 @@ The lead writes each finding here before the task that depends on it starts. Unt
 | # | Question | Hypothesis | Fallback | Used by |
 |---|---|---|---|---|
 | F-1 | Tile two tabs from code | Writing the same `tiling` group into both tabs with `TabTiler` shows a split view on 8.1 and 8.2, with the selected tab left and the row's tab right | Vivaldi's command through `vivaldi.tabsPrivate` or the `Tile tabs` shortcut event, found by the probe; if none works, NFR-2: the item is not shown | T6 |
-| F-2 | Open the address bar and catch the tab opened from it | `NewTabOpener.open()` makes a blank tab with the address field focused; Enter navigates **that** tab, so `chrome.tabs.onUpdated` with a `url` that is not the new-tab page tells the chosen page; Esc leaves the blank tab, which is closed again when it is still blank and still selected | Vivaldi's `Cmd/Ctrl+L` field on the selected tab and `onCreated`; the probe says which event fires and in what order | T6 |
+| F-2 | Tile a blank new tab with the row's tab and open the address bar on it | `NewTabOpener.open()` makes a blank tab with the address field focused; tiled with the row's tab at once, Enter navigates **that** tab inside the split; the blank tab, still blank when the field closes, is closed again by `chrome.tabs.onRemoved` or `onUpdated` handling, which undoes the split | Vivaldi's `Cmd/Ctrl+L` field on the selected tab and `onCreated`; the probe says which event fires and in what order | T6 |
 | F-3 | Create a workspace | `WorkspaceCreator.create(name)` works when called by a menu command (not at a quiet moment from the sync): `vivaldi.workspaces.list` lists the new name within 3 s | A `deferred` result is retried once; a `failed` one gives the error toast and no move | T7 |
 | F-4 | Move a tab between workspaces | Writing `workspaceId` with `TabData.withWorkspace` into the tab (as 033 does, `FolderRelocation` 101-109) shows the tab in the target and hides it in the source, without switching | None needed; the probe confirms 8.1 and 8.2 | T7 |
 | F-5 | Switch to a workspace from code | Click the row of the workspace in Vivaldi's workspace popup (`workspaceMenuButton`, `workspaceRow` of the catalog), or activate a tab of the target | The toast click only activates the moved tab, which also switches | T7 |
@@ -201,10 +201,12 @@ in `src/shared/links/`:
 - `open(linkId)`: with a selected tab, `LinkedTab.of(linkId)` or, when the row has no tab, a new
   tab opened from the bookmark url and linked to it with `WorkspaceTabs.open(url, workspaceId, { bookmarkId })`, as `LinkActivator.#open` does (`LinkActivator.ts` 70-73); T6 checks that it opens without taking the selection; then
   `tiler.tile([selectedId, rowTabId])` (selected tab left, as in Arc).
-- Without a selected tab (FR-9): `NewTabOpener.open()` and a one-shot listener of `chrome.tabs.onUpdated`
-  for that tab; when its `url` becomes a page other than the new-tab page, `tiler.tile([newId, rowTabId])`
-  and the listener goes. Esc, a click elsewhere that closes the blank tab, a second command or `stop()`
-  remove the listener and tile nothing. Details of the events are F-2.
+- Without a selected tab (FR-9), as in Arc's recording of 2026-11-21: the tab of the row and a new blank tab
+  are tiled at once, `tiler.tile([rowTabId, newId])` (row left, blank right), and the address bar is opened
+  on the blank tab (`NewTabOpener`); what the user chooses navigates that tab, so it loads in the right
+  pane and nothing else is needed. When the blank tab is closed while still blank (Esc, a click elsewhere),
+  a one-shot listener of `chrome.tabs.onRemoved` or `onUpdated` undoes the split (Q-5); a second command or
+  `stop()` remove the listener. Details of the events are F-2.
 - A failure logs and shows `Could not open the split view` as an error toast.
 
 ## Components

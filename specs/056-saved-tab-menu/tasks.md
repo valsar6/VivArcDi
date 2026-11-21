@@ -87,7 +87,8 @@ A task edits only its files. A file in two columns is shared: the owner is named
 - [ ] **T6.** Open in Split View. Starts when F-1 and F-2 are in the design. Tests first (names free, they
   cover FR-8, FR-9 and NFR-2): tiles the selected tab and the row's tab; opens a tab for a row with
   none; disabled when the row is the selected tab or already tiled with it; with no tab selected the
-  address bar opens and the tab chosen is tiled, while Esc tiles nothing; not shown, and logged once,
+  row's tab and a blank tab are tiled at once, the address bar opens on the blank one, and closing it
+  without a choice closes the blank tab and undoes the split; not shown, and logged once,
   when tiling cannot be driven. Then the move of `TabTiler` to `shared/tabs` (peek tests stay green),
   `SplitView` and the slot. Prepares AC-10, AC-11 (scenarios in T8).
 - [ ] **T7a.** Extract the workspace-menu drivers (`Poll`, `ElementGestures`, `EditorOpener`,
