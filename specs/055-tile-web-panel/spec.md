@@ -71,7 +71,7 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
 | AC-5 | WHEN **Close web panel** is chosen, THE module SHALL remove only that panel. | auto: `closes only the panel of the tile` |
 | AC-6 | WHEN a command is chosen, THE tile and the other web panels SHALL stay as they were. | auto: `leaves the tile and other panels untouched` |
 | AC-7 | IF web panels cannot be written, THEN THE menu SHALL NOT show the command. | auto: `hides open as web panel when panels are not writable` |
-| AC-8 | WHEN a web panel is added, THE panel SHALL exist in Vivaldi's panel list of a lab Vivaldi. | live: `a tile becomes a web panel in the panel list` |
+| AC-8 | WHEN a web panel is added, THE panel SHALL exist in Vivaldi's panel list of a lab Vivaldi. | manual |
 | AC-9 | WHEN Tore chooses **Open as web panel** on a tile, THE side panel SHALL open on that site in its mobile layout, and **Close web panel** SHALL close it. | manual |
 
 ## Out of scope
@@ -89,8 +89,7 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
   `faviconUrl` (a data URL), `mobileMode` (`true`) and `zoom` (`1`). `chrome.sidePanel` is not exposed
   in the window. Not yet known: whether writing the array with `vivaldi.prefs.set` makes the panel
   appear in the panel bar, and how the side panel is shown on it. The read-only probe cannot test a
-  write, so task T1 of the design does it in the live scenario `a tile becomes a web panel in the panel list` on the throwaway
-  profile; NFR-1 is the fallback if the write does not take effect.
+  write, so task T1 of the design does it on the throwaway profile; NFR-1 is the fallback if the write does not take effect.
 - [x] **2. Which URL identifies "already a panel"?** The stored URLs differ in form (`https://social.vivaldi.net/`
   and `https://wikipedia.org`), so a trailing slash cannot decide. Accepted by Tore, 2026-11-21: the
   same URL after dropping the fragment and a trailing slash.
