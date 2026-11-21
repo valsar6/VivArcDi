@@ -1,8 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { MenuItem } from '../../../../src/core/dom/ContextMenu.js';
+import { LinkMenuItems } from '../../../../src/modules/folders/editing/LinkMenuItems.js';
 import { RowMenu } from '../../../../src/modules/folders/editing/RowMenu.js';
 import { asDocument, DomDocument } from '../../../core/dom.js';
+
+const NONE = { copyLink: (): null => null, editPinnedPage: async (): Promise<null> => null, openInSplitView: async (): Promise<null> => null, duplicate: (): null => null, moveTo: (): null => null };
+
+const linkItems = (calls: string[]): LinkMenuItems =>
+  new LinkMenuItems({
+    ...NONE,
+    removePin: (id): MenuItem => ({ label: 'Remove pin', run: (): void => void calls.push(`removePin ${id}`) }),
+    tileTab: (id): MenuItem => ({ label: 'Tile tab', run: (): void => void calls.push(`tile ${id}`) }),
+  });
 
 function setup(): { dom: DomDocument; opened: Array<{ labels: string[]; x: number; y: number }>; items: () => MenuItem[]; calls: string[] } {
   const dom = new DomDocument();
@@ -18,10 +28,12 @@ function setup(): { dom: DomDocument; opened: Array<{ labels: string[]; x: numbe
       },
       close: (): void => undefined,
     },
-    removal: { removePin: async (id): Promise<void> => void calls.push(`removePin ${id}`), tile: async (id): Promise<void> => void calls.push(`tile ${id}`) },
+    items: linkItems(calls),
   }).attach();
   return { dom, opened, items: (): MenuItem[] => last, calls };
 }
+
+const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
 const rightClick = (dom: DomDocument, target: unknown): { prevented: number } => {
   const seen = { prevented: 0 };
@@ -29,11 +41,12 @@ const rightClick = (dom: DomDocument, target: unknown): { prevented: number } =>
   return seen;
 };
 
-test('opens the menu of a link row with Remove pin and Tile tab', () => {
+test('opens the menu of a link row with Remove pin and Tile tab', async () => {
   const { dom, opened, items, calls } = setup();
   const row = dom.createElement('div');
   row.setAttribute('data-vivarcdi-link-id', '33');
   assert.equal(rightClick(dom, row).prevented, 1);
+  await settle();
   assert.deepEqual(opened, [{ labels: ['Remove pin', 'Tile tab'], x: 7, y: 9 }]);
   items().forEach((item) => {
     if ('run' in item) {
@@ -52,7 +65,7 @@ test('leaves the menu of anything else to Vivaldi', () => {
 
 test('stops listening on detach', () => {
   const dom = new DomDocument();
-  const row = new RowMenu({ document: asDocument(dom), menu: { open: (): void => undefined, close: (): void => undefined }, removal: { removePin: async (): Promise<void> => undefined, tile: async (): Promise<void> => undefined } });
+  const row = new RowMenu({ document: asDocument(dom), menu: { open: (): void => undefined, close: (): void => undefined }, items: linkItems([]) });
   row.attach();
   row.detach();
   assert.equal([...dom.listeners.values()].flat().length, 0);

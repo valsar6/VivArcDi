@@ -1,14 +1,13 @@
-import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from '../../../shared/tabs/CommandLabels.js';
-import type { ContextMenu, MenuItem } from '../../../core/dom/ContextMenu.js';
+import type { ContextMenu } from '../../../core/dom/ContextMenu.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
-import type { LinkRemoval } from '../favoritelinks/LinkRemoval.js';
+import type { LinkMenuItems } from './LinkMenuItems.js';
 import { LINK_ATTRIBUTE } from '../dragdrop/DropTargets.js';
 
 export interface RowMenuDependencies {
   /** The document of Vivaldi's browser window. */
   document: Document;
   menu: Pick<ContextMenu, 'open' | 'close'>;
-  removal: Pick<LinkRemoval, 'removePin' | 'tile'>;
+  items: Pick<LinkMenuItems, 'for'>;
 }
 
 export class RowMenu {
@@ -16,9 +15,8 @@ export class RowMenu {
   #onContext = (event: Event): void => this.#context(event as MouseEvent);
 
   /**
-   * The menu of a link row of the folders section, opened with a right click: Remove pin puts the
-   * page back among today's tabs, and Tile tab makes it a tile of the Favorites grid. Vivaldi's own
-   * menu is cancelled for the link rows of bookmarks only.
+   * The menu of a link row of the folders section, opened with a right click, with the items of
+   * `LinkMenuItems`. Vivaldi's own menu is cancelled for the link rows of bookmarks only.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -48,11 +46,8 @@ export class RowMenu {
     }
     event.preventDefault();
     event.stopPropagation();
-    const { menu, removal } = this.#deps;
-    const items: MenuItem[] = [
-      { label: REMOVE_PIN_LABEL, run: (): void => void removal.removePin(id) },
-      { label: TILE_TAB_LABEL, run: (): void => void removal.tile(id) },
-    ];
-    menu.open(items, event.clientX, event.clientY);
+    const { menu, items } = this.#deps;
+    const { clientX, clientY } = event;
+    void items.for(id).then((list) => menu.open(list, clientX, clientY));
   }
 }

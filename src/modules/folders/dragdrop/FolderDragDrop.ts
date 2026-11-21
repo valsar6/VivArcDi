@@ -1,5 +1,5 @@
 import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
-import type { ContextMenu } from '../../../core/dom/ContextMenu.js';
+import type { ContextMenu, MenuItem } from '../../../core/dom/ContextMenu.js';
 import type { DragPill } from '../../../shared/dragdrop/DragPill.js';
 import { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
@@ -19,6 +19,9 @@ import { PanelBookmarkDrop } from './PanelBookmarkDrop.js';
 import { FolderMenu } from '../editing/FolderMenu.js';
 import { FolderMenuItems } from '../editing/FolderMenuItems.js';
 import type { FolderActions } from '../editing/FolderMenuItems.js';
+import { LinkMenuItems } from '../editing/LinkMenuItems.js';
+import type { LinkActions } from '../editing/LinkMenuItems.js';
+import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from '../../../shared/tabs/CommandLabels.js';
 import { RowMenu } from '../editing/RowMenu.js';
 import { TabDrops } from './TabDrops.js';
 import type { TabLinks } from '../links/TabLinks.js';
@@ -41,6 +44,8 @@ export interface FolderDragDropDependencies {
   section: () => HTMLElement;
   /** Gives the element of the space header, if there is one. */
   header: () => HTMLElement | null;
+  /** What the items of the link menu do, except Remove pin and Tile tab. */
+  linkActions: Omit<LinkActions, 'removePin' | 'tileTab'>;
   /** What the items of the folder menu do. */
   folderActions: FolderActions;
   tabs: LinkRemovalTabs;
@@ -76,7 +81,7 @@ export class FolderDragDrop {
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }: FolderDragDropDependencies) {
+  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, linkActions, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }: FolderDragDropDependencies) {
     const targets = new DropTargets(section, header);
     const drops = new TabDrops({ tabs, favorites, indexBefore, logger });
     this.#release = new TabDragRelease<DropTarget>({
@@ -111,10 +116,18 @@ export class FolderDragDrop {
       onEnd: (): void => removal.clear(),
       pill,
     });
-    this.#menus = [new RowMenu({ document, menu, removal }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
+    this.#menus = [new RowMenu({ document, menu, items: FolderDragDrop.#linkItems(linkActions, removal) }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
     this.#zone = LinkDropZone.of(document);
     this.#linkTargets = new FolderLinkTargets({ targets, place: new DropPlace(indexBefore), favorites, logger });
     this.#panelDrop = new PanelBookmarkDrop({ document, targets, place: new DropPlace(indexBefore), favorites });
+  }
+
+  static #linkItems(actions: Omit<LinkActions, 'removePin' | 'tileTab'>, removal: Pick<LinkRemoval, 'removePin' | 'tile'>): LinkMenuItems {
+    return new LinkMenuItems({
+      ...actions,
+      removePin: (linkId): MenuItem => ({ label: REMOVE_PIN_LABEL, run: (): void => void removal.removePin(linkId) }),
+      tileTab: (linkId): MenuItem => ({ label: TILE_TAB_LABEL, run: (): void => void removal.tile(linkId) }),
+    });
   }
 
   /**
