@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-21 (revised 2026-11-21, to approve again) |
+| Approved | Tore, 2026-11-21 (revised after the probes, approved again 2026-11-21) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -93,11 +93,11 @@ Right-click on a tile opens VivArcDi's menu (031 FR-4). It gains **Open as web p
   button), and submitting it makes Vivaldi create the panel, read its title and icon from the page and
   open the side panel on it. Decided by Tore, 2026-11-21: drive that form, with its elements named in
   the selector catalog.
-- [ ] **4. Can the command close a panel?** The panel bar's **Customize** popup only toggles a panel's
+- [x] **4. Can the command close a panel?** The panel bar's **Customize** popup only toggles a panel's
   visibility; its only delete control is for separators, and the panel button's context menu is
   native, so code cannot reach it. The side panel's own close button only hides the panel. Proposed:
   no close command; the already-a-panel menu item **Show web panel** replaces **Close web panel**, and
-  removal stays with Vivaldi (this revision). To confirm by Tore.
+  removal stays with Vivaldi (this revision). Accepted by Tore, 2026-11-21.
 - [x] **2. Which URL identifies "already a panel"?** The stored URLs differ in form (`https://social.vivaldi.net/`
   and `https://wikipedia.org`), so a trailing slash cannot decide. Accepted by Tore, 2026-11-21: the
   same URL after dropping the fragment and a trailing slash.
