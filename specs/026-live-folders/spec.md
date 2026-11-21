@@ -132,7 +132,7 @@ touched, because a live folder is not a bookmark folder.
 - **FR-9.** Revision of 2026-11-12 (Tore, after the first try on Vivaldi): the connect panel follows
   the theme and confirms its two buttons with the toast of 004 (AC-25 to AC-27). The label of the main
   button takes its color from the theme's highlight foreground, so it stays readable when a dark theme
-  has a light accent (AC-28, issue #237).
+  has a light accent (AC-28 and AC-29, issue #237).
 - **FR-8.** The installer command `live-folders token` of the first revision is removed, and so is the
   token file.
 - **FR-6.** A failed refresh keeps the last rows and marks the folder with a warning.
@@ -170,6 +170,7 @@ touched, because a live folder is not a bookmark folder.
 | AC-26 | WHEN the user presses `Cancel` in the connect panel, THE flow SHALL stop and the toast `GitHub connection cancelled` SHALL appear. | auto: `confirms a cancelled connection with a toast` |
 | AC-27 | THE connect panel SHALL follow the colors of the theme: the code on its own line, `Copy code and open GitHub` as the main button in the accent color, `Cancel` as a quiet text button, each label on one line. | manual |
 | AC-28 | THE label of the main button of the connect panel SHALL keep a contrast of at least 4.5:1 with its background, at rest and on hover, on light and dark themes. | auto: `keeps the main button label readable on light and dark themes` |
+| AC-29 | THE label of the main button of the connect panel SHALL be readable in Vivaldi on a dark theme with a light accent. | live: `the connect button stays readable on a dark theme` |
 
 ## Out of scope
 
