@@ -1,0 +1,32 @@
+import type { Scenario } from '../../../scripts/live/scenarios/ScenarioCatalog.js';
+import { chooseSplitView, createSavedTab, removeSavedTab, sideBySide, tiledTabs, waitForTiledWebviews, WAIT_MS } from './savedTab.js';
+
+const scenario: Scenario = {
+  name: 'opens a saved tab in split view',
+  spec: '056',
+  run: async (driver) => {
+    const selected = await driver.evaluate<number>(`chrome.tabs.create({ url: 'about:blank#selected', active: true }).then((tab) => tab.id)`);
+    const saved = await createSavedTab(driver, 'https://example.com/#056-split');
+    try {
+      await chooseSplitView(driver, saved);
+      await driver.waitFor(`chrome.tabs.query({ currentWindow: true }).then((tabs) => tabs.filter((tab) => JSON.parse(tab.vivExtData || '{}').tiling).length === 2)`, WAIT_MS);
+      const tabs = await tiledTabs(driver);
+      const row = tabs.find((tab) => tab.bookmarkId === saved.bookmarkId);
+      const chosen = tabs.find((tab) => tab.id === selected);
+      if (row === undefined || chosen === undefined) {
+        throw new Error('the saved tab or the selected tab is missing after the command');
+      }
+      if (row.group === null || row.group !== chosen.group) {
+        throw new Error(`the saved tab (tiling ${row.group}) and the selected tab (tiling ${chosen.group}) are not in one group`);
+      }
+      await waitForTiledWebviews(driver, [row.id, selected]);
+      if (!(await sideBySide(driver, selected, row.id))) {
+        throw new Error('the two pages are tiled but not side by side');
+      }
+    } finally {
+      await removeSavedTab(driver, saved);
+    }
+  },
+};
+
+export default scenario;
