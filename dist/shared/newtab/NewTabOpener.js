@@ -21,9 +21,18 @@ class NewTabOpener {
    * @throws {Error} When the window or the tab cannot be reached.
    */
   async open() {
-    const windowId = await this.#runtime.currentWindowId();
-    await this.#tabs.create({ windowId });
+    await this.create();
     this.#address.focus();
+  }
+  /**
+   * Opens a blank tab in this window without touching the address field.
+   *
+   * @returns The new tab.
+   * @throws {Error} When the window or the tab cannot be reached.
+   */
+  async create() {
+    const windowId = await this.#runtime.currentWindowId();
+    return this.#tabs.create({ windowId });
   }
 }
 export {

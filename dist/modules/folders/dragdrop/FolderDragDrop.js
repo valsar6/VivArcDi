@@ -12,6 +12,8 @@ import { LinkRemoval } from "../favoritelinks/LinkRemoval.js";
 import { PanelBookmarkDrop } from "./PanelBookmarkDrop.js";
 import { FolderMenu } from "../editing/FolderMenu.js";
 import { FolderMenuItems } from "../editing/FolderMenuItems.js";
+import { LinkMenuItems } from "../editing/LinkMenuItems.js";
+import { REMOVE_PIN_LABEL, TILE_TAB_LABEL } from "../../../shared/tabs/CommandLabels.js";
 import { RowMenu } from "../editing/RowMenu.js";
 import { TabDrops } from "./TabDrops.js";
 class FolderDragDrop {
@@ -34,7 +36,7 @@ class FolderDragDrop {
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }) {
+  constructor({ document, wrapperSelector, stripSelector, skipSelector, pill, menu, linkActions, folderActions, section, header, tabs, writer, tabLinks, favorites, notify, indexBefore, logger }) {
     const targets = new DropTargets(section, header);
     const drops = new TabDrops({ tabs, favorites, indexBefore, logger });
     this.#release = new TabDragRelease({
@@ -69,10 +71,17 @@ class FolderDragDrop {
       onEnd: () => removal.clear(),
       pill
     });
-    this.#menus = [new RowMenu({ document, menu, removal }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
+    this.#menus = [new RowMenu({ document, menu, items: FolderDragDrop.#linkItems(linkActions, removal) }), new FolderMenu({ document, menu, items: new FolderMenuItems(folderActions) })];
     this.#zone = LinkDropZone.of(document);
     this.#linkTargets = new FolderLinkTargets({ targets, place: new DropPlace(indexBefore), favorites, logger });
     this.#panelDrop = new PanelBookmarkDrop({ document, targets, place: new DropPlace(indexBefore), favorites });
+  }
+  static #linkItems(actions, removal) {
+    return new LinkMenuItems({
+      ...actions,
+      removePin: (linkId) => ({ label: REMOVE_PIN_LABEL, run: () => void removal.removePin(linkId) }),
+      tileTab: (linkId) => ({ label: TILE_TAB_LABEL, run: () => void removal.tile(linkId) })
+    });
   }
   /**
    * Starts following the mouse and the drag events, and offers the places to `LinkDropZone`.

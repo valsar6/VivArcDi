@@ -3,20 +3,15 @@ import { DragPill } from "../../../shared/dragdrop/DragPill.js";
 import { FavoriteDropZone } from "../../../shared/dragdrop/FavoriteDropZone.js";
 import { FolderCommands } from "../../../shared/links/FolderCommands.js";
 import { LinkId } from "../../../shared/links/LinkId.js";
-import { TabDataWriter } from "../../../core/tabs/TabDataWriter.js";
 import { TabMenuItems } from "../favoritelinks/TabMenuItems.js";
-import { BookmarkCopier } from "./BookmarkCopier.js";
-import { BookmarkTrash } from "./BookmarkTrash.js";
 import { Toast } from "../../../core/dom/Toast.js";
 import { TodayList } from "../../../shared/tabs/TodayList.js";
 import { VirtualFolders } from "../../../shared/links/VirtualFolders.js";
 import { CreatedLinks } from "../favoritelinks/CreatedLinks.js";
 import { FavoriteShortcut } from "../favoritelinks/FavoriteShortcut.js";
-import { FolderDeletion } from "./FolderDeletion.js";
+import { FolderActionsFactory } from "./FolderActionsFactory.js";
+import { SavedTabActions } from "./SavedTabActions.js";
 import { FolderDragDrop } from "../dragdrop/FolderDragDrop.js";
-import { FolderDuplication } from "./FolderDuplication.js";
-import { FolderLinkTabs } from "./FolderLinkTabs.js";
-import { FolderRelocation } from "./FolderRelocation.js";
 import { TabCommands } from "../favoritelinks/TabCommands.js";
 import { WorkspaceFavorites } from "../favoritelinks/WorkspaceFavorites.js";
 const TOAST_MS = 2e3;
@@ -27,6 +22,7 @@ class FolderEditing {
   #sources;
   #favorites;
   #stops = [];
+  #saved;
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
    * for a folder, Cmd/Ctrl+D, a tab released over the section or the header, a link row dragged out
@@ -42,6 +38,7 @@ class FolderEditing {
     this.#context = context;
     this.#view = view;
     this.#sources = sources;
+    this.#saved = new SavedTabActions(context, sources);
     this.#favorites = new WorkspaceFavorites({
       writer: context.bookmarkWriter,
       links: sources.tabLinks,
@@ -62,6 +59,7 @@ class FolderEditing {
     const toast = this.#createToast();
     this.#stops.push(
       () => toast.remove(),
+      () => this.#saved.stop(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
       this.#startDrops((text, kind) => toast.show(text, kind)),
@@ -116,40 +114,6 @@ class FolderEditing {
     shortcut.attach();
     return () => shortcut.detach();
   }
-  #folderActions(notify) {
-    const { tabs, bookmarkWriter, logger } = this.#context;
-    const linkTabs = new FolderLinkTabs({ tabs });
-    const duplication = new FolderDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), notify, logger });
-    const relocation = new FolderRelocation({
-      writer: bookmarkWriter,
-      linkTabs,
-      tabData: TabDataWriter.of(tabs),
-      names: this.#sources.names,
-      active: this.#sources.active,
-      roots: this.#sources.roots,
-      openFolders: this.#sources.openFolders,
-      closing: this.#sources.closing,
-      notify,
-      logger
-    });
-    const deletion = new FolderDeletion({
-      writer: bookmarkWriter,
-      linkTabs,
-      trash: new BookmarkTrash({ tree: () => bookmarkWriter.tree() }),
-      tabs,
-      openFolders: this.#sources.openFolders,
-      closing: this.#sources.closing,
-      redraw: this.#sources.redraw,
-      notify,
-      logger
-    });
-    return {
-      rename: (folderId) => this.#view.edit(folderId),
-      duplicate: (folderId) => void duplication.duplicate(folderId),
-      moveTo: (folderId) => relocation.submenu(folderId),
-      remove: (folderId) => void deletion.delete(folderId)
-    };
-  }
   #startDrops(notify) {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
     const drops = new FolderDragDrop({
@@ -161,7 +125,8 @@ class FolderEditing {
       menu: new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body }),
       section: () => this.#view.element,
       header: () => document.querySelector(HEADER_SELECTOR),
-      folderActions: this.#folderActions(notify),
+      linkActions: this.#saved.create(notify),
+      folderActions: FolderActionsFactory.create({ context: this.#context, view: this.#view, sources: this.#sources, notify }),
       tabs,
       writer: bookmarkWriter,
       tabLinks: this.#sources.tabLinks,

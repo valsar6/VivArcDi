@@ -109,6 +109,10 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-menu] > [role=menuitemcheckbox]:hover {
   background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-menu] > [data-vivarcdi-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-menu] > [aria-haspopup] {
   justify-content: space-between;
 }

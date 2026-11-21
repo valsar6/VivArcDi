@@ -24,6 +24,13 @@ class TabTiler {
       tabIds.map((tabId, index) => this.#mark(tabId, { id, index, layout: "row", type: "selection" }))
     );
   }
+  /**
+   * @param tabIds Tabs to take out of their tiling group.
+   * @returns Resolves once every tab is unmarked.
+   */
+  async untile(tabIds) {
+    await Promise.all(tabIds.map((tabId) => this.#mark(tabId, void 0)));
+  }
   async #mark(tabId, tiling) {
     await this.#writer.write(tabId, (tab) => TabData.with(tab, "tiling", tiling));
   }

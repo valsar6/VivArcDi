@@ -10,7 +10,7 @@ import { PEEK_OPTIONS } from "./PeekOptions.js";
 import { PeekKeys } from "./PeekKeys.js";
 import { parsePeekMessage } from "./PeekMessage.js";
 import { PeekPanel } from "./PeekPanel.js";
-import { TabTiler } from "./TabTiler.js";
+import { TabTiler } from "../../shared/tabs/TabTiler.js";
 import { TAB_ID_ATTRIBUTE } from "../../core/browser/Webview.js";
 const OPEN_ATTRIBUTE = "data-vivarcdi-peek";
 const WEB_URL = /^https?:\/\//i;

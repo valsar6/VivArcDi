@@ -57,6 +57,10 @@
   background-color: #c2412d;
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.250 2.500h1.500v6.500h-1.500zM7.250 10.500h1.500V12h-1.500z'/%3E%3C/svg%3E");
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-toast][data-vivarcdi-actionable] {
+  cursor: pointer;
+  pointer-events: auto;
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-toast][data-vivarcdi-visible] {
   opacity: 1;
   transform: translate(-50%, 0);

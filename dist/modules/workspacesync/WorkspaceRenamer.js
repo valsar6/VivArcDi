@@ -1,4 +1,4 @@
-import { MenuCommand } from "./MenuCommand.js";
+import { MenuCommand } from "../../shared/spaces/MenuCommand.js";
 class WorkspaceRenamer extends MenuCommand {
   /**
    * Renames a workspace through the inline editor of Vivaldi's menu: opens the menu, opens the

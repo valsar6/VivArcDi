@@ -1,5 +1,6 @@
 const TOAST_ATTRIBUTE = "data-vivarcdi-toast";
 const VISIBLE_ATTRIBUTE = "data-vivarcdi-visible";
+const ACTIONABLE_ATTRIBUTE = "data-vivarcdi-actionable";
 const KIND_ATTRIBUTE = "data-vivarcdi-toast-kind";
 const defaultTimers = {
   set: (run, delayMs) => setTimeout(run, delayMs),
@@ -10,6 +11,8 @@ class Toast {
   #timers;
   #element = null;
   #pending = null;
+  #onClick = null;
+  #listening = false;
   /**
    * One short message at the bottom of the window, read out by screen readers. Showing a new
    * message while one is visible replaces its text and starts its time again.
@@ -25,9 +28,16 @@ class Toast {
    *
    * @param text The message, such as `Copied`.
    * @param kind The icon of the message: `ok` by default, `neutral` for a cancellation, `error` for a failure.
+   * @param onClick What a click on the toast does, once; the toast then hides. Without it the toast ignores the pointer.
    */
-  show(text, kind = "ok") {
+  show(text, kind = "ok", onClick) {
     const element = this.#ensureElement();
+    if (onClick !== void 0 && !this.#listening) {
+      this.#listening = true;
+      element.addEventListener("click", () => this.#click());
+    }
+    this.#onClick = onClick ?? null;
+    element.toggleAttribute(ACTIONABLE_ATTRIBUTE, onClick !== void 0);
     element.textContent = text;
     element.setAttribute(KIND_ATTRIBUTE, kind);
     element.toggleAttribute(VISIBLE_ATTRIBUTE, true);
@@ -39,6 +49,8 @@ class Toast {
    */
   remove() {
     this.#cancel();
+    this.#listening = false;
+    this.#onClick = null;
     this.#element?.remove();
     this.#element = null;
   }
@@ -51,8 +63,18 @@ class Toast {
     }
     return this.#element;
   }
+  #click() {
+    const run = this.#onClick;
+    if (run !== null) {
+      this.#cancel();
+      this.#hide();
+      run();
+    }
+  }
   #hide() {
     this.#pending = null;
+    this.#element?.toggleAttribute(ACTIONABLE_ATTRIBUTE, false);
+    this.#onClick = null;
     this.#element?.toggleAttribute(VISIBLE_ATTRIBUTE, false);
   }
   #cancel() {
@@ -63,6 +85,7 @@ class Toast {
   }
 }
 export {
+  ACTIONABLE_ATTRIBUTE,
   KIND_ATTRIBUTE,
   TOAST_ATTRIBUTE,
   Toast,

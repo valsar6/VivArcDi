@@ -43,6 +43,14 @@ class BookmarkWriter {
     return this.#call((api, done) => api.update(id, { description }, done));
   }
   /**
+   * @param id The link.
+   * @param url The address it opens from now on; its title is left as it is.
+   * @returns The changed bookmark.
+   */
+  setUrl(id, url) {
+    return this.#call((api, done) => api.update(id, { url }, done));
+  }
+  /**
    * @param id The bookmark or folder.
    * @param destination The folder and the position it goes to.
    * @returns The moved bookmark.

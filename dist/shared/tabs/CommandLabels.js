@@ -4,7 +4,17 @@ const REMOVE_PIN_LABEL = "Remove pin";
 const UNTILE_TAB_LABEL = "Untile tab";
 const OPEN_WEB_PANEL_LABEL = "Open as web panel";
 const SHOW_WEB_PANEL_LABEL = "Show web panel";
+const COPY_LINK_LABEL = "Copy Link";
+const EDIT_PINNED_PAGE_LABEL = "Edit Pinned Page";
+const OPEN_IN_SPLIT_VIEW_LABEL = "Open in Split View";
+const DUPLICATE_LINK_LABEL = "Duplicate";
+const MOVE_TO_LABEL = "Move to";
 export {
+  COPY_LINK_LABEL,
+  DUPLICATE_LINK_LABEL,
+  EDIT_PINNED_PAGE_LABEL,
+  MOVE_TO_LABEL,
+  OPEN_IN_SPLIT_VIEW_LABEL,
   OPEN_WEB_PANEL_LABEL,
   PIN_TAB_LABEL,
   REMOVE_PIN_LABEL,

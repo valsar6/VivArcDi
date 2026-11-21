@@ -531,6 +531,14 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   **Untile tab** (the page becomes the first tab of today, and the tile leaves every workspace) and
   **Pin tab**. The page is never lost, and the bookmark rule above applies to Remove pin and Untile tab.
   If Vivaldi's menu of a tab cannot be extended, the reason is logged and Cmd/Ctrl+D and the drags remain.
+- **Menu of a saved tab.** Right-click a link row for the items of Arc besides Remove pin and Tile tab:
+  **Copy Link** (the saved address, with a toast), **Edit Pinned Page** (**Edit…** opens a dialog to type
+  the address the row opens first, **Replace Pinned URL with Current** takes the address of the open tab,
+  and is disabled while the two are the same), **Open in Split View** (the page of the row beside the
+  selected tab; with no tab selected, beside a new empty tab with the address bar open on it),
+  **Duplicate** (a closed copy right below the row) and **Move to** (the workspaces with a check on the
+  current one, and **New Space…**; only the tab of the row moves, and the toast "Tab moved! Click to go
+  there." switches to the workspace). Share and Mute of Arc are not reproduced.
 - **Open a tile as a web panel.** Right-click a tile of an `http` or `https` page and choose **Open as web
   panel**: VivArcDi fills Vivaldi's own Add web panel form with the page, so Vivaldi creates the panel and
   opens the side panel on it. A page that already is a web panel shows **Show web panel** instead, which

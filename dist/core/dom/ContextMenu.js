@@ -1,5 +1,6 @@
 const MENU_ATTRIBUTE = "data-vivarcdi-menu";
 const CHECKED_ATTRIBUTE = "data-vivarcdi-checked";
+const DISABLED_ATTRIBUTE = "data-vivarcdi-disabled";
 const EDGE_PX = 4;
 class ContextMenu {
   #deps;
@@ -10,7 +11,7 @@ class ContextMenu {
    * VivArcDi's own menu, drawn at the pointer for the rows and tiles that VivArcDi owns. It stays
    * inside the window, and closes on Escape, on a click elsewhere and after a command. It is
    * outside the window drag region. An item can show a check mark, and an item with items opens
-   * a submenu to its side while the pointer is on it.
+   * a submenu to its side while the pointer is on it. A disabled item does nothing and keeps the menu open.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -73,6 +74,11 @@ class ContextMenu {
       row.setAttribute("aria-checked", String(item.checked));
       row.toggleAttribute(CHECKED_ATTRIBUTE, item.checked);
     }
+    if (item.disabled === true) {
+      row.setAttribute("aria-disabled", "true");
+      row.setAttribute(DISABLED_ATTRIBUTE, "");
+      return;
+    }
     row.addEventListener("mouseenter", () => this.#closeAbove(level));
     row.addEventListener("click", () => {
       this.close();
@@ -116,5 +122,6 @@ class ContextMenu {
 export {
   CHECKED_ATTRIBUTE,
   ContextMenu,
+  DISABLED_ATTRIBUTE,
   MENU_ATTRIBUTE
 };
