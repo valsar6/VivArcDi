@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-21 (pull request #241) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -93,7 +93,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 AC-10 and AC-11 read from the DOM and `chrome.tabs`, so the design turns them into `live:` scenarios
 (`opens a saved tab in split view`, `opens a saved tab in split view with a new tab`) with the
 scenarios themselves; until then they are `manual`, because the check of 046 fails on a `live:` name
-without a scenario.
+without a scenario. The task that writes the scenarios changes AC-10 and AC-11 to `live:` in the same
+pull request ([tasks.md](tasks.md) T8).
 
 ## Out of scope
 
@@ -106,10 +107,10 @@ without a scenario.
 
 ## Open questions
 
-- [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it.
-- [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9).
-- [x] **Q-3. Duplicate and the open tab.** The copy is closed (Tore, 2026-11-21).
-- [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md) (Tore, 2026-11-21).
+- [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it. Answered (Tore, 2026-11-21).
+- [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9). Answered (Tore, 2026-11-21).
+- [x] **Q-3. Duplicate and the open tab.** The copy is closed. Answered (Tore, 2026-11-21).
+- [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md). Answered (Tore, 2026-11-21).
 
 ## References
 
