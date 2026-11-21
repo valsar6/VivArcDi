@@ -85,6 +85,19 @@ Two read-only probes, kept outside the repository as in 055.
 - **T7a and T7b are one task (T7).** Moving the workspace-menu drivers to `src/shared/spaces/` alone
   leaves files used by one module, which fails the same check.
 - `FolderEditing.ts` passed the 200 lines limit; `#folderActions` moved to `FolderActionsFactory.ts`.
+- The five slots of the menu moved out of `FolderEditing.ts` into `SavedTabActions.ts`, for the same limit.
+- `WorkspaceRenamer` stays in `src/modules/workspacesync/`: only `workspacesync` uses it, so the check of
+  034 refuses it in `src/shared/spaces/`. The other drivers moved (T7).
+- Move to: the toast `Tab moved! Click to go there.` has the click action only when the row has an open tab
+  (the click activates that tab, which switches the workspace); without a tab it is `Moved "<name>" to
+  <space>` with no action. `deferred` and `failed` creations of a space give `Could not create the space`
+  and move nothing, with no retry.
+- Open in Split View: the tab of the row is the left pane; the right pane is the selected tab when it is an
+  ordinary tab (a tab with `vivarcdi.favoriteId` is a Favorites tile tab and is not), otherwise Vivaldi's New Tab
+  command runs and the new empty tab is the right pane with the address bar focused (Tore, 2026-11-21).
+  `NewTabOpener` gained `create()`.
+- Live scenarios (T8) wait for the real state with an async poll, not `driver.waitFor` on a promise, and read
+  the class `tiled` on the `.webpageview` that holds the webview.
 
 ## The menu (FR-1)
 
