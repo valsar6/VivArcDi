@@ -53,8 +53,12 @@ dialog, the disabled states and the address bar of an empty selection are those 
 | AC-2 | WHEN Duplicate is chosen on a tile, THE module SHALL add a copy right after it in the grid. | auto: `duplicates a tile right after it` |
 | AC-3 | WHEN `Edit…` is saved with a valid URL on a tile, THE URL SHALL change in every workspace and the name and icon SHALL stay. | auto: `edits the pinned url of a tile` |
 | AC-4 | WHEN `Replace Pinned URL with Current` is chosen on a tile, THE URL SHALL become the URL of the open tab. | auto: `replaces the pinned url of a tile with the current one` |
-| AC-5 | WHEN `Open in Split View` is chosen on a tile, THE page of the tile and the selected tab SHALL be tiled side by side. | live: `opens a tile in split view` |
+| AC-5 | WHEN `Open in Split View` is chosen on a tile, THE page of the tile and the selected tab SHALL be tiled side by side. | manual |
 | AC-6 | WHEN Tore uses the new items on a tile, THE results SHALL be those of the saved tabs and show in every workspace. | manual |
+
+AC-5 becomes the `live:` scenario `opens a tile in split view` with the design, together with the
+scenario itself; until then it is `manual`, because the check of 046 fails on a `live:` name without a
+scenario.
 
 ## Out of scope
 
