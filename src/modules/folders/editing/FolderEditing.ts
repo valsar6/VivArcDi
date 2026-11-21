@@ -1,12 +1,10 @@
 import type { ActiveWorkspace } from '../../../core/workspaces/ActiveWorkspace.js';
 import { ContextMenu } from '../../../core/dom/ContextMenu.js';
-import type { MenuItem } from '../../../core/dom/ContextMenu.js';
 import { DragPill } from '../../../shared/dragdrop/DragPill.js';
 import { FavoriteDropZone } from '../../../shared/dragdrop/FavoriteDropZone.js';
 import { FolderCommands } from '../../../shared/links/FolderCommands.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import type { ModuleContext } from '../../../core/boot/Module.js';
-import { TextCopier } from '../../../shared/clipboard/TextCopier.js';
 import { TabMenuItems } from '../favoritelinks/TabMenuItems.js';
 import type { ContextMenuApi } from '../favoritelinks/TabMenuItems.js';
 import { Toast } from '../../../core/dom/Toast.js';
@@ -14,22 +12,12 @@ import type { ToastKind } from '../../../core/dom/Toast.js';
 import { TodayList } from '../../../shared/tabs/TodayList.js';
 import { VirtualFolders } from '../../../shared/links/VirtualFolders.js';
 import type { WorkspaceNames } from '../../../core/workspaces/WorkspaceNames.js';
-import { BookmarkCopier } from './BookmarkCopier.js';
 import type { ClosingLinks } from './ClosingLinks.js';
 import { CreatedLinks } from '../favoritelinks/CreatedLinks.js';
 import { FavoriteShortcut } from '../favoritelinks/FavoriteShortcut.js';
 import { FolderActionsFactory } from './FolderActionsFactory.js';
+import { SavedTabActions } from './SavedTabActions.js';
 import { FolderDragDrop } from '../dragdrop/FolderDragDrop.js';
-import { LinkClipboard } from './LinkClipboard.js';
-import { LinkDuplication } from './LinkDuplication.js';
-import { LinkExtras } from './LinkExtras.js';
-import { LinkedTab } from './LinkedTab.js';
-import { LinkRelocationFactory } from './LinkRelocationFactory.js';
-import type { LinkRelocation } from './LinkRelocation.js';
-import type { LinkActions } from './LinkMenuItems.js';
-import { PinnedAddress } from './PinnedAddress.js';
-import { PromptDialog } from './PromptDialog.js';
-import { SplitView } from './SplitView.js';
 import type { FolderSectionView } from '../view/FolderSectionView.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 import { TabCommands } from '../favoritelinks/TabCommands.js';
@@ -69,9 +57,7 @@ export class FolderEditing {
   #sources: EditingSources;
   #favorites: WorkspaceFavorites;
   #stops: Array<() => void> = [];
-  #pinned: PinnedAddress | null = null;
-  #split: SplitView | undefined;
-  #relocation: LinkRelocation | null = null;
+  #saved: SavedTabActions;
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
@@ -88,6 +74,7 @@ export class FolderEditing {
     this.#context = context;
     this.#view = view;
     this.#sources = sources;
+    this.#saved = new SavedTabActions(context, sources);
     this.#favorites = new WorkspaceFavorites({
       writer: context.bookmarkWriter,
       links: sources.tabLinks,
@@ -109,6 +96,7 @@ export class FolderEditing {
     const toast = this.#createToast();
     this.#stops.push(
       () => toast.remove(),
+      () => this.#saved.stop(),
       FolderCommands.of(this.#context.document).onNewFolder(() => void this.#newFolder()),
       this.#startShortcut((text) => toast.show(text)),
       this.#startDrops((text, kind) => toast.show(text, kind)),
@@ -169,71 +157,6 @@ export class FolderEditing {
     return () => shortcut.detach();
   }
 
-  #linkActions(toast: (text: string, kind?: ToastKind) => void): Omit<LinkActions, 'removePin' | 'tileTab'> {
-    return {
-      copyLink: (linkId): MenuItem | null => this.#copyLink(linkId, toast),
-      editPinnedPage: (linkId): Promise<MenuItem | null> => this.#editPinnedPage(linkId, toast),
-      openInSplitView: (linkId): Promise<MenuItem | null> => this.#openInSplitView(linkId, toast),
-      duplicate: (linkId): MenuItem | null => this.#duplicate(linkId, toast),
-      moveTo: (linkId): MenuItem | null => this.#moveTo(linkId),
-    };
-  }
-
-  #copyLink(linkId: string, notify: (text: string, kind?: ToastKind) => void): MenuItem {
-    const { document, bookmarkWriter, logger } = this.#context;
-    const clipboard = new LinkClipboard({ writer: bookmarkWriter, copier: TextCopier.for(document, document.defaultView?.navigator.clipboard), notify, logger });
-    return { label: 'Copy Link', run: (): void => void clipboard.copy(linkId) };
-  }
-
-  async #editPinnedPage(linkId: string, notify: (text: string, kind?: ToastKind) => void): Promise<MenuItem | null> {
-    const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
-    this.#pinned ??= new PinnedAddress({
-      writer: bookmarkWriter,
-      linkedTab: new LinkedTab(tabs),
-      dialog: new PromptDialog({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
-      notify,
-      logger,
-    });
-    return this.#pinned.submenu(linkId);
-  }
-
-  #openInSplitView(linkId: string, notify: (text: string, kind?: ToastKind) => void): Promise<MenuItem | null> {
-    return this.#splitView(notify).item(linkId);
-  }
-
-  #splitView(notify: (text: string, kind?: ToastKind) => void): SplitView {
-    if (this.#split === undefined) {
-      const split = SplitView.of(this.#context, notify);
-      this.#stops.push(() => {
-        split.stop();
-        this.#split = undefined;
-      });
-      this.#split = split;
-    }
-    return this.#split;
-  }
-
-  #duplicate(linkId: string, notify: (text: string, kind?: ToastKind) => void): MenuItem {
-    const { bookmarkWriter, logger } = this.#context;
-    const duplication = new LinkDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), extras: new LinkExtras(), notify, logger });
-    return { label: 'Duplicate', run: (): void => void duplication.duplicate(linkId) };
-  }
-
-  #moveTo(linkId: string): MenuItem | null {
-    if (this.#relocation === null) {
-      const relocation = LinkRelocationFactory.create({ context: this.#context, sources: this.#sources });
-      if (relocation === null) {
-        return null;
-      }
-      this.#relocation = relocation;
-      this.#stops.push(() => {
-        relocation.dispose();
-        this.#relocation = null;
-      });
-    }
-    return this.#relocation.submenu(linkId);
-  }
-
   #startDrops(notify: (text: string, kind?: ToastKind) => void): () => void {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
     const drops = new FolderDragDrop({
@@ -245,7 +168,7 @@ export class FolderEditing {
       menu: new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body }),
       section: (): HTMLElement => this.#view.element,
       header: (): HTMLElement | null => document.querySelector<HTMLElement>(HEADER_SELECTOR),
-      linkActions: this.#linkActions(notify),
+      linkActions: this.#saved.create(notify),
       folderActions: FolderActionsFactory.create({ context: this.#context, view: this.#view, sources: this.#sources, notify }),
       tabs,
       writer: bookmarkWriter,
