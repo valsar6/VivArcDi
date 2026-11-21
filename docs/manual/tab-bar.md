@@ -108,6 +108,11 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Keep a tile's site beside the page | Right-click the tile and choose **Open as web panel** |
 | Put a link back among today's tabs | Right-click its row and choose **Remove pin** |
 | Make a link a tile | Right-click its row and choose **Tile tab** |
+| Copy the address of a link | Right-click its row and choose **Copy Link** |
+| Change the address a link opens first | Right-click its row, **Edit Pinned Page**, then **Edit…** (or **Replace Pinned URL with Current**) |
+| Open a link beside the page you are on | Right-click its row and choose **Open in Split View** |
+| Copy a link below itself | Right-click its row and choose **Duplicate** |
+| Move a link to another workspace | Right-click its row, **Move to**, then the workspace or **New Space…**; click the toast to follow it |
 | Keep the current page | Cmd/Ctrl+D adds it at the end of the workspace's folder; press it again to undo |
 | Copy bookmarks in | Drag a bookmark or a whole folder from Vivaldi's Bookmarks panel onto the folders |
 
