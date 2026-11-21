@@ -85,10 +85,10 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 | AC-8 | WHEN `Replace Pinned URL with Current` is chosen, THE bookmark URL SHALL become the URL of the open tab. | auto: `replaces the pinned url with the current one` |
 | AC-9 | WHILE the open tab has the saved URL or there is no open tab, THE item `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace pinned url when equal` |
 | AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | live: `opens a saved tab in split view` |
-| AC-10b | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | live: `opens a saved tab in split view with a new tab` |
-| AC-11 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
-| AC-12 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
-| AC-13 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
+| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | live: `opens a saved tab in split view with a new tab` |
+| AC-12 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
+| AC-13 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
+| AC-14 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
 
 ## Out of scope
 
