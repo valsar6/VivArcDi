@@ -19,8 +19,11 @@ const scenario: Scenario = {
       if (row.group === null || row.group !== chosen.group) {
         throw new Error(`the saved tab (tiling ${row.group}) and the selected tab (tiling ${chosen.group}) are not in one group`);
       }
+      if (row.index !== 0 || chosen.index !== 1) {
+        throw new Error(`expected the saved tab at index 0 (left) and the selected tab at index 1 (right), found ${JSON.stringify([row, chosen])}`);
+      }
       await waitForTiledWebviews(driver, [row.id, selected]);
-      if (!(await sideBySide(driver, selected, row.id))) {
+      if (!(await sideBySide(driver, row.id, selected))) {
         throw new Error('the two pages are tiled but not side by side');
       }
     } finally {

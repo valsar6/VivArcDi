@@ -5,7 +5,7 @@ const scenario: Scenario = {
   name: 'opens a saved tab in split view with a new tab',
   spec: '056',
   run: async (driver) => {
-    const original = await driver.evaluate<number>(`chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => tabs[0].id)`);
+    const tileTab = await driver.evaluate<number>(`chrome.tabs.create({ url: 'about:blank#tile-tab', active: true }).then((tab) => chrome.tabs.update(tab.id, { vivExtData: JSON.stringify({ vivarcdi: { favoriteId: '056-tile' } }) }).then(() => tab.id))`);
     const saved = await createSavedTab(driver, 'https://example.com/#056-split-blank');
     try {
       await chooseSplitView(driver, saved);
@@ -16,8 +16,8 @@ const scenario: Scenario = {
       if (row === undefined || blank === undefined) {
         throw new Error('the saved tab or the new tab is missing after the command');
       }
-      if (blank.id === original) {
-        throw new Error('the row was tiled with the tab that was already open, not with a new tab');
+      if (blank.id === tileTab) {
+        throw new Error('the row was tiled with the Favorites tile tab that was selected, not with a new tab');
       }
       if (row.group !== blank.group || row.index !== 0 || blank.index !== 1) {
         throw new Error(`expected the row at index 0 and the new tab at index 1 of one group, found ${JSON.stringify([row, blank])}`);
@@ -29,6 +29,7 @@ const scenario: Scenario = {
       await driver.waitFor(`document.activeElement?.matches(${JSON.stringify(driver.selector('addressField'))})`, WAIT_MS);
     } finally {
       await removeSavedTab(driver, saved);
+      await driver.evaluate(`chrome.tabs.remove(${tileTab})`);
     }
   },
 };

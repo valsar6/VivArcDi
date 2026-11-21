@@ -1,4 +1,3 @@
-import type { BrowserRuntime } from '../../../core/browser/BrowserRuntime.js';
 import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
 import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
 import type { ModuleContext } from '../../../core/boot/Module.js';
@@ -8,6 +7,7 @@ import type { Logger } from '../../../core/support/Logger.js';
 import { TabData } from '../../../core/tabs/TabData.js';
 import { WorkspaceTabs } from '../../../core/workspaces/WorkspaceTabs.js';
 import { AddressField } from '../../../shared/newtab/AddressField.js';
+import { NewTabOpener } from '../../../shared/newtab/NewTabOpener.js';
 import { OPEN_IN_SPLIT_VIEW_LABEL } from '../../../shared/tabs/CommandLabels.js';
 import { TabTiler } from '../../../shared/tabs/TabTiler.js';
 import { BlankTabWatch } from './BlankTabWatch.js';
@@ -19,7 +19,7 @@ export type SplitViewTabs = Pick<BrowserTabs, 'available' | 'query' | 'get' | 'c
 
 export interface SplitViewDeps {
   tabs: SplitViewTabs;
-  runtime: Pick<BrowserRuntime, 'currentWindowId'>;
+  newTab: Pick<NewTabOpener, 'create'>;
   bookmarks: Pick<BookmarkWriter, 'get'>;
   address: Pick<AddressField, 'focus'>;
   tiler: Pick<TabTiler, 'tile' | 'untile'>;
@@ -35,8 +35,9 @@ export class SplitView {
   #warned = false;
 
   /**
-   * The `Open in Split View` command of a link row: tiles the page of the row with the selected tab,
-   * or with a new blank tab when no tab is selected, and opens the address bar on that blank tab.
+   * The `Open in Split View` command of a link row: tiles the page of the row, on the left, with the
+   * selected ordinary tab, or, when the selected tab is a Favorites tile tab or there is none, with a
+   * new blank tab on the right, and opens the address bar on that blank tab.
    *
    * @param deps What it reads and drives.
    */
@@ -53,11 +54,12 @@ export class SplitView {
    */
   public static of(context: ModuleContext, notify: (text: string, kind?: ToastKind) => void): SplitView {
     const { document, selectors, tabs, runtime, bookmarkWriter, logger } = context;
+    const address = new AddressField(document, selectors.get('addressField'));
     return new SplitView({
       tabs,
-      runtime,
+      newTab: new NewTabOpener(tabs, runtime, address),
       bookmarks: bookmarkWriter,
-      address: new AddressField(document, selectors.get('addressField')),
+      address,
       tiler: new TabTiler(tabs),
       linked: new LinkedTab(tabs),
       notify,
@@ -80,8 +82,8 @@ export class SplitView {
   }
 
   /**
-   * Tiles the page of the row with the selected tab, or, with no tab selected, with a new blank tab
-   * whose address bar opens. A failure is logged and shown as an error toast.
+   * Tiles the page of the row, on the left, with the selected ordinary tab, or, without one, with a
+   * new blank tab on the right whose address bar opens. A failure is logged and shown as an error toast.
    *
    * @param linkId The bookmark id of the link row.
    */
@@ -90,10 +92,10 @@ export class SplitView {
     try {
       const selected = await this.#selected();
       const row = await this.#rowTab(linkId, selected);
-      if (selected?.id === undefined) {
+      if (selected?.id === undefined || TabData.ownOf(selected).favoriteId !== undefined) {
         await this.#tileWithBlank(row);
       } else {
-        await this.#deps.tiler.tile([selected.id, row]);
+        await this.#deps.tiler.tile([row, selected.id]);
       }
     } catch (error) {
       this.#deps.logger.warn('could not open the split view', error);
@@ -130,8 +132,7 @@ export class SplitView {
   }
 
   async #tileWithBlank(row: number): Promise<void> {
-    const windowId = await this.#deps.runtime.currentWindowId();
-    const blank = await this.#deps.tabs.create({ windowId, active: true });
+    const blank = await this.#deps.newTab.create();
     if (blank.id === undefined) {
       throw new Error('the blank tab has no id');
     }
