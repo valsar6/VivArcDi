@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-21 (pull request #241) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -48,8 +48,10 @@ each new item from the release that implements it. `Share` and `Mute` are not re
   address that is a valid URL and keeps the name and icon.
 - **Open in Split View** opens the page of the row beside the tab that is selected, in Vivaldi's tab
   tiling, as the selected tab and the row's page side by side. If the row has no open tab, it opens one.
-  Where no tab is selected, the item stays enabled: the address bar opens so that the user picks the
-  page to open as a new tab, and that tab is tiled with the page of the row.
+  Where no tab is selected, the item stays enabled. Seen in Arc (`Registrazione schermo 2026-11-21 alle
+  15.10.39.mov`, 12 s): the split appears at once, with the page of the row on the left and an empty
+  pane titled `Search or Enter URL…` on the right, and the search palette opens over it; what the user
+  picks loads in the empty pane.
 
 ## Requirements
 
@@ -63,7 +65,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 - **FR-6.** `Edit…` saves a valid URL into the bookmark; an invalid one keeps the dialog open with the field marked. Name and icon (027) stay.
 - **FR-7.** `Replace Pinned URL with Current` sets the bookmark URL to the URL of the open tab and is disabled when equal or when the row has no open tab.
 - **FR-8.** Open in Split View tiles the page of the row with the selected tab; if they are already tiled together, or the row is the selected tab, the item is disabled.
-- **FR-9.** WHERE no tab is selected, Open in Split View opens the address bar; the page the user chooses opens as a new tab tiled with the page of the row. Esc in the address bar tiles nothing.
+- **FR-9.** WHERE no tab is selected, Open in Split View tiles the page of the row (left) with a new empty tab (right) at once and opens the address bar on it; the page the user chooses loads in that tab. IF the user closes the address bar without choosing, THEN the empty tab is closed and the split is undone.
 
 ### Non-functional
 
@@ -85,7 +87,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 | AC-8 | WHEN `Replace Pinned URL with Current` is chosen, THE bookmark URL SHALL become the URL of the open tab. | auto: `replaces the pinned url with the current one` |
 | AC-9 | WHILE the open tab has the saved URL or there is no open tab, THE item `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace pinned url when equal` |
 | AC-10 | WHEN `Open in Split View` is chosen, THE page of the row and the selected tab SHALL be tiled side by side. | manual |
-| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL open the address bar, and the tab opened from it SHALL be tiled with the page of the row. | manual |
+| AC-11 | WHEN no tab is selected and `Open in Split View` is chosen, THE module SHALL tile the page of the row with a new empty tab and open the address bar on it, and the page chosen SHALL load in that tab. | manual |
 | AC-12 | WHEN Tore uses Copy Link, Duplicate and Move to on a saved tab, THE results SHALL be those of the recording. | manual |
 | AC-13 | WHEN Tore edits the pinned URL and clicks the row, THE new address SHALL open first, also after a restart. | manual |
 | AC-14 | THE menu, its submenus and the dialog SHALL look and work like the recording on macOS and Debian. | manual |
@@ -93,7 +95,8 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 AC-10 and AC-11 read from the DOM and `chrome.tabs`, so the design turns them into `live:` scenarios
 (`opens a saved tab in split view`, `opens a saved tab in split view with a new tab`) with the
 scenarios themselves; until then they are `manual`, because the check of 046 fails on a `live:` name
-without a scenario.
+without a scenario. The task that writes the scenarios changes AC-10 and AC-11 to `live:` in the same
+pull request ([tasks.md](tasks.md) T8).
 
 ## Out of scope
 
@@ -106,10 +109,11 @@ without a scenario.
 
 ## Open questions
 
-- [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it.
-- [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9).
-- [x] **Q-3. Duplicate and the open tab.** The copy is closed (Tore, 2026-11-21).
-- [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md) (Tore, 2026-11-21).
+- [x] **Q-1. Move to and the open tab.** Only the tab the command is run on moves (Tore, 2026-11-21); the toast lets the user follow it. Answered (Tore, 2026-11-21).
+- [x] **Q-2. Split View with nothing selected.** Not disabled: the address bar opens and the new tab is tiled with the row (Tore, 2026-11-21, FR-9). Answered (Tore, 2026-11-21).
+- [x] **Q-5. Closing the address bar without a choice.** The empty tab closes and the split is undone (Tore, 2026-11-21). Answered (Tore, 2026-11-21).
+- [x] **Q-3. Duplicate and the open tab.** The copy is closed. Answered (Tore, 2026-11-21).
+- [x] **Q-4. The tiles.** A separate spec, [057](../057-tile-menu/spec.md). Answered (Tore, 2026-11-21).
 
 ## References
 
