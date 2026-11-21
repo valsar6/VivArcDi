@@ -14,6 +14,7 @@ import { GridFavoriteTargets } from "./GridFavoriteTargets.js";
 import { LinkedTabs } from "./LinkedTabs.js";
 import { TileDrag } from "./TileDrag.js";
 import { TileMenu } from "./TileMenu.js";
+import { TileWebPanels } from "./TileWebPanels.js";
 import { TabToFavorite } from "./TabToFavorite.js";
 const inWindow = (element) => element?.parentElement == null ? null : element;
 class GridDragging {
@@ -31,11 +32,11 @@ class GridDragging {
    * order of the Favorites. The grid is also offered to the folders
    * through `FavoriteDropZone`, as the place where a link dragged out of them becomes a Favorite.
    * A pill with the icon and the title follows what is dragged, and the right-click menu of a tile
-   * offers Untile tab and Pin tab, which do the same moves without dragging.
+   * offers Untile tab and Pin tab, which do the same moves without dragging, and a web panel command.
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, selectors, tabs, writer, folder, logger, favorites, pinned }) {
+  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned }) {
     const wrapperSelector = selectors.get("tabWrapper");
     const stripSelector = selectors.get("tabStrip");
     const grid = () => favorites.active ? inWindow(favorites.element) : null;
@@ -69,7 +70,7 @@ class GridDragging {
       pill
     });
     const menu = new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body });
-    this.#tileMenu = new TileMenu({ document, grid, menu, removal });
+    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels: TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? void 0 });
   }
   /**
    * Starts following the mouse and the drag events, and offers the grid to `FavoriteDropZone`.

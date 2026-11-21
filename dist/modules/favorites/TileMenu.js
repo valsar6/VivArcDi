@@ -5,7 +5,8 @@ class TileMenu {
   #onContext = (event) => this.#context(event);
   /**
    * The menu of a tile of the Favorites grid, opened with a right click: Untile tab puts the page
-   * back among today's tabs, and Pin tab makes it a link of the workspace favorites. Vivaldi's own
+   * back among today's tabs, Pin tab makes it a link of the workspace favorites, and a web panel
+   * command follows when the page can be one. Vivaldi's own
    * menu is cancelled for tiles only.
    *
    * @param dependencies Everything it collaborates with.
@@ -34,12 +35,22 @@ class TileMenu {
     }
     event.preventDefault();
     event.stopPropagation();
-    const { menu, removal } = this.#deps;
-    const items = [
+    this.#open(this.#commands(id), id, event);
+  }
+  #commands(id) {
+    const { removal } = this.#deps;
+    return [
       { label: UNTILE_TAB_LABEL, run: () => void removal.untile(id) },
       { label: PIN_TAB_LABEL, run: () => void removal.pin(id) }
     ];
-    menu.open(items, event.clientX, event.clientY);
+  }
+  #open(items, id, { clientX, clientY }) {
+    const { panels, menu } = this.#deps;
+    if (panels === void 0) {
+      menu.open(items, clientX, clientY);
+      return;
+    }
+    void panels.item(id).catch(() => null).then((panel) => menu.open(panel === null ? items : [...items, panel], clientX, clientY));
   }
 }
 export {

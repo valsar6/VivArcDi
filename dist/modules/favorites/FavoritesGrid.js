@@ -46,7 +46,7 @@ class FavoritesGrid extends Module {
    *
    * @param context What the module may use.
    */
-  async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter }) {
+  async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter, prefs }) {
     const settings = options;
     this.#settings = settings;
     this.#document = document;
@@ -76,7 +76,7 @@ class FavoritesGrid extends Module {
     await this.#unloadedTabs?.start().catch((error) => logger.error("Could not read unloaded tabs", error));
     await this.#fromPinned?.start().catch((error) => logger.error("Could not read the pinned tabs", error));
     await this.#startBookmarks(tabs, bookmarks, logger);
-    this.#startDragging(tabs, bookmarkWriter, logger);
+    this.#startDragging(tabs, bookmarkWriter, prefs, logger);
   }
   /**
    * Removes the grid and every listener, leaving Vivaldi's tab bar as it was.
@@ -154,11 +154,11 @@ class FavoritesGrid extends Module {
     });
     await this.#fromBookmarks.start().catch((error) => logger.error("Could not read the Favorites folder", error));
   }
-  #startDragging(tabs, writer, logger) {
+  #startDragging(tabs, writer, prefs, logger) {
     if (this.#fromBookmarks === null || !writer.available || this.#document === null || this.#selectors === null) {
       return;
     }
-    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, favorites: this.#fromBookmarks, pinned: this.#fromPinned });
+    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, prefs, favorites: this.#fromBookmarks, pinned: this.#fromPinned });
     this.#dragging.start();
   }
   #update() {
