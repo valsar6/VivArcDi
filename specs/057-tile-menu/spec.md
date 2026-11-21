@@ -15,8 +15,7 @@ Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/RE
 Duplicate, Move to, Edit Pinned Page and Open in Split View. The tiles of the Favorites grid have only
 Untile tab and Pin tab ([031](../031-pin-and-tile-commands/spec.md)) and Rename and Change icon
 ([027](../027-rename-pinned-tabs/spec.md)). Tore asked for the same items on a tile as a separate spec
-(2026-11-21). The recording of 056 does not show the menu of a tile, so what follows is a proposal to
-check against Arc.
+(2026-11-21). Tore confirmed on 2026-11-21 that Arc shows these items on a tile, without Move to.
 
 ## User stories
 
@@ -67,5 +66,5 @@ scenario.
 
 ## Open questions
 
-- [ ] **Q-1. Does Arc show these items on a Favorites tile?** Proposal: yes, minus Move to; to confirm with a recording.
-- [ ] **Q-2. Duplicate of a tile.** Proposal: right after the tile, closed.
+- [x] **Q-1. Does Arc show these items on a Favorites tile?** Yes, minus Move to (Tore, 2026-11-21).
+- [x] **Q-2. Duplicate of a tile.** Right after the tile, closed (Tore, 2026-11-21).
