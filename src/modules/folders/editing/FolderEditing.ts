@@ -24,6 +24,8 @@ import { LinkClipboard } from './LinkClipboard.js';
 import { LinkDuplication } from './LinkDuplication.js';
 import { LinkExtras } from './LinkExtras.js';
 import { LinkedTab } from './LinkedTab.js';
+import { LinkRelocationFactory } from './LinkRelocationFactory.js';
+import type { LinkRelocation } from './LinkRelocation.js';
 import type { LinkActions } from './LinkMenuItems.js';
 import { PinnedAddress } from './PinnedAddress.js';
 import { PromptDialog } from './PromptDialog.js';
@@ -51,7 +53,7 @@ export interface EditingSources {
   /** The links whose tabs are about to close. */
   closing: ClosingLinks;
   /** The workspaces Vivaldi lists. */
-  names: Pick<WorkspaceNames, 'entries'>;
+  names: Pick<WorkspaceNames, 'entries' | 'names' | 'idOf' | 'refresh'>;
   /** The workspace the user is in. */
   active: Pick<ActiveWorkspace, 'current'>;
   /** The root folder of each workspace. */
@@ -69,6 +71,7 @@ export class FolderEditing {
   #stops: Array<() => void> = [];
   #pinned: PinnedAddress | null = null;
   #split: SplitView | undefined;
+  #relocation: LinkRelocation | null = null;
 
   /**
    * Everything the user can change from the tab bar: a new folder from the space header, a new name
@@ -216,8 +219,19 @@ export class FolderEditing {
     return { label: 'Duplicate', run: (): void => void duplication.duplicate(linkId) };
   }
 
-  #moveTo(_linkId: string): MenuItem | null {
-    return null;
+  #moveTo(linkId: string): MenuItem | null {
+    if (this.#relocation === null) {
+      const relocation = LinkRelocationFactory.create({ context: this.#context, sources: this.#sources });
+      if (relocation === null) {
+        return null;
+      }
+      this.#relocation = relocation;
+      this.#stops.push(() => {
+        relocation.dispose();
+        this.#relocation = null;
+      });
+    }
+    return this.#relocation.submenu(linkId);
   }
 
   #startDrops(notify: (text: string, kind?: ToastKind) => void): () => void {

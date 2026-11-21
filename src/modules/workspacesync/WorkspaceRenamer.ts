@@ -1,5 +1,5 @@
-import { MenuCommand } from './MenuCommand.js';
-import type { MenuParts } from './MenuCommand.js';
+import { MenuCommand } from '../../shared/spaces/MenuCommand.js';
+import type { MenuParts } from '../../shared/spaces/MenuCommand.js';
 
 export interface SpaceRenamer {
   /**
