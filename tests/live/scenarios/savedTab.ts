@@ -49,18 +49,19 @@ export interface Tiled {
   group: string | null;
   index: number | null;
   bookmarkId: string | null;
+  raw: string;
 }
 
 export function tiledTabs(driver: Driver): Promise<Tiled[]> {
   return driver.evaluate<Tiled[]>(`(async () => (await chrome.tabs.query({ currentWindow: true })).map((tab) => {
     const data = JSON.parse(tab.vivExtData || '{}');
-    return { id: tab.id, url: tab.url || tab.pendingUrl || '', group: data.tiling?.id ?? null, index: data.tiling?.index ?? null, bookmarkId: data.vivarcdi?.bookmarkId ?? null };
+    return { id: tab.id, url: tab.url || tab.pendingUrl || '', group: data.tiling?.id ?? null, index: data.tiling?.index ?? null, bookmarkId: data.vivarcdi?.bookmarkId ?? null, raw: tab.vivExtData || '' };
   }))()`);
 }
 
 export async function waitForTiledWebviews(driver: Driver, ids: number[]): Promise<void> {
   const webview = (id: number): string => `document.querySelector(${JSON.stringify(`${driver.selector('tabWebview')}`.replace('[tab_id]', `[tab_id="${id}"]`))})`;
-  await driver.waitFor(`${ids.map((id) => `${webview(id)}?.classList.contains('tiled')`).join(' && ')}`, WAIT_MS);
+  await driver.waitFor(`${ids.map((id) => `${webview(id)}?.closest('.webpageview')?.classList.contains('tiled')`).join(' && ')}`, WAIT_MS);
 }
 
 export async function sideBySide(driver: Driver, left: number, right: number): Promise<boolean> {
@@ -69,5 +70,34 @@ export async function sideBySide(driver: Driver, left: number, right: number): P
     const first = ${webview(left)};
     const second = ${webview(right)};
     return first.width > 0 && second.width > 0 && first.right <= second.left + 1 && Math.abs(first.top - second.top) <= 1;
+  })()`);
+}
+
+export async function waitUntil(driver: Driver, expression: string): Promise<void> {
+  const deadline = Date.now() + WAIT_MS;
+  while (!(await driver.evaluate<boolean>(`(async () => Boolean(await (${expression})))()`))) {
+    if (Date.now() > deadline) {
+      throw new Error(`timed out waiting for ${expression.slice(0, 120)}`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+}
+
+export function waitForSplit(driver: Driver, saved: SavedTab): Promise<void> {
+  return waitUntil(driver, `chrome.tabs.query({ currentWindow: true }).then((tabs) => {
+    const tiled = tabs.map((tab) => JSON.parse(tab.vivExtData || '{}')).filter((data) => data.tiling);
+    return tiled.length === 2 && tabs.some((tab) => JSON.parse(tab.vivExtData || '{}').vivarcdi?.bookmarkId === ${JSON.stringify(saved.bookmarkId)} && JSON.parse(tab.vivExtData || '{}').tiling);
+  })`);
+}
+
+export async function markAsTile(driver: Driver, tabId: number): Promise<void> {
+  await waitUntil(driver, `(async () => {
+    const tab = await chrome.tabs.get(${tabId});
+    const data = JSON.parse(tab.vivExtData || '{}');
+    if (data.vivarcdi?.favoriteId === '056-tile') {
+      return true;
+    }
+    await chrome.tabs.update(${tabId}, { vivExtData: JSON.stringify({ ...data, vivarcdi: { ...data.vivarcdi, favoriteId: '056-tile' } }) });
+    return false;
   })()`);
 }
