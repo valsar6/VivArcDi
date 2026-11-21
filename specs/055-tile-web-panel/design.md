@@ -5,66 +5,79 @@
 | Status | Draft |
 | Spec | [spec.md](spec.md) |
 
-Written after the spec was approved on 2026-11-21. It says **how**; the spec says **what**. It builds
+Written after the spec was approved on 2026-11-21 and revised the same day after the probes of task T1. It says **how**; the spec says **what**. It builds
 on the tile menu of [031](../031-pin-and-tile-commands/design.md) (`TileMenu`, `ContextMenu`).
 
 ## Approach
 
-### What the probe showed
+### What the probes showed
 
-Vivaldi keeps its web panels in the preference `vivaldi.panels.web.elements`, an array of
-`{ id: 'WEBPANEL_<uuid>', url, title, faviconUrl, mobileMode, zoom }` (probe of 2026-11-21, saved
-outside the repository). `chrome.sidePanel` is not exposed to the window. So the feature is a write
-of that array, plus a way to show the panel; both are proved by T1 before the rest is built.
+Vivaldi keeps its web panels in the preference `vivaldi.panels.web.elements`, but a write of that
+array does not take effect: the value persists and the panel bar does not change (5 s, with and
+without an icon), and the window cannot be reloaded from code. The interface does it: the panel bar's
+add button opens a form, and submitting it makes Vivaldi create the element itself (with `origin`,
+`faviconUrlValid`, `resizable` and `width` fields a hand-made element would lack), read the title
+and icon from the page and open the side panel. The probes are kept outside the repository. So the
+feature drives Vivaldi's own form, the way the rest of VivArcDi drives Vivaldi's DOM.
 
-### Reading and writing the panels (FR-1 to FR-5, NFR-3)
+### Driving the form (FR-2, NFR-1, NFR-3)
 
-`BrowserPrefs` is read-only on purpose (it says so in its docstring). The write does not go into it:
+**`WebPanelForm`** in `src/shared/panels` has one method, `add(url)`:
 
-- **`WebPanelList`** in `src/shared/panels` reads the array through `BrowserPrefs.get` and keeps the
-  rule of what counts as the same page: `sameAddress(a, b)` drops the fragment and a trailing slash
-  (question 2). It exposes `find(url)`, `add(page)` and `remove(id)`.
-- **`PanelPrefsWriter`** in `src/core/browser` is the single place that calls `vivaldi.prefs.set`,
-  with its own narrow interface (`set(key, value)`), so tests use a fake. `add` and `remove` read the
-  current array, change one element and write the whole array back; no other element is rebuilt, so
-  the panels of the user stay as they are (FR-5).
-- A new element is `{ id: 'WEBPANEL_' + crypto.randomUUID(), url, title, faviconUrl, mobileMode: true, zoom: 1 }`.
-  `faviconUrl` is a data URL in Vivaldi's own panels; the tile shows `chrome://favicon/...`, so the
-  icon is read once into a data URL. IF that fails, the element is added without an icon and Vivaldi
-  shows its default (T1 says whether the field may be empty).
+1. click the add button of the panel bar;
+2. wait for the form, set the address field with the native `value` setter and dispatch an `input`
+   event (a React field ignores a plain assignment), then click the submit button;
+3. resolve when the new panel's button is in the bar, or reject after a short time.
 
-### Showing the panel (FR-2)
+If any element is missing it throws a typed error; the caller hides the commands (NFR-1) and logs the
+reason once. The elements are read through `context.selectors` (below), so a Vivaldi version that
+moves them is a catalog change.
 
-How the side panel is brought up on a new element is not known; T1 probes the panel bar and the
-preferences `vivaldi.panels.*` that change when a panel is opened by hand. The two candidates are a
-second preference write (the active panel) and a click on the button of the panel in the bar. The
-design takes the first that T1 shows to work; if neither does, the panel is only added and appears in
-the panel bar, and the spec's AC-9 wording is revised before the code.
+### Reading and showing the panels (FR-1, FR-3, FR-5)
+
+**`WebPanelList`** in `src/shared/panels` reads `vivaldi.panels.web.elements` through
+`BrowserPrefs.get` (read-only, as it stays) and keeps the rule of what counts as the same page:
+`sameAddress(a, b)` drops the fragment and a trailing slash (question 2). It exposes `find(url)`,
+which returns the id of the panel, and `show(id)`, which clicks the panel's button in the bar
+(`[data-name="WEBPANEL_<uuid>"]`) and so brings up the side panel. It writes nothing and never
+touches a panel.
 
 ### The menu (FR-1, FR-3, FR-4)
 
-`TileMenu` gains a `panels` dependency (`WebPanelList` plus the tile's page, read from the
-bookmark of the tile id as the other tile commands do). On a right click it asks `panels.find(url)`:
+`TileMenu` gains a `panels` dependency (`WebPanelList`, `WebPanelForm` and the tile's page, read from
+the bookmark of the tile id as the other tile commands do). On a right click it asks `panels.find(url)`:
 
 | Tile page | Extra item |
 |---|---|
 | `http` or `https`, not a panel | **Open as web panel** |
-| `http` or `https`, already a panel | **Close web panel** |
+| `http` or `https`, already a panel | **Show web panel** |
 | other scheme | none |
 
-The items come after **Pin tab**. Neither item touches the tile (FR-4). IF `PanelPrefsWriter` is not
-available (`vivaldi.prefs.set` missing or the preference unreadable), `TileMenu` gets no `panels`
-and shows no extra item; the reason is logged once (NFR-1).
+The items come after **Pin tab**. Neither item touches the tile (FR-4). IF the form or the panel bar
+is not found, `TileMenu` gets no `panels` and shows no extra item (NFR-1).
+
+## Selectors
+
+New names in `src/selectors/<version>.json`, found by the probes on Vivaldi 8.3 and checked by the
+selector check of `npm run live` (spec 047):
+
+| Name | Selector | Is |
+|---|---|---|
+| `panelAddButton` | `#panels button[data-name="PanelWeb"]` | the button that opens the form (titled "Customize panel") |
+| `panelAddressField` | `.CustomizePanelPopup input.address` | the address field |
+| `panelAddSubmit` | `.CustomizePanelPopup button.FormButton` | the submit button |
+| `webPanelButton` | `#panels button[data-name^="WEBPANEL_"]` | one button per web panel; the id is in `data-name` |
 
 ## Components
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/browser/PanelPrefsWriter.ts` | The only `vivaldi.prefs.set` call; writes the panel list | Adapter |
-| `src/shared/panels/WebPanelList.ts` | Reads the list; `find`, `add`, `remove`; same-address rule | - |
+| `src/shared/panels/WebPanelForm.ts` | Opens Vivaldi's add form, fills and submits it; waits for the new button | - |
+| `src/shared/panels/WebPanelList.ts` | Reads the list; `find`, `show`; same-address rule | - |
 | `src/modules/favorites/TileMenu.ts` | The two items, chosen from the tile's page and the list | - |
-| `src/modules/favorites/GridDragging.ts` | Builds `WebPanelList` and passes it to `TileMenu` | - |
-| `src/shared/tabs/CommandLabels.ts` | `OPEN_WEB_PANEL_LABEL`, `CLOSE_WEB_PANEL_LABEL` | - |
+| `src/modules/favorites/GridDragging.ts` | Builds the panel collaborators and passes them to `TileMenu` | - |
+| `src/shared/tabs/CommandLabels.ts` | `OPEN_WEB_PANEL_LABEL`, `SHOW_WEB_PANEL_LABEL` | - |
+| `src/selectors/8.1.json` and the selector check | The four names above | - |
 | `tests/live/scenarios/a-tile-becomes-a-web-panel-in-the-panel-list.live.ts` | AC-8 | - |
 
 ## Configuration
@@ -73,8 +86,11 @@ None: the items are part of the Favorites module and follow it.
 
 ## Risks
 
-- A write may be ignored while Vivaldi runs, or overwritten by Vivaldi's own sync of panels; T1 checks
-  both on the throwaway profile.
-- Vivaldi may change the element format in a later version; `WebPanelList` ignores elements it cannot
-  read and never rewrites them differently from how it found them.
-- The side panel may not be openable from code; see "Showing the panel".
+- Vivaldi may restyle the form or the panel bar in a later version; the catalog and the selector
+  check turn that into one named failure, and NFR-1 hides the commands meanwhile.
+- The form closes or moves while it is being driven; the wait in step 3 has a timeout and leaves no
+  half-filled form open (the popup is closed with its own close button on failure).
+- A tile whose address Vivaldi rewrites on submit (a redirect, a trailing slash) is found again by
+  the same-address rule, so it is not added twice.
+- Removing a panel is not offered (question 4); a user who removes one by hand sees **Open as web
+  panel** again.
