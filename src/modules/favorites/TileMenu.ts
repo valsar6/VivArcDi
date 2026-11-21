@@ -1,6 +1,7 @@
 import { PIN_TAB_LABEL, UNTILE_TAB_LABEL } from '../../shared/tabs/CommandLabels.js';
 import type { ContextMenu, MenuItem } from '../../core/dom/ContextMenu.js';
 import type { FavoriteRemoval } from './FavoriteRemoval.js';
+import type { TileWebPanels } from './TileWebPanels.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
 
 export interface TileMenuDependencies {
@@ -10,6 +11,8 @@ export interface TileMenuDependencies {
   grid: () => HTMLElement | null;
   menu: Pick<ContextMenu, 'open' | 'close'>;
   removal: Pick<FavoriteRemoval, 'untile' | 'pin'>;
+  /** The web panel command; without it the menu has none. */
+  panels?: Pick<TileWebPanels, 'item'> | undefined;
 }
 
 export class TileMenu {
@@ -18,7 +21,8 @@ export class TileMenu {
 
   /**
    * The menu of a tile of the Favorites grid, opened with a right click: Untile tab puts the page
-   * back among today's tabs, and Pin tab makes it a link of the workspace favorites. Vivaldi's own
+   * back among today's tabs, Pin tab makes it a link of the workspace favorites, and a web panel
+   * command follows when the page can be one. Vivaldi's own
    * menu is cancelled for tiles only.
    *
    * @param dependencies Everything it collaborates with.
@@ -50,11 +54,26 @@ export class TileMenu {
     }
     event.preventDefault();
     event.stopPropagation();
-    const { menu, removal } = this.#deps;
-    const items: MenuItem[] = [
+    this.#open(this.#commands(id), id, event);
+  }
+
+  #commands(id: string): MenuItem[] {
+    const { removal } = this.#deps;
+    return [
       { label: UNTILE_TAB_LABEL, run: (): void => void removal.untile(id) },
       { label: PIN_TAB_LABEL, run: (): void => void removal.pin(id) },
     ];
-    menu.open(items, event.clientX, event.clientY);
+  }
+
+  #open(items: MenuItem[], id: string, { clientX, clientY }: MouseEvent): void {
+    const { panels, menu } = this.#deps;
+    if (panels === undefined) {
+      menu.open(items, clientX, clientY);
+      return;
+    }
+    void panels
+      .item(id)
+      .catch(() => null)
+      .then((panel) => menu.open(panel === null ? items : [...items, panel], clientX, clientY));
   }
 }

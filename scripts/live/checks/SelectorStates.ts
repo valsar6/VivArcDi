@@ -51,6 +51,15 @@ export const SELECTOR_STATES: Record<string, SelectorState> = {
       await driver.evaluate(setActivePinned(false));
     },
   },
+  'web-panel-form': {
+    enter: async (driver) => {
+      await driver.click(driver.selector('panelAddButton'));
+      await driver.waitForElement(driver.selector('panelAddressField'));
+    },
+    leave: async (driver) => {
+      await driver.evaluate(`document.querySelector('.CustomizePanelPopup button.close')?.click()`);
+    },
+  },
   'workspace-popup': { enter: openWorkspacePopup, leave: closeWorkspacePopup },
   'workspace-editor': {
     enter: async (driver) => {

@@ -17,7 +17,9 @@ import { GridDropZone } from './GridDropZone.js';
 import { GridFavoriteTargets } from './GridFavoriteTargets.js';
 import { LinkedTabs } from './LinkedTabs.js';
 import { TileDrag } from './TileDrag.js';
+import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
 import { TileMenu } from './TileMenu.js';
+import { TileWebPanels } from './TileWebPanels.js';
 import { TabToFavorite } from './TabToFavorite.js';
 
 export interface GridDraggingDependencies {
@@ -30,6 +32,8 @@ export interface GridDraggingDependencies {
   /** Path of the Favorites folder. */
   folder: string;
   logger: Logger;
+  /** Vivaldi's preferences, for the web panel command of a tile. */
+  prefs: BrowserPrefs;
   /** The bookmark Favorites: whether they are shown, and the element of their grid. */
   favorites: { readonly active: boolean; readonly element: HTMLElement };
   /** The pinned tiles under them, if there are any. */
@@ -54,11 +58,11 @@ export class GridDragging {
    * order of the Favorites. The grid is also offered to the folders
    * through `FavoriteDropZone`, as the place where a link dragged out of them becomes a Favorite.
    * A pill with the icon and the title follows what is dragged, and the right-click menu of a tile
-   * offers Untile tab and Pin tab, which do the same moves without dragging.
+   * offers Untile tab and Pin tab, which do the same moves without dragging, and a web panel command.
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, selectors, tabs, writer, folder, logger, favorites, pinned }: GridDraggingDependencies) {
+  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned }: GridDraggingDependencies) {
     const wrapperSelector = selectors.get('tabWrapper');
     const stripSelector = selectors.get('tabStrip');
     const grid = (): HTMLElement | null => (favorites.active ? inWindow(favorites.element) : null);
@@ -92,7 +96,7 @@ export class GridDragging {
       pill,
     });
     const menu = new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body });
-    this.#tileMenu = new TileMenu({ document, grid, menu, removal });
+    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels: TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? undefined });
   }
 
   /**

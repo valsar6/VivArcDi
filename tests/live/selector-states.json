@@ -15,5 +15,7 @@
   },
   "callMeetInCall": {
     "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
-  }
+  },
+  "panelAddressField": "web-panel-form",
+  "panelAddSubmit": "web-panel-form"
 }
