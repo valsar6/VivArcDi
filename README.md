@@ -531,6 +531,11 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   **Untile tab** (the page becomes the first tab of today, and the tile leaves every workspace) and
   **Pin tab**. The page is never lost, and the bookmark rule above applies to Remove pin and Untile tab.
   If Vivaldi's menu of a tab cannot be extended, the reason is logged and Cmd/Ctrl+D and the drags remain.
+- **Open a tile as a web panel.** Right-click a tile of an `http` or `https` page and choose **Open as web
+  panel**: VivArcDi fills Vivaldi's own Add web panel form with the page, so Vivaldi creates the panel and
+  opens the side panel on it. A page that already is a web panel shows **Show web panel** instead, which
+  brings that panel up. The tile stays, and removing a panel is left to Vivaldi. If the form is not found,
+  the commands are not shown.
 - **Copy from the Bookmarks panel.** Drag a bookmark or a folder from Vivaldi's Bookmarks panel onto the
   workspace's folders and release: a folder is copied with all its levels, a link is added as a link.
   The drop targets are the same as for tabs. The originals stay in the panel, separators are not

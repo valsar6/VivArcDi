@@ -55,6 +55,10 @@ every workspace.
 - **Untile or pin from the menu.** Right-click a tile: **Untile tab** puts the page back as the first
   tab of today and removes the tile from every workspace; **Pin tab** makes it a link of the
   workspace's folder.
+- **Open a tile as a web panel.** Right-click a tile and choose **Open as web panel**: the page
+  appears in Vivaldi's side panel in its mobile layout, as if you had added it with the **+** of the
+  panel bar. A tile whose page is already a panel shows **Show web panel**, which brings it up. To
+  remove a panel use Vivaldi's panel bar.
 
 ![Mockup: a Today tab dragged between two tiles becomes a Favorite](images/mockups/drag-tab-to-favorites.gif)
 
@@ -101,6 +105,7 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Take a link out | Drag its row below the separator to make it a tab of today, or onto the Favorites grid to make it a Favorite |
 | Pin a tab of today | Right-click it and choose **Pin tab** in Vivaldi's menu |
 | Make a tab of today a tile | Right-click it and choose **Tile tab** |
+| Keep a tile's site beside the page | Right-click the tile and choose **Open as web panel** |
 | Put a link back among today's tabs | Right-click its row and choose **Remove pin** |
 | Make a link a tile | Right-click its row and choose **Tile tab** |
 | Keep the current page | Cmd/Ctrl+D adds it at the end of the workspace's folder; press it again to undo |

@@ -26,5 +26,9 @@
   "workspaceSave": ".WorkspacePopup .actions input.primary",
   "workspaceRow": ".WorkspacePopup button.workspace-item-wrapper",
   "popupHeader": ".toolbar-extensions, .toolbar-addressbar, .toolbar-mainbar, .UrlBar",
-  "callMeetInCall": "button[jsname=\"CQylAd\"]"
+  "callMeetInCall": "button[jsname=\"CQylAd\"]",
+  "panelAddButton": "#panels button[data-name=\"PanelWeb\"]",
+  "panelAddressField": ".CustomizePanelPopup input.address",
+  "panelAddSubmit": ".CustomizePanelPopup button.FormButton",
+  "webPanelButton": "#panels button[data-name^=\"WEBPANEL_\"]"
 }

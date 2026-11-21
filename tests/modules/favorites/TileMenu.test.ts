@@ -57,3 +57,22 @@ test('leaves the menu of anything but a tile of the grid to Vivaldi', () => {
   assert.equal(rightClick(dom, dom.createElement('div')), 0);
   assert.deepEqual(opened, []);
 });
+
+test('adds the web panel command after Pin tab when there is one', async () => {
+  const dom = new DomDocument();
+  const grid = dom.createElement('div');
+  const tile = dom.createElement('div');
+  tile.setAttribute(TILE_ATTRIBUTE, 'f1');
+  grid.append(tile);
+  const opened: string[][] = [];
+  new TileMenu({
+    document: asDocument(dom),
+    grid: (): HTMLElement => asElement(grid),
+    menu: { open: (items): void => void opened.push(items.map((item) => item.label ?? '')), close: (): void => undefined },
+    removal: { untile: async (): Promise<void> => undefined, pin: async (): Promise<void> => undefined },
+    panels: { item: async (id): Promise<{ label: string; run: () => void } | null> => (id === 'f1' ? { label: 'Open as web panel', run: (): void => undefined } : null) },
+  }).attach();
+  rightClick(dom, tile);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(opened, [['Untile tab', 'Pin tab', 'Open as web panel']]);
+});

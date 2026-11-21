@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was approved on 2026-11-21 and revised the same day after the probes of task T1. It says **how**; the spec says **what**. It builds
@@ -22,7 +22,7 @@ feature drives Vivaldi's own form, the way the rest of VivArcDi drives Vivaldi's
 
 ### Driving the form (FR-2, NFR-1, NFR-3)
 
-**`WebPanelForm`** in `src/shared/panels` has one method, `add(url)`:
+**`WebPanelForm`** in `src/modules/favorites/panels` has one method, `add(url)`:
 
 1. click the add button of the panel bar;
 2. wait for the form, set the address field with the native `value` setter and dispatch an `input`
@@ -35,7 +35,7 @@ moves them is a catalog change.
 
 ### Reading and showing the panels (FR-1, FR-3, FR-5)
 
-**`WebPanelList`** in `src/shared/panels` reads `vivaldi.panels.web.elements` through
+**`WebPanelList`** in `src/modules/favorites/panels` reads `vivaldi.panels.web.elements` through
 `BrowserPrefs.get` (read-only, as it stays) and keeps the rule of what counts as the same page:
 `sameAddress(a, b)` drops the fragment and a trailing slash (question 2). It exposes `find(url)`,
 which returns the id of the panel, and `show(id)`, which clicks the panel's button in the bar
@@ -72,12 +72,14 @@ selector check of `npm run live` (spec 047):
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/shared/panels/WebPanelForm.ts` | Opens Vivaldi's add form, fills and submits it; waits for the new button | - |
-| `src/shared/panels/WebPanelList.ts` | Reads the list; `find`, `show`; same-address rule | - |
-| `src/modules/favorites/TileMenu.ts` | The two items, chosen from the tile's page and the list | - |
+| `src/modules/favorites/panels/PanelBar.ts` | The only code that touches the panel bar and the form: click, fill, list buttons | Adapter |
+| `src/modules/favorites/panels/WebPanelForm.ts` | Opens Vivaldi's add form, fills and submits it; waits for the new button | - |
+| `src/modules/favorites/panels/WebPanelList.ts` | Reads the list; `find`, `show`; same-address rule | - |
+| `src/modules/favorites/TileWebPanels.ts` | Chooses **Open as web panel** or **Show web panel** from the tile's page and the list | - |
+| `src/modules/favorites/TileMenu.ts` | Adds that item after **Pin tab** | - |
 | `src/modules/favorites/GridDragging.ts` | Builds the panel collaborators and passes them to `TileMenu` | - |
 | `src/shared/tabs/CommandLabels.ts` | `OPEN_WEB_PANEL_LABEL`, `SHOW_WEB_PANEL_LABEL` | - |
-| `src/selectors/8.1.json` and the selector check | The four names above | - |
+| `src/selectors/8.1.json`, `tests/live/selector-states.json` and `SelectorStates.ts` | The four names above, and the state that opens the form | - |
 | `tests/live/scenarios/a-tile-becomes-a-web-panel-in-the-panel-list.live.ts` | AC-8 | - |
 
 ## Configuration
@@ -88,8 +90,8 @@ None: the items are part of the Favorites module and follow it.
 
 - Vivaldi may restyle the form or the panel bar in a later version; the catalog and the selector
   check turn that into one named failure, and NFR-1 hides the commands meanwhile.
-- The form closes or moves while it is being driven; the wait in step 3 has a timeout and leaves no
-  half-filled form open (the popup is closed with its own close button on failure).
+- The form closes or moves while it is being driven; each wait has a timeout and the command fails
+  with a logged reason, so nothing waits for ever.
 - A tile whose address Vivaldi rewrites on submit (a redirect, a trailing slash) is found again by
   the same-address rule, so it is not added twice.
 - Removing a panel is not offered (question 4); a user who removes one by hand sees **Open as web
