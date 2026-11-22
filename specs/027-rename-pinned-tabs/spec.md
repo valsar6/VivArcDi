@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-08 |
-| Revision | Draft, 2026-11-22: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11) |
+| Revision | Draft, answers of 2026-11-22 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -71,9 +71,9 @@ A right click on a saved row or a Favorite tile shows "Change Icon…" and "Rena
 ## Open questions
 
 - [x] Show the stored name in Vivaldi's own bookmarks panel too, or only in VivArcDi rows?
-- [ ] **Q-2. Where the name and icon are stored.** Proposal: a probe of the design finds whether the bookmark can carry a `vivExtData` through the Vivaldi API; if not, VivArcDi's own storage keyed by bookmark id (037), synced with 030. Either way FR-1 holds.
-- [ ] **Q-3. The emoji list.** Proposal: a bundled list with a name and keywords in English for the search, grouped in the categories of the recording (faces, nature, food, activities, travel, objects, symbols, flags), no network.
-- [ ] **Q-4. Reset.** Proposal: a reset button in the picker and an empty name, not a menu item, as the recording's menu has none.
+- [x] **Q-2. Where the name and icon are stored.** Proposal: a probe of the design finds whether the bookmark can carry a `vivExtData` through the Vivaldi API; if not, VivArcDi's own storage keyed by bookmark id (037), synced with 030. Either way FR-1 holds. Confirmed (Tore, 2026-11-22), with a probe in the design to check it.
+- [x] **Q-3. The emoji list.** Proposal: a bundled list with a name and keywords in English for the search, grouped in the categories of the recording (faces, nature, food, activities, travel, objects, symbols, flags), no network. Confirmed (Tore, 2026-11-22).
+- [x] **Q-4. Reset.** Proposal: a reset button in the picker and an empty name, not a menu item, as the recording's menu has none. Confirmed (Tore, 2026-11-22).
 
 ## References
 
