@@ -146,11 +146,11 @@ A task edits only its files. A file in two rows has its owners named.
   `title` of the tile is gone, the label is `no-drag` and clamped to the window, `destroy` stops
   listening. Then `TileHoverName`, its use in `FavoritesView` and its block in `favorites.scss`. AC-14.
 - [ ] **T9. The name through Vivaldi Sync** (starts after T1 and T2; not deferrable, FR-9). Tests first:
-  `syncs the name of a saved tab` (renaming a row writes `name:<address key>` with the name into the
+  `syncs the name of a saved tab` (renaming a row writes `name:uuid:<uuid>` of its bookmark with the name into the
   settings of its workspace in the sync store, through `WorkspaceSettings`); also: the same for a
   Favorites tile (area outside any workspace) and for a tile made from a pinned tab (`page:` key, the
-  workspace of the pinned tab); a name that arrives from the store is applied to every label of this
-  computer with the same address key; a `null` removes the name; a name applied by the sync is not
+  workspace of the pinned tab); a name that arrives from the store is applied to the label of the bookmark with that `uuid` (and, for
+  `name:page:<key>`, to the labels with that address key); a bookmark with no `uuid` is skipped and tried at the next pass; `BookmarkNode` gains `uuid` (the file of its type is T9's); a `null` removes the name; a name applied by the sync is not
   written back (030 FR-4); the icon and the favicon are never written; a bookmark outside the base
   folder and the Favorites folder is not synced; a failing write logs once. Then `LabelSync`, its
   start in `WorkspaceSync` and its call after a sync pass. The implementer reads `WorkspaceRoots` and

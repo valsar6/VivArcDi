@@ -110,7 +110,7 @@ as 056 did.
 |---|---|---|
 | F-1 | `chrome.bookmarks` has the eleven standard methods; `vivaldi.bookmarksPrivate` has `emptyTrash`, `export`, `getFolderIds`, `isCustomThumbnail`, `updatePartners`, `updateSpeedDialsForWindowsJumplist`. No method sets a custom field. | None. |
 | F-2 | The members of a node are `bookmarkbar`, `children`, `dateAdded`, `description`, `folderType`, `id`, `index`, `nickname`, `parentId`, `partner`, `speeddial`, `syncing`, `themeColor`, `thumbnail`, `title`, `trash` and **`uuid`**. There is no `vivExtData` and no `guid`. The only free candidates are `nickname` (Vivaldi's keyword of the bookmark, synced) and `description` (030's `Settings` bookmark uses it); both mean something else. | **Plan A is not adopted: plan B stays** (`vivarcdi.labels`). |
-| F-2b | `uuid` is a stable identifier that Vivaldi Sync carries between computers. | **Proposal for T9, to confirm with Tore:** the name sync keys a row or a tile from a bookmark by its `uuid` (`name:uuid:<uuid>`), not by its address. That removes the quirk of two links with the same address sharing a name; a tile from a pinned tab keeps `name:page:<address key>`. `BookmarkNode` must then expose `uuid`. Not proven in the lab: that a bookmark created by VivArcDi gets a `uuid` at once (a probe cannot create one). |
+| F-2b | `uuid` is a stable identifier that Vivaldi Sync carries between computers. | **Confirmed by Tore (2026-11-22): "so that if I change the address I know it was that very favorite".** The name sync keys a row or a tile from a bookmark by its `uuid` (`name:uuid:<uuid>`), not by its address. That removes the quirk of two links with the same address sharing a name; a tile from a pinned tab keeps `name:page:<address key>`. `BookmarkNode` must then expose `uuid`. Not proven in the lab: that a bookmark created by VivArcDi gets a `uuid` at once (a probe cannot create one). |
 | F-3 | Same ids and members in both runs (`0`, `1`, `2`, `4`); the lab has no bookmark of its own, so the stability of a user bookmark's id is not proven. | An id is the local key; the `uuid` is the key across computers. |
 | F-4 | A lab tab reports `favIconUrl` about one second after a load: `https://www.wikipedia.org/static/favicon/wikipedia.ico` (the `https` form). Its change when a page changes its icon is not probed. | Plan 1 of the favicon works for a page that is open. |
 | F-5 | The UI window can `fetch` a page (`ok`, `type: basic`, the page has a `link rel=icon`) and its `/favicon.ico` (`image/vnd.microsoft.icon`, 2.7 KB). | Plan 2 works for a page that is not open. |
@@ -132,24 +132,27 @@ path of 030: the `Settings` bookmark of each workspace in the sync store, read a
 
 **How.** `LabelSync` in `src/modules/workspacesync/` (T9) keeps the names, and only the names (the
 icon, the favicon and the name's emoji stay local: out of scope, spec), in the workspace settings under
-one key per link, `name:<address key>`, with the name as the value and `null` for a removed name. The
-address key is the one that 030 already uses to match pinned tabs (`AddressKey.from(url)`), because ids
-of bookmarks and of tabs are local to a computer.
+one key per link, with the name as the value and `null` for a removed name: `name:uuid:<uuid>` for a row
+or a tile from a bookmark, with the `uuid` that Vivaldi gives every bookmark node and Sync carries between
+computers (probe F-2b; `BookmarkNode` gains `uuid`), so a link stays itself when its address changes; and
+`name:page:<address key>` for a tile made from a pinned tab, which has no bookmark, with the address key
+that 030 uses to match pinned tabs (`AddressKey.from(url)`). Ids of bookmarks and of tabs are local to a
+computer.
 
 - **Out.** On `LinkLabels.onChange`, the names that changed since the last snapshot are written. The
   area of a label is found like this: `page:<key>` is the workspace of the active pinned tab (`TabData.of`
-  then `WorkspaceNames`), `bookmark:<id>` is looked up in the bookmark tree: a link under
+  then `WorkspaceNames`), `bookmark:<id>` is looked up in the bookmark tree, which also gives its `uuid`: a link under
   `<workspacesBase>/<workspace name>` belongs to that workspace, one under the base folder or under the
   Favorites folder to the area outside any workspace (`null`). `workspacesBase` and the Favorites folder
   are the options of the folders and favorites modules, read through `context.modules` as 030 reads
   them; a bookmark elsewhere is not synced.
-- **In.** After each sync pass of 030, for every workspace area, each `name:<key>` is applied to the
-  labels of this computer whose address key matches (`page:<key>`, and every bookmark of the area
-  with that address): `LinkLabels.set(key, { name })` with the "applied by sync" flag, which is not
+- **In.** After each sync pass of 030, for every workspace area, each `name:uuid:<uuid>` is applied to the
+  label of the bookmark of this computer with that `uuid`, and each `name:page:<key>` to the labels whose
+  address key matches (`page:<key>`): `LinkLabels.set(key, { name })` with the "applied by sync" flag, which is not
   written back (030 FR-4). A `null` removes the name.
 - Two computers that rename the same link race on one key: the last write wins, as for every setting of
-  030. Two links with one address share the name through sync (not locally). Both are listed in
-  Risks.
+  030. A bookmark that has no `uuid` yet (not proven for one created by VivArcDi) is skipped and
+  tried again at the next pass. Listed in Risks.
 
 ### Display (FR-2, FR-8, FR-10)
 
@@ -540,8 +543,8 @@ too long a `data:` result); the rows and tiles (the name wins over the title of 
 an unknown symbol draws the favicon, a stored `favicon` is drawn, a label change redraws); the menu order
 (`LinkMenuItems.test.ts` with and without the two slots; `TileLinkCommands` with the items in group 2 and
 alone for a pinned-tab tile, none for a tile with no key); the duplicate copies the label; `LabelSync`
-(out for a row, a tile and a pinned-tab tile; in applies a name by address key and removes on `null`;
-a name applied by sync is not written back).
+(out for a row, a tile and a pinned-tab tile; in applies a name by `uuid` (and by address key for a pinned-tab tile) and removes on `null`;
+a name applied by sync is not written back; a bookmark with no `uuid` is skipped).
 
 ## Risks
 
