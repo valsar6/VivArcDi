@@ -35,7 +35,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [024 Site boosts and zap](024-site-boosts-and-zap/spec.md) | 5 | Approved |
 | [025 Annotated screenshots](025-annotated-screenshots/spec.md) | 5 | Approved |
 | [026 Live folders](026-live-folders/spec.md) | 3 | Approved |
-| [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Approved |
+| [027 Rename and re-icon pinned tabs](027-rename-pinned-tabs/spec.md) | 3 | Implemented |
 | [028 Arc sidebar look](028-arc-sidebar-look/spec.md) | 3 | Approved |
 | [029 Arc Light theme](029-arc-light-theme/spec.md) | 3 | Approved |
 | [030 Workspace sync](030-workspace-sync/spec.md) | 3 | Implemented |
@@ -63,8 +63,8 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [053 Single scroll](053-single-scroll/spec.md) | 3 | Implemented |
 | [054 Call Picture in Picture](054-call-pip/spec.md) | 5 | Approved |
 | [055 Open a tile as a web panel](055-tile-web-panel/spec.md) | 3 | Implemented |
-| [056 Menu of a saved tab](056-saved-tab-menu/spec.md) | 3 | Approved |
-| [057 Menu of a Favorites tile](057-tile-menu/spec.md) | 1 | Approved |
+| [056 Menu of a saved tab](056-saved-tab-menu/spec.md) | 3 | Implemented |
+| [057 Menu of a Favorites tile](057-tile-menu/spec.md) | 1 | Implemented |
 
 
 

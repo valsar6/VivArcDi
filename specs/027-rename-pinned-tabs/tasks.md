@@ -176,5 +176,5 @@ A task edits only its files. A file in two rows has its owners named.
   and AC-16 (rename a row on one computer, the name shows on the other after Vivaldi Sync, and the icon
   does not follow, as agreed). Plus the checks that no criterion can make: `Refresh favicon` on a site
   that changed its icon, and the 3 second hover on a tile.
-- [ ] **T12. Manual checks by Tore** on macOS and Debian. When he reports them green, the spec becomes
+- [x] **T12. Manual checks by Tore** (green, 2026-11-22; the spec is `Implemented`) on macOS and Debian. When he reports them green, the spec becomes
   `Implemented`.
