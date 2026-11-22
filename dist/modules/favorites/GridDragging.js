@@ -25,6 +25,7 @@ class GridDragging {
   #targets;
   #unregister = null;
   #firstTile;
+  #tileLinks;
   /**
    * Both directions of dragging on the Favorites grid: a tab of the list released over the grid
    * becomes a Favorite, and a tile dragged out of the grid takes the Favorite out and keeps the
@@ -36,7 +37,7 @@ class GridDragging {
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned }) {
+  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned, tileLinks }) {
     const wrapperSelector = selectors.get("tabWrapper");
     const stripSelector = selectors.get("tabStrip");
     const grid = () => favorites.active ? inWindow(favorites.element) : null;
@@ -70,7 +71,9 @@ class GridDragging {
       pill
     });
     const menu = new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body });
-    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels: TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? void 0 });
+    const panels = TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? void 0;
+    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels, links: tileLinks });
+    this.#tileLinks = tileLinks;
   }
   /**
    * Starts following the mouse and the drag events, and offers the grid to `FavoriteDropZone`.
@@ -88,6 +91,7 @@ class GridDragging {
     this.#toFavorite.stop();
     this.#tileDrag.detach();
     this.#tileMenu.detach();
+    this.#tileLinks?.stop();
     this.#unregister?.();
     this.#unregister = null;
     this.#firstTile.destroy();

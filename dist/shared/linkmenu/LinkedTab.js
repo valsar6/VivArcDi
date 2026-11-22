@@ -1,4 +1,4 @@
-import { TabData } from "../../../core/tabs/TabData.js";
+import { TabData } from "../../core/tabs/TabData.js";
 class LinkedTab {
   #tabs;
   /**

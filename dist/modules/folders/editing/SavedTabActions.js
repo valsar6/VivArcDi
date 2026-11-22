@@ -1,13 +1,13 @@
 import { TextCopier } from "../../../shared/clipboard/TextCopier.js";
-import { BookmarkCopier } from "./BookmarkCopier.js";
-import { LinkClipboard } from "./LinkClipboard.js";
-import { LinkDuplication } from "./LinkDuplication.js";
-import { LinkExtras } from "./LinkExtras.js";
-import { LinkedTab } from "./LinkedTab.js";
+import { BookmarkCopier } from "../../../shared/linkmenu/BookmarkCopier.js";
+import { LinkClipboard } from "../../../shared/linkmenu/LinkClipboard.js";
+import { LinkDuplication } from "../../../shared/linkmenu/LinkDuplication.js";
+import { LinkExtras } from "../../../shared/linkmenu/LinkExtras.js";
+import { LinkedTab } from "../../../shared/linkmenu/LinkedTab.js";
 import { LinkRelocationFactory } from "./LinkRelocationFactory.js";
-import { PinnedAddress } from "./PinnedAddress.js";
-import { PromptDialog } from "./PromptDialog.js";
-import { SplitView } from "./SplitView.js";
+import { PinnedAddress } from "../../../shared/linkmenu/PinnedAddress.js";
+import { PromptDialog } from "../../../shared/linkmenu/PromptDialog.js";
+import { SplitView } from "../../../shared/linkmenu/SplitView.js";
 class SavedTabActions {
   #context;
   #sources;

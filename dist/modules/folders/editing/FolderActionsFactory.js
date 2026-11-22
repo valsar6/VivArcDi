@@ -1,5 +1,5 @@
 import { TabDataWriter } from "../../../core/tabs/TabDataWriter.js";
-import { BookmarkCopier } from "./BookmarkCopier.js";
+import { BookmarkCopier } from "../../../shared/linkmenu/BookmarkCopier.js";
 import { BookmarkTrash } from "./BookmarkTrash.js";
 import { FolderDeletion } from "./FolderDeletion.js";
 import { FolderDuplication } from "./FolderDuplication.js";

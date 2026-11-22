@@ -1,9 +1,9 @@
-import { TabData } from "../../../core/tabs/TabData.js";
-import { WorkspaceTabs } from "../../../core/workspaces/WorkspaceTabs.js";
-import { AddressField } from "../../../shared/newtab/AddressField.js";
-import { NewTabOpener } from "../../../shared/newtab/NewTabOpener.js";
-import { OPEN_IN_SPLIT_VIEW_LABEL } from "../../../shared/tabs/CommandLabels.js";
-import { TabTiler } from "../../../shared/tabs/TabTiler.js";
+import { TabData } from "../../core/tabs/TabData.js";
+import { WorkspaceTabs } from "../../core/workspaces/WorkspaceTabs.js";
+import { AddressField } from "../newtab/AddressField.js";
+import { NewTabOpener } from "../newtab/NewTabOpener.js";
+import { OPEN_IN_SPLIT_VIEW_LABEL } from "../tabs/CommandLabels.js";
+import { TabTiler } from "../tabs/TabTiler.js";
 import { BlankTabWatch } from "./BlankTabWatch.js";
 import { LinkedTab } from "./LinkedTab.js";
 const SPLIT_FAILED_TEXT = "Could not open the split view";
