@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
-import { BookmarkCopier } from '../../../../src/modules/folders/editing/BookmarkCopier.js';
+import { BookmarkCopier } from '../../../../src/shared/linkmenu/BookmarkCopier.js';
 import type { ToastKind } from '../../../../src/core/dom/Toast.js';
 import { FolderDuplication } from '../../../../src/modules/folders/editing/FolderDuplication.js';
 import { silentLogger } from '../../reopen/fakes.js';

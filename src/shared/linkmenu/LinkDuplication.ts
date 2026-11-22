@@ -1,8 +1,8 @@
 import type { BookmarkCopier } from './BookmarkCopier.js';
-import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
 import type { LinkExtras } from './LinkExtras.js';
-import type { Logger } from '../../../core/support/Logger.js';
-import type { ToastKind } from '../../../core/dom/Toast.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { ToastKind } from '../../core/dom/Toast.js';
 
 export interface LinkDuplicationDependencies {
   writer: Pick<BookmarkWriter, 'get'>;

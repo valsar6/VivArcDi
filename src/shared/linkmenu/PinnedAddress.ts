@@ -1,7 +1,7 @@
-import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
-import type { CommandItem, MenuItem } from '../../../core/dom/ContextMenu.js';
-import type { Logger } from '../../../core/support/Logger.js';
-import type { ToastKind } from '../../../core/dom/Toast.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import type { CommandItem, MenuItem } from '../../core/dom/ContextMenu.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { ToastKind } from '../../core/dom/Toast.js';
 import type { LinkedTab } from './LinkedTab.js';
 import type { PromptDialog } from './PromptDialog.js';
 

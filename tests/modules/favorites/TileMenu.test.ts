@@ -76,3 +76,55 @@ test('adds the web panel command after Pin tab when there is one', async () => {
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(opened, [['Untile tab', 'Pin tab', 'Open as web panel']]);
 });
+
+function menuWith(links: { items: (id: string) => Promise<MenuItem[]> } | undefined, opened: MenuItem[][]): { dom: DomDocument; tile: DomNode } {
+  const dom = new DomDocument();
+  const grid = dom.createElement('div');
+  const tile = dom.createElement('div');
+  tile.setAttribute(TILE_ATTRIBUTE, 'f1');
+  grid.append(tile);
+  new TileMenu({
+    document: asDocument(dom),
+    grid: (): HTMLElement => asElement(grid),
+    menu: { open: (items): void => void opened.push(items), close: (): void => undefined },
+    removal: { untile: async (): Promise<void> => undefined, pin: async (): Promise<void> => undefined },
+    links,
+  }).attach();
+  return { dom, tile };
+}
+
+const labels = (items: MenuItem[]): string[] => items.map((item) => item.label ?? '-');
+
+test('puts the link commands before Untile tab', async () => {
+  const opened: MenuItem[][] = [];
+  const asked: string[] = [];
+  const { dom, tile } = menuWith(
+    {
+      items: async (id): Promise<MenuItem[]> => {
+        asked.push(id);
+        return [{ label: 'Copy Link', run: (): void => undefined }, { separator: true }, { label: 'Duplicate', run: (): void => undefined }];
+      },
+    },
+    opened,
+  );
+  rightClick(dom, tile);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(asked, ['f1']);
+  assert.deepEqual(opened.map(labels), [['Copy Link', '-', 'Duplicate', '-', 'Untile tab', 'Pin tab']]);
+});
+
+test('leaves the menu as it was without link commands', async () => {
+  const opened: MenuItem[][] = [];
+  const none = menuWith(undefined, opened);
+  rightClick(none.dom, none.tile);
+  const empty = menuWith({ items: async (): Promise<MenuItem[]> => [] }, opened);
+  rightClick(empty.dom, empty.tile);
+  const failing = menuWith({ items: async (): Promise<MenuItem[]> => Promise.reject(new Error('no bookmark')) }, opened);
+  rightClick(failing.dom, failing.tile);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(opened.map(labels), [
+    ['Untile tab', 'Pin tab'],
+    ['Untile tab', 'Pin tab'],
+    ['Untile tab', 'Pin tab'],
+  ]);
+});

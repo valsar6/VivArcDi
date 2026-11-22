@@ -18,6 +18,7 @@ import { GridFavoriteTargets } from './GridFavoriteTargets.js';
 import { LinkedTabs } from './LinkedTabs.js';
 import { TileDrag } from './TileDrag.js';
 import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
+import type { TileLinkCommands } from './TileLinkCommands.js';
 import { TileMenu } from './TileMenu.js';
 import { TileWebPanels } from './TileWebPanels.js';
 import { TabToFavorite } from './TabToFavorite.js';
@@ -38,6 +39,8 @@ export interface GridDraggingDependencies {
   favorites: { readonly active: boolean; readonly element: HTMLElement };
   /** The pinned tiles under them, if there are any. */
   pinned: { readonly element: HTMLElement } | null;
+  /** The link commands of the menu of a tile; without them the menu has none. */
+  tileLinks?: TileLinkCommands;
 }
 
 const inWindow = (element: HTMLElement | undefined): HTMLElement | null => (element?.parentElement == null ? null : element);
@@ -50,6 +53,7 @@ export class GridDragging {
   #targets: GridFavoriteTargets;
   #unregister: (() => void) | null = null;
   #firstTile: FirstTileArea;
+  #tileLinks: TileLinkCommands | undefined;
 
   /**
    * Both directions of dragging on the Favorites grid: a tab of the list released over the grid
@@ -62,7 +66,7 @@ export class GridDragging {
    *
    * @param dependencies Everything it collaborates with.
    */
-  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned }: GridDraggingDependencies) {
+  constructor({ document, selectors, tabs, writer, folder, logger, prefs, favorites, pinned, tileLinks }: GridDraggingDependencies) {
     const wrapperSelector = selectors.get('tabWrapper');
     const stripSelector = selectors.get('tabStrip');
     const grid = (): HTMLElement | null => (favorites.active ? inWindow(favorites.element) : null);
@@ -96,7 +100,9 @@ export class GridDragging {
       pill,
     });
     const menu = new ContextMenu({ document, parent: (): Element => document.querySelector(selectors.get('browser')) ?? document.body });
-    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels: TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? undefined });
+    const panels = TileWebPanels.of({ document, selectors, prefs, writer, logger }) ?? undefined;
+    this.#tileMenu = new TileMenu({ document, grid, menu, removal, panels, links: tileLinks });
+    this.#tileLinks = tileLinks;
   }
 
   /**
@@ -116,6 +122,7 @@ export class GridDragging {
     this.#toFavorite.stop();
     this.#tileDrag.detach();
     this.#tileMenu.detach();
+    this.#tileLinks?.stop();
     this.#unregister?.();
     this.#unregister = null;
     this.#firstTile.destroy();

@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DIALOG_ATTRIBUTE, PromptDialog } from '../../../../src/modules/folders/editing/PromptDialog.js';
-import type { PromptOptions } from '../../../../src/modules/folders/editing/PromptDialog.js';
-import { asDocument, DomDocument } from '../../../core/dom.js';
-import type { DomNode } from '../../../core/dom.js';
+import { DIALOG_ATTRIBUTE, PromptDialog } from '../../../src/shared/linkmenu/PromptDialog.js';
+import type { PromptOptions } from '../../../src/shared/linkmenu/PromptDialog.js';
+import { asDocument, DomDocument } from '../../core/dom.js';
+import type { DomNode } from '../../core/dom.js';
 
 const FIELD = 'data-vivarcdi-dialog-field';
 const CONFIRM = 'data-vivarcdi-dialog-confirm';

@@ -11,8 +11,8 @@ import { WorkspaceCreator } from '../../../shared/spaces/WorkspaceCreator.js';
 import { WorkspaceMenu } from '../../../shared/spaces/WorkspaceMenu.js';
 import type { EditingSources } from './FolderEditing.js';
 import { LinkRelocation } from './LinkRelocation.js';
-import { LinkedTab } from './LinkedTab.js';
-import { PromptDialog } from './PromptDialog.js';
+import { LinkedTab } from '../../../shared/linkmenu/LinkedTab.js';
+import { PromptDialog } from '../../../shared/linkmenu/PromptDialog.js';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher.js';
 
 const TOAST_MS = 4000;
