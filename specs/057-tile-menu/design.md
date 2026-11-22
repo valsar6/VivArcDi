@@ -49,11 +49,12 @@ bookmark and tab:
 | Group | Items |
 |---|---|
 | 1 | `Copy Link` |
-| 2 | `Edit Pinned Page ▸` with `Replace Pinned URL with Current` and `Edit…` |
+| 2 | `Change Icon…`, `Rename…`, `Edit Pinned Page ▸` with `Replace Pinned URL with Current` and `Edit…` |
 | 3 | `Open in Split View`, `Duplicate` |
 
-The groups are split by `SeparatorItem`s. A tile whose bookmark cannot be read gets no items and the
-failure is logged; the menu keeps Untile tab and Pin tab.
+The groups are split by `SeparatorItem`s. The label items of 027 come first in group 2, before
+`Edit Pinned Page`; a tile whose bookmark cannot be read keeps them alone when it has a label key, and
+the failure is logged. Without them it gets no items. The menu always keeps Untile tab and Pin tab.
 
 **Placement of Duplicate.** The copy goes to `parentId` of the tile's bookmark (the Favorites folder)
 at `index + 1`, closed: no tab is created. `FavoritesFolder` reads the folder again on every change,

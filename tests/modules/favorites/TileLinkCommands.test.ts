@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { LabelKeys, LinkLabels } from '../../../src/core/browser/LinkLabels.js';
 import type { CommandItem, MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
 import type { ToastKind } from '../../../src/core/dom/Toast.js';
 import { Logger } from '../../../src/core/support/Logger.js';
@@ -10,6 +11,7 @@ import { TileTab } from '../../../src/modules/favorites/TileTab.js';
 import type { PromptOptions } from '../../../src/shared/linkmenu/PromptDialog.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../folders/fakes.js';
+import { MemoryStorage } from '../reopen/fakes.js';
 import { own } from './linked.js';
 
 const SAVED = 'https://b.example/';
@@ -17,6 +19,7 @@ const SAVED = 'https://b.example/';
 interface Setup {
   chrome: WritableChrome;
   commands: TileLinkCommands;
+  labels: LinkLabels;
   sink: SilentSink;
   copied: string[];
   asked: PromptOptions[];
@@ -33,6 +36,7 @@ function setUp(options: { answer?: string | null; tabUrl?: string } = {}): Setup
     ...(options.tabUrl === undefined ? [] : [{ id: 2, url: options.tabUrl, vivExtData: own({}, '22', SAVED) }]),
   ]);
   const sink = new SilentSink();
+  const labels = LinkLabels.of(new MemoryStorage(), new Logger('test', sink));
   const copied: string[] = [];
   const asked: PromptOptions[] = [];
   const toasts: Array<[string, ToastKind | undefined]> = [];
@@ -47,6 +51,7 @@ function setUp(options: { answer?: string | null; tabUrl?: string } = {}): Setup
       },
     },
     split: { item: async (): Promise<MenuItem> => ({ label: 'Open in Split View', run: (): void => undefined }), stop: (): void => undefined },
+    store: labels,
     notify: (text, kind): void => void toasts.push([text, kind]),
     logger: new Logger('test', sink),
   });
@@ -54,7 +59,7 @@ function setUp(options: { answer?: string | null; tabUrl?: string } = {}): Setup
     const found = (await commands.items('22')).find((entry) => entry.label === label);
     return found as MenuItem;
   };
-  return { chrome, commands, sink, copied, asked, toasts, item };
+  return { chrome, commands, labels, sink, copied, asked, toasts, item };
 }
 
 const settled = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
@@ -79,6 +84,15 @@ test('duplicates a tile right after it', async () => {
     childrenOf(chrome).map((node) => [node.title, node.url]),
     [['A', 'https://a.example/'], ['B', SAVED], ['B', SAVED], ['C', 'https://c.example/']],
   );
+});
+
+test('the duplicate keeps the label of the tile', async () => {
+  const { chrome, item, labels } = setUp();
+  await labels.set(LabelKeys.bookmark('22'), { name: 'Short', icon: { emoji: '💬' } });
+  (await item('Duplicate') as CommandItem).run();
+  await settled();
+  const copy = childrenOf(chrome).find((node) => node.title === 'B' && node.id !== '22') as BookmarkNode;
+  assert.deepEqual(labels.get(LabelKeys.bookmark(copy.id)), { name: 'Short', icon: { emoji: '💬' } });
 });
 
 test('edits the pinned url of a tile', async () => {
