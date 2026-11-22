@@ -5,8 +5,8 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-08 |
-| Revision | Draft, answers of 2026-11-22 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11) |
+| Approved | 2026-11-08; revision 2026-11-22 |
+| Revision | Approved by Tore on 2026-11-22, answers to Q-2 to Q-4 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11); amended 2026-11-22 after the design review: the name follows Vivaldi Sync, tiles made from a pinned tab are renamable too, a tile's name shows after a hover, a favicon refresh (FR-9 to FR-12, AC-12 to AC-16) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -39,6 +39,10 @@ A right click on a saved row or a Favorite tile shows "Change Icon…" and "Rena
 - **FR-6.** `Change Icon…` opens the picker with `Emoji` and `Icons`; the emoji tab has a search field that filters the grid; the icons tab has the 24 symbols of 033 FR-9; a reset button brings back title and favicon.
 - **FR-7.** The picker and the edit field are outside the window drag region and close on Esc and on a click elsewhere.
 - **FR-8.** A stored name and icon show in rows and in tiles (in every workspace for a tile).
+- **FR-9.** The name follows Vivaldi Sync like the other data of the workspace favorites (030): a name set on one computer shows on the others. The sync of the icon is a later iteration (Tore, 2026-11-22).
+- **FR-10.** Every Favorites tile can be renamed and re-iconed, also a tile made from a pinned tab, which has no bookmark: the contract is the item the user sees, not the bookmark, and the design finds the key under which the label is stored for such a tile.
+- **FR-11.** A tile shows no title; its name shows after the pointer rests on it for 3 seconds. Renaming a tile edits the name in a field under the icon.
+- **FR-12.** The picker has `Reset`, which brings back the favicon of the site and clears the name, and `Refresh favicon`, which reads the favicon of the site again and shows the new one.
 
 ### Non-functional
 
@@ -60,20 +64,26 @@ A right click on a saved row or a Favorite tile shows "Change Icon…" and "Rena
 | AC-9 | THE menus of a saved row and of a tile SHALL show `Change Icon…` and `Rename…` after the first group. | auto: `adds rename and change icon to the menus of a row and a tile` |
 | AC-10 | WHEN a tile is renamed or re-iconed, THE new name and icon SHALL show in every workspace. | auto: `shows the name and icon of a tile in every workspace` |
 | AC-11 | WHEN Tore renames a row, picks an emoji by search and an icon, and resets, THE picker and the field SHALL look and work like the recording on macOS and Debian. | manual |
+| AC-12 | WHEN a name is saved, THE name SHALL be part of the data that Vivaldi Sync carries between computers. | auto: `syncs the name of a saved tab` |
+| AC-13 | WHEN a tile made from a pinned tab is renamed and re-iconed, THE tile SHALL show the new icon and keep the name. | auto: `renames and re-icons a tile made from a pinned tab` |
+| AC-14 | WHEN the pointer rests on a tile for 3 seconds, THE tile SHALL show its name; WHEN it leaves, THE name SHALL go. | auto: `shows the name of a tile after a hover of three seconds` |
+| AC-15 | WHEN `Refresh favicon` is chosen, THE row or tile SHALL show the favicon read again from the site. | auto: `refreshes the favicon of a saved tab` |
+| AC-16 | WHEN Tore renames a row on one computer, THE name SHALL show on the other after Vivaldi Sync. | manual |
 
 ## Out of scope
 
 - Renaming ordinary Today tabs.
 - Custom image icons.
+- The sync of the icon, and the refresh of the favicon of the folders of the workspace favorites: later iterations.
 - The `Share` and `Mute` items of Arc's menu (056 and 057).
 - Folder rows and folder icons: [033](../033-folder-menu/spec.md), which reuses the picker.
 
 ## Open questions
 
 - [x] Show the stored name in Vivaldi's own bookmarks panel too, or only in VivArcDi rows?
-- [x] **Q-2. Where the name and icon are stored.** Proposal: a probe of the design finds whether the bookmark can carry a `vivExtData` through the Vivaldi API; if not, VivArcDi's own storage keyed by bookmark id (037), synced with 030. Either way FR-1 holds. Confirmed (Tore, 2026-11-22), with a probe in the design to check it.
-- [x] **Q-3. The emoji list.** Proposal: a bundled list with a name and keywords in English for the search, grouped in the categories of the recording (faces, nature, food, activities, travel, objects, symbols, flags), no network. Confirmed (Tore, 2026-11-22).
-- [x] **Q-4. Reset.** Proposal: a reset button in the picker and an empty name, not a menu item, as the recording's menu has none. Confirmed (Tore, 2026-11-22).
+- [x] **Q-2. Where the name and icon are stored.** Proposal: a probe of the design finds whether the bookmark can carry a `vivExtData` through the Vivaldi API; if not, VivArcDi's own storage keyed by bookmark id (037), synced with 030. Either way FR-1 holds. Answered (Tore, 2026-11-22): confirmed, with a probe in the design to check it.
+- [x] **Q-3. The emoji list.** Proposal: a bundled list with a name and keywords in English for the search, grouped in the categories of the recording (faces, nature, food, activities, travel, objects, symbols, flags), no network. Answered (Tore, 2026-11-22): confirmed.
+- [x] **Q-4. Reset.** Proposal: a reset button in the picker and an empty name, not a menu item, as the recording's menu has none. Answered (Tore, 2026-11-22): confirmed.
 
 ## References
 
