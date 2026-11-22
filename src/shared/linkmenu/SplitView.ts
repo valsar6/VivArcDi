@@ -1,15 +1,15 @@
-import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
-import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
-import type { ModuleContext } from '../../../core/boot/Module.js';
-import type { MenuItem } from '../../../core/dom/ContextMenu.js';
-import type { ToastKind } from '../../../core/dom/Toast.js';
-import type { Logger } from '../../../core/support/Logger.js';
-import { TabData } from '../../../core/tabs/TabData.js';
-import { WorkspaceTabs } from '../../../core/workspaces/WorkspaceTabs.js';
-import { AddressField } from '../../../shared/newtab/AddressField.js';
-import { NewTabOpener } from '../../../shared/newtab/NewTabOpener.js';
-import { OPEN_IN_SPLIT_VIEW_LABEL } from '../../../shared/tabs/CommandLabels.js';
-import { TabTiler } from '../../../shared/tabs/TabTiler.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import type { ModuleContext } from '../../core/boot/Module.js';
+import type { MenuItem } from '../../core/dom/ContextMenu.js';
+import type { ToastKind } from '../../core/dom/Toast.js';
+import type { Logger } from '../../core/support/Logger.js';
+import { TabData } from '../../core/tabs/TabData.js';
+import { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
+import { AddressField } from '../newtab/AddressField.js';
+import { NewTabOpener } from '../newtab/NewTabOpener.js';
+import { OPEN_IN_SPLIT_VIEW_LABEL } from '../tabs/CommandLabels.js';
+import { TabTiler } from '../tabs/TabTiler.js';
 import { BlankTabWatch } from './BlankTabWatch.js';
 import { LinkedTab } from './LinkedTab.js';
 

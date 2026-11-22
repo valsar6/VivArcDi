@@ -1,4 +1,4 @@
-import type { BookmarkCopier } from './BookmarkCopier.js';
+import type { BookmarkCopier } from '../../../shared/linkmenu/BookmarkCopier.js';
 import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
 import type { Logger } from '../../../core/support/Logger.js';
 import type { ToastKind } from '../../../core/dom/Toast.js';

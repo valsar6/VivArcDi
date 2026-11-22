@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
-import { BookmarkCopier } from '../../../../src/modules/folders/editing/BookmarkCopier.js';
-import type { ToastKind } from '../../../../src/core/dom/Toast.js';
-import { LinkDuplication } from '../../../../src/modules/folders/editing/LinkDuplication.js';
-import type { LinkExtras } from '../../../../src/modules/folders/editing/LinkExtras.js';
-import { silentLogger } from '../../reopen/fakes.js';
-import { FolderTabs, WritableChrome, folder, link } from '../fakes.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import { BookmarkCopier } from '../../../src/shared/linkmenu/BookmarkCopier.js';
+import type { ToastKind } from '../../../src/core/dom/Toast.js';
+import { LinkDuplication } from '../../../src/shared/linkmenu/LinkDuplication.js';
+import type { LinkExtras } from '../../../src/shared/linkmenu/LinkExtras.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { FolderTabs, WritableChrome, folder, link } from '../../modules/folders/fakes.js';
 
 const tree = (): BookmarkNode[] => [folder('0', '', [folder('1', 'Bar', [link('9', 'First', 'https://first.example/'), link('10', 'Site', 'https://site.example/'), link('14', 'Last', 'https://last.example/')])])];
 

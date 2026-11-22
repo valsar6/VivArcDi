@@ -3,7 +3,7 @@ import type { SubmenuItem } from '../../../core/dom/ContextMenu.js';
 import type { ModuleContext } from '../../../core/boot/Module.js';
 import { TabDataWriter } from '../../../core/tabs/TabDataWriter.js';
 import type { ToastKind } from '../../../core/dom/Toast.js';
-import { BookmarkCopier } from './BookmarkCopier.js';
+import { BookmarkCopier } from '../../../shared/linkmenu/BookmarkCopier.js';
 import { BookmarkTrash } from './BookmarkTrash.js';
 import { FolderDeletion } from './FolderDeletion.js';
 import { FolderDuplication } from './FolderDuplication.js';

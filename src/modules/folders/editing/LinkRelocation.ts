@@ -8,8 +8,8 @@ import type { ActiveWorkspace } from '../../../core/workspaces/ActiveWorkspace.j
 import type { WorkspaceListing, WorkspaceNames } from '../../../core/workspaces/WorkspaceNames.js';
 import type { MenuResult } from '../../../shared/spaces/MenuCommand.js';
 import type { ClosingLinks } from './ClosingLinks.js';
-import type { LinkedTab } from './LinkedTab.js';
-import type { PromptDialog } from './PromptDialog.js';
+import type { LinkedTab } from '../../../shared/linkmenu/LinkedTab.js';
+import type { PromptDialog } from '../../../shared/linkmenu/PromptDialog.js';
 import type { WorkspaceSwitcher } from './WorkspaceSwitcher.js';
 import type { WorkspaceRoots } from '../tree/WorkspaceRoots.js';
 

@@ -1,4 +1,4 @@
-import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 
 const BLANK_MARKS = ['newtab', 'startpage'];
 
