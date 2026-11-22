@@ -5,6 +5,8 @@ import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
 import type { ChromeApi } from '../../../src/core/browser/BrowserTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { BOOKMARK_FOLDERS_OPTIONS } from '../../../src/modules/folders/BookmarkFoldersOptions.js';
+import { FAVORITES_GRID_OPTIONS } from '../../../src/modules/favorites/FavoritesGridOptions.js';
 import { WORKSPACE_SYNC_OPTIONS } from '../../../src/modules/workspacesync/WorkspaceSyncOptions.js';
 import type { WorkspaceSyncOptions } from '../../../src/modules/workspacesync/WorkspaceSyncOptions.js';
 import { SYNC_DELAY_MS, WorkspaceSync } from '../../../src/modules/workspacesync/WorkspaceSync.js';
@@ -39,6 +41,7 @@ const contextOf = (setup: ReturnType<typeof world>, options: Partial<WorkspaceSy
     windows: new BrowserWindows(chromeApi),
     prefs: new BrowserPrefs(prefs),
     storage: new MemoryStorage(),
+    modules: { 'bookmark-folders': { ...BOOKMARK_FOLDERS_OPTIONS.defaults }, 'favorites-grid': { ...FAVORITES_GRID_OPTIONS.defaults } },
     notices: silentNotices(),
   } as unknown as ModuleContext<WorkspaceSyncOptions>;
   return { context, sink };
