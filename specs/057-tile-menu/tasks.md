@@ -45,11 +45,11 @@ files). T6 follows T4 and T5. T7 follows T6. T8 and T9 come last.
   AC-5 of the spec changes from `manual` to `live: \`opens a tile in split view\``: the check
   `every live check has a scenario` fails a spec that names a scenario before it exists (as T6 of
   [055](../055-tile-web-panel/tasks.md)).
-- [ ] **T8. Docs and version** (owned by the lead): README row to `Implemented` when everything is
+- [x] **T8. Docs and version** (done in `6b01595`: README, manual, minor bump to 0.66.0, release check green): README row to `Implemented` when everything is
   green, `docs/manual/tab-bar.md` with the five items of the tile menu, `package.json`,
   `package-lock.json` and `installer/vivarcdi/__init__.py` with a minor bump, checked with
   `npm run release -- check --base origin/main --branch features/tile-menu`.
-- [ ] **T9. Manual checklist for Tore**, in Italian, under `~/Desktop/sonde-vivarci/057-tile-menu/`,
+- [x] **T9. Manual checklist for Tore** (written in `~/Desktop/sonde-vivarci/057-tile-menu/verifica-057.md`, awaiting the report), in Italian, under `~/Desktop/sonde-vivarci/057-tile-menu/`,
   from AC-6 (and AC-5 until its scenario exists): right click on a tile on macOS and Debian; Copy
   Link and paste; Duplicate and check the copy right after the tile and in every workspace; `Edit…`
   with a valid and an invalid address; `Replace Pinned URL with Current`; Open in Split View with a tab
