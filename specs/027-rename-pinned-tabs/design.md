@@ -104,6 +104,23 @@ and that Vivaldi's panel does not show it. Tore proves what the lab cannot (sync
 computers: AC-16). The lead writes the findings into a table under this heading before T2 and T7 start,
 as 056 did.
 
+**Findings (T1, 2026-11-22, lab Vivaldi 8.3.4191.47, two runs of the same probe, kept outside the repository).**
+
+| # | Finding | Effect on the plan |
+|---|---|---|
+| F-1 | `chrome.bookmarks` has the eleven standard methods; `vivaldi.bookmarksPrivate` has `emptyTrash`, `export`, `getFolderIds`, `isCustomThumbnail`, `updatePartners`, `updateSpeedDialsForWindowsJumplist`. No method sets a custom field. | None. |
+| F-2 | The members of a node are `bookmarkbar`, `children`, `dateAdded`, `description`, `folderType`, `id`, `index`, `nickname`, `parentId`, `partner`, `speeddial`, `syncing`, `themeColor`, `thumbnail`, `title`, `trash` and **`uuid`**. There is no `vivExtData` and no `guid`. The only free candidates are `nickname` (Vivaldi's keyword of the bookmark, synced) and `description` (030's `Settings` bookmark uses it); both mean something else. | **Plan A is not adopted: plan B stays** (`vivarcdi.labels`). |
+| F-2b | `uuid` is a stable identifier that Vivaldi Sync carries between computers. | **Proposal for T9, to confirm with Tore:** the name sync keys a row or a tile from a bookmark by its `uuid` (`name:uuid:<uuid>`), not by its address. That removes the quirk of two links with the same address sharing a name; a tile from a pinned tab keeps `name:page:<address key>`. `BookmarkNode` must then expose `uuid`. Not proven in the lab: that a bookmark created by VivArcDi gets a `uuid` at once (a probe cannot create one). |
+| F-3 | Same ids and members in both runs (`0`, `1`, `2`, `4`); the lab has no bookmark of its own, so the stability of a user bookmark's id is not proven. | An id is the local key; the `uuid` is the key across computers. |
+| F-4 | A lab tab reports `favIconUrl` about one second after a load: `https://www.wikipedia.org/static/favicon/wikipedia.ico` (the `https` form). Its change when a page changes its icon is not probed. | Plan 1 of the favicon works for a page that is open. |
+| F-5 | The UI window can `fetch` a page (`ok`, `type: basic`, the page has a `link rel=icon`) and its `/favicon.ico` (`image/vnd.microsoft.icon`, 2.7 KB). | Plan 2 works for a page that is not open. |
+| F-6 | `chrome://favicon/size/16@2x/<url>` and `chrome://favicon2/?size=32&pageUrl=` both load (32 px), also with a changing query string. Whether they follow a changed icon is not provable in the lab. | Plans 3 and 4 are not needed unless Tore's checks of a real site fail. |
+
+**Storage plan: B. Favicon plan: 1 (the `favIconUrl` of the open tab), then 2 (fetch of the page and
+`/favicon.ico`).** Not provable in the lab: the round trip of a write to a bookmark field, what Vivaldi's
+panel does with one, the sync between two computers and the refresh of a real site that changed its icon
+(AC-15, AC-16 and the checklist).
+
 ### The name and Vivaldi Sync (FR-9, AC-12)
 
 **What exists.** For a saved row the custom name is the bookmark title, and Vivaldi Sync already carries
