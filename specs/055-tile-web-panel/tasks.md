@@ -19,5 +19,5 @@ before bumping).
   changes from `manual` to `live: \`a tile becomes a web panel in the panel list\`` in the same
   pull request (the check `every live check has a scenario` fails a spec that names a scenario
   before it exists). AC-8.
-- [ ] **T7.** README and `docs/manual/tab-bar.md`; manual checklist for Tore from AC-9.
-- [ ] **T8.** Manual checks on macOS and Debian.
+- [x] **T7.** README and `docs/manual/tab-bar.md`; manual checklist for Tore from AC-9.
+- [x] **T8.** Manual checks on macOS and Debian.
