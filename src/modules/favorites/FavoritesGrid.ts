@@ -1,4 +1,3 @@
-import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
 import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 import { DomQuery } from '../../core/dom/DomQuery.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
@@ -71,7 +70,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
    * @param context What the module may use.
    */
   public override async start(context: ModuleContext<FavoritesGridOptions>): Promise<void> {
-    const { document, selectors, logger, options, tabs, bookmarks, bookmarkWriter, prefs } = context;
+    const { document, selectors, logger, options, tabs, bookmarks } = context;
     const settings = options;
     this.#settings = settings;
     this.#document = document;
@@ -103,7 +102,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
     await this.#fromPinned?.start().catch((error: unknown) => logger.error('Could not read the pinned tabs', error));
     await this.#startBookmarks(tabs, bookmarks, logger);
-    this.#startDragging(context, tabs, bookmarkWriter, prefs, logger);
+    this.#startDragging(context);
   }
 
   /**
@@ -189,7 +188,8 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     await this.#fromBookmarks.start().catch((error: unknown) => logger.error('Could not read the Favorites folder', error));
   }
 
-  #startDragging(context: ModuleContext, tabs: BrowserTabs, writer: ModuleContext['bookmarkWriter'], prefs: BrowserPrefs, logger: Logger): void {
+  #startDragging(context: ModuleContext<FavoritesGridOptions>): void {
+    const { tabs, bookmarkWriter: writer, prefs, logger } = context;
     if (this.#fromBookmarks === null || !writer.available || this.#document === null || this.#selectors === null) {
       return;
     }
