@@ -27,7 +27,7 @@ builders there. 057 needs these pieces and assumes them in `src/shared/`:
 | Piece of 056 | Used by 057 as | Generalization needed |
 |---|---|---|
 | Copy Link (uses the copier of 004 and its toast) | `copies the saved link of a tile` | takes a bookmark id and its URL, not a row |
-| Duplicate (`BookmarkCopier.copy(ids, parentId, index)`) | copy at `index + 1` of the tile's parent | `BookmarkCopier` is in `modules/folders/editing` and copies only title and URL today; 056 FR-3 adds icon and `vivExtData`, and it must move to `shared` |
+| Duplicate (`BookmarkCopier.copy(ids, parentId, index)`) | copy at `index + 1` of the tile's parent | none in what it copies: `BookmarkCopier` copies only title and URL (bookmarks of this Vivaldi have no `vivExtData` and no icon member); it moved to `src/shared/linkmenu/` in T3 |
 | `Edit Pinned URL` dialog and its URL check | `edits the pinned url of a tile` | none, if it takes a callback `save(url)` |
 | `Replace Pinned URL with Current` and its disabled rule | `replaces the pinned url of a tile...` | takes "the open tab" as an argument |
 | Open in Split View (tiling, address-bar path, NFR-2) | AC-5 | takes "the tab of the row" as an argument |
@@ -58,12 +58,42 @@ failure is logged; the menu keeps Untile tab and Pin tab.
 **Placement of Duplicate.** The copy goes to `parentId` of the tile's bookmark (the Favorites folder)
 at `index + 1`, closed: no tab is created. `FavoritesFolder` reads the folder again on every change,
 so the copy appears in the grid right after the tile, and its tile is in every workspace (FR-3). The
-copy keeps title, URL, icon and `vivExtData`; the `vivExtData` link key of an open tab is not copied
-(the tab stays with the original).
+copy keeps title and URL (`BookmarkCopier` copies only those two); the name and icon of the tile are
+the 027 label (store `vivarcdi.labels`, key `bookmark:<id>`), which `LinkExtras` copies on Duplicate.
+A bookmark has no `vivExtData` and no icon member (its fields are title, url, description, nickname,
+thumbnail, themeColor, speeddial, uuid), so there is nothing else to copy, and an open tab is not
+copied: it stays with the original.
 
 **An address change in every workspace.** The tile is one bookmark; `Edit…` and `Replace` write its
 URL once with the service of 041/042 and the grid follows the bookmark. Task T1 (probe) confirms how
 the other workspaces show it (below).
+
+### Findings of the probe (T1)
+
+The probe ran on the read-only lab. The lab has no Favorites folder and its guard blocks bookmark
+writes, so findings 1 to 3 come from the code and the bookmark tree, not from a run on a real tile; the
+live check is in the scenario of T7. Finding 4 is from `LinkedTabs.snapshot()` in the lab.
+
+1. **Where a tile lives.** A tile's bookmark is a plain http(s) link, direct child of the folder at the
+   path `favorites-grid.folder`. Grid order is folder order, that is `BookmarkNode.index`;
+   `BookmarkFavorites` does not sort. It skips subfolders, separators and non-web links, then applies
+   `slice(0, maxTiles)` (`maxTiles` = 12).
+2. **Duplicate at `index + 1`.** `chrome.bookmarks.create({ parentId, index: index + 1 })` puts the copy
+   right after the tile. `FavoritesFolder` rereads `getTree` on every change, and the folder is the
+   same in every workspace, so the copy shows in all of them. The copy has no tab, so it appears
+   closed. Caveat: when `maxTiles` is reached, the copy can fall past the cut-off and push the last
+   tile out of the grid.
+3. **Address change.** `BookmarkWriter.update` triggers `onChange`, so every workspace grid redraws.
+   `LinkedTabs.sync` (current window, all workspaces) rewrites `vivarcdi.pinnedUrl` on the tabs with the
+   matching `favoriteId`; the loaded page URL of those tabs does not change.
+4. **The open tab.** `LinkedTabs.snapshot()` returns only tabs in the workspace of the active tab, and
+   among them the active one, else the one with the greatest `lastAccessed`. This matches the rule of
+   the design. The multi-workspace case could not be simulated in the lab: Vivaldi drops a `workspaceId`
+   written through `vivExtData`, and the workspaces of the lab preferences are not recognized by tabs.
+   T7 checks it on a real profile.
+
+For the scenario of T7: `chrome.tabs.create({ pinned: true })` yields an unpinned tab; create the tab,
+then `chrome.tabs.update(id, { pinned: true })`.
 
 ### The menu
 
@@ -87,7 +117,7 @@ scope). `GridDragging` builds `TileLinkCommands` and passes it to `TileMenu`, as
 | `src/modules/favorites/TileLinkCommands.ts` | The items of 056 for the bookmark and open tab of a tile | Adapter |
 | `src/modules/favorites/TileMenu.ts` | Adds the groups from `links` before Untile tab | - |
 | `src/modules/favorites/GridDragging.ts` | Builds `TileLinkCommands` and passes it | - |
-| `src/shared/...` (names of 056's design) | The item builders of 056, moved from `modules/folders` where they are not yet in `shared` | - |
+| `src/shared/linkmenu/` | The item builders of 056 and `BookmarkCopier`, moved there from `modules/folders` in T3 (commit 7eb84dd on `wip/057-t3`) | - |
 | `tests/live/scenarios/opens-a-tile-in-split-view.live.ts` | AC-5 | - |
 
 ## Texts and logs
@@ -114,5 +144,6 @@ that are not criteria (`puts the link commands before Untile tab`, `leaves the m
 ## Risks
 
 - 056's design may place its builders differently from the table above; T3 absorbs the difference.
-- The "open tab" of a tile in another workspace: the tile has a tab only in the workspaces where it was opened; with none, `Replace` is disabled and `Open in Split View` opens one (056). The probe checks the rule.
+- The "open tab" of a tile in another workspace: the tile has a tab only in the workspaces where it was opened; with none, `Replace` is disabled and `Open in Split View` opens one (056). The probe could not simulate several workspaces; T7 checks the rule live.
+- With `maxTiles` reached, a duplicate can fall past the cut-off and push the last tile out of the grid (finding 2); accepted, the spec does not change.
 - Vivaldi's tiling may not be drivable on a version: the item is not shown and the reason is logged (056 NFR-2).
