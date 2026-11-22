@@ -1,32 +1,39 @@
 import type { Scenario } from '../../../scripts/live/scenarios/ScenarioCatalog.js';
 import { chooseSplitView, removeSavedTab, sideBySide, tiledTabs, waitForSplit, waitForTiledWebviews } from './savedTab.js';
-import { createTile, menuRows, openTileMenu } from './tile.js';
+import { createTile, menuRows, openTileMenu, type MenuRow } from './tile.js';
 
 const LINKS = ['Copy Link', 'Edit Pinned Page', 'Open in Split View', 'Duplicate'];
 
-function checkMenuOrder(rows: { role: string; text: string }[]): void {
-  const show = JSON.stringify(rows);
+function checkLinkOrder(rows: MenuRow[]): void {
   if (rows[0]?.text !== LINKS[0]) {
-    throw new Error(`expected ${LINKS[0]} first in the menu of a tile, found ${show}`);
+    throw new Error(`expected ${LINKS[0]} first in the menu of a tile, found ${JSON.stringify(rows)}`);
   }
-  let last = -1;
-  for (const label of LINKS) {
+  let last = 0;
+  for (const label of LINKS.slice(1)) {
     const index = rows.findIndex((row) => row.text === label);
     if (index <= last) {
-      throw new Error(`expected the link commands in the order ${LINKS.join(', ')}, found ${show}`);
+      throw new Error(`expected the link commands in the order ${LINKS.join(', ')}, found ${JSON.stringify(rows)}`);
     }
     last = index;
   }
+}
+
+function checkCommandOrder(rows: MenuRow[]): void {
   const untile = rows.findIndex((row) => row.text === 'Untile tab');
-  if (untile < 0 || rows[untile - 1]?.role !== 'separator') {
-    throw new Error(`expected one separator right before Untile tab, found ${show}`);
+  if (rows[untile - 1]?.role !== 'separator') {
+    throw new Error(`expected one separator right before Untile tab, found ${JSON.stringify(rows)}`);
   }
   if (rows.findIndex((row) => row.text === 'Pin tab') <= untile) {
-    throw new Error(`expected Pin tab right after Untile tab, found ${show}`);
+    throw new Error(`expected Pin tab right after Untile tab, found ${JSON.stringify(rows)}`);
   }
   if (rows.some((row) => row.text.startsWith('Move to'))) {
-    throw new Error(`a tile has no Move to in its menu: ${show}`);
+    throw new Error(`a tile has no Move to in its menu: ${JSON.stringify(rows)}`);
   }
+}
+
+function checkMenuOrder(rows: MenuRow[]): void {
+  checkLinkOrder(rows);
+  checkCommandOrder(rows);
 }
 
 const scenario: Scenario = {

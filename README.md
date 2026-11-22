@@ -539,6 +539,13 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   **Duplicate** (a closed copy right below the row) and **Move to** (the workspaces with a check on the
   current one, and **New Space…**; only the tab of the row moves, and the toast "Tab moved! Click to go
   there." switches to the workspace). Share and Mute of Arc are not reproduced.
+- **Menu of a tile.** Right-click a tile for the same items as a saved tab, without **Move to**:
+  **Copy Link** (the saved address, with a toast), **Edit Pinned Page** (**Edit…** opens a dialog to type
+  the address the tile opens first, **Replace Pinned URL with Current** takes the address of the open tab,
+  and is disabled while the two are the same), **Open in Split View** (the page of the tile beside the
+  selected tab; with no tab selected, beside a new empty tab with the address bar open on it) and
+  **Duplicate** (a closed copy right after the tile, before the cut-off of `maxTiles`). A tile is one
+  bookmark: an address change, a copy or a rename shows in every workspace.
 - **Open a tile as a web panel.** Right-click a tile of an `http` or `https` page and choose **Open as web
   panel**: VivArcDi fills Vivaldi's own Add web panel form with the page, so Vivaldi creates the panel and
   opens the side panel on it. A page that already is a web panel shows **Show web panel** instead, which

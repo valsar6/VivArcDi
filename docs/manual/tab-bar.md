@@ -55,6 +55,12 @@ every workspace.
 - **Untile or pin from the menu.** Right-click a tile: **Untile tab** puts the page back as the first
   tab of today and removes the tile from every workspace; **Pin tab** makes it a link of the
   workspace's folder.
+- **Menu of a tile.** Right-click a tile for the same items as a [link row](#folders), without
+  **Move to**: **Copy Link** copies the saved address and shows a toast, **Edit Pinned Page** opens
+  **Edit…** to type the address the tile opens first or **Replace Pinned URL with Current** to take the
+  address of the open tab, **Open in Split View** shows the page of the tile beside the selected tab,
+  and **Duplicate** adds a closed copy right after the tile. A tile is one bookmark, so these changes
+  show in every workspace.
 - **Open a tile as a web panel.** Right-click a tile and choose **Open as web panel**: the page
   appears in Vivaldi's side panel in its mobile layout, as if you had added it with the **+** of the
   panel bar. A tile whose page is already a panel shows **Show web panel**, which brings it up. To

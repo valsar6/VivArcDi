@@ -61,7 +61,7 @@ each new item from the release that implements it. `Share` and `Mute` are not re
 
 - **FR-1.** The menu of a link row gains Copy Link, Edit Pinned Page ▸, Open in Split View, Duplicate and Move to ▸, in Arc's order.
 - **FR-2.** Copy Link copies the saved URL and shows the toast of 004.
-- **FR-3.** Duplicate creates a bookmark with the same title, URL, icon and `vivExtData`, right below the row, closed.
+- **FR-3.** Duplicate creates a bookmark with the same title and URL, right below the row, closed; the 027 label of the source is copied through `LinkExtras` once that task lands.
 - **FR-4.** Move to ▸ lists the workspaces with the current one checked; choosing one moves the bookmark and its open tab (033 FR-7) and shows the toast; clicking the toast switches to that workspace.
 - **FR-5.** `New Space…` in Move to creates a workspace with the name typed and moves the tab into it; an empty name or Esc creates nothing.
 - **FR-6.** `Edit…` saves a valid URL into the bookmark; an invalid one keeps the dialog open with the field marked. Name and icon (027) stay.
