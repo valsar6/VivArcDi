@@ -389,10 +389,11 @@ tasks run in parallel; `EmojiCatalog` and `IconSymbols` satisfy them.
   `null`; a second `pick` closes the first. The popover is placed to the right of the anchor, to the left
   when there is no room, clamped to the window (`ContextMenu` has the same rule for its submenus);
   `-webkit-app-region: no-drag`.
-- Attributes for tests and styles: `data-vivarcdi-picker`, `data-vivarcdi-picker-tab` (`emoji`, `icons`),
+- Attributes for tests and styles: `data-vivarcdi-picker`, `data-vivarcdi-picker-header`, `data-vivarcdi-picker-pane` (`emoji`, `icons`), `data-vivarcdi-picker-body`, `data-vivarcdi-picker-grid` (`emoji`, `icons`), `data-vivarcdi-picker-bar`, `data-vivarcdi-picker-tab` (`emoji`, `icons`),
   `data-vivarcdi-picker-search`, `data-vivarcdi-picker-cell`, `data-vivarcdi-picker-category`,
   `data-vivarcdi-picker-reset`, `data-vivarcdi-picker-refresh`. Styles `src/styles/icon-picker.scss`,
-  `styles/icon-picker.css` in `config.json`, the tokens in `_tokens.scss`.
+  `styles/icon-picker.css` in `config.json`, the tokens in `_tokens.scss`; the stylesheet targets those
+  marks, never the position of a child, since the emoji body is a wrapper reused between opens.
 - 1,400 buttons are drawn once, on first open; a later open reuses them.
 
 ## The two menu items (T6, FR-4, FR-5, FR-6, FR-10, FR-12)
