@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-08; revision 2026-11-22 |
-| Revision | Approved by Tore on 2026-11-22, answers to Q-2 to Q-4 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11); amended 2026-11-22 after the design review: the name follows Vivaldi Sync, tiles made from a pinned tab are renamable too, a tile's name shows after a hover, a favicon refresh (FR-9 to FR-12, AC-12 to AC-17) |
+| Revision | Approved by Tore on 2026-11-22, answers to Q-2 to Q-4 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11); amended 2026-11-22 after the design review: the name follows Vivaldi Sync, tiles made from a pinned tab are renamable too, a tile's name shows after a hover, a favicon refresh (FR-9 to FR-12, AC-12 to AC-16) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
