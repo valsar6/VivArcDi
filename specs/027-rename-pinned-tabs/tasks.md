@@ -167,7 +167,7 @@ A task edits only its files. A file in two rows has its owners named.
   features/rename-pinned-tabs`; the README row to `Implemented` when everything is green; a section on
   the two commands, the picker, the hover name and the sync of the name in `docs/manual/tab-bar.md`;
   `make check`.
-- [ ] **T11. Manual checklist in Italian for Tore**, under `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/`,
+- [x] **T11. Manual checklist in Italian for Tore** (written in `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/verifica-027.md`, awaiting the report), under `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/`,
   from the criteria that stay `manual`: AC-1 (rename a saved row, restart Vivaldi, the name is still
   there; the same for a tile and for a tile made from a pinned tab), AC-2 (choose an emoji for a row and
   for a tile, the favicon is replaced; then a symbol of `Icons`; then `Reset`), AC-11 (rename with Enter,
