@@ -16,7 +16,8 @@
     "styles/dialog.css",
     "styles/sidebar-look.css",
     "styles/compact-tab-bar.css",
-    "styles/column-scroll.css"
+    "styles/column-scroll.css",
+    "styles/inline-editor.css"
   ],
   "modules": {
     "activation-marker": {

@@ -294,3 +294,8 @@ $warning-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 $check-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.500 11.500 3 8l1-1 2.500 2.500L12 4l1 1z'/%3E%3C/svg%3E");
 $submenu-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3.500 10.500 8 6 12.500l-1-1L8.500 8 5 4.500z'/%3E%3C/svg%3E");
 $menu-mark-size: 14px;
+$inline-editor: '[data-vivarcdi-inline-editor]';
+$inline-editor-layer: 79;
+$inline-editor-radius: 4px;
+$inline-editor-padding: 0 6px;
+$inline-editor-shadow: #{$arc-shadow-edge}, 0 4px 12px rgb(40 30 60 / 12%);
