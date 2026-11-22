@@ -49,7 +49,7 @@ files). T6 follows T4 and T5. T7 follows T6. T8 and T9 come last.
   green, `docs/manual/tab-bar.md` with the five items of the tile menu, `package.json`,
   `package-lock.json` and `installer/vivarcdi/__init__.py` with a minor bump, checked with
   `npm run release -- check --base origin/main --branch features/tile-menu`.
-- [x] **T9. Manual checklist for Tore** (written in `~/Desktop/sonde-vivarci/057-tile-menu/verifica-057.md`, awaiting the report), in Italian, under `~/Desktop/sonde-vivarci/057-tile-menu/`,
+- [x] **T9. Manual checklist for Tore** (written in `~/Desktop/sonde-vivarci/057-tile-menu/verifica-057.md`, green 2026-11-22; the spec is `Implemented`), in Italian, under `~/Desktop/sonde-vivarci/057-tile-menu/`,
   from AC-6 (and AC-5 until its scenario exists): right click on a tile on macOS and Debian; Copy
   Link and paste; Duplicate and check the copy right after the tile and in every workspace; `Edit…`
   with a valid and an invalid address; `Replace Pinned URL with Current`; Open in Split View with a tab

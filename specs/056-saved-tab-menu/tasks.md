@@ -117,4 +117,4 @@ A task edits only its files. A file in two columns is shared: the owner is named
   Link, Duplicate and Move to as in the recording), AC-13 (edit the pinned URL, click the row, restart)
   and AC-14 (menu, submenus and dialog on macOS and Debian). AC-10 and AC-11 are `live:` after T8 and
   are not in the list.
-- [ ] **T11.** Manual checks by Tore on macOS and Debian.
+- [x] **T11.** Manual checks by Tore on macOS and Debian, green 2026-11-22; the spec is `Implemented`.
