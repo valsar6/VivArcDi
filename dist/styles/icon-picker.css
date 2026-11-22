@@ -1,0 +1,105 @@
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] {
+  position: fixed;
+  z-index: 79;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 320px;
+  height: 360px;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: var(--colorBg, #fff);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  color: var(--colorFg, #212121);
+  font-size: 14px;
+  -webkit-app-region: no-drag;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: default;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] button:hover {
+  background-color: color-mix(in srgb, var(--colorFg, #212121) 14%, transparent);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > button {
+  height: 28px;
+  min-width: 28px;
+  padding-inline: 8px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-tab] {
+  font-weight: 600;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-refresh] {
+  margin-inline-start: auto;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-reset] {
+  min-width: 28px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child)[hidden] {
+  display: none;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] input {
+  box-sizing: border-box;
+  flex: none;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--colorFg, #212121) 15%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-cell] {
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-cell] svg {
+  width: 20px;
+  height: 20px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-category] {
+  flex: 1;
+  height: 28px;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  min-height: 0;
+  overflow-y: auto;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:nth-child(2) > div {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:last-child {
+  display: flex;
+  flex: none;
+}

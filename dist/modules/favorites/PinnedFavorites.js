@@ -1,8 +1,10 @@
+import { LabelKeys } from "../../core/browser/LinkLabels.js";
 import { SerialTask } from "../../core/support/SerialTask.js";
 import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
 import { TabData } from "../../core/tabs/TabData.js";
 import { TabUnloader } from "../../core/tabs/TabUnloader.js";
 import { GRID_ORDER } from "./BookmarkFavorites.js";
+import { FavoriteLabels } from "./FavoriteLabels.js";
 import { FavoritesView } from "./FavoritesView.js";
 import { TabChanges } from "./TabChanges.js";
 import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
@@ -16,6 +18,8 @@ class PinnedFavorites {
   #changes;
   #task;
   #tabIds = [];
+  #tiles = [];
+  #stopLabels = null;
   #detach = null;
   /**
    * The pinned tabs of the active workspace that no Favorite of the bookmark folder stands for,
@@ -28,10 +32,14 @@ class PinnedFavorites {
   constructor(dependencies) {
     const { document, selectors, tabs, logger } = dependencies;
     this.#deps = dependencies;
-    this.#view = new FavoritesView(document, {
-      open: (favorite) => void this.#open(Number(favorite.id)),
-      unload: (favorite) => void this.#unload(Number(favorite.id))
-    });
+    this.#view = new FavoritesView(
+      document,
+      {
+        open: (favorite) => void this.#open(Number(favorite.id)),
+        unload: (favorite) => void this.#unload(Number(favorite.id))
+      },
+      () => document.querySelector(selectors.get("browser")) ?? document.body
+    );
     this.#view.element.setAttribute(TILE_SOURCE_ATTRIBUTE, "pinned");
     this.#anchor = TabBarAnchor.of(document, selectors.get("tabListHost"));
     this.#changes = new TabChanges(tabs, logger, () => this.#task.request());
@@ -70,6 +78,7 @@ class PinnedFavorites {
    */
   async start() {
     this.#changes.start();
+    this.#stopLabels = this.#deps.labels.onChange(() => this.#show());
     this.#task.request();
     await this.#task.idle();
   }
@@ -77,6 +86,8 @@ class PinnedFavorites {
    * Removes the tiles and every listener, and shows the pinned tabs in the list again.
    */
   stop() {
+    this.#stopLabels?.();
+    this.#stopLabels = null;
     this.#changes.stop();
     this.place(false);
     this.#view.destroy();
@@ -107,13 +118,18 @@ class PinnedFavorites {
     const windowTabs = await this.#deps.tabs.query({ currentWindow: true });
     const tiles = PinnedFavorites.tilesOf(windowTabs, this.#deps.maxTiles);
     this.#tabIds = tiles.map((tab) => tab.id);
-    this.#view.show(tiles.map((tab) => PinnedFavorites.#favoriteOf(tab)));
+    this.#tiles = tiles.map((tab) => PinnedFavorites.#favoriteOf(tab));
+    this.#show();
     this.#view.apply(new Map(tiles.map((tab) => [String(tab.id), PinnedFavorites.#stateOf(tab)])));
     this.#deps.onChange();
   }
+  #show() {
+    this.#view.show(this.#tiles.map((favorite) => FavoriteLabels.apply(favorite, this.#deps.labels)));
+  }
   static #favoriteOf(tab) {
     const url = tab.url ?? tab.pendingUrl ?? "";
-    return { id: String(tab.id), title: tab.title ?? url, url };
+    const labelKey = LabelKeys.page(tab);
+    return { id: String(tab.id), title: tab.title ?? url, url, ...labelKey === null ? {} : { labelKey } };
   }
   static #stateOf(tab) {
     return { active: tab.active, unloaded: UnloadedTabs.isUnloaded(tab), away: false };

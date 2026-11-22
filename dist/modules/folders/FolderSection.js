@@ -1,5 +1,6 @@
 import { ActiveWorkspace } from "../../core/workspaces/ActiveWorkspace.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
+import { LabelKeys, LinkLabels } from "../../core/browser/LinkLabels.js";
 import { HiddenTabMarker } from "../../shared/tabs/HiddenTabMarker.js";
 import { HiddenTabs } from "../../shared/tabs/HiddenTabs.js";
 import { LinkId } from "../../shared/links/LinkId.js";
@@ -34,6 +35,7 @@ class FolderSection {
   #hiddenTabs;
   #hiddenMarker;
   #collapse;
+  #labels;
   #virtual;
   #rootEmpty = true;
   #roots;
@@ -74,6 +76,7 @@ class FolderSection {
     this.#hiddenTabs = HiddenTabs.of(document);
     this.#collapse = SpaceCollapse.of(document);
     this.#virtual = VirtualFolders.of(document);
+    this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
     this.#view = new FolderSectionView(
@@ -99,6 +102,7 @@ class FolderSection {
     this.#hiddenMarker.start();
     this.#stops.push(
       this.#collapse.onChange(() => this.#redraw.request()),
+      this.#labels.onChange(() => this.#redraw.request()),
       this.#virtual.onChange(() => this.#virtualChanged()),
       this.#virtual.onReveal((id) => this.#reveal(id)),
       () => this.#hiddenMarker.stop(),
@@ -196,7 +200,8 @@ class FolderSection {
   #draw() {
     const sources = {
       isOpen: (id) => this.#openFolders.has(id),
-      tabFor: (link) => this.#openLinks.tabFor(link)
+      tabFor: (link) => this.#openLinks.tabFor(link),
+      labels: (id) => this.#labels.get(LabelKeys.bookmark(id))
     };
     const live = this.#virtual.entriesFor(this.#workspace ?? null);
     const entries = [...this.#source.entries, ...live];

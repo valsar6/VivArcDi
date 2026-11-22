@@ -22,7 +22,7 @@ class LinkMenuItems {
     const [edit, split] = await Promise.all([actions.editPinnedPage(linkId), actions.openInSplitView(linkId)]);
     return [
       [actions.copyLink(linkId)],
-      [edit],
+      [actions.changeIcon(linkId), actions.rename(linkId), edit],
       [split, actions.duplicate(linkId), actions.moveTo(linkId)],
       [actions.removePin(linkId), actions.tileTab(linkId)]
     ];

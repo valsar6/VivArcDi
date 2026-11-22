@@ -1,8 +1,14 @@
+import { LabelIcon } from "../../shared/icons/LabelIcon.js";
+import { notifyRowsDrawn } from "../../shared/links/InPlaceEditor.js";
+import { TileHoverName } from "./TileHoverName.js";
 const TILES_ATTRIBUTE = "data-vivarcdi-tiles";
 const TILE_ATTRIBUTE = "data-vivarcdi-tile";
 const CURRENT_ATTRIBUTE = "data-vivarcdi-current";
 const DIMMED_ATTRIBUTE = "data-vivarcdi-unloaded";
 const AWAY_ATTRIBUTE = "data-vivarcdi-away";
+const LABEL_KEY_ATTRIBUTE = "data-vivarcdi-label-key";
+const TILE_LABEL_ATTRIBUTE = "data-vivarcdi-tile-label";
+const ICON_CLASS = "vivarcdi-tile-icon";
 const MIDDLE_BUTTON = 1;
 const PRIMARY_BUTTON = 0;
 class FavoritesView {
@@ -12,6 +18,7 @@ class FavoritesView {
   #favorites = /* @__PURE__ */ new Map();
   #tiles = /* @__PURE__ */ new Map();
   #signature = "";
+  #stopHover;
   #onClick = (event) => this.#handle(event);
   #onMouseDown = (event) => {
     if (event.button === MIDDLE_BUTTON) {
@@ -25,8 +32,9 @@ class FavoritesView {
    *
    * @param document The document of Vivaldi's browser window.
    * @param actions What clicks on tiles do.
+   * @param parent The element the hover name is added to; the body when not given.
    */
-  constructor(document, actions) {
+  constructor(document, actions, parent = () => document.body) {
     this.#document = document;
     this.#actions = actions;
     this.#root = document.createElement("div");
@@ -34,6 +42,15 @@ class FavoritesView {
     this.#root.addEventListener("click", this.#onClick);
     this.#root.addEventListener("auxclick", this.#onClick);
     this.#root.addEventListener("mousedown", this.#onMouseDown);
+    const hover = new TileHoverName({
+      document,
+      parent,
+      timers: {
+        set: (run, ms) => setTimeout(run, ms),
+        clear: (handle) => clearTimeout(handle)
+      }
+    });
+    this.#stopHover = hover.attach(this.#root, (tile) => tile.getAttribute(TILE_LABEL_ATTRIBUTE) ?? "");
   }
   /**
    * @returns The grid element, to place in the tab bar.
@@ -61,6 +78,7 @@ class FavoritesView {
     this.#favorites = new Map(favorites.map((favorite) => [favorite.id, favorite]));
     this.#tiles = new Map(favorites.map((favorite) => [favorite.id, this.#tileOf(favorite)]));
     this.#root.replaceChildren(...this.#tiles.values());
+    notifyRowsDrawn(this.#document);
   }
   /**
    * Shows the state of each tile.
@@ -82,6 +100,7 @@ class FavoritesView {
     this.#root.removeEventListener("click", this.#onClick);
     this.#root.removeEventListener("auxclick", this.#onClick);
     this.#root.removeEventListener("mousedown", this.#onMouseDown);
+    this.#stopHover();
     this.#root.remove();
   }
   /**
@@ -95,15 +114,25 @@ class FavoritesView {
     const tile = this.#document.createElement("div");
     tile.setAttribute(TILE_ATTRIBUTE, favorite.id);
     tile.setAttribute(DIMMED_ATTRIBUTE, "");
-    tile.title = favorite.title;
+    tile.setAttribute(TILE_LABEL_ATTRIBUTE, favorite.title);
+    if (favorite.labelKey !== void 0) {
+      tile.setAttribute(LABEL_KEY_ATTRIBUTE, favorite.labelKey);
+    }
+    tile.append(...this.#iconOf(favorite));
+    return tile;
+  }
+  #iconOf(favorite) {
+    const chosen = favorite.icon === void 0 ? null : LabelIcon.create(this.#document, favorite.icon, ICON_CLASS);
+    if (chosen !== null) {
+      return [chosen];
+    }
     const letter = this.#document.createElement("span");
     letter.textContent = (favorite.title.trim()[0] ?? "?").toUpperCase();
     const icon = this.#document.createElement("img");
     icon.alt = "";
     icon.addEventListener("error", () => icon.remove(), { once: true });
-    icon.src = FavoritesView.iconOf(favorite.url);
-    tile.append(letter, icon);
-    return tile;
+    icon.src = favorite.favicon ?? FavoritesView.iconOf(favorite.url);
+    return [letter, icon];
   }
   #handle(event) {
     const favorite = this.#favoriteAt(event.target);
@@ -128,6 +157,8 @@ export {
   CURRENT_ATTRIBUTE,
   DIMMED_ATTRIBUTE,
   FavoritesView,
+  LABEL_KEY_ATTRIBUTE,
   TILES_ATTRIBUTE,
-  TILE_ATTRIBUTE
+  TILE_ATTRIBUTE,
+  TILE_LABEL_ATTRIBUTE
 };

@@ -1,3 +1,4 @@
+import { LinkLabels } from "../../core/browser/LinkLabels.js";
 import { DomQuery } from "../../core/dom/DomQuery.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
 import { HiddenTabMarker } from "../../shared/tabs/HiddenTabMarker.js";
@@ -51,21 +52,21 @@ class FavoritesGrid extends Module {
    * @param context What the module may use.
    */
   async start(context) {
-    const { document, selectors, logger, options, tabs, bookmarks } = context;
-    const settings = options;
-    this.#settings = settings;
+    const { document, selectors, logger, options, tabs, bookmarks, storage } = context;
+    this.#settings = options;
     this.#document = document;
     this.#selectors = selectors;
     this.#refresh = new FrameTask(() => this.#update());
-    this.#layout = new GridLayout(settings);
-    this.#pinnedLayout = new GridLayout(settings);
+    this.#layout = new GridLayout(this.#settings);
+    this.#pinnedLayout = new GridLayout(this.#settings);
+    const labels = LinkLabels.of(storage, logger);
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
-      this.#startMiddleClick(settings, tabs, logger);
+      this.#startMiddleClick(this.#settings, tabs, logger);
     } else {
       logger.warn("chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs");
     }
-    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_TABS);
+    this.#tagger = new FavoriteTagger(selectors, this.#settings.maxTiles, this.#unloadedTabs ?? NO_TABS);
     this.#hiddenTabs = HiddenTabs.of(document);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     this.#hiddenMarker.start();
@@ -76,11 +77,11 @@ class FavoritesGrid extends Module {
       attributes: true,
       attributeFilter: ["class"]
     });
-    this.#fromPinned = this.#pinnedFavorites(tabs, logger);
+    this.#fromPinned = this.#pinnedFavorites(tabs, labels, logger);
     this.#update();
     await this.#unloadedTabs?.start().catch((error) => logger.error("Could not read unloaded tabs", error));
     await this.#fromPinned?.start().catch((error) => logger.error("Could not read the pinned tabs", error));
-    await this.#startBookmarks(tabs, bookmarks, logger);
+    await this.#startBookmarks(tabs, bookmarks, labels, logger);
     this.#startDragging(context);
   }
   /**
@@ -123,7 +124,7 @@ class FavoritesGrid extends Module {
     });
     this.#middleClick.attach();
   }
-  #pinnedFavorites(tabs, logger) {
+  #pinnedFavorites(tabs, labels, logger) {
     const document = this.#document;
     const selectors = this.#selectors;
     const hiddenTabs = this.#hiddenTabs;
@@ -132,6 +133,7 @@ class FavoritesGrid extends Module {
     }
     return new PinnedFavorites({
       document,
+      labels,
       selectors,
       tabs,
       logger,
@@ -140,7 +142,7 @@ class FavoritesGrid extends Module {
       onChange: () => this.#refresh?.request()
     });
   }
-  async #startBookmarks(tabs, bookmarks, logger) {
+  async #startBookmarks(tabs, bookmarks, labels, logger) {
     const document = this.#document;
     const selectors = this.#selectors;
     const hiddenTabs = this.#hiddenTabs;
@@ -150,6 +152,7 @@ class FavoritesGrid extends Module {
     }
     this.#fromBookmarks = new BookmarkFavorites({
       document,
+      labels,
       selectors,
       tabs,
       bookmarks,

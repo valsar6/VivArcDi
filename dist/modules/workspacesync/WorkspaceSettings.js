@@ -38,6 +38,13 @@ class WorkspaceSettings {
       await this.#store.writeSettings(workspaceName, JSON.stringify({ ...settings, [key]: value }));
     }
   }
+  /**
+   * @param workspaceName The workspace name, or null for the area outside any workspace.
+   * @returns Every setting it holds, by key; empty when it has none.
+   */
+  all(workspaceName) {
+    return this.#all(workspaceName);
+  }
   async #all(workspaceName) {
     if (workspaceName !== null && SyncNames.reserved(workspaceName)) {
       return {};

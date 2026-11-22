@@ -114,6 +114,8 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Keep a tile's site beside the page | Right-click the tile and choose **Open as web panel** |
 | Put a link back among today's tabs | Right-click its row and choose **Remove pin** |
 | Make a link a tile | Right-click its row and choose **Tile tab** |
+| Rename a link or give it an icon | Right-click its row, then **Rename…** or **Change Icon…** |
+| Rename or re-icon a tile | Right-click the tile, then **Rename…** or **Change Icon…** |
 | Copy the address of a link | Right-click its row and choose **Copy Link** |
 | Change the address a link opens first | Right-click its row, **Edit Pinned Page**, then **Edit…** (or **Replace Pinned URL with Current**) |
 | Open a link beside the page you are on | Right-click its row and choose **Open in Split View** |
@@ -143,6 +145,28 @@ Pinned tabs are rows below the folders. Each workspace has its own.
 - In a pinned tab, a link to another site opens in [Peek](peek.md), so the tab keeps its page.
 
 ![Mockup: a pinned tab browses away and comes back with one click](images/mockups/pinned-tab-reset.gif)
+
+## Names and icons
+
+Rows and tiles show the title and favicon of the page. Arc lets you shorten the name and pick an icon,
+and VivArcDi keeps both with the link, so they survive a restart and show in every workspace.
+
+- **Rename.** Right-click a link row or a tile and choose **Rename…**: the title becomes a field with
+  the text selected. Enter saves, Esc cancels, and a click elsewhere saves. Saving an empty name brings
+  back the page title. A tile edits the name in a field under its icon, and shows the name when you
+  rest the pointer on it for three seconds.
+- **Choose an icon.** **Change Icon…** opens a popover beside the row with two tabs. `Emoji` has a
+  search field, focused, and a scrolling grid of emoji with the category buttons at the bottom; typing
+  filters the grid. `Icons` has the same line symbols as the folder menu. The chosen emoji or symbol
+  replaces the favicon, and **Reset** brings back the page title and the favicon together.
+- **Refresh the favicon.** **Refresh favicon** in the picker reads the icon of the site again, for a
+  site that changed it, and clears the chosen emoji.
+- **A tile made from a pinned tab** can be renamed and re-iconed too, even though it has no bookmark.
+- **The name follows Vivaldi Sync.** A name set on one computer shows on the others after a sync. The
+  icon stays on the computer where you chose it, for now.
+
+The rename never changes the address of the link, and Vivaldi's own Bookmarks panel keeps the original
+title.
 
 ## No duplicate tabs
 

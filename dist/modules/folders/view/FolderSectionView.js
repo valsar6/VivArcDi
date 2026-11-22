@@ -1,4 +1,5 @@
 import { LinkId } from "../../../shared/links/LinkId.js";
+import { notifyRowsDrawn } from "../../../shared/links/InPlaceEditor.js";
 import { EDIT_ATTRIBUTE, FolderNameEditor } from "../editing/FolderNameEditor.js";
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from "./FolderRowElement.js";
 import { LinkIcon } from "../../../shared/links/LinkIcon.js";
@@ -12,6 +13,7 @@ const defaultTimers = {
   clear: (handle) => clearTimeout(handle)
 };
 class FolderSectionView {
+  #document;
   #handlers;
   #element;
   #links = /* @__PURE__ */ new Map();
@@ -35,6 +37,7 @@ class FolderSectionView {
    * @param timers Timers, replaceable in tests.
    */
   constructor(document, handlers, timers = defaultTimers) {
+    this.#document = document;
     this.#handlers = handlers;
     this.#timers = timers;
     this.#editor = new FolderNameEditor(document, timers, (id, name) => this.#finished(id, name));
@@ -72,6 +75,7 @@ class FolderSectionView {
     }
     this.#element.toggleAttribute("hidden", rows.length === 0);
     this.#editor.focus();
+    notifyRowsDrawn(this.#document);
   }
   /**
    * Starts editing the name of a folder row. A folder that is not drawn yet, such as one just

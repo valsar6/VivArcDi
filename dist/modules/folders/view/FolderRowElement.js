@@ -1,3 +1,4 @@
+import { LabelIcon } from "../../../shared/icons/LabelIcon.js";
 import { LinkIcon } from "../../../shared/links/LinkIcon.js";
 const CLOSE_ATTRIBUTE = "data-vivarcdi-link-close";
 const LIVE_FOLDER_ATTRIBUTE = "data-vivarcdi-live-folder";
@@ -55,7 +56,11 @@ ${row.subtitle}` : row.title);
     element.toggleAttribute(SUBTITLE_ATTRIBUTE, row.subtitle !== void 0);
     const title = this.#title(row.title);
     const text = row.subtitle === void 0 ? title : this.#twoLines(title, row.subtitle);
-    element.append(LinkIcon.create(this.#document, row, ICON_CLASS, row.tab?.favIconUrl), text, ...row.tab === void 0 ? [] : [this.#closeButton()]);
+    element.append(this.#linkIcon(row), text, ...row.tab === void 0 ? [] : [this.#closeButton()]);
+  }
+  #linkIcon(row) {
+    const chosen = row.icon === void 0 ? null : LabelIcon.create(this.#document, row.icon, ICON_CLASS);
+    return chosen ?? LinkIcon.create(this.#document, row, ICON_CLASS, row.favicon ?? row.tab?.favIconUrl);
   }
   #title(text) {
     const label = this.#document.createElement("span");

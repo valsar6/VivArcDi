@@ -192,3 +192,36 @@
   outline: 2px solid color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) 55%, transparent);
   outline-offset: -2px;
 }
+
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > .vivarcdi-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-tile] > .vivarcdi-tile-icon > svg {
+  width: 1em;
+  height: 1em;
+  color: currentcolor;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-tile-name] {
+  position: fixed;
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: 240px;
+  padding: 4px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--colorFg, #fff);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+}

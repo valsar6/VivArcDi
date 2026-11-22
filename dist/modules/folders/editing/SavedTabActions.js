@@ -1,9 +1,11 @@
+import { LabelKeys, LinkLabels } from "../../../core/browser/LinkLabels.js";
 import { TextCopier } from "../../../shared/clipboard/TextCopier.js";
 import { BookmarkCopier } from "../../../shared/linkmenu/BookmarkCopier.js";
 import { LinkClipboard } from "../../../shared/linkmenu/LinkClipboard.js";
 import { LinkDuplication } from "../../../shared/linkmenu/LinkDuplication.js";
 import { LinkExtras } from "../../../shared/linkmenu/LinkExtras.js";
 import { LinkedTab } from "../../../shared/linkmenu/LinkedTab.js";
+import { LabelCommands } from "../../../shared/links/LabelCommands.js";
 import { LinkRelocationFactory } from "./LinkRelocationFactory.js";
 import { PinnedAddress } from "../../../shared/linkmenu/PinnedAddress.js";
 import { PromptDialog } from "../../../shared/linkmenu/PromptDialog.js";
@@ -15,10 +17,11 @@ class SavedTabActions {
   #pinned = null;
   #split;
   #relocation = null;
+  #labelCommands = null;
   /**
    * The items of the menu of a saved tab that Arc has besides Remove pin and Tile tab: Copy Link,
-   * Edit Pinned Page, Open in Split View, Duplicate and Move to. Each one builds its collaborators
-   * the first time the menu asks for it.
+   * Change Icon, Rename, Edit Pinned Page, Open in Split View, Duplicate and Move to. Each one
+   * builds its collaborators the first time the menu asks for it.
    *
    * @param context What the module may use.
    * @param sources What it reads from the section.
@@ -29,16 +32,47 @@ class SavedTabActions {
   }
   /**
    * @param toast Shows a message to the user.
-   * @returns The five actions the menu of a saved tab is built from.
+   * @returns The seven actions the menu of a saved tab is built from.
    */
   create(toast) {
+    const labels = this.#labelCommandsFor(toast);
     return {
       copyLink: (linkId) => this.#copyLink(linkId, toast),
+      changeIcon: (linkId) => labels.items(linkId)[0] ?? null,
+      rename: (linkId) => labels.items(linkId)[1] ?? null,
       editPinnedPage: (linkId) => this.#editPinnedPage(linkId, toast),
       openInSplitView: (linkId) => this.#openInSplitView(linkId, toast),
       duplicate: (linkId) => this.#duplicate(linkId, toast),
       moveTo: (linkId) => this.#moveTo(linkId)
     };
+  }
+  #labelCommandsFor(toast) {
+    this.#labelCommands ??= LabelCommands.of(this.#context, {
+      keyOf: (linkId) => LabelKeys.bookmark(linkId),
+      target: (linkId) => this.#rowTarget(linkId),
+      textOf: (linkId) => this.#rowTarget(linkId)?.anchor.textContent ?? "",
+      pageOf: (linkId) => this.#pageOf(linkId),
+      notify: toast
+    });
+    return this.#labelCommands;
+  }
+  #rowTarget(linkId) {
+    const { document } = this.#context;
+    const anchor = document.querySelector(`[data-vivarcdi-link-id="${linkId}"] .vivarcdi-folders-title`);
+    return anchor === null ? null : { anchor, covers: true };
+  }
+  async #pageOf(linkId) {
+    try {
+      const { url } = await this.#context.bookmarkWriter.get(linkId);
+      if (url === void 0) {
+        return null;
+      }
+      const tab = await new LinkedTab(this.#context.tabs).of(linkId);
+      return tab === void 0 ? { url } : { url, tab };
+    } catch (error) {
+      this.#context.logger.warn("could not read the page of the link", error);
+      return null;
+    }
   }
   #copyLink(linkId, notify) {
     const { document, bookmarkWriter, logger } = this.#context;
@@ -71,8 +105,9 @@ class SavedTabActions {
     return this.#split;
   }
   #duplicate(linkId, notify) {
-    const { bookmarkWriter, logger } = this.#context;
-    const duplication = new LinkDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), extras: new LinkExtras(), notify, logger });
+    const { bookmarkWriter, storage, logger } = this.#context;
+    const extras = new LinkExtras(LinkLabels.of(storage, logger));
+    const duplication = new LinkDuplication({ writer: bookmarkWriter, copier: new BookmarkCopier(bookmarkWriter), extras, notify, logger });
     return { label: "Duplicate", run: () => void duplication.duplicate(linkId) };
   }
   #moveTo(linkId) {

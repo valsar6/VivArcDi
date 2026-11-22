@@ -76,6 +76,17 @@
   border-radius: 3px;
   object-fit: contain;
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-icon:not(img, .vivarcdi-folders-letter) {
+  display: grid;
+  place-items: center;
+  font-size: 12.8px;
+  line-height: 1;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-icon:not(img, .vivarcdi-folders-letter) > svg {
+  width: 1em;
+  height: 1em;
+  color: currentcolor;
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-letter {
   display: grid;
   place-items: center;

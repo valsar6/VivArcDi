@@ -4,7 +4,7 @@ class FolderRows {
    * Decides which rows the section shows. An open folder shows its children. A closed folder shows
    * none of them, except the links that have an open tab, which stay below it, one level in, so
    * that what is in use is always visible. A link whose tab shows another page of the web takes
-   * that page's title. When the space is collapsed, only the links that have an open tab are shown,
+   * that page's title, and a name the user gave it wins over both. When the space is collapsed, only the links that have an open tab are shown,
    * at the depth they have below a closed folder, and no folder row.
    *
    * @param entries The tree of folders and links.
@@ -45,9 +45,25 @@ class FolderRows {
   }
   static #link(link, depth, sources) {
     const tab = sources.tabFor(link);
+    const label = sources.labels?.(link.id);
+    return {
+      kind: "link",
+      id: link.id,
+      title: label?.name ?? FolderRows.#shownTitle(link, tab),
+      url: link.url,
+      key: link.key,
+      depth,
+      tab,
+      ...link.subtitle === void 0 ? {} : { subtitle: link.subtitle },
+      ...FolderRows.#looks(label)
+    };
+  }
+  static #looks(label) {
+    return { ...label?.icon === void 0 ? {} : { icon: label.icon }, ...label?.favicon === void 0 ? {} : { favicon: label.favicon } };
+  }
+  static #shownTitle(link, tab) {
     const otherTitle = tab !== void 0 && tab.key !== link.key ? tab.title : void 0;
-    const title = otherTitle !== void 0 && otherTitle !== "" ? otherTitle : link.title;
-    return { kind: "link", id: link.id, title, url: link.url, key: link.key, depth, tab, ...link.subtitle === void 0 ? {} : { subtitle: link.subtitle } };
+    return otherTitle !== void 0 && otherTitle !== "" ? otherTitle : link.title;
   }
 }
 export {
