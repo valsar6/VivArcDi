@@ -5,16 +5,14 @@ import { FrameTask } from '../../core/support/FrameTask.js';
 import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
 import { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import type { Logger } from '../../core/support/Logger.js';
-import { Module } from '../../core/boot/Module.js';
-import type { ModuleContext } from '../../core/boot/Module.js';
+import { Module, type ModuleContext } from '../../core/boot/Module.js';
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import { TabUnloader } from '../../core/tabs/TabUnloader.js';
 import { BookmarkFavorites } from './BookmarkFavorites.js';
 import { FavoriteTagger } from './FavoriteTagger.js';
 import type { UnloadedLookup } from './FavoriteTagger.js';
-import { FAVORITES_GRID_OPTIONS } from './FavoritesGridOptions.js';
-import type { FavoritesGridOptions } from './FavoritesGridOptions.js';
+import { FAVORITES_GRID_OPTIONS, type FavoritesGridOptions } from './FavoritesGridOptions.js';
 import { GridDragging } from './GridDragging.js';
 import { GridLayout } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
@@ -23,7 +21,6 @@ import { TileLinkCommands } from './TileLinkCommands.js';
 import { Toast } from '../../core/dom/Toast.js';
 import type { TileSource } from './TileSource.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
-
 const NO_TABS: UnloadedLookup = { has: () => false };
 const NOTHING_PLACED: Readonly<PlacedGrid> = { grid: null, count: 0 };
 
@@ -72,22 +69,21 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
    */
   public override async start(context: ModuleContext<FavoritesGridOptions>): Promise<void> {
     const { document, selectors, logger, options, tabs, bookmarks, storage } = context;
-    const settings = options;
-    this.#settings = settings;
+    this.#settings = options;
     this.#document = document;
     this.#selectors = selectors;
     this.#refresh = new FrameTask(() => this.#update());
-    this.#layout = new GridLayout(settings);
-    this.#pinnedLayout = new GridLayout(settings);
+    this.#layout = new GridLayout(this.#settings);
+    this.#pinnedLayout = new GridLayout(this.#settings);
     const labels = LinkLabels.of(storage, logger);
 
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
-      this.#startMiddleClick(settings, tabs, logger);
+      this.#startMiddleClick(this.#settings, tabs, logger);
     } else {
       logger.warn('chrome.tabs is missing: unloaded tiles are not dimmed and middle click closes tabs');
     }
-    this.#tagger = new FavoriteTagger(selectors, settings.maxTiles, this.#unloadedTabs ?? NO_TABS);
+    this.#tagger = new FavoriteTagger(selectors, this.#settings.maxTiles, this.#unloadedTabs ?? NO_TABS);
     this.#hiddenTabs = HiddenTabs.of(document);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     this.#hiddenMarker.start();
