@@ -1,9 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  BAR_ATTRIBUTE,
+  BODY_ATTRIBUTE,
   CATEGORY_ATTRIBUTE,
   CELL_ATTRIBUTE,
+  GRID_ATTRIBUTE,
+  HEADER_ATTRIBUTE,
   IconPicker,
+  PANE_ATTRIBUTE,
   PICKER_ATTRIBUTE,
   REFRESH_ATTRIBUTE,
   RESET_ATTRIBUTE,
@@ -105,6 +110,35 @@ test('opens the icon picker with emoji and icons', async () => {
   tab(dom, 'icons')?.click();
   const symbols = cells(dom).filter((id) => id.startsWith('symbol-'));
   assert.deepEqual(symbols, SYMBOLS.map((symbol) => symbol.id));
+  picker.close();
+});
+
+test('keeps the search field, the grid and the categories in the tab body', async () => {
+  const { dom, picker } = await started();
+  const popover = open(dom);
+  assert.ok(popover);
+  assert.equal(popover.children[0]?.getAttribute(HEADER_ATTRIBUTE), '');
+  const body = inside(dom, BODY_ATTRIBUTE)[0];
+  assert.ok(body);
+  assert.equal(body.parentElement?.getAttribute(PANE_ATTRIBUTE), 'emoji');
+  const [search, grid, bar] = body.children;
+  assert.ok(search && grid && bar);
+  assert.equal(search.getAttribute(SEARCH_ATTRIBUTE), '');
+  assert.equal(grid.getAttribute(GRID_ATTRIBUTE), 'emoji');
+  assert.equal(bar.getAttribute(BAR_ATTRIBUTE), '');
+  assert.equal(grid.children.length, CATEGORIES.length);
+  assert.equal(grid.descendants().filter((node) => node.hasAttribute(CELL_ATTRIBUTE)).length, 3);
+  assert.equal(bar.children.length, CATEGORIES.length);
+  picker.close();
+});
+
+test('draws the symbols of the Icons tab in their own grid', async () => {
+  const { dom, picker } = await started();
+  tab(dom, 'icons')?.click();
+  const grid = inside(dom, GRID_ATTRIBUTE).find((node) => node.getAttribute(GRID_ATTRIBUTE) === 'icons');
+  assert.ok(grid);
+  assert.equal(grid.parentElement?.getAttribute(PANE_ATTRIBUTE), 'icons');
+  assert.deepEqual(grid.children.map((node) => node.getAttribute(CELL_ATTRIBUTE)), SYMBOLS.map((symbol) => symbol.id));
   picker.close();
 });
 

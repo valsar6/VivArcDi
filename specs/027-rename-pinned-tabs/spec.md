@@ -7,7 +7,7 @@
 | Owner | Tore |
 | Implemented | 2026-11-22, after Tore's manual checks (T12) |
 | Approved | 2026-11-08; revision 2026-11-22 |
-| Revision | Approved by Tore on 2026-11-22, answers to Q-2 to Q-4 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11); amended 2026-11-22 after the design review: the name follows Vivaldi Sync, tiles made from a pinned tab are renamable too, a tile's name shows after a hover, a favicon refresh (FR-9 to FR-12, AC-12 to AC-16) |
+| Revision | Approved by Tore on 2026-11-22, answers to Q-2 to Q-4 included: the menu of 056 and 057, in-place rename, and the picker with Emoji and Icons tabs of Tore's recording of 2026-11-21 (AC-5 to AC-11); amended 2026-11-22 after the design review: the name follows Vivaldi Sync, tiles made from a pinned tab are renamable too, a tile's name shows after a hover, a favicon refresh (FR-9 to FR-12, AC-12 to AC-16); amended 2026-11-23 for issue #255: the emoji grid, the category bar and the icons grid stay inside the popover (FR-13, AC-17) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -44,6 +44,7 @@ A right click on a saved row or a Favorite tile shows "Change Icon…" and "Rena
 - **FR-10.** Every Favorites tile can be renamed and re-iconed, also a tile made from a pinned tab, which has no bookmark: the contract is the item the user sees, not the bookmark, and the design finds the key under which the label is stored for such a tile.
 - **FR-11.** A tile shows no title; its name shows after the pointer rests on it for 3 seconds. Renaming a tile edits the name in a field under the icon.
 - **FR-12.** The picker has `Reset`, which brings back the favicon of the site and clears the name, and `Refresh favicon`, which reads the favicon of the site again and shows the new one.
+- **FR-13.** The emoji grid, its category bar and the icons grid stay inside the popover: eight emoji to a row, six symbols to a row.
 
 ### Non-functional
 
@@ -70,6 +71,7 @@ A right click on a saved row or a Favorite tile shows "Change Icon…" and "Rena
 | AC-14 | WHEN the pointer rests on a tile for 3 seconds, THE tile SHALL show its name; WHEN it leaves, THE name SHALL go. | auto: `shows the name of a tile after a hover of three seconds` |
 | AC-15 | WHEN `Refresh favicon` is chosen, THE row or tile SHALL show the favicon read again from the site. | auto: `refreshes the favicon of a saved tab` |
 | AC-16 | WHEN Tore renames a row on one computer, THE name SHALL show on the other after Vivaldi Sync. | manual |
+| AC-17 | WHEN the picker opens, THE emoji grid, its category bar and the icons grid SHALL stay inside the popover, eight emoji to a row and six symbols to a row. | live: `the icon picker keeps its grid inside the popover` |
 
 ## Out of scope
 

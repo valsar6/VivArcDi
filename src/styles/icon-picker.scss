@@ -34,7 +34,7 @@
     }
   }
 
-  > div:first-child {
+  > [data-vivarcdi-picker-header] {
     display: flex;
     align-items: center;
     gap: $picker-gap;
@@ -58,7 +58,7 @@
     }
   }
 
-  > div:not(:first-child) {
+  > [data-vivarcdi-picker-pane] {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -68,6 +68,14 @@
     &[hidden] {
       display: none;
     }
+  }
+
+  [data-vivarcdi-picker-body] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $picker-gap;
+    min-height: 0;
   }
 
   input {
@@ -93,29 +101,41 @@
     }
   }
 
+  [data-vivarcdi-picker-grid] {
+    min-height: 0;
+    gap: $picker-section-gap;
+    overflow-y: auto;
+  }
+
+  [data-vivarcdi-picker-grid='emoji'] {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat($picker-emoji-columns, $picker-cell-size);
+    align-content: start;
+
+    > div {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: repeat($picker-emoji-columns, $picker-cell-size);
+      gap: $picker-section-gap;
+    }
+  }
+
+  [data-vivarcdi-picker-grid='icons'] {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat($picker-icon-columns, $picker-cell-size);
+    align-content: start;
+  }
+
+  [data-vivarcdi-picker-bar] {
+    display: flex;
+    flex: none;
+    gap: $picker-gap;
+  }
+
   [data-vivarcdi-picker-category] {
     flex: 1;
     height: $picker-button-size;
   }
-}
-
-#{$root} #{$picker} > div:not(:first-child) > div:nth-child(2) {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: $picker-section-gap;
-  min-height: 0;
-  overflow-y: auto;
-
-  > div {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-}
-
-#{$root} #{$picker} > div:not(:first-child) > div:last-child {
-  display: flex;
-  flex: none;
 }
