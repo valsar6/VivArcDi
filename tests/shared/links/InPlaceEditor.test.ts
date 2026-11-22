@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { InPlaceEditor, type EditTarget } from '../../../src/shared/links/InPlaceEditor.js';
+import { InPlaceEditor, ROWS_DRAWN_EVENT, type EditTarget } from '../../../src/shared/links/InPlaceEditor.js';
 import { DomDocument, type DomNode, asDocument, asElement } from '../../core/dom.js';
 
 interface Rig {
@@ -153,6 +153,29 @@ test('reposition cancels when the anchor is gone', async () => {
   const field = fieldOf(r);
   Object.defineProperty(anchor, 'isConnected', { value: false });
   r.editor.reposition();
+  assert.equal(await result, null);
+  assert.equal(field.parentElement, null);
+});
+
+test('follows the rows drawn again while the field is open', () => {
+  const r = rig();
+  const anchor = makeAnchor(r, rect);
+  void r.editor.edit({ target: targetOf(anchor, true), value: 'Mail', label: 'Name' });
+  const field = fieldOf(r);
+  anchor.rect = { left: 40, right: 140, top: 200, bottom: 230 };
+  r.document.emit(ROWS_DRAWN_EVENT, {});
+  assert.equal(field.properties.get('left'), '40px');
+  assert.equal(field.properties.get('top'), '200px');
+  assert.equal(field.properties.get('width'), '100px');
+});
+
+test('closes when the rows are drawn again and the anchor is gone', async () => {
+  const r = rig();
+  const anchor = makeAnchor(r, rect);
+  const result = r.editor.edit({ target: targetOf(anchor, true), value: 'Mail', label: 'Name' });
+  const field = fieldOf(r);
+  Object.defineProperty(anchor, 'isConnected', { value: false });
+  r.document.emit(ROWS_DRAWN_EVENT, {});
   assert.equal(await result, null);
   assert.equal(field.parentElement, null);
 });

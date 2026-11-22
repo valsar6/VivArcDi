@@ -18,6 +18,17 @@ export interface EditOptions {
 
 export const EDITOR_ATTRIBUTE = 'data-vivarcdi-inline-editor';
 
+export const ROWS_DRAWN_EVENT = 'vivarcdi:rows-drawn';
+
+/**
+ * Tells an open field that the rows or the tiles were drawn again.
+ *
+ * @param document The document of Vivaldi's browser window.
+ */
+export function notifyRowsDrawn(document: Document): void {
+  document.dispatchEvent(new Event(ROWS_DRAWN_EVENT));
+}
+
 const TILE_FIELD_WIDTH = 160;
 const TILE_FIELD_GAP = 4;
 const TILE_FIELD_HEIGHT = 24;
@@ -39,6 +50,7 @@ export class InPlaceEditor {
   #document: Document;
   #parent: () => Element;
   #open: Open | null = null;
+  #onRowsDrawn = (): void => this.reposition();
 
   /**
    * A small floating text field over a row title or under a tile. It lives in the browser window, not
@@ -74,6 +86,7 @@ export class InPlaceEditor {
             return;
           }
           this.#open = null;
+          this.#document.removeEventListener(ROWS_DRAWN_EVENT, this.#onRowsDrawn);
           input.remove();
           resolve(text);
         },
@@ -81,6 +94,7 @@ export class InPlaceEditor {
       input.addEventListener('keydown', (event) => this.#key(event, open));
       input.addEventListener('blur', () => open.settle(input.value.trim()));
       this.#open = open;
+      this.#document.addEventListener(ROWS_DRAWN_EVENT, this.#onRowsDrawn);
       this.#place(open);
       this.#parent().append(input);
       input.focus();

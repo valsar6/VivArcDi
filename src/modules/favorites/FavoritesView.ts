@@ -1,6 +1,7 @@
 import { LabelIcon } from '../../shared/icons/LabelIcon.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { TileState } from './FavoriteStates.js';
+import { notifyRowsDrawn } from '../../shared/links/InPlaceEditor.js';
 import { TileHoverName } from './TileHoverName.js';
 
 export const TILES_ATTRIBUTE = 'data-vivarcdi-tiles';
@@ -94,6 +95,7 @@ export class FavoritesView {
     this.#favorites = new Map(favorites.map((favorite) => [favorite.id, favorite]));
     this.#tiles = new Map(favorites.map((favorite) => [favorite.id, this.#tileOf(favorite)]));
     this.#root.replaceChildren(...this.#tiles.values());
+    notifyRowsDrawn(this.#document);
   }
 
   /**

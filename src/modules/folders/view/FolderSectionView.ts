@@ -1,4 +1,5 @@
 import { LinkId } from '../../../shared/links/LinkId.js';
+import { notifyRowsDrawn } from '../../../shared/links/InPlaceEditor.js';
 import { EDIT_ATTRIBUTE, FolderNameEditor } from '../editing/FolderNameEditor.js';
 import type { Row } from './FolderRows.js';
 import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from './FolderRowElement.js';
@@ -35,6 +36,7 @@ const defaultTimers: ViewTimers = {
 };
 
 export class FolderSectionView {
+  #document: Document;
   #handlers: SectionHandlers;
   #element: HTMLElement;
   #links = new Map<string, { target: LinkTarget; tabId: number | undefined }>();
@@ -59,6 +61,7 @@ export class FolderSectionView {
    * @param timers Timers, replaceable in tests.
    */
   constructor(document: Document, handlers: SectionHandlers, timers: ViewTimers = defaultTimers) {
+    this.#document = document;
     this.#handlers = handlers;
     this.#timers = timers;
     this.#editor = new FolderNameEditor(document, timers, (id, name) => this.#finished(id, name));
@@ -98,6 +101,7 @@ export class FolderSectionView {
     }
     this.#element.toggleAttribute('hidden', rows.length === 0);
     this.#editor.focus();
+    notifyRowsDrawn(this.#document);
   }
 
   /**

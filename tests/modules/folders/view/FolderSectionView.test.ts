@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Row } from '../../../../src/modules/folders/view/FolderRows.js';
 import { FolderSectionView } from '../../../../src/modules/folders/view/FolderSectionView.js';
+import { ROWS_DRAWN_EVENT } from '../../../../src/shared/links/InPlaceEditor.js';
 import { LinkActivator } from '../../../../src/shared/links/LinkActivator.js';
 import { OpenLinks } from '../../../../src/shared/links/OpenLinks.js';
 import type { OpenTab } from '../../../../src/shared/links/OpenLinks.js';
@@ -50,6 +51,14 @@ test('closes the tab of a link from its row', async () => {
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(tabs.actions(), [['remove', 2]]);
   assert.deepEqual(clicks, []);
+});
+
+test('tells an open field that the rows were drawn again', async () => {
+  const { document, view } = await setup(new FolderTabs());
+  let drawn = 0;
+  document.addEventListener(ROWS_DRAWN_EVENT, () => void (drawn += 1));
+  view.render([linkRow(undefined)]);
+  assert.equal(drawn, 1);
 });
 
 test('a click on the row of a link opens it and a link without a tab has no close button', async () => {
