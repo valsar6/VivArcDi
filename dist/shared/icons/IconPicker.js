@@ -1,5 +1,10 @@
 import { LabelIcon } from "./LabelIcon.js";
 const PICKER_ATTRIBUTE = "data-vivarcdi-picker";
+const HEADER_ATTRIBUTE = "data-vivarcdi-picker-header";
+const PANE_ATTRIBUTE = "data-vivarcdi-picker-pane";
+const BODY_ATTRIBUTE = "data-vivarcdi-picker-body";
+const GRID_ATTRIBUTE = "data-vivarcdi-picker-grid";
+const BAR_ATTRIBUTE = "data-vivarcdi-picker-bar";
 const TAB_ATTRIBUTE = "data-vivarcdi-picker-tab";
 const SEARCH_ATTRIBUTE = "data-vivarcdi-picker-search";
 const CELL_ATTRIBUTE = "data-vivarcdi-picker-cell";
@@ -23,10 +28,10 @@ function emojiCell(document, { emoji, name }, choose) {
   return Object.assign(button(document, name, { [CELL_ATTRIBUTE]: emoji }, () => choose({ icon: { emoji } })), { textContent: emoji });
 }
 function emojiBody(document, catalog, choose) {
-  const element = make(document, "div");
+  const element = make(document, "div", { [BODY_ATTRIBUTE]: "" });
   const search = make(document, "input", { type: "search", placeholder: "Search", [SEARCH_ATTRIBUTE]: "" });
-  const grid = make(document, "div");
-  const bar = make(document, "div");
+  const grid = make(document, "div", { [GRID_ATTRIBUTE]: "emoji" });
+  const bar = make(document, "div", { [BAR_ATTRIBUTE]: "" });
   const sections = catalog.categories().map((category) => {
     const section = make(document, "div");
     section.append(...category.emoji.map((entry) => emojiCell(document, entry, choose)));
@@ -107,7 +112,7 @@ class IconPicker {
   #open({ anchor, tabs = ALL_TABS, refresh = false }) {
     const { document } = this.#deps;
     const popover = make(document, "div", { [PICKER_ATTRIBUTE]: "", role: "dialog" });
-    const panes = new Map(tabs.map((name) => [name, make(document, "div")]));
+    const panes = new Map(tabs.map((name) => [name, make(document, "div", { [PANE_ATTRIBUTE]: name })]));
     const show = (shown) => {
       panes.forEach((pane, name) => pane.toggleAttribute("hidden", name !== shown));
       if (shown === "emoji") {
@@ -121,7 +126,7 @@ class IconPicker {
     this.#place(popover, anchor);
     document.addEventListener("keydown", this.#onKey, true);
     document.addEventListener("mousedown", this.#onPress, true);
-    panes.get("icons")?.append(...this.#symbolCells());
+    panes.get("icons")?.append(this.#symbolGrid());
     const emoji = panes.get("emoji");
     if (emoji !== void 0) {
       void this.#drawEmoji(popover, emoji);
@@ -130,13 +135,19 @@ class IconPicker {
   }
   #header(tabs, refresh, show) {
     const { document } = this.#deps;
-    const header = make(document, "div");
+    const header = make(document, "div", { [HEADER_ATTRIBUTE]: "" });
     header.append(...tabs.map((name) => Object.assign(button(document, TAB_LABELS[name], { [TAB_ATTRIBUTE]: name }, () => show(name)), { textContent: TAB_LABELS[name] })));
     if (refresh) {
       header.append(button(document, "Refresh favicon", { [REFRESH_ATTRIBUTE]: "" }, () => this.#choose({ refresh: true })));
     }
     header.append(button(document, "Reset", { [RESET_ATTRIBUTE]: "" }, () => this.#choose({ reset: true })));
     return header;
+  }
+  #symbolGrid() {
+    const { document } = this.#deps;
+    const grid = make(document, "div", { [GRID_ATTRIBUTE]: "icons" });
+    grid.append(...this.#symbolCells());
+    return grid;
   }
   #symbolCells() {
     const { document, symbols } = this.#deps;
@@ -180,9 +191,14 @@ class IconPicker {
   }
 }
 export {
+  BAR_ATTRIBUTE,
+  BODY_ATTRIBUTE,
   CATEGORY_ATTRIBUTE,
   CELL_ATTRIBUTE,
+  GRID_ATTRIBUTE,
+  HEADER_ATTRIBUTE,
   IconPicker,
+  PANE_ATTRIBUTE,
   PICKER_ATTRIBUTE,
   REFRESH_ATTRIBUTE,
   RESET_ATTRIBUTE,

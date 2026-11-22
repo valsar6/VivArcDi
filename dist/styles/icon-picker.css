@@ -30,34 +30,41 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-picker] button:hover {
   background-color: color-mix(in srgb, var(--colorFg, #212121) 14%, transparent);
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-header] {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > button {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-header] > button {
   height: 28px;
   min-width: 28px;
   padding-inline: 8px;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-tab] {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-header] > [data-vivarcdi-picker-tab] {
   font-weight: 600;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-refresh] {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-header] > [data-vivarcdi-picker-refresh] {
   margin-inline-start: auto;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:first-child > [data-vivarcdi-picker-reset] {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-header] > [data-vivarcdi-picker-reset] {
   min-width: 28px;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-pane] {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 6px;
   min-height: 0;
 }
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child)[hidden] {
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] > [data-vivarcdi-picker-pane][hidden] {
   display: none;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-body] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-picker] input {
   box-sizing: border-box;
@@ -79,27 +86,35 @@
   width: 20px;
   height: 20px;
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-grid] {
+  min-height: 0;
+  gap: 4px;
+  overflow-y: auto;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-grid=emoji] {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(8, 32px);
+  align-content: start;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-grid=emoji] > div {
+  display: grid;
+  grid-column: 1/-1;
+  grid-template-columns: repeat(8, 32px);
+  gap: 4px;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-grid=icons] {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(6, 32px);
+  align-content: start;
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-bar] {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-picker] [data-vivarcdi-picker-category] {
   flex: 1;
   height: 28px;
-}
-
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:nth-child(2) {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 4px;
-  min-height: 0;
-  overflow-y: auto;
-}
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:nth-child(2) > div {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-#browser[data-vivarcdi-active] [data-vivarcdi-picker] > div:not(:first-child) > div:last-child {
-  display: flex;
-  flex: none;
 }
