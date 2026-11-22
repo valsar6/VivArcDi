@@ -71,7 +71,7 @@ A task edits only its files. A file in two rows has its owners named.
 
 ## Tasks
 
-- [ ] **T1. Probe (Q-2 and the favicon)**, read-only, run by the lead with `npm run live -- --probe
+- [x] **T1. Probe (Q-2 and the favicon)**, read-only, run by the lead with `npm run live -- --probe
   <file>` on the throwaway profile, **only after Tore agrees**. It answers F-1 to F-6 of the design: the
   methods of `chrome.bookmarks` and `vivaldi.bookmarksPrivate`; the members of every node of the tree
   (permanent folders and Trash); whether an id is stable between runs; what a lab tab reports as
