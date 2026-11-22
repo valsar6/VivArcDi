@@ -64,10 +64,14 @@ export class PinnedFavorites implements TileSource {
   constructor(dependencies: PinnedFavoritesDependencies) {
     const { document, selectors, tabs, logger } = dependencies;
     this.#deps = dependencies;
-    this.#view = new FavoritesView(document, {
-      open: (favorite): void => void this.#open(Number(favorite.id)),
-      unload: (favorite): void => void this.#unload(Number(favorite.id)),
-    });
+    this.#view = new FavoritesView(
+      document,
+      {
+        open: (favorite): void => void this.#open(Number(favorite.id)),
+        unload: (favorite): void => void this.#unload(Number(favorite.id)),
+      },
+      () => document.querySelector(selectors.get('browser')) ?? document.body,
+    );
     this.#view.element.setAttribute(TILE_SOURCE_ATTRIBUTE, 'pinned');
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#changes = new TabChanges(tabs, logger, () => this.#task.request());

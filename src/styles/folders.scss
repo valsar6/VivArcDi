@@ -90,6 +90,19 @@
     object-fit: contain;
   }
 
+  .vivarcdi-folders-icon:not(img, .vivarcdi-folders-letter) {
+    display: grid;
+    place-items: center;
+    font-size: $folders-icon-size * 0.8;
+    line-height: 1;
+
+    > svg {
+      width: 1em;
+      height: 1em;
+      color: currentcolor;
+    }
+  }
+
   .vivarcdi-folders-letter {
     display: grid;
     place-items: center;

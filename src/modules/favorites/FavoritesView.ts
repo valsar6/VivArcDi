@@ -1,6 +1,7 @@
 import { LabelIcon } from '../../shared/icons/LabelIcon.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { TileState } from './FavoriteStates.js';
+import { TileHoverName } from './TileHoverName.js';
 
 export const TILES_ATTRIBUTE = 'data-vivarcdi-tiles';
 export const TILE_ATTRIBUTE = 'data-vivarcdi-tile';
@@ -8,6 +9,7 @@ export const CURRENT_ATTRIBUTE = 'data-vivarcdi-current';
 export const DIMMED_ATTRIBUTE = 'data-vivarcdi-unloaded';
 export const AWAY_ATTRIBUTE = 'data-vivarcdi-away';
 export const LABEL_KEY_ATTRIBUTE = 'data-vivarcdi-label-key';
+export const TILE_LABEL_ATTRIBUTE = 'data-vivarcdi-tile-label';
 
 const ICON_CLASS = 'vivarcdi-tile-icon';
 
@@ -28,6 +30,7 @@ export class FavoritesView {
   #favorites = new Map<string, Favorite>();
   #tiles = new Map<string, HTMLElement>();
   #signature = '';
+  #stopHover: () => void;
   #onClick = (event: Event): void => this.#handle(event as MouseEvent);
   #onMouseDown = (event: Event): void => {
     if ((event as MouseEvent).button === MIDDLE_BUTTON) {
@@ -42,8 +45,9 @@ export class FavoritesView {
    *
    * @param document The document of Vivaldi's browser window.
    * @param actions What clicks on tiles do.
+   * @param parent The element the hover name is added to; the body when not given.
    */
-  constructor(document: Document, actions: TileActions) {
+  constructor(document: Document, actions: TileActions, parent: () => Element = () => document.body) {
     this.#document = document;
     this.#actions = actions;
     this.#root = document.createElement('div');
@@ -51,6 +55,15 @@ export class FavoritesView {
     this.#root.addEventListener('click', this.#onClick);
     this.#root.addEventListener('auxclick', this.#onClick);
     this.#root.addEventListener('mousedown', this.#onMouseDown);
+    const hover = new TileHoverName({
+      document,
+      parent,
+      timers: {
+        set: (run: () => void, ms: number): unknown => setTimeout(run, ms),
+        clear: (handle: unknown): void => clearTimeout(handle as ReturnType<typeof setTimeout>),
+      },
+    });
+    this.#stopHover = hover.attach(this.#root, (tile) => tile.getAttribute(TILE_LABEL_ATTRIBUTE) ?? '');
   }
 
   /**
@@ -104,6 +117,7 @@ export class FavoritesView {
     this.#root.removeEventListener('click', this.#onClick);
     this.#root.removeEventListener('auxclick', this.#onClick);
     this.#root.removeEventListener('mousedown', this.#onMouseDown);
+    this.#stopHover();
     this.#root.remove();
   }
 
@@ -119,7 +133,7 @@ export class FavoritesView {
     const tile = this.#document.createElement('div');
     tile.setAttribute(TILE_ATTRIBUTE, favorite.id);
     tile.setAttribute(DIMMED_ATTRIBUTE, '');
-    tile.title = favorite.title;
+    tile.setAttribute(TILE_LABEL_ATTRIBUTE, favorite.title);
     if (favorite.labelKey !== undefined) {
       tile.setAttribute(LABEL_KEY_ATTRIBUTE, favorite.labelKey);
     }

@@ -67,10 +67,14 @@ export class BookmarkFavorites implements TileSource {
     this.#deps = dependencies;
     this.#links = new LinkedTabs(tabs);
     const opener = new FavoriteOpener(tabs, this.#links, new TabUnloader(tabs), logger);
-    this.#view = new FavoritesView(document, {
-      open: (favorite): void => void opener.open(favorite),
-      unload: (favorite): void => void opener.unload(favorite),
-    });
+    this.#view = new FavoritesView(
+      document,
+      {
+        open: (favorite): void => void opener.open(favorite),
+        unload: (favorite): void => void opener.unload(favorite),
+      },
+      () => document.querySelector(selectors.get('browser')) ?? document.body,
+    );
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#folder = new FavoritesFolder(bookmarks, folder, (favorites) => this.#receive(favorites));
     this.#changes = new TabChanges(tabs, logger, () => this.#readStates());

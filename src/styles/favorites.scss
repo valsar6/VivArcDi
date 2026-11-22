@@ -226,3 +226,42 @@
   outline: $today-outline-width solid color-mix(in srgb, var(--colorHighlightBg, #4c8bf5) #{$today-outline-tint}, transparent);
   outline-offset: -$today-outline-width;
 }
+
+$tile-symbol-scale: 0.9;
+$tile-name-attribute: '[data-vivarcdi-tile-name]';
+$tile-name-layer: 60;
+$tile-name-max-width: 240px;
+
+#{$root} #{$own-tile} > .vivarcdi-tile-icon {
+  display: grid;
+  place-items: center;
+  width: $tile-icon-size;
+  height: $tile-icon-size;
+  font-size: $tile-icon-size * $tile-symbol-scale;
+  font-weight: 400;
+  line-height: 1;
+
+  > svg {
+    width: 1em;
+    height: 1em;
+    color: currentcolor;
+  }
+}
+
+#{$root} #{$tile-name-attribute} {
+  position: fixed;
+  z-index: $tile-name-layer;
+  box-sizing: border-box;
+  max-width: $tile-name-max-width;
+  padding: 4px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: var(--colorBg, #222);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+  color: var(--colorFg, #fff);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  -webkit-app-region: no-drag;
+}

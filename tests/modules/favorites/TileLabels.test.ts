@@ -5,7 +5,7 @@ import { LabelKeys, LinkLabels } from '../../../src/core/browser/LinkLabels.js';
 import type { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { BookmarkFavorites } from '../../../src/modules/favorites/BookmarkFavorites.js';
-import { LABEL_KEY_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
+import { LABEL_KEY_ATTRIBUTE, TILE_LABEL_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
 import { PinnedFavorites } from '../../../src/modules/favorites/PinnedFavorites.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { asDocument } from '../../core/dom.js';
@@ -30,7 +30,7 @@ const installFakes = (t: TestContext): void => {
   t.after(() => delete globals['MutationObserver']);
 };
 
-const titleOf = (tile: DomNode | undefined): string | undefined => (tile as unknown as { title?: string } | undefined)?.title;
+const titleOf = (tile: DomNode | undefined): string | undefined => tile?.getAttribute(TILE_LABEL_ATTRIBUTE) ?? undefined;
 const sourceOf = (icon: DomNode | undefined): string | undefined => (icon as unknown as { src?: string } | undefined)?.src;
 
 const tilesOf = (element: HTMLElement): DomNode[] => (element as unknown as DomNode).children;
