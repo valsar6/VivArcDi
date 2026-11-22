@@ -1,3 +1,4 @@
+import { LinkLabels } from '../../core/browser/LinkLabels.js';
 import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
 import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 import { DomQuery } from '../../core/dom/DomQuery.js';
@@ -65,7 +66,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
    *
    * @param context What the module may use.
    */
-  public override async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter, prefs }: ModuleContext<FavoritesGridOptions>): Promise<void> {
+  public override async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter, prefs, storage }: ModuleContext<FavoritesGridOptions>): Promise<void> {
     const settings = options;
     this.#settings = settings;
     this.#document = document;
@@ -73,6 +74,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     this.#refresh = new FrameTask(() => this.#update());
     this.#layout = new GridLayout(settings);
     this.#pinnedLayout = new GridLayout(settings);
+    const labels = LinkLabels.of(storage, logger);
 
     if (tabs.available) {
       this.#unloadedTabs = new UnloadedTabs(tabs, () => this.#refresh?.request());
@@ -92,11 +94,11 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
       attributes: true,
       attributeFilter: ['class'],
     });
-    this.#fromPinned = this.#pinnedFavorites(tabs, logger);
+    this.#fromPinned = this.#pinnedFavorites(tabs, labels, logger);
     this.#update();
     await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
     await this.#fromPinned?.start().catch((error: unknown) => logger.error('Could not read the pinned tabs', error));
-    await this.#startBookmarks(tabs, bookmarks, logger);
+    await this.#startBookmarks(tabs, bookmarks, labels, logger);
     this.#startDragging(tabs, bookmarkWriter, prefs, logger);
   }
 
@@ -141,7 +143,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     this.#middleClick.attach();
   }
 
-  #pinnedFavorites(tabs: BrowserTabs, logger: Logger): PinnedFavorites | null {
+  #pinnedFavorites(tabs: BrowserTabs, labels: LinkLabels, logger: Logger): PinnedFavorites | null {
     const document = this.#document;
     const selectors = this.#selectors;
     const hiddenTabs = this.#hiddenTabs;
@@ -150,6 +152,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     }
     return new PinnedFavorites({
       document,
+      labels,
       selectors,
       tabs,
       logger,
@@ -159,7 +162,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     });
   }
 
-  async #startBookmarks(tabs: BrowserTabs, bookmarks: BrowserBookmarks | undefined, logger: Logger): Promise<void> {
+  async #startBookmarks(tabs: BrowserTabs, bookmarks: BrowserBookmarks | undefined, labels: LinkLabels, logger: Logger): Promise<void> {
     const document = this.#document;
     const selectors = this.#selectors;
     const hiddenTabs = this.#hiddenTabs;
@@ -169,6 +172,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     }
     this.#fromBookmarks = new BookmarkFavorites({
       document,
+      labels,
       selectors,
       tabs,
       bookmarks,

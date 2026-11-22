@@ -1,9 +1,9 @@
+import type { LabelIcon as Icon } from '../../core/browser/LinkLabels.js';
+import { LabelIcon } from './LabelIcon.js';
+
 export type PickerTab = 'emoji' | 'icons';
 
-/** The icon a label shows: an emoji, or the id of one of the symbols. */
-export type PickedIcon = { emoji: string } | { symbol: string };
-
-export type PickResult = { icon: PickedIcon } | { reset: true } | { refresh: true };
+export type PickResult = { icon: Icon } | { reset: true } | { refresh: true };
 
 export interface PickerEmoji {
   emoji: string;
@@ -47,8 +47,6 @@ export const REFRESH_ATTRIBUTE = 'data-vivarcdi-picker-refresh';
 const ALL_TABS: readonly PickerTab[] = ['emoji', 'icons'];
 const TAB_LABELS: Record<PickerTab, string> = { emoji: 'Emoji', icons: 'Icons' };
 const EDGE_PX = 4;
-const SVG_ATTRIBUTES = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 type Choose = (result: PickResult) => void;
 
@@ -64,15 +62,6 @@ function button(document: Document, label: string, attributes: Record<string, st
   const element = make(document, 'button', { type: 'button', 'aria-label': label, ...attributes });
   element.addEventListener('click', onClick);
   return element;
-}
-
-function symbolGlyph(document: Document, path: string): Element {
-  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
-  const shape = document.createElementNS(SVG_NAMESPACE, 'path');
-  shape.setAttribute('d', path);
-  Object.entries(SVG_ATTRIBUTES).forEach(([name, value]) => svg.setAttribute(name, value));
-  svg.append(shape);
-  return svg;
 }
 
 function emojiCell(document: Document, { emoji, name }: PickerEmoji, choose: Choose): HTMLElement {
@@ -207,7 +196,7 @@ export class IconPicker {
     const { document, symbols } = this.#deps;
     return symbols.map(({ id, label, path }) => {
       const cell = button(document, label, { [CELL_ATTRIBUTE]: id }, () => this.#finish({ icon: { symbol: id } }));
-      cell.append(symbolGlyph(document, path));
+      cell.append(LabelIcon.glyph(document, path));
       return cell;
     });
   }

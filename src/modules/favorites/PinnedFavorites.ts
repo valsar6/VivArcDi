@@ -2,11 +2,14 @@ import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
 import type { Logger } from '../../core/support/Logger.js';
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
+import { LabelKeys } from '../../core/browser/LinkLabels.js';
 import { SerialTask } from '../../core/support/SerialTask.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { TabData } from '../../core/tabs/TabData.js';
 import { TabUnloader } from '../../core/tabs/TabUnloader.js';
 import { GRID_ORDER } from './BookmarkFavorites.js';
+import { FavoriteLabels } from './FavoriteLabels.js';
+import type { FavoriteLabelStore } from './FavoriteLabels.js';
 import type { TileState } from './FavoriteStates.js';
 import type { Favorite } from './FavoritesFolder.js';
 import { FavoritesView } from './FavoritesView.js';
@@ -29,6 +32,8 @@ export interface PinnedFavoritesDependencies {
   tabs: PinnedFavoritesTabs;
   /** Reports failures. */
   logger: Logger;
+  /** The names and icons the user gave to links. */
+  labels: FavoriteLabelStore;
   /** Most tiles shown. */
   maxTiles: number;
   /** Receives the ids of the tabs that tiles stand for, to hide them from the list. */
@@ -44,6 +49,8 @@ export class PinnedFavorites implements TileSource {
   #changes: TabChanges;
   #task: SerialTask;
   #tabIds: number[] = [];
+  #tiles: Favorite[] = [];
+  #stopLabels: (() => void) | null = null;
   #detach: (() => void) | null = null;
 
   /**
@@ -107,6 +114,7 @@ export class PinnedFavorites implements TileSource {
    */
   public async start(): Promise<void> {
     this.#changes.start();
+    this.#stopLabels = this.#deps.labels.onChange(() => this.#show());
     this.#task.request();
     await this.#task.idle();
   }
@@ -115,6 +123,8 @@ export class PinnedFavorites implements TileSource {
    * Removes the tiles and every listener, and shows the pinned tabs in the list again.
    */
   public stop(): void {
+    this.#stopLabels?.();
+    this.#stopLabels = null;
     this.#changes.stop();
     this.place(false);
     this.#view.destroy();
@@ -147,14 +157,20 @@ export class PinnedFavorites implements TileSource {
     const windowTabs = await this.#deps.tabs.query({ currentWindow: true });
     const tiles = PinnedFavorites.tilesOf(windowTabs, this.#deps.maxTiles);
     this.#tabIds = tiles.map((tab) => tab.id as number);
-    this.#view.show(tiles.map((tab) => PinnedFavorites.#favoriteOf(tab)));
+    this.#tiles = tiles.map((tab) => PinnedFavorites.#favoriteOf(tab));
+    this.#show();
     this.#view.apply(new Map(tiles.map((tab) => [String(tab.id), PinnedFavorites.#stateOf(tab)])));
     this.#deps.onChange();
   }
 
+  #show(): void {
+    this.#view.show(this.#tiles.map((favorite) => FavoriteLabels.apply(favorite, this.#deps.labels)));
+  }
+
   static #favoriteOf(tab: chrome.tabs.Tab): Favorite {
     const url = tab.url ?? tab.pendingUrl ?? '';
-    return { id: String(tab.id), title: tab.title ?? url, url };
+    const labelKey = LabelKeys.page(tab);
+    return { id: String(tab.id), title: tab.title ?? url, url, ...(labelKey === null ? {} : { labelKey }) };
   }
 
   static #stateOf(tab: chrome.tabs.Tab): TileState {

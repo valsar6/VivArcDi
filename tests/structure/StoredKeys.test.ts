@@ -5,6 +5,7 @@ import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { StoredFormat, StoredRead, VersionedStorage } from '../../src/core/browser/StoredFormat.js';
 import type { SaveOutcome } from '../../src/core/browser/SavingStorage.js';
+import { LinkLabels } from '../../src/core/browser/LinkLabels.js';
 import { LastOpenedStore } from '../../src/shared/links/LastOpenedStore.js';
 import { CreatedLinks } from '../../src/modules/folders/favoritelinks/CreatedLinks.js';
 import { OpenFolders } from '../../src/modules/folders/tree/OpenFolders.js';
@@ -60,6 +61,7 @@ const readEveryStore = (log: ReadLog): void => {
   void new LiveFolderStore(log, logger).workspaces;
   void new GithubConnection({ storage: log, logger, send: (): Promise<never> => Promise.reject(new Error('unused')) }).token;
   new LastOpenedStore(log, logger).load(new Date());
+  LinkLabels.of(log, logger).all();
   const open = new OpenFolders(log, logger);
   open.load();
   open.useWorkspace('w1');
@@ -80,6 +82,7 @@ test('every stored JSON key reads through the shared reader', () => {
     'vivarcdi.liveFolders',
     'vivarcdi.liveFolders.github',
     'vivarcdi.lastOpened',
+    'vivarcdi.labels',
     'vivarcdi.openFolders',
     'vivarcdi.openFolders.w1',
     'vivarcdi.createdLinks',

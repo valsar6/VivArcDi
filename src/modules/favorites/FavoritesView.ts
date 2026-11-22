@@ -1,3 +1,4 @@
+import { LabelIcon } from '../../shared/icons/LabelIcon.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { TileState } from './FavoriteStates.js';
 
@@ -6,6 +7,9 @@ export const TILE_ATTRIBUTE = 'data-vivarcdi-tile';
 export const CURRENT_ATTRIBUTE = 'data-vivarcdi-current';
 export const DIMMED_ATTRIBUTE = 'data-vivarcdi-unloaded';
 export const AWAY_ATTRIBUTE = 'data-vivarcdi-away';
+export const LABEL_KEY_ATTRIBUTE = 'data-vivarcdi-label-key';
+
+const ICON_CLASS = 'vivarcdi-tile-icon';
 
 const MIDDLE_BUTTON = 1;
 const PRIMARY_BUTTON = 0;
@@ -116,14 +120,25 @@ export class FavoritesView {
     tile.setAttribute(TILE_ATTRIBUTE, favorite.id);
     tile.setAttribute(DIMMED_ATTRIBUTE, '');
     tile.title = favorite.title;
+    if (favorite.labelKey !== undefined) {
+      tile.setAttribute(LABEL_KEY_ATTRIBUTE, favorite.labelKey);
+    }
+    tile.append(...this.#iconOf(favorite));
+    return tile;
+  }
+
+  #iconOf(favorite: Favorite): HTMLElement[] {
+    const chosen = favorite.icon === undefined ? null : LabelIcon.create(this.#document, favorite.icon, ICON_CLASS);
+    if (chosen !== null) {
+      return [chosen];
+    }
     const letter = this.#document.createElement('span');
     letter.textContent = (favorite.title.trim()[0] ?? '?').toUpperCase();
     const icon = this.#document.createElement('img');
     icon.alt = '';
     icon.addEventListener('error', () => icon.remove(), { once: true });
-    icon.src = FavoritesView.iconOf(favorite.url);
-    tile.append(letter, icon);
-    return tile;
+    icon.src = favorite.favicon ?? FavoritesView.iconOf(favorite.url);
+    return [letter, icon];
   }
 
   #handle(event: MouseEvent): void {
