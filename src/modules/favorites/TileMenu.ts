@@ -1,8 +1,11 @@
 import { PIN_TAB_LABEL, UNTILE_TAB_LABEL } from '../../shared/tabs/CommandLabels.js';
 import type { ContextMenu, MenuItem } from '../../core/dom/ContextMenu.js';
 import type { FavoriteRemoval } from './FavoriteRemoval.js';
+import type { TileLinkCommands } from './TileLinkCommands.js';
 import type { TileWebPanels } from './TileWebPanels.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
+
+const SEPARATOR: MenuItem = { separator: true };
 
 export interface TileMenuDependencies {
   /** The document of Vivaldi's browser window. */
@@ -13,6 +16,8 @@ export interface TileMenuDependencies {
   removal: Pick<FavoriteRemoval, 'untile' | 'pin'>;
   /** The web panel command; without it the menu has none. */
   panels?: Pick<TileWebPanels, 'item'> | undefined;
+  /** The link commands of 056 for a tile; without them the menu has none. */
+  links?: Pick<TileLinkCommands, 'items'> | undefined;
 }
 
 export class TileMenu {
@@ -22,8 +27,8 @@ export class TileMenu {
   /**
    * The menu of a tile of the Favorites grid, opened with a right click: Untile tab puts the page
    * back among today's tabs, Pin tab makes it a link of the workspace favorites, and a web panel
-   * command follows when the page can be one. Vivaldi's own
-   * menu is cancelled for tiles only.
+   * command follows when the page can be one. The link commands, when there are any, come first,
+   * followed by a separator. Vivaldi's own menu is cancelled for tiles only.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -54,7 +59,7 @@ export class TileMenu {
     }
     event.preventDefault();
     event.stopPropagation();
-    this.#open(this.#commands(id), id, event);
+    void this.#open(id, event);
   }
 
   #commands(id: string): MenuItem[] {
@@ -65,15 +70,15 @@ export class TileMenu {
     ];
   }
 
-  #open(items: MenuItem[], id: string, { clientX, clientY }: MouseEvent): void {
-    const { panels, menu } = this.#deps;
-    if (panels === undefined) {
-      menu.open(items, clientX, clientY);
+  async #open(id: string, { clientX, clientY }: MouseEvent): Promise<void> {
+    const { panels, links, menu } = this.#deps;
+    if (panels === undefined && links === undefined) {
+      menu.open(this.#commands(id), clientX, clientY);
       return;
     }
-    void panels
-      .item(id)
-      .catch(() => null)
-      .then((panel) => menu.open(panel === null ? items : [...items, panel], clientX, clientY));
+    const linked = links === undefined ? [] : await links.items(id).catch((): MenuItem[] => []);
+    const panel = panels === undefined ? null : await panels.item(id).catch(() => null);
+    const items = linked.length === 0 ? [] : [...linked, SEPARATOR];
+    menu.open([...items, ...this.#commands(id), ...(panel === null ? [] : [panel])], clientX, clientY);
   }
 }

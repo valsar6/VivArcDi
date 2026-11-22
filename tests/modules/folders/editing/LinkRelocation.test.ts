@@ -8,8 +8,8 @@ import type { WorkspaceListing } from '../../../../src/core/workspaces/Workspace
 import type { MenuResult } from '../../../../src/shared/spaces/MenuCommand.js';
 import { ClosingLinks } from '../../../../src/modules/folders/editing/ClosingLinks.js';
 import { LinkRelocation } from '../../../../src/modules/folders/editing/LinkRelocation.js';
-import { LinkedTab } from '../../../../src/modules/folders/editing/LinkedTab.js';
-import type { PromptOptions } from '../../../../src/modules/folders/editing/PromptDialog.js';
+import { LinkedTab } from '../../../../src/shared/linkmenu/LinkedTab.js';
+import type { PromptOptions } from '../../../../src/shared/linkmenu/PromptDialog.js';
 import { WorkspaceRoots } from '../../../../src/modules/folders/tree/WorkspaceRoots.js';
 import { silentLogger } from '../../reopen/fakes.js';
 import { FolderTabs, WritableChrome, folder, link } from '../fakes.js';

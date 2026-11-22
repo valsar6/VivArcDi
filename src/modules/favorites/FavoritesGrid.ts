@@ -1,5 +1,4 @@
 import { LinkLabels } from '../../core/browser/LinkLabels.js';
-import type { BrowserPrefs } from '../../core/browser/BrowserPrefs.js';
 import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 import { DomQuery } from '../../core/dom/DomQuery.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
@@ -20,6 +19,8 @@ import { GridDragging } from './GridDragging.js';
 import { GridLayout } from './GridLayout.js';
 import { MiddleClickUnload } from './MiddleClickUnload.js';
 import { PinnedFavorites } from './PinnedFavorites.js';
+import { TileLinkCommands } from './TileLinkCommands.js';
+import { Toast } from '../../core/dom/Toast.js';
 import type { TileSource } from './TileSource.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
 
@@ -30,6 +31,8 @@ interface PlacedGrid {
   grid: HTMLElement | null;
   count: number;
 }
+
+const TOAST_MS = 2000;
 
 export class FavoritesGrid extends Module<FavoritesGridOptions> {
   public static override id = 'favorites-grid';
@@ -51,6 +54,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
   #hiddenMarker: HiddenTabMarker | null = null;
   #fromPinned: PinnedFavorites | null = null;
   #dragging: GridDragging | null = null;
+  #toast: Toast | null = null;
 
   /**
    * Shows the Favorites as an Arc-style grid of icon tiles at the top of a vertical tab bar.
@@ -66,7 +70,8 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
    *
    * @param context What the module may use.
    */
-  public override async start({ document, selectors, logger, options, tabs, bookmarks, bookmarkWriter, prefs, storage }: ModuleContext<FavoritesGridOptions>): Promise<void> {
+  public override async start(context: ModuleContext<FavoritesGridOptions>): Promise<void> {
+    const { document, selectors, logger, options, tabs, bookmarks, storage } = context;
     const settings = options;
     this.#settings = settings;
     this.#document = document;
@@ -99,7 +104,7 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     await this.#unloadedTabs?.start().catch((error: unknown) => logger.error('Could not read unloaded tabs', error));
     await this.#fromPinned?.start().catch((error: unknown) => logger.error('Could not read the pinned tabs', error));
     await this.#startBookmarks(tabs, bookmarks, labels, logger);
-    this.#startDragging(tabs, bookmarkWriter, prefs, logger);
+    this.#startDragging(context);
   }
 
   /**
@@ -121,6 +126,8 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
 
   #stopBookmarks(): void {
     this.#dragging?.stop();
+    this.#toast?.remove();
+    this.#toast = null;
     this.#fromBookmarks?.stop();
     this.#fromPinned?.stop();
     this.#hiddenMarker?.stop();
@@ -185,11 +192,15 @@ export class FavoritesGrid extends Module<FavoritesGridOptions> {
     await this.#fromBookmarks.start().catch((error: unknown) => logger.error('Could not read the Favorites folder', error));
   }
 
-  #startDragging(tabs: BrowserTabs, writer: ModuleContext['bookmarkWriter'], prefs: BrowserPrefs, logger: Logger): void {
+  #startDragging(context: ModuleContext<FavoritesGridOptions>): void {
+    const { tabs, bookmarkWriter: writer, prefs, logger } = context;
     if (this.#fromBookmarks === null || !writer.available || this.#document === null || this.#selectors === null) {
       return;
     }
-    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, prefs, favorites: this.#fromBookmarks, pinned: this.#fromPinned });
+    const toast = new Toast({ document: this.#document, parent: this.#document.querySelector(this.#selectors.get('browser')) ?? this.#document.body, durationMs: TOAST_MS });
+    this.#toast = toast;
+    const tileLinks = TileLinkCommands.of(context, (text, kind) => toast.show(text, kind));
+    this.#dragging = new GridDragging({ document: this.#document, selectors: this.#selectors, tabs, writer, folder: this.#settings.folder, logger, prefs, favorites: this.#fromBookmarks, pinned: this.#fromPinned, tileLinks });
     this.#dragging.start();
   }
 

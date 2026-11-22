@@ -1,13 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
-import type { CommandItem, MenuItem, SubmenuItem } from '../../../../src/core/dom/ContextMenu.js';
-import { LinkedTab } from '../../../../src/modules/folders/editing/LinkedTab.js';
-import { PinnedAddress } from '../../../../src/modules/folders/editing/PinnedAddress.js';
-import type { PromptOptions } from '../../../../src/modules/folders/editing/PromptDialog.js';
-import type { ToastKind } from '../../../../src/core/dom/Toast.js';
-import { silentLogger } from '../../reopen/fakes.js';
-import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../fakes.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import type { CommandItem, MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
+import { LinkedTab } from '../../../src/shared/linkmenu/LinkedTab.js';
+import { PinnedAddress } from '../../../src/shared/linkmenu/PinnedAddress.js';
+import type { PromptOptions } from '../../../src/shared/linkmenu/PromptDialog.js';
+import type { ToastKind } from '../../../src/core/dom/Toast.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { FolderTabs, WritableChrome, bookmarkTree, folder, link } from '../../modules/folders/fakes.js';
 
 const SAVED = 'https://a.example/';
 

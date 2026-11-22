@@ -1,7 +1,7 @@
-import type { BookmarkWriter } from '../../../core/browser/bookmarks/BookmarkWriter.js';
-import type { Logger } from '../../../core/support/Logger.js';
-import type { TextCopier } from '../../../shared/clipboard/TextCopier.js';
-import type { ToastKind } from '../../../core/dom/Toast.js';
+import type { BookmarkWriter } from '../../core/browser/bookmarks/BookmarkWriter.js';
+import type { Logger } from '../../core/support/Logger.js';
+import type { TextCopier } from '../clipboard/TextCopier.js';
+import type { ToastKind } from '../../core/dom/Toast.js';
 import { COPIED_TEXT, FAILED_TEXT } from './LinkTexts.js';
 
 export interface LinkClipboardDependencies {

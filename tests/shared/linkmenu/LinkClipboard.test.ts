@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
-import type { ToastKind } from '../../../../src/core/dom/Toast.js';
-import { LinkClipboard } from '../../../../src/modules/folders/editing/LinkClipboard.js';
-import { silentLogger } from '../../reopen/fakes.js';
-import { WritableChrome, folder, link } from '../fakes.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import type { ToastKind } from '../../../src/core/dom/Toast.js';
+import { LinkClipboard } from '../../../src/shared/linkmenu/LinkClipboard.js';
+import { silentLogger } from '../../modules/reopen/fakes.js';
+import { WritableChrome, folder, link } from '../../modules/folders/fakes.js';
 
 const tree = (): BookmarkNode[] => [folder('0', '', [folder('1', 'Bar', [link('5', 'Site', 'https://site.example/a'), folder('6', 'Dir')])])];
 

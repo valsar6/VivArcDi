@@ -1,5 +1,5 @@
-import type { BrowserTabs } from '../../../core/browser/BrowserTabs.js';
-import { TabData } from '../../../core/tabs/TabData.js';
+import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
+import { TabData } from '../../core/tabs/TabData.js';
 
 export class LinkedTab {
   #tabs: Pick<BrowserTabs, 'query'>;

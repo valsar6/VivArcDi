@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LinkedTab } from '../../../../src/modules/folders/editing/LinkedTab.js';
-import { FolderTabs } from '../fakes.js';
+import { LinkedTab } from '../../../src/shared/linkmenu/LinkedTab.js';
+import { FolderTabs } from '../../modules/folders/fakes.js';
 
 const linkedTo = (bookmarkId: string, workspaceId?: number): string => JSON.stringify({ ...(workspaceId === undefined ? {} : { workspaceId }), vivarcdi: { bookmarkId } });
 

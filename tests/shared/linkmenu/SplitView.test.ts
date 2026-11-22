@@ -1,16 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SplitView } from '../../../../src/modules/folders/editing/SplitView.js';
-import { LinkedTab } from '../../../../src/modules/folders/editing/LinkedTab.js';
-import { TabData } from '../../../../src/core/tabs/TabData.js';
-import { Logger } from '../../../../src/core/support/Logger.js';
-import { NewTabOpener } from '../../../../src/shared/newtab/NewTabOpener.js';
-import { TabTiler } from '../../../../src/shared/tabs/TabTiler.js';
-import type { BookmarkNode } from '../../../../src/core/browser/bookmarks/BookmarkNode.js';
-import type { MenuItem } from '../../../../src/core/dom/ContextMenu.js';
-import { SilentSink } from '../../../loader/fakes.js';
-import { FolderTabs } from '../fakes.js';
-import type { FolderTab } from '../fakes.js';
+import { SplitView } from '../../../src/shared/linkmenu/SplitView.js';
+import { LinkedTab } from '../../../src/shared/linkmenu/LinkedTab.js';
+import { TabData } from '../../../src/core/tabs/TabData.js';
+import { Logger } from '../../../src/core/support/Logger.js';
+import { NewTabOpener } from '../../../src/shared/newtab/NewTabOpener.js';
+import { TabTiler } from '../../../src/shared/tabs/TabTiler.js';
+import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
+import type { MenuItem } from '../../../src/core/dom/ContextMenu.js';
+import { SilentSink } from '../../loader/fakes.js';
+import { FolderTabs } from '../../modules/folders/fakes.js';
+import type { FolderTab } from '../../modules/folders/fakes.js';
 
 const linkedTo = (bookmarkId: string): string => JSON.stringify({ vivarcdi: { bookmarkId } });
 const tiled = (id: string, index: number): string => JSON.stringify({ tiling: { id, index, layout: 'row', type: 'selection' } });
