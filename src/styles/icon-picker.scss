@@ -1,0 +1,121 @@
+@use 'tokens' as *;
+
+#{$root} #{$picker} {
+  position: fixed;
+  z-index: $picker-layer;
+  display: flex;
+  flex-direction: column;
+  gap: $picker-gap;
+  box-sizing: border-box;
+  width: $picker-width;
+  height: $picker-height;
+  padding: $picker-padding;
+  border-radius: $picker-radius;
+  background-color: var(--colorBg, #{$surface-fallback});
+  box-shadow: $picker-shadow;
+  color: var(--colorFg, #{$ink-fallback});
+  font-size: $row-font-size;
+  -webkit-app-region: no-drag;
+
+  button {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: $picker-button-radius;
+    background: transparent;
+    color: inherit;
+    cursor: default;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--colorFg, #{$ink-fallback}) #{$tint-hover}, transparent);
+    }
+  }
+
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: $picker-gap;
+
+    > button {
+      height: $picker-button-size;
+      min-width: $picker-button-size;
+      padding-inline: $gap;
+    }
+
+    > [data-vivarcdi-picker-tab] {
+      font-weight: 600;
+    }
+
+    > [data-vivarcdi-picker-refresh] {
+      margin-inline-start: auto;
+    }
+
+    > [data-vivarcdi-picker-reset] {
+      min-width: $picker-button-size;
+    }
+  }
+
+  > div:not(:first-child) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $picker-gap;
+    min-height: 0;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  input {
+    box-sizing: border-box;
+    flex: none;
+    width: 100%;
+    height: $picker-field-height;
+    padding: 0 $gap;
+    border: 1px solid color-mix(in srgb, var(--colorFg, #{$ink-fallback}) #{$tint-separator}, transparent);
+    border-radius: $picker-button-radius;
+    background: transparent;
+    color: inherit;
+  }
+
+  [data-vivarcdi-picker-cell] {
+    width: $picker-cell-size;
+    height: $picker-cell-size;
+    font-size: $picker-cell-font-size;
+
+    svg {
+      width: $picker-icon-size;
+      height: $picker-icon-size;
+    }
+  }
+
+  [data-vivarcdi-picker-category] {
+    flex: 1;
+    height: $picker-button-size;
+  }
+}
+
+#{$root} #{$picker} > div:not(:first-child) > div:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: $picker-section-gap;
+  min-height: 0;
+  overflow-y: auto;
+
+  > div {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+#{$root} #{$picker} > div:not(:first-child) > div:last-child {
+  display: flex;
+  flex: none;
+}
