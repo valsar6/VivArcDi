@@ -155,14 +155,14 @@ A task edits only its files. A file in two rows has its owners named.
   folder and the Favorites folder is not synced; a failing write logs once. Then `LabelSync`, its
   start in `WorkspaceSync` and its call after a sync pass. The implementer reads `WorkspaceRoots` and
   `SyncPass` to place the area of a bookmark and cites the lines in the report. AC-12.
-- [ ] **T13. Wire `reposition()` to the redraws** (found while integrating T6): the design says the
+- [x] **T13. Wire `reposition()` to the redraws** (done in `e20663e`: `notifyRowsDrawn` from `FavoritesView.show` and `FolderSectionView.render`, the editor listens while a field is open; found while integrating T6): the design says the
   wiring calls `InPlaceEditor.reposition()` after `FolderSectionView.render` and after
   `FavoritesView.show`, but no task owns those two files and nothing calls it, so an open field can
   stay at the old screen position when the rows are drawn again mid-rename. Tests first: a field that
   is open follows its anchor when the rows are drawn again, and closes when the anchor is gone. Then
   the hook the two views fire and the subscription in `InPlaceEditor`. The lead decides whether it
   goes with T10 or right after the manual checks.
-- [ ] **T10. Docs and version** (the lead): minor bump in `package.json`, `package-lock.json` and
+- [x] **T10. Docs and version** (done: docs and the minor bump to 0.67.0; the README row of the spec index stays `Approved` until T12): minor bump in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`, checked with `npm run release -- check --base origin/main --branch
   features/rename-pinned-tabs`; the README row to `Implemented` when everything is green; a section on
   the two commands, the picker, the hover name and the sync of the name in `docs/manual/tab-bar.md`;
