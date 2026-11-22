@@ -9,3 +9,5 @@ export const EDIT_PINNED_PAGE_LABEL = 'Edit Pinned Page';
 export const OPEN_IN_SPLIT_VIEW_LABEL = 'Open in Split View';
 export const DUPLICATE_LINK_LABEL = 'Duplicate';
 export const MOVE_TO_LABEL = 'Move to';
+export const CHANGE_ICON_LABEL = 'Change Icon…';
+export const RENAME_LABEL = 'Rename…';

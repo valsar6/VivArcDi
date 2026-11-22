@@ -1,4 +1,5 @@
 import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
+import type { LabelIcon } from '../../core/browser/LinkLabels.js';
 import type { BookmarkNode } from '../../core/browser/bookmarks/BookmarkNode.js';
 import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 
@@ -9,6 +10,12 @@ export interface Favorite {
   title: string;
   /** Address of the bookmark. */
   url: string;
+  /** The key of its label in `LinkLabels`; absent when it can have none. */
+  labelKey?: string;
+  /** The emoji or symbol the user chose for it. */
+  icon?: LabelIcon;
+  /** The favicon read again from the site, drawn when there is no icon. */
+  favicon?: string;
 }
 
 export type FavoritesListener = (favorites: Favorite[] | null) => void;

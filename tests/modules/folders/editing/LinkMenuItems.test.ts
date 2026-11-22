@@ -7,10 +7,12 @@ import type { LinkActions } from '../../../../src/modules/folders/editing/LinkMe
 const item = (label: string): MenuItem => ({ label, run: (): void => undefined });
 const describe = (items: MenuItem[]): string[] => items.map((entry) => ('separator' in entry ? '-' : (entry.label ?? '')));
 
-function actions(present: Partial<Record<'copy' | 'edit' | 'split' | 'duplicate' | 'move', boolean>> = {}): LinkActions {
-  const all = { copy: true, edit: true, split: true, duplicate: true, move: true, ...present };
+function actions(present: Partial<Record<'copy' | 'icon' | 'rename' | 'edit' | 'split' | 'duplicate' | 'move', boolean>> = {}): LinkActions {
+  const all = { copy: true, icon: false, rename: false, edit: true, split: true, duplicate: true, move: true, ...present };
   return {
     copyLink: (): MenuItem | null => (all.copy ? item('Copy Link') : null),
+    changeIcon: (): MenuItem | null => (all.icon ? item('Change Icon…') : null),
+    rename: (): MenuItem | null => (all.rename ? item('Rename…') : null),
     editPinnedPage: async (): Promise<MenuItem | null> => (all.edit ? item('Edit Pinned Page') : null),
     openInSplitView: async (): Promise<MenuItem | null> => (all.split ? item('Open in Split View') : null),
     duplicate: (): MenuItem | null => (all.duplicate ? item('Duplicate') : null),

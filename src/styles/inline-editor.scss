@@ -1,0 +1,17 @@
+@use 'tokens' as *;
+
+#{$root} #{$inline-editor} {
+  position: fixed;
+  z-index: $inline-editor-layer;
+  box-sizing: border-box;
+  margin: 0;
+  padding: $inline-editor-padding;
+  border: 1px solid var(--colorHighlightBg, currentcolor);
+  border-radius: $inline-editor-radius;
+  outline: none;
+  background-color: var(--colorBg, #{$surface-fallback});
+  box-shadow: $inline-editor-shadow;
+  color: var(--colorFg, #{$ink-fallback});
+  font: inherit;
+  -webkit-app-region: no-drag;
+}

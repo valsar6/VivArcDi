@@ -1,12 +1,26 @@
+import { LabelKeys } from '../../core/browser/LinkLabels.js';
+import type { LinkLabels } from '../../core/browser/LinkLabels.js';
+
 export class LinkExtras {
+  #labels: Pick<LinkLabels, 'copy'>;
+
   /**
-   * What a saved link carries besides its title and address: its name and icon. Nothing stores
-   * them yet (spec 027), so copying them does nothing until that spec fills this hook.
+   * What a saved link carries besides its title and address: its name and icon, kept with the
+   * label of the bookmark.
    *
-   * @param _fromId The bookmark id of the original link.
-   * @param _toId The bookmark id of its copy.
+   * @param labels Where the labels are kept.
    */
-  public copy(_fromId: string, _toId: string): Promise<void> {
-    return Promise.resolve();
+  constructor(labels: Pick<LinkLabels, 'copy'>) {
+    this.#labels = labels;
+  }
+
+  /**
+   * Gives the copy the whole label of the original link.
+   *
+   * @param fromId The bookmark id of the original link.
+   * @param toId The bookmark id of its copy.
+   */
+  public copy(fromId: string, toId: string): Promise<void> {
+    return this.#labels.copy(LabelKeys.bookmark(fromId), LabelKeys.bookmark(toId));
   }
 }

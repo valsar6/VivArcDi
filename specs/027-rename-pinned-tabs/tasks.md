@@ -117,7 +117,7 @@ A task edits only its files. A file in two rows has its owners named.
   emoji tab; a failing catalog leaves the `Icons` tab; a second `pick` closes the first; `no-drag`). The
   tests use fake catalogs and symbols, so T5 needs neither T2 nor T3. Then `IconPicker`, its style and the
   `styles` line. AC-6, AC-7. Runs in parallel with T1, T3 and T4.
-- [ ] **T6. The two commands in both menus, pinned-tab tiles and the favicon refresh** (starts after T2
+- [x] **T6. The two commands in both menus, pinned-tab tiles and the favicon refresh** (done in `026d97e`, from `wip/027-t6`; starts after T2
   to T5, T7 to T9 and after 057 T3 to T5). Tests first: `rename keeps the url` (a `BookmarkWriter` that
   fails on any call: renaming and choosing an icon never call it), `renames a saved tab in place` (the
   field opens with the text selected, Enter saves the name, Escape saves nothing, an empty text brings
@@ -146,21 +146,28 @@ A task edits only its files. A file in two rows has its owners named.
   `title` of the tile is gone, the label is `no-drag` and clamped to the window, `destroy` stops
   listening. Then `TileHoverName`, its use in `FavoritesView` and its block in `favorites.scss`. AC-14.
 - [ ] **T9. The name through Vivaldi Sync** (starts after T1 and T2; not deferrable, FR-9). Tests first:
-  `syncs the name of a saved tab` (renaming a row writes `name:<address key>` with the name into the
+  `syncs the name of a saved tab` (renaming a row writes `name:uuid:<uuid>` of its bookmark with the name into the
   settings of its workspace in the sync store, through `WorkspaceSettings`); also: the same for a
   Favorites tile (area outside any workspace) and for a tile made from a pinned tab (`page:` key, the
-  workspace of the pinned tab); a name that arrives from the store is applied to every label of this
-  computer with the same address key; a `null` removes the name; a name applied by the sync is not
+  workspace of the pinned tab); a name that arrives from the store is applied to the label of the bookmark with that `uuid` (and, for
+  `name:page:<key>`, to the labels with that address key); a bookmark with no `uuid` is skipped and tried at the next pass; `BookmarkNode` gains `uuid` (the file of its type is T9's); a `null` removes the name; a name applied by the sync is not
   written back (030 FR-4); the icon and the favicon are never written; a bookmark outside the base
   folder and the Favorites folder is not synced; a failing write logs once. Then `LabelSync`, its
   start in `WorkspaceSync` and its call after a sync pass. The implementer reads `WorkspaceRoots` and
   `SyncPass` to place the area of a bookmark and cites the lines in the report. AC-12.
-- [ ] **T10. Docs and version** (the lead): minor bump in `package.json`, `package-lock.json` and
+- [x] **T13. Wire `reposition()` to the redraws** (done in `e20663e`: `notifyRowsDrawn` from `FavoritesView.show` and `FolderSectionView.render`, the editor listens while a field is open; found while integrating T6): the design says the
+  wiring calls `InPlaceEditor.reposition()` after `FolderSectionView.render` and after
+  `FavoritesView.show`, but no task owns those two files and nothing calls it, so an open field can
+  stay at the old screen position when the rows are drawn again mid-rename. Tests first: a field that
+  is open follows its anchor when the rows are drawn again, and closes when the anchor is gone. Then
+  the hook the two views fire and the subscription in `InPlaceEditor`. The lead decides whether it
+  goes with T10 or right after the manual checks.
+- [x] **T10. Docs and version** (done: docs and the minor bump to 0.67.0; the README row of the spec index stays `Approved` until T12): minor bump in `package.json`, `package-lock.json` and
   `installer/vivarcdi/__init__.py`, checked with `npm run release -- check --base origin/main --branch
   features/rename-pinned-tabs`; the README row to `Implemented` when everything is green; a section on
   the two commands, the picker, the hover name and the sync of the name in `docs/manual/tab-bar.md`;
   `make check`.
-- [ ] **T11. Manual checklist in Italian for Tore**, under `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/`,
+- [x] **T11. Manual checklist in Italian for Tore** (written in `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/verifica-027.md`, awaiting the report), under `~/Desktop/sonde-vivarci/027-rename-pinned-tabs/`,
   from the criteria that stay `manual`: AC-1 (rename a saved row, restart Vivaldi, the name is still
   there; the same for a tile and for a tile made from a pinned tab), AC-2 (choose an emoji for a row and
   for a tile, the favicon is replaced; then a symbol of `Icons`; then `Reset`), AC-11 (rename with Enter,

@@ -7,6 +7,7 @@ import { FAVORITE_ATTRIBUTE, GRID_ATTRIBUTE } from '../../../src/modules/favorit
 import { FavoritesGrid } from '../../../src/modules/favorites/FavoritesGrid.js';
 import { FAVORITES_GRID_OPTIONS } from '../../../src/modules/favorites/FavoritesGridOptions.js';
 import { SilentSink, silentNotices } from '../../loader/fakes.js';
+import { MemoryStorage } from '../reopen/fakes.js';
 import { FakeNode, FakeTabs, selectors, tabBar, tabSlot } from './fakes.js';
 
 class FakeObserver {
@@ -66,6 +67,7 @@ function setUp(tabs: unknown): {
     logger: new Logger('test', sink),
     options: FAVORITES_GRID_OPTIONS.defaults,
     tabs,
+    storage: new MemoryStorage(),
     notices: silentNotices(),
   } as unknown as ModuleContext<FavoritesGridOptions>;
   return { context, document, strip, sink };

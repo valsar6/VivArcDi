@@ -3,6 +3,8 @@ import type { MenuItem } from '../../../core/dom/ContextMenu.js';
 export interface LinkActions {
   /** Each member that can be null is null where the command is not available: the item is left out. */
   copyLink: (linkId: string) => MenuItem | null;
+  changeIcon: (linkId: string) => MenuItem | null;
+  rename: (linkId: string) => MenuItem | null;
   editPinnedPage: (linkId: string) => Promise<MenuItem | null>;
   openInSplitView: (linkId: string) => Promise<MenuItem | null>;
   duplicate: (linkId: string) => MenuItem | null;
@@ -41,7 +43,7 @@ export class LinkMenuItems {
     const [edit, split] = await Promise.all([actions.editPinnedPage(linkId), actions.openInSplitView(linkId)]);
     return [
       [actions.copyLink(linkId)],
-      [edit],
+      [actions.changeIcon(linkId), actions.rename(linkId), edit],
       [split, actions.duplicate(linkId), actions.moveTo(linkId)],
       [actions.removePin(linkId), actions.tileTab(linkId)],
     ];

@@ -1,6 +1,8 @@
 /** A bookmark or a bookmark folder, as `chrome.bookmarks` reports it. */
 export interface BookmarkNode {
   id: string;
+  /** Vivaldi gives every node a uuid that Sync carries between computers; the id is local to one. */
+  uuid?: string | undefined;
   /** The folder that holds it; absent on the root. */
   parentId?: string | undefined;
   /** Position among the children of its parent, when `chrome.bookmarks` reports it. */

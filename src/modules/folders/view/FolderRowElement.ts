@@ -1,5 +1,6 @@
 import type { FolderNameEditor } from '../editing/FolderNameEditor.js';
 import type { FolderRow, LinkRow, Row } from './FolderRows.js';
+import { LabelIcon } from '../../../shared/icons/LabelIcon.js';
 import { LinkIcon } from '../../../shared/links/LinkIcon.js';
 
 export const CLOSE_ATTRIBUTE = 'data-vivarcdi-link-close';
@@ -63,7 +64,12 @@ export class FolderRowElement {
     element.toggleAttribute(SUBTITLE_ATTRIBUTE, row.subtitle !== undefined);
     const title = this.#title(row.title);
     const text = row.subtitle === undefined ? title : this.#twoLines(title, row.subtitle);
-    element.append(LinkIcon.create(this.#document, row, ICON_CLASS, row.tab?.favIconUrl), text, ...(row.tab === undefined ? [] : [this.#closeButton()]));
+    element.append(this.#linkIcon(row), text, ...(row.tab === undefined ? [] : [this.#closeButton()]));
+  }
+
+  #linkIcon(row: LinkRow): HTMLElement {
+    const chosen = row.icon === undefined ? null : LabelIcon.create(this.#document, row.icon, ICON_CLASS);
+    return chosen ?? LinkIcon.create(this.#document, row, ICON_CLASS, row.favicon ?? row.tab?.favIconUrl);
   }
 
   #title(text: string): HTMLElement {

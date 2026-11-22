@@ -14,9 +14,11 @@
     "styles/today.css",
     "styles/toast.css",
     "styles/dialog.css",
+    "styles/icon-picker.css",
     "styles/sidebar-look.css",
     "styles/compact-tab-bar.css",
-    "styles/column-scroll.css"
+    "styles/column-scroll.css",
+    "styles/inline-editor.css"
   ],
   "modules": {
     "activation-marker": {

@@ -546,6 +546,11 @@ Vivaldi's Bookmarks panel and stays if you uninstall VivArcDi:
   selected tab; with no tab selected, beside a new empty tab with the address bar open on it) and
   **Duplicate** (a closed copy right after the tile, before the cut-off of `maxTiles`). A tile is one
   bookmark: an address change, a copy or a rename shows in every workspace.
+- **Names and icons.** Right-click a link row or a tile for **Rename…** (a field in place with the text
+  selected: Enter saves, Esc cancels, an empty name brings back the page title) and **Change Icon…**
+  (a picker with an `Emoji` tab and its search, an `Icons` tab of the folder symbols, **Reset** and
+  **Refresh favicon**). The label is stored with the link, shows in every workspace and follows
+  Vivaldi Sync; the icon stays local, and a tile shows its name after a three second hover.
 - **Open a tile as a web panel.** Right-click a tile of an `http` or `https` page and choose **Open as web
   panel**: VivArcDi fills Vivaldi's own Add web panel form with the page, so Vivaldi creates the panel and
   opens the side panel on it. A page that already is a web panel shows **Show web panel** instead, which

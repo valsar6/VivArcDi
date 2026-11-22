@@ -45,6 +45,14 @@ export class WorkspaceSettings {
     }
   }
 
+  /**
+   * @param workspaceName The workspace name, or null for the area outside any workspace.
+   * @returns Every setting it holds, by key; empty when it has none.
+   */
+  public all(workspaceName: string | null): Promise<Record<string, unknown>> {
+    return this.#all(workspaceName);
+  }
+
   async #all(workspaceName: string | null): Promise<Record<string, unknown>> {
     if (workspaceName !== null && SyncNames.reserved(workspaceName)) {
       return {};

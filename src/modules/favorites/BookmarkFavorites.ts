@@ -1,3 +1,4 @@
+import { LabelKeys } from '../../core/browser/LinkLabels.js';
 import type { BrowserBookmarks } from '../../core/browser/bookmarks/BrowserBookmarks.js';
 import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { HiddenTabs } from '../../shared/tabs/HiddenTabs.js';
@@ -6,6 +7,8 @@ import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { SerialTask } from '../../core/support/SerialTask.js';
 import { TabUnloader } from '../../core/tabs/TabUnloader.js';
+import { FavoriteLabels } from './FavoriteLabels.js';
+import type { FavoriteLabelStore } from './FavoriteLabels.js';
 import { FavoriteOpener } from './FavoriteOpener.js';
 import { FavoriteStates } from './FavoriteStates.js';
 import { FavoritesFolder } from './FavoritesFolder.js';
@@ -29,6 +32,8 @@ export interface BookmarkFavoritesDependencies {
   bookmarks: BrowserBookmarks;
   /** Reports failures. */
   logger: Logger;
+  /** The names and icons the user gave to links. */
+  labels: FavoriteLabelStore;
   /** Path of the Favorites folder. */
   folder: string;
   /** Most tiles shown. */
@@ -49,6 +54,7 @@ export class BookmarkFavorites implements TileSource {
   #favorites: Favorite[] | null = null;
   #changes: TabChanges;
   #states: SerialTask;
+  #stopLabels: (() => void) | null = null;
 
   /**
    * The Favorites drawn from a bookmark folder: the same tiles in every workspace, each one
@@ -61,10 +67,14 @@ export class BookmarkFavorites implements TileSource {
     this.#deps = dependencies;
     this.#links = new LinkedTabs(tabs);
     const opener = new FavoriteOpener(tabs, this.#links, new TabUnloader(tabs), logger);
-    this.#view = new FavoritesView(document, {
-      open: (favorite): void => void opener.open(favorite),
-      unload: (favorite): void => void opener.unload(favorite),
-    });
+    this.#view = new FavoritesView(
+      document,
+      {
+        open: (favorite): void => void opener.open(favorite),
+        unload: (favorite): void => void opener.unload(favorite),
+      },
+      () => document.querySelector(selectors.get('browser')) ?? document.body,
+    );
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#folder = new FavoritesFolder(bookmarks, folder, (favorites) => this.#receive(favorites));
     this.#changes = new TabChanges(tabs, logger, () => this.#readStates());
@@ -100,6 +110,7 @@ export class BookmarkFavorites implements TileSource {
    */
   public async start(): Promise<void> {
     this.#changes.start();
+    this.#stopLabels = this.#deps.labels.onChange(() => this.#show());
     await this.#folder.start();
   }
 
@@ -107,6 +118,8 @@ export class BookmarkFavorites implements TileSource {
    * Removes the tiles and every listener.
    */
   public stop(): void {
+    this.#stopLabels?.();
+    this.#stopLabels = null;
     this.#folder.stop();
     this.#changes.stop();
     this.place(false);
@@ -137,15 +150,22 @@ export class BookmarkFavorites implements TileSource {
 
   #receive(favorites: Favorite[] | null): void {
     const { logger, folder, maxTiles } = this.#deps;
+    this.#favorites = favorites === null ? null : favorites.slice(0, maxTiles).map((favorite) => ({ ...favorite, labelKey: LabelKeys.bookmark(favorite.id) }));
     if (favorites === null) {
       logger.warn(`Bookmark folder "${folder}" not found: the Favorites are the first pinned tabs`);
     } else {
-      this.#view.show(favorites.slice(0, maxTiles));
+      this.#show();
       this.#links.sync(favorites).catch((error: unknown) => logger.error('Could not update linked tabs', error));
     }
-    this.#favorites = favorites === null ? null : favorites.slice(0, maxTiles);
     this.#readStates();
     this.#deps.onChange();
+  }
+
+  #show(): void {
+    const { labels } = this.#deps;
+    if (this.#favorites !== null) {
+      this.#view.show(this.#favorites.map((favorite) => FavoriteLabels.apply(favorite, labels)));
+    }
   }
 
   #readStates(): void {

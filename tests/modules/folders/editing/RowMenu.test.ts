@@ -5,7 +5,7 @@ import { LinkMenuItems } from '../../../../src/modules/folders/editing/LinkMenuI
 import { RowMenu } from '../../../../src/modules/folders/editing/RowMenu.js';
 import { asDocument, DomDocument } from '../../../core/dom.js';
 
-const NONE = { copyLink: (): null => null, editPinnedPage: async (): Promise<null> => null, openInSplitView: async (): Promise<null> => null, duplicate: (): null => null, moveTo: (): null => null };
+const NONE = { copyLink: (): null => null, changeIcon: (): null => null, rename: (): null => null, editPinnedPage: async (): Promise<null> => null, openInSplitView: async (): Promise<null> => null, duplicate: (): null => null, moveTo: (): null => null };
 
 const linkItems = (calls: string[]): LinkMenuItems =>
   new LinkMenuItems({

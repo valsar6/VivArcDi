@@ -51,7 +51,7 @@ function setup(): Setup {
     skipSelector: '.skip',
     pill: { show: (): void => undefined, move: (): void => undefined, hide: (): void => undefined },
     menu: { open: (): void => undefined, close: (): void => undefined },
-    linkActions: { copyLink: (): null => null, editPinnedPage: async (): Promise<null> => null, openInSplitView: async (): Promise<null> => null, duplicate: (): null => null, moveTo: (): null => null },
+    linkActions: { copyLink: (): null => null, changeIcon: (): null => null, rename: (): null => null, editPinnedPage: async (): Promise<null> => null, openInSplitView: async (): Promise<null> => null, duplicate: (): null => null, moveTo: (): null => null },
     folderActions: { rename: (): void => undefined, duplicate: (): void => undefined, moveTo: (): null => null, remove: (): void => undefined },
     tabs: {
       get: async (id): Promise<chrome.tabs.Tab> => ({ id, url: PAGE }) as chrome.tabs.Tab,

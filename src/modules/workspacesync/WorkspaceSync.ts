@@ -4,10 +4,12 @@ import type { ModuleContext } from '../../core/boot/Module.js';
 import { WORKSPACE_SYNC_OPTIONS } from './WorkspaceSyncOptions.js';
 import type { WorkspaceSyncOptions } from './WorkspaceSyncOptions.js';
 import { SerialTask } from '../../core/support/SerialTask.js';
+import { LinkLabels } from '../../core/browser/LinkLabels.js';
 import { Toast } from '../../core/dom/Toast.js';
 import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import { Debounce } from './Debounce.js';
+import { LabelSync } from './LabelSync.js';
 import { LocalPinned } from './LocalPinned.js';
 import { ReactEditorOpener } from '../../shared/spaces/EditorOpener.js';
 import type { MenuParts } from '../../shared/spaces/MenuCommand.js';
@@ -24,6 +26,8 @@ import { SyncBase } from './SyncBase.js';
 import { SyncPass } from './SyncPass.js';
 import { SyncStore } from './SyncStore.js';
 import { WindowOwner } from './WindowOwner.js';
+import { WorkspaceSettings } from './WorkspaceSettings.js';
+import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolderFinder.js';
 import { WorkspaceCreator } from '../../shared/spaces/WorkspaceCreator.js';
 import { WorkspaceMenu } from '../../shared/spaces/WorkspaceMenu.js';
 import { DisabledRenamer, WorkspaceRenamer } from './WorkspaceRenamer.js';
@@ -44,6 +48,7 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
   #names: WorkspaceNames | null = null;
   #toast: Toast | null = null;
   #retry: Debounce | null = null;
+  #labelSync: LabelSync | null = null;
 
   /**
    * Keeps the pinned tabs of each workspace the same on every computer of the same Vivaldi
@@ -63,7 +68,12 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
     this.#names = names;
     await names.start();
     const pass = this.#pass(context, names);
-    const task = new SerialTask(() => pass.run(), (error) => logger.error('workspace sync failed', error));
+    const labelSync = this.#labelSync = WorkspaceSync.#labelSyncOf(context, names);
+    labelSync.start();
+    const task = new SerialTask(async () => {
+      await pass.run();
+      await labelSync.apply();
+    }, (error) => logger.error('workspace sync failed', error));
     const trigger = new Debounce(() => task.request(), SYNC_DELAY_MS);
     this.#trigger = trigger;
     this.#retry = new Debounce(() => trigger.request(), QUIET_RETRY_MS);
@@ -79,6 +89,8 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
     this.#unsubscribe = [];
     this.#trigger?.cancel();
     this.#retry?.cancel();
+    this.#labelSync?.stop();
+    this.#labelSync = null;
     this.#names?.stop();
     this.#toast?.remove();
     this.#trigger = null;
@@ -116,6 +128,22 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
         retry: () => this.#retry?.request(),
         logger,
       }),
+      logger,
+    });
+  }
+
+  static #labelSyncOf({ bookmarks, bookmarkWriter, tabs, storage, modules, logger, options }: ModuleContext<WorkspaceSyncOptions>, names: WorkspaceNames): LabelSync {
+    const path = (module: string, option: string): string[] => {
+      const value = modules[module]?.[option];
+      return typeof value === 'string' ? BookmarkFolderFinder.parsePath(value) : [];
+    };
+    return new LabelSync({
+      labels: LinkLabels.of(storage, logger),
+      settings: new WorkspaceSettings(new SyncStore(bookmarks, bookmarkWriter, options.folder), logger),
+      bookmarks,
+      tabs,
+      names,
+      folders: { base: path('bookmark-folders', 'workspacesBase'), favorites: path('favorites-grid', 'folder') },
       logger,
     });
   }

@@ -152,6 +152,11 @@ export class DomDocument {
     this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]);
   }
 
+  public dispatchEvent(event: Event): boolean {
+    this.emit(event.type, event as unknown as Record<string, unknown>);
+    return true;
+  }
+
   public removeEventListener(type: string, listener: (event: Event) => void): void {
     this.listeners.set(type, (this.listeners.get(type) ?? []).filter((candidate) => candidate !== listener));
   }

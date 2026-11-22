@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { LinkLabels } from '../../../src/core/browser/LinkLabels.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
@@ -11,7 +12,7 @@ import type { DomNode } from '../../core/dom.js';
 import { SilentSink } from '../../loader/fakes.js';
 import { FolderTabs } from '../folders/fakes.js';
 import type { FolderTab } from '../folders/fakes.js';
-import { settle } from '../reopen/fakes.js';
+import { MemoryStorage, settle } from '../reopen/fakes.js';
 
 const catalog = new SelectorCatalog({ browser: '#browser', tabListHost: '.list' }, 'test');
 const inWorkspace = (id: number): string => JSON.stringify({ workspaceId: id });
@@ -42,6 +43,7 @@ function setup(t: TestContext, tabs: FolderTab[], maxTiles = 12): Setup {
     selectors: catalog,
     tabs: fake,
     logger: new Logger('test', new SilentSink()),
+    labels: LinkLabels.of(new MemoryStorage(), new Logger('test', new SilentSink())),
     maxTiles,
     hiddenTabs: hidden,
     onChange: (): void => void changes.push(1),

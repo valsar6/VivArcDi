@@ -1,3 +1,4 @@
+import type { LabelIcon, LinkLabel } from '../../../core/browser/LinkLabels.js';
 import type { FolderEntry, LinkEntry, TreeEntry } from '../../../shared/links/FolderEntries.js';
 import { FolderTree } from '../../../shared/links/FolderTree.js';
 import type { LinkRef, OpenTab } from '../../../shared/links/OpenLinks.js';
@@ -25,6 +26,10 @@ export interface LinkRow {
   tab: OpenTab | undefined;
   /** A second line under the title. */
   subtitle?: string;
+  /** The emoji or symbol the user chose. */
+  icon?: LabelIcon;
+  /** The favicon read again from the site, drawn when there is no icon. */
+  favicon?: string;
 }
 
 export type Row = FolderRow | LinkRow;
@@ -32,6 +37,8 @@ export type Row = FolderRow | LinkRow;
 export interface RowSources {
   isOpen: (folderId: string) => boolean;
   tabFor: (link: LinkRef) => OpenTab | undefined;
+  /** The name and icon the user gave a link, by link id. */
+  labels?: (linkId: string) => LinkLabel | undefined;
 }
 
 export class FolderRows {
@@ -39,7 +46,7 @@ export class FolderRows {
    * Decides which rows the section shows. An open folder shows its children. A closed folder shows
    * none of them, except the links that have an open tab, which stay below it, one level in, so
    * that what is in use is always visible. A link whose tab shows another page of the web takes
-   * that page's title. When the space is collapsed, only the links that have an open tab are shown,
+   * that page's title, and a name the user gave it wins over both. When the space is collapsed, only the links that have an open tab are shown,
    * at the depth they have below a closed folder, and no folder row.
    *
    * @param entries The tree of folders and links.
@@ -84,8 +91,26 @@ export class FolderRows {
 
   static #link(link: LinkEntry, depth: number, sources: RowSources): LinkRow {
     const tab = sources.tabFor(link);
+    const label = sources.labels?.(link.id);
+    return {
+      kind: 'link',
+      id: link.id,
+      title: label?.name ?? FolderRows.#shownTitle(link, tab),
+      url: link.url,
+      key: link.key,
+      depth,
+      tab,
+      ...(link.subtitle === undefined ? {} : { subtitle: link.subtitle }),
+      ...FolderRows.#looks(label),
+    };
+  }
+
+  static #looks(label: LinkLabel | undefined): Pick<LinkRow, 'icon' | 'favicon'> {
+    return { ...(label?.icon === undefined ? {} : { icon: label.icon }), ...(label?.favicon === undefined ? {} : { favicon: label.favicon }) };
+  }
+
+  static #shownTitle(link: LinkEntry, tab: OpenTab | undefined): string {
     const otherTitle = tab !== undefined && tab.key !== link.key ? tab.title : undefined;
-    const title = otherTitle !== undefined && otherTitle !== '' ? otherTitle : link.title;
-    return { kind: 'link', id: link.id, title, url: link.url, key: link.key, depth, tab, ...(link.subtitle === undefined ? {} : { subtitle: link.subtitle }) };
+    return otherTitle !== undefined && otherTitle !== '' ? otherTitle : link.title;
   }
 }
