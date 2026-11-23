@@ -52,6 +52,10 @@ export class FakeNode {
     return null;
   }
 
+  public querySelectorAll(selector: string): FakeNode[] {
+    return this.children.flatMap((child) => [...(child.matches(selector) ? [child] : []), ...child.querySelectorAll(selector)]);
+  }
+
   public closest(selector: string): FakeNode | null {
     if (selector.startsWith('[') && this.hasAttribute(selector.slice(1, -1))) {
       return this;

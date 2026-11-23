@@ -2,10 +2,10 @@ import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { PinnedClosing } from './PinnedClosing.js';
 import { PinnedMarking } from './PinnedMarking.js';
+import { PinnedPageLoader } from './PinnedPageLoader.js';
 import { PinWatcher } from './PinWatcher.js';
 import { PINNED_TABS_OPTIONS } from './PinnedTabsOptions.js';
 import type { PinnedTabsOptions } from './PinnedTabsOptions.js';
-import { ResetClick } from './ResetClick.js';
 import { SavedAddresses } from './SavedAddresses.js';
 
 export class PinnedTabs extends Module<PinnedTabsOptions> {
@@ -15,12 +15,12 @@ export class PinnedTabs extends Module<PinnedTabsOptions> {
 
   #watcher: PinWatcher | null = null;
   #marking: PinnedMarking | null = null;
-  #reset: ResetClick | null = null;
+  #loader: PinnedPageLoader | null = null;
   #closing: PinnedClosing | null = null;
 
   /**
-   * Makes pinned tabs work as in Arc: each one remembers its own page, shows a reset arrow when
-   * it leaves it, and is unloaded instead of closed. A separator follows the last pinned row.
+   * Makes pinned tabs work as in Arc: each one remembers its own page and loads it again when
+   * it is reopened, and is unloaded instead of closed. A separator follows the last pinned row.
    *
    * @param context What the module may use.
    */
@@ -33,11 +33,10 @@ export class PinnedTabs extends Module<PinnedTabsOptions> {
     const addresses = new SavedAddresses(tabs);
     this.#watcher = new PinWatcher(tabs, addresses, logger);
     this.#marking = new PinnedMarking(context);
+    this.#loader = new PinnedPageLoader(tabs, logger);
     await this.#watcher.start();
     await this.#marking.start();
-    if (options.resetButton) {
-      this.#startReset(context, addresses);
-    }
+    await this.#loader.start();
     if (options.unloadOnClose) {
       this.#closing = new PinnedClosing(context);
       await this.#closing.start();
@@ -49,24 +48,12 @@ export class PinnedTabs extends Module<PinnedTabsOptions> {
    */
   public override stop(): void {
     this.#closing?.stop();
-    this.#reset?.detach();
+    this.#loader?.stop();
     this.#marking?.stop();
     this.#watcher?.stop();
     this.#closing = null;
-    this.#reset = null;
+    this.#loader = null;
     this.#marking = null;
     this.#watcher = null;
-  }
-
-  #startReset({ document, selectors, logger }: ModuleContext<PinnedTabsOptions>, addresses: SavedAddresses): void {
-    const marking = this.#marking;
-    this.#reset = new ResetClick({
-      document,
-      faviconSelector: selectors.get('tabFavicon'),
-      wrapperSelector: selectors.get('tabWrapper'),
-      isAway: (tabId): boolean => marking?.isAway(tabId) === true,
-      reset: (tabId): void => void addresses.load(tabId).catch((error: unknown) => logger.error(`Could not reset tab ${tabId}`, error)),
-    });
-    this.#reset.attach();
   }
 }

@@ -1,22 +1,5 @@
 @use 'tokens' as *;
 
-#{$root} #{$away} .tab-header .favicon {
-  position: relative;
-  cursor: pointer;
-
-  > * {
-    visibility: hidden;
-  }
-
-  &::after {
-    position: absolute;
-    inset: 0;
-    background-color: currentcolor;
-    content: '';
-    mask: $reset-glyph center / contain no-repeat;
-  }
-}
-
 #{$root} #{$pinned-last} {
   margin-bottom: $separator-gap;
   padding-bottom: $separator-gap;

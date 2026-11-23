@@ -1,16 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabUnloader } from '../../../src/core/tabs/TabUnloader.js';
-import { FavoriteOpener } from '../../../src/modules/favorites/FavoriteOpener.js';
-import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
-import { AwayTabs } from '../../../src/modules/pinned/AwayTabs.js';
 import { CloseShortcut } from '../../../src/modules/pinned/CloseShortcut.js';
 import { PinWatcher } from '../../../src/modules/pinned/PinWatcher.js';
-import { ResetClick } from '../../../src/modules/pinned/ResetClick.js';
 import { SavedAddresses } from '../../../src/modules/pinned/SavedAddresses.js';
-import { AWAY_ATTRIBUTE, TabBarMarker } from '../../../src/modules/pinned/TabBarMarker.js';
-import { PINNED_LAST_ATTRIBUTE } from '../../../src/shared/tabs/TabBarMarks.js';
-import { FakeNode, selectors } from '../favorites/fakes.js';
 import { LinkingTabs, own, silentLogger } from '../favorites/linked.js';
 import { event, ListeningDocument, row } from './fakes.js';
 
@@ -99,68 +91,6 @@ test('forgets the address of an unpinned tab', async () => {
   assert.deepEqual(tabs.extData(2), { workspaceId: 7 });
   watcher.stop();
   assert.equal(tabs.updated.size, 0);
-});
-
-test('marks favorites and pinned tabs that left their own page', () => {
-  const marks = AwayTabs.marksOf([
-    { id: 1, pinned: true, url: 'https://web.whatsapp.com/', vivExtData: own({}, 'w', 'https://web.whatsapp.com/') },
-    { id: 2, pinned: true, url: 'https://www.reddit.com/r/vivaldi', vivExtData: own({}, 'r', 'https://www.reddit.com/') },
-    { id: 3, pinned: true, url: 'https://docs.example/b', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 4, pinned: true, url: 'https://docs.example/a?tab=2#top', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 5, pinned: false, url: 'https://news.example/', vivExtData: own({}, undefined, 'https://docs.example/a') },
-  ] as unknown as chrome.tabs.Tab[]);
-  assert.deepEqual([...marks.away], [2, 3]);
-  assert.deepEqual([...marks.linked], [1, 2]);
-
-  const slot = (id: number, pinned: boolean): FakeNode => {
-    const wrapper = new FakeNode(['wrapper']);
-    wrapper.dataset['id'] = `tab-${id}`;
-    return new FakeNode(pinned ? ['pinned'] : [], [wrapper]);
-  };
-  const slots = [slot(1, true), slot(2, true), slot(3, true), slot(4, true), slot(5, false)];
-  const document = new FakeNode([], [new FakeNode(['strip'], slots)]);
-  const marker = new TabBarMarker(selectors);
-  marker.apply(document as unknown as ParentNode, marks);
-  assert.deepEqual(slots.map((node) => node.hasAttribute(AWAY_ATTRIBUTE)), [false, true, true, false, false]);
-  assert.deepEqual(slots.map((node) => node.hasAttribute(PINNED_LAST_ATTRIBUTE)), [false, false, false, true, false]);
-  marker.clear();
-  assert.ok(slots.every((node) => !node.hasAttribute(AWAY_ATTRIBUTE) && !node.hasAttribute(PINNED_LAST_ATTRIBUTE)));
-});
-
-test('loads the own page on reset', async () => {
-  const reddit = { id: 'r', title: 'Reddit', url: 'https://www.reddit.com/' };
-  const tabs = new LinkingTabs([
-    { id: 2, active: true, pinned: true, url: 'https://www.reddit.com/r/vivaldi', vivExtData: own({}, 'r', reddit.url) },
-    { id: 3, pinned: true, url: 'https://docs.example/b', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 4, pinned: true, url: 'https://docs.example/a', vivExtData: own({}, undefined, 'https://docs.example/a') },
-  ]);
-  await new FavoriteOpener(tabs, new LinkedTabs(tabs), new TabUnloader(tabs), silentLogger).open(reddit);
-  const addresses = new SavedAddresses(tabs);
-  const document = new ListeningDocument();
-  const reset = new ResetClick({
-    document: document as unknown as Document,
-    faviconSelector: 'favicon',
-    wrapperSelector: 'wrapper',
-    isAway: (tabId): boolean => tabId === 3,
-    reset: (tabId): void => void addresses.load(tabId),
-  });
-  reset.attach();
-  const away = row(3, true);
-  const click = document.dispatch(event('click', { target: { closest: (selector: string) => (selector === 'favicon' ? away.favicon : null) } }));
-  const home = row(4, true);
-  const ignored = document.dispatch(event('click', { target: { closest: (selector: string) => (selector === 'favicon' ? home.favicon : null) } }));
-  await settle();
-  await addresses.load(4);
-  assert.deepEqual(
-    tabs.actions().filter(([name]) => name === 'update').map(([, tabId, change]) => [tabId, change]),
-    [
-      [2, { url: reddit.url }],
-      [3, { url: 'https://docs.example/a' }],
-    ],
-  );
-  assert.deepEqual([click.defaultPrevented, ignored.defaultPrevented], [true, false]);
-  reset.detach();
-  assert.equal(document.count(), 0);
 });
 
 test('unloads a pinned tab on close shortcut', () => {

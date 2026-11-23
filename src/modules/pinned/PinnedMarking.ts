@@ -2,14 +2,14 @@ import { DomQuery } from '../../core/dom/DomQuery.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { SerialTask } from '../../core/support/SerialTask.js';
-import { AwayTabs } from './AwayTabs.js';
-import type { TabMarks } from './AwayTabs.js';
+import { PinnedMarks } from './PinnedMarks.js';
+import type { TabMarks } from './PinnedMarks.js';
 import { TabBarMarker } from './TabBarMarker.js';
 
 export class PinnedMarking {
   #context: ModuleContext;
-  #marks: TabMarks = { away: new Set(), linked: new Set() };
-  #away: AwayTabs;
+  #marks: TabMarks = { linked: new Set() };
+  #marksReader: PinnedMarks;
   #marker: TabBarMarker;
   #read: SerialTask;
   #draw: FrameTask;
@@ -17,31 +17,23 @@ export class PinnedMarking {
   #unsubscribe: Array<() => void> = [];
 
   /**
-   * Keeps the marks of the tab bar in step with the tabs: away rows and the separator after
-   * the last pinned row.
+   * Keeps the marks of the tab bar in step with the tabs: the separator after the last pinned
+   * row.
    *
    * @param context The context of the pinned-tabs module.
    */
   constructor(context: ModuleContext) {
     this.#context = context;
-    this.#away = new AwayTabs(context.tabs);
-    this.#marker = new TabBarMarker(context.selectors);
+    this.#marksReader = new PinnedMarks(context.tabs);
+    this.#marker = new TabBarMarker(context.selectors, context.logger);
     this.#draw = new FrameTask(() => this.#marker.apply(context.document, this.#marks));
     this.#read = new SerialTask(
       async () => {
-        this.#marks = await this.#away.read();
+        this.#marks = await this.#marksReader.read();
         this.#draw.request();
       },
       (error) => context.logger.error('Could not read the pinned tabs', error),
     );
-  }
-
-  /**
-   * @param tabId A tab.
-   * @returns Whether it is a pinned tab away from its own page.
-   */
-  public isAway(tabId: number): boolean {
-    return this.#marks.away.has(tabId);
   }
 
   /**

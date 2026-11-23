@@ -65,7 +65,6 @@
     },
     "pinned-tabs": {
       "enabled": true,
-      "resetButton": true,
       "unloadOnClose": true
     },
     "space-header": {
