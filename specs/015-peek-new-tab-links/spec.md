@@ -6,6 +6,7 @@
 | Phase | 2 |
 | Owner | Tore |
 | Approved | 2026-10-30 |
+| Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): with the `little-arc` module on, a `target="_blank"` link in a pinned or Favorite page opens in Little Arc; the Peek trigger applies only where Little Arc cannot open. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -53,7 +54,8 @@ nor Cmd/Ctrl+O, and Peek only takes them while it is open.
 ### Functional
 
 - **FR-1.** A new trigger `pinnedNewTab` opens in Peek a left click, without Cmd/Ctrl/Alt, on a link
-  with `target="_blank"` in a Favorite or pinned tab, whatever the site of the link.
+  with `target="_blank"` in a Favorite or pinned tab, whatever the site of the link, unless the
+  `little-arc` module is on; then the link opens in Little Arc ([059](../059-pinned-tabs-arc/spec.md)).
 - **FR-2.** A new trigger `anyNewTab`, off by default, does the same in every other tab.
 - **FR-3.** The three buttons sit in a column outside the panel, next to its top right corner, in the
   order Close, Expand, Split. Each has a tooltip; Close and Expand show Cmd/Ctrl+W and Cmd/Ctrl+O.

@@ -12,7 +12,8 @@ was, dimmed. The panel holds the real page: you can scroll it, type in it and fo
 - **Shift+click** on any link.
 - In a **Favorite**, a **pinned tab** or a **folder link**: a link to another site, so the tab keeps its
   own page. Subdomains count as the same site.
-- In the same tabs: a link that asks for a new tab (`target="_blank"`), even on the same site.
+- In a Favorite or pinned page, a link that asks for a new window (`target="_blank"`) opens in
+  [Little Arc](little-arc.md) instead, with the `little-arc` module on.
 
 Options in `config.json` extend Peek to every tab; see the [README](../../README.md#peek).
 

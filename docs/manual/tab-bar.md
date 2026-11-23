@@ -28,10 +28,10 @@ every workspace.
   become the tiles.
 - **Open one.** Click a tile. The first time it opens as a hidden pinned tab of the workspace; after
   that the click brings you back to it. Each workspace keeps its own tab for each Favorite.
-- **Go home.** Click the tile of the current tab after you browsed away: the tab goes back to the
-  Favorite's page.
+- **Browse away.** A link followed inside a Favorite's tab changes what the tab shows, not the
+  bookmark. The tile keeps its favicon, and a click on it activates the tab without resetting it.
 - **Unload it.** Middle click, Cmd/Ctrl+W or the close button unload the tab instead of closing it.
-  The tile stays, dimmed, and a click loads it again.
+  The tile stays, dimmed, and a click loads the bookmark's page again.
 - **Add one by dragging.** Take a tab from the list or from the pinned rows and release it over the
   grid. The tiles move apart to leave a gap where it will land, and a new tile appears there with the
   page's icon, the same in every workspace. The tab stays open as the tab of that Favorite. The
@@ -138,13 +138,16 @@ to filter, use Up and Down, and press Enter or click to open. Esc closes the pan
 
 Pinned tabs are rows below the folders. Each workspace has its own.
 
-- A pinned tab remembers the page it was pinned with. When it shows another page, its icon turns into
-  a back arrow: click the arrow to return.
-- Cmd/Ctrl+W and the close button unload a pinned tab instead of closing it. **Close tab** in the
-  context menu still closes it.
-- In a pinned tab, a link to another site opens in [Peek](peek.md), so the tab keeps its page.
-
-![Mockup: a pinned tab browses away and comes back with one click](images/mockups/pinned-tab-reset.gif)
+- A pinned tab remembers the page it was pinned with. Following a link inside it changes what it
+  shows, not its own page; the favicon stays the same and there is no back arrow. Closing and
+  reopening the tab loads its own page again.
+- The **minus** at the right end of the row, Cmd/Ctrl+W and the close affordance unload a pinned tab
+  instead of closing it. The row stays, dimmed; a click loads its own page. **Close tab** and
+  **Unpin tab** in the menu still close or unpin it.
+- The row's menu has **Edit Pinned Page**, with **Replace Pinned URL with Current** and **Edit…**, to
+  change the page it opens first.
+- In a pinned tab, a link to another site opens in [Peek](peek.md), so the tab keeps its page; a link
+  that asks for a new window opens in [Little Arc](little-arc.md).
 
 ## Names and icons
 
