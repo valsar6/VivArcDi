@@ -51,12 +51,13 @@ export class Peek extends Module<PeekOptions> {
       return;
     }
     const settings = context.options;
+    const triggers = effectiveTriggers(context, settings);
     const container = DomQuery.require(context.document, context.selectors.get('webviewContainer'));
     const scripts = await PageScripts.load(context.payload);
     this.#token = crypto.randomUUID();
     this.#container = container;
     this.#controller = this.#createController(context, settings, scripts);
-    this.#injector = this.#createInjector(context, settings, scripts);
+    this.#injector = this.#createInjector(context, triggers, scripts);
     this.#keys = new PeekKeys(context.document, () => this.#controller?.isOpen ?? false, (command) => this.#run(command));
     this.#subscribe(context);
     this.#injector.attach();
@@ -173,4 +174,14 @@ export class Peek extends Module<PeekOptions> {
       void this.#controller?.split();
     }
   }
+}
+
+function effectiveTriggers({ modules }: ModuleContext<PeekOptions>, settings: PeekOptions): PeekTriggers {
+  return {
+    shiftClick: settings.shiftClick,
+    pinnedCrossSite: settings.pinnedCrossSite,
+    anyCrossSite: settings.anyCrossSite,
+    pinnedNewTab: settings.pinnedNewTab && modules?.['little-arc']?.enabled !== true,
+    anyNewTab: settings.anyNewTab,
+  };
 }
