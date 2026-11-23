@@ -3,7 +3,6 @@ import { OptionSchema } from '../../core/boot/options/OptionSchema.js';
 import type { OptionValues } from '../../core/boot/options/OptionSchema.js';
 
 export const PINNED_TABS_OPTIONS = OptionSchema.of({
-  resetButton: Option.boolean(true),
   unloadOnClose: Option.boolean(true),
 });
 

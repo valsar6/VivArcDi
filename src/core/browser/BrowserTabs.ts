@@ -56,6 +56,7 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
         getLastFocused?: ((...args: unknown[]) => void) | undefined;
         remove?: ((...args: unknown[]) => void) | undefined;
         onFocusChanged?: ChromeEvent<(windowId: number) => void> | undefined;
+        onRemoved?: ChromeEvent<(windowId: number) => void> | undefined;
       }
     | undefined;
   search?: { query: (...args: unknown[]) => void } | undefined;

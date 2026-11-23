@@ -72,6 +72,7 @@ function setUp(tab: { pinned?: boolean; vivExtData?: string } = { pinned: true }
     runtime: new BrowserRuntime({ runtime: { onMessage: messages } }),
     payload: new FakeLoader({ 'page/peek-links.js': 'LINKS', 'page/peek-keys.js': 'KEYS' }),
     build: { vivarcdiVersion: 'test', vivaldiVersion: '8.1' },
+    modules: {},
     notices: silentNotices(),
   } as unknown as ModuleContext<PeekOptions>;
   return { context, document, container, webview, messages, tabs };
@@ -99,6 +100,20 @@ test('peek module gives the tab of a folder link the policy of a pinned tab', as
   await peek.start(context);
   await settle();
   assert.match(webview.executed[0] ?? '', /"pinned":true,"tabId":1/);
+  peek.stop();
+});
+
+test('peek leaves new-tab links of pinned pages to Little Arc', async () => {
+  const { context, webview } = setUp();
+  const peek = new Peek();
+  const modules = { 'little-arc': { enabled: true } };
+  await peek.start({ ...context, modules });
+  await settle();
+  const code = webview.executed[0] ?? '';
+  assert.match(code, /"pinned":true,"tabId":1/);
+  assert.match(code, /"pinnedNewTab":false/);
+  assert.match(code, /"shiftClick":true,"pinnedCrossSite":true,"anyCrossSite":false/);
+  assert.match(code, /"anyNewTab":false/);
   peek.stop();
 });
 

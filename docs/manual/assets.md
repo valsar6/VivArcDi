@@ -13,7 +13,6 @@ VivArcDi that still have to be made on a real Vivaldi.
 | `images/diagrams/how-it-works.svg` | Diagram | Install, files in Vivaldi, start, re-apply after updates | [Manual](README.md) |
 | `images/mockups/tab-bar-anatomy.png` | Mockup | The sections of the tab bar, numbered | [Manual](README.md), [Tab bar](tab-bar.md) |
 | `images/mockups/folder-panel-and-peek-out.gif` | Mockup | Folder panel on hover, then the link below its closed folder | [Tab bar](tab-bar.md#folder-panel) |
-| `images/mockups/pinned-tab-reset.gif` | Mockup | Pinned tab away from its page, back arrow, back home | [Tab bar](tab-bar.md#pinned-tabs) |
 | `images/mockups/peek.gif` | Mockup | Shift+click opens Peek with Close, Expand, Split | [Peek](peek.md) |
 | `images/mockups/today-archive.png` | Mockup | Archive panel grouped by day | [Today](today-and-keyboard.md#today-archive) |
 | `images/mockups/copy-url.png` | Mockup | The "Copied" toast | [Today](today-and-keyboard.md#copy-url) |
@@ -42,7 +41,7 @@ can be swapped for it.
 |---|---|---|---|
 | 1 | `vivarcdi/tab-bar-tour.gif` | Whole tab bar at rest, then hover a Favorite, a folder and a pinned tab | `tab-bar-anatomy.png` |
 | 2 | `vivarcdi/favorites.gif` | Click three tiles, middle click one to unload it (it dims), click it again | new |
-| 3 | `vivarcdi/pinned-tab-reset.gif` | In a pinned tab follow a link on the same site, the icon becomes ↩, click it | `pinned-tab-reset.gif` |
+| 3 | `vivarcdi/pinned-tab-unload.gif` | In a pinned tab follow a same-site link, hover the row, click the minus, reopen the row at its pinned page | `pinned-tab-reset.gif` |
 | 4 | `vivarcdi/peek.gif` | Shift+click a link, scroll inside Peek, click Expand | `peek.gif` |
 | 5 | `vivarcdi/peek-split.gif` | From a pinned tab click a link to another site, then Split | `peek-split.gif` |
 | 6 | `vivarcdi/folders.gif` | Open a folder, open a link, close the folder: the link stays below it | new |

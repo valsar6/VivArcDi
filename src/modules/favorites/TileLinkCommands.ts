@@ -8,6 +8,7 @@ import { TextCopier } from '../../shared/clipboard/TextCopier.js';
 import { AddressField } from '../../shared/newtab/AddressField.js';
 import { NewTabOpener } from '../../shared/newtab/NewTabOpener.js';
 import { BookmarkCopier } from '../../shared/linkmenu/BookmarkCopier.js';
+import { BookmarkPinnedStore } from '../../shared/linkmenu/BookmarkPinnedStore.js';
 import { LinkClipboard } from '../../shared/linkmenu/LinkClipboard.js';
 import { LinkDuplication } from '../../shared/linkmenu/LinkDuplication.js';
 import { LinkExtras } from '../../shared/linkmenu/LinkExtras.js';
@@ -57,7 +58,7 @@ export class TileLinkCommands {
   constructor(dependencies: TileLinkCommandsDependencies) {
     const { writer, tile, clipboard, dialog, store, notify, logger } = dependencies;
     this.#deps = dependencies;
-    this.#pinned = new PinnedAddress({ writer, linkedTab: tile, dialog, notify, logger });
+    this.#pinned = new PinnedAddress({ store: new BookmarkPinnedStore({ writer, linkedTab: tile }), dialog, notify, logger });
     this.#clipboard = new LinkClipboard({ writer, copier: clipboard, notify, logger });
     this.#duplication = new LinkDuplication({ writer, copier: new BookmarkCopier(writer), extras: new LinkExtras(store), notify, logger });
   }

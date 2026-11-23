@@ -17,6 +17,7 @@ export class FakeElement {
   public throwOnExecute = false;
   public style = {
     setProperty: (name: string, value: string): Map<string, string> => this.properties.set(name, value),
+    removeProperty: (name: string): boolean => this.properties.delete(name),
   };
 
   constructor(tagName = 'div', attributes: Record<string, string> = {}) {

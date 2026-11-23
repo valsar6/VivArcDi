@@ -1,4 +1,5 @@
 export const LITTLE_ARC_MESSAGE_TYPE = 'vivarcdi-little-arc';
+export const LITTLE_ARC_CONSOLE_PREFIX = 'vivarcdi-little-arc:';
 
 export interface AdoptMessage {
   type: typeof LITTLE_ARC_MESSAGE_TYPE;
@@ -35,6 +36,65 @@ export interface DestinationColors {
   space: string;
   pill: string;
   ink: string;
+}
+
+export interface PageLinkPolicy {
+  /** Secret that proves the click comes from an injected script. */
+  token: string;
+  /** Id of the tab whose page holds the link. */
+  tabId: number;
+}
+
+export interface PageLinkMessage {
+  type: typeof LITTLE_ARC_MESSAGE_TYPE;
+  action: 'page-link';
+  token: string;
+  tabId: number;
+  url: string;
+}
+
+/**
+ * @param token Secret given to the injected scripts.
+ * @param tabId The tab whose page holds the link.
+ * @param url The address of the link.
+ * @returns The message a page sends when a new-window link is clicked.
+ */
+export function pageLinkMessage(token: string, tabId: number, url: string): PageLinkMessage {
+  return { type: LITTLE_ARC_MESSAGE_TYPE, action: 'page-link', token, tabId, url };
+}
+
+/**
+ * @param value Anything received through `chrome.runtime.onMessage` or a page's console line.
+ * @returns The message when it is a valid new-window link request, otherwise null.
+ */
+export function parsePageLinkMessage(value: unknown): PageLinkMessage | null {
+  const candidate = typeof value === 'string' ? pageLinkFromConsole(value) : value;
+  if (typeof candidate !== 'object' || candidate === null) {
+    return null;
+  }
+  const message = candidate as Record<string, unknown>;
+  return isPageLink(message) ? pageLinkMessage(message['token'] as string, message['tabId'] as number, message['url'] as string) : null;
+}
+
+function isPageLink(message: Record<string, unknown>): boolean {
+  return (
+    message['type'] === LITTLE_ARC_MESSAGE_TYPE &&
+    message['action'] === 'page-link' &&
+    typeof message['token'] === 'string' &&
+    Number.isInteger(message['tabId']) &&
+    typeof message['url'] === 'string'
+  );
+}
+
+function pageLinkFromConsole(line: string): unknown {
+  if (!line.startsWith(LITTLE_ARC_CONSOLE_PREFIX)) {
+    return null;
+  }
+  try {
+    return JSON.parse(line.slice(LITTLE_ARC_CONSOLE_PREFIX.length));
+  } catch {
+    return null;
+  }
 }
 
 export interface DestinationQuestion {

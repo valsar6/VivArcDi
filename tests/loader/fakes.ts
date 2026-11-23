@@ -36,6 +36,11 @@ export class FakeElement {
   public parent: FakeElement | null = null;
   public textContent = '';
   public attributes: Record<string, string> = {};
+  public properties = new Map<string, string>();
+  public style = {
+    setProperty: (name: string, value: string): Map<string, string> => this.properties.set(name, value),
+    removeProperty: (name: string): boolean => this.properties.delete(name),
+  };
   public classList = {
     add: (name: string): Set<string> => this.classes.add(name),
     remove: (name: string): boolean => this.classes.delete(name),

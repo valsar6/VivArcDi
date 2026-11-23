@@ -121,6 +121,19 @@ test('a click on a tile activates its tab, and reloads it when unloaded', async 
   assert.deepEqual(tabs.calls.filter(([call]) => call !== 'query'), [['activate', 1], ['activate', 2], ['reload', 2]]);
 });
 
+test('loads the own page of an unloaded pinned tile', async (t) => {
+  const ownPage = 'https://site2.example/own';
+  const data = JSON.stringify({ workspaceId: 7, vivarcdi: { pinnedUrl: ownPage } });
+  const { favorites, tabs } = setup(t, [
+    pinned(1, 7, { active: true }),
+    pinned(2, 7, { discarded: true, url: 'https://site2.example/away', vivExtData: data }),
+  ]);
+  await favorites.start();
+  press(tilesOf(favorites)[1]);
+  await settle();
+  assert.deepEqual(tabs.calls.filter(([call]) => call !== 'query'), [['activate', 2], ['update', 2, { url: ownPage }]]);
+});
+
 test('follows tab changes and never shows more than the maximum', async (t) => {
   const { favorites, tabs } = setup(t, [pinned(1, 7, { active: true })], 2);
   await favorites.start();

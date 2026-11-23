@@ -1,15 +1,19 @@
 import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
 import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
+import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
+import { DomQuery } from '../../core/dom/DomQuery.js';
 import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
 import { WindowKeys } from '../../core/dom/WindowKeys.js';
+import { KeptTab } from '../../shared/tabs/KeptTab.js';
 import { DestinationPalette } from './DestinationPalette.js';
 import { DestinationPicker } from './DestinationPicker.js';
 import { ExternalLinkDetector } from './ExternalLinkDetector.js';
 import { DETECTION_DELAY_MS, ExternalLinkWatcher } from './ExternalLinkWatcher.js';
 import { FocusHistory } from './FocusHistory.js';
+import { LittleArcIndicator } from './LittleArcIndicator.js';
 import { LittleArcLauncher } from './LittleArcLauncher.js';
-import { isDestinationQuestion, parseAdoptMessage } from './LittleArcMessage.js';
+import { isDestinationQuestion, parseAdoptMessage, parsePageLinkMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import type { LittleArcOptions } from './LittleArcOptions.js';
 import { screenOf } from './ScreenAreas.js';
@@ -18,13 +22,19 @@ import type { CommandBarMount } from './commandbar/CommandBarMount.js';
 import { WorkspaceAdopter } from './WorkspaceAdopter.js';
 import type { DestinationSource } from './WorkspaceAdopter.js';
 
+const LINK_SCRIPT_PATH = 'page/little-arc-links.js';
+const LINK_SCRIPT_GLOBAL = 'VivArcDiLittleArcLinks';
+
 export class MainWindowRole {
   #context: ModuleContext;
   #settings: LittleArcOptions;
   #registry: LittleArcRegistry;
   #windowId: number;
   #launcher: LittleArcLauncher;
+  #indicator: LittleArcIndicator;
   #cleanups: Array<() => void> = [];
+  #token = crypto.randomUUID();
+  #keptTabs = new Map<number, boolean>();
 
   /**
    * What Little Arc does in a normal window: opens the small window on Cmd+Opt+N, moves links that
@@ -47,6 +57,7 @@ export class MainWindowRole {
       size: settings,
       logger: context.logger,
     });
+    this.#indicator = new LittleArcIndicator({ ...context, logger: context.logger.child('LittleArcIndicator') });
   }
 
   /**
@@ -61,7 +72,9 @@ export class MainWindowRole {
     );
     keys.attach();
     this.#cleanups.push(() => keys.detach());
+    this.#cleanups.push(this.#indicator.start());
     await this.#listenForPages();
+    await this.#listenForKeptLinks();
     if (this.#settings.externalLinks) {
       this.#listenForExternalLinks();
     }
@@ -93,9 +106,7 @@ export class MainWindowRole {
   }
 
   #open(bar: CommandBarMount | null): void {
-    if (bar?.toggle() !== true) {
-      void this.#launcher.openBlank();
-    }
+    if (bar?.toggle() !== true) void this.#launcher.openBlank();
   }
 
   async #listenForPages(): Promise<void> {
@@ -126,16 +137,73 @@ export class MainWindowRole {
     const request = parseAdoptMessage(message);
     if (request !== null) {
       void adopter.adopt(request);
-    } else if (isDestinationQuestion(message)) {
+      return;
+    }
+    if (isDestinationQuestion(message)) {
       void this.#answer(adopter);
+      return;
+    }
+    void this.#handleLink(message);
+  }
+
+  async #listenForKeptLinks(): Promise<void> {
+    const { document, selectors, tabs, runtime, payload, logger } = this.#context;
+    let container: Element;
+    let script: string;
+    try {
+      container = DomQuery.require(document, selectors.get('webviewContainer'));
+      script = await payload.text(LINK_SCRIPT_PATH);
+    } catch (error) {
+      logger.warn('cannot follow the pages of the tabs: new-window links stay with Vivaldi', error);
+      return;
+    }
+    const injector = new PageScriptInjector({
+      container,
+      webviewSelector: selectors.get('tabWebview'),
+      scriptFor: async (tabId): Promise<string | null> => this.#linkScript(script, tabId),
+      uninstallScript: `globalThis.${LINK_SCRIPT_GLOBAL}?.uninstall();`,
+      purpose: 'Little Arc links',
+      onConsoleMessage: (message): void => void this.#handleLink(message),
+      errors: runtime,
+      logger,
+    });
+    injector.attach();
+    this.#cleanups.push(() => injector.detach());
+    this.#cleanups.push(
+      tabs.onUpdated((tabId, change, tab) => {
+        const kept = KeptTab.is(tab);
+        if ((change.pinned !== undefined || 'vivExtData' in change) && this.#keptTabs.get(tabId) !== kept) {
+          this.#keptTabs.set(tabId, kept);
+          injector.refresh(tabId);
+        }
+      }),
+    );
+  }
+
+  async #linkScript(script: string, tabId: number): Promise<string | null> {
+    const tab = await this.#context.tabs.get(tabId);
+    return KeptTab.is(tab) ? `${script}\n${LINK_SCRIPT_GLOBAL}.install(${JSON.stringify({ token: this.#token, tabId })});` : null;
+  }
+
+  async #handleLink(value: unknown): Promise<void> {
+    const link = parsePageLinkMessage(value);
+    if (link === null || link.token !== this.#token) {
+      return;
+    }
+    try {
+      const tab = await this.#context.tabs.get(link.tabId);
+      if (KeptTab.is(tab)) {
+        const windowId = await this.#launcher.openAddressIn(link.url);
+        if (windowId !== null) await this.#indicator.show(link.tabId, windowId, link.url);
+      }
+    } catch (error) {
+      this.#context.logger.warn('could not read the tab of a Little Arc link', error);
     }
   }
 
   async #answer(adopter: WorkspaceAdopter): Promise<void> {
     const answer = await adopter.describeDestination();
-    if (answer !== null) {
-      await this.#context.runtime.sendMessage(answer).catch((error: unknown) => this.#context.logger.warn('could not answer the Little Arc bar', error));
-    }
+    if (answer !== null) await this.#context.runtime.sendMessage(answer).catch((error: unknown) => this.#context.logger.warn('could not answer the Little Arc bar', error));
   }
 
   #listenForExternalLinks(): void {

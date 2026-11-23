@@ -1,4 +1,4 @@
-import type { BrowserWindows } from '../../core/browser/BrowserWindows.js';
+import type { BrowserWindows, WindowDetails } from '../../core/browser/BrowserWindows.js';
 import type { Logger } from '../../core/support/Logger.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import { WindowBounds } from './WindowBounds.js';
@@ -41,7 +41,7 @@ export class LittleArcLauncher {
    * @returns Whether the window was opened.
    */
   public openBlank(): Promise<boolean> {
-    return this.#open({ url: BLANK_PAGE });
+    return this.#opened({ url: BLANK_PAGE });
   }
 
   /**
@@ -52,7 +52,19 @@ export class LittleArcLauncher {
    * @returns Whether the window was opened.
    */
   public openAddress(url: string): Promise<boolean> {
-    return this.#open({ url });
+    return this.#opened({ url });
+  }
+
+  /**
+   * Opens a Little Arc window for a link of another page and keeps its id, so the row or tile the
+   * link came from can be marked.
+   *
+   * @param url The address of the link.
+   * @returns The id of the new window, or null when it could not be opened.
+   */
+  public async openAddressIn(url: string): Promise<number | null> {
+    const details = await this.#open({ url });
+    return details?.id ?? null;
   }
 
   /**
@@ -63,19 +75,23 @@ export class LittleArcLauncher {
    * @returns Whether the tab was moved.
    */
   public adopt(tabId: number): Promise<boolean> {
-    return this.#open({ tabId });
+    return this.#opened({ tabId });
   }
 
-  async #open(source: { url: string } | { tabId: number }): Promise<boolean> {
+  async #opened(source: { url: string } | { tabId: number }): Promise<boolean> {
+    return (await this.#open(source)) !== null;
+  }
+
+  async #open(source: { url: string } | { tabId: number }): Promise<WindowDetails | null> {
     try {
       const details = await this.#windows.create({ ...source, type: 'popup', focused: true, ...WindowBounds.centred(this.#screen(), this.#size) });
       if (details.id !== undefined) {
         this.#registry.mark(details.id);
       }
-      return true;
+      return details;
     } catch (error) {
       this.#logger.error('could not open a Little Arc window, leaving the link to Vivaldi', error);
-      return false;
+      return null;
     }
   }
 }

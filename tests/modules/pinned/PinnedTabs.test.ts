@@ -1,20 +1,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TabUnloader } from '../../../src/core/tabs/TabUnloader.js';
-import { FavoriteOpener } from '../../../src/modules/favorites/FavoriteOpener.js';
-import { LinkedTabs } from '../../../src/modules/favorites/LinkedTabs.js';
-import { AwayTabs } from '../../../src/modules/pinned/AwayTabs.js';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { CloseShortcut } from '../../../src/modules/pinned/CloseShortcut.js';
+import { PINNED_MINUS_ATTRIBUTE, PINNED_UNLOAD_ATTRIBUTE, PinnedMinus } from '../../../src/modules/pinned/PinnedMinus.js';
 import { PinWatcher } from '../../../src/modules/pinned/PinWatcher.js';
-import { ResetClick } from '../../../src/modules/pinned/ResetClick.js';
 import { SavedAddresses } from '../../../src/modules/pinned/SavedAddresses.js';
-import { AWAY_ATTRIBUTE, TabBarMarker } from '../../../src/modules/pinned/TabBarMarker.js';
-import { PINNED_LAST_ATTRIBUTE } from '../../../src/shared/tabs/TabBarMarks.js';
-import { FakeNode, selectors } from '../favorites/fakes.js';
+import { immediateFrames } from '../folders/fakes.js';
 import { LinkingTabs, own, silentLogger } from '../favorites/linked.js';
-import { event, ListeningDocument, row } from './fakes.js';
+import { event, ListeningDocument, MinusDocument, MinusNode, row } from './fakes.js';
 
 const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
+
+const minusSelectors = new SelectorCatalog(
+  { browser: '[data-browser]', pinnedTab: 'pinned', tabWrapper: '[data-slot]', tabFavicon: 'favicon' },
+  'test',
+);
 
 const pin = (tabs: LinkingTabs, tabId: number, pinned: boolean): void => {
   const tab = { ...tabs.tabs.get(tabId), pinned } as chrome.tabs.Tab;
@@ -101,68 +101,6 @@ test('forgets the address of an unpinned tab', async () => {
   assert.equal(tabs.updated.size, 0);
 });
 
-test('marks favorites and pinned tabs that left their own page', () => {
-  const marks = AwayTabs.marksOf([
-    { id: 1, pinned: true, url: 'https://web.whatsapp.com/', vivExtData: own({}, 'w', 'https://web.whatsapp.com/') },
-    { id: 2, pinned: true, url: 'https://www.reddit.com/r/vivaldi', vivExtData: own({}, 'r', 'https://www.reddit.com/') },
-    { id: 3, pinned: true, url: 'https://docs.example/b', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 4, pinned: true, url: 'https://docs.example/a?tab=2#top', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 5, pinned: false, url: 'https://news.example/', vivExtData: own({}, undefined, 'https://docs.example/a') },
-  ] as unknown as chrome.tabs.Tab[]);
-  assert.deepEqual([...marks.away], [2, 3]);
-  assert.deepEqual([...marks.linked], [1, 2]);
-
-  const slot = (id: number, pinned: boolean): FakeNode => {
-    const wrapper = new FakeNode(['wrapper']);
-    wrapper.dataset['id'] = `tab-${id}`;
-    return new FakeNode(pinned ? ['pinned'] : [], [wrapper]);
-  };
-  const slots = [slot(1, true), slot(2, true), slot(3, true), slot(4, true), slot(5, false)];
-  const document = new FakeNode([], [new FakeNode(['strip'], slots)]);
-  const marker = new TabBarMarker(selectors);
-  marker.apply(document as unknown as ParentNode, marks);
-  assert.deepEqual(slots.map((node) => node.hasAttribute(AWAY_ATTRIBUTE)), [false, true, true, false, false]);
-  assert.deepEqual(slots.map((node) => node.hasAttribute(PINNED_LAST_ATTRIBUTE)), [false, false, false, true, false]);
-  marker.clear();
-  assert.ok(slots.every((node) => !node.hasAttribute(AWAY_ATTRIBUTE) && !node.hasAttribute(PINNED_LAST_ATTRIBUTE)));
-});
-
-test('loads the own page on reset', async () => {
-  const reddit = { id: 'r', title: 'Reddit', url: 'https://www.reddit.com/' };
-  const tabs = new LinkingTabs([
-    { id: 2, active: true, pinned: true, url: 'https://www.reddit.com/r/vivaldi', vivExtData: own({}, 'r', reddit.url) },
-    { id: 3, pinned: true, url: 'https://docs.example/b', vivExtData: own({}, undefined, 'https://docs.example/a') },
-    { id: 4, pinned: true, url: 'https://docs.example/a', vivExtData: own({}, undefined, 'https://docs.example/a') },
-  ]);
-  await new FavoriteOpener(tabs, new LinkedTabs(tabs), new TabUnloader(tabs), silentLogger).open(reddit);
-  const addresses = new SavedAddresses(tabs);
-  const document = new ListeningDocument();
-  const reset = new ResetClick({
-    document: document as unknown as Document,
-    faviconSelector: 'favicon',
-    wrapperSelector: 'wrapper',
-    isAway: (tabId): boolean => tabId === 3,
-    reset: (tabId): void => void addresses.load(tabId),
-  });
-  reset.attach();
-  const away = row(3, true);
-  const click = document.dispatch(event('click', { target: { closest: (selector: string) => (selector === 'favicon' ? away.favicon : null) } }));
-  const home = row(4, true);
-  const ignored = document.dispatch(event('click', { target: { closest: (selector: string) => (selector === 'favicon' ? home.favicon : null) } }));
-  await settle();
-  await addresses.load(4);
-  assert.deepEqual(
-    tabs.actions().filter(([name]) => name === 'update').map(([, tabId, change]) => [tabId, change]),
-    [
-      [2, { url: reddit.url }],
-      [3, { url: 'https://docs.example/a' }],
-    ],
-  );
-  assert.deepEqual([click.defaultPrevented, ignored.defaultPrevented], [true, false]);
-  reset.detach();
-  assert.equal(document.count(), 0);
-});
-
 test('unloads a pinned tab on close shortcut', () => {
   const document = new ListeningDocument();
   const unloaded: number[] = [];
@@ -175,6 +113,43 @@ test('unloads a pinned tab on close shortcut', () => {
   assert.ok([keyMac, keyOther, click].every((fake) => fake.defaultPrevented && fake.stopped));
   shortcut.detach();
   assert.equal(document.count(), 0);
+});
+
+test('unloads a pinned tab from its minus', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addRow(5);
+  const tabs = new LinkingTabs([
+    { id: 5, url: 'https://docs.example/a' },
+    { id: 6, active: true, url: 'https://news.example/' },
+  ]);
+  const watchers = new Set<() => void>();
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs,
+    logger: silentLogger,
+    watch: (_target, onChange): (() => void) => {
+      watchers.add(onChange);
+      return () => watchers.delete(onChange);
+    },
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  assert.ok(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE));
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  const down = document.dispatch(event('mousedown', { target: button }));
+  const click = document.dispatch(event('click', { target: button }));
+  await settle();
+  assert.ok(down.defaultPrevented && down.stopped);
+  assert.ok(click.defaultPrevented && click.stopped);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'discard'), [['discard', 5]]);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), []);
+  minus.stop();
+  assert.equal(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE), false);
+  assert.equal(button.parentElement, null);
+  assert.equal(watchers.size, 0);
 });
 
 test('leaves the close shortcut to Vivaldi for ordinary tabs', () => {

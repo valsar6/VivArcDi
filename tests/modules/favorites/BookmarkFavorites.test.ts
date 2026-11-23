@@ -66,7 +66,7 @@ test('activates the linked tab of a favorite', async () => {
   await opener(tabs).open(whatsapp);
   assert.deepEqual(tabs.actions(), [
     ['activate', 2],
-    ['reload', 2],
+    ['update', 2, { url: whatsapp.url }],
   ]);
 });
 

@@ -9,7 +9,7 @@
 Make [Vivaldi](https://vivaldi.com) behave like the late [Arc](https://arc.net) browser.
 
 Other projects, such as [VivalArc](https://github.com/tovifun/VivalArc), restyle Vivaldi to look like Arc.
-VivArcDi goes further and reproduces how Arc **behaves**: a Favorites grid, pinned tabs that reset to
+VivArcDi goes further and reproduces how Arc **behaves**: a Favorites grid, pinned tabs that keep
 their saved page, folders that let the active tab peek out, and a real Peek overlay for links.
 
 It ships three things:
@@ -30,7 +30,7 @@ for Debian, with no terminal and no Python needed.
 
 What works today:
 
-- [Favorites grid](#favorites) and [pinned tabs](#pinned-tabs) that reset and unload, with
+- [Favorites grid](#favorites) and [pinned tabs](#pinned-tabs) that keep their page and unload, with
   [reopening](#reopen-pinned-tabs) instead of duplicating.
 - [Peek](#peek), a real overlay for links, and [Little Arc](#little-arc).
 - [Bookmark folders in the tab bar](#bookmark-folders), the [folder panel](#folder-panel) and
@@ -320,10 +320,11 @@ the same in every workspace.
   pinned tab the first time. Each workspace has its own tab per Favorite, hidden from the tab list.
 - The tile of the current tab is the light pill, as the active tab; tiles whose tab is unloaded, or not open
   yet in this workspace, are dimmed.
-- A click on the current tile, after browsing away, brings the tab back to the bookmark's page.
+- A click on the current tile, after browsing away, leaves the page as it is; the tile never resets
+  it. The bookmark's page loads again when the tab is unloaded and the tile is clicked.
 - Middle click, Cmd/Ctrl+W or the tab's close button unload the tab instead of closing it. The tile
-  stays, and a click loads it again. If the tile was the active tab, the most recently used tab
-  takes its place.
+  stays, and a click loads the bookmark's page. If the tile was the active tab, the most recently
+  used tab takes its place.
 - At most three columns, whatever the width of the tab bar. Hovering a tile shows its title.
 
 If the folder is missing or has no links, the first pinned tabs of the current workspace become the tiles, drawn the same way, and a click on a tile activates that tab. Their slots in Vivaldi's tab list are hidden
@@ -348,17 +349,19 @@ Pinned tabs show as rows below the Favorites and the bookmark folders, followed 
 the other tabs. Each workspace has its own pinned tabs.
 
 - A pinned tab remembers the page it was pinned with, its own page. Unpinning forgets it.
-- When it shows another page, its favicon turns into a back arrow: a click brings the tab back to
-  its own page.
-- Cmd/Ctrl+W and the close button unload a pinned tab instead of closing it, with the focus in the
-  page or in the interface. "Close tab" in the context menu still closes it.
+- Following a link inside the pinned tab changes what it shows, not its own page. The favicon stays
+  the same and there is no back arrow; closing and reopening the tab loads its own page again.
+- The minus at the right end of the row, Cmd/Ctrl+W and the close affordance unload a pinned tab
+  instead of closing it. The row stays, dimmed; a click loads its own page. "Close tab" and "Unpin
+  tab" in the menu still close or unpin it.
+- The row's menu has Edit Pinned Page, with Replace Pinned URL with Current and Edit…, to change the
+  page it opens first.
 
 Options of `pinned-tabs` in `config.json`:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `resetButton` | `true` | The favicon of a pinned tab away from its own page brings it back |
-| `unloadOnClose` | `true` | Cmd/Ctrl+W and the close button unload Favorites and pinned tabs |
+| `unloadOnClose` | `true` | Cmd/Ctrl+W, the minus and the close affordance unload Favorites and pinned tabs |
 
 Own pages are kept in the tab's own data in Vivaldi, so they survive a restart. Without VivArcDi,
 Favorites' tabs and pinned tabs are ordinary pinned tabs.
@@ -371,6 +374,9 @@ behind it. The panel shows the real page, so you can scroll, type and follow lin
 - **Shift+click** on a link opens it in Peek instead of a new window.
 - In a Favorite, a pinned tab or the tab of a [bookmark folder](#bookmark-folders) link, a link to **another site** opens in Peek, so the tab keeps its page.
   Subdomains count as the same site: from `mail.google.com`, `docs.google.com` opens in the tab.
+- A link that asks for a new window (`target="_blank"`) in a Favorite or pinned page opens in
+  [Little Arc](#little-arc), not in Peek, so the pinned page keeps its place. Peek keeps the trigger
+  only where Little Arc cannot open.
 - **Expand** (or Cmd/Ctrl+O) opens the page as a tab right after the current one.
 - **Split** opens it as a tab and tiles it side by side with the current one.
 - **Close**, a click on the dimmed area, Esc or Cmd/Ctrl+W closes the Peek, never the tab behind.
@@ -383,7 +389,7 @@ Options of `peek` in `config.json`:
 | `shiftClick` | `true` | Shift+click opens Peek |
 | `pinnedCrossSite` | `true` | Links to another site in Favorites and pinned tabs open Peek |
 | `anyCrossSite` | `false` | Links to another site in every other tab open Peek too |
-| `pinnedNewTab` | `true` | Links that ask for a new tab (`target="_blank"`) in Favorites and pinned tabs open Peek, even on the same site |
+| `pinnedNewTab` | `true` | Links that ask for a new tab (`target="_blank"`) in Favorites and pinned tabs open Peek, unless the `little-arc` module is on, in which case they open Little Arc |
 | `anyNewTab` | `false` | Links that ask for a new tab in every other tab open Peek too |
 | `widthPercent` | `90` | Panel width, as a percentage of the page area (40 to 100) |
 | `heightPercent` | `94` | Panel height, as a percentage of the page area (40 to 100) |
@@ -420,6 +426,8 @@ What it does:
 - A **link opened from another app** (Mail, Slack, Notes) opens in Little Arc instead of a tab of the
   main window. VivArcDi recognizes it as a new, active tab with no opener that appears just as Vivaldi
   comes to the front.
+- A **link that asks for a new window** (`target="_blank"`) in a pinned or Favorite page opens here;
+  the row or tile it came from shows a small favicon of the page while the window is open.
 - **Open in *workspace*** or Cmd/Ctrl+O turns the page into a tab of the workspace you last used and
   closes the small window. Esc in an empty address field and Cmd/Ctrl+W close it and forget the page.
 - A Little Arc window nobody touched for six hours closes by itself.
@@ -754,7 +762,7 @@ and merges the mirror with the tabs after every change:
 | 0 | Loader, installer, native settings guide |
 | 1 | Favorites: icon grid with adaptive columns, closing unloads instead of removing |
 | 2 | Peek: real overlay for Shift+click and for external links from pinned tabs and Favorites |
-| 3 | Pinned tabs per workspace: reopen instead of duplicating, bookmark folders in the tab bar and their hover panel, reset to saved URL, folders that let the active tab peek out |
+| 3 | Pinned tabs per workspace: reopen instead of duplicating, bookmark folders in the tab bar and their hover panel, keep the saved page, folders that let the active tab peek out |
 | 4 | Today tabs with auto-archive, Arc keyboard shortcuts |
 | 5 | Little Arc, optional browser extension |
 

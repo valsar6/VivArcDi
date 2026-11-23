@@ -25,6 +25,7 @@ const KEYED = (token: string): unknown => ({ token, tabId: 1 });
 
 const CASES: Case[] = [
   { name: 'peek-links', event: 'click', argument: (token) => ({ triggers: TRIGGERS, pinned: false, tabId: 1, token }) },
+  { name: 'little-arc-links', event: 'click', argument: (token) => ({ token, tabId: 1 }) },
   { name: 'peek-keys', event: 'keydown', argument: (token) => token },
   { name: 'pinned-keys', event: 'keydown', argument: KEYED },
   { name: 'copy-keys', event: 'keydown', argument: KEYED },
@@ -32,7 +33,7 @@ const CASES: Case[] = [
   { name: 'call-pip', event: 'keydown', argument: (token) => ({ token, tabId: 1, letter: 'p', inCallSelector: '.in-call' }) },
 ];
 
-const KEYS = ['vivarcdi.peek.links', 'vivarcdi.peek.keys', 'vivarcdi.pinned.keys', 'vivarcdi.copy.keys', 'vivarcdi.archive.keys', 'vivarcdi.call.pip'];
+const KEYS = ['vivarcdi.peek.links', 'vivarcdi.little-arc.links', 'vivarcdi.peek.keys', 'vivarcdi.pinned.keys', 'vivarcdi.copy.keys', 'vivarcdi.archive.keys', 'vivarcdi.call.pip'];
 const SCRIPT_FOLDER = fileURLToPath(new URL('../../src/page/', import.meta.url));
 
 let live: Registered[] = [];

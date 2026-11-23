@@ -107,6 +107,11 @@ needs no new listener. The row, not a new control, is the target:
 }
 ```
 
+**Probe result (T2).** 8.3 has no `.tab-header .close` on a pinned row, so the rule above cannot be a
+restyle of Vivaldi's X. T8 adds a VivArcDi minus button at the right end of the row, hidden until the
+row is hovered or active, and the CSS above becomes the starting point for that button. `CloseShortcut`
+keeps its own click path; the button calls the same unload.
+
 `$minus-glyph` joins the tokens next to `$close-glyph`. The block lives in `pinned.scss`, next to the
 separator, and uses `pinnedTab`/`tabClose` through the existing tokens. It sits under
 `#browser[data-vivarcdi-active][data-vivarcdi-pinned-unload]`: `PinnedTabs` sets that attribute from
@@ -121,47 +126,28 @@ written from that record; no selector is guessed.
 
 ### Edit Pinned Page on a pinned row
 
-The menu of a pinned row is Vivaldi's own menu, extended the way the folders already extend it: a
-wrapper around `vivaldi.contextMenu.show`. Two pieces move so that `modules/pinned` can use them
-without importing `modules/folders`:
+**Decision (Tore, 2026-11-23): custom menu.** The lab found that the pinned-row menu is native and
+does not call `vivaldi.contextMenu.show`, so it cannot be extended the way the folders extend theirs.
+T10 builds a VivArcDi HTML context menu on the pinned row instead; it carries `Edit Pinned Page ▸`,
+`Close tab` and `Unpin tab`. The `TabMenuItems`/`MenuItemShape` move (T5) is dropped. The
+`PinnedAddress`/store refactor below still applies to the pinned page; the menu view is VivArcDi's.
 
-- `TabMenuItems` and `MenuItemShape` move to `src/shared/tabmenu/`. Their behavior and tests stay;
-  only the import paths and the missing-API warning change (it is no longer about Pin tab and Tile
-  tab only).
-- `PinnedAddress` learns a `PinnedPageStore` instead of a `BookmarkWriter` and a `LinkedTab`:
-  `read(id)`, `write(id, url)` and `tab(id)`. `BookmarkPinnedStore` (shared) wraps the bookmark
-  writer and the linked tab for 056/057, so `TileLinkCommands` and `SavedTabActions` keep their
-  items and tests. `TabPinnedStore` (pinned) reads and writes `vivExtData.pinnedUrl` with
-  `TabDataWriter`, so `Edit…` and `Replace` act on the pinned page of the tab, not on a bookmark.
 
-`PinnedAddress` gains a synchronous `menuFor(id, snapshot)` next to the asynchronous `submenu(id)`
-of 056/057: the menu of Vivaldi must be built before `show` returns, so the disabled state comes
-from a snapshot the module keeps, and the click re-reads the tab before it writes.
-
-`TabMenuItems` changes from a fixed list of commands to `items(tabId) => TabMenuItem[]`, a small tree
-of commands and submenus. The folders module passes a function that returns its two flat commands,
-so its menu is unchanged. `MenuItemShape` learns the submenu type from the first item that has one
-(the existing menu test already records it as `{ type: 'folder', id, label, items: [] }`) and gains
-`submenu(id, label, items)`: it copies the sample's keys, sets that type and puts the children built
-with `command` in `items`. When the menu has no submenu item to learn from, `submenu` returns null.
-A `command` can now be built disabled, the sample's boolean flag set to false.
-
-`PinnedRowMenu` (new, `modules/pinned`) owns the wrapper and a small snapshot of the pinned tabs
-(read at start and on `onActivated`, `onUpdated`, `onRemoved`, like `PinnedMarking`). It builds:
+`PinnedRowMenu` captures `contextmenu` on a pinned row, prevents Vivaldi's native menu there
+and opens VivArcDi's core `ContextMenu` at the pointer. Its items:
 
 | Menu | Item | Disabled when |
 |---|---|---|
 | top | `Edit Pinned Page ▸` | never |
 | submenu | `Replace Pinned URL with Current` | no open tab, or the address equals the pinned page |
 | submenu | `Edit…` | never |
+| bottom | `Close tab` | never |
+| bottom | `Unpin tab` | never |
 
-Vivaldi's own Close tab and Unpin tab stay after the added items, untouched (FR-8). There is no
-reset item, as in Arc.
-
-**Fallback.** If Vivaldi's menu has no submenu shape the wrapper can copy, `MenuItemShape.submenu`
-returns null, `PinnedRowMenu` adds nothing, logs once, and reports it in the review; the design does
-not put the two items at the top level on its own, because the spec asks for
-`Edit Pinned Page ▸` and for Vivaldi's items to stay. Tore decides then whether the spec changes.
+The core `ContextMenu` owns the hover/click submenu, outside click, Esc and focus. There is no reset
+item. `PinnedAddress` takes a `PinnedPageStore`: `BookmarkPinnedStore` wraps the bookmark path for
+056/057, `TabPinnedStore` reads and writes `vivExtData.pinnedUrl` with `TabDataWriter`. The
+`TabMenuItems`/`MenuItemShape` move (T5) is closed; the custom menu needs neither.
 
 ### Cmd+L on a pinned tab (Q-1, T12)
 
@@ -187,6 +173,10 @@ The probe's result is written in "Findings of the probe (T1)". If the field's na
 told apart from a click on a same-window link, T12 is closed without code: the "open and reset"
 would also undo Q-7's deferred behavior, which the spec leaves out. AC-17 then stays manual and
 unimplemented, and the lead records it as a follow-up.
+
+**Probe result (T2).** The lab on 8.3 offered no safe signal: the synthetic events changed neither
+focus nor navigation, and a real CDP Meta+L plus Enter left the pinned tab on its address and opened
+no tab. T12 is closed without code, AC-17 stays out, and the lead records it as a follow-up.
 
 ### A new-window link and the indicator (Q-3)
 
@@ -230,6 +220,16 @@ It re-applies on tab-bar mutations once per frame, and clears on `windows.onRemo
 
 If T4 cannot say what the icon is, T11 is closed without code, the design says so, and AC-18 is
 reported to Tore as met for the routing only.
+
+#### Findings (T4, 2026-11-23)
+
+Tore's screenshots of 2026-11-23 show the ULTIMATE GUITAR row with the MuseHub page in Little Arc.
+The indicator is a small square icon, about 16 px, at the right end of the pinned row after the
+title; its image is the favicon of the Little Arc page (the purple MuseHub icon), not a generic page
+glyph. The screenshots do not show whether it is clickable or has a tooltip, and they do not show a
+Favorite tile with one. The smallest indicator of the design (not clickable, no tooltip, the page
+favicon, shown while the window is open) matches the row; the tile position is the design's choice
+and Tore's manual check decides it. T11 proceeds on that basis.
 
 ### Clear
 
@@ -351,6 +351,28 @@ The findings are written here by T2 with the version and the date for each of th
   Q-1 are visible without changing the field.
 - The `span.pinned-group` children on 8.3, which 058's probe already recorded.
 
+#### Findings (T2, 2026-11-23, Vivaldi 8.3.4191.47)
+
+The probe ran on the only installed build, 8.3.4191.47, on the throwaway profile; 8.1 and 8.2 were
+not installed. The first run had the Favorites grid on, so the pinned row was hidden by
+`data-vivarcdi-hidden`; a second run with `favorites-grid` off and a real hover inspected the visible
+row.
+
+- **Close markup.** The pinned row's `.tab-header` contains only `span.favicon` and its image. There is
+  no `.close` element, also after a real hover. Vivaldi 8.3's pinned tabs have no close button to
+  restyle, so T8 must add a VivArcDi minus control instead of drawing a minus on Vivaldi's X.
+- **Menu.** A real right-click on the pinned row did not call `vivaldi.contextMenu.show`; the wrapper
+  was installed (`couldWrap: true`) and `menuItems` stayed empty. The pinned-row menu is native on
+  8.3, or not routed through that API. T10 cannot add `Edit Pinned Page` to it with the wrapper the
+  folders use. A custom VivArcDi menu on the row, or dropping the item and amending the spec, is a
+  decision for Tore; T10 is blocked until then.
+- **Cmd/Ctrl+L.** Synthetic events did not change focus or navigate. A real CDP Meta+L, an
+  `insertText` of another address and Enter left the pinned tab on its address and created no tab
+  (`seen` only an `onUpdated` with a null URL and status). No safe signal separates the address
+  field from a same-window link, so T12 is closed and AC-17 stays out, as the design allows.
+- **Group.** The pinned row is a child of `span.pinned-group`; with the grid off it is visible, and
+  the group/separator approach of 058 holds.
+
 ### Q-7 probe (T3, Tore)
 
 Measured in Arc 1.174.1, not in VivArcDi; the design writes the question, not the answer.
@@ -374,16 +396,14 @@ same-window link are indistinguishable from `chrome.tabs` alone.
 | `src/modules/pinned/TabBarMarker.ts` | Separator only, over the strip and every `pinnedGroup`; no away mark | One pass per frame |
 | `src/modules/pinned/PinnedMarking.ts` | Builds the marker and the marks; no `isAway` | Existing wiring |
 | `src/modules/pinned/PinnedPageLoader.ts` | Loads the pinned page when a pinned tab is reopened after an unload | Observer |
-| `src/modules/pinned/PinnedTabs.ts` | Starts the loader and the row menu; no reset click, no `resetButton` | Module |
+| `src/modules/pinned/PinnedTabs.ts` | Starts the loader, the minus and the row menu; no reset click, no `resetButton` | Module |
+| `src/modules/pinned/PinnedMinus.ts` | The VivArcDi minus on a pinned row; unloads, never closes | Control |
 | `src/modules/pinned/TabPinnedStore.ts` | `PinnedPageStore` over `vivExtData.pinnedUrl` | Adapter |
-| `src/modules/pinned/PinnedRowMenu.ts` | `Edit Pinned Page ▸` in Vivaldi's menu of a pinned row | Adapter |
-| `src/modules/pinned/PinnedAddressBar.ts` | Q-1, only if T2 records a safe signal | Observer |
+| `src/modules/pinned/PinnedRowMenu.ts` | VivArcDi's HTML menu of a pinned row: Edit Pinned Page, Close tab, Unpin tab | Adapter |
 | `src/modules/favorites/FavoriteStates.ts` | `{ active, unloaded }` per tile | - |
 | `src/modules/favorites/FavoritesView.ts` | The tile without the away attribute | - |
 | `src/modules/favorites/FavoriteOpener.ts` | A click activates; an unloaded tab loads the bookmark's address | - |
 | `src/modules/favorites/PinnedFavorites.ts` | A tile of a pinned tab loads its own page when reopened | - |
-| `src/shared/tabmenu/TabMenuItems.ts` | Vivaldi's tab menu with commands and submenus; moved from `modules/folders` | Wrapper |
-| `src/shared/tabmenu/MenuItemShape.ts` | Learns the menu item shape, including a submenu; moved | - |
 | `src/shared/linkmenu/PinnedAddress.ts` | The `Edit Pinned Page` texts, dialog and disabled states over a `PinnedPageStore` | Adapter |
 | `src/shared/linkmenu/BookmarkPinnedStore.ts` | `PinnedPageStore` over a bookmark and its linked tab | Adapter |
 | `src/modules/littlearc/LittleArcIndicator.ts` | Marks the row or tile a Little Arc window came from | Observer |
@@ -440,44 +460,18 @@ export class PinnedAddress {
   edit(id: string): Promise<void>;
 }
 
-export interface TabMenuCommand {
-  id: string;
-  label: string;
-  disabled?: boolean;
-  run: (tab: chrome.tabs.Tab) => void | Promise<void>;
-}
-
-export interface TabMenuTree {
-  id: string;
-  label: string;
-  items: readonly TabMenuCommand[];
-}
-
-export type TabMenuItem = TabMenuCommand | TabMenuTree;
-
-export interface TabMenuItemsDependencies {
-  document: Document;
-  contextMenu: ContextMenuApi | undefined;
-  wrapperSelector: string;
-  tabs: Pick<BrowserTabs, 'get'>;
-  items: (tabId: number) => readonly TabMenuItem[];
-  appliesTo: (tab: chrome.tabs.Tab) => boolean;
-  logger: Logger;
-  now?: () => number;
-}
-
 export interface PinnedRowMenuDependencies {
   document: Document;
-  contextMenu: ContextMenuApi | undefined;
+  menu: Pick<ContextMenu, 'open' | 'close'>;
   selectors: SelectorCatalog;
-  tabs: Pick<BrowserTabs, 'get' | 'query' | 'onActivated' | 'onUpdated' | 'onRemoved'>;
+  tabs: Pick<BrowserTabs, 'get' | 'update' | 'remove'>;
   address: Pick<PinnedAddress, 'menuFor' | 'replace' | 'edit'>;
-  logger: Logger;
+  logger: Pick<Logger, 'warn'>;
 }
 
 export class PinnedRowMenu {
   constructor(dependencies: PinnedRowMenuDependencies);
-  start(): Promise<void>;
+  start(): void;
   stop(): void;
 }
 
@@ -490,16 +484,15 @@ export class LittleArcLauncher {
 }
 
 export class LittleArcIndicator {
-  show(sourceTabId: number, windowId: number): Promise<void>;
+  show(sourceTabId: number, windowId: number, url: string): Promise<void>;
   clear(windowId: number): void;
 }
 ```
 
-Call sites that change: `PinnedTabs` (loader and row menu, reset removed), `PinnedMarking`
-(`PinnedMarks`, logger), `FolderEditing` (imports of `TabMenuItems` from `shared/tabmenu`),
-`TileLinkCommands` and `SavedTabActions` (`BookmarkPinnedStore`), `MainWindowRole` (page-link script
-and indicator), `LittleArcLauncher` (`openAddressIn`), `BrowserWindows` and its `ChromeApi` type
-(`onRemoved`). `FavoritesView`, `FavoriteStates`, `FavoriteOpener`, `PinnedFavorites` and `Peek` keep
+Call sites that change: `PinnedTabs` (loader, minus and row menu, reset removed), `PinnedMarking`
+(`PinnedMarks`, logger), `TileLinkCommands` and `SavedTabActions` (`BookmarkPinnedStore`),
+`MainWindowRole` (page-link script and indicator), `LittleArcLauncher` (`openAddressIn`),
+`BrowserWindows` and its `ChromeApi` type (`onRemoved`). `FavoritesView`, `FavoriteStates`, `FavoriteOpener`, `PinnedFavorites` and `Peek` keep
 their constructors.
 
 ## Vivaldi interface
@@ -509,23 +502,21 @@ their constructors.
 | `pinnedGroup` | `.pinned-group` | The group of pinned rows on 8.3 |
 | `pinnedTab` | `.tab-position.is-pinned` | A pinned row, in the group or in the strip; the minus |
 | `tabWrapper` | `.tab-wrapper` | `data-id="tab-<id>"` for the slot and the tab menu |
-| `tabClose` | `.tab-header .close` | Vivaldi's close button, restyled as the minus; the click stays `CloseShortcut` |
-| `tabFavicon` | `.tab-header .favicon` | Unused after the reset click goes; the selector stays in the catalog for the check of 046 |
+| `tabClose` | `.tab-header .close` | The close affordance of ordinary rows; the pinned minus is a VivArcDi control |
+| `tabFavicon` | `.tab-header .favicon` | The favicon; the pinned minus is attached beside it |
 | `tabStrip` | `#tabs-container .tab-strip` | The strip slots, after the group's |
 | `tabWebview` | `#webview-container webview[tab_id]` | The page script of the new-window link |
 | `browser` | `#browser` | The toast parent and the dialog parent |
 
-`vivaldi.contextMenu.show` and `vivaldi.contextMenu.onActivated` are read as the folders module
-already reads them, and every member is checked before use. `chrome.windows.onRemoved` is added to
-the `ChromeApi` type next to `onFocusChanged`.
+The pinned menu is VivArcDi's HTML `ContextMenu`; `vivaldi.contextMenu.show` is not used for it.
+`chrome.windows.onRemoved` is added to the `ChromeApi` type next to `onFocusChanged`.
 
 Marks added: `data-vivarcdi-little-arc`, written by `LittleArcIndicator` only, and
 `data-vivarcdi-pinned-unload` on `#browser`, written by `PinnedTabs` from the `unloadOnClose`
 option. Marks removed: `data-vivarcdi-away`, on rows and tiles. No selector name is added.
 
-Fallbacks: without `vivaldi.contextMenu.show` no item is added and the reason is logged once; a
-missing strip with a group is normal on 8.3; a strip and no group is 8.1 and 8.2; neither warns once
-and leaves the tab bar as Vivaldi draws it (NFR-5).
+Fallbacks: a missing strip with a group is normal on 8.3; a strip and no group is 8.1 and 8.2;
+neither warns once and leaves the tab bar as Vivaldi draws it (NFR-5).
 
 ## Configuration
 
@@ -602,18 +593,15 @@ Behavior that no criterion names, and its tests:
 
 Texts, unchanged from 056/057: `Edit Pinned Page`, `Replace Pinned URL with Current`, `Edit…`,
 `Edit Pinned URL`, `URL`, `Save`, `This is what opens first when you click this tab or its favicon.`,
-`Enter a valid address`, `Could not change the address`. The menu of a pinned row adds no other text.
-The indicator has no text and no tooltip.
+`Enter a valid address`, `Could not change the address`. The custom menu adds `Close tab` and
+`Unpin tab`. The indicator has no text and no tooltip.
 
 Logs:
 
 - `pinned-tabs`: `warn` `The tab strip is missing: pinned rows are left as Vivaldi draws them`
   (058, once per marker); `warn` `Could not load the pinned page of tab <id>`;
-  `warn` `vivaldi.contextMenu.show is missing: no command is added to the menu of a tab` (the moved,
-  now neutral, `TabMenuItems` text); `warn` `"<label>" does not apply to this tab`;
-  `warn` `could not run "<label>" from the menu of a tab`;
-  `warn` `the items of vivaldi.contextMenu.show are not as expected: no command was added to the
-  menu of the tab`.
+  `warn` `could not read the pinned tab <id>`; `warn` `could not close tab <id>`;
+  `warn` `could not unpin tab <id>`; `warn` `Could not unload tab <id>`.
 - `pinned-tabs`, from `PinnedAddress`: `warn` `could not read the pinned address` and
   `warn` `could not change the pinned address`, as in 056.
 - `little-arc`: `warn` `Could not open a Little Arc window, leaving the link to Vivaldi` (existing);
@@ -624,13 +612,13 @@ Logs:
 
 | Risk | Mitigation |
 |---|---|
-| Vivaldi's close button markup differs per version | T1 records it; the minus rule is written from the record, and a version without the expected child keeps Vivaldi's X rather than a broken glyph |
-| Vivaldi's menu has no submenu shape the wrapper can copy | `MenuItemShape.submenu` returns null, nothing is added, the reason is logged and reported; no silent flat fallback |
+| The pinned row has no close button on 8.3 | T8 adds a VivArcDi minus control; no Vivaldi X is assumed |
+| The pinned-row menu is native and cannot be extended | T10 uses VivArcDi's HTML `ContextMenu`; Vivaldi's native menu is left for other rows |
 | The update on a discarded tab loses the race with Vivaldi's reload | `PinnedPageLoader` navigates once more on `complete` while the tab is remembered; the id is dropped on `complete` and on `onRemoved` |
 | The away removal breaks the separator or the last pinned row | The separator is chosen from the combined slots, and the tests of T6 cover the strip, the group and the linked tabs |
 | A row is redrawn while a Little Arc window is open | The indicator re-applies its attribute on tab-bar mutations, one pass per frame; a link to a missing element is ignored |
 | Both Peek and Little Arc claim a `target="_blank"` click | Peek drops `pinnedNewTab` when `little-arc` is enabled; a test proves it, and the page script ignores modifier clicks |
 | Little Arc cannot open (no `chrome.windows`, a failed launcher) | The link stays in Vivaldi and the launcher logs it; Peek's trigger is only off when the module is enabled, and the failure is reported |
 | The 8.1 and 8.2 builds are not on the machine | T1 records which versions ran; the manual T14 covers the rest |
-| AC-17 and the indicator stay out | T12 and T11 are explicitly conditional; the lead records them as follow-ups and reports AC-17 and AC-18 to Tore |
+| AC-17 stays out | T12 is closed by the probe; AC-17 is recorded as a follow-up. The indicator is implemented in T11 |
 | The version bump does not match the branch type | CONTRIBUTING requires a minor bump for `features/` and a patch bump for `fix/`; T13 uses the one the release check accepts |

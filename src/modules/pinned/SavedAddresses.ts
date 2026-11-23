@@ -4,12 +4,11 @@ import { TabDataWriter } from '../../core/tabs/TabDataWriter.js';
 import { TabData } from '../../core/tabs/TabData.js';
 import type { OwnTabChanges } from '../../core/tabs/TabData.js';
 
-export type SavedAddressTabs = Pick<BrowserTabs, 'get' | 'update'>;
+type SavedAddressTabs = Pick<BrowserTabs, 'get' | 'update'>;
 
 const WEB_URL = /^https?:\/\//i;
 
 export class SavedAddresses {
-  #tabs: SavedAddressTabs;
   #writer: TabDataWriter;
 
   /**
@@ -19,7 +18,6 @@ export class SavedAddresses {
    * @param tabs Tabs API.
    */
   constructor(tabs: SavedAddressTabs) {
-    this.#tabs = tabs;
     this.#writer = TabDataWriter.of(tabs);
   }
 
@@ -52,18 +50,6 @@ export class SavedAddresses {
       const linked = favoriteId !== undefined || pinnedUrl !== undefined;
       return linked ? TabData.withOwn(tab, { favoriteId: undefined, pinnedUrl: undefined }) : null;
     });
-  }
-
-  /**
-   * Brings a tab back to its own page when it shows another one.
-   *
-   * @param tabId The tab.
-   */
-  public async load(tabId: number): Promise<void> {
-    const target = OwnPage.resetTarget(await this.#tabs.get(tabId));
-    if (target !== null) {
-      await this.#tabs.update(tabId, { url: target });
-    }
   }
 
   async #rewrite(tabId: number, changes: OwnTabChanges): Promise<void> {

@@ -8,7 +8,6 @@ export const TILES_ATTRIBUTE = 'data-vivarcdi-tiles';
 export const TILE_ATTRIBUTE = 'data-vivarcdi-tile';
 export const CURRENT_ATTRIBUTE = 'data-vivarcdi-current';
 export const DIMMED_ATTRIBUTE = 'data-vivarcdi-unloaded';
-export const AWAY_ATTRIBUTE = 'data-vivarcdi-away';
 export const LABEL_KEY_ATTRIBUTE = 'data-vivarcdi-label-key';
 export const TILE_LABEL_ATTRIBUTE = 'data-vivarcdi-tile-label';
 
@@ -108,7 +107,6 @@ export class FavoritesView {
       const state = states.get(id);
       tile.toggleAttribute(CURRENT_ATTRIBUTE, state?.active === true);
       tile.toggleAttribute(DIMMED_ATTRIBUTE, state?.unloaded ?? true);
-      tile.toggleAttribute(AWAY_ATTRIBUTE, state?.away === true);
     });
   }
 
