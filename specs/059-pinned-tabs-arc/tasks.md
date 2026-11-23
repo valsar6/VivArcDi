@@ -58,7 +58,7 @@ after T9.
 | T11 | `src/modules/littlearc/LittleArcIndicator.ts`, `MainWindowRole.ts`, `src/core/browser/BrowserWindows.ts`, `src/core/browser/BrowserTabs.ts` (the `ChromeApi` window event), `src/styles/little-arc.scss`, `tests/modules/littlearc/module.test.ts` |
 | T12 | `src/modules/pinned/PinnedAddressBar.ts`, `PinnedTabs.ts`, `tests/modules/pinned/PinnedAddressBar.test.ts` |
 | T13 | `README.md`, `docs/manual/tab-bar.md`, the headers of `specs/003-pinned-tabs-and-folders/spec.md` and `specs/058-pinned-tabs-83/spec.md`, the header and FR-1 of `specs/015-peek-new-tab-links/spec.md`, `package.json`, `package-lock.json`, `installer/vivarcdi/__init__.py`, `specs/README.md` when the spec is implemented |
-| T14 | Nothing in the repository while the checklist is written; `.claude/tmp/059-pinned-tabs-arc/verifica-059.md` |
+| T14 | Nothing in the repository while the checklist is written; `~/Desktop/sonde-vivarcdi/verifica-059.md` |
 
 ## Tasks
 
@@ -76,7 +76,7 @@ after T9.
   `pinned-group` chain; and the Q-1 verdict, either a signal that tells the address field's
   navigation from a link (and which) or none. If the verdict is none, say that T12 is closed and
   AC-17 stays out. Satisfies Q-1. Done when the findings are in the design and the lead agrees.
-- [ ] **T3. Q-7 measurement in Arc** (Tore, documents only, in parallel with T1 and T2). Tore runs
+- [ ] **T3. Q-7 measurement in Arc** (not measured; recorded as a follow-up) (Tore, documents only, in parallel with T1 and T2). Tore runs
   the four steps of design.md "Q-7 probe (T3, Tore)" in Arc 1.174.1 and reports whether a
   same-window cross-site link in a pinned or Favorite page navigates the tab, opens a new tab or
   opens Little Arc. The lead records the answer in the follow-up. If it is not measured before the
@@ -182,8 +182,8 @@ after T9.
   `package-lock.json` and `installer/vivarcdi/__init__.py` as the branch type requires, then run
   `npm run release -- check --base origin/main --branch features/pinned-tabs-arc` and `make check`.
   Leave the spec `Approved` until T14 is green. Done when the release check and `make check` pass.
-- [ ] **T14. Manual checklist in Italian** (last; written from AC-14 to AC-21 and AC-28, in
-  `.claude/tmp/059-pinned-tabs-arc/verifica-059.md`). On macOS and Debian, on Vivaldi 8.3 and, where
+- [x] **T14. Manual checklist in Italian** (last; written from AC-14 to AC-21 and AC-28, in
+  `~/Desktop/sonde-vivarcdi/verifica-059.md`). On macOS and Debian, on Vivaldi 8.3 and, where
   a build is available, 8.1 and 8.2: a pinned row and a Favorite tile that browse away keep their
   icon and have no arrow, no away mark
   and no reset on click; the minus unloads the row and it comes back at its pinned page; the row

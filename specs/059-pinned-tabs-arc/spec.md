@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-23 |
+| Implemented | 2026-11-23, after Tore's checks (T14); follow-ups #263 (Little Arc placement) and #264 (pinned minus UI) |
 | Amended | 2026-11-23: the 8.3 probe found no close button on a pinned row, so the minus is a VivArcDi control; the pinned-row menu is a VivArcDi custom menu (Tore's decision). |
 | Supersedes | [003](../003-pinned-tabs-and-folders/spec.md) FR-5, AC-9, AC-10 and AC-16 (fully; they cover Favorites and pinned tabs); the away-arrow parts of [058](../058-pinned-tabs-83/spec.md) AC-1 and AC-4 to AC-6, whose pinned-group layout and separator stay |
 
@@ -291,6 +292,12 @@ it adds no live scenario, so it names none.
 - The other items of a tile's menu and the saved-page behavior of link rows and tiles:
   [056](../056-saved-tab-menu/spec.md) and [057](../057-tile-menu/spec.md).
 - Vivaldi 8.4 and later.
+
+## Follow-ups
+
+- AC-17 (Cmd/Ctrl+L on a pinned tab): no safe signal without taking the address field from Vivaldi; not implemented.
+- Little Arc should sit under the sidebar when it opens: #263.
+- Pinned minus UI check and polish against Arc: #264.
 
 ## Open questions
 
