@@ -246,6 +246,16 @@ It re-applies on tab-bar mutations once per frame, and clears on `windows.onRemo
 If T4 cannot say what the icon is, T11 is closed without code, the design says so, and AC-18 is
 reported to Tore as met for the routing only.
 
+#### Findings (T4, 2026-11-23)
+
+Tore's screenshots of 2026-11-23 show the ULTIMATE GUITAR row with the MuseHub page in Little Arc.
+The indicator is a small square icon, about 16 px, at the right end of the pinned row after the
+title; its image is the favicon of the Little Arc page (the purple MuseHub icon), not a generic page
+glyph. The screenshots do not show whether it is clickable or has a tooltip, and they do not show a
+Favorite tile with one. The smallest indicator of the design (not clickable, no tooltip, the page
+favicon, shown while the window is open) matches the row; the tile position is the design's choice
+and Tore's manual check decides it. T11 proceeds on that basis.
+
 ### Clear
 
 No code change. `TodayTabPolicy.isArchivable` already refuses a kept tab, so `ArchiveSweeper.clear`
