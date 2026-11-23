@@ -94,9 +94,12 @@ selector check on 8.3 reports no failed selector.
 | AC-1 | WHEN a pinned row sits in Vivaldi's pinned group beside the tab strip and its tab left its own page, THE module SHALL mark it as away so its reset arrow shows. | auto: `marks an away pinned row of a group beside the tab strip` |
 | AC-2 | WHEN the pinned rows sit in a group beside the tab strip, THE module SHALL mark the last pinned row shown with the separator. | auto: `marks the separator after the last pinned row of a group beside the tab strip` |
 | AC-3 | THE selector catalog in use on Vivaldi 8.3 SHALL define every selector the 8.1 catalog defines. | auto: `defines on Vivaldi 8.3 every selector of the 8.1 catalog` |
-| AC-4 | WHEN a pinned row on Vivaldi 8.3 leaves its own page, THE row SHALL show the reset arrow and a click on it SHALL load the own page. | live: `an away pinned row shows its arrow and resets on click` |
+| AC-4 | WHEN a pinned row on Vivaldi 8.3 leaves its own page, THE row SHALL show the reset arrow and a click on it SHALL load the own page. | manual |
 | AC-5 | WHEN Tore turns the Favorites grid off on Vivaldi 8.3 and browses away from a pinned tab, THE row, its arrow, the separator and the click SHALL work as with the grid on. | manual |
 | AC-6 | WHEN Tore runs the same flow on Vivaldi 8.1, or 8.2 if 8.1 is no longer installed, THE arrow, the separator and the click SHALL work as before. | manual |
+
+AC-4 becomes a live check when the implementation adds its scenario. A Draft spec names none:
+`every live check has a scenario` would look for a scenario that does not exist yet.
 
 ## Out of scope
 
@@ -119,7 +122,8 @@ selector check on 8.3 reports no failed selector.
   `.tab-position.is-pinned .favicon` and the tab stayed at `guides.html`, but the probe did not tell
   whether the reset found no away tab or no tab id in the row's wrapper. Recommendation: the design
   probes the pinned row on 8.3 for the wrapper that carries `data-id` and for the
-  `.tab-header`/`.favicon` nesting the reset matches; the scenario of AC-4 then proves the click.
+  `.tab-header`/`.favicon` nesting the reset matches; the live scenario added with the
+  implementation then proves the click.
 - [ ] **Q-3. Which Vivaldi build Tore still has.** Recommendation: run AC-6 on 8.1 if it is still
   installed, otherwise on 8.2; the change must leave both untouched. If neither is available, say so
   and rely on the 8.3 live run and the automated tests.
