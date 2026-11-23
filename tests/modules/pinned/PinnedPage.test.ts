@@ -11,9 +11,13 @@ const activate = (tabs: LinkingTabs, tabId: number): void => {
   tabs.activated.forEach((listener) => listener({ tabId, windowId: 1 }));
 };
 
-const complete = (tabs: LinkingTabs, tabId: number, url: string): void => {
+const updated = (tabs: LinkingTabs, tabId: number, change: chrome.tabs.OnUpdatedInfo, url: string): void => {
   const tab = { ...tabs.tabs.get(tabId), id: tabId, url } as chrome.tabs.Tab;
-  tabs.updated.forEach((listener) => listener(tabId, { status: 'complete' }, tab));
+  tabs.updated.forEach((listener) => listener(tabId, change, tab));
+};
+
+const complete = (tabs: LinkingTabs, tabId: number, url: string): void => {
+  updated(tabs, tabId, { status: 'complete' }, url);
 };
 
 const updates = (tabs: LinkingTabs): Array<[number, unknown]> =>
@@ -54,6 +58,30 @@ test('loads the pinned page when an unloaded pinned tab opens', async () => {
   complete(tabs, 2, 'https://www.reddit.com/r/vivaldi');
   await settle();
   assert.deepEqual(updates(tabs).at(-1), [2, { url: home }]);
+  const count = updates(tabs).length;
+  tabs.navigate(2, 'https://docs.example/c');
+  await settle();
+  assert.equal(updates(tabs).length, count);
+  loader.stop();
+});
+
+test('loads the pinned page when a discarded pinned tab opens after its last page started loading', async () => {
+  const home = 'https://www.reddit.com/';
+  const last = 'https://www.reddit.com/r/vivaldi';
+  const tabs = new LinkingTabs([
+    { id: 2, pinned: true, url: last, vivExtData: own({}, undefined, home) },
+    { id: 3, active: true, url: 'https://news.example/' },
+  ]);
+  const loader = new PinnedPageLoader(tabs, silentLogger);
+  await loader.start();
+  updated(tabs, 2, { discarded: false, status: 'unloaded' }, last);
+  updated(tabs, 2, { status: 'loading', url: last }, last);
+  activate(tabs, 2);
+  await settle();
+  assert.deepEqual(updates(tabs), [[2, { url: home }]]);
+  complete(tabs, 2, last);
+  await settle();
+  assert.deepEqual(updates(tabs), [[2, { url: home }], [2, { url: home }]]);
   const count = updates(tabs).length;
   tabs.navigate(2, 'https://docs.example/c');
   await settle();
