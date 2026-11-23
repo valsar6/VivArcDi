@@ -383,6 +383,7 @@ test('edits the new folder right after the plus button asks for it', async (t) =
   await frame();
   FolderCommands.of(context.document).requestNewFolder();
   await frame();
+  await frame();
   assert.deepEqual(chrome.created, ['Untitled']);
   assert.deepEqual(titles(dom).length, 2);
   const field = rows(dom)[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
