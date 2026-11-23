@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-23 |
 | Supersedes | [003](../003-pinned-tabs-and-folders/spec.md) FR-5, AC-9, AC-10 and AC-16 (fully; they cover Favorites and pinned tabs); the away-arrow parts of [058](../058-pinned-tabs-83/spec.md) AC-1 and AC-4 to AC-6, whose pinned-group layout and separator stay |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -240,8 +240,8 @@ in the `span.pinned-group` layout that 058 reads on 8.3.
 
 ## Acceptance criteria
 
-Written in [EARS](../README.md#acceptance-criteria). A Draft spec names only `auto` and `manual`
-checks: it adds no live scenario, so it names none.
+Written in [EARS](../README.md#acceptance-criteria). This spec names only `auto` and `manual` checks:
+it adds no live scenario, so it names none.
 
 | ID | Criterion | Check |
 |---|---|---|
@@ -292,38 +292,51 @@ checks: it adds no live scenario, so it names none.
 
 ## Open questions
 
-- [ ] **Q-1. Cmd+L without blocking Vivaldi.** How to notice or intercept Cmd/Ctrl+L and the address
+- [x] **Q-1. Cmd+L without blocking Vivaldi.** How to notice or intercept Cmd/Ctrl+L and the address
   it opens, without taking the key from Vivaldi. Recommendation: probe what Vivaldi does on 8.1, 8.2
   and 8.3 first; prefer watching the pinned tab's navigation and reopening the address in a new tab
   over binding Cmd+L, and if neither works without blocking the address field, say so and leave AC-17
-  out of the implementation.
+  out of the implementation. Answered (Tore, 2026-11-23): the design makes the probe the first task;
+  it records on the lab Vivaldi 8.1, 8.2 and 8.3 what Cmd/Ctrl+L and the address field do on a
+  pinned tab and prefers watching the tab's navigation and reopening the address in a new unpinned
+  tab over binding the key. If neither works without taking the address field from Vivaldi, the
+  probe records it and AC-17 stays out of the implementation.
 - [x] **Q-2. Clear: close or archive?** Arc closes every unpinned tab; VivArcDi's 004 archives the
   Today tabs of the workspace. Recommendation: keep 004's archive, and make this spec guarantee only
   that the pinned tabs and the Favorites stay open (Tore, 2026-11-23: Arc closes). Answered (Tore,
   2026-11-23): keep 004's archive; this spec guarantees that the pinned tabs and the Favorite tabs
   stay open.
-- [ ] **Q-3. The Little Arc indicator.** What exactly the icon next to the pinned row or the tile is,
+- [x] **Q-3. The Little Arc indicator.** What exactly the icon next to the pinned row or the tile is,
   where it sits and what it opens. Recommendation: read it from Tore's recording and a probe before
-  the design; do not guess a shape or a tooltip.
+  the design; do not guess a shape or a tooltip. Answered (Tore, 2026-11-23): the design reads it
+  from Tore's recording of 2026-11-23 (a small page icon, the MuseHub purple one, at the right end of
+  the pinned row after the title) and from a probe, and specifies the smallest indicator that matches
+  what he saw, without guessing its exact semantics. If the probe is inconclusive, the indicator
+  stays out and the design says so.
 - [x] **Q-4. Minus or close button.** Whether the minus replaces Vivaldi's close button or is a new
   VivArcDi control. Recommendation: restyle Vivaldi's close button as a minus on pinned rows only, so
   the key and the click keep one code path; add a control of VivArcDi's only if a version cannot be
   restyled. Answered (Tore, 2026-11-23): restyle Vivaldi's close button on pinned rows only, not a
   new control; a Favorite keeps its middle click, Cmd/Ctrl+W and close affordance.
-- [ ] **Q-5. The statuses of 003 and 058.** How to record the supersession once 059 lands.
+- [x] **Q-5. The statuses of 003 and 058.** How to record the supersession once 059 lands.
   Recommendation: add an "Amended by 059" note to both headers and list the superseded criteria
   there; keep 003 `Approved` and 058 in its current status, because the saved pages, the separator
-  and the 8.3 layout remain valid.
+  and the 8.3 layout remain valid. Answered (Tore, 2026-11-23): the implementation adds an
+  `Amended by 059` row to the headers of 003 and 058, lists the superseded criteria there and keeps
+  their current statuses. It is a documentation task of the implementation, not of this design
+  pull request.
 - [x] **Q-6. `target="_blank"`: Peek or Little Arc?** 015 (Approved, 2026-10-30) opens a new-window
   link in a pinned tab in Peek; Tore's run of Arc 1.174.1 on 2026-11-23 showed one in Little Arc with
   an icon next to the pinned row. Recommendation: Little Arc wins for a new-window link, and 015's
   Peek trigger applies only where Little Arc cannot open; 015 then gets an amendment. Answered (Tore,
   2026-11-23): Little Arc wins; 015 gets an amendment, and its Peek trigger applies only where Little
   Arc cannot open.
-- [ ] **Q-7. A same-window cross-site link in a pinned or Favorite page.** In a pinned or Favorite
+- [x] **Q-7. A same-window cross-site link in a pinned or Favorite page.** In a pinned or Favorite
   page, does a link to another site that opens in the same window navigate that tab or open a new tab
   or Little Arc? Tore did not test it. Recommendation: probe it in Arc before the design and write
-  the answer here; do not guess.
+  the answer here; do not guess. Answered (Tore, 2026-11-23): deferred to a probe in Arc made by
+  Tore, with the exact question and steps in the design. If the behavior is not measured before the
+  implementation, it stays out of the first implementation and is recorded as a follow-up.
 
 ## References
 
@@ -335,7 +348,7 @@ checks: it adds no live scenario, so it names none.
   an existing pinned tab.
 - [028 Arc sidebar look](../028-arc-sidebar-look/spec.md): the row look and the close affordance
   this spec turns into a minus on pinned rows.
-- [046 Live verification](../046-live-verification/spec.md): a Draft names no live scenario; the
+- [046 Live verification](../046-live-verification/spec.md): this spec names no live scenario; the
   `manual` checks become Tore's checklist.
 - [056 Menu of a saved tab](../056-saved-tab-menu/spec.md): the Edit Pinned Page texts, the dialog
   and the disabled state used on pinned rows and tiles.
