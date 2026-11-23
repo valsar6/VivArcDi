@@ -6,7 +6,7 @@ In Arc the sidebar is the browser: the sites you always use at the top, then the
 its folders and pinned pages, and below a line the pages you opened today. VivArcDi builds the same
 order inside Vivaldi's vertical tab bar.
 
-![The VivArcDi tab bar, with numbered sections](images/mockups/tab-bar-anatomy.png)
+![The tab bar at rest, then the pointer resting on a Favorite, a folder and a pinned tab](images/vivarcdi/tab-bar-tour.gif)
 
 1. [Favorites](#favorites)
 2. [Space header](#space-header)
@@ -22,6 +22,8 @@ workspace plays the part of an Arc space.
 
 The Favorites are a grid of square tiles at the top of the tab bar, at most three columns, the same in
 every workspace.
+
+![Clicking three Favorites, unloading one with a middle click, then loading it again](images/vivarcdi/favorites.gif)
 
 - **Choose them.** Make a bookmark folder named `Favorites` and put the sites in it. The order of the
   bookmarks is the order of the tiles. Without that folder, the first pinned tabs of the workspace
@@ -74,6 +76,8 @@ The active tile is a light pill; dimmed tiles are unloaded or not open yet in th
 
 A row between the Favorites and the folders shows the icon and name of the active workspace.
 
+![Clicking the header collapses the folders into it and clicking again expands them, then the workspace menu switches to another workspace](images/vivarcdi/space-header.gif)
+
 - Click it to collapse the workspace: the folders show only the links that have an open tab, and
   unloaded pinned tabs hide. Click again to open it. Each workspace remembers its state.
 - Rest the pointer on it to show `+`, which adds a folder.
@@ -88,6 +92,8 @@ By default it is `VivArcDi/<workspace name>` in your bookmarks, made the first t
 You can point a workspace at any existing folder in `config.json` (see the
 [README](../../README.md#bookmark-folders)).
 
+![Opening a folder, clicking one of its links, then closing it with the link row still below](images/vivarcdi/folders.gif)
+
 - **Open and close** a folder with a click. Subfolders open inside their parent, and the state
   survives a restart.
 - **Open a link** with a click. Its row becomes its tab: a dot marks it as open, and it stays visible
@@ -99,6 +105,8 @@ You can point a workspace at any existing folder in `config.json` (see the
   folders are. The scroll bar is thin and shows only while you scroll.
 
 Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
+
+![Clicking + on the space header, naming the folder, then dragging a tab onto it](images/vivarcdi/edit-folders.gif)
 
 | To | Do |
 |---|---|
@@ -132,7 +140,7 @@ Rest the pointer on a closed folder: a panel opens next to the tab bar with a se
 link of the folder, the most recently opened first, each with the time since you last opened it. Type
 to filter, use Up and Down, and press Enter or click to open. Esc closes the panel.
 
-![Mockup: the folder panel, then a link that stays visible below its closed folder](images/mockups/folder-panel-and-peek-out.gif)
+![Resting on a closed folder opens its panel, typing narrows the links and Enter opens one](images/vivarcdi/folder-panel.gif)
 
 ## Pinned tabs
 
