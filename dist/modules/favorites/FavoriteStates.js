@@ -1,4 +1,3 @@
-import { OwnPage } from "../../shared/tabs/OwnPage.js";
 import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 class FavoriteStates {
   /**
@@ -16,8 +15,7 @@ class FavoriteStates {
           id,
           {
             active: tab?.active === true,
-            unloaded: tab === void 0 || UnloadedTabs.isUnloaded(tab),
-            away: tab !== void 0 && OwnPage.isAway(tab)
+            unloaded: tab === void 0 || UnloadedTabs.isUnloaded(tab)
           }
         ];
       })

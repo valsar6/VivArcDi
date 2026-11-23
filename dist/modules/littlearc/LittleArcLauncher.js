@@ -25,7 +25,7 @@ class LittleArcLauncher {
    * @returns Whether the window was opened.
    */
   openBlank() {
-    return this.#open({ url: BLANK_PAGE });
+    return this.#opened({ url: BLANK_PAGE });
   }
   /**
    * Opens a Little Arc window that starts loading an address. A search is opened through the fallback
@@ -35,7 +35,18 @@ class LittleArcLauncher {
    * @returns Whether the window was opened.
    */
   openAddress(url) {
-    return this.#open({ url });
+    return this.#opened({ url });
+  }
+  /**
+   * Opens a Little Arc window for a link of another page and keeps its id, so the row or tile the
+   * link came from can be marked.
+   *
+   * @param url The address of the link.
+   * @returns The id of the new window, or null when it could not be opened.
+   */
+  async openAddressIn(url) {
+    const details = await this.#open({ url });
+    return details?.id ?? null;
   }
   /**
    * Moves a tab that Vivaldi opened in the main window into a new Little Arc window, so that the
@@ -45,7 +56,10 @@ class LittleArcLauncher {
    * @returns Whether the tab was moved.
    */
   adopt(tabId) {
-    return this.#open({ tabId });
+    return this.#opened({ tabId });
+  }
+  async #opened(source) {
+    return await this.#open(source) !== null;
   }
   async #open(source) {
     try {
@@ -53,10 +67,10 @@ class LittleArcLauncher {
       if (details.id !== void 0) {
         this.#registry.mark(details.id);
       }
-      return true;
+      return details;
     } catch (error) {
       this.#logger.error("could not open a Little Arc window, leaving the link to Vivaldi", error);
-      return false;
+      return null;
     }
   }
 }

@@ -3,7 +3,6 @@ import { TabDataWriter } from "../../core/tabs/TabDataWriter.js";
 import { TabData } from "../../core/tabs/TabData.js";
 const WEB_URL = /^https?:\/\//i;
 class SavedAddresses {
-  #tabs;
   #writer;
   /**
    * Keeps the own page of pinned tabs in their `vivExtData`, under VivArcDi's key, so it
@@ -12,7 +11,6 @@ class SavedAddresses {
    * @param tabs Tabs API.
    */
   constructor(tabs) {
-    this.#tabs = tabs;
     this.#writer = TabDataWriter.of(tabs);
   }
   /**
@@ -42,17 +40,6 @@ class SavedAddresses {
       const linked = favoriteId !== void 0 || pinnedUrl !== void 0;
       return linked ? TabData.withOwn(tab, { favoriteId: void 0, pinnedUrl: void 0 }) : null;
     });
-  }
-  /**
-   * Brings a tab back to its own page when it shows another one.
-   *
-   * @param tabId The tab.
-   */
-  async load(tabId) {
-    const target = OwnPage.resetTarget(await this.#tabs.get(tabId));
-    if (target !== null) {
-      await this.#tabs.update(tabId, { url: target });
-    }
   }
   async #rewrite(tabId, changes) {
     await this.#writer.write(tabId, (tab) => TabData.withOwn(tab, changes));

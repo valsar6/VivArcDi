@@ -1,4 +1,5 @@
 const LITTLE_ARC_MESSAGE_TYPE = "vivarcdi-little-arc";
+const LITTLE_ARC_CONSOLE_PREFIX = "vivarcdi-little-arc:";
 function adoptMessage(tabId, windowId) {
   return { type: LITTLE_ARC_MESSAGE_TYPE, action: "adopt", tabId, windowId };
 }
@@ -11,6 +12,30 @@ function parseAdoptMessage(value) {
     return null;
   }
   return adoptMessage(tabId, windowId);
+}
+function pageLinkMessage(token, tabId, url) {
+  return { type: LITTLE_ARC_MESSAGE_TYPE, action: "page-link", token, tabId, url };
+}
+function parsePageLinkMessage(value) {
+  const candidate = typeof value === "string" ? pageLinkFromConsole(value) : value;
+  if (typeof candidate !== "object" || candidate === null) {
+    return null;
+  }
+  const message = candidate;
+  return isPageLink(message) ? pageLinkMessage(message["token"], message["tabId"], message["url"]) : null;
+}
+function isPageLink(message) {
+  return message["type"] === LITTLE_ARC_MESSAGE_TYPE && message["action"] === "page-link" && typeof message["token"] === "string" && Number.isInteger(message["tabId"]) && typeof message["url"] === "string";
+}
+function pageLinkFromConsole(line) {
+  if (!line.startsWith(LITTLE_ARC_CONSOLE_PREFIX)) {
+    return null;
+  }
+  try {
+    return JSON.parse(line.slice(LITTLE_ARC_CONSOLE_PREFIX.length));
+  } catch {
+    return null;
+  }
 }
 function destinationQuestion() {
   return { type: LITTLE_ARC_MESSAGE_TYPE, action: "destination" };
@@ -34,11 +59,14 @@ function parseDestinationAnswer(value) {
   return destinationAnswer(typeof name === "string" ? name : null, parseColors(colors));
 }
 export {
+  LITTLE_ARC_CONSOLE_PREFIX,
   LITTLE_ARC_MESSAGE_TYPE,
   adoptMessage,
   destinationAnswer,
   destinationQuestion,
   isDestinationQuestion,
+  pageLinkMessage,
   parseAdoptMessage,
-  parseDestinationAnswer
+  parseDestinationAnswer,
+  parsePageLinkMessage
 };

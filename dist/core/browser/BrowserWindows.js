@@ -68,6 +68,21 @@ class BrowserWindows {
     event.addListener(listener);
     return () => event.removeListener(listener);
   }
+  /**
+   * Listens to closed windows.
+   *
+   * @param listener Called with the id of the window that closed.
+   * @returns A function that removes the listener.
+   * @throws {Error} When `chrome.windows.onRemoved` is missing.
+   */
+  onRemoved(listener) {
+    const event = this.#windows?.onRemoved;
+    if (event === void 0) {
+      throw new Error("chrome.windows.onRemoved is not available");
+    }
+    event.addListener(listener);
+    return () => event.removeListener(listener);
+  }
   #call(method, ...args) {
     const windows = this.#windows;
     const call = windows?.[method];

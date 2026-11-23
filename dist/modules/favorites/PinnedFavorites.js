@@ -3,6 +3,7 @@ import { SerialTask } from "../../core/support/SerialTask.js";
 import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
 import { TabData } from "../../core/tabs/TabData.js";
 import { TabUnloader } from "../../core/tabs/TabUnloader.js";
+import { OwnPage } from "../../shared/tabs/OwnPage.js";
 import { GRID_ORDER } from "./BookmarkFavorites.js";
 import { FavoriteLabels } from "./FavoriteLabels.js";
 import { FavoritesView } from "./FavoritesView.js";
@@ -132,17 +133,25 @@ class PinnedFavorites {
     return { id: String(tab.id), title: tab.title ?? url, url, ...labelKey === null ? {} : { labelKey } };
   }
   static #stateOf(tab) {
-    return { active: tab.active, unloaded: UnloadedTabs.isUnloaded(tab), away: false };
+    return { active: tab.active, unloaded: UnloadedTabs.isUnloaded(tab) };
   }
   async #open(tabId) {
     try {
       const tab = await this.#deps.tabs.get(tabId);
       await this.#deps.tabs.activate(tabId);
       if (UnloadedTabs.isUnloaded(tab)) {
-        await this.#deps.tabs.reload(tabId);
+        await this.#load(tabId, tab);
       }
     } catch (error) {
       this.#deps.logger.error("Could not open the pinned tab", error);
+    }
+  }
+  async #load(tabId, tab) {
+    const own = OwnPage.of(tab);
+    if (own === null) {
+      await this.#deps.tabs.reload(tabId);
+    } else {
+      await this.#deps.tabs.update(tabId, { url: own });
     }
   }
   async #unload(tabId) {

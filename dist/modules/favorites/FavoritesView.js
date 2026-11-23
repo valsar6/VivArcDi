@@ -5,7 +5,6 @@ const TILES_ATTRIBUTE = "data-vivarcdi-tiles";
 const TILE_ATTRIBUTE = "data-vivarcdi-tile";
 const CURRENT_ATTRIBUTE = "data-vivarcdi-current";
 const DIMMED_ATTRIBUTE = "data-vivarcdi-unloaded";
-const AWAY_ATTRIBUTE = "data-vivarcdi-away";
 const LABEL_KEY_ATTRIBUTE = "data-vivarcdi-label-key";
 const TILE_LABEL_ATTRIBUTE = "data-vivarcdi-tile-label";
 const ICON_CLASS = "vivarcdi-tile-icon";
@@ -90,7 +89,6 @@ class FavoritesView {
       const state = states.get(id);
       tile.toggleAttribute(CURRENT_ATTRIBUTE, state?.active === true);
       tile.toggleAttribute(DIMMED_ATTRIBUTE, state?.unloaded ?? true);
-      tile.toggleAttribute(AWAY_ATTRIBUTE, state?.away === true);
     });
   }
   /**
@@ -153,7 +151,6 @@ class FavoritesView {
   }
 }
 export {
-  AWAY_ATTRIBUTE,
   CURRENT_ATTRIBUTE,
   DIMMED_ATTRIBUTE,
   FavoritesView,

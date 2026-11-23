@@ -26,6 +26,8 @@ switcher: only back, an address pill and **Open in** a workspace.
     Little Arc window with the address field ready.
 - A **link opened from another app**, such as Mail, Slack or Notes, opens in Little Arc instead of a
   tab of your main window.
+- A **link that asks for a new window** (`target="_blank"`) in a pinned or Favorite page opens here;
+  the row or tile it came from shows a small favicon of the page while the window is open.
 
 Little Arc works while Vivaldi is open. A key that works from every app is not part of this version.
 

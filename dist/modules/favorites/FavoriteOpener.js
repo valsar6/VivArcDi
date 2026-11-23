@@ -1,4 +1,3 @@
-import { OwnPage } from "../../shared/tabs/OwnPage.js";
 import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 class FavoriteOpener {
   #tabs;
@@ -7,8 +6,8 @@ class FavoriteOpener {
   #logger;
   /**
    * Carries out clicks on Favorites tiles, as in Arc: a click brings the user to the Favorite's
-   * tab of the current workspace, opening it when there is none yet; a click on the tile that is
-   * already active brings the tab back to its own page.
+   * tab of the current workspace, opening it when there is none yet; a click on the tab that is
+   * already active does nothing, and a click never takes the shown page away.
    *
    * @param tabs Tabs API.
    * @param links Linked tabs.
@@ -32,10 +31,8 @@ class FavoriteOpener {
       const tab = linked.get(favorite.id);
       if (tab?.id === void 0) {
         await this.#openNew(favorite, workspaceId);
-      } else if (tab.active) {
-        await this.#reset(tab.id, tab);
-      } else {
-        await this.#activate(tab.id, tab);
+      } else if (tab.active !== true) {
+        await this.#activate(tab.id, tab, favorite.url);
       }
     } catch (error) {
       this.#logger.error(`Could not open the Favorite "${favorite.title}"`, error);
@@ -62,16 +59,10 @@ class FavoriteOpener {
       await this.#links.link(created.id, favorite, workspaceId);
     }
   }
-  async #reset(tabId, tab) {
-    const own = OwnPage.resetTarget(tab);
-    if (own !== null) {
-      await this.#tabs.update(tabId, { url: own });
-    }
-  }
-  async #activate(tabId, tab) {
+  async #activate(tabId, tab, url) {
     await this.#tabs.activate(tabId);
     if (UnloadedTabs.isUnloaded(tab)) {
-      await this.#tabs.reload(tabId);
+      await this.#tabs.update(tabId, { url });
     }
   }
 }

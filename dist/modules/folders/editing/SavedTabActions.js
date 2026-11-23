@@ -1,6 +1,7 @@
 import { LabelKeys, LinkLabels } from "../../../core/browser/LinkLabels.js";
 import { TextCopier } from "../../../shared/clipboard/TextCopier.js";
 import { BookmarkCopier } from "../../../shared/linkmenu/BookmarkCopier.js";
+import { BookmarkPinnedStore } from "../../../shared/linkmenu/BookmarkPinnedStore.js";
 import { LinkClipboard } from "../../../shared/linkmenu/LinkClipboard.js";
 import { LinkDuplication } from "../../../shared/linkmenu/LinkDuplication.js";
 import { LinkExtras } from "../../../shared/linkmenu/LinkExtras.js";
@@ -82,8 +83,7 @@ class SavedTabActions {
   async #editPinnedPage(linkId, notify) {
     const { document, selectors, tabs, bookmarkWriter, logger } = this.#context;
     this.#pinned ??= new PinnedAddress({
-      writer: bookmarkWriter,
-      linkedTab: new LinkedTab(tabs),
+      store: new BookmarkPinnedStore({ writer: bookmarkWriter, linkedTab: new LinkedTab(tabs) }),
       dialog: new PromptDialog({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body }),
       notify,
       logger
