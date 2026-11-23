@@ -5,3 +5,26 @@
   padding-bottom: $separator-gap;
   border-bottom: 1px solid color-mix(in srgb, var(--colorFg, #fff) #{$separator-tint}, transparent);
 }
+
+#{$root}#{$pinned-unload} .tab-position.is-pinned #{$pinned-minus} {
+  position: absolute;
+  inset-inline-end: $minus-offset;
+  top: 50%;
+  translate: 0 -50%;
+  width: $minus-size;
+  height: $minus-size;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background-color: currentcolor;
+  mask: $minus-glyph center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition;
+}
+
+#{$root}#{$pinned-unload} .tab-position.is-pinned:hover #{$pinned-minus},
+#{$root}#{$pinned-unload} .tab-position.is-pinned:has(.tab.active) #{$pinned-minus} {
+  opacity: 1;
+  pointer-events: auto;
+}

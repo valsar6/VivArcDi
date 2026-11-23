@@ -1,3 +1,5 @@
+import { FakeNode } from '../favorites/fakes.js';
+
 type Listener = (event: Event) => void;
 
 /** An element that answers `closest` and `dataset` from what the test gives it. */
@@ -88,5 +90,69 @@ export class ListeningDocument {
 
   public count(): number {
     return [...this.listeners.values()].reduce((total, list) => total + list.length, 0);
+  }
+}
+
+/** A node of the tab bar that `append`, `remove` and attribute selectors work on. */
+export class MinusNode extends FakeNode {
+  public get parentElement(): MinusNode | null {
+    return this.parent as MinusNode | null;
+  }
+
+  public append(...nodes: MinusNode[]): void {
+    nodes.forEach((node) => {
+      node.remove();
+      node.parent = this;
+      this.children.push(node);
+    });
+  }
+
+  public remove(): void {
+    const parent = this.parent;
+    if (parent === null) {
+      return;
+    }
+    parent.children = parent.children.filter((child) => child !== this);
+    this.parent = null;
+  }
+
+  public setAttribute(name: string, value: string): void {
+    this.attributes.set(name, value);
+  }
+
+  public override matches(selector: string): boolean {
+    if (selector.startsWith('[') && selector.endsWith(']')) {
+      return this.hasAttribute(selector.slice(1, -1));
+    }
+    return super.matches(selector);
+  }
+}
+
+/** A document with the browser element and the pinned rows of the tab bar. */
+export class MinusDocument extends ListeningDocument {
+  public browser = new MinusNode(['[data-browser]']);
+  public rows: MinusNode[] = [];
+
+  public addRow(tabId: number): MinusNode {
+    const favicon = new MinusNode(['favicon']);
+    const header = new MinusNode([], [favicon]);
+    const wrapper = new MinusNode([], [header]);
+    wrapper.setAttribute('data-slot', '');
+    wrapper.dataset['id'] = `tab-${tabId}`;
+    const row = new MinusNode(['pinned'], [wrapper]);
+    this.rows.push(row);
+    return row;
+  }
+
+  public querySelector(selector: string): MinusNode | null {
+    return selector === '[data-browser]' ? this.browser : null;
+  }
+
+  public querySelectorAll(selector: string): MinusNode[] {
+    return selector === 'pinned' ? this.rows : [];
+  }
+
+  public createElement(): MinusNode {
+    return new MinusNode();
   }
 }

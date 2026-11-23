@@ -1,12 +1,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { CloseShortcut } from '../../../src/modules/pinned/CloseShortcut.js';
+import { PINNED_MINUS_ATTRIBUTE, PINNED_UNLOAD_ATTRIBUTE, PinnedMinus } from '../../../src/modules/pinned/PinnedMinus.js';
 import { PinWatcher } from '../../../src/modules/pinned/PinWatcher.js';
 import { SavedAddresses } from '../../../src/modules/pinned/SavedAddresses.js';
+import { immediateFrames } from '../folders/fakes.js';
 import { LinkingTabs, own, silentLogger } from '../favorites/linked.js';
-import { event, ListeningDocument, row } from './fakes.js';
+import { event, ListeningDocument, MinusDocument, MinusNode, row } from './fakes.js';
 
 const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
+
+const minusSelectors = new SelectorCatalog(
+  { browser: '[data-browser]', pinnedTab: 'pinned', tabWrapper: '[data-slot]', tabFavicon: 'favicon' },
+  'test',
+);
 
 const pin = (tabs: LinkingTabs, tabId: number, pinned: boolean): void => {
   const tab = { ...tabs.tabs.get(tabId), pinned } as chrome.tabs.Tab;
@@ -105,6 +113,43 @@ test('unloads a pinned tab on close shortcut', () => {
   assert.ok([keyMac, keyOther, click].every((fake) => fake.defaultPrevented && fake.stopped));
   shortcut.detach();
   assert.equal(document.count(), 0);
+});
+
+test('unloads a pinned tab from its minus', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addRow(5);
+  const tabs = new LinkingTabs([
+    { id: 5, url: 'https://docs.example/a' },
+    { id: 6, active: true, url: 'https://news.example/' },
+  ]);
+  const watchers = new Set<() => void>();
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs,
+    logger: silentLogger,
+    watch: (_target, onChange): (() => void) => {
+      watchers.add(onChange);
+      return () => watchers.delete(onChange);
+    },
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  assert.ok(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE));
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  const down = document.dispatch(event('mousedown', { target: button }));
+  const click = document.dispatch(event('click', { target: button }));
+  await settle();
+  assert.ok(down.defaultPrevented && down.stopped);
+  assert.ok(click.defaultPrevented && click.stopped);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'discard'), [['discard', 5]]);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), []);
+  minus.stop();
+  assert.equal(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE), false);
+  assert.equal(button.parentElement, null);
+  assert.equal(watchers.size, 0);
 });
 
 test('leaves the close shortcut to Vivaldi for ordinary tabs', () => {
