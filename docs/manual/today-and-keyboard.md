@@ -18,7 +18,7 @@ Open the archive with the button at the bottom of the tab bar or Cmd/Ctrl+Shift+
 tabs by day, with a search field. Up and Down move, Enter or a click reopens the tab in its workspace,
 Esc closes the panel. The archive stays on your computer.
 
-![Mockup: the archive panel](images/mockups/today-archive.png)
+![Cmd/Ctrl+Shift+A opens the archive grouped by day, a search narrows it, Enter reopens an entry and the archive's Clear archives the Today tabs](images/vivarcdi/today-archive.gif)
 
 Change the delay with `archiveAfterHours`, or turn the archive off with `enabled: false`
 ([README](../../README.md#today-archive)).
@@ -28,7 +28,7 @@ Change the delay with `archiveAfterHours`, or turn the archive off with `enabled
 Cmd/Ctrl+Shift+C copies the address of the current tab, also while the page has the focus, and shows
 "Copied" at the bottom of the window.
 
-![Mockup: the Copied toast](images/mockups/copy-url.png)
+![Cmd/Ctrl+Shift+C shows the "Copied" toast](images/vivarcdi/copy-url.gif)
 
 ## Arc keyboard shortcuts
 

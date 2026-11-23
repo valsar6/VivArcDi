@@ -5,7 +5,7 @@
 Little Arc is a small window for a quick lookup. It has no tab bar, no panels and no workspace
 switcher: only back, an address pill and **Open in** a workspace.
 
-![Mockup: a Little Arc window](images/mockups/little-arc.png)
+![Cmd+Opt+N opens the command bar, the typed address opens the Little Arc window and the address pill is edited to another page](images/vivarcdi/little-arc.gif)
 
 ## Open it
 

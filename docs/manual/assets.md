@@ -2,8 +2,8 @@
 
 [Back to the manual](README.md)
 
-This page lists the graphic assets of the manual, where each one comes from, and the recordings of
-VivArcDi that still have to be made on a real Vivaldi.
+This page lists the graphic assets of the manual, where each one comes from, the recordings made on
+a real Vivaldi, and the few that still have to be made.
 
 ## What is here
 
@@ -11,14 +11,19 @@ VivArcDi that still have to be made on a real Vivaldi.
 |---|---|---|---|
 | `images/diagrams/feature-map.svg` | Diagram | Available, in progress and proposed features | [Manual](README.md) |
 | `images/diagrams/how-it-works.svg` | Diagram | Install, files in Vivaldi, start, re-apply after updates | [Manual](README.md) |
-| `images/mockups/tab-bar-anatomy.png` | Mockup | The sections of the tab bar, numbered | [Manual](README.md), [Tab bar](tab-bar.md) |
-| `images/mockups/folder-panel-and-peek-out.gif` | Mockup | Folder panel on hover, then the link below its closed folder | [Tab bar](tab-bar.md#folder-panel) |
-| `images/mockups/peek.gif` | Mockup | Shift+click opens Peek with Close, Expand, Split | [Peek](peek.md) |
-| `images/mockups/today-archive.png` | Mockup | Archive panel grouped by day | [Today](today-and-keyboard.md#today-archive) |
-| `images/mockups/copy-url.png` | Mockup | The "Copied" toast | [Today](today-and-keyboard.md#copy-url) |
-| `images/mockups/little-arc.png` | Mockup | A Little Arc window | [Little Arc](little-arc.md) |
-| `images/mockups/incognito.png` | Mockup | The incognito tab bar | [Incognito](incognito.md) |
-| `images/mockups/peek-split.gif` | Mockup | Peek from a pinned tab, then Split | [Peek](peek.md) |
+| `images/vivarcdi/before-after.gif` | Recording | Stock Vivaldi and the same page with VivArcDi alternate | [Manual](README.md), [README](../../README.md) |
+| `images/vivarcdi/tab-bar-tour.gif` | Recording | The tab bar at rest, then hovering a Favorite, a folder and a pinned tab | [Manual](README.md), [Tab bar](tab-bar.md) |
+| `images/vivarcdi/favorites.gif` | Recording | Three tiles clicked, one unloaded with a middle click, then loaded again | [README](../../README.md), [Tab bar](tab-bar.md#favorites) |
+| `images/vivarcdi/folders.gif` | Recording | A folder opened, a link clicked, the folder closed with the link row below it | [Tab bar](tab-bar.md#folders) |
+| `images/vivarcdi/folder-panel.gif` | Recording | A closed folder shows its panel, search narrows it, Enter opens a link | [Tab bar](tab-bar.md#folder-panel) |
+| `images/vivarcdi/edit-folders.gif` | Recording | `+` on the space header, the folder named, a tab dragged onto it | [Tab bar](tab-bar.md#folders) |
+| `images/vivarcdi/space-header.gif` | Recording | The header collapses and expands the folders; the workspace menu switches workspace | [Tab bar](tab-bar.md#space-header) |
+| `images/vivarcdi/peek.gif` | Recording | Shift+click opens Peek, the page scrolls inside it, then Expand | [Peek](peek.md) |
+| `images/vivarcdi/peek-split.gif` | Recording | Peek from a pinned tab, then Split side by side | [Peek](peek.md) |
+| `images/vivarcdi/today-archive.gif` | Recording | Archive grouped by day, search, reopen an entry, Clear | [Today](today-and-keyboard.md#today-archive) |
+| `images/vivarcdi/copy-url.gif` | Recording | The "Copied" toast | [Today](today-and-keyboard.md#copy-url) |
+| `images/vivarcdi/little-arc.gif` | Recording | The command bar, the Little Arc window, an edited address | [Little Arc](little-arc.md) |
+| `images/vivarcdi/incognito.gif` | Recording | A private window with the incognito bar, New Tab and Clear | [Incognito](incognito.md) |
 | `images/mockups/sidebar-look.gif` | Mockup | Row hover, then the palettes powder, lagoon and arclight | [Tab bar](tab-bar.md#the-arc-look) |
 | `images/mockups/drag-tab-to-favorites.gif` | Mockup | A Today tab dragged into the Favorites (spec 020) | [Favorites](tab-bar.md#favorites) |
 | `images/mockups/theme-color.gif` | Mockup | Edit Theme Color with three colors (spec 019) | [Roadmap](roadmap.md#theme-color-per-space) |
@@ -39,23 +44,11 @@ can be swapped for it.
 
 | # | File | Record this | Replaces |
 |---|---|---|---|
-| 1 | `vivarcdi/tab-bar-tour.gif` | Whole tab bar at rest, then hover a Favorite, a folder and a pinned tab | `tab-bar-anatomy.png` |
-| 2 | `vivarcdi/favorites.gif` | Click three tiles, middle click one to unload it (it dims), click it again | new |
-| 3 | `vivarcdi/pinned-tab-unload.gif` | In a pinned tab follow a same-site link, hover the row, click the minus, reopen the row at its pinned page | `pinned-tab-reset.gif` |
-| 4 | `vivarcdi/peek.gif` | Shift+click a link, scroll inside Peek, click Expand | `peek.gif` |
-| 5 | `vivarcdi/peek-split.gif` | From a pinned tab click a link to another site, then Split | `peek-split.gif` |
-| 6 | `vivarcdi/folders.gif` | Open a folder, open a link, close the folder: the link stays below it | new |
-| 7 | `vivarcdi/folder-panel.gif` | Rest on a closed folder, type in the search field, Enter | `folder-panel-and-peek-out.gif` |
-| 8 | `vivarcdi/edit-folders.gif` | `+` on the space header, type a name, drag a tab into the new folder | new |
-| 9 | `vivarcdi/copy-bookmarks.gif` | Drag a folder from the Bookmarks panel onto the workspace folders | new |
-| 10 | `vivarcdi/space-header.gif` | Click the space header to collapse and expand; switch workspace | new |
-| 11 | `vivarcdi/today-archive.gif` | Cmd/Ctrl+Shift+A, search, reopen a tab; then Clear on the separator | `today-archive.png` |
-| 12 | `vivarcdi/copy-url.gif` | Cmd/Ctrl+Shift+C with the toast | `copy-url.png` |
-| 13 | `vivarcdi/little-arc.gif` | Cmd+Opt+N, type a site, Move to workspace | `little-arc.png` |
-| 14 | `vivarcdi/little-arc-external.gif` | Click a link in Mail or Notes: it opens in Little Arc | new |
-| 15 | `vivarcdi/incognito.gif` | Open a private window, New Tab, Clear | `incognito.png` |
-| 16 | `vivarcdi/installer.gif` | macOS: open VivArcDi.app, Install, tick the shortcuts box | new |
-| 17 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `sidebar-look.gif` |
+| 1 | `vivarcdi/pinned-tab-unload.gif` | In a pinned tab follow a same-site link, hover the row, click the minus, reopen the row at its pinned page | `pinned-tab-reset.gif` |
+| 2 | `vivarcdi/copy-bookmarks.gif` | Drag a folder from the Bookmarks panel onto the workspace folders | new |
+| 3 | `vivarcdi/little-arc-external.gif` | Click a link in Mail or Notes: it opens in Little Arc | new |
+| 4 | `vivarcdi/installer.gif` | macOS: open VivArcDi.app, Install, tick the shortcuts box | new |
+| 5 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `sidebar-look.gif` |
 
 Tips for the recordings:
 

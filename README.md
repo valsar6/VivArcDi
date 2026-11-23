@@ -42,8 +42,15 @@ What works today:
 The [roadmap](#roadmap) lists the phases, and the [user manual](docs/manual/README.md) shows each
 feature with pictures.
 
-Tested against the Vivaldi 8.1 interface. Other versions stay untouched until they get a
+Tested against the Vivaldi 8.1 interface; the recordings below were captured on Vivaldi 8.3 with
+the 8.1 selector file. Other versions stay untouched until they get a
 [selector file](docs/architecture.md#selectors).
+
+## Before and after
+
+![Stock Vivaldi and the same page with VivArcDi alternate every three seconds](docs/manual/images/vivarcdi/before-after.gif)
+
+The same page in stock Vivaldi and with VivArcDi. The recording starts with stock Vivaldi.
 
 ## Download
 
@@ -330,6 +337,8 @@ the same in every workspace.
 If the folder is missing or has no links, the first pinned tabs of the current workspace become the tiles, drawn the same way, and a click on a tile activates that tab. Their slots in Vivaldi's tab list are hidden
 0.6.0, and the console says so. Removing a bookmark from the folder turns its tabs into ordinary
 pinned tabs.
+
+![Clicking three Favorites, unloading one with a middle click, then loading it again](docs/manual/images/vivarcdi/favorites.gif)
 
 Options of `favorites-grid` in `config.json`:
 
