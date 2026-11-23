@@ -1,4 +1,3 @@
-import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { LinkSnapshot } from './LinkedTabs.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
@@ -8,8 +7,6 @@ export interface TileState {
   active: boolean;
   /** The Favorite's tab is unloaded, or not opened yet in this workspace. */
   unloaded: boolean;
-  /** The Favorite's tab shows another page than its own. */
-  away: boolean;
 }
 
 export class FavoriteStates {
@@ -29,7 +26,6 @@ export class FavoriteStates {
           {
             active: tab?.active === true,
             unloaded: tab === undefined || UnloadedTabs.isUnloaded(tab),
-            away: tab !== undefined && OwnPage.isAway(tab),
           },
         ];
       }),

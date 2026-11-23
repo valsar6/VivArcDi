@@ -7,6 +7,7 @@ import { SerialTask } from '../../core/support/SerialTask.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
 import { TabData } from '../../core/tabs/TabData.js';
 import { TabUnloader } from '../../core/tabs/TabUnloader.js';
+import { OwnPage } from '../../shared/tabs/OwnPage.js';
 import { GRID_ORDER } from './BookmarkFavorites.js';
 import { FavoriteLabels } from './FavoriteLabels.js';
 import type { FavoriteLabelStore } from './FavoriteLabels.js';
@@ -21,7 +22,7 @@ export const TILE_SOURCE_ATTRIBUTE = 'data-vivarcdi-tile-source';
 const HIDDEN_OWNER = 'pinned-favorites';
 export const PINNED_GRID_ORDER = GRID_ORDER + 1;
 
-export type PinnedFavoritesTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'discard' | 'get' | 'onUpdated' | 'onActivated' | 'onRemoved' | 'onCreated'>;
+export type PinnedFavoritesTabs = Pick<BrowserTabs, 'query' | 'activate' | 'reload' | 'update' | 'discard' | 'get' | 'onUpdated' | 'onActivated' | 'onRemoved' | 'onCreated'>;
 
 export interface PinnedFavoritesDependencies {
   /** The document of Vivaldi's browser window. */
@@ -178,7 +179,7 @@ export class PinnedFavorites implements TileSource {
   }
 
   static #stateOf(tab: chrome.tabs.Tab): TileState {
-    return { active: tab.active, unloaded: UnloadedTabs.isUnloaded(tab), away: false };
+    return { active: tab.active, unloaded: UnloadedTabs.isUnloaded(tab) };
   }
 
   async #open(tabId: number): Promise<void> {
@@ -186,10 +187,19 @@ export class PinnedFavorites implements TileSource {
       const tab = await this.#deps.tabs.get(tabId);
       await this.#deps.tabs.activate(tabId);
       if (UnloadedTabs.isUnloaded(tab)) {
-        await this.#deps.tabs.reload(tabId);
+        await this.#load(tabId, tab);
       }
     } catch (error) {
       this.#deps.logger.error('Could not open the pinned tab', error);
+    }
+  }
+
+  async #load(tabId: number, tab: chrome.tabs.Tab): Promise<void> {
+    const own = OwnPage.of(tab);
+    if (own === null) {
+      await this.#deps.tabs.reload(tabId);
+    } else {
+      await this.#deps.tabs.update(tabId, { url: own });
     }
   }
 
