@@ -149,6 +149,7 @@ $clear-height: $separator-gap * 2 + 1px;
   height: $clear-height;
   padding: 0 $gap;
   border: 0;
+  border-top: 1px solid var(--vivarcdi-line);
   background: transparent;
   color: var(--colorFg, inherit);
   font: inherit;
@@ -156,6 +157,11 @@ $clear-height: $separator-gap * 2 + 1px;
   opacity: 0;
   cursor: pointer;
   transition: opacity var(--vivarcdi-transition);
+
+  &::before {
+    content: "↓";
+    margin-inline-end: 4px;
+  }
 
   &:hover,
   &:focus-visible {

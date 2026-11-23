@@ -23,6 +23,6 @@ test('draws the close button of a pinned row as a minus', () => {
   assert.match(base, /mask: url\("data:image\/svg\+xml/);
   assert.match(css, /\.tab-position\.is-pinned:hover \[data-vivarcdi-pinned-minus\][^{]*\{[^}]*opacity: 1/);
   assert.match(css, /\.tab-position\.is-pinned:has\(\.tab\.active\) \[data-vivarcdi-pinned-minus\]/);
-  assert.equal(css.includes('.tab-header .close'), false);
+  assert.match(css, /\.tab-position\.is-pinned \.tab-header \.close[^{]*\{[^}]*display: none/);
   assert.equal(css.includes('data-vivarcdi-tile'), false);
 });
