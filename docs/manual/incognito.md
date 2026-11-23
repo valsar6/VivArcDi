@@ -4,7 +4,7 @@
 
 A private window of Vivaldi gets the bare sidebar of Arc's incognito window.
 
-![Mockup: the incognito tab bar](images/mockups/incognito.png)
+![A private window with the incognito bar; New Tab adds a tab and Clear closes the Today tabs](images/vivarcdi/incognito.gif)
 
 From top to bottom:
 

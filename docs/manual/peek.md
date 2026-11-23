@@ -5,7 +5,7 @@
 Peek opens a link in a rounded panel over the page you are reading. The page behind stays where it
 was, dimmed. The panel holds the real page: you can scroll it, type in it and follow its links.
 
-![Mockup: Shift+click on a link opens it in Peek](images/mockups/peek.gif)
+![Shift+click opens Peek over the page, the page scrolls inside it, then its Expand button opens it as a tab](images/vivarcdi/peek.gif)
 
 ## When a link opens in Peek
 
@@ -31,4 +31,4 @@ Switching tab also closes Peek.
 
 A link from a pinned tab opens in Peek; Split puts both pages side by side:
 
-![Mockup: Peek from a pinned tab, then Split](images/mockups/peek-split.gif)
+![A pinned tile opened, Shift+click opens Peek on a link, then Split tiles the two pages side by side](images/vivarcdi/peek-split.gif)

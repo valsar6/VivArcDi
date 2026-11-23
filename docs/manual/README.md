@@ -9,7 +9,13 @@ This manual is for people who use VivArcDi. It describes what each feature does 
 The [README](../../README.md) has every option of `config.json`, and the [specifications](../../specs/README.md)
 have the exact behavior.
 
-![The VivArcDi tab bar, with numbered sections](images/mockups/tab-bar-anatomy.png)
+## Before and after
+
+![Stock Vivaldi and the same page with VivArcDi alternate every three seconds](images/vivarcdi/before-after.gif)
+
+The recording starts with stock Vivaldi; the second state is VivArcDi.
+
+![The tab bar at rest, then the pointer resting on a Favorite, a folder and a pinned tab](images/vivarcdi/tab-bar-tour.gif)
 
 ## Chapters
 
