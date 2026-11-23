@@ -90,11 +90,8 @@ after T9.
   on a Favorite tile. Write the reading in design.md "A new-window link and the indicator (Q-3)" and
   the smallest indicator to build. If the recording does not settle it, say so and mark T11 closed.
   Satisfies Q-3. Done when the reading is in the design and the lead agrees.
-- [ ] **T5. Move the tab menu to `shared`** (no behavior change; runs in parallel with T6, T7, T8 and
-  T9). Move `TabMenuItems.ts` and `MenuItemShape.ts` from `src/modules/folders/favoritelinks/` to
-  `src/shared/tabmenu/`, with their tests, and update `FolderEditing.ts`. Give the missing-API
-  warning the neutral text of design.md "Texts and logs". No test is renamed and the folders menu
-  stays as it is. Done when the existing tests pass and `make check` is green.
+- [x] **T5. Move the tab menu to `shared`** (closed by the menu decision). The pinned-row menu is a
+  VivArcDi HTML menu (T10), so `TabMenuItems`/`MenuItemShape` do not move. No code.
 - [ ] **T6. Pinned module: no away, separator over 8.3, pinned page on reopen** (TDD; runs in
   parallel with T5, T7, T8 and T9). Tests first, in `tests/modules/pinned/Marking.test.ts`:
   `does not mark a pinned tab that left its own page` (AC-5), `marks the separator after the last
@@ -146,11 +143,19 @@ after T9.
   triggers for shift-click, cross-site and ordinary tabs are unchanged. Satisfies AC-18 for the
   routing; the indicator is T11. Done when `make check` is green and `npm run live` passes on the
   lab after Tore agrees.
-- [ ] **T10. Edit Pinned Page on a pinned row** (BLOCKED until Tore chooses the menu; TDD; alone,
-  after T5 and T6). T2 found that the pinned-row menu is native and does not call
-  `vivaldi.contextMenu.show`, so the folders' wrapper cannot extend it. Tore must choose a custom
-  VivArcDi menu on the row that also carries Close tab and Unpin tab, or dropping the item and
-  amending the spec. Do not move `TabMenuItems`/`MenuItemShape` (T5) until then.
+- [ ] **T10. Edit Pinned Page on a pinned row** (TDD; alone, after T6). Tore chose a custom VivArcDi
+  menu on 2026-11-23 after the probe found the pinned-row menu native. Build `PinnedRowMenu` as an
+  HTML context menu on a pinned row: `Edit Pinned Page ▸` with `Replace Pinned URL with Current`
+  (disabled when there is no open tab or the addresses are equal) and `Edit…` (PromptDialog), plus
+  `Close tab` (real close) and `Unpin tab`. Prevent Vivaldi's native menu only for pinned rows;
+  outside click and Esc close it; submenu on hover/click; no reset item. Use a `PinnedPageStore`
+  over `vivExtData.pinnedUrl` (new `TabPinnedStore`); `PinnedAddress`/056/057 keep their bookmark
+  path. Tests in `tests/modules/pinned/PinnedRowMenu.test.ts`: `replaces the pinned page of a row
+  with the current one`, `edits the pinned page of a row`,
+  `disables replace on a pinned row when the addresses are equal`,
+  `adds Edit Pinned Page to the menu of a pinned tab`, `closes and unpins from the pinned row menu`
+  and `leaves the menu of anything but a pinned tab to Vivaldi`. Satisfies AC-10, AC-11, AC-12 and
+  keeps AC-25, AC-26. Done when `make check` is green.
 - [ ] **T11. The Little Arc indicator** (conditional on T4; alone, after T9 and T4). Tests first, in
   `tests/modules/littlearc/module.test.ts`:
   `marks the row a Little Arc window came from and clears it when the window closes`. Then

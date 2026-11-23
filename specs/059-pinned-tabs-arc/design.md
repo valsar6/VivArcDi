@@ -126,6 +126,13 @@ written from that record; no selector is guessed.
 
 ### Edit Pinned Page on a pinned row
 
+**Decision (Tore, 2026-11-23): custom menu.** The lab found that the pinned-row menu is native and
+does not call `vivaldi.contextMenu.show`, so it cannot be extended the way the folders extend theirs.
+T10 builds a VivArcDi HTML context menu on the pinned row instead; it carries `Edit Pinned Page ▸`,
+`Close tab` and `Unpin tab`. The `TabMenuItems`/`MenuItemShape` move (T5) is dropped. The
+`PinnedAddress`/store refactor below still applies to the pinned page; the menu view is VivArcDi's.
+
+
 The menu of a pinned row is Vivaldi's own menu, extended the way the folders already extend it: a
 wrapper around `vivaldi.contextMenu.show`. Two pieces move so that `modules/pinned` can use them
 without importing `modules/folders`:
