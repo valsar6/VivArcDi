@@ -11,6 +11,7 @@ import { DestinationPicker } from './DestinationPicker.js';
 import { ExternalLinkDetector } from './ExternalLinkDetector.js';
 import { DETECTION_DELAY_MS, ExternalLinkWatcher } from './ExternalLinkWatcher.js';
 import { FocusHistory } from './FocusHistory.js';
+import { LittleArcIndicator } from './LittleArcIndicator.js';
 import { LittleArcLauncher } from './LittleArcLauncher.js';
 import { isDestinationQuestion, parseAdoptMessage, parsePageLinkMessage } from './LittleArcMessage.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
@@ -30,6 +31,7 @@ export class MainWindowRole {
   #registry: LittleArcRegistry;
   #windowId: number;
   #launcher: LittleArcLauncher;
+  #indicator: LittleArcIndicator;
   #cleanups: Array<() => void> = [];
   #token = crypto.randomUUID();
   #keptTabs = new Map<number, boolean>();
@@ -55,6 +57,7 @@ export class MainWindowRole {
       size: settings,
       logger: context.logger,
     });
+    this.#indicator = new LittleArcIndicator({ ...context, logger: context.logger.child('LittleArcIndicator') });
   }
 
   /**
@@ -69,6 +72,7 @@ export class MainWindowRole {
     );
     keys.attach();
     this.#cleanups.push(() => keys.detach());
+    this.#cleanups.push(this.#indicator.start());
     await this.#listenForPages();
     await this.#listenForKeptLinks();
     if (this.#settings.externalLinks) {
@@ -102,9 +106,7 @@ export class MainWindowRole {
   }
 
   #open(bar: CommandBarMount | null): void {
-    if (bar?.toggle() !== true) {
-      void this.#launcher.openBlank();
-    }
+    if (bar?.toggle() !== true) void this.#launcher.openBlank();
   }
 
   async #listenForPages(): Promise<void> {
@@ -191,7 +193,8 @@ export class MainWindowRole {
     try {
       const tab = await this.#context.tabs.get(link.tabId);
       if (KeptTab.is(tab)) {
-        await this.#launcher.openAddressIn(link.url);
+        const windowId = await this.#launcher.openAddressIn(link.url);
+        if (windowId !== null) await this.#indicator.show(link.tabId, windowId, link.url);
       }
     } catch (error) {
       this.#context.logger.warn('could not read the tab of a Little Arc link', error);
@@ -200,9 +203,7 @@ export class MainWindowRole {
 
   async #answer(adopter: WorkspaceAdopter): Promise<void> {
     const answer = await adopter.describeDestination();
-    if (answer !== null) {
-      await this.#context.runtime.sendMessage(answer).catch((error: unknown) => this.#context.logger.warn('could not answer the Little Arc bar', error));
-    }
+    if (answer !== null) await this.#context.runtime.sendMessage(answer).catch((error: unknown) => this.#context.logger.warn('could not answer the Little Arc bar', error));
   }
 
   #listenForExternalLinks(): void {

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
 import { BrowserRuntime } from '../../../src/core/browser/BrowserRuntime.js';
 import { BrowserSearch } from '../../../src/core/browser/BrowserSearch.js';
+import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import type { ChromeApi, RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
 import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
 import type { WindowDetails } from '../../../src/core/browser/BrowserWindows.js';
@@ -15,6 +16,7 @@ import { ShortcutKeys } from '../../../src/core/dom/ShortcutKeys.js';
 import { WindowKeys } from '../../../src/core/dom/WindowKeys.js';
 import { ExternalLinkWatcher } from '../../../src/modules/littlearc/ExternalLinkWatcher.js';
 import { LittleArc } from '../../../src/modules/littlearc/LittleArc.js';
+import { LITTLE_ARC_MARK_ATTRIBUTE } from '../../../src/modules/littlearc/LittleArcIndicator.js';
 import { LittleArcLauncher } from '../../../src/modules/littlearc/LittleArcLauncher.js';
 import { LITTLE_ARC_CONSOLE_PREFIX, adoptMessage, destinationAnswer, pageLinkMessage } from '../../../src/modules/littlearc/LittleArcMessage.js';
 import { WorkspaceAdopter } from '../../../src/modules/littlearc/WorkspaceAdopter.js';
@@ -167,7 +169,7 @@ function tabOf(page: Page): chrome.tabs.Tab {
 }
 
 const selectors = new SelectorCatalog(
-  { browser: '#browser', webviewContainer: '#webview-container', tabWebview: '#webview-container webview[tab_id]' },
+  { browser: '#browser', webviewContainer: '#webview-container', tabWebview: '#webview-container webview[tab_id]', tabWrapper: '.tab-wrapper' },
   'test',
 );
 
@@ -176,12 +178,14 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
   document: FakeDocument;
   created: Events<(tab: chrome.tabs.Tab) => void>;
   focus: Events<(id: number) => void>;
+  removed: Events<(id: number) => void>;
   messages: Events<RuntimeMessageListener>;
   webviews: FakeElement[];
   windowCalls: Array<Record<string, unknown>>;
 } {
   const created = new Events<(tab: chrome.tabs.Tab) => void>();
   const focus = new Events<(id: number) => void>();
+  const removed = new Events<(id: number) => void>();
   const messages = new Events<RuntimeMessageListener>();
   const container = new FakeElement('div');
   const webviews = pages.map((page) => {
@@ -189,7 +193,7 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
     container.append(webview);
     return webview;
   });
-  const document = new FakeDocument({ '#webview-container': container });
+  const document = new FakeDocument({ '#webview-container': container, '#browser': new FakeElement('div') });
   const windowCalls: Array<Record<string, unknown>> = [];
   const tabs = {
     available: true,
@@ -213,6 +217,7 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
       },
       getCurrent: (callback: (info: unknown) => void): void => callback({ id: 1, type }),
       onFocusChanged: focus,
+      onRemoved: removed,
     },
     runtime: { onMessage: messages },
   } as unknown as ChromeApi;
@@ -226,11 +231,15 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
     runtime: new BrowserRuntime(chromeApi),
     prefs: new BrowserPrefs(undefined),
     selectors,
-    storage: { getItem: (): null => null, setItem: (): void => undefined },
+    storage: {
+      getItem: (): null => null,
+      setItem: (): void => undefined,
+      read: <T>(_key: string, format: StoredFormat<T>): StoredRead<T> => format.decode(null),
+    },
     payload: new FakeLoader({ 'page/little-arc-links.js': 'LITTLE_ARC_LINKS' }),
     notices: silentNotices(),
   } as unknown as ModuleContext<LittleArcOptions>;
-  return { context, document, created, focus, messages, webviews, windowCalls };
+  return { context, document, created, focus, removed, messages, webviews, windowCalls };
 }
 
 test('little arc ignores external links when disabled', async () => {
@@ -283,6 +292,25 @@ test('opens a blank link of a pinned page in Little Arc', async () => {
   assert.equal(windowCalls[0]?.['url'], 'https://example.com/new');
   assert.equal(windowCalls[0]?.['type'], 'popup');
   module.stop();
+});
+
+test('marks the row a Little Arc window came from and clears it when the window closes', async () => {
+  const { context, document, removed, webviews } = contextOf({}, 'normal', [{ tabId: 1, pinned: true }]);
+  const row = new FakeElement('div');
+  document.elements['.tab-wrapper[data-id="tab-1"]'] = row;
+  const module = new LittleArc();
+  await module.start(context);
+  const policy = /install\((.*)\);$/.exec(webviews[0]?.executed[0] ?? '')?.[1] ?? '{}';
+  const { token } = JSON.parse(policy) as { token: string };
+  webviews[0]?.dispatch('consolemessage', {
+    message: `${LITTLE_ARC_CONSOLE_PREFIX}${JSON.stringify(pageLinkMessage(token, 1, 'https://example.com/new'))}`,
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(row.hasAttribute(LITTLE_ARC_MARK_ATTRIBUTE), true);
+  removed.listeners.forEach((listener) => listener(77));
+  assert.equal(row.hasAttribute(LITTLE_ARC_MARK_ATTRIBUTE), false);
+  module.stop();
+  assert.equal(removed.listeners.size, 0);
 });
 
 test('leaves blank links of ordinary pages to Vivaldi', async () => {
