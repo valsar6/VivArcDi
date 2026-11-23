@@ -6,6 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-23 |
+| Amended | 2026-11-23: the 8.3 probe found no close button on a pinned row, so the minus is a VivArcDi control; the pinned-row menu is a VivArcDi custom menu (Tore's decision). |
 | Supersedes | [003](../003-pinned-tabs-and-folders/spec.md) FR-5, AC-9, AC-10 and AC-16 (fully; they cover Favorites and pinned tabs); the away-arrow parts of [058](../058-pinned-tabs-83/spec.md) AC-1 and AC-4 to AC-6, whose pinned-group layout and separator stay |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -185,16 +186,17 @@ in the `span.pinned-group` layout that 058 reads on 8.3.
 - **FR-3.** WHEN an unloaded pinned tab is opened, THE tab SHALL load its pinned page.
 - **FR-4.** THE tab bar SHALL NOT mark a pinned tab as away and a pinned row SHALL show no reset arrow
   or visible reset control; the row SHALL keep the favicon of its tab.
-- **FR-5.** The unload affordance of a pinned row SHALL be Vivaldi's close button restyled as a minus
-  on pinned rows only, not a new control. It SHALL sit at the right end of the row, be shown while the
-  row is hovered or active and hidden otherwise, and a click on it SHALL unload the tab and SHALL NOT
-  close it.
+- **FR-5.** The unload affordance of a pinned row SHALL be a minus at the right end of the row. It
+  MAY restyle Vivaldi's close button where Vivaldi draws one; on Vivaldi 8.3, which draws none, it
+  SHALL be a VivArcDi control. It SHALL be shown while the row is hovered or active and hidden
+  otherwise, and a click on it SHALL unload the tab and SHALL NOT close it.
 - **FR-6.** Cmd/Ctrl+W on a pinned tab SHALL unload it and SHALL NOT close it, as 003/FR-6 says.
 - **FR-7.** The menu of a pinned row SHALL offer `Edit Pinned Page ▸` with `Replace Pinned URL with
   Current` and `Edit…`, with the texts, the dialog and the disabled states of 056/FR-6 and FR-7,
   acting on the pinned page of that tab. It SHALL NOT offer a reset item.
-- **FR-8.** The menu of a pinned row SHALL keep a real close or unpin route, so a pinned tab can be
-  closed or unpinned without the minus. Vivaldi's Close tab and Unpin tab stay as they are.
+- **FR-8.** The menu of a pinned row SHALL keep a real close and unpin route, so a pinned tab can be
+  closed or unpinned without the minus. The menu is VivArcDi's custom menu (Tore, 2026-11-23), so it
+  SHALL carry `Close tab` and `Unpin tab` itself.
 - **FR-9.** WHEN a pinned tab shows another address and the user opens an address from the address
   field with Cmd/Ctrl+L, THE address SHALL open in a new unpinned tab and the pinned tab SHALL keep
   its pinned page. Picking the pinned site from Vivaldi's suggestions SHALL switch to the pinned tab,
@@ -259,7 +261,7 @@ it adds no live scenario, so it names none.
 | AC-12 | WHILE the current address equals the pinned page or the row has no open tab, `Replace Pinned URL with Current` SHALL be disabled. | auto: `disables replace on a pinned row when the addresses are equal` |
 | AC-13 | WHEN Clear is clicked, THE pinned tabs SHALL stay open. | auto: `a pinned tab is not archivable` |
 | AC-14 | WHEN Tore compares Arc 1.174.1 with VivArcDi, THE pinned row SHALL show no back arrow, no reset button and no away mark, SHALL keep its favicon after browsing away, and a click on the row SHALL NOT navigate it back. | manual |
-| AC-15 | WHEN Tore hovers a pinned row and makes it active, THE minus SHALL be Vivaldi's close button restyled as a minus at the right end, look and show as Arc's, and a click on it SHALL unload the row, which SHALL come back at its pinned page. | manual |
+| AC-15 | WHEN Tore hovers a pinned row and makes it active, THE minus SHALL sit at the right end and look and show as Arc's (a restyled close button where Vivaldi draws one, a VivArcDi control otherwise), and a click on it SHALL unload the row, which SHALL come back at its pinned page. | manual |
 | AC-16 | WHEN Tore right-clicks a pinned row, THE menu SHALL show `Edit Pinned Page` with `Replace Pinned URL with Current` and `Edit…` and no reset item, and SHALL keep Close tab and Unpin tab. | manual |
 | AC-17 | WHEN Tore presses Cmd/Ctrl+L on a pinned tab showing another address and opens an address, THE address SHALL open in a new unpinned tab, the pinned tab SHALL keep its page, and a pinned-site suggestion SHALL switch to the pinned tab. | manual |
 | AC-18 | WHEN Tore opens a `target="_blank"` link in a pinned or Favorite page, THE page SHALL open in Little Arc and the row or tile SHALL show the indicator; Little Arc SHALL win over Peek, and 015 SHALL be amended so its Peek trigger applies only where Little Arc cannot open. | manual |
