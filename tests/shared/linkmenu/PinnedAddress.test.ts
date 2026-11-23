@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import type { BookmarkNode } from '../../../src/core/browser/bookmarks/BookmarkNode.js';
 import type { CommandItem, MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
 import { LinkedTab } from '../../../src/shared/linkmenu/LinkedTab.js';
+import { BookmarkPinnedStore } from '../../../src/shared/linkmenu/BookmarkPinnedStore.js';
 import { PinnedAddress } from '../../../src/shared/linkmenu/PinnedAddress.js';
 import type { PromptOptions } from '../../../src/shared/linkmenu/PromptDialog.js';
 import type { ToastKind } from '../../../src/core/dom/Toast.js';
@@ -29,8 +30,7 @@ function setUp(answer: string | null, tabUrl?: string): Setup {
   const asked: PromptOptions[] = [];
   const toasts: Array<[string, ToastKind | undefined]> = [];
   const address = new PinnedAddress({
-    writer: chrome.writer,
-    linkedTab: new LinkedTab(tabs),
+    store: new BookmarkPinnedStore({ writer: chrome.writer, linkedTab: new LinkedTab(tabs) }),
     dialog: {
       ask: async (options: PromptOptions): Promise<string | null> => {
         asked.push(options);
