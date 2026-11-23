@@ -17,6 +17,8 @@ a real Vivaldi, and the few that still have to be made.
 | `images/vivarcdi/folders.gif` | Recording | A folder opened, a link clicked, the folder closed with the link row below it | [Tab bar](tab-bar.md#folders) |
 | `images/vivarcdi/folder-panel.gif` | Recording | A closed folder shows its panel, search narrows it, Enter opens a link | [Tab bar](tab-bar.md#folder-panel) |
 | `images/vivarcdi/edit-folders.gif` | Recording | `+` on the space header, the folder named, a tab dragged onto it | [Tab bar](tab-bar.md#folders) |
+| `images/vivarcdi/copy-bookmarks.gif` | Recording | A folder dragged from the Bookmarks panel onto the folder rows | [Tab bar](tab-bar.md#folders) |
+| `images/vivarcdi/pinned-tab-unload.gif` | Recording | A pinned tab following a link, unloaded with the minus, reopened on its pinned page | [Tab bar](tab-bar.md#pinned-tabs) |
 | `images/vivarcdi/space-header.gif` | Recording | The header collapses and expands the folders; the workspace menu switches workspace | [Tab bar](tab-bar.md#space-header) |
 | `images/vivarcdi/peek.gif` | Recording | Shift+click opens Peek, the page scrolls inside it, then Expand | [Peek](peek.md) |
 | `images/vivarcdi/peek-split.gif` | Recording | Peek from a pinned tab, then Split side by side | [Peek](peek.md) |
@@ -44,11 +46,9 @@ can be swapped for it.
 
 | # | File | Record this | Replaces |
 |---|---|---|---|
-| 1 | `vivarcdi/pinned-tab-unload.gif` | In a pinned tab follow a same-site link, hover the row, click the minus, reopen the row at its pinned page | `pinned-tab-reset.gif` |
-| 2 | `vivarcdi/copy-bookmarks.gif` | Drag a folder from the Bookmarks panel onto the workspace folders | new |
-| 3 | `vivarcdi/little-arc-external.gif` | Click a link in Mail or Notes: it opens in Little Arc | new |
-| 4 | `vivarcdi/installer.gif` | macOS: open VivArcDi.app, Install, tick the shortcuts box | new |
-| 5 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `sidebar-look.gif` |
+| 1 | `vivarcdi/little-arc-external.gif` | Click a link in Mail or Notes: it opens in Little Arc | new |
+| 2 | `vivarcdi/installer.gif` | macOS: open VivArcDi.app, Install, tick the shortcuts box | new |
+| 3 | `vivarcdi/sidebar-look.gif` | Once spec 028 is done: the tab bar in two palettes | `sidebar-look.gif` |
 
 Tips for the recordings:
 
