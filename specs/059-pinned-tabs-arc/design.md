@@ -107,6 +107,11 @@ needs no new listener. The row, not a new control, is the target:
 }
 ```
 
+**Probe result (T2).** 8.3 has no `.tab-header .close` on a pinned row, so the rule above cannot be a
+restyle of Vivaldi's X. T8 adds a VivArcDi minus button at the right end of the row, hidden until the
+row is hovered or active, and the CSS above becomes the starting point for that button. `CloseShortcut`
+keeps its own click path; the button calls the same unload.
+
 `$minus-glyph` joins the tokens next to `$close-glyph`. The block lives in `pinned.scss`, next to the
 separator, and uses `pinnedTab`/`tabClose` through the existing tokens. It sits under
 `#browser[data-vivarcdi-active][data-vivarcdi-pinned-unload]`: `PinnedTabs` sets that attribute from
@@ -158,6 +163,12 @@ A `command` can now be built disabled, the sample's boolean flag set to false.
 Vivaldi's own Close tab and Unpin tab stay after the added items, untouched (FR-8). There is no
 reset item, as in Arc.
 
+**Probe result (T2).** A real right-click on a pinned row did not call `vivaldi.contextMenu.show`; the
+pinned-row menu is native on 8.3 (or not routed through that API), so the folders' wrapper cannot
+extend it. T10 is blocked until Tore chooses: a custom VivArcDi menu on the row that also carries
+Close tab and Unpin tab, or dropping `Edit Pinned Page` from the pinned row and amending the spec. Do
+not move `TabMenuItems`/`MenuItemShape` (T5) until that choice is made.
+
 **Fallback.** If Vivaldi's menu has no submenu shape the wrapper can copy, `MenuItemShape.submenu`
 returns null, `PinnedRowMenu` adds nothing, logs once, and reports it in the review; the design does
 not put the two items at the top level on its own, because the spec asks for
@@ -187,6 +198,10 @@ The probe's result is written in "Findings of the probe (T1)". If the field's na
 told apart from a click on a same-window link, T12 is closed without code: the "open and reset"
 would also undo Q-7's deferred behavior, which the spec leaves out. AC-17 then stays manual and
 unimplemented, and the lead records it as a follow-up.
+
+**Probe result (T2).** The lab on 8.3 offered no safe signal: the synthetic events changed neither
+focus nor navigation, and a real CDP Meta+L plus Enter left the pinned tab on its address and opened
+no tab. T12 is closed without code, AC-17 stays out, and the lead records it as a follow-up.
 
 ### A new-window link and the indicator (Q-3)
 
@@ -350,6 +365,28 @@ The findings are written here by T2 with the version and the date for each of th
 - What Cmd/Ctrl+L and the Enter of the address field do to a pinned tab, and which of the signals of
   Q-1 are visible without changing the field.
 - The `span.pinned-group` children on 8.3, which 058's probe already recorded.
+
+#### Findings (T2, 2026-11-23, Vivaldi 8.3.4191.47)
+
+The probe ran on the only installed build, 8.3.4191.47, on the throwaway profile; 8.1 and 8.2 were
+not installed. The first run had the Favorites grid on, so the pinned row was hidden by
+`data-vivarcdi-hidden`; a second run with `favorites-grid` off and a real hover inspected the visible
+row.
+
+- **Close markup.** The pinned row's `.tab-header` contains only `span.favicon` and its image. There is
+  no `.close` element, also after a real hover. Vivaldi 8.3's pinned tabs have no close button to
+  restyle, so T8 must add a VivArcDi minus control instead of drawing a minus on Vivaldi's X.
+- **Menu.** A real right-click on the pinned row did not call `vivaldi.contextMenu.show`; the wrapper
+  was installed (`couldWrap: true`) and `menuItems` stayed empty. The pinned-row menu is native on
+  8.3, or not routed through that API. T10 cannot add `Edit Pinned Page` to it with the wrapper the
+  folders use. A custom VivArcDi menu on the row, or dropping the item and amending the spec, is a
+  decision for Tore; T10 is blocked until then.
+- **Cmd/Ctrl+L.** Synthetic events did not change focus or navigate. A real CDP Meta+L, an
+  `insertText` of another address and Enter left the pinned tab on its address and created no tab
+  (`seen` only an `onUpdated` with a null URL and status). No safe signal separates the address
+  field from a same-window link, so T12 is closed and AC-17 stays out, as the design allows.
+- **Group.** The pinned row is a child of `span.pinned-group`; with the grid off it is visible, and
+  the group/separator approach of 058 holds.
 
 ### Q-7 probe (T3, Tore)
 

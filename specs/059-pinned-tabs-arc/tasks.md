@@ -52,7 +52,7 @@ after T9.
 | T5 | `src/shared/tabmenu/TabMenuItems.ts`, `src/shared/tabmenu/MenuItemShape.ts`, the two files they leave in `src/modules/folders/favoritelinks/`, `src/modules/folders/editing/FolderEditing.ts`, the moved tests |
 | T6 | `src/modules/pinned/PinnedMarks.ts`, `TabBarMarker.ts`, `PinnedMarking.ts`, `PinnedPageLoader.ts`, `PinnedTabs.ts`, `PinnedTabsOptions.ts`, `SavedAddresses.ts` (if a read is needed), `AwayTabs.ts` and `ResetClick.ts` (deleted), `src/config.json` (`resetButton`), `tests/modules/pinned/PinnedTabs.test.ts`, `tests/modules/pinned/Marking.test.ts`, `tests/modules/pinned/PinnedPage.test.ts`, `tests/modules/favorites/fakes.ts` |
 | T7 | `src/modules/favorites/FavoriteStates.ts`, `FavoritesView.ts`, `FavoriteOpener.ts`, `PinnedFavorites.ts`, `tests/modules/favorites/FavoritePage.test.ts`, `tests/modules/favorites/FavoritesView.test.ts` (only if a test names the attribute) |
-| T8 | `src/styles/pinned.scss`, `src/styles/_tokens.scss`, `tests/styles/Pinned.test.ts` |
+| T8 | `src/modules/pinned/PinnedUnloadButton.ts`, `src/modules/pinned/PinnedTabs.ts`, `src/styles/pinned.scss`, `src/styles/_tokens.scss`, `tests/modules/pinned/PinnedTabs.test.ts`, `tests/styles/Pinned.test.ts` |
 | T9 | `src/page/little-arc-links.ts`, `src/modules/littlearc/LittleArcMessage.ts`, `LittleArcLauncher.ts`, `MainWindowRole.ts`, `src/modules/peek/Peek.ts`, `tests/modules/littlearc/module.test.ts`, `tests/modules/peek/Peek.test.ts` |
 | T10 | `src/shared/linkmenu/PinnedAddress.ts`, `src/shared/linkmenu/BookmarkPinnedStore.ts`, `src/shared/tabmenu/TabMenuItems.ts`, `src/shared/tabmenu/MenuItemShape.ts`, `src/modules/pinned/TabPinnedStore.ts`, `src/modules/pinned/PinnedRowMenu.ts`, `src/modules/pinned/PinnedTabs.ts`, `src/modules/favorites/TileLinkCommands.ts`, `src/modules/folders/editing/SavedTabActions.ts`, `tests/modules/pinned/PinnedRowMenu.test.ts` |
 | T11 | `src/modules/littlearc/LittleArcIndicator.ts`, `MainWindowRole.ts`, `src/core/browser/BrowserWindows.ts`, `src/core/browser/BrowserTabs.ts` (the `ChromeApi` window event), `src/styles/little-arc.scss`, `tests/modules/littlearc/module.test.ts` |
@@ -104,8 +104,7 @@ after T9.
   `warns once when neither the strip nor a group matches` (NFR-4); in
   `tests/modules/pinned/PinnedPage.test.ts`: `keeps the pinned page when a pinned tab navigates`
   (AC-4), `loads the pinned page when an unloaded pinned tab opens` (AC-6) and
-  `loads the pinned page of the active tab at start`; in `tests/modules/pinned/PinnedTabs.test.ts`:
-  `unloads a pinned tab from its minus` (AC-8). Keep `saves the address of a newly pinned tab` (AC-1),
+  `loads the pinned page of the active tab at start`. Keep `saves the address of a newly pinned tab` (AC-1),
   `saves the address of a pinned tab seen for the first time` (AC-2),
   `forgets the address of an unpinned tab` (AC-3), `unloads a pinned tab on close shortcut` (AC-7)
   and `leaves the close shortcut to Vivaldi for ordinary tabs` (AC-9) green. Remove
@@ -114,10 +113,9 @@ after T9.
   and `ResetClick.ts`; add `PinnedMarks` with only the linked set; drop the away attribute and add
   the group slots to `TabBarMarker` as 058 designed; add `PinnedPageLoader`; remove `isAway`,
   `#startReset` and the `resetButton` option, and drop `resetButton` from `config.json`; set
-  `data-vivarcdi-pinned-unload` on `#browser` from `unloadOnClose`, removing it on stop; add
   `querySelectorAll` to the `FakeNode` fake if 058's change is not in yet. Close tab and Unpin tab
-  are untouched. Satisfies AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, NFR-4. Done when the tests pass and
-  `make check` is green.
+  are untouched. The minus control and its test belong to T8. Satisfies AC-4, AC-5, AC-6, AC-7,
+  AC-9, NFR-4. Done when the tests pass and `make check` is green.
 - [ ] **T7. Favorites: no away, the bookmark's page on open** (TDD; runs in parallel with T5, T6, T8
   and T9). Tests first, in `tests/modules/favorites/FavoritePage.test.ts`:
   `keeps the bookmark page when a favorite tab navigates` (AC-22),
@@ -129,14 +127,15 @@ after T9.
   `OwnPage.of(tab)` when there is one. Keep `edits the pinned url of a tile` (AC-25) and
   `replaces the pinned url of a tile with the current one` (AC-26) green. Satisfies AC-22, AC-23,
   AC-24, AC-25, AC-26. Done when the tests pass and `make check` is green.
-- [ ] **T8. The minus on a pinned row** (after T2; runs in parallel with T5, T6, T7 and T9). A style
-  test first, `draws the close button of a pinned row as a minus` in `tests/styles/Pinned.test.ts`:
-  a rule under `#browser[data-vivarcdi-active][data-vivarcdi-pinned-unload]` for
-  `.tab-position.is-pinned .tab-header .close` that hides Vivaldi's X and draws `$minus-glyph`,
-  shown on hover and on the active row, and no such rule for a tile. Then `$minus-glyph` in
-  `_tokens.scss` and the rule in `pinned.scss`, from T2's close markup. `CloseShortcut` does not
-  change. Supports AC-15 (manual look) and US-2. Done when the style
-  test and `make check` are green.
+- [ ] **T8. The minus on a pinned row** (after T2; runs in parallel with T5, T6, T7 and T9). The T2
+  probe found no Vivaldi close button on a pinned row, so this task adds a VivArcDi minus button
+  instead of restyling the X. Failing tests first: `unloads a pinned tab from its minus` (AC-8) in
+  `tests/modules/pinned/PinnedTabs.test.ts` and the style test in `tests/styles/Pinned.test.ts`.
+  The button sits at the right end of the pinned row, after the title, hidden until the row is
+  hovered or active; a click calls the existing unload path and never closes the tab; a Favorite
+  tile gets no such control. Add the button element/class and one pass per frame so Vivaldi's
+  redraws keep it; `CloseShortcut` does not change. Supports AC-8 and AC-15 (manual look) and US-2.
+  Done when the tests and `make check` are green.
 - [ ] **T9. A new-window link opens in Little Arc** (TDD; runs in parallel with T5, T6, T7 and T8).
   Tests first: `opens a blank link of a pinned page in Little Arc`,
   `leaves blank links of ordinary pages to Vivaldi` in `tests/modules/littlearc/module.test.ts`, and
@@ -147,18 +146,11 @@ after T9.
   triggers for shift-click, cross-site and ordinary tabs are unchanged. Satisfies AC-18 for the
   routing; the indicator is T11. Done when `make check` is green and `npm run live` passes on the
   lab after Tore agrees.
-- [ ] **T10. Edit Pinned Page on a pinned row** (TDD; alone, after T5 and T6). Tests first, in
-  `tests/modules/pinned/PinnedRowMenu.test.ts`: `replaces the pinned page of a row with the current
-  one` (AC-10), `edits the pinned page of a row` (AC-11),
-  `disables replace on a pinned row when the addresses are equal` (AC-12),
-  `adds Edit Pinned Page after the items of the menu of a pinned tab` and
-  `leaves the menu of anything but a pinned tab to Vivaldi`. Then: `PinnedAddress` takes a
-  `PinnedPageStore` and gains `menuFor`, `replace` and `edit`; add `BookmarkPinnedStore` and
-  `TabPinnedStore`; add `TabMenuTree`, `items(tabId)` in `TabMenuItems` and the submenu and
-  disabled builders in `MenuItemShape`; add `PinnedRowMenu` and wire it in `PinnedTabs` with the
-  `Toast` and the `PromptDialog`. The 056/057 items and tests stay as they are. If T2 found no
-  submenu shape, add nothing, log once and report it; the task is then closed without the menu.
-  Satisfies AC-10, AC-11, AC-12 and keeps AC-25, AC-26. Done when `make check` is green.
+- [ ] **T10. Edit Pinned Page on a pinned row** (BLOCKED until Tore chooses the menu; TDD; alone,
+  after T5 and T6). T2 found that the pinned-row menu is native and does not call
+  `vivaldi.contextMenu.show`, so the folders' wrapper cannot extend it. Tore must choose a custom
+  VivArcDi menu on the row that also carries Close tab and Unpin tab, or dropping the item and
+  amending the spec. Do not move `TabMenuItems`/`MenuItemShape` (T5) until then.
 - [ ] **T11. The Little Arc indicator** (conditional on T4; alone, after T9 and T4). Tests first, in
   `tests/modules/littlearc/module.test.ts`:
   `marks the row a Little Arc window came from and clears it when the window closes`. Then
@@ -168,13 +160,10 @@ after T9.
   task is closed without code: the routing of T9 stands and the lead reports AC-18 to Tore as met
   for the routing only. Satisfies AC-18. Done when `make check` is green and the live check of T4
   passes on the lab after Tore agrees.
-- [ ] **T12. Cmd+L and the address on a pinned tab** (conditional on T2; alone, after T6, T10 and
-  T2). Implemented only if T2 recorded a signal that tells the address field's navigation from a
-  link without taking the key or the field. Tests first: `opens an address typed on a pinned tab in
-  a new unpinned tab` and `keeps the pinned page when the address field sends a new one`. Then
-  `PinnedAddressBar` as described in design.md, wired in `PinnedTabs`. It never binds Cmd+L and never
-  prevents the field's Enter. If T2 recorded no signal, the task is closed without code and AC-17
-  stays out; the lead records it as a follow-up. Satisfies AC-17. Done when `make check` is green.
+- [x] **T12. Cmd+L and the address on a pinned tab** (closed by T2; no code). T2 found no safe
+  signal on 8.3: synthetic events changed neither focus nor navigation, and a real CDP Meta+L plus
+  Enter left the pinned tab on its address and opened no tab. AC-17 stays out and is recorded as a
+  follow-up. No code.
 - [ ] **T13. Docs and version** (the lead, after T5 to T12). `README.md`: the Favorites and pinned
   tabs sections lose the away state and the reset arrow and gain the minus, the pinned-page menu and
   Little Arc for new-window links; the Peek section says a `target="_blank"` link in a pinned or
