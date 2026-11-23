@@ -13,7 +13,7 @@ interface Source {
   tabId: number;
   favoriteId: string | undefined;
   url: string;
-  element: Element;
+  element: HTMLElement;
 }
 
 export interface LittleArcIndicatorDependencies {
@@ -144,15 +144,15 @@ export class LittleArcIndicator {
     }
   }
 
-  #mark(element: Element, url: string): void {
+  #mark(element: HTMLElement, url: string): void {
     element.setAttribute(LITTLE_ARC_MARK_ATTRIBUTE, '');
     element.style.setProperty('--vivarcdi-little-arc-icon', `url("chrome://favicon/size/16@2x/${url}")`);
   }
 
-  #elementOf(tabId: number, favoriteId: string | undefined): Element | null {
+  #elementOf(tabId: number, favoriteId: string | undefined): HTMLElement | null {
     if (favoriteId !== undefined) {
-      return this.#document.querySelector<Element>(`[${TILE_SELECTOR}="${favoriteId}"]`);
+      return this.#document.querySelector<HTMLElement>(`[${TILE_SELECTOR}="${favoriteId}"]`);
     }
-    return this.#document.querySelector<Element>(`${this.#selectors.get('tabWrapper')}[data-id="tab-${tabId}"]`);
+    return this.#document.querySelector<HTMLElement>(`${this.#selectors.get('tabWrapper')}[data-id="tab-${tabId}"]`);
   }
 }
