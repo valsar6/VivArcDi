@@ -132,6 +132,8 @@ Every change below is a real bookmark, so it shows in Vivaldi's Bookmarks panel:
 | Keep the current page | Cmd/Ctrl+D adds it at the end of the workspace's folder; press it again to undo |
 | Copy bookmarks in | Drag a bookmark or a whole folder from Vivaldi's Bookmarks panel onto the folders |
 
+![Dragging a folder from Vivaldi's Bookmarks panel onto the folder rows, where it appears with its links](images/vivarcdi/copy-bookmarks.gif)
+
 A deleted folder is not erased: restore it from the Trash in the Bookmarks panel. Moving folders stays in the Bookmarks panel.
 
 ### Folder panel
@@ -145,6 +147,8 @@ to filter, use Up and Down, and press Enter or click to open. Esc closes the pan
 ## Pinned tabs
 
 Pinned tabs are rows below the folders. Each workspace has its own.
+
+![A pinned tab following a link, its minus clicked, the row unloaded, then reopened on its pinned page; the rows are shown with the Favorites grid turned off](images/vivarcdi/pinned-tab-unload.gif)
 
 - A pinned tab remembers the page it was pinned with. Following a link inside it changes what it
   shows, not its own page; the favicon stays the same and there is no back arrow. Closing and
