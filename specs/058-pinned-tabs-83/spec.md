@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | – |
-| Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): AC-1 and the away-arrow parts of AC-4 to AC-6 are superseded; the pinned-group layout and the separator stay. |
+| Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): AC-1 and the away-arrow parts of AC-4 to AC-6 are superseded; the pinned-group layout and the separator stay. [060](../060-clear-bar-and-pinned-unload/spec.md) (2026-11-24): the pinned rows with the grid on are tiles up to `maxTiles`. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -51,8 +51,10 @@ pinned row shown carries the separator below it, and a click on the arrow loads 
 [003](../003-pinned-tabs-and-folders/spec.md) and
 [007](../007-reopen-pinned-tabs/spec.md). The behavior holds whether the Favorites grid is on or off:
 with the grid on, a pinned tab linked to a Favorite stays hidden behind its tile
-([003](../003-pinned-tabs-and-folders/spec.md) FR-3) and the other pinned tabs show as rows; with
-the grid off, every pinned tab shows as a row.
+([003](../003-pinned-tabs-and-folders/spec.md) FR-3), and every other pinned tab of the workspace up
+to `maxTiles` becomes a tile under the Favorites ([059](../059-pinned-tabs-arc/spec.md) FR-3), so no
+pinned row shows; a pinned tab past `maxTiles` keeps its row. With the grid off, every pinned tab
+shows as a row.
 Restarting Vivaldi or changing workspace does not change any of it.
 
 VivArcDi reads the pinned rows wherever Vivaldi puts them, through the selector catalog of

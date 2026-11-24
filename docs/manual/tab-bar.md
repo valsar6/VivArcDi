@@ -155,7 +155,8 @@ Pinned tabs are rows below the folders. Each workspace has its own.
   reopening the tab loads its own page again.
 - The **minus** at the right end of the row, Cmd/Ctrl+W and the close affordance unload a pinned tab
   instead of closing it. The row stays, dimmed; a click loads its own page. **Close tab** and
-  **Unpin tab** in the menu still close or unpin it.
+  **Unpin tab** in the menu still close or unpin it. With the Favorites grid on, the same **minus**
+  sits on the tile of the pinned tab.
 - The row's menu has **Edit Pinned Page**, with **Replace Pinned URL with Current** and **Edit…**, to
   change the page it opens first.
 - In a pinned tab, a link to another site opens in [Peek](peek.md), so the tab keeps its page; a link
