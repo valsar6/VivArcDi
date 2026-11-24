@@ -18,9 +18,10 @@ export interface MenuRow {
  */
 export async function createTile(driver: Driver, url: string): Promise<SavedTab> {
   const bookmarkId = await driver.evaluate<string>(`(async () => {
-    const roots = (await chrome.bookmarks.getTree())[0].children.flatMap((node) => node.children ?? []);
-    const found = roots.find((node) => node.url === undefined && node.title === ${JSON.stringify(FOLDER)});
-    const parentId = (found ?? (await chrome.bookmarks.create({ parentId: roots[0].parentId, title: ${JSON.stringify(FOLDER)} }))).id;
+    const [root] = await chrome.bookmarks.getTree();
+    const bar = (root.children ?? []).find((node) => node.id === '1') ?? root.children[0];
+    const found = (bar.children ?? []).find((node) => node.url === undefined && node.title === ${JSON.stringify(FOLDER)});
+    const parentId = (found ?? (await chrome.bookmarks.create({ parentId: bar.id, title: ${JSON.stringify(FOLDER)} }))).id;
     return (await chrome.bookmarks.create({ parentId, title: 'Tile of the live check', url: ${JSON.stringify(url)} })).id;
   })()`);
   await driver.waitForElement(`[data-vivarcdi-tile="${bookmarkId}"]`);

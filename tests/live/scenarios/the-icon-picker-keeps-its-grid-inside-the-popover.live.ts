@@ -100,6 +100,7 @@ const scenario: Scenario = {
       await driver.waitFor(`[...document.querySelectorAll(${JSON.stringify(ITEM)})].some((element) => element.textContent.includes(${JSON.stringify(CHANGE_ICON)}))`);
       await driver.click(ITEM, CHANGE_ICON);
       await driver.waitForElement(PICKER);
+      await driver.waitForElement(`${PICKER} ${EMOJI_GRID}`);
       checkEmoji(await emojiLayout(driver));
       await driver.click(TAB, 'Icons');
       checkIcons(await iconsLayout(driver));
