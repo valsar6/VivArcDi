@@ -122,6 +122,29 @@
   filter: saturate($unloaded-saturation);
 }
 
+#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$tile-minus} {
+  position: absolute;
+  inset-inline-end: $minus-offset;
+  top: 50%;
+  translate: 0 -50%;
+  width: $minus-size;
+  height: $minus-size;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background-color: currentcolor;
+  mask: $minus-glyph center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition;
+}
+
+#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}:hover #{$tile-minus},
+#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}#{$tile-current} #{$tile-minus} {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 #{$root} #{$tiles} {
   @include tint('', $tint-rest);
   @include tint('-hover', $tint-hover);

@@ -7,6 +7,7 @@ import { Logger } from '../../../src/core/support/Logger.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { PinnedFavorites, TILE_SOURCE_ATTRIBUTE } from '../../../src/modules/favorites/PinnedFavorites.js';
 import { TILE_ATTRIBUTE, CURRENT_ATTRIBUTE, DIMMED_ATTRIBUTE } from '../../../src/modules/favorites/FavoritesView.js';
+import { TILE_MINUS_ATTRIBUTE } from '../../../src/modules/favorites/PinnedTileMinus.js';
 import { asDocument, DomDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { SilentSink } from '../../loader/fakes.js';
@@ -65,6 +66,20 @@ const press = (tile: DomNode | undefined): void =>
   tile?.bubble({ type: 'click', target: tile, button: 0, preventDefault: (): void => undefined, stopPropagation: (): void => undefined } as unknown as Event);
 
 const tilesOf = (favorites: PinnedFavorites): DomNode[] => (favorites as unknown as { place(visible: boolean): DomNode }).place(true).children;
+
+const minusOf = (tile: DomNode | undefined): DomNode | undefined =>
+  tile?.children.find((child) => child.hasAttribute(TILE_MINUS_ATTRIBUTE));
+
+const pressMinus = (dom: DomDocument, type: string, target: DomNode): { prevented: boolean; stopped: boolean } => {
+  let prevented = false;
+  let stopped = false;
+  dom.emit(type, {
+    target,
+    preventDefault: (): void => void (prevented = true),
+    stopImmediatePropagation: (): void => void (stopped = true),
+  });
+  return { prevented, stopped };
+};
 
 test('the first pinned tabs of the active workspace become the tiles, by position', () => {
   const tabs = [
@@ -132,6 +147,45 @@ test('loads the own page of an unloaded pinned tile', async (t) => {
   press(tilesOf(favorites)[1]);
   await settle();
   assert.deepEqual(tabs.calls.filter(([call]) => call !== 'query'), [['activate', 2], ['update', 2, { url: ownPage }]]);
+});
+
+test('puts the minus back after the tiles are drawn again', async (t) => {
+  const { favorites, tabs } = setup(t, [pinned(1, 7, { active: true })]);
+  await favorites.start();
+  assert.ok(minusOf(tilesOf(favorites)[0]) !== undefined);
+  tabs.open(pinned(2));
+  await settle();
+  await settle();
+  const tiles = tilesOf(favorites);
+  assert.equal(tiles.length, 2);
+  tiles.forEach((tile) => assert.ok(minusOf(tile) !== undefined));
+  favorites.stop();
+});
+
+test('shows a minus on the tile of a pinned tab', async (t) => {
+  const { favorites } = setup(t, [pinned(1, 7, { active: true }), pinned(2)]);
+  await favorites.start();
+  const tiles = tilesOf(favorites);
+  assert.equal(tiles.length, 2);
+  tiles.forEach((tile) => {
+    const minus = minusOf(tile);
+    assert.ok(minus !== undefined);
+    assert.equal(minus.getAttribute('type'), 'button');
+    assert.equal(minus.getAttribute('aria-label'), 'Unload tab');
+  });
+  favorites.stop();
+});
+
+test('unloads a pinned tab from its tile minus', async (t) => {
+  const { dom, favorites, tabs } = setup(t, [pinned(1, 7, { active: true }), pinned(2)]);
+  await favorites.start();
+  const minus = minusOf(tilesOf(favorites)[1]);
+  assert.ok(minus !== undefined);
+  const pressed = ['pointerdown', 'mousedown', 'click'].map((type) => pressMinus(dom, type, minus));
+  await settle();
+  assert.ok(pressed.every(({ prevented, stopped }) => prevented && stopped));
+  assert.deepEqual(tabs.calls.filter(([name]) => name !== 'query'), [['discard', 2]]);
+  favorites.stop();
 });
 
 test('follows tab changes and never shows more than the maximum', async (t) => {
