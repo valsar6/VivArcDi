@@ -14,6 +14,7 @@ import type { FavoriteLabelStore } from './FavoriteLabels.js';
 import type { TileState } from './FavoriteStates.js';
 import type { Favorite } from './FavoritesFolder.js';
 import { FavoritesView } from './FavoritesView.js';
+import { PinnedTileMinus } from './PinnedTileMinus.js';
 import { TabChanges } from './TabChanges.js';
 import type { TileSource } from './TileSource.js';
 import { UnloadedTabs } from '../../shared/tabs/UnloadedTabs.js';
@@ -46,6 +47,7 @@ export interface PinnedFavoritesDependencies {
 export class PinnedFavorites implements TileSource {
   #deps: PinnedFavoritesDependencies;
   #view: FavoritesView;
+  #tileMinus: PinnedTileMinus;
   #anchor: TabBarAnchor;
   #changes: TabChanges;
   #task: SerialTask;
@@ -74,6 +76,11 @@ export class PinnedFavorites implements TileSource {
       () => document.querySelector(selectors.get('browser')) ?? document.body,
     );
     this.#view.element.setAttribute(TILE_SOURCE_ATTRIBUTE, 'pinned');
+    this.#tileMinus = new PinnedTileMinus({
+      document,
+      grid: (): HTMLElement => this.#view.element,
+      unload: (tabId): void => void this.#unload(tabId),
+    });
     this.#anchor = TabBarAnchor.of(document, selectors.get('tabListHost'));
     this.#changes = new TabChanges(tabs, logger, () => this.#task.request());
     this.#task = new SerialTask(
@@ -120,6 +127,7 @@ export class PinnedFavorites implements TileSource {
   public async start(): Promise<void> {
     this.#changes.start();
     this.#stopLabels = this.#deps.labels.onChange(() => this.#show());
+    this.#tileMinus.start();
     this.#task.request();
     await this.#task.idle();
   }
@@ -132,6 +140,7 @@ export class PinnedFavorites implements TileSource {
     this.#stopLabels = null;
     this.#changes.stop();
     this.place(false);
+    this.#tileMinus.stop();
     this.#view.destroy();
     this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
   }
@@ -170,6 +179,7 @@ export class PinnedFavorites implements TileSource {
 
   #show(): void {
     this.#view.show(this.#tiles.map((favorite) => FavoriteLabels.apply(favorite, this.#deps.labels)));
+    this.#tileMinus.sync();
   }
 
   static #favoriteOf(tab: chrome.tabs.Tab): Favorite {

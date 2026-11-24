@@ -2,6 +2,8 @@
 
 $archive: '[data-vivarcdi-archive]';
 $clear: '[data-vivarcdi-clear]';
+$clear-row: '[data-vivarcdi-clear-row]';
+$clear-line: '[data-vivarcdi-clear-line]';
 $archive-width: 340px;
 $archive-max-height: 70vh;
 $archive-row-height: 44px;
@@ -137,11 +139,34 @@ $clear-height: $separator-gap * 2 + 1px;
   }
 }
 
-#{$root} #{$pinned-last} #{$clear} {
+#{$root} #{$clear-row} {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  z-index: 1;
+  height: 0;
+  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));
+  pointer-events: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 0;
+    border-top: 1px solid var(--vivarcdi-line);
+    opacity: 0;
+  }
+
+  &#{$clear-line}::before {
+    opacity: 1;
+  }
+}
+
+#{$root} #{$clear-row} #{$clear} {
   position: absolute;
   inset-inline: 0;
-  bottom: 0;
-  z-index: 1;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -149,12 +174,12 @@ $clear-height: $separator-gap * 2 + 1px;
   height: $clear-height;
   padding: 0 $gap;
   border: 0;
-  border-top: 1px solid var(--vivarcdi-line);
   background: transparent;
   color: var(--colorFg, inherit);
   font: inherit;
   font-size: 11px;
   opacity: 0;
+  pointer-events: auto;
   cursor: pointer;
   transition: opacity var(--vivarcdi-transition);
 

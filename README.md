@@ -362,7 +362,8 @@ the other tabs. Each workspace has its own pinned tabs.
   the same and there is no back arrow; closing and reopening the tab loads its own page again.
 - The minus at the right end of the row, Cmd/Ctrl+W and the close affordance unload a pinned tab
   instead of closing it. The row stays, dimmed; a click loads its own page. "Close tab" and "Unpin
-  tab" in the menu still close or unpin it.
+  tab" in the menu still close or unpin it. With the Favorites grid on, the same minus sits on the
+  tab's tile.
 - The row's menu has Edit Pinned Page, with Replace Pinned URL with Current and Edit…, to change the
   page it opens first.
 
@@ -682,7 +683,7 @@ well. The active tab and a tab playing audio are never archived.
 The archive opens from the button at the bottom of the tab bar or with Cmd/Ctrl+Shift+A: a search
 field, then the closed tabs grouped by day with favicon, title, host and time. Up and Down move the
 highlight, Enter or a click reopens the tab in its workspace and removes it from the archive, Esc
-closes the panel. Resting the pointer on the line under the pinned tabs shows **Clear**, which
+closes the panel. Resting the pointer on the line above the Today tabs shows **Clear**, which
 archives every Today tab of the workspace except the active one; the panel has the same action.
 
 The archive stays on your machine, in Vivaldi's extension storage.

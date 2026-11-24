@@ -170,7 +170,7 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-3 | THE Clear control SHALL sit outside the native pinned row and its group, so hiding that row SHALL NOT collapse it. | auto: `keeps the Clear control out of the hidden pinned group` |
 | AC-4 | WHEN Vivaldi rebuilds the tab list, THE module SHALL put the Clear control back above the Today tabs and take its clicks. | auto: `puts the Clear control above the Today tabs and takes its clicks` |
 | AC-5 | THE Clear control SHALL be drawn on the separator above the Today tabs. | auto: `draws the Clear bar on the separator above the Today tabs` |
-| AC-6 | WHILE the Favorites grid is on and every pinned row is hidden, THE Clear control SHALL keep a non-zero box above the Today tabs. | manual (a live check once the implementation adds its scenario) |
+| AC-6 | WHILE the Favorites grid is on and every pinned row is hidden, THE Clear control SHALL keep a non-zero box above the Today tabs. | live: `the Clear bar keeps a box above Today with the Favorites grid on` |
 | AC-7 | THE tile of a pinned tab SHALL show a minus, hidden until the tile is hovered or its tab is current. | auto: `shows a minus on the tile of a pinned tab` |
 | AC-8 | WHEN the minus of a pinned tile is clicked, THE module SHALL unload the tab and SHALL NOT close it or open the tile. | auto: `unloads a pinned tab from its tile minus` |
 | AC-9 | WHEN an unloaded pinned tile is opened, THE tab SHALL load its pinned page. | auto: `loads the own page of an unloaded pinned tile` |
@@ -180,9 +180,9 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-13 | WHEN Tore hovers the tile of a pinned tab on Vivaldi 8.3 with the Favorites grid on, the minus SHALL look and sit as on a pinned row, a click SHALL unload the tab, and a click on the dimmed tile SHALL load the pinned page; a Favorite tile SHALL show no minus. | manual |
 | AC-14 | WHEN Tore turns the Favorites grid off on Vivaldi 8.3, the Clear control SHALL stay above the Today tabs and the row minus SHALL unload as before. | manual |
 
-AC-6 is checked by hand until the implementation adds its scenario, named "the Clear bar keeps a box
-above Today with the Favorites grid on"; the criterion then becomes a live check on the lab Vivaldi of
-[046](../046-live-verification/spec.md); on the 8.3 lab it proves the case measured in issue #267.
+The scenario of AC-6 opens a pinned tab and a Today tab with the default Favorites grid on the lab
+Vivaldi of [046](../046-live-verification/spec.md); on the 8.3 lab it proves the case measured in
+issue #267.
 
 ## Out of scope
 
