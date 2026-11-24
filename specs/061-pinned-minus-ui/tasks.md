@@ -33,7 +33,7 @@ after T1. T5 runs last on the code; the live scenario needs T1 and T2.
 
 ## Tasks
 
-- [ ] **T1. The badge on rows and tiles** (TDD). Failing tests first, in `tests/styles/Pinned.test.ts`:
+- [x] **T1. The badge on rows and tiles** (TDD). Failing tests first, in `tests/styles/Pinned.test.ts`:
   `draws the pinned row minus as a badge like Arc` (AC-1) and
   `shows the pinned row minus on hover and on the current row` (AC-3); in
   `tests/styles/Favorites.test.ts`: `draws the pinned tile minus as the same badge` (AC-2),
@@ -42,7 +42,7 @@ after T1. T5 runs last on the code; the live scenario needs T1 and T2.
   radius, size and offset, the masked dash on `::before`, and the unchanged hover/current selectors.
   Then add `_minus.scss` with the shared mixin, change the tokens, apply it in both stylesheets and
   remove the mask from the button itself. Done when `make check` is green.
-- [ ] **T2. The press and the label** (TDD; after T1). Failing tests first in
+- [x] **T2. The press and the label** (TDD; after T1). Failing tests first in
   `tests/modules/pinned/PinnedTabs.test.ts`: `labels the pinned minus as Unload tab` (AC-5),
   `unloads a pinned tab from its minus` (AC-6) and
   `does not start a drag from the pinned row minus` (AC-8); in
@@ -50,7 +50,7 @@ after T1. T5 runs last on the code; the live scenario needs T1 and T2.
   (AC-7) and `does not drag or open a pinned tile from its minus` (AC-9). Add `pointerdown` to the
   listeners `PinnedMinus` swallows; keep the unload path and both labels. Done when `make check` is
   green.
-- [ ] **T3. The minus on folder and link rows** (TDD; after T1; Q-1 option A). Failing tests first
+- [x] **T3. The minus on folder and link rows** (TDD; after T1; Q-1 option A). Failing tests first
   with the verbatim names `shows the link row minus on hover and on the current link` (AC-10),
   `unloads a link tab from its minus` (AC-11) and
   `unloads the link tabs of a folder from its minus` (AC-12) in `tests/modules/folders/`, plus the
@@ -66,7 +66,7 @@ after T1. T5 runs last on the code; the live scenario needs T1 and T2.
   `live: the pinned minus is a badge on the tile of a pinned tab`. Run `npm run live -- --only 061`
   only with Tore's agreement on a machine with Vivaldi and a desktop session; otherwise leave the
   scenario to Tore's manual run. Done when the scenario passes or Tore has run it.
-- [ ] **T5. Docs and version** (lead; after T3 and T4). Amend 009/FR-12 so an open link row shows the
+- [x] **T5. Docs and version** (lead; after T3 and T4). Amend 009/FR-12 so an open link row shows the
   unloading minus instead of a closing `×`; name the badge, the folder/link behavior and the live
   check in `docs/manual/tab-bar.md` and `README.md`; bump the minor version read from `origin/main`
   in the three version files. Done when `make check` is green.

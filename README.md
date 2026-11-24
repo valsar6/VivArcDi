@@ -360,10 +360,11 @@ the other tabs. Each workspace has its own pinned tabs.
 - A pinned tab remembers the page it was pinned with, its own page. Unpinning forgets it.
 - Following a link inside the pinned tab changes what it shows, not its own page. The favicon stays
   the same and there is no back arrow; closing and reopening the tab loads its own page again.
-- The minus at the right end of the row, Cmd/Ctrl+W and the close affordance unload a pinned tab
-  instead of closing it. The row stays, dimmed; a click loads its own page. "Close tab" and "Unpin
-  tab" in the menu still close or unpin it. With the Favorites grid on, the same minus sits on the
-  tab's tile.
+- The rounded minus badge at the right end of the row, shown on hover or on the current row, Cmd/Ctrl+W
+  and the close affordance unload a pinned tab instead of closing it. The row stays, dimmed; a click
+  loads its own page. "Close tab" and "Unpin tab" in the menu still close or unpin it. With the
+  Favorites grid on, the same minus sits on the tab's tile. The folder and link rows of the bookmark
+  folders use the same badge to unload their tabs without removing a bookmark.
 - The row's menu has Edit Pinned Page, with Replace Pinned URL with Current and Edit…, to change the
   page it opens first.
 
