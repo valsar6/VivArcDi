@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
-| Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. If Q-1 is answered A, it replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus and leaves the other close routes of 009/FR-15 as they are. |
+| Approved | 2026-11-24 |
+| Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. It replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus for the unload; the other close routes of 009/FR-15 stay. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -230,24 +230,13 @@ stay the manual checks of AC-15 and AC-16.
 
 ## Open questions
 
-- [ ] **Q-1. What a press does on the rows of a Favorites folder and a Favorites link.** The
-  recording shows the minus on both, but VivArcDi draws those rows itself
-  ([FolderRowElement.ts](../../src/modules/folders/view/FolderRowElement.ts)), and a link row already
-  has a hover `×` that closes its tab for real (009/FR-12, FR-15), while a folder row has no tab.
-  Two candidates.
-  - **A. The same minus on both, and it unloads.** The link row's `×` becomes the minus: a press
-    unloads its tab, the row stays with its dimmed unloaded look, and the bookmark stays. A folder
-    row shows the minus on hover while it has an open link tab, and a press unloads the tabs of the
-    link rows below it, keeping the folder and the bookmarks. Closing for real stays Cmd/Ctrl+W and
-    Vivaldi's own close, which 009/FR-15 keeps. Matches the recording and gives every row one
-    gesture.
-  - **B. The minus on the link row only, beside its `×`.** The `×` keeps closing (009/FR-15) and the
-    folder rows keep no control. A folder row has no tab to unload, so the recording's folder-row
-    minus is not reproduced, and two different controls sit on one link row.
-  Recommendation: A, because the recording shows one control on both rows, the unload model is the
-  one 059/FR-5 and 060/FR-5 give the pinned rows and tiles, and a press never removes a bookmark or
-  a folder. If Tore chooses B, AC-10 and AC-11 shrink to the link row beside its `×`, AC-12 and the
-  folder-row parts of FR-6 and AC-16 go, and 009 keeps its close button unchanged.
+- [x] **Q-1. What a press does on the rows of a Favorites folder and a Favorites link.** Tore chose
+  **A** on 2026-11-24: the link row's `×` becomes the minus and a press unloads its tab, the row stays
+  with its dimmed unloaded look and the bookmark stays. A folder row shows the minus on hover while it
+  has an open link tab, and a press unloads the tabs of the link rows below it, keeping the folder and
+  the bookmarks. Closing for real stays Cmd/Ctrl+W and Vivaldi's own close (009/FR-15). This matches
+  the recording and gives every row one gesture; option B, keeping the `×` beside a link-row minus and
+  no control on folders, is rejected.
 
 ## References
 
