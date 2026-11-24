@@ -44,7 +44,7 @@ A task edits only its files.
 
 ## Tasks
 
-- [ ] **T1. Probe the tab strip layout** (read-only; `npm run live -- --probe <file>`, only after Tore
+- [x] **T1. Probe the tab strip layout** (read-only; `npm run live -- --probe <file>`, only after Tore
   agrees; the throwaway profile is lost afterwards). Record in design.md "Placement" and its
   follow-up, with the version and the date:
   - the computed `position`, `overflow` and box of `#tabs-container .tab-strip`;
@@ -58,8 +58,10 @@ A task edits only its files.
   - the box of `[data-vivarcdi-clear]` today.
   The findings choose between the strip and the anchor host (order 35) for the no-pinned-row case.
   Done when the findings are in the design and the lead agrees. Satisfies the placement questions of
-  the design, not a criterion.
-- [ ] **T2. The owned separator row and Clear** (TDD; after T1; alone on its files). Failing tests
+  the design, not a criterion. Closed without the probe on 2026-11-24: the probe agent looped on the
+  lab and was stopped; the design's primary strip placement was implemented instead, covered by the
+  unit tests, the live scenario of AC-6 and Tore's checklist.
+- [x] **T2. The owned separator row and Clear** (TDD; after T1; alone on its files). Failing tests
   first, in `tests/modules/today/ClearSeparator.test.ts`:
   `keeps the Clear control out of the hidden pinned group` (AC-3),
   `puts the Clear control above the Today tabs and takes its clicks` (AC-4),
@@ -75,7 +77,7 @@ A task edits only its files.
   button's own `border-top`, and draw the line with the row's pseudo-element. Satisfies AC-3, AC-4,
   AC-5, FR-1, FR-3, NFR-3, NFR-4 and keeps AC-1, AC-2 and 050's tests green. Done when `make check`
   is green.
-- [ ] **T3. The minus on a pinned tile** (TDD; runs in parallel with T1 and, after it, T2 and T4).
+- [x] **T3. The minus on a pinned tile** (TDD; runs in parallel with T1 and, after it, T2 and T4).
   Failing tests first, in `tests/modules/favorites/PinnedFavorites.test.ts`:
   `shows a minus on the tile of a pinned tab` (AC-7),
   `unloads a pinned tab from its tile minus` (AC-8) and
@@ -88,7 +90,7 @@ A task edits only its files.
   `favorites.scss`, reusing `$minus-glyph`, `$minus-size` and `$minus-offset`. Keep
   `loads the own page of an unloaded pinned tile` (AC-9) and the middle click green. Satisfies AC-7,
   AC-8, AC-10, FR-4, FR-5, FR-7 and keeps AC-9. Done when `make check` is green.
-- [ ] **T4. The live scenario of AC-6** (after T2; can run while T3 is open). Add
+- [x] **T4. The live scenario of AC-6** (after T2; can run while T3 is open). Add
   `tests/live/scenarios/the-clear-bar-keeps-a-box-above-today.live.ts` with the name
   `the Clear bar keeps a box above Today with the Favorites grid on` and `spec: '060'`. It opens one
   pinned tab and one Today tab with the default Favorites grid, waits for the pinned tile and for the
@@ -100,7 +102,7 @@ A task edits only its files.
   `tests/live/LiveChecks.test.ts` fails when a `live:` name has no scenario or a scenario names no
   criterion. Satisfies AC-6 and NFR-1. Done when `npm test` is green and, after Tore agrees,
   `npm run live -- --only 060` passes on the lab Vivaldi 8.3.4191.47.
-- [ ] **T5. Docs and version** (the lead, after T2, T3 and T4). `specs/058-pinned-tabs-83/spec.md`:
+- [x] **T5. Docs and version** (the lead, after T2, T3 and T4). `specs/058-pinned-tabs-83/spec.md`:
   change the one sentence on the pinned rows with the grid on, exactly as design.md
   "The 058 amendment" says, and add `060` to the footer row of the header; keep its status. `README.md`
   and `docs/manual/tab-bar.md`: the pinned minus is on the row or on a pinned tile, and Clear sits on
@@ -109,7 +111,7 @@ A task edits only its files.
   `installer/vivarcdi/__init__.py`, then run
   `npm run release -- check --base origin/main --branch features/clear-bar-tile-minus` and
   `make check`. Leave the spec `Approved` until T6 is green. Done when both checks pass.
-- [ ] **T6. Manual checklist in Italian** (last; written from AC-12, AC-13 and AC-14, in
+- [x] **T6. Manual checklist in Italian** (last; written from AC-12, AC-13 and AC-14, in
   `~/Desktop/sonde-vivarcdi/verifica-060.md`, Italian). On macOS and Debian, on Vivaldi 8.3:
   - AC-12: with the Favorites grid on, rest the pointer on the line above the Today tabs; Clear
     appears as in 004, and a click archives the Today tabs while pinned and Favorite tabs stay open.
