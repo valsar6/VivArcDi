@@ -33,6 +33,7 @@ export class PinnedMinus {
   #buttons = new Map<Element, HTMLElement>();
   #unwatch: (() => void) | null = null;
   #onClick = (event: Event): void => this.#handle(event);
+  #onPointerDown = (event: Event): void => this.#swallow(event);
   #onMouseDown = (event: Event): void => this.#swallow(event);
 
   /**
@@ -53,6 +54,7 @@ export class PinnedMinus {
   public start(): void {
     const { document, selectors } = this.#deps;
     document.addEventListener('click', this.#onClick, true);
+    document.addEventListener('pointerdown', this.#onPointerDown, true);
     document.addEventListener('mousedown', this.#onMouseDown, true);
     const browser = document.querySelector<Element>(selectors.get('browser'));
     browser?.setAttribute(PINNED_UNLOAD_ATTRIBUTE, '');
@@ -80,6 +82,7 @@ export class PinnedMinus {
    */
   public stop(): void {
     this.#deps.document.removeEventListener('click', this.#onClick, true);
+    this.#deps.document.removeEventListener('pointerdown', this.#onPointerDown, true);
     this.#deps.document.removeEventListener('mousedown', this.#onMouseDown, true);
     this.#unwatch?.();
     this.#unwatch = null;
