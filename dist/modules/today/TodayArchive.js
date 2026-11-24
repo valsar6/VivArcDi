@@ -7,7 +7,7 @@ import { ArchivePanelView } from "./ArchivePanelView.js";
 import { ArchiveRestorer } from "./ArchiveRestorer.js";
 import { ArchiveStore } from "./ArchiveStore.js";
 import { ArchiveSweeper, repeatEvery } from "./ArchiveSweeper.js";
-import { ClearButton } from "./ClearButton.js";
+import { ClearSeparator } from "./ClearSeparator.js";
 import { TODAY_ARCHIVE_OPTIONS } from "./TodayArchiveOptions.js";
 const HOUR_MS = 36e5;
 const SYSTEM_CLOCK = { now: () => Date.now(), repeat: repeatEvery };
@@ -89,7 +89,7 @@ class TodayArchive extends Module {
     this.#stops.push(() => panel.close());
     const toggle = () => this.#toggle(context);
     const frames = this.#clock.frames === void 0 ? {} : { timing: this.#clock.frames };
-    const clear = new ClearButton(document, browser, () => void this.#clear(), frames);
+    const clear = new ClearSeparator({ document, selectors, onClear: () => void this.#clear(), logger, ...frames });
     this.#startPart(clear);
     if (selectors.has("tabsContainer")) {
       this.#startPart(new ArchiveButton(document, selectors.get("tabsContainer"), toggle, { root: browser, ...frames }));

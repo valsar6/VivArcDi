@@ -102,6 +102,29 @@
   filter: saturate(0.4);
 }
 
+#browser[data-vivarcdi-active] [data-vivarcdi-tiles][data-vivarcdi-tile-source=pinned] [data-vivarcdi-tile-minus] {
+  position: absolute;
+  inset-inline-end: 4px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background-color: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.500 7.250h11v1.500h-11z'/%3E%3C/svg%3E") center/contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+#browser[data-vivarcdi-active] [data-vivarcdi-tiles][data-vivarcdi-tile-source=pinned] [data-vivarcdi-tile]:hover [data-vivarcdi-tile-minus],
+#browser[data-vivarcdi-active] [data-vivarcdi-tiles][data-vivarcdi-tile-source=pinned] [data-vivarcdi-tile][data-vivarcdi-current] [data-vivarcdi-tile-minus] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 #browser[data-vivarcdi-active] [data-vivarcdi-tiles] {
   --vivarcdi-tile-bg: color-mix(in srgb, var(--colorFg, #fff) 8%, transparent);
   --vivarcdi-tile-bg-hover: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);

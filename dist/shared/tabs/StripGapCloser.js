@@ -1,6 +1,7 @@
 import { FrameTask } from "../../core/support/FrameTask.js";
 import { GapShifts } from "./GapShifts.js";
 import { HIDDEN_ATTRIBUTE } from "./HiddenAttribute.js";
+import { OWN_ROW_ATTRIBUTE } from "./TabBarMarks.js";
 import { Logger } from "../../core/support/Logger.js";
 import { StripDragWatch } from "./StripDragWatch.js";
 const SHIFT_PROPERTY = "--vivarcdi-gap-shift";
@@ -98,7 +99,7 @@ class StripGapCloser {
       this.#clear();
       return;
     }
-    const slots = [...strip.children];
+    const slots = [...strip.children].filter((child) => !child.hasAttribute(OWN_ROW_ATTRIBUTE));
     const pinned = this.#pinnedVisible();
     const separators = slots.map((slot) => !pinned && this.#isSeparator(slot));
     slots.forEach((slot, index) => this.#collapse(slot, separators[index] ?? false));

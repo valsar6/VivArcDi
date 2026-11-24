@@ -7,6 +7,7 @@ import { OwnPage } from "../../shared/tabs/OwnPage.js";
 import { GRID_ORDER } from "./BookmarkFavorites.js";
 import { FavoriteLabels } from "./FavoriteLabels.js";
 import { FavoritesView } from "./FavoritesView.js";
+import { PinnedTileMinus } from "./PinnedTileMinus.js";
 import { TabChanges } from "./TabChanges.js";
 import { UnloadedTabs } from "../../shared/tabs/UnloadedTabs.js";
 const TILE_SOURCE_ATTRIBUTE = "data-vivarcdi-tile-source";
@@ -15,6 +16,7 @@ const PINNED_GRID_ORDER = GRID_ORDER + 1;
 class PinnedFavorites {
   #deps;
   #view;
+  #tileMinus;
   #anchor;
   #changes;
   #task;
@@ -42,6 +44,11 @@ class PinnedFavorites {
       () => document.querySelector(selectors.get("browser")) ?? document.body
     );
     this.#view.element.setAttribute(TILE_SOURCE_ATTRIBUTE, "pinned");
+    this.#tileMinus = new PinnedTileMinus({
+      document,
+      grid: () => this.#view.element,
+      unload: (tabId) => void this.#unload(tabId)
+    });
     this.#anchor = TabBarAnchor.of(document, selectors.get("tabListHost"));
     this.#changes = new TabChanges(tabs, logger, () => this.#task.request());
     this.#task = new SerialTask(
@@ -80,6 +87,7 @@ class PinnedFavorites {
   async start() {
     this.#changes.start();
     this.#stopLabels = this.#deps.labels.onChange(() => this.#show());
+    this.#tileMinus.start();
     this.#task.request();
     await this.#task.idle();
   }
@@ -91,6 +99,7 @@ class PinnedFavorites {
     this.#stopLabels = null;
     this.#changes.stop();
     this.place(false);
+    this.#tileMinus.stop();
     this.#view.destroy();
     this.#deps.hiddenTabs.clear(HIDDEN_OWNER);
   }
@@ -126,6 +135,7 @@ class PinnedFavorites {
   }
   #show() {
     this.#view.show(this.#tiles.map((favorite) => FavoriteLabels.apply(favorite, this.#deps.labels)));
+    this.#tileMinus.sync();
   }
   static #favoriteOf(tab) {
     const url = tab.url ?? tab.pendingUrl ?? "";
