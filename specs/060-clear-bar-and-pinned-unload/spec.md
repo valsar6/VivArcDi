@@ -203,7 +203,8 @@ lab it proves the case measured in issue #267.
 
 ## Open questions
 
-- [ ] **Q-1. Where the Clear control lives.** Two candidates.
+- [x] **Q-1. Where the Clear control lives.** Chosen: **A**, a VivArcDi-owned separator row above
+  the Today tabs (Tore, 2026-11-24). Two candidates.
   - **A. A VivArcDi-owned separator row above the Today tabs.** The control sits on the line where
     004 puts it, outside the native pinned row, and the row also draws the line when every pinned
     row is hidden. Keeps Arc's placement and the manual's wording, works in both pinned layouts,
@@ -215,7 +216,8 @@ lab it proves the case measured in issue #267.
   Recommendation: A, because it fixes the cause (an owned row outside the hidden group) and keeps
   the control where users and the manual expect it; fall back to B only if the design cannot anchor
   the row without a second line.
-- [ ] **Q-2. How an unload affordance reaches a pinned tab whose row is hidden.** Two candidates.
+- [x] **Q-2. How an unload affordance reaches a pinned tab whose row is hidden.** Chosen: **A**, the
+  minus on the pinned tile (Tore, 2026-11-24). Two candidates.
   - **A. The minus on the pinned tile**, with the glyph, size and behavior of 059 AC-15, on hover or
     when the tile is current. One click, the same gesture as the row, and the unload action already
     exists in [PinnedFavorites.ts](../../src/modules/favorites/PinnedFavorites.ts) lines 206-212.
@@ -225,7 +227,8 @@ lab it proves the case measured in issue #267.
     the gesture would differ from the row's.
   Recommendation: A, for parity with Arc and 059 and for the smaller surface; B only if a minus on a
   tile proves unreadable in the design's probe.
-- [ ] **Q-3. Hover or always visible.** Recommendation: keep 004's hover behavior on the separator,
+- [x] **Q-3. Hover or always visible.** Chosen: keep 004's hover behavior on the separator (Tore,
+  2026-11-24),
   hidden at rest (opacity 0), so the sidebar stays calm; the live check proves the box, and the
   manual check proves the hover and the look. An always-visible Clear is not this spec's change.
 
