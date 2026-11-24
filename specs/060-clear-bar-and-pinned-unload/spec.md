@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-24 |
 | Supersedes | Nothing. [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and AC-7 keep their user-visible placement, hover and archive; [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 keep the row minus. This spec fixes where the Clear control sits in the DOM and adds the same minus to a pinned tile. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -180,10 +180,9 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-13 | WHEN Tore hovers the tile of a pinned tab on Vivaldi 8.3 with the Favorites grid on, the minus SHALL look and sit as on a pinned row, a click SHALL unload the tab, and a click on the dimmed tile SHALL load the pinned page; a Favorite tile SHALL show no minus. | manual |
 | AC-14 | WHEN Tore turns the Favorites grid off on Vivaldi 8.3, the Clear control SHALL stay above the Today tabs and the row minus SHALL unload as before. | manual |
 
-AC-6 is checked by hand in this Draft. When the implementation adds its scenario, named
-"the Clear bar keeps a box above Today with the Favorites grid on", AC-6 becomes a live check on the
-lab Vivaldi of [046](../046-live-verification/spec.md); on the 8.3 lab it proves the case measured in
-issue #267.
+AC-6 is checked by hand until the implementation adds its scenario, named "the Clear bar keeps a box
+above Today with the Favorites grid on"; the criterion then becomes a live check on the lab Vivaldi of
+[046](../046-live-verification/spec.md); on the 8.3 lab it proves the case measured in issue #267.
 
 ## Out of scope
 
@@ -205,8 +204,8 @@ issue #267.
 
 ## Open questions
 
-- [x] **Q-1. Where the Clear control lives.** Chosen: **A**, a VivArcDi-owned separator row above
-  the Today tabs (Tore, 2026-11-24). Two candidates.
+- [x] **Q-1. Where the Clear control lives.** Answered (Tore, 2026-11-24): **A**, a VivArcDi-owned
+  separator row above the Today tabs. Two candidates.
   - **A. A VivArcDi-owned separator row above the Today tabs.** The control sits on the line where
     004 puts it, outside the native pinned row, and the row also draws the line when every pinned
     row is hidden. Keeps Arc's placement and the manual's wording, works in both pinned layouts,
@@ -218,8 +217,8 @@ issue #267.
   Recommendation: A, because it fixes the cause (an owned row outside the hidden group) and keeps
   the control where users and the manual expect it; fall back to B only if the design cannot anchor
   the row without a second line.
-- [x] **Q-2. How an unload affordance reaches a pinned tab whose row is hidden.** Chosen: **A**, the
-  minus on the pinned tile (Tore, 2026-11-24). Two candidates.
+- [x] **Q-2. How an unload affordance reaches a pinned tab whose row is hidden.** Answered (Tore,
+  2026-11-24): **A**, the minus on the pinned tile. Two candidates.
   - **A. The minus on the pinned tile**, with the glyph, size and behavior of 059 AC-15, on hover or
     when the tile is current. One click, the same gesture as the row, and the unload action already
     exists in [PinnedFavorites.ts](../../src/modules/favorites/PinnedFavorites.ts) lines 206-212.
@@ -229,10 +228,9 @@ issue #267.
     the gesture would differ from the row's.
   Recommendation: A, for parity with Arc and 059 and for the smaller surface; B only if a minus on a
   tile proves unreadable in the design's probe.
-- [x] **Q-3. Hover or always visible.** Chosen: keep 004's hover behavior on the separator (Tore,
-  2026-11-24),
-  hidden at rest (opacity 0), so the sidebar stays calm; the live check proves the box, and the
-  manual check proves the hover and the look. An always-visible Clear is not this spec's change.
+- [x] **Q-3. Hover or always visible.** Answered (Tore, 2026-11-24): keep 004's hover behavior on the
+  separator, hidden at rest (opacity 0), so the sidebar stays calm; the live check proves the box, and
+  the manual check proves the hover and the look. An always-visible Clear is not this spec's change.
 
 ## References
 
