@@ -2,14 +2,15 @@ import { LinkId } from '../../../shared/links/LinkId.js';
 import { notifyRowsDrawn } from '../../../shared/links/InPlaceEditor.js';
 import { EDIT_ATTRIBUTE, FolderNameEditor } from '../editing/FolderNameEditor.js';
 import type { Row } from './FolderRows.js';
-import { CLOSE_ATTRIBUTE, FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from './FolderRowElement.js';
+import { FolderMinus } from './FolderMinus.js';
+import { FolderRowElement, ICON_CLASS, LIVE_FOLDER_ATTRIBUTE } from './FolderRowElement.js';
 import { LinkIcon } from '../../../shared/links/LinkIcon.js';
 import { LEAVING_ATTRIBUTE, RowTransition } from './RowTransition.js';
 
 export interface SectionHandlers {
   onFolder: (folderId: string) => void;
   onLink: (link: LinkTarget) => void;
-  onClose: (tabId: number) => void;
+  onUnload: (tabIds: number[]) => void;
   onRename: (folderId: string, name: string) => void;
   onMenu: (virtualId: string, x: number, y: number) => void;
 }
@@ -54,10 +55,11 @@ export class FolderSectionView {
    * a folder row can be edited in place. A single click on a folder row waits for the double click
    * time, so that a double click edits the name and does not toggle the folder. A live folder
    * row has its own icon and a warning mark, a right click on it or on one of its rows reports the point for its menu,
-   * and a link row with a subtitle shows it under the title.
+   * and a link row with a subtitle shows it under the title. A press on a minus unloads the tabs it
+   * stands for and never opens or toggles its row.
    *
    * @param document The browser window document.
-   * @param handlers What a click on a folder row, on a link row and on the close button of a link row does, what a new name does, and what a right click on a live folder or one of its rows does.
+   * @param handlers What a click on a folder row, on a link row and on the minuses does, what a new name does, and what a right click on a live folder or one of its rows does.
    * @param timers Timers, replaceable in tests.
    */
   constructor(document: Document, handlers: SectionHandlers, timers: ViewTimers = defaultTimers) {
@@ -68,6 +70,8 @@ export class FolderSectionView {
     this.#elements = new FolderRowElement(document, this.#editor);
     this.#element = document.createElement('div');
     this.#element.setAttribute('data-vivarcdi-folders', '');
+    this.#element.addEventListener('pointerdown', (event) => FolderMinus.swallow(event));
+    this.#element.addEventListener('mousedown', (event) => FolderMinus.swallow(event));
     this.#element.addEventListener('click', (event) => this.#click(event));
     this.#element.addEventListener('dblclick', (event) => this.#doubleClick(event));
     this.#element.addEventListener('contextmenu', (event) => this.#contextMenu(event as MouseEvent), true);
@@ -151,7 +155,7 @@ export class FolderSectionView {
     if (row.kind === 'link') {
       this.#links.set(row.id, { target: { id: row.id, url: row.url, key: row.key }, tabId: row.tab?.tabId });
     }
-    return this.#elements.create(row);
+    return this.#elements.create(row, FolderMinus.hasOpenLinks(this.#rows, row));
   }
 
   #click(event: Event): void {
@@ -160,8 +164,13 @@ export class FolderSectionView {
     if (row === null || target?.closest(`[${EDIT_ATTRIBUTE}]`) != null) {
       return;
     }
-    if (target?.closest(`[${CLOSE_ATTRIBUTE}]`) !== null) {
-      this.#close(row);
+    if (FolderMinus.isMinus(target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const ids = FolderMinus.tabIds(this.#rows, row, this.#links);
+      if (ids.length > 0) {
+        this.#handlers.onUnload(ids);
+      }
     } else {
       this.#open(row);
     }
@@ -233,13 +242,6 @@ export class FolderSectionView {
     if (this.#toggle !== null) {
       this.#timers.clear(this.#toggle);
       this.#toggle = null;
-    }
-  }
-
-  #close(row: HTMLElement): void {
-    const tabId = this.#links.get(row.getAttribute('data-vivarcdi-link-id') ?? '')?.tabId;
-    if (tabId !== undefined) {
-      this.#handlers.onClose(tabId);
     }
   }
 }
