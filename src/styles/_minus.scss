@@ -1,0 +1,30 @@
+@use 'tokens' as *;
+
+@mixin minus-badge {
+  position: absolute;
+  inset-inline-end: $minus-offset;
+  top: 50%;
+  translate: 0 -50%;
+  box-sizing: border-box;
+  width: $minus-badge-size;
+  height: $minus-badge-size;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  border-radius: $minus-badge-radius;
+  background-color: color-mix(in srgb, var(--colorFg, #fff) $minus-badge-tint, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    width: $minus-size;
+    height: $minus-size;
+    margin: auto;
+    background-color: currentcolor;
+    content: '';
+    mask: $minus-glyph center / contain no-repeat;
+  }
+}

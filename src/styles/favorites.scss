@@ -1,4 +1,5 @@
 @use 'tokens' as *;
+@use 'minus' as *;
 
 @mixin tint($name, $percent) {
   --vivarcdi-tile-bg#{$name}: color-mix(in srgb, var(--colorFg, #fff) #{$percent}, transparent);
@@ -123,20 +124,7 @@
 }
 
 #{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$tile-minus} {
-  position: absolute;
-  inset-inline-end: $minus-offset;
-  top: 50%;
-  translate: 0 -50%;
-  width: $minus-size;
-  height: $minus-size;
-  padding: 0;
-  border: 0;
-  appearance: none;
-  background-color: currentcolor;
-  mask: $minus-glyph center / contain no-repeat;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity $transition;
+  @include minus-badge;
 }
 
 #{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}:hover #{$tile-minus},
