@@ -3,6 +3,7 @@ import type { FrameTiming } from '../../core/support/FrameTask.js';
 import { GapShifts } from './GapShifts.js';
 import type { GapSlot } from './GapShifts.js';
 import { HIDDEN_ATTRIBUTE } from './HiddenAttribute.js';
+import { OWN_ROW_ATTRIBUTE } from './TabBarMarks.js';
 import { Logger } from '../../core/support/Logger.js';
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
 import { StripDragWatch } from './StripDragWatch.js';
@@ -118,7 +119,7 @@ export class StripGapCloser {
       this.#clear();
       return;
     }
-    const slots = [...strip.children] as HTMLElement[];
+    const slots = ([...strip.children] as HTMLElement[]).filter((child) => !child.hasAttribute(OWN_ROW_ATTRIBUTE));
     const pinned = this.#pinnedVisible();
     const separators = slots.map((slot) => !pinned && this.#isSeparator(slot));
     slots.forEach((slot, index) => this.#collapse(slot, separators[index] ?? false));

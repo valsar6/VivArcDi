@@ -4,15 +4,10 @@ import { TabData } from '../../../src/core/tabs/TabData.js';
 import { ArchiveButton } from '../../../src/modules/today/ArchiveButton.js';
 import { ARCHIVE_CONSOLE_PREFIX, parseArchiveMessage } from '../../../src/modules/today/ArchiveMessage.js';
 import { ArchiveRestorer } from '../../../src/modules/today/ArchiveRestorer.js';
-import { ClearButton } from '../../../src/modules/today/ClearButton.js';
 import { asDocument } from '../../core/dom.js';
-import type { DomNode } from '../../core/dom.js';
 import { immediateFrames } from '../folders/fakes.js';
-import { event } from '../pinned/fakes.js';
 import { silentLogger } from '../reopen/fakes.js';
 import { NOW, TodayDocument, entry } from './fakes.js';
-
-const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
 function watched(): { watch: (target: Node, onChange: () => void) => () => void; change: () => void; count: () => number } {
   const listeners = new Set<() => void>();
@@ -64,38 +59,6 @@ test('restores an entry in its workspace and removes it from the archive', async
   const failing = new ArchiveRestorer({ open: async (): Promise<chrome.tabs.Tab> => Promise.reject(new Error('no')) }, { remove: (chosen): number => removed.push(chosen) }, silentLogger());
   await failing.restore(archived);
   assert.equal(removed.length, 1);
-});
-
-test('puts the Clear button back in the separator row and takes its clicks', async () => {
-  const dom = new TodayDocument();
-  const rows = new Map<string, DomNode | null>([['[data-vivarcdi-pinned-last]', dom.list]]);
-  dom.querySelector = ((selector: string): DomNode | null => rows.get(selector) ?? null) as typeof dom.querySelector;
-  const watcher = watched();
-  const cleared: number[] = [];
-  const button = new ClearButton(asDocument(dom), dom.parent as unknown as Node, () => cleared.push(1), { watch: watcher.watch, timing: immediateFrames });
-  button.start();
-  const clear = dom.list.children.at(-1);
-  assert.ok(clear);
-  assert.ok(clear.hasAttribute('data-vivarcdi-clear'));
-  const other = dom.createElement('div');
-  dom.parent.append(other);
-  rows.set('[data-vivarcdi-pinned-last]', other);
-  watcher.change();
-  await settle();
-  assert.equal(other.children.at(-1), clear);
-  const press = dom.listeners.get('mousedown')?.[0];
-  const down = event('mousedown', { target: clear });
-  press?.(down as unknown as Event);
-  assert.equal(down.stopped, true);
-  const click = event('click', { target: clear });
-  dom.listeners.get('click')?.forEach((listener) => listener(click as unknown as Event));
-  assert.deepEqual(cleared, [1]);
-  dom.listeners.get('click')?.forEach((listener) => listener(event('click', { target: other }) as unknown as Event));
-  assert.deepEqual(cleared, [1]);
-  button.stop();
-  assert.equal(clear.parentElement, null);
-  assert.equal(watcher.count(), 0);
-  assert.equal([...dom.listeners.values()].flat().length, 0);
 });
 
 test('keeps the archive footer at the end of the tab container', () => {

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HIDDEN_ATTRIBUTE } from '../../../src/shared/tabs/HiddenTabMarker.js';
+import { OWN_ROW_ATTRIBUTE } from '../../../src/shared/tabs/TabBarMarks.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { StripGapCloser } from '../../../src/shared/tabs/StripGapCloser.js';
@@ -249,6 +250,19 @@ test('reads the offsets from the slot inside a wrapper', () => {
   closer.request();
   frameRun();
   assert.deepEqual([slots[0]?.values.has(SHIFT), slots[1]?.values.get(SHIFT), frame.values.get('max-height')], [false, '40px', '80px']);
+});
+
+test('ignores the row that is not a slot', () => {
+  const own = new FakeElement();
+  own.attributes.add(OWN_ROW_ATTRIBUTE);
+  const { closer, frame, frameRun, slots } = setUp([slot(0, 40, true), own, slot(40, 40)]);
+  closer.request();
+  frameRun();
+  assert.deepEqual(
+    slots.map((node) => node.values.get(SHIFT)),
+    [undefined, undefined, '40px'],
+  );
+  assert.equal(frame.values.get('max-height'), '80px');
 });
 
 test('counts a pinned tab inside a collapsed group as not visible', () => {

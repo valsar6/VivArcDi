@@ -11,7 +11,7 @@ import { ArchiveStore } from './ArchiveStore.js';
 import type { ArchiveEntry } from './ArchiveStore.js';
 import { ArchiveSweeper, repeatEvery } from './ArchiveSweeper.js';
 import type { RepeatTimer } from './ArchiveSweeper.js';
-import { ClearButton } from './ClearButton.js';
+import { ClearSeparator } from './ClearSeparator.js';
 import { TODAY_ARCHIVE_OPTIONS } from './TodayArchiveOptions.js';
 import type { TodayArchiveOptions } from './TodayArchiveOptions.js';
 
@@ -110,7 +110,7 @@ export class TodayArchive extends Module<TodayArchiveOptions> {
     this.#stops.push(() => panel.close());
     const toggle = (): void => this.#toggle(context);
     const frames = this.#clock.frames === undefined ? {} : { timing: this.#clock.frames };
-    const clear = new ClearButton(document, browser, () => void this.#clear(), frames);
+    const clear = new ClearSeparator({ document, selectors, onClear: (): void => void this.#clear(), logger, ...frames });
     this.#startPart(clear);
     if (selectors.has('tabsContainer')) {
       this.#startPart(new ArchiveButton(document, selectors.get('tabsContainer'), toggle, { root: browser, ...frames }));
