@@ -48,9 +48,9 @@ the 8.1 selector file. Other versions stay untouched until they get a
 
 ## Before and after
 
-![Stock Vivaldi and the same page with VivArcDi alternate every three seconds](docs/manual/images/vivarcdi/before-after.gif)
+![Stock Vivaldi and the same page with VivArcDi alternate every two seconds; with VivArcDi the three Favorites tiles and the workspace folders take the place of the tab strip](docs/manual/images/vivarcdi/before-after.gif)
 
-The same page in stock Vivaldi and with VivArcDi. The recording starts with stock Vivaldi.
+The same page in stock Vivaldi and with VivArcDi, where the Favorites tiles and the workspace folders take the place of the tab strip. The recording starts with stock Vivaldi.
 
 ## Download
 

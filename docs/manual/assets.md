@@ -11,7 +11,7 @@ a real Vivaldi, and the few that still have to be made.
 |---|---|---|---|
 | `images/diagrams/feature-map.svg` | Diagram | Available, in progress and proposed features | [Manual](README.md) |
 | `images/diagrams/how-it-works.svg` | Diagram | Install, files in Vivaldi, start, re-apply after updates | [Manual](README.md) |
-| `images/vivarcdi/before-after.gif` | Recording | Stock Vivaldi and the same page with VivArcDi alternate | [Manual](README.md), [README](../../README.md) |
+| `images/vivarcdi/before-after.gif` | Recording | Stock Vivaldi and the same page with VivArcDi, with its Favorites tiles and workspace folders, alternate | [Manual](README.md), [README](../../README.md) |
 | `images/vivarcdi/tab-bar-tour.gif` | Recording | The tab bar at rest, then hovering a Favorite, a folder and a pinned tab | [Manual](README.md), [Tab bar](tab-bar.md) |
 | `images/vivarcdi/favorites.gif` | Recording | Three tiles clicked, one unloaded with a middle click, then loaded again | [README](../../README.md), [Tab bar](tab-bar.md#favorites) |
 | `images/vivarcdi/folders.gif` | Recording | A folder opened, a link clicked, the folder closed with the link row below it | [Tab bar](tab-bar.md#folders) |
