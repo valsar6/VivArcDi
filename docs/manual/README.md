@@ -11,9 +11,9 @@ have the exact behavior.
 
 ## Before and after
 
-![Stock Vivaldi and the same page with VivArcDi alternate every three seconds](images/vivarcdi/before-after.gif)
+![Stock Vivaldi and the same page with VivArcDi alternate every two seconds; with VivArcDi the three Favorites tiles and the workspace folders take the place of the tab strip](images/vivarcdi/before-after.gif)
 
-The recording starts with stock Vivaldi; the second state is VivArcDi.
+The recording starts with stock Vivaldi; the second state is VivArcDi, with the Favorites tiles and the workspace folders in place of the tab strip.
 
 ![The tab bar at rest, then the pointer resting on a Favorite, a folder and a pinned tab](images/vivarcdi/tab-bar-tour.gif)
 
