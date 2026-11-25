@@ -7,6 +7,7 @@ import { LinkId } from '../../shared/links/LinkId.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
+import { FolderUnloader } from './links/FolderUnloader.js';
 import { VirtualFolders } from '../../shared/links/VirtualFolders.js';
 import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import { ClosingLinks } from './editing/ClosingLinks.js';
@@ -58,11 +59,9 @@ export class FolderSection {
   #stops: Array<() => void> = [];
 
   /**
-   * The section in the tab bar and everything it needs: the tree of the bookmarks, the tabs that
-   * stand for the links, the folders that are open, and the clicks. The tabs of the links are
-   * hidden from Vivaldi's tab list, since their rows stand for them. The folders that a source
-   * fills, such as the live folders, are drawn after the bookmarks with the same rows; the
-   * section opens them, renames them and reports their clicks through `VirtualFolders`.
+   * The section in the tab bar: the bookmark tree, the tabs of the links, the open folders and the
+   * clicks. The tabs are hidden from Vivaldi's list, since their rows stand for them. Live folders
+   * are drawn with the same rows and reported through `VirtualFolders`.
    *
    * @param context What the module may use.
    * @param settings The root folders and how many levels are shown.
@@ -93,12 +92,13 @@ export class FolderSection {
     this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
+    const unloader = new FolderUnloader(tabs, logger);
     this.#view = new FolderSectionView(
       document,
       {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => (LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? undefined : void activator.activate(link)),
-        onClose: (tabId): void => void activator.close(tabId),
+        onUnload: (tabIds): void => unloader.unload(tabIds),
         onRename: (id, name): void => void this.#editing.rename(id, name),
         onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },
@@ -156,11 +156,7 @@ export class FolderSection {
       childIds: (): readonly string[] => this.#source.childIds,
       redraw: (): void => this.#redraw.request(),
       tabLinks: this.#tabLinks,
-      openFolders: this.#openFolders,
-      closing: this.#closing,
-      names: this.#names,
-      active: this.#active,
-      roots: this.#roots,
+      openFolders: this.#openFolders, closing: this.#closing, names: this.#names, active: this.#active, roots: this.#roots,
     });
   }
 

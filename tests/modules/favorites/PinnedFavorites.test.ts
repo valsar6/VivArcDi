@@ -188,6 +188,18 @@ test('unloads a pinned tab from its tile minus', async (t) => {
   favorites.stop();
 });
 
+test('does not drag or open a pinned tile from its minus', async (t) => {
+  const { dom, favorites, tabs } = setup(t, [pinned(1, 7, { active: true }), pinned(2)]);
+  await favorites.start();
+  const minus = minusOf(tilesOf(favorites)[1]);
+  assert.ok(minus !== undefined);
+  const pressed = ['pointerdown', 'mousedown', 'click'].map((type) => pressMinus(dom, type, minus));
+  await settle();
+  assert.ok(pressed.every(({ prevented, stopped }) => prevented && stopped));
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'activate'), []);
+  favorites.stop();
+});
+
 test('follows tab changes and never shows more than the maximum', async (t) => {
   const { favorites, tabs } = setup(t, [pinned(1, 7, { active: true })], 2);
   await favorites.start();

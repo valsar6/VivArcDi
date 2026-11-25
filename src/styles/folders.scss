@@ -1,4 +1,5 @@
 @use 'tokens' as *;
+@use 'minus' as *;
 
 #{$root} #{$folders} {
   --vivarcdi-folders-hover: color-mix(in srgb, var(--colorFg, #fff) #{$folders-tint-hover}, transparent);
@@ -18,6 +19,7 @@
   }
 
   > [role] {
+    position: relative;
     display: flex;
     align-items: center;
     gap: $gap;
@@ -149,36 +151,23 @@
     background-color: color-mix(in srgb, var(--colorFg, #fff) #{$tint-active}, transparent);
   }
 
-  [data-vivarcdi-link-unloaded] > :not(.vivarcdi-folders-close) {
+  [data-vivarcdi-link-unloaded] > :not(.vivarcdi-folders-minus) {
     opacity: $unloaded-opacity;
   }
 
-  .vivarcdi-folders-close {
-    display: none;
-    flex: none;
-    place-items: center;
-    width: $folders-icon-size;
-    height: $folders-icon-size;
-    border-radius: 3px;
-    line-height: 1;
-
-    &::before {
-      content: '\00d7';
-    }
-
-    &:hover {
-      background-color: var(--vivarcdi-folders-hover);
-    }
+  .vivarcdi-folders-minus {
+    @include minus-badge;
   }
 
-  [data-vivarcdi-link-open]:hover {
-    .vivarcdi-folders-close {
-      display: grid;
-    }
+  > [data-vivarcdi-link-open]:hover [data-vivarcdi-link-minus],
+  > [data-vivarcdi-link-active] [data-vivarcdi-link-minus],
+  > [data-vivarcdi-folder-unload]:hover [data-vivarcdi-folder-minus] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    &::after {
-      display: none;
-    }
+  [data-vivarcdi-link-open]:hover::after {
+    display: none;
   }
 
   [data-vivarcdi-link-open]::after {

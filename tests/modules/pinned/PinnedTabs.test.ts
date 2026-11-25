@@ -140,9 +140,11 @@ test('unloads a pinned tab from its minus', async () => {
   const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
   assert.ok(button instanceof MinusNode);
   const down = document.dispatch(event('mousedown', { target: button }));
+  const pointerDown = document.dispatch(event('pointerdown', { target: button }));
   const click = document.dispatch(event('click', { target: button }));
   await settle();
   assert.ok(down.defaultPrevented && down.stopped);
+  assert.ok(pointerDown.defaultPrevented && pointerDown.stopped);
   assert.ok(click.defaultPrevented && click.stopped);
   assert.deepEqual(tabs.calls.filter(([name]) => name === 'discard'), [['discard', 5]]);
   assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), []);
@@ -150,6 +152,55 @@ test('unloads a pinned tab from its minus', async () => {
   assert.equal(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE), false);
   assert.equal(button.parentElement, null);
   assert.equal(watchers.size, 0);
+});
+
+test('labels the pinned minus as Unload tab', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addRow(5);
+  const watchers = new Set<() => void>();
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs: new LinkingTabs([{ id: 5, url: 'https://docs.example/a' }]),
+    logger: silentLogger,
+    watch: (_target, onChange): (() => void) => {
+      watchers.add(onChange);
+      return () => watchers.delete(onChange);
+    },
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  assert.equal(button.getAttribute('aria-label'), 'Unload tab');
+  minus.stop();
+});
+
+test('does not start a drag from the pinned row minus', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addRow(5);
+  const watchers = new Set<() => void>();
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs: new LinkingTabs([{ id: 5, url: 'https://docs.example/a' }]),
+    logger: silentLogger,
+    watch: (_target, onChange): (() => void) => {
+      watchers.add(onChange);
+      return () => watchers.delete(onChange);
+    },
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  const pointerDown = document.dispatch(event('pointerdown', { target: button }));
+  const mouseDown = document.dispatch(event('mousedown', { target: button }));
+  assert.ok(pointerDown.defaultPrevented && pointerDown.stopped);
+  assert.ok(mouseDown.defaultPrevented && mouseDown.stopped);
+  minus.stop();
 });
 
 test('leaves the close shortcut to Vivaldi for ordinary tabs', () => {

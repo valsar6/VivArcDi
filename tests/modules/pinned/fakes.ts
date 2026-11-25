@@ -120,6 +120,10 @@ export class MinusNode extends FakeNode {
     this.attributes.set(name, value);
   }
 
+  public getAttribute(name: string): string | null {
+    return this.attributes.get(name) ?? null;
+  }
+
   public override matches(selector: string): boolean {
     if (selector.startsWith('[') && selector.endsWith(']')) {
       return this.hasAttribute(selector.slice(1, -1));

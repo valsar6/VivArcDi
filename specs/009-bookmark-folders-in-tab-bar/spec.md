@@ -75,16 +75,16 @@ panel; the tab bar follows the changes as they happen.
 **The link row is the tab.** As in Arc, the tab that a link opens is not a today's tab: Vivaldi's tab
 list hides it, with the same mark that [003](../003-pinned-tabs-and-folders/spec.md) uses for the tabs
 of the Favorites. The link row stands for it: a dot while it is open, the look of an active tab while
-it is the active tab, its page's title and icon while it shows another page of the same site, and a
-close button on hover. The tab is linked to the bookmark, not only to the address: the link is stored
+it is the active tab, its page's title and icon while it shows another page of the same site, and an
+unload minus on hover, as [061](../061-pinned-minus-ui/spec.md) says. The tab is linked to the bookmark, not only to the address: the link is stored
 in the tab's `vivExtData` (`vivarcdi: { bookmarkId }`), so it survives a restart, a redirect (`Jira`
 going to `id.atlassian.com/login`) and the pages opened inside it.
 
 A tab becomes the tab of a link when the link opens it, when Cmd/Ctrl+T opens the link's address and
 no tab of the link is open (007 already switches when one is), and, at start-up, when an existing tab
 of the window and workspace has the link's address and no link yet. A link has at most one tab in each
-workspace. Closing the tab, with the close button of the row, Cmd/Ctrl+W or Vivaldi's menu, closes it
-for real: the link goes back inside its closed folder. The Today archive of
+workspace. Closing the tab with Cmd/Ctrl+W or Vivaldi's menu closes it for real: the link goes back
+inside its closed folder. The Today archive of
 [004](../004-today-tabs-and-keyboard/spec.md) never archives the tab of a link, as it never archives a
 Favorite.
 
@@ -119,7 +119,8 @@ Favorite.
   Vivaldi's layout allows. Replaced by [053 Single scroll](../053-single-scroll/spec.md): the whole
   column scrolls as one and `maxHeightPercent` no longer exists.
 - **FR-12.** The tab of a link is marked as hidden in Vivaldi's tab list, as the tabs of the
-  Favorites are in 003; the link row shows its state (open, active, unloaded) and has a close button.
+  Favorites are in 003; the link row shows its state (open, active, unloaded) and has the unload minus
+  of [061](../061-pinned-minus-ui/spec.md) on hover.
 - **FR-13.** A tab opened from a link, or adopted as the tab of a link, stores the bookmark id in its
   `vivExtData`; the link and the tab stay linked while the tab navigates, until the tab closes or the
   bookmark is removed.
@@ -176,7 +177,7 @@ Favorite.
 | AC-20 | WHEN the user clicks a link with no open tab, THE module SHALL store the bookmark id in the new tab. | auto: `links the tab opened from a link to its bookmark` |
 | AC-21 | WHILE the tab of a link shows another address, THE section SHALL keep it as the tab of that link. | auto: `keeps the tab of a link while it navigates away` |
 | AC-22 | WHEN a new tab opens the address of a link that has no tab, THE module SHALL make it the tab of that link. | auto: `adopts a new tab that opens the address of a link` |
-| AC-23 | WHEN the user closes the tab of a link from its row, THE module SHALL close the tab. | auto: `closes the tab of a link from its row` |
+| AC-23 | WHEN the user presses the minus of a link row, THE module SHALL unload its tab instead of closing it (061/AC-11). | auto: `unloads a link tab from its minus` |
 | AC-24 | THE Today archive SHALL never archive the tab of a link. | auto: `does not archive the tab of a link` |
 | AC-25 | WHEN Tore clicks `Board Rame Development` and logs in through `id.atlassian.com`, THE tab list SHALL show no new tab and the link row SHALL show the active page. | manual |
 | AC-26 | WHEN the user clicks a link to another site in the tab of a link, THE page SHALL open in Peek and the tab SHALL keep its page. | manual |

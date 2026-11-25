@@ -11,20 +11,34 @@ const compiled = (): string => sass.compile(`${STYLES}favorites.scss`).css;
 const SOURCE = '\\[data-vivarcdi-tiles\\]\\[data-vivarcdi-tile-source=pinned\\]';
 const MINUS = '\\[data-vivarcdi-tile-minus\\]';
 
-test('draws the tile minus only on hover and on the current tile', () => {
+test('draws the pinned tile minus as the same badge', () => {
   const tokens = read('_tokens.scss');
-  const source = read('favorites.scss');
   const css = compiled();
   assert.match(tokens, /\$tile-minus: '\[data-vivarcdi-tile-minus\]'/);
-  assert.ok(source.includes('$minus-glyph'), '$minus-glyph is used');
-  assert.ok(source.includes('$minus-size'), '$minus-size is used');
-  assert.ok(source.includes('$minus-offset'), '$minus-offset is used');
+  assert.match(tokens, /\$minus-badge-size: 21px/);
+  assert.match(tokens, /\$minus-badge-radius: 5px/);
+  assert.match(tokens, /\$minus-size: 16px/);
   const base = new RegExp(`${SOURCE}[^{]*${MINUS}[^{]*\\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+  assert.match(base, /width: 21px;/);
+  assert.match(base, /height: 21px;/);
+  assert.match(base, /border-radius: 5px;/);
+  assert.match(base, /background-color: color-mix\(/);
   assert.match(base, /opacity: 0;/);
   assert.match(base, /pointer-events: none/);
-  assert.match(base, /mask: url\("data:image\/svg\+xml/);
+  assert.equal(/mask:/.test(base), false);
+  const dash = new RegExp(`${SOURCE}[^{]*${MINUS}::before \\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+  assert.match(dash, /width: 16px;/);
+  assert.match(dash, /mask: url\("data:image\/svg\+xml/);
+});
+
+test('shows the pinned tile minus on hover and on the current tile', () => {
+  const css = compiled();
   assert.match(css, /\[data-vivarcdi-tile\]:hover \[data-vivarcdi-tile-minus\][^{]*\{[^}]*opacity: 1/);
   assert.match(css, /\[data-vivarcdi-tile\]\[data-vivarcdi-current\] \[data-vivarcdi-tile-minus\][^{]*\{[^}]*opacity: 1/);
   assert.match(css, /\[data-vivarcdi-tile\]:hover \[data-vivarcdi-tile-minus\][^{]*\{[^}]*pointer-events: auto/);
+});
+
+test('keeps the minus off a Favorite tile', () => {
+  const css = compiled();
   assert.equal(/\[data-vivarcdi-favorite\][^{]*\[data-vivarcdi-tile-minus\]/.test(css), false);
 });
