@@ -1,4 +1,3 @@
-import { ActiveWorkspace } from "../../core/workspaces/ActiveWorkspace.js";
 import { ContextMenu } from "../../core/dom/ContextMenu.js";
 import { LinkId } from "../../shared/links/LinkId.js";
 import { Module } from "../../core/boot/Module.js";
@@ -75,7 +74,7 @@ class LiveFolders extends Module {
     this.#stops.reverse().forEach((stop) => stop());
     this.#stops = [];
   }
-  #build({ document, selectors, tabs, storage, options, logger, notices }) {
+  #build({ document, selectors, tabs, storage, options, logger, notices, activeWorkspace }) {
     const clientId = options.githubClientId;
     const virtual = VirtualFolders.of(document);
     const store = new LiveFolderStore(storage, logger);
@@ -84,7 +83,6 @@ class LiveFolders extends Module {
     const parent = () => document.querySelector(selectors.get("browser")) ?? document.body;
     const menu = new ContextMenu({ document, parent });
     const editor = new RepositoryEditor({ document, parent });
-    const active = new ActiveWorkspace(tabs, () => void 0, logger);
     const copier = TextCopier.for(document, document.defaultView?.navigator.clipboard);
     const toast = new Toast({ document, parent: parent(), durationMs: TOAST_MS });
     const refresher = new LiveFolderRefresher({
@@ -97,7 +95,7 @@ class LiveFolders extends Module {
       intervalMs: options.refreshMinutes * MS_PER_MINUTE,
       logger
     });
-    const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, active, logger), closeAfterMs: CONNECTED_MS, notify: (text, kind) => toast.show(text, kind) });
+    const connect = new GithubConnect({ clientId, connection, send: postWithFetch, document, parent, copier, openPage: LiveFolders.#opener(tabs, activeWorkspace, logger), closeAfterMs: CONNECTED_MS, notify: (text, kind) => toast.show(text, kind) });
     const folderMenu = new LiveFolderMenu({
       menu,
       editor,
@@ -109,17 +107,16 @@ class LiveFolders extends Module {
       anchor: (linkId) => LiveFolderHandlers.below(document, linkId)
     });
     const rowMenu = new LiveRowMenu({ menu, store, copier, toast: (text) => toast.show(text), changed: () => publisher.publish() });
-    return { document, virtual, store, publisher, menu, editor, active, refresher, folderMenu, rowMenu, connection, connect, toast };
+    return { document, virtual, store, publisher, menu, editor, active: activeWorkspace, refresher, folderMenu, rowMenu, connection, connect, toast };
   }
   #wire(parts) {
-    const { virtual, publisher, menu, editor, active, refresher, connection, connect, toast } = parts;
+    const { virtual, publisher, menu, editor, refresher, connection, connect, toast } = parts;
     const handlers = new LiveFolderHandlers(parts);
     this.#stops.push(
       () => menu.close(),
       () => editor.close(),
       () => connect.close(),
       () => toast.remove(),
-      () => active.stop(),
       () => refresher.stop(),
       () => publisher.clear(),
       connection.onChange(() => this.#connectionChanged(parts)),

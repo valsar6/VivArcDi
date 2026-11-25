@@ -32,7 +32,7 @@ class OpenFolders {
    * @param workspaceId The workspace id, or null for the area outside any workspace.
    */
   useWorkspace(workspaceId) {
-    this.#key = workspaceId === null ? OPEN_FOLDERS_STORAGE_KEY : `${OPEN_FOLDERS_STORAGE_KEY}.${workspaceId}`;
+    this.#key = OpenFolders.#keyFor(workspaceId);
     this.load();
   }
   /**
@@ -63,15 +63,26 @@ class OpenFolders {
    * Drops a folder that no longer exists, so that it comes back closed if it is restored.
    *
    * @param id A folder id.
+   * @param workspaceId The workspace whose key holds the folder, loaded or not.
    */
-  forget(id) {
-    if (this.#ids.delete(id)) {
-      this.#save();
+  forget(id, workspaceId) {
+    const key = OpenFolders.#keyFor(workspaceId);
+    const loaded = key === this.#key;
+    const ids = loaded ? this.#ids : new Set(this.#storage?.read(key, FORMAT).value);
+    if (!ids.delete(id)) {
+      return;
     }
+    if (loaded) {
+      this.#ids = ids;
+    }
+    this.#save(key, ids);
   }
-  #save() {
+  static #keyFor(workspaceId) {
+    return workspaceId === null ? OPEN_FOLDERS_STORAGE_KEY : `${OPEN_FOLDERS_STORAGE_KEY}.${workspaceId}`;
+  }
+  #save(key = this.#key, ids = this.#ids) {
     try {
-      this.#storage?.setItem(this.#key, FORMAT.encode([...this.#ids]));
+      this.#storage?.setItem(key, FORMAT.encode([...ids]));
     } catch (error) {
       this.#logger.warn("open folders are kept for this session only", error);
     }

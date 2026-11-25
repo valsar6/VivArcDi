@@ -36,6 +36,7 @@ class FolderRelocation {
    */
   async move(folderId, workspace) {
     const { closing, notify, writer, linkTabs } = this.#deps;
+    const originWorkspaceId = this.#deps.active.current;
     let name = folderId;
     let linkIds = [];
     try {
@@ -50,7 +51,7 @@ class FolderRelocation {
       const tabIds = await linkTabs.ownTabsOf(linkIds);
       closing.add(linkIds);
       await writer.move(folderId, { parentId: targetRootId });
-      this.#deps.openFolders.forget(folderId);
+      this.#deps.openFolders.forget(folderId, originWorkspaceId);
       await this.#send(tabIds, workspace.id);
       notify(`Moved "${name}" to ${workspace.name}`);
     } catch (error) {

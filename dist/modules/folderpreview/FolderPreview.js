@@ -21,7 +21,9 @@ class FolderPreview extends Module {
       logger.warn("chrome.bookmarks, chrome.tabs or the browser element is missing: the folder panel is off");
       return;
     }
-    const openLinks = new OpenLinks(tabs, () => void 0, logger);
+    const openLinks = new OpenLinks(tabs, () => void 0, logger, {
+      shownWorkspace: () => context.activeWorkspace.current
+    });
     this.#controller = new PreviewController({
       document,
       parent,

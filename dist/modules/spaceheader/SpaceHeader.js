@@ -1,4 +1,3 @@
-import { ActiveWorkspace } from "../../core/workspaces/ActiveWorkspace.js";
 import { HiddenTabMarker } from "../../shared/tabs/HiddenTabMarker.js";
 import { ContextMenu } from "../../core/dom/ContextMenu.js";
 import { FolderCommands } from "../../shared/links/FolderCommands.js";
@@ -53,10 +52,9 @@ class SpaceHeader extends Module {
     this.#stops = [];
     this.#parts = null;
   }
-  #build({ document, selectors, tabs, prefs, storage, logger }) {
+  #build({ document, selectors, tabs, prefs, storage, logger, activeWorkspace }) {
     const collapse = SpaceCollapse.of(document);
     const hidden = HiddenTabs.of(document);
-    const active = new ActiveWorkspace(tabs, (workspace) => void this.#show(workspace), logger);
     return {
       document,
       collapse,
@@ -68,9 +66,9 @@ class SpaceHeader extends Module {
         (x, y) => this.#openMenu(x, y)
       ),
       names: new WorkspaceNames(prefs, () => this.#render(), logger),
-      active,
+      active: activeWorkspace,
       marker: new HiddenTabMarker(document, selectors, hidden),
-      pinned: new CollapsedPinned(tabs, { collapse, hidden, workspace: () => active.current }, logger),
+      pinned: new CollapsedPinned(tabs, { collapse, hidden, workspace: () => activeWorkspace.current }, logger),
       menu: new ContextMenu({ document, parent: () => document.querySelector(selectors.get("browser")) ?? document.body })
     };
   }
@@ -86,7 +84,7 @@ class SpaceHeader extends Module {
       () => menu.close(),
       () => collapse.set(false),
       () => names.stop(),
-      () => active.stop(),
+      active.onChange((workspace) => void this.#show(workspace)),
       () => view.remove(),
       () => marker.stop(),
       () => pinned.stop(),

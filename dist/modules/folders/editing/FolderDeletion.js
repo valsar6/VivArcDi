@@ -16,6 +16,7 @@ class FolderDeletion {
    */
   async delete(folderId) {
     const { closing, notify } = this.#deps;
+    const workspaceId = this.#deps.active.current;
     let name = folderId;
     let linkIds = [];
     try {
@@ -25,7 +26,7 @@ class FolderDeletion {
       const tabIds = await this.#deps.linkTabs.tabsOf(linkIds);
       closing.add(linkIds);
       await this.#moveToTrash(folderId);
-      this.#deps.openFolders.forget(folderId);
+      this.#deps.openFolders.forget(folderId, workspaceId);
       await this.#close(tabIds);
       notify(`Folder "${name}" moved to Trash`);
     } catch (error) {

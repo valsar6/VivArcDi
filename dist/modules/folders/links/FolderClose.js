@@ -17,13 +17,14 @@ class FolderClose {
   /**
    * @param tabIds The tabs to close.
    * @param folderId The pressed folder, or undefined for a link row.
+   * @param workspace The workspace shown when the press started.
    */
-  async apply(tabIds, folderId) {
+  async apply(tabIds, folderId, workspace) {
     if (!await this.#closer.close(tabIds)) {
       return;
     }
     if (folderId !== void 0) {
-      this.#openFolders.forget(folderId);
+      this.#openFolders.forget(folderId, workspace);
     }
     this.#redraw();
   }

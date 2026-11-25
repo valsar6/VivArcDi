@@ -6,6 +6,8 @@ import { BrowserHistory } from "../browser/BrowserHistory.js";
 import { BrowserSearch } from "../browser/BrowserSearch.js";
 import { BrowserTabs } from "../browser/BrowserTabs.js";
 import { BrowserWindows } from "../browser/BrowserWindows.js";
+import { ActiveWorkspace } from "../workspaces/ActiveWorkspace.js";
+import { WorkspaceNames } from "../workspaces/WorkspaceNames.js";
 import { BootReport } from "./BootReport.js";
 import { Logger } from "../support/Logger.js";
 import { ModuleStarter } from "./ModuleStarter.js";
@@ -16,6 +18,7 @@ import { ResourceLoader } from "./ResourceLoader.js";
 import { SelectorCatalog } from "../dom/SelectorCatalog.js";
 import { StyleInjector } from "./StyleInjector.js";
 import { UiReadiness } from "./UiReadiness.js";
+const WORKSPACE_TABS = "the workspace cannot follow the tabs";
 class VivArcDi {
   #loader;
   #registry;
@@ -23,9 +26,12 @@ class VivArcDi {
   #document;
   #runtime;
   #storage;
+  #tabs;
   #notices = null;
   #styles;
   #starter;
+  #workspaces;
+  #activeWorkspace;
   #started = [];
   /**
    * The application: reads the configuration, waits for Vivaldi's interface,
@@ -54,7 +60,11 @@ class VivArcDi {
     this.#document = document;
     this.#runtime = runtime;
     this.#storage = storage;
-    this.#starter = VivArcDi.#starterOf(
+    this.#tabs = tabs;
+    const workspaceLogger = logger.child("workspaces");
+    this.#workspaces = new WorkspaceNames(prefs, () => void 0, workspaceLogger);
+    this.#activeWorkspace = new ActiveWorkspace(tabs, workspaceLogger, (workspaceId) => !this.#workspaces.listed || this.#workspaces.has(workspaceId));
+    this.#starter = ModuleStarter.of(
       { document, tabs, bookmarks, bookmarkWriter, runtime, history, prefs, payload: loader },
       windows,
       search,
@@ -91,16 +101,6 @@ class VivArcDi {
     });
     await app.start();
     return app;
-  }
-  static #starterOf(services, windows, search, logger) {
-    return new ModuleStarter(
-      {
-        ...services,
-        windows: windows ?? new BrowserWindows(void 0),
-        search: search ?? new BrowserSearch(void 0)
-      },
-      logger
-    );
   }
   static #prefsApi(chromeApi) {
     const vivaldi = globalThis.vivaldi;
@@ -148,13 +148,17 @@ class VivArcDi {
     config.styles.forEach((path) => this.#styles.inject(path));
     const services = WindowServices.open(this.#document, selectors, this.#storage, this.#logger);
     this.#notices = services.notices;
+    if (this.#tabs.available) {
+      await this.#workspaces.start();
+      await this.#activeWorkspace.start().catch((error) => this.#logger.warn(WORKSPACE_TABS, error));
+    }
     report.enter("modules");
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
     const { modules, unknown, skipped } = this.#registry.createEnabled(config.modules, await this.#isPrivateWindow());
     report.skip(skipped.config, skipped.window);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services });
+      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services, activeWorkspace: this.#activeWorkspace });
       report.record(entry.id, outcome);
       if (outcome === "started") {
         this.#started.push(entry);
@@ -178,6 +182,8 @@ class VivArcDi {
       }
     }
     this.#started = [];
+    this.#activeWorkspace.stop();
+    this.#workspaces.stop();
     this.#notices?.remove();
     this.#styles.removeAll();
   }

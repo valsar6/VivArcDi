@@ -1,42 +1,59 @@
+import { InspectionTarget } from "../tabs/InspectionTarget.js";
 import { TabData } from "../tabs/TabData.js";
 class ActiveWorkspace {
   #tabs;
-  #onChange;
   #logger;
+  #listed;
   #current = null;
   #generation = 0;
+  #listeners = /* @__PURE__ */ new Set();
   #unsubscribe = [];
+  #warnedUnlisted = false;
   /**
-   * Follows the workspace of the active tab of the window and reports it when it changes. While no
-   * tab is active the last known workspace stays, so the section does not flicker during a switch.
+   * Follows the workspace of the active tab of the window and reports it when it changes.
    *
    * @param tabs Tabs API.
-   * @param onChange Called with the new workspace id, or null outside any workspace.
    * @param logger Logger for failures.
+   * @param listed Says whether Vivaldi lists a workspace id; an id it does not list keeps the last
+   * workspace. Every id is accepted when the list cannot be read.
    */
-  constructor(tabs, onChange, logger) {
+  constructor(tabs, logger, listed = () => true) {
     this.#tabs = tabs;
-    this.#onChange = onChange;
     this.#logger = logger;
+    this.#listed = listed;
   }
   /**
-   * @returns The workspace id of the active tab, or null outside any workspace.
+   * @returns The workspace to show, or null outside any workspace.
    */
   get current() {
     return this.#current;
   }
   /**
-   * Reads the workspace now, without reporting it, and starts following the tabs. Throws when a
-   * tab event is missing.
+   * Follows a change of the workspace.
+   *
+   * @param listener Called with the new workspace id, or null outside any workspace.
+   * @returns A function that removes the listener.
+   */
+  onChange(listener) {
+    this.#listeners.add(listener);
+    return () => void this.#listeners.delete(listener);
+  }
+  /**
+   * Reads the workspace now, without reporting it, and starts following the tabs. Does nothing
+   * when it already follows them. Throws when a tab event is missing.
    */
   async start() {
+    if (this.#unsubscribe.length > 0) {
+      return;
+    }
     this.#unsubscribe = [
       this.#tabs.onActivated(() => void this.refresh()),
       this.#tabs.onUpdated((_id, change) => {
         if ("vivExtData" in change) {
           void this.refresh();
         }
-      })
+      }),
+      this.#tabs.onRemoved(() => void this.refresh())
     ];
     const workspace = await this.#read();
     if (workspace !== void 0) {
@@ -59,16 +76,30 @@ class ActiveWorkspace {
     const workspace = await this.#read();
     if (generation === this.#generation && workspace !== void 0 && workspace !== this.#current) {
       this.#current = workspace;
-      this.#onChange(workspace);
+      this.#listeners.forEach((listener) => listener(workspace));
     }
   }
   async #read() {
     try {
       const [active] = await this.#tabs.query({ active: true, currentWindow: true });
-      return active === void 0 ? void 0 : TabData.of(active);
+      if (active === void 0 || InspectionTarget.is(active.url ?? active.pendingUrl)) {
+        return void 0;
+      }
+      const workspace = TabData.of(active);
+      if (workspace !== null && !this.#listed(workspace)) {
+        this.#warnUnlisted(workspace);
+        return void 0;
+      }
+      return workspace;
     } catch (error) {
       this.#logger.warn("could not read the active workspace", error);
       return void 0;
+    }
+  }
+  #warnUnlisted(workspaceId) {
+    if (!this.#warnedUnlisted) {
+      this.#warnedUnlisted = true;
+      this.#logger.warn("the active tab names a workspace Vivaldi does not list", `${workspaceId}: keeping the last one`);
     }
   }
 }

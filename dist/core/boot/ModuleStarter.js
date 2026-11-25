@@ -1,6 +1,23 @@
+import { BrowserSearch } from "../browser/BrowserSearch.js";
+import { BrowserWindows } from "../browser/BrowserWindows.js";
 class ModuleStarter {
   #services;
   #logger;
+  /**
+   * Builds a starter from the services of a window, filling in the APIs that were not given.
+   *
+   * @param services The services shared by the modules.
+   * @param windows The windows API, or undefined for none.
+   * @param search The search API, or undefined for none.
+   * @param logger The application logger.
+   * @returns The starter.
+   */
+  static of(services, windows, search, logger) {
+    return new ModuleStarter(
+      { ...services, windows: windows ?? new BrowserWindows(void 0), search: search ?? new BrowserSearch(void 0) },
+      logger
+    );
+  }
   /**
    * Starts one module with a context built from the injected services.
    *
@@ -19,7 +36,7 @@ class ModuleStarter {
    * @returns How the module ended: started, failed, or off by invalid options.
    */
   async start(entry, start) {
-    const { settings, selectors, build, storage, notices } = start;
+    const { settings, selectors, build, storage, notices, activeWorkspace } = start;
     const options = settings.optionsOf(entry.id);
     const logger = this.#logger.child(entry.id);
     if (options === null) {
@@ -35,7 +52,8 @@ class ModuleStarter {
         build,
         modules: settings.all,
         storage,
-        notices
+        notices,
+        activeWorkspace
       });
       return "started";
     } catch (error) {

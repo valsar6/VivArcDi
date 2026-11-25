@@ -7,7 +7,9 @@ class OpenLinks {
   #tabs;
   #onChange;
   #logger;
+  #shownWorkspace;
   #task;
+  #generation = 0;
   #linkedTabIds = [];
   #linked = /* @__PURE__ */ new Map();
   #unlinked = /* @__PURE__ */ new Map();
@@ -23,12 +25,13 @@ class OpenLinks {
    * @param tabs Tabs API.
    * @param onChange Called when the tabs of the links change.
    * @param logger Logger for failures.
-   * @param timing Frame scheduling, replaceable in tests.
+   * @param settings The workspace the section shows, and frame scheduling replaceable in tests.
    */
-  constructor(tabs, onChange, logger, timing = {}) {
+  constructor(tabs, onChange, logger, { shownWorkspace, timing = {} }) {
     this.#tabs = tabs;
     this.#onChange = onChange;
     this.#logger = logger;
+    this.#shownWorkspace = shownWorkspace;
     this.#task = new FrameTask(() => void this.refresh(), timing);
   }
   /**
@@ -49,9 +52,10 @@ class OpenLinks {
     await this.refresh();
   }
   /**
-   * Stops following the tabs.
+   * Stops following the tabs. A read that lands after this changes nothing.
    */
   stop() {
+    this.#generation += 1;
     this.#task.cancel();
     this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
     this.#unsubscribe = [];
@@ -70,11 +74,15 @@ class OpenLinks {
     return this.#linked.get(link.id) ?? this.#unlinked.get(link.key);
   }
   /**
-   * Reads the tabs again and reports a change.
+   * Reads the tabs again and reports a change. A read that lands after a newer one is dropped.
    */
   async refresh() {
+    const generation = ++this.#generation;
     try {
-      this.#update(await this.#tabs.query({ currentWindow: true }));
+      const tabs = await this.#tabs.query({ currentWindow: true });
+      if (generation === this.#generation) {
+        this.#update(tabs);
+      }
     } catch (error) {
       this.#logger.warn("could not read the open tabs", error);
     }
@@ -106,9 +114,9 @@ class OpenLinks {
     return new Map([...chosen].map(([group, tab]) => [group, OpenLinks.#openTab(tab)]));
   }
   #update(tabs) {
+    const workspace = this.#shownWorkspace();
     const linkedTabIds = tabs.filter((tab) => OpenLinks.#bookmarkIdOf(tab) !== void 0).flatMap((tab) => tab.id === void 0 ? [] : [tab.id]);
-    const active = tabs.find((tab) => tab.active);
-    const visible = tabs.filter((tab) => tab.id !== void 0 && (active === void 0 || TabData.shares(tab, active)));
+    const visible = tabs.filter((tab) => tab.id !== void 0 && (TabData.of(tab) === null || TabData.of(tab) === workspace));
     const linked = OpenLinks.#byGroup(visible, OpenLinks.#bookmarkIdOf);
     const unlinked = OpenLinks.#byGroup(
       visible.filter((tab) => OpenLinks.#bookmarkIdOf(tab) === void 0),

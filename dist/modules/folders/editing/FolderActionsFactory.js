@@ -34,6 +34,7 @@ class FolderActionsFactory {
       trash: new BookmarkTrash({ tree: () => bookmarkWriter.tree() }),
       tabs,
       openFolders: sources.openFolders,
+      active: sources.active,
       closing: sources.closing,
       redraw: sources.redraw,
       notify,

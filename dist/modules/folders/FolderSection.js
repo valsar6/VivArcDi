@@ -1,4 +1,3 @@
-import { ActiveWorkspace } from "../../core/workspaces/ActiveWorkspace.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
 import { LabelKeys, LinkLabels } from "../../core/browser/LinkLabels.js";
 import { HiddenTabMarker } from "../../shared/tabs/HiddenTabMarker.js";
@@ -62,7 +61,7 @@ class FolderSection {
     this.#openFolders = new OpenFolders(context.storage, logger);
     this.#roots = roots;
     this.#names = new WorkspaceNames(prefs, () => this.#namesChanged(), logger);
-    this.#active = new ActiveWorkspace(tabs, (workspace) => void this.#show(workspace), logger);
+    this.#active = context.activeWorkspace;
     this.#source = new FolderTreeSource(bookmarks, {
       path: [],
       maxDepth,
@@ -71,7 +70,7 @@ class FolderSection {
       onChange: () => this.#treeChanged(),
       logger
     });
-    this.#openLinks = new OpenLinks(tabs, () => this.#tabsChanged(), logger);
+    this.#openLinks = new OpenLinks(tabs, () => this.#tabsChanged(), logger, { shownWorkspace: () => this.#workspace ?? null });
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
     this.#hiddenTabs = HiddenTabs.of(document);
@@ -86,7 +85,7 @@ class FolderSection {
       {
         onFolder: (id) => this.#toggle(id),
         onLink: (link) => LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? void 0 : void activator.activate(link),
-        onClose: (tabIds, folderId) => void this.#close.apply(tabIds, folderId),
+        onClose: (tabIds, folderId) => void this.#close.apply(tabIds, folderId, this.#workspace ?? null),
         onRename: (id, name) => void this.#editing.rename(id, name),
         onMenu: (id, x, y) => this.#virtual.openMenu(id, x, y)
       }
@@ -113,7 +112,7 @@ class FolderSection {
       () => this.#source.stop(),
       () => this.#openLinks.stop(),
       () => this.#adopter.stop(),
-      () => this.#active.stop(),
+      this.#active.onChange((workspace) => void this.#show(workspace)),
       () => this.#names.stop()
     );
     await this.#names.start();
