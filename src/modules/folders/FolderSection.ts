@@ -85,7 +85,7 @@ export class FolderSection {
       onChange: (): void => this.#treeChanged(),
       logger,
     });
-    this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger);
+    this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger, { shownWorkspace: (): string | null => this.#workspace ?? null });
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
     this.#hiddenTabs = HiddenTabs.of(document);

@@ -9,9 +9,12 @@ const JIRA = { id: '12', key: 'jira.example.com' };
 const linkedTo = (bookmarkId: string, workspaceId = 7): string => JSON.stringify({ workspaceId, vivarcdi: { bookmarkId } });
 const settle = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
-async function start(tabs: FolderTabs): Promise<{ links: OpenLinks; changes: () => number }> {
+async function start(tabs: FolderTabs, shown = '7'): Promise<{ links: OpenLinks; changes: () => number }> {
   let changes = 0;
-  const links = new OpenLinks(tabs, () => (changes += 1), silentLogger(), immediateFrames);
+  const links = new OpenLinks(tabs, () => (changes += 1), silentLogger(), {
+    shownWorkspace: (): string | null => shown,
+    timing: immediateFrames,
+  });
   await links.start();
   return { links, changes: () => changes };
 }
@@ -80,4 +83,35 @@ test('lets go of the tab of a link when the tab closes', async () => {
   assert.deepEqual(links.linkedTabIds, []);
   links.stop();
   assert.equal(tabs.listenerCount(), 0);
+});
+
+test("does not show other workspaces' tabs when no tab is active", async () => {
+  const tabs = new FolderTabs([
+    { id: 2, url: `https://${MAHJONG.key}/`, vivExtData: linkedTo('11', 7) },
+    { id: 3, url: `https://${JIRA.key}/`, vivExtData: linkedTo('12', 8) },
+  ]);
+  const { links } = await start(tabs, '7');
+  assert.equal(links.tabFor(MAHJONG)?.tabId, 2);
+  assert.equal(links.tabFor(JIRA), undefined);
+  links.stop();
+});
+
+test('keeps the newer read when an older one lands after it', async () => {
+  const tabs = new FolderTabs();
+  const reads: Array<(value: chrome.tabs.Tab[]) => void> = [];
+  tabs.query = (): Promise<chrome.tabs.Tab[]> => new Promise((resolve) => reads.push(resolve));
+  const links = new OpenLinks(tabs, () => undefined, silentLogger(), {
+    shownWorkspace: (): string | null => '7',
+    timing: immediateFrames,
+  });
+  const older = links.refresh();
+  const newer = links.refresh();
+  const tab = { id: 2, url: `https://${MAHJONG.key}/`, vivExtData: linkedTo('11', 7) } as unknown as chrome.tabs.Tab;
+  reads[1]?.([]);
+  await newer;
+  assert.equal(links.tabFor(MAHJONG), undefined);
+  reads[0]?.([tab]);
+  await older;
+  assert.equal(links.tabFor(MAHJONG), undefined);
+  links.stop();
 });

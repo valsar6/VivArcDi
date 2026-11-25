@@ -25,13 +25,22 @@ export interface LinkRef {
   key: string;
 }
 
+export interface OpenLinksSettings {
+  /** The workspace the section shows, or null outside any workspace. */
+  shownWorkspace: () => string | null;
+  /** Frame scheduling, replaceable in tests. */
+  timing?: FrameTiming;
+}
+
 const WATCHED_CHANGES = ['url', 'pendingUrl', 'discarded', 'status', 'favIconUrl', 'title', 'vivExtData'] as const;
 
 export class OpenLinks {
   #tabs: OpenLinksTabs;
   #onChange: () => void;
   #logger: Logger;
+  #shownWorkspace: () => string | null;
   #task: FrameTask;
+  #generation = 0;
   #linkedTabIds: number[] = [];
   #linked = new Map<string, OpenTab>();
   #unlinked = new Map<string, OpenTab>();
@@ -48,12 +57,18 @@ export class OpenLinks {
    * @param tabs Tabs API.
    * @param onChange Called when the tabs of the links change.
    * @param logger Logger for failures.
-   * @param timing Frame scheduling, replaceable in tests.
+   * @param settings The workspace the section shows, and frame scheduling replaceable in tests.
    */
-  constructor(tabs: OpenLinksTabs, onChange: () => void, logger: Logger, timing: FrameTiming = {}) {
+  constructor(
+    tabs: OpenLinksTabs,
+    onChange: () => void,
+    logger: Logger,
+    { shownWorkspace, timing = {} }: OpenLinksSettings,
+  ) {
     this.#tabs = tabs;
     this.#onChange = onChange;
     this.#logger = logger;
+    this.#shownWorkspace = shownWorkspace;
     this.#task = new FrameTask(() => void this.refresh(), timing);
   }
 
@@ -76,9 +91,10 @@ export class OpenLinks {
   }
 
   /**
-   * Stops following the tabs.
+   * Stops following the tabs. A read that lands after this changes nothing.
    */
   public stop(): void {
+    this.#generation += 1;
     this.#task.cancel();
     this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
     this.#unsubscribe = [];
@@ -100,11 +116,15 @@ export class OpenLinks {
   }
 
   /**
-   * Reads the tabs again and reports a change.
+   * Reads the tabs again and reports a change. A read that lands after a newer one is dropped.
    */
   public async refresh(): Promise<void> {
+    const generation = ++this.#generation;
     try {
-      this.#update(await this.#tabs.query({ currentWindow: true }));
+      const tabs = await this.#tabs.query({ currentWindow: true });
+      if (generation === this.#generation) {
+        this.#update(tabs);
+      }
     } catch (error) {
       this.#logger.warn('could not read the open tabs', error);
     }
@@ -141,9 +161,9 @@ export class OpenLinks {
   }
 
   #update(tabs: chrome.tabs.Tab[]): void {
+    const workspace = this.#shownWorkspace();
     const linkedTabIds = tabs.filter((tab) => OpenLinks.#bookmarkIdOf(tab) !== undefined).flatMap((tab) => (tab.id === undefined ? [] : [tab.id]));
-    const active = tabs.find((tab) => tab.active);
-    const visible = tabs.filter((tab) => tab.id !== undefined && (active === undefined || TabData.shares(tab, active)));
+    const visible = tabs.filter((tab) => tab.id !== undefined && (TabData.of(tab) === null || TabData.of(tab) === workspace));
     const linked = OpenLinks.#byGroup(visible, OpenLinks.#bookmarkIdOf);
     const unlinked = OpenLinks.#byGroup(
       visible.filter((tab) => OpenLinks.#bookmarkIdOf(tab) === undefined),
