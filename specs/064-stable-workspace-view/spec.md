@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-25 |
 | Follow-up to | [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md); GitHub issue #283 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -163,24 +163,27 @@ only and has no way to open `vivaldi:inspect/#apps`, so no `live:` scenario is u
 
 ## Open questions
 
-- [ ] **Q-1. Should an internal inspection page change the workspace?** An inspection page such as
+- [x] **Q-1. Should an internal inspection page change the workspace?** An inspection page such as
   `vivaldi:inspect/#apps`, and the extension and window targets it opens, should NOT change the
   workspace the sidebar shows, while a normal tab that genuinely belongs to no workspace still
   selects the `Tabs` area as today (so 043/FR-4 is preserved). Recommendation: yes. The tab's
   address is available through `chrome.tabs` (`BrowserTabs.query` returns `chrome.tabs.Tab`, whose
   `url` and `pendingUrl` are read elsewhere already, `OpenLinks.ts:121`), so the distinction is
-  implementable without polling.
-- [ ] **Q-2. What happens when a removal leaves no active tab?** The last known workspace should
+  implementable without polling. Answered (Tore, 2026-11-25): yes; inspection pages leave the
+  shown workspace alone, while a normal tab outside any workspace still selects `Tabs`.
+- [x] **Q-2. What happens when a removal leaves no active tab?** The last known workspace should
   stay until Vivaldi selects another one, instead of the section falling to `Tabs`.
-  Recommendation: yes.
-- [ ] **Q-3. Should every surface share one workspace state?** The header, folder rows, open-link
+  Recommendation: yes. Answered (Tore, 2026-11-25): yes, the last known workspace stays.
+- [x] **Q-3. Should every surface share one workspace state?** The header, folder rows, open-link
   rows and pinned tiles should show the same workspace and never mix one workspace's name with
-  another's rows. Recommendation: yes.
-- [ ] **Q-4. Which workspace gets a folder's close state?** A folder minus press should save the
+  another's rows. Recommendation: yes. Answered (Tore, 2026-11-25): yes, every surface uses one
+  workspace state.
+- [x] **Q-4. Which workspace gets a folder's close state?** A folder minus press should save the
   close state under the workspace active when the press started, even if the active tab changes
   while its tabs close. Recommendation: yes. This refines the ordering prescribed in the
   `FolderClose` paragraph of [063's design](../063-minus-closes-folder-tabs/design.md), where the
-  folder is forgotten after the awaits on whatever workspace is current then.
+  folder is forgotten after the awaits on whatever workspace is current then. Answered (Tore,
+  2026-11-25): yes; the close state is saved under the workspace active at press time.
 
 ## References
 
