@@ -31,7 +31,7 @@ class FolderSectionView {
    * a folder row can be edited in place. A single click on a folder row waits for the double click
    * time, so that a double click edits the name and does not toggle the folder. A live folder
    * row has its own icon and a warning mark, a right click on it or on one of its rows reports the point for its menu,
-   * and a link row with a subtitle shows it under the title. A press on a minus unloads the tabs it
+   * and a link row with a subtitle shows it under the title. A press on a minus closes the tabs it
    * stands for and never opens or toggles its row.
    *
    * @param document The browser window document.
@@ -137,7 +137,8 @@ class FolderSectionView {
       event.stopImmediatePropagation();
       const ids = FolderMinus.tabIds(this.#rows, row, this.#links);
       if (ids.length > 0) {
-        this.#handlers.onUnload(ids);
+        const folderId = row.getAttribute("data-vivarcdi-folder-id") ?? void 0;
+        this.#handlers.onClose(ids, folderId);
       }
     } else {
       this.#open(row);
