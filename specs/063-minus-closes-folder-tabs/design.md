@@ -21,6 +21,7 @@ written.
 | Area | What changes | Where |
 |---|---|---|
 | Close | A `FolderCloser` calls `tabs.remove` for every id and reports success | `modules/folders/links/FolderCloser.ts` |
+| Folder state | `FolderClose` forgets the folder and redraws only after every close succeeded | `modules/folders/links/FolderClose.ts` |
 | Wiring | The view's `onUnload` becomes `onClose`, carrying the folder id of a folder press | `modules/folders/view/FolderSectionView.ts`, `modules/folders/FolderSection.ts` |
 | Folder state | A successful folder press forgets its id in `OpenFolders` and redraws | `modules/folders/FolderSection.ts` |
 | Labels | `Close tab` and `Close tabs` replace `Unload tab` and `Unload tabs` on the two rows | `modules/folders/view/FolderRowElement.ts` |
@@ -74,16 +75,18 @@ collects the ids, the view reads `data-vivarcdi-folder-id` from the row and pass
 argument: a defined id for a folder minus, `undefined` for a link minus. The delegated listener,
 `FolderMinus.swallow` and the drag/click routing stay as they are, so a press still opens nothing.
 
-`FolderSection` builds one `FolderCloser` from the context's `tabs` and logger and wires:
+`FolderSection` builds one `FolderClose` from a `FolderCloser`, the section's `OpenFolders` and a
+redraw callback, and wires:
 
 ```ts
-onClose: (tabIds, folderId): void => void this.#close(tabIds, folderId);
+onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId);
 ```
 
-`#close` awaits `closer.close(tabIds)`. On success it calls `#openFolders.forget(folderId)` when the
-id is defined — the same save-backed removal that folder deletion and relocation use — and requests
-one redraw. On failure it only logs through `FolderCloser`; no folder state changes. Virtual folders
-keep their source's behavior: a later click opens them again through the existing `#toggle` path.
+`FolderClose.apply` awaits `closer.close(tabIds)`. On success it calls
+`openFolders.forget(folderId)` when the id is defined — the same save-backed removal that folder
+deletion and relocation use — and requests one redraw. On failure it only logs through
+`FolderCloser`; no folder state changes. Virtual folders keep their source's behavior: a later click
+opens them again through the existing `#toggle` path.
 
 The pinned path is untouched: `PinnedMinus` and `PinnedTileMinus` still call `TabUnloader.discard`
 through their own modules.
@@ -117,6 +120,7 @@ from `origin/main` right before that task.
 | File | Role |
 |---|---|
 | `src/modules/folders/links/FolderCloser.ts` | Closes tab ids, reports failure |
+| `src/modules/folders/links/FolderClose.ts` | Forgets the folder and redraws after success |
 | `src/modules/folders/links/FolderUnloader.ts` | Removed; no caller left |
 | `src/modules/folders/view/FolderSectionView.ts` | `onClose` with the folder id |
 | `src/modules/folders/view/FolderRowElement.ts` | Close labels |

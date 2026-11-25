@@ -100,11 +100,11 @@ You can point a workspace at any existing folder in `config.json` (see the
   open, with no dot, and it stays visible below its folder when you close the folder, as in Arc. The
   tab is hidden from Vivaldi's own tab list, so the list holds only the pages you opened outside the
   Favorites, pinned tabs and folders.
-- **Unload a link** with the rounded **minus** on hover: the row stays dimmed, its bookmark stays, and
-  a click loads the page again. Cmd/Ctrl+W and Vivaldi's menu still close it for real, and the link
-  goes back inside its folder.
-- **Unload a folder's links** with the same **minus** on the folder row while its links are open,
-  without removing the folder or its bookmarks.
+- **Close a link** with the rounded **minus** on hover: its tab closes, the row returns to its folder
+  as an ordinary bookmark without the extra indent, and the bookmark stays. Cmd/Ctrl+W and Vivaldi's
+  menu close it for real too.
+- **Close a folder's links** with the same **minus** on the folder row while its links are open: their
+  tabs close and the folder closes again, without removing the folder or its bookmarks.
 - **Scroll** the column as one list, as in Arc: the Favorites stay in place at the top, the Archive footer
   at the bottom, and the folders and the Today tabs between them scroll together, however long the
   folders are. The scroll bar is thin and shows only while you scroll.

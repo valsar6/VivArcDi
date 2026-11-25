@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) approved 2026-11-12 (PR #146 merged by Tore) |
-| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-4, FR-5 and AC-13: an open link is marked by indentation, without a dot. |
+| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-4, FR-5 and AC-13: an open link is marked by indentation, without a dot. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-12 and FR-15: the row minuses close tabs. |
 
 ## Summary
 
@@ -121,15 +121,16 @@ Favorite.
   Vivaldi's layout allows. Replaced by [053 Single scroll](../053-single-scroll/spec.md): the whole
   column scrolls as one and `maxHeightPercent` no longer exists.
 - **FR-12.** The tab of a link is marked as hidden in Vivaldi's tab list, as the tabs of the
-  Favorites are in 003; the link row shows its state (open, active, unloaded) and has the unload minus
-  of [061](../061-pinned-minus-ui/spec.md) on hover.
+  Favorites are in 003; the link row shows its state (open, active, unloaded) and has the close minus
+  of [061](../061-pinned-minus-ui/spec.md) as refined by 063 on hover.
 - **FR-13.** A tab opened from a link, or adopted as the tab of a link, stores the bookmark id in its
   `vivExtData`; the link and the tab stay linked while the tab navigates, until the tab closes or the
   bookmark is removed.
 - **FR-14.** WHEN a new tab opens the address of a link that has no tab in the window and workspace,
   THEN that tab becomes the tab of the link. At start-up, an existing tab with the address of a link
   that has no tab becomes its tab.
-- **FR-15.** Closing the tab of a link closes it; the link returns inside its closed folder.
+- **FR-15.** Closing the tab of a link closes it; the link returns inside its closed folder. The
+  row's minus and the folder's minus also close tabs, as 063/FR-1 and FR-2 say.
 - **FR-16.** The Today archive of 004 skips the tabs of links.
 - **FR-17.** Peek of 002 treats the tab of a link as a Favorite or pinned tab: a click on a link to
   another site opens in Peek (option `pinnedCrossSite`).

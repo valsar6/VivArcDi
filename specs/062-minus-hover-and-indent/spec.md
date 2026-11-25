@@ -7,6 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-25 |
 | Supersedes | Nothing yet. It refines the visibility and the badge of [061](../061-pinned-minus-ui/spec.md) FR-1, FR-2, AC-1 to AC-4 and of [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-4 and AC-13, and keeps 061's unload model and labels. |
+| Refined by | [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-1 to FR-3: the folder and link row minuses close tabs instead of unloading them. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -101,8 +102,9 @@ group, with the Favorites grid on and off, in the light and dark themes.
 - **FR-2.** WHILE the pointer rests on a minus, THE badge surface and the hover colors SHALL be
   visible, and WHILE the pointer rests on its row but not on the minus, THE minus SHALL be only its
   dash on a transparent background with no badge, border or tint.
-- **FR-3.** A press on a minus SHALL keep the unload, drag, open, bookmark and label behavior of
-  061/FR-3 to FR-6 and FR-9.
+- **FR-3.** A press on a minus SHALL keep the drag, open and bookmark behavior of 061/FR-3 to FR-6
+  and FR-9. A pinned row or tile SHALL still unload its tab; a Favorites folder or link row SHALL
+  close its tab instead, as 063/FR-1 and FR-2 say.
 - **FR-4.** An open link row SHALL NOT show a dot or another mark of its open state beside its icon
   or title, and an open link SHALL stay visible below its closed folder.
 - **FR-5.** WHILE a row stands for an open tab, including a tab that Vivaldi does not display in its

@@ -364,8 +364,8 @@ the other tabs. Each workspace has its own pinned tabs.
   and colors appear when you hover the button itself. Cmd/Ctrl+W and the close affordance unload a
   pinned tab instead of closing it. The row stays, dimmed; a click loads its own page. "Close tab"
   and "Unpin tab" in the menu still close or unpin it. With the Favorites grid on, the same minus
-  sits on the tab's tile. The folder and link rows of the bookmark folders use the same badge to
-  unload their tabs without removing a bookmark.
+  sits on the tab's tile. The link rows of the bookmark folders use the same badge to close their
+  tabs, and the folder's badge closes its open tabs and the folder, without removing a bookmark.
 - The row's menu has Edit Pinned Page, with Replace Pinned URL with Current and Edit…, to change the
   page it opens first.
 
@@ -508,7 +508,7 @@ indented than a closed link, with no dot, and remains visible below its closed f
 As in Arc, the link row is the tab. The tab a link opens is linked to its bookmark and hidden from
 Vivaldi's list of tabs, so the list holds only the pages you opened outside the Favorites, the pinned
 tabs and the folders. The row shows that extra indent, the look of an active tab while the tab is the
-active one, a dimmed look while the tab is unloaded, and, on hover, the minus that unloads its tab.
+active one, a dimmed look while the tab is unloaded, and, on hover, the minus that closes its tab.
 The tab stays linked while it navigates, so a redirect or a login page does not turn it into a stray
 tab, and it keeps the link after a restart. Closing the tab with Cmd/Ctrl+W or Vivaldi's menu puts the
 link back inside its closed folder. A new tab becomes the tab of a link when it opens the
