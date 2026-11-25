@@ -6,6 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) approved 2026-11-12 (PR #146 merged by Tore) |
+| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-4, FR-5 and AC-13: an open link is marked by indentation, without a dot. |
 
 ## Summary
 
@@ -98,8 +99,9 @@ Favorite.
   and restored after a restart.
 - **FR-3.** A click on a link activates the open tab with the same address in the same window and
   workspace, loading it if unloaded; with no such tab it opens the address in a new tab.
-- **FR-4.** A link with an open tab shows a dot, and stays visible below its folder while the folder
-  is closed.
+- **FR-4.** A link with an open tab stays visible below its folder while the folder is closed. Its
+  row is indented one step further than a closed link at the same depth and shows no dot (062/FR-4,
+  FR-5).
 - **FR-5.** The section follows the bookmarks: a created, renamed, moved or removed bookmark under the
   root changes it without a restart.
 - **FR-6.** Separators, folders deeper than `maxDepth` and links that are not `http` or `https` are
@@ -167,7 +169,7 @@ Favorite.
 | AC-10 | WHEN a tab that matches a link of the root becomes active, THE module SHALL record its last-opened date. | auto: `records the last opened date of tabs that match a bookmark` |
 | AC-11 | THE section SHALL appear below the Favorites grid in the vertical tab bar, also with the sidebar set to auto-hide. | manual |
 | AC-12 | WHEN Tore clicks a folder, THE folder SHALL open and close, with its subfolders inside it. | manual |
-| AC-13 | WHILE a folder is closed and one of its links is open, THAT link SHALL appear below the folder, indented, with a dot. | manual |
+| AC-13 | WHILE a folder is closed and one of its links is open, THAT link SHALL appear below the folder, indented one step further than a closed link, with no dot (062/AC-8). | manual |
 | AC-14 | WHEN Tore switches workspace, resizes the window or toggles the sidebar, THE section SHALL stay in place. | manual |
 | AC-15 | IF the module is disabled or VivArcDi is uninstalled, THEN the bookmarks and the Bookmarks panel SHALL be unchanged. | manual |
 | AC-16 | WHILE a folder with many links is open, THE tab list SHALL stay reachable by scrolling. | manual |

@@ -96,9 +96,10 @@ You can point a workspace at any existing folder in `config.json` (see the
 
 - **Open and close** a folder with a click. Subfolders open inside their parent, and the state
   survives a restart.
-- **Open a link** with a click. Its row becomes its tab: a dot marks it as open, and it stays visible
-  below its folder when you close the folder, as in Arc. The tab is hidden from Vivaldi's own tab list,
-  so the list holds only the pages you opened outside the Favorites, pinned tabs and folders.
+- **Open a link** with a click. Its row becomes its tab: one extra step of indentation marks it as
+  open, with no dot, and it stays visible below its folder when you close the folder, as in Arc. The
+  tab is hidden from Vivaldi's own tab list, so the list holds only the pages you opened outside the
+  Favorites, pinned tabs and folders.
 - **Unload a link** with the rounded **minus** on hover: the row stays dimmed, its bookmark stays, and
   a click loads the page again. Cmd/Ctrl+W and Vivaldi's menu still close it for real, and the link
   goes back inside its folder.
@@ -157,11 +158,11 @@ Pinned tabs are rows below the folders. Each workspace has its own.
 - A pinned tab remembers the page it was pinned with. Following a link inside it changes what it
   shows, not its own page; the favicon stays the same and there is no back arrow. Closing and
   reopening the tab loads its own page again.
-- The **minus** at the right end of the row is a small rounded badge with a dash, shown on hover or
-  on the current row. It, Cmd/Ctrl+W and the close affordance unload a pinned tab instead of closing
-  it. The row stays, dimmed; a click loads its own page. **Close tab** and
-  **Unpin tab** in the menu still close or unpin it. With the Favorites grid on, the same **minus**
-  sits on the tile of the pinned tab.
+- The **minus** at the right end of the row is a small rounded badge with a dash, shown on hover of
+  the row or tile only; its badge and colors appear when you hover the button itself. It,
+  Cmd/Ctrl+W and the close affordance unload a pinned tab instead of closing it. The row stays,
+  dimmed; a click loads its own page. **Close tab** and **Unpin tab** in the menu still close or
+  unpin it. With the Favorites grid on, the same **minus** sits on the tile of the pinned tab.
 - The row's menu has **Edit Pinned Page**, with **Replace Pinned URL with Current** and **Edit…**, to
   change the page it opens first.
 - In a pinned tab, a link to another site opens in [Peek](peek.md), so the tab keeps its page; a link

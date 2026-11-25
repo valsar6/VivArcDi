@@ -360,11 +360,12 @@ the other tabs. Each workspace has its own pinned tabs.
 - A pinned tab remembers the page it was pinned with, its own page. Unpinning forgets it.
 - Following a link inside the pinned tab changes what it shows, not its own page. The favicon stays
   the same and there is no back arrow; closing and reopening the tab loads its own page again.
-- The rounded minus badge at the right end of the row, shown on hover or on the current row, Cmd/Ctrl+W
-  and the close affordance unload a pinned tab instead of closing it. The row stays, dimmed; a click
-  loads its own page. "Close tab" and "Unpin tab" in the menu still close or unpin it. With the
-  Favorites grid on, the same minus sits on the tab's tile. The folder and link rows of the bookmark
-  folders use the same badge to unload their tabs without removing a bookmark.
+- The rounded minus badge at the right end of the row appears on row or tile hover only; its badge
+  and colors appear when you hover the button itself. Cmd/Ctrl+W and the close affordance unload a
+  pinned tab instead of closing it. The row stays, dimmed; a click loads its own page. "Close tab"
+  and "Unpin tab" in the menu still close or unpin it. With the Favorites grid on, the same minus
+  sits on the tab's tile. The folder and link rows of the bookmark folders use the same badge to
+  unload their tabs without removing a bookmark.
 - The row's menu has Edit Pinned Page, with Replace Pinned URL with Current and Edit…, to change the
   page it opens first.
 
@@ -501,16 +502,16 @@ The module has only the `enabled` option. Set it to `false` and no row is drawn 
 Shows a bookmark folder in the vertical tab bar, right below the Favorites grid, like the folders of
 Arc. Each folder opens and closes on click, subfolders open inside their parent, and the folders you
 left open stay open after a restart. A click on a link brings you to its tab if it is open in the
-current window and workspace, and opens it otherwise. A link that is open shows a dot and stays
-visible below its closed folder.
+current window and workspace, and opens it otherwise. A link with an open tab stays one step further
+indented than a closed link, with no dot, and remains visible below its closed folder.
 
 As in Arc, the link row is the tab. The tab a link opens is linked to its bookmark and hidden from
 Vivaldi's list of tabs, so the list holds only the pages you opened outside the Favorites, the pinned
-tabs and the folders. The row shows the dot, the look of an active tab while the tab is the active
-one, a dimmed look while the tab is unloaded, and, on hover, a close button that closes the tab. The
-tab stays linked while it navigates, so a redirect or a login page does not turn it into a stray tab,
-and it keeps the link after a restart. Closing the tab, with the button, Cmd/Ctrl+W or Vivaldi's menu,
-puts the link back inside its closed folder. A new tab becomes the tab of a link when it opens the
+tabs and the folders. The row shows that extra indent, the look of an active tab while the tab is the
+active one, a dimmed look while the tab is unloaded, and, on hover, the minus that unloads its tab.
+The tab stays linked while it navigates, so a redirect or a login page does not turn it into a stray
+tab, and it keeps the link after a restart. Closing the tab with Cmd/Ctrl+W or Vivaldi's menu puts the
+link back inside its closed folder. A new tab becomes the tab of a link when it opens the
 address of a link that has no tab, and when VivArcDi starts, an open tab with the address of a link
 that has no tab becomes its tab. The Today archive never archives these tabs, and a click on a link to
 another site inside one opens in [Peek](#peek), as for pinned tabs. When a bookmark is removed, its

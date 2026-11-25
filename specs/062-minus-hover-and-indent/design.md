@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-25, PR #278) |
 | Spec | [spec.md](spec.md) |
 
 Tore approved the spec on 2026-11-25 (PR #277) and answered Q-1 and Q-2 in it. This document says
@@ -32,8 +32,8 @@ transition, and one hover rule that sets `opacity: 1` and `pointer-events: auto`
 - `pinned.scss`: `.tab-position.is-pinned:hover #{$pinned-minus}`; drop the
   `.tab-position.is-pinned:has(.tab.active) #{$pinned-minus}` selector.
 - `favorites.scss`: `#{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}:hover #{$tile-minus}`;
-  drop the selector that also matches `#{$tile-current}`. The `$tile-current` token becomes unused
-  and is removed with it.
+  drop the selector that also matches `#{$tile-current}`. The token stays: the current tile's
+  background still uses it.
 - `folders.scss`: `[data-vivarcdi-link-open]:hover [data-vivarcdi-link-minus]` and
   `[data-vivarcdi-folder-unload]:hover [data-vivarcdi-folder-minus]`; drop
   `[data-vivarcdi-link-active] [data-vivarcdi-link-minus]`. The active attribute stays on the row:
@@ -123,7 +123,7 @@ read from `origin/main` right before that task as CONTRIBUTING requires.
 
 | File | Role |
 |---|---|
-| `src/styles/_tokens.scss` | Hover tints, dash mix; remove the dot and tile-current tokens |
+| `src/styles/_tokens.scss` | Hover tints, dash mix; remove the dot token |
 | `src/styles/_minus.scss` | Shared badge rules and the new `&:hover` surface |
 | `src/styles/pinned.scss`, `src/styles/favorites.scss` | Hover-only visibility selectors |
 | `src/styles/folders.scss` | Hover-only visibility, no dot |
