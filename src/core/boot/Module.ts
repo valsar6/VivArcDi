@@ -8,6 +8,7 @@ import type { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { BrowserWindows } from '../browser/BrowserWindows.js';
 import type { Logger } from '../support/Logger.js';
 import type { VersionedStorage } from '../browser/StoredFormat.js';
+import type { ActiveWorkspace } from '../workspaces/ActiveWorkspace.js';
 import type { NoticeBoard } from '../dom/Notices.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
@@ -27,6 +28,8 @@ export interface ModuleContext<O extends object = RawOptions> {
   options: Readonly<O>;
   /** The `chrome.tabs` API; check `tabs.available` first. */
   tabs: BrowserTabs;
+  /** The one workspace state of this window: which workspace every surface shows. */
+  activeWorkspace: ActiveWorkspace;
   /** The `chrome.bookmarks` API, read-only; check `bookmarks.available` first. */
   bookmarks: BrowserBookmarks;
   /** The only way to create, rename and delete bookmarks; check `bookmarkWriter.available` first. */

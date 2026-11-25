@@ -4,6 +4,7 @@ import { Notices, NOTICE_MS } from '../dom/Notices.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import { Toast } from '../dom/Toast.js';
 import type { Logger } from '../support/Logger.js';
+import type { ActiveWorkspace } from '../workspaces/ActiveWorkspace.js';
 import { GuardedStorage } from './GuardedStorage.js';
 import { NoticedStorage } from './NoticedStorage.js';
 import type { ModuleSettings } from './ModuleSettings.js';
@@ -15,6 +16,7 @@ export interface StartServices {
   build: BuildInfo;
   storage: VersionedStorage;
   notices: Notices;
+  activeWorkspace: ActiveWorkspace;
 }
 
 export class WindowServices {

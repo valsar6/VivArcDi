@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
+import { ActiveWorkspace } from '../../../src/core/workspaces/ActiveWorkspace.js';
 import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
 import type { Logger } from '../../../src/core/support/Logger.js';
+import { SpaceHeader } from '../../../src/modules/spaceheader/SpaceHeader.js';
 import { TabData } from '../../../src/core/tabs/TabData.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
@@ -51,6 +53,7 @@ function setup(
     prefs,
     storage: new MemoryStorage(),
     notices: silentNotices(),
+    activeWorkspace: new ActiveWorkspace(tabs, silentLogger()),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   return { dom, module: new BookmarkFolders(), context };
 }
@@ -105,6 +108,7 @@ test('draws the folders above the tab list and removes them on stop', async (t) 
   await settle();
   assert.deepEqual(tabs.actions()[0]?.[0], 'create');
 
+  context.activeWorkspace.stop();
   module.stop();
   assert.deepEqual(dom.parent.children, [dom.list]);
   assert.equal(tabs.listenerCount(), 0);
@@ -187,6 +191,33 @@ function activate(tabs: FolderTabs, tabId: number): void {
 
 const titles = (dom: DomDocument): Array<string | undefined> => rows(dom).map((row) => (row.textContent === '' ? row.children[1]?.textContent : row.textContent));
 const sectionOf = (dom: DomDocument): DomNode | undefined => dom.parent.children[0]?.children[0];
+
+const anchored = (dom: DomDocument): DomNode[] => dom.parent.children[0]?.children ?? [];
+const headerOf = (dom: DomDocument): DomNode | undefined => anchored(dom).find((node) => node.hasAttribute('data-vivarcdi-space-header'));
+const headerName = (dom: DomDocument): string | undefined => headerOf(dom)?.children.filter((part) => !part.hasAttribute('data-vivarcdi-space-add')).at(-1)?.textContent;
+const folderSection = (dom: DomDocument): DomNode | undefined => anchored(dom).find((node) => node.hasAttribute('data-vivarcdi-folders'));
+const folderTitles = (dom: DomDocument): Array<string | undefined> => (folderSection(dom)?.children ?? []).map((row) => (row.textContent === '' ? row.children[1]?.textContent : row.textContent));
+
+test('renders the header and folder rows from one workspace', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  const header = new SpaceHeader();
+  await module.start(context);
+  await header.start(context);
+  await frame();
+  assert.equal(headerName(dom), 'Casetta');
+  assert.deepEqual(folderTitles(dom), ['Jira']);
+
+  tabs.tabs.set(4, { id: 4, windowId: 1, url: 'vivaldi://inspect/#apps', vivExtData: inWorkspace(WORK.id) });
+  activate(tabs, 4);
+  await frame();
+  assert.equal(headerName(dom), 'Casetta');
+  assert.deepEqual(folderTitles(dom), ['Jira']);
+
+  header.stop();
+  module.stop();
+  context.activeWorkspace.stop();
+});
 
 test('shows the folders of the active workspace', async (t) => {
   installFrames(t);

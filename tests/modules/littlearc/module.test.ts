@@ -238,6 +238,13 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
     },
     payload: new FakeLoader({ 'page/little-arc-links.js': 'LITTLE_ARC_LINKS' }),
     notices: silentNotices(),
+    activeWorkspace: {
+      current: null,
+      start: async (): Promise<void> => undefined,
+      onChange: (): (() => void) => (): void => undefined,
+      refresh: async (): Promise<void> => undefined,
+      stop: (): void => undefined,
+    },
   } as unknown as ModuleContext<LittleArcOptions>;
   return { context, document, created, focus, removed, messages, webviews, windowCalls };
 }

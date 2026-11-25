@@ -8,12 +8,13 @@ import { BrowserSearch } from '../browser/BrowserSearch.js';
 import { BrowserTabs } from '../browser/BrowserTabs.js';
 import type { ChromeApi } from '../browser/BrowserTabs.js';
 import { BrowserWindows } from '../browser/BrowserWindows.js';
+import { ActiveWorkspace } from '../workspaces/ActiveWorkspace.js';
+import { WorkspaceNames } from '../workspaces/WorkspaceNames.js';
 import { BootReport } from './BootReport.js';
 import type { BootOutcome } from './BootReport.js';
 import { Logger } from '../support/Logger.js';
 import type { ModuleRegistry, EnabledModule } from './ModuleRegistry.js';
 import { ModuleStarter } from './ModuleStarter.js';
-import type { ModuleServices } from './ModuleStarter.js';
 import { ModuleSettings } from './ModuleSettings.js';
 import { PersistentStorage } from '../browser/PersistentStorage.js';
 import type { SavingStorage } from '../browser/SavingStorage.js';
@@ -25,6 +26,8 @@ import { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import { StyleInjector } from './StyleInjector.js';
 import type { BuildInfo, Config } from './types.js';
 import { UiReadiness } from './UiReadiness.js';
+
+const WORKSPACE_TABS = 'the workspace cannot follow the tabs';
 
 export interface VivArcDiDependencies {
   /** Loads payload files. */
@@ -62,9 +65,12 @@ export class VivArcDi {
   #document: Document;
   #runtime: BrowserRuntime;
   #storage: SavingStorage;
+  #tabs: BrowserTabs;
   #notices: Notices | null = null;
   #styles: StyleInjector;
   #starter: ModuleStarter;
+  #workspaces: WorkspaceNames;
+  #activeWorkspace: ActiveWorkspace;
   #started: EnabledModule[] = [];
 
   /**
@@ -94,12 +100,13 @@ export class VivArcDi {
     this.#document = document;
     this.#runtime = runtime;
     this.#storage = storage;
-    this.#starter = VivArcDi.#starterOf(
-      { document, tabs, bookmarks, bookmarkWriter, runtime, history, prefs, payload: loader },
-      windows,
-      search,
-      logger,
-    );
+    this.#tabs = tabs;
+    const workspaceLogger = logger.child('workspaces');
+    this.#workspaces = new WorkspaceNames(prefs, (): void => undefined, workspaceLogger);
+    this.#activeWorkspace = new ActiveWorkspace(tabs, workspaceLogger, (workspaceId): boolean =>
+      !this.#workspaces.listed || this.#workspaces.has(workspaceId));
+    this.#starter = ModuleStarter.of(
+      { document, tabs, bookmarks, bookmarkWriter, runtime, history, prefs, payload: loader }, windows, search, logger);
     this.#styles = new StyleInjector(document, loader);
   }
 
@@ -136,22 +143,6 @@ export class VivArcDi {
     });
     await app.start();
     return app;
-  }
-
-  static #starterOf(
-    services: Omit<ModuleServices, 'windows' | 'search'>,
-    windows: BrowserWindows | undefined,
-    search: BrowserSearch | undefined,
-    logger: Logger,
-  ): ModuleStarter {
-    return new ModuleStarter(
-      {
-        ...services,
-        windows: windows ?? new BrowserWindows(undefined),
-        search: search ?? new BrowserSearch(undefined),
-      },
-      logger,
-    );
   }
 
   static #prefsApi(chromeApi: ChromeApi | undefined): PrefsApi | undefined {
@@ -204,6 +195,10 @@ export class VivArcDi {
     config.styles.forEach((path) => this.#styles.inject(path));
     const services = WindowServices.open(this.#document, selectors, this.#storage, this.#logger);
     this.#notices = services.notices;
+    if (this.#tabs.available) {
+      await this.#workspaces.start();
+      await this.#activeWorkspace.start().catch((error: unknown) => this.#logger.warn(WORKSPACE_TABS, error));
+    }
 
     report.enter('modules');
     const settings = ModuleSettings.check(config.modules, this.#registry, this.#logger);
@@ -211,7 +206,7 @@ export class VivArcDi {
     report.skip(skipped.config, skipped.window);
     unknown.forEach((id) => this.#logger.warn(`Unknown module "${id}" in config.json`));
     for (const entry of modules) {
-      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services });
+      const outcome = await this.#starter.start(entry, { settings, selectors, build, ...services, activeWorkspace: this.#activeWorkspace });
       report.record(entry.id, outcome);
       if (outcome === 'started') {
         this.#started.push(entry);
@@ -237,6 +232,8 @@ export class VivArcDi {
       }
     }
     this.#started = [];
+    this.#activeWorkspace.stop();
+    this.#workspaces.stop();
     this.#notices?.remove();
     this.#styles.removeAll();
   }

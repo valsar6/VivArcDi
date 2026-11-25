@@ -1,4 +1,3 @@
-import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
 import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { PageScriptInjector } from '../../core/browser/PageScriptInjector.js';
@@ -115,9 +114,7 @@ export class MainWindowRole {
       logger.warn('chrome.runtime.onMessage is missing: pages cannot be moved from Little Arc');
       return;
     }
-    const workspace = new ActiveWorkspace(tabs, (): void => undefined, logger);
-    await workspace.start().catch((error: unknown) => logger.warn('cannot follow the workspace of this window', error));
-    this.#cleanups.push(() => workspace.stop());
+    const workspace = this.#context.activeWorkspace;
     const picker = new DestinationPicker(this.#settings.askWorkspace, () => Promise.resolve(null));
     const destination = await this.#destinationSource();
     const adopter = new WorkspaceAdopter({ tabs, windows, windowId: this.#windowId, recentWorkspace: (): string | null => workspace.current, picker, destination, logger });

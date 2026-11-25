@@ -1,4 +1,4 @@
-import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
+import type { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
 import { LabelKeys, LinkLabels, type LinkLabel } from '../../core/browser/LinkLabels.js';
 import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
@@ -76,7 +76,7 @@ export class FolderSection {
     this.#openFolders = new OpenFolders(context.storage, logger);
     this.#roots = roots;
     this.#names = new WorkspaceNames(prefs, (): void => this.#namesChanged(), logger);
-    this.#active = new ActiveWorkspace(tabs, (workspace): void => void this.#show(workspace), logger);
+    this.#active = context.activeWorkspace;
     this.#source = new FolderTreeSource(bookmarks, {
       path: [],
       maxDepth,
@@ -128,7 +128,7 @@ export class FolderSection {
       () => this.#source.stop(),
       () => this.#openLinks.stop(),
       () => this.#adopter.stop(),
-      () => this.#active.stop(),
+      this.#active.onChange((workspace): void => void this.#show(workspace)),
       () => this.#names.stop(),
     );
     await this.#names.start();
