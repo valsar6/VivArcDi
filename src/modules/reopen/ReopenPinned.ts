@@ -2,6 +2,7 @@ import { BookmarkFolderFinder } from '../../core/browser/bookmarks/BookmarkFolde
 import { LinkKeyIndex } from './LinkKeyIndex.js';
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
+import { TabData } from '../../core/tabs/TabData.js';
 import { ActivationRecorder } from './ActivationRecorder.js';
 import { LastOpenedStore } from '../../shared/links/LastOpenedStore.js';
 import { NewTabWatcher } from './NewTabWatcher.js';
@@ -20,8 +21,8 @@ export class ReopenPinned extends Module {
 
   /**
    * Opening from a new tab the address of a Favorite, a pinned tab or a bookmark link of the current workspace
-   * switches to that tab instead of keeping a duplicate, and the date each pinned tab is opened
-   * is recorded. Without `chrome.tabs` or its events the module stays off.
+   * switches to that tab instead of keeping a duplicate, and the date each pinned or linked tab is
+   * opened is recorded. Without `chrome.tabs` or its events the module stays off.
    *
    * @param context What the module may use.
    */
@@ -38,7 +39,8 @@ export class ReopenPinned extends Module {
     const switcher = new TabSwitcher(tabs, logger);
     const watcher = new NewTabWatcher(tabs, (navigation) => void this.#reopen(navigation, finder, switcher, context));
     const recorder = new ActivationRecorder(tabs, store, logger, {
-      isTracked: (tab, key): boolean => tab.pinned || links?.has(key) === true,
+      isTracked: (tab, key): boolean =>
+        tab.pinned || TabData.ownOf(tab).bookmarkId !== undefined || links?.has(key) === true,
     });
     try {
       watcher.start();
