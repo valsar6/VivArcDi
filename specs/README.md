@@ -70,7 +70,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [060 Clear bar and pinned tile unload](060-clear-bar-and-pinned-unload/spec.md) | 3 | Approved |
 | [061 Pinned minus UI](061-pinned-minus-ui/spec.md) | 3 | Approved |
 | [062 Minus on hover and open-link indent](062-minus-hover-and-indent/spec.md) | 3 | Implemented |
-| [063 Minus closes folder link tabs](063-minus-closes-folder-tabs/spec.md) | 3 | Approved |
+| [063 Minus closes folder link tabs](063-minus-closes-folder-tabs/spec.md) | 3 | Implemented |
 
 
 
