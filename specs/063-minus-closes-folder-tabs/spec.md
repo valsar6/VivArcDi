@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-25 |
 | Supersedes | Nothing yet. It changes the press of the Favorites link row's and folder row's minus in [061](../061-pinned-minus-ui/spec.md) FR-6, AC-11 and AC-12, the unload model kept by [062](../062-minus-hover-and-indent/spec.md) FR-3, and the other close routes of [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-15. The pinned row and tile minus of 061/FR-3 keeps unloading. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -156,10 +156,9 @@ read from the module's fakes.
 
 ## Open questions
 
-- [ ] **Q-1. What the two minuses are called.** The recording shows Arc's tooltips
-  `Close and Keep Pinned` and `Close This Folder`, but 061 deliberately kept `Unload tab` and
-  `Unload tabs` because a press unloaded. With a real close, the proposed names are `Close tab` and
-  `Close tabs`, with no visible tooltip. Tore to confirm or give the words to use.
+- [x] **Q-1. What the two minuses are called.** Tore approved the proposed names on 2026-11-25
+  with the spec: `Close tab` for a link row and `Close tabs` for a folder row, with no visible
+  tooltip. Arc's `Close and Keep Pinned` and `Close This Folder` wording stays out of VivArcDi.
 
 ## References
 
