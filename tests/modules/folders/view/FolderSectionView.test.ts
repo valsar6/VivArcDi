@@ -15,23 +15,28 @@ const OPEN: OpenTab = { tabId: 2, title: 'Mahjong', key: KEY, favIconUrl: undefi
 
 const linkRow = (tab: OpenTab | undefined): Row => ({ kind: 'link', id: '11', title: 'Mahjong Soul', url: MAHJONG, key: KEY, depth: 0, tab });
 
-async function setup(_tabs: FolderTabs): Promise<{ document: DomDocument; view: FolderSectionView; clicks: string[]; unloads: number[][]; timers: ManualTimers }> {
+interface CloseCall {
+  tabIds: number[];
+  folderId: string | undefined;
+}
+
+async function setup(_tabs: FolderTabs): Promise<{ document: DomDocument; view: FolderSectionView; clicks: string[]; closes: CloseCall[]; timers: ManualTimers }> {
   const document = new DomDocument();
   const clicks: string[] = [];
-  const unloads: number[][] = [];
+  const closes: CloseCall[] = [];
   const timers = new ManualTimers();
   const view = new FolderSectionView(
     asDocument(document),
     {
       onFolder: (id): void => void clicks.push(`folder ${id}`),
       onLink: (link): void => void clicks.push(`link ${link.id}`),
-      onUnload: (tabIds): void => void unloads.push(tabIds),
+      onClose: (tabIds, folderId): void => void closes.push({ tabIds, folderId }),
       onRename: (id, name): void => void clicks.push(`rename ${id} ${name}`),
       onMenu: (id, x, y): void => void clicks.push(`menu ${id} ${x} ${y}`),
     },
     timers,
   );
-  return { document, view, clicks, unloads, timers };
+  return { document, view, clicks, closes, timers };
 }
 
 const rowOf = (view: FolderSectionView): DomNode => (view.element as unknown as DomNode).children[0] as DomNode;
@@ -51,7 +56,7 @@ test('shows the link row minus only while the row is hovered', async () => {
   view.render([linkRow(OPEN)]);
   const button = minusOf(rowOf(view));
   assert.ok(button);
-  assert.equal(button.getAttribute('aria-label'), 'Unload tab');
+  assert.equal(button.getAttribute('aria-label'), 'Close tab');
   view.render([linkRow(undefined)]);
   assert.equal(minusOf(rowOf(view)), undefined);
 });
@@ -70,9 +75,9 @@ test('indents every row of an open tab one step further than a closed link row',
   assert.equal(rows[2]?.getAttribute('data-vivarcdi-depth'), '1');
 });
 
-test('unloads a link tab from its minus', async () => {
+test('closes a link tab from its minus', async () => {
   const tabs = new FolderTabs([{ id: 2, url: MAHJONG }]);
-  const { view, clicks, unloads } = await setup(tabs);
+  const { view, clicks, closes } = await setup(tabs);
   view.render([linkRow(OPEN)]);
   const button = minusOf(rowOf(view));
   assert.ok(button);
@@ -80,7 +85,7 @@ test('unloads a link tab from its minus', async () => {
   pressMinus(button, 'mousedown');
   pressMinus(button, 'click');
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual(unloads, [[2]]);
+  assert.deepEqual(closes, [{ tabIds: [2], folderId: undefined }]);
   assert.deepEqual(tabs.actions(), []);
   assert.deepEqual(clicks, []);
 });
@@ -114,16 +119,41 @@ test('marks the row of an open link as active or unloaded', async () => {
 
 const folderRow = (id = '10', title = 'Hobbies'): Row => ({ kind: 'folder', id, title, depth: 0, open: false });
 
-test('unloads the link tabs of a folder from its minus', async () => {
-  const { view, clicks, unloads } = await setup(new FolderTabs());
+test('closes the open link tabs of a folder from its minus and closes the folder', async () => {
+  const { view, clicks, closes } = await setup(new FolderTabs());
   const nested = (tabId: number): Row => ({ ...linkRow({ ...OPEN, tabId }), depth: 1 });
   view.render([folderRow(), nested(3), nested(4), folderRow('12', 'Streaming')]);
   const button = rowOf(view).children.find((child) => child.hasAttribute('data-vivarcdi-folder-minus'));
   assert.ok(button);
-  assert.equal(button.getAttribute('aria-label'), 'Unload tabs');
   pressMinus(button, 'click');
-  assert.deepEqual(unloads, [[3, 4]]);
+  assert.deepEqual(closes, [{ tabIds: [3, 4], folderId: '10' }]);
   assert.deepEqual(clicks, []);
+});
+
+test('does not drag or open a Favorites row from its minus', async () => {
+  const tabs = new FolderTabs([{ id: 2, url: MAHJONG }]);
+  const { view, clicks } = await setup(tabs);
+  view.render([folderRow(), { ...linkRow(OPEN), depth: 1 }]);
+  const rows = (view.element as unknown as DomNode).children;
+  const folderMinus = rows[0]?.children.find((child) => child.hasAttribute('data-vivarcdi-folder-minus'));
+  const linkMinus = rows[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-link-minus'));
+  assert.ok(folderMinus);
+  assert.ok(linkMinus);
+  [folderMinus, linkMinus].forEach((button) => ['pointerdown', 'mousedown', 'click'].forEach((type) => pressMinus(button, type)));
+  assert.deepEqual(clicks, []);
+  assert.deepEqual(tabs.actions(), []);
+});
+
+test('labels the row minuses for closing tabs', async () => {
+  const { view } = await setup(new FolderTabs());
+  view.render([folderRow(), { ...linkRow(OPEN), depth: 1 }]);
+  const rows = (view.element as unknown as DomNode).children;
+  const folderMinus = rows[0]?.children.find((child) => child.hasAttribute('data-vivarcdi-folder-minus'));
+  const linkMinus = rows[1]?.children.find((child) => child.hasAttribute('data-vivarcdi-link-minus'));
+  assert.equal(folderMinus?.getAttribute('aria-label'), 'Close tabs');
+  assert.equal(linkMinus?.getAttribute('aria-label'), 'Close tab');
+  assert.equal(folderMinus?.getAttribute('title'), null);
+  assert.equal(linkMinus?.getAttribute('title'), null);
 });
 
 const inputOf = (view: FolderSectionView): DomNode | undefined => rowOf(view).children.find((child) => child.hasAttribute('data-vivarcdi-edit'));
