@@ -65,9 +65,10 @@ after T1. T4 runs last on the code and reads the version from `origin/main` at t
   rows, describe the folder's re-close and keep the pinned unload wording. In the three version
   files, make the minor bump read from `origin/main` right before editing. Done when `make check`
   is green.
-- [ ] **T5. Tore's manual check** (last). On macOS and Debian, with the Favorites grid on and off,
+- [x] **T5. Tore's manual check** (last). On macOS and Debian, with the Favorites grid on and off,
   replay the recording of 2026-11-25 at 10:30: press a link's minus and confirm its tab closes, the
   row loses the indent and returns among the folder's children, and the bookmark stays; press a
   folder's minus and confirm all open link tabs inside close, the folder closes, and nothing is
   renamed or deleted. Confirm the pinned row and tile minus still unload. Record the result in the
-  checklist built from AC-6.
+  checklist built from AC-6. Tore confirmed it on 2026-11-25; issue #283 tracks a separate
+  workspace-sync anomaly seen during the check.
