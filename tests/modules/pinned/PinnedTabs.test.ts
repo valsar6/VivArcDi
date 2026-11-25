@@ -154,6 +154,33 @@ test('unloads a pinned tab from its minus', async () => {
   assert.equal(watchers.size, 0);
 });
 
+test('keeps the pinned minus unloading', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addRow(5);
+  const tabs = new LinkingTabs([
+    { id: 5, url: 'https://docs.example/a' },
+    { id: 6, active: true, url: 'https://news.example/' },
+  ]);
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs,
+    logger: silentLogger,
+    watch: (_target): (() => void) => (): void => undefined,
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  const click = document.dispatch(event('click', { target: button }));
+  await settle();
+  assert.ok(click.defaultPrevented && click.stopped);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'discard'), [['discard', 5]]);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), []);
+  minus.stop();
+});
+
 test('labels the pinned minus as Unload tab', async () => {
   const document = new MinusDocument();
   const pinned = document.addRow(5);

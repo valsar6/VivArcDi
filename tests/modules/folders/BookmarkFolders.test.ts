@@ -648,3 +648,73 @@ test('shows a warning mark with the reason on a live folder', async (t) => {
   assert.equal(mark?.getAttribute('title'), 'The token was refused');
   module.stop();
 });
+
+const rowWithId = (dom: DomDocument, attribute: string, id: string): DomNode | undefined =>
+  rows(dom).find((row) => row.getAttribute(attribute) === id);
+
+function pressRowMinus(row: DomNode | undefined, attribute: string): void {
+  const button = row?.children.find((child) => child.hasAttribute(attribute));
+  assert.ok(button);
+  button.bubble({
+    type: 'click',
+    target: button,
+    preventDefault: (): void => undefined,
+    stopPropagation: (): void => undefined,
+    stopImmediatePropagation: (): void => undefined,
+  } as unknown as Event);
+}
+
+test('closes a link tab from its minus', async (t) => {
+  installFrames(t);
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/' },
+    { id: 2, url: MAHJONG, vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11' } }) },
+  ]);
+  const { dom, module, context } = setup(tabs);
+  await module.start(context);
+  await frame();
+  rows(dom)[0]?.click();
+  await toggleDelay();
+  await frame();
+  const row = rowWithId(dom, 'data-vivarcdi-link-id', '11');
+  assert.ok(row);
+  assert.equal(row.hasAttribute('data-vivarcdi-link-open'), true);
+  assert.equal(row.properties.get('--vivarcdi-depth'), '2');
+  pressRowMinus(row, 'data-vivarcdi-link-minus');
+  await frame();
+  await frame();
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'remove'), [['remove', 2]]);
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'discard'), []);
+  const again = rowWithId(dom, 'data-vivarcdi-link-id', '11');
+  assert.ok(again);
+  assert.equal(again.hasAttribute('data-vivarcdi-link-open'), false);
+  assert.equal(again.properties.get('--vivarcdi-depth'), '1');
+  module.stop();
+});
+
+test('closes the open link tabs of a folder from its minus and closes the folder', async (t) => {
+  installFrames(t);
+  const other = 'https://example.org/';
+  const bookmarks = recordingChrome(
+    bookmarkTree([folder('10', 'Hobbies', [link('11', 'Mahjong Soul', MAHJONG), link('12', 'Other', other)]), folder('20', 'Music')]),
+  ).bookmarks;
+  const tabs = new FolderTabs([
+    { id: 1, active: true, url: 'https://example.com/' },
+    { id: 2, url: MAHJONG, vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11' } }) },
+    { id: 3, url: other, vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '12' } }) },
+  ]);
+  const { dom, module, context } = setup(tabs, bookmarks);
+  await module.start(context);
+  await frame();
+  const folderRow = rowWithId(dom, 'data-vivarcdi-folder-id', '10');
+  assert.ok(folderRow);
+  pressRowMinus(folderRow, 'data-vivarcdi-folder-minus');
+  await frame();
+  await frame();
+  assert.deepEqual(tabs.actions().filter(([name]) => name === 'remove'), [['remove', 2], ['remove', 3]]);
+  assert.equal(rowWithId(dom, 'data-vivarcdi-link-id', '11'), undefined);
+  assert.equal(rowWithId(dom, 'data-vivarcdi-link-id', '12'), undefined);
+  assert.equal(rowWithId(dom, 'data-vivarcdi-folder-id', '10')?.hasAttribute('data-vivarcdi-open'), false);
+  assert.ok(rowWithId(dom, 'data-vivarcdi-folder-id', '20'));
+  module.stop();
+});
