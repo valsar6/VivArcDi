@@ -127,8 +127,7 @@
   @include minus-badge;
 }
 
-#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}:hover #{$tile-minus},
-#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}#{$tile-current} #{$tile-minus} {
+#{$root} #{$tiles}[data-vivarcdi-tile-source='pinned'] #{$own-tile}:hover #{$tile-minus} {
   opacity: 1;
   pointer-events: auto;
 }

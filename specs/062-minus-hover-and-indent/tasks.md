@@ -33,7 +33,7 @@ T1. T4 runs last on the code and reads the version from `origin/main` at that po
 
 ## Tasks
 
-- [ ] **T1. Hover-only minus and badge** (TDD). In `tests/styles/Pinned.test.ts`, rename
+- [x] **T1. Hover-only minus and badge** (TDD). In `tests/styles/Pinned.test.ts`, rename
   `shows the pinned row minus on hover and on the current row` to
   `shows the pinned row minus only while the row is hovered` (AC-1), assert the hover selector is
   present and the `:has(.tab.active)` one is gone, and add
@@ -44,9 +44,10 @@ T1. T4 runs last on the code and reads the version from `origin/main` at that po
   `shows the pinned tile minus on hover and on the current tile` to
   `shows the pinned tile minus only while the tile is hovered` (AC-2), assert the
   `[data-vivarcdi-current]` selector is gone, and update the badge assertion under its existing
-  name. Then change `_minus.scss` and the two stylesheets, and remove `$minus-badge-tint`,
-  `$folders-dot-size` and `$tile-current` from `_tokens.scss`. Done when `make check` is green.
-- [ ] **T2. Indent open rows and remove the dot** (TDD; after T1). With the verbatim names
+  name. Then change `_minus.scss` and the two stylesheets, and remove `$minus-badge-tint` and
+  `$folders-dot-size` from `_tokens.scss`. `$tile-current` stays for the current tile's background.
+  Done when `make check` is green.
+- [x] **T2. Indent open rows and remove the dot** (TDD; after T1). With the verbatim names
   `shows the link row minus only while the row is hovered` (AC-3),
   `shows the folder row minus only while the row is hovered` (AC-4),
   `shows the folder and link minus badges only while the buttons are hovered` (AC-6),
@@ -60,12 +61,12 @@ T1. T4 runs last on the code and reads the version from `origin/main` at that po
   and set the display indent in `FolderRowElement.create` while leaving `data-vivarcdi-depth` as the
   bookmark depth. Rename the old DOM test `shows the link row minus on hover and on the current link`
   to AC-3's name. Done when `make check` is green.
-- [ ] **T3. Retire the superseded checks** (after T1; can run with T2). In 061, mark FR-1, AC-1,
+- [x] **T3. Retire the superseded checks** (after T1; can run with T2). In 061, mark FR-1, AC-1,
   AC-3, AC-4 and AC-10 as refined by 062 and point their `auto:` checks at 062's verbatim names;
   keep the press, label and unload criteria untouched. In 009, mark FR-4 and AC-13 as refined by
   062 and replace "with a dot" with the indented, dot-free look. Do not edit the approved 062 spec.
   Done when `make check` is green.
-- [ ] **T4. Docs and version** (lead; after T2 and T3). In `docs/manual/tab-bar.md` and `README.md`,
+- [x] **T4. Docs and version** (lead; after T2 and T3). In `docs/manual/tab-bar.md` and `README.md`,
   replace the open-link dot with the one-step indent and describe the minus as shown on row or tile
   hover with its badge on button hover. In the three version files, make the minor bump read from
   `origin/main` right before editing. Done when `make check` is green.

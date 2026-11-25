@@ -15,8 +15,7 @@
   @include minus-badge;
 }
 
-#{$root}#{$pinned-unload} .tab-position.is-pinned:hover #{$pinned-minus},
-#{$root}#{$pinned-unload} .tab-position.is-pinned:has(.tab.active) #{$pinned-minus} {
+#{$root}#{$pinned-unload} .tab-position.is-pinned:hover #{$pinned-minus} {
   opacity: 1;
   pointer-events: auto;
 }

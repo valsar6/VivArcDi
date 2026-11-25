@@ -160,23 +160,9 @@
   }
 
   > [data-vivarcdi-link-open]:hover [data-vivarcdi-link-minus],
-  > [data-vivarcdi-link-active] [data-vivarcdi-link-minus],
   > [data-vivarcdi-folder-unload]:hover [data-vivarcdi-folder-minus] {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  [data-vivarcdi-link-open]:hover::after {
-    display: none;
-  }
-
-  [data-vivarcdi-link-open]::after {
-    flex: none;
-    width: $folders-dot-size;
-    height: $folders-dot-size;
-    border-radius: 50%;
-    background-color: var(--colorHighlightBg, currentcolor);
-    content: '';
   }
 }
 

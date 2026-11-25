@@ -7,6 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-24 |
 | Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. It replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus for the unload; the other close routes of 009/FR-15 stay. |
+| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -147,8 +148,9 @@ with the Favorites grid on and off.
   a rounded-square badge of about 21×21 CSS px with a radius of about 5 px and a centered dash of
   about 11×2 px, at the right end and vertically centered, in the theme's colors so that it stays
   legible in light and dark themes.
-- **FR-2.** The minus SHALL be visible while its row or tile is hovered or its tab is the current
-  one, and hidden otherwise.
+- **FR-2.** The minus SHALL be visible while its row or tile is hovered, and hidden otherwise,
+  even if its tab is the current one (062/FR-1). The badge and its colors SHALL appear only while
+  the button itself is hovered (062/FR-2).
 - **FR-3.** WHEN the minus is clicked, THE module SHALL unload the tab and SHALL NOT close it; the
   row or tile SHALL stay, and opening it SHALL load the pinned page (059/FR-3, FR-5; 060/FR-4, FR-5).
 - **FR-4.** A press that starts on the minus SHALL NOT start a drag of the row or tile, and on a
@@ -192,19 +194,19 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 |---|---|---|
 | AC-1 | THE minus of a pinned row SHALL be a rounded-square badge of about 21×21 CSS px with a radius of about 5 px and a centered dash of about 11×2 px, in the theme's colors, at the right end of the row. | auto: `draws the pinned row minus as a badge like Arc` |
 | AC-2 | THE minus of a pinned tile SHALL be the same badge as the row's, at the right end of the tile. | auto: `draws the pinned tile minus as the same badge` |
-| AC-3 | WHILE a pinned row is hovered or its tab is the current one, THE minus SHALL be visible, and WHILE neither holds, THE minus SHALL be hidden. | auto: `shows the pinned row minus on hover and on the current row` |
-| AC-4 | WHILE a pinned tile is hovered or its tab is the current one, THE minus SHALL be visible, and WHILE neither holds, THE minus SHALL be hidden. | auto: `shows the pinned tile minus on hover and on the current tile` |
+| AC-3 | WHILE a pinned row is hovered, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if its tab is current (062/AC-1). | auto: `shows the pinned row minus only while the row is hovered` |
+| AC-4 | WHILE a pinned tile is hovered, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if its tab is current (062/AC-2). | auto: `shows the pinned tile minus only while the tile is hovered` |
 | AC-5 | THE minus of a pinned row and of a pinned tile SHALL carry the label `Unload tab`. | auto: `labels the pinned minus as Unload tab` |
 | AC-6 | WHEN the minus of a pinned row is clicked, THE module SHALL unload the tab and SHALL NOT close it. | auto: `unloads a pinned tab from its minus` |
 | AC-7 | WHEN the minus of a pinned tile is clicked, THE module SHALL unload the tab and SHALL NOT close it or open the tile. | auto: `unloads a pinned tab from its tile minus` |
 | AC-8 | WHEN a press starts on the minus of a pinned row, THE module SHALL NOT start a drag of the row. | auto: `does not start a drag from the pinned row minus` |
 | AC-9 | WHEN a press starts on the minus of a pinned tile, THE module SHALL NOT start a drag of the tile and SHALL NOT open it. | auto: `does not drag or open a pinned tile from its minus` |
-| AC-10 | WHILE the pointer rests on the row of a Favorites link or the link's tab is the current one, THE minus SHALL be visible, and WHILE neither holds, THE minus SHALL be hidden. | auto: `shows the link row minus on hover and on the current link` |
+| AC-10 | WHILE the pointer rests on the row of a Favorites link, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if the link is active (062/AC-3). | auto: `shows the link row minus only while the row is hovered` |
 | AC-11 | WHEN the minus of a Favorites link row is clicked, THE module SHALL unload its tab and SHALL NOT close it or remove the bookmark. | auto: `unloads a link tab from its minus` |
 | AC-12 | WHILE the pointer rests on the row of a Favorites folder with an open link tab, THE minus SHALL be visible, and WHEN it is clicked, THE module SHALL unload the tabs of the link rows below it and SHALL NOT remove the folder or its bookmarks. | auto: `unloads the link tabs of a folder from its minus` |
 | AC-13 | THE minus SHALL NOT appear on a tile of the bookmark grid. | auto: `keeps the minus off a Favorite tile` |
 | AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 21×21 CSS px at the right end of the tile. | live: `the pinned minus is a badge on the tile of a pinned tab` |
-| AC-15 | WHEN Tore compares VivArcDi with his recording of 2026-11-24, the minus of a pinned row and of a pinned tile SHALL look and sit as in the recording, SHALL appear on hover and on the current row or tile, and a press SHALL unload without closing, dragging or opening. | manual |
+| AC-15 | WHEN Tore compares VivArcDi with his recording of 2026-11-24 and the screenshots of 2026-11-25, the minus of a pinned row and of a pinned tile SHALL look and sit as in the recording, SHALL appear on hover only with its badge on button hover, and a press SHALL unload without closing, dragging or opening (062/AC-9). | manual |
 | AC-16 | WHEN Tore compares the row of a Favorites folder and of a Favorites link with the recording, THE minus SHALL look and sit as on a pinned row, and a press SHALL unload the tabs it stands for without closing them or removing the bookmark or the folder. | manual |
 
 AC-14 is checked by the live scenario on the lab Vivaldi of
