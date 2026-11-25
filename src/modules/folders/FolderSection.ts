@@ -94,7 +94,8 @@ export class FolderSection {
     this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
-    this.#close = new FolderClose(new FolderCloser(tabs, logger), this.#openFolders, () => this.#redraw.request());
+    const closer = new FolderCloser(tabs, logger);
+    this.#close = new FolderClose(closer, this.#openFolders, () => this.#redraw.request(), this.#active);
     this.#view = new FolderSectionView(
       document,
       {
@@ -154,8 +155,7 @@ export class FolderSection {
   #createEditing(): FolderEditing {
     return new FolderEditing(this.#context, this.#view, {
       root: (): string[] => this.#roots.rootFor(this.#names.nameOf(this.#workspace ?? null)),
-      base: (): string[] => this.#roots.base,
-      childIds: (): readonly string[] => this.#source.childIds,
+      base: (): string[] => this.#roots.base, childIds: (): readonly string[] => this.#source.childIds,
       redraw: (): void => this.#redraw.request(),
       tabLinks: this.#tabLinks,
       openFolders: this.#openFolders, closing: this.#closing, names: this.#names, active: this.#active, roots: this.#roots,

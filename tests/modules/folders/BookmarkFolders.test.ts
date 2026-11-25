@@ -749,3 +749,34 @@ test('closes the open link tabs of a folder from its minus and closes the folder
   assert.ok(rowWithId(dom, 'data-vivarcdi-folder-id', '20'));
   module.stop();
 });
+
+test('keeps the workspace of a folder minus when Vivaldi activates another workspace', async (t) => {
+  installFrames(t);
+  const { tabs, dom, module, context } = workspaceSetup();
+  await module.start(context);
+  await frame();
+  tabs.tabs.set(4, { id: 4, windowId: 1, url: 'https://jira.example/', vivExtData: JSON.stringify({ workspaceId: CASETTA.id, vivarcdi: { bookmarkId: '12' } }) });
+  activate(tabs, 4);
+  await frame();
+  rows(dom)[0]?.click();
+  await toggleDelay();
+  await frame();
+  const remove = tabs.remove.bind(tabs);
+  tabs.remove = async (tabId: number): Promise<void> => {
+    await remove(tabId);
+    activate(tabs, 3);
+  };
+  const folderRow = rowWithId(dom, 'data-vivarcdi-folder-id', '11');
+  assert.ok(folderRow);
+  pressRowMinus(folderRow, 'data-vivarcdi-folder-minus');
+  await frame();
+  await frame();
+  assert.equal(context.activeWorkspace.current, String(CASETTA.id));
+  assert.deepEqual(folderTitles(dom), ['Jira']);
+
+  activate(tabs, 3);
+  await frame();
+  assert.equal(context.activeWorkspace.current, null);
+  module.stop();
+  context.activeWorkspace.stop();
+});
