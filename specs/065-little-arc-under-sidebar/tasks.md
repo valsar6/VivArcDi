@@ -35,14 +35,14 @@ this spec, so no live scenario is part of these tasks.
 
 ## Tasks
 
-- [ ] **T1. Read and update a window** (TDD; parallel with T2). Extend the wrapper test
+- [x] **T1. Read and update a window** (TDD; parallel with T2). Extend the wrapper test
   `browser windows wrap the callbacks of chrome.windows` in `tests/modules/littlearc/module.test.ts`
   with a `get` call and an `update` call carrying bounds and `focused: true`; extend
   `browser windows report errors and a missing API` for the two new calls. Then add `get` and
   `update` to `BrowserWindows`, the optional methods to `ChromeApi.windows`, the bounds to
   `WindowDetails` and the new `WindowUpdate` type. Keep `#call` and its `lastError` handling as the
   single path. Done when `make check` is green.
-- [ ] **T2. Sidebar-aware bounds** (TDD; parallel with T1). Failing tests first in the new
+- [x] **T2. Sidebar-aware bounds** (TDD; parallel with T1). Failing tests first in the new
   `tests/modules/littlearc/placement.test.ts`: `places the Little Arc window clear of the sidebar`
   (AC-1), `places Little Arc beside the rendered sidebar` (AC-2),
   `falls back when the sidebar leaves no room beside it` (AC-4) and
@@ -50,7 +50,7 @@ this spec, so no live scenario is part of these tasks.
   `verticalTabBar` element and a screen area; assert the left edge, the gap, the shrink, the centred
   fallback and the warning reasons. Then add `SidebarBox` and `SidebarPlacement` with `SIDEBAR_GAP`
   and `MIN_POPUP_WIDTH`, leaving `WindowBounds.centred` untouched. Done when `make check` is green.
-- [ ] **T3. Place and verify the popup** (TDD; after T1 and T2). Failing tests first in
+- [x] **T3. Place and verify the popup** (TDD; after T1 and T2). Failing tests first in
   `tests/modules/littlearc/module.test.ts`: `uses the same placement for every Little Arc opening`
   (AC-3), `keeps the Little Arc popup bar and the Open in workspace action` (AC-6),
   `moves Little Arc clear of the sidebar after creation` (AC-9) and
@@ -61,7 +61,7 @@ this spec, so no live scenario is part of these tasks.
   focus of the main window when the overlap remains. Keep `type: 'popup'`, `focused: true`, the
   registry mark, the bar, the indicator and the adoption path unchanged. Done when `make check` is
   green.
-- [ ] **T4. Docs and version** (lead; after T3). Say in `docs/manual/little-arc.md` and `README.md`
+- [x] **T4. Docs and version** (lead; after T3). Say in `docs/manual/little-arc.md` and `README.md`
   that Little Arc opens beside the sidebar, that the sidebar stays usable and that an overlap is
   corrected once before the main window is left in front. Bump the patch version read from
   `origin/main` in the three version files. Set the spec to `Implemented` when the code pull request

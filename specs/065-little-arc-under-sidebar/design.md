@@ -32,18 +32,23 @@ not cover the sidebar — without adding an option.
 
 ### Reading the sidebar
 
-`SidebarBox` is a value object with screen-coordinate edges:
+`SidebarBox` is a class with screen-coordinate edges and a reader:
 
 ```ts
-export interface SidebarBox {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
+export class SidebarBox {
+  public readonly left: number;
+  public readonly right: number;
+  public readonly top: number;
+  public readonly bottom: number;
+
+  public static read(document: Document, selector: string): SidebarBox | null;
 }
 
-export function sidebarBox(document: Document, selector: string): SidebarBox | null;
+export function sidebarOf(context: Pick<ModuleContext, 'document' | 'selectors'>): SidebarBox | null;
 ```
+
+`MainWindowRole` passes `sidebarOf(context)` to the launcher; the helper checks that the selector
+exists before reading it.
 
 The selector is the existing `verticalTabBar` entry of
 [8.1.json](../../src/selectors/8.1.json) (`#tabs-tabbar-container:is(.left, .right)`); 8.2 and 8.3

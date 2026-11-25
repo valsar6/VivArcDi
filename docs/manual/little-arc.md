@@ -29,6 +29,11 @@ switcher: only back, an address pill and **Open in** a workspace.
 - A **link that asks for a new window** (`target="_blank"`) in a pinned or Favorite page opens here;
   the row or tile it came from shows a small favicon of the page while the window is open.
 
+Little Arc opens beside the vertical tab bar, so the sidebar stays visible: you can click another
+tab while the page is open. If Vivaldi places the window over the sidebar anyway, VivArcDi moves it
+once; if that is not enough, the main window stays in front so the sidebar stays clickable. The
+Little Arc page, its bar and **Open in** are unchanged in either case.
+
 Little Arc works while Vivaldi is open. A key that works from every app is not part of this version.
 
 ## Keep it or let it go

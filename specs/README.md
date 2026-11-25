@@ -72,7 +72,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [062 Minus on hover and open-link indent](062-minus-hover-and-indent/spec.md) | 3 | Implemented |
 | [063 Minus closes folder link tabs](063-minus-closes-folder-tabs/spec.md) | 3 | Implemented |
 | [064 Stable workspace view](064-stable-workspace-view/spec.md) | 3 | Implemented |
-| [065 Little Arc under the sidebar](065-little-arc-under-sidebar/spec.md) | 5 | Approved |
+| [065 Little Arc under the sidebar](065-little-arc-under-sidebar/spec.md) | 5 | Implemented |
 
 
 
