@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-25 |
 | Refines | The window placement of [005 Little Arc](../005-little-arc/spec.md) and its size option FR-10; follows up the placement item in [059 Pinned tabs and Favorites like Arc](../059-pinned-tabs-arc/spec.md), recorded at AC-18 and in its Follow-ups. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
