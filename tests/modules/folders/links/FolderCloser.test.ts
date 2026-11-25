@@ -39,10 +39,10 @@ test('reports the folder only after every tab closed', async () => {
   const seen: string[] = [];
   const openFolders = { forget: (id: string): void => void seen.push(id) } as unknown as OpenFolders;
   const close = new FolderClose(new FolderCloser(tabs, logger), openFolders, (): void => void seen.push('redraw'));
-  await close.apply([3, 4], '10');
+  await close.apply([3, 4], '10', null);
   assert.deepEqual(seen, ['10', 'redraw']);
   tabs.failing.add('remove');
-  await close.apply([3, 4], '11');
+  await close.apply([3, 4], '11', null);
   assert.deepEqual(seen, ['10', 'redraw']);
   assert.equal(errors.length, 1);
 });

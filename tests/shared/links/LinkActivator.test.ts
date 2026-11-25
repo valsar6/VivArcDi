@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { TabData } from '../../../src/core/tabs/TabData.js';
 import { LinkActivator } from '../../../src/shared/links/LinkActivator.js';
 import { OpenLinks } from '../../../src/shared/links/OpenLinks.js';
 import { silentLogger } from '../../modules/reopen/fakes.js';
@@ -10,8 +11,18 @@ const MAHJONG_KEY = 'mahjongsoul.game.yo-star.com';
 const MAHJONG_LINK = { id: '11', url: MAHJONG, key: MAHJONG_KEY };
 const linkedTo = (bookmarkId: string, workspaceId?: number): string => JSON.stringify({ ...(workspaceId === undefined ? {} : { workspaceId }), vivarcdi: { bookmarkId } });
 
+function shownWorkspace(tabs: FolderTabs): () => string | null {
+  return (): string | null => {
+    const active = [...tabs.tabs.values()].find((tab) => tab.active === true);
+    return active === undefined ? null : TabData.of(active as chrome.tabs.Tab);
+  };
+}
+
 async function setup(tabs: FolderTabs): Promise<LinkActivator> {
-  const open = new OpenLinks(tabs, () => undefined, silentLogger(), immediateFrames);
+  const open = new OpenLinks(tabs, () => undefined, silentLogger(), {
+    shownWorkspace: shownWorkspace(tabs),
+    timing: immediateFrames,
+  });
   await open.refresh();
   return new LinkActivator(tabs, open, silentLogger());
 }
@@ -86,7 +97,10 @@ test('looks for the tab of a link only in the active workspace', async () => {
     { id: 1, active: true, url: 'https://example.com/', vivExtData: JSON.stringify({ workspaceId: 7 }) },
     { id: 2, url: MAHJONG, vivExtData: linkedTo('11', 8) },
   ]);
-  const open = new OpenLinks(tabs, () => undefined, silentLogger(), immediateFrames);
+  const open = new OpenLinks(tabs, () => undefined, silentLogger(), {
+    shownWorkspace: shownWorkspace(tabs),
+    timing: immediateFrames,
+  });
   const activator = new LinkActivator(tabs, open, silentLogger());
   await open.refresh();
   await activator.activate(MAHJONG_LINK);

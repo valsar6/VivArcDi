@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { MENU_ATTRIBUTE } from '../../../src/core/dom/ContextMenu.js';
 import type { MenuItem, SubmenuItem } from '../../../src/core/dom/ContextMenu.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
+import { ActiveWorkspace } from '../../../src/core/workspaces/ActiveWorkspace.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { SpaceMenuItems } from '../../../src/shared/spaces/SpaceMenuItems.js';
 import { VirtualFolders } from '../../../src/shared/links/VirtualFolders.js';
@@ -15,7 +16,7 @@ import { LiveFolderStore, LIVE_FOLDERS_STORAGE_KEY } from '../../../src/modules/
 import { asDocument, DomDocument } from '../../core/dom.js';
 import type { DomNode } from '../../core/dom.js';
 import { FolderTabs, WritableChrome, bookmarkTree, link } from '../folders/fakes.js';
-import { settle } from '../reopen/fakes.js';
+import { settle, silentLogger } from '../reopen/fakes.js';
 import { CODE_URL } from '../../../src/modules/livefolders/GithubDeviceFlow.js';
 import { FakeDeviceGithub, FakeGithub, ME, MemoryStorage, pullRequest, recordingLogger } from './fakes.js';
 import { Notices } from '../../../src/core/dom/Notices.js';
@@ -55,9 +56,12 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
   const toasts = new RecordingToast();
   const { logger, sink } = recordingLogger();
   const bookmarks = new WritableChrome(bookmarkTree([link('10', 'Docs', 'https://docs.example/')]));
+  const tabs = new FolderTabs([{ id: 1, active: true, url: 'https://a.example/', vivExtData: inWorkspace }]);
+  const activeWorkspace = new ActiveWorkspace(tabs, silentLogger());
   const module = new LiveFolders();
   t.after(() => {
     module.stop();
+    activeWorkspace.stop();
     globalThis.fetch = original;
   });
   const context = {
@@ -65,11 +69,12 @@ function setup(t: TestContext, { storage = new MemoryStorage(), token = TOKEN, h
     selectors: new SelectorCatalog({ browser: '#browser', tabListHost: '.list', tabStrip: '.strip', tabWrapper: '.wrapper' }, 'test'),
     logger,
     options: { refreshMinutes: 5, githubClientId: clientId },
-    tabs: new FolderTabs([{ id: 1, active: true, url: 'https://a.example/', vivExtData: inWorkspace }]),
+    tabs,
     storage,
     bookmarks: bookmarks.reader,
     bookmarkWriter: bookmarks.writer,
     notices: new Notices(toasts),
+    activeWorkspace,
   } as unknown as ModuleContext<LiveFoldersOptions>;
   return { dom, module, context, storage, github, bookmarks, virtual: VirtualFolders.of(dom), toasts, lines: (): string[] => sink.lines };
 }

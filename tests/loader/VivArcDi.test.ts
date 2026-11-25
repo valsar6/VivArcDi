@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { ActiveWorkspace } from '../../src/core/workspaces/ActiveWorkspace.js';
 import { TOAST_ATTRIBUTE } from '../../src/core/dom/Toast.js';
 import { createApp, runtimeAnswering, savingStorage, seen } from './boot.js';
 import type { FakeElement, SilentSink } from './fakes.js';
@@ -113,6 +114,15 @@ test("other modules' options are checked too", async () => {
 });
 
 const toastsOf = (browser: FakeElement): FakeElement[] => browser.children.filter((child) => TOAST_ATTRIBUTE in child.attributes);
+
+test('the module context carries the workspace state', async () => {
+  seen.length = 0;
+  const { app } = createApp({ modules: { follower: { enabled: true } } });
+  await app.start();
+  assert.ok(seen[0]?.activeWorkspace instanceof ActiveWorkspace);
+  assert.equal(seen[0]?.activeWorkspace.current, null);
+  await app.stop();
+});
 
 test('warns once when nothing can be saved', async () => {
   seen.length = 0;

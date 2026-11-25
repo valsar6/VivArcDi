@@ -1,4 +1,4 @@
-import { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
+import type { ActiveWorkspace } from '../../core/workspaces/ActiveWorkspace.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
 import { LabelKeys, LinkLabels, type LinkLabel } from '../../core/browser/LinkLabels.js';
 import { HiddenTabMarker } from '../../shared/tabs/HiddenTabMarker.js';
@@ -76,7 +76,7 @@ export class FolderSection {
     this.#openFolders = new OpenFolders(context.storage, logger);
     this.#roots = roots;
     this.#names = new WorkspaceNames(prefs, (): void => this.#namesChanged(), logger);
-    this.#active = new ActiveWorkspace(tabs, (workspace): void => void this.#show(workspace), logger);
+    this.#active = context.activeWorkspace;
     this.#source = new FolderTreeSource(bookmarks, {
       path: [],
       maxDepth,
@@ -85,7 +85,7 @@ export class FolderSection {
       onChange: (): void => this.#treeChanged(),
       logger,
     });
-    this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger);
+    this.#openLinks = new OpenLinks(tabs, (): void => this.#tabsChanged(), logger, { shownWorkspace: (): string | null => this.#workspace ?? null });
     this.#tabLinks = new TabLinks(tabs);
     this.#adopter = new LinkTabAdopter(tabs, links, this.#tabLinks, logger);
     this.#hiddenTabs = HiddenTabs.of(document);
@@ -100,7 +100,7 @@ export class FolderSection {
       {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => (LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? undefined : void activator.activate(link)),
-        onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId),
+        onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId, this.#workspace ?? null),
         onRename: (id, name): void => void this.#editing.rename(id, name),
         onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },
@@ -128,7 +128,7 @@ export class FolderSection {
       () => this.#source.stop(),
       () => this.#openLinks.stop(),
       () => this.#adopter.stop(),
-      () => this.#active.stop(),
+      this.#active.onChange((workspace): void => void this.#show(workspace)),
       () => this.#names.stop(),
     );
     await this.#names.start();

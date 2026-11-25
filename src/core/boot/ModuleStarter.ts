@@ -3,9 +3,9 @@ import type { BrowserBookmarks } from '../browser/bookmarks/BrowserBookmarks.js'
 import type { BrowserPrefs } from '../browser/BrowserPrefs.js';
 import type { BrowserRuntime } from '../browser/BrowserRuntime.js';
 import type { BrowserHistory } from '../browser/BrowserHistory.js';
-import type { BrowserSearch } from '../browser/BrowserSearch.js';
+import { BrowserSearch } from '../browser/BrowserSearch.js';
 import type { BrowserTabs } from '../browser/BrowserTabs.js';
-import type { BrowserWindows } from '../browser/BrowserWindows.js';
+import { BrowserWindows } from '../browser/BrowserWindows.js';
 import type { Logger } from '../support/Logger.js';
 import type { ModuleOutcome } from './BootReport.js';
 import type { EnabledModule } from './ModuleRegistry.js';
@@ -40,6 +40,27 @@ export class ModuleStarter {
   #logger: Logger;
 
   /**
+   * Builds a starter from the services of a window, filling in the APIs that were not given.
+   *
+   * @param services The services shared by the modules.
+   * @param windows The windows API, or undefined for none.
+   * @param search The search API, or undefined for none.
+   * @param logger The application logger.
+   * @returns The starter.
+   */
+  public static of(
+    services: Omit<ModuleServices, 'windows' | 'search'>,
+    windows: BrowserWindows | undefined,
+    search: BrowserSearch | undefined,
+    logger: Logger,
+  ): ModuleStarter {
+    return new ModuleStarter(
+      { ...services, windows: windows ?? new BrowserWindows(undefined), search: search ?? new BrowserSearch(undefined) },
+      logger,
+    );
+  }
+
+  /**
    * Starts one module with a context built from the injected services.
    *
    * @param services The services every module receives.
@@ -58,7 +79,7 @@ export class ModuleStarter {
    * @returns How the module ended: started, failed, or off by invalid options.
    */
   public async start(entry: EnabledModule, start: StartServices): Promise<ModuleOutcome> {
-    const { settings, selectors, build, storage, notices } = start;
+    const { settings, selectors, build, storage, notices, activeWorkspace } = start;
     const options = settings.optionsOf(entry.id);
     const logger = this.#logger.child(entry.id);
     if (options === null) {
@@ -75,6 +96,7 @@ export class ModuleStarter {
         modules: settings.all,
         storage,
         notices,
+        activeWorkspace,
       });
       return 'started';
     } catch (error) {

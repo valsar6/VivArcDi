@@ -3,6 +3,7 @@ import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { BookmarkWriter } from '../../../src/core/browser/bookmarks/BookmarkWriter.js';
 import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { ActiveWorkspace } from '../../../src/core/workspaces/ActiveWorkspace.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
@@ -61,6 +62,7 @@ function running(tabs: RacingFolderTabs): Running {
     prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
     notices: silentNotices(),
+    activeWorkspace: new ActiveWorkspace(tabs, silentLogger()),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   const module = new BookmarkFolders();
   const stamps = new ActivityStamps(tabs, () => 42, silentLogger());

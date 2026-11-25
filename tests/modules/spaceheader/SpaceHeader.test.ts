@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import type { TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { BrowserPrefs } from '../../../src/core/browser/BrowserPrefs.js';
+import { ActiveWorkspace } from '../../../src/core/workspaces/ActiveWorkspace.js';
 import { FolderCommands } from '../../../src/shared/links/FolderCommands.js';
 import { HiddenTabs } from '../../../src/shared/tabs/HiddenTabs.js';
 import { Logger } from '../../../src/core/support/Logger.js';
@@ -43,6 +44,7 @@ function setup(tabs: FolderTabs, { api = new FakePrefsApi(), logger = silentLogg
     prefs: prefs ?? new BrowserPrefs(api),
     storage,
     notices: silentNotices(),
+    activeWorkspace: new ActiveWorkspace(tabs, silentLogger()),
   } as unknown as ModuleContext;
   return { dom, module: new SpaceHeader(), context, tabs, api, storage };
 }

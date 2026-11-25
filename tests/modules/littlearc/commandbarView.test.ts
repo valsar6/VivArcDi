@@ -173,6 +173,13 @@ function contextOf(options: Record<string, unknown>, hasHost: boolean): { contex
     selectors: { has: (): boolean => true, get: (): string => '#browser' },
     storage: { getItem: (): null => null, setItem: (): void => undefined },
     notices: silentNotices(),
+    activeWorkspace: {
+      current: null,
+      start: async (): Promise<void> => undefined,
+      onChange: (): (() => void) => (): void => undefined,
+      refresh: async (): Promise<void> => undefined,
+      stop: (): void => undefined,
+    },
   } as unknown as ModuleContext<LittleArcOptions>;
   return { context, created, page };
 }

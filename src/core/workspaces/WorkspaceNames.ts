@@ -21,6 +21,7 @@ export class WorkspaceNames {
   #onChange: () => void;
   #logger: Logger;
   #workspaces = new Map<string, WorkspaceEntry>();
+  #readOnce = false;
   #warned = false;
   #unsubscribe: (() => void) | null = null;
 
@@ -43,6 +44,21 @@ export class WorkspaceNames {
    */
   public get following(): boolean {
     return this.#unsubscribe !== null;
+  }
+
+  /**
+   * @returns Whether a read of Vivaldi's list of workspaces succeeded; when false, every workspace id is accepted.
+   */
+  public get listed(): boolean {
+    return this.#readOnce;
+  }
+
+  /**
+   * @param workspaceId The id of a workspace, as `TabData.of` returns it.
+   * @returns Whether Vivaldi lists that workspace.
+   */
+  public has(workspaceId: string): boolean {
+    return this.#workspaces.has(workspaceId);
   }
 
   /**
@@ -147,7 +163,9 @@ export class WorkspaceNames {
       return new Map();
     }
     try {
-      return WorkspaceNames.#parse(await this.#prefs.get(LIST_KEY));
+      const workspaces = WorkspaceNames.#parse(await this.#prefs.get(LIST_KEY));
+      this.#readOnce = true;
+      return workspaces;
     } catch (error) {
       this.#warn('could not read the workspaces: every workspace uses the default root', error);
       return new Map();

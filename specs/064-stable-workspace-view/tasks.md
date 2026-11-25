@@ -38,7 +38,7 @@ from `origin/main` at that point.
 
 ## Tasks
 
-- [ ] **T1. One workspace state, started by the boot** (TDD; parallel with T2 and T3). Add
+- [x] **T1. One workspace state, started by the boot** (TDD; parallel with T2 and T3). Add
   `tests/core/tabs/InspectionTarget.test.ts` for the helper. In
   `tests/core/workspaces/ActiveWorkspace.test.ts` rewrite the setup for `onChange` listeners and add
   `keeps the selected workspace when an internal tab becomes active` (AC-1),
@@ -56,14 +56,14 @@ from `origin/main` at that point.
   `LinkTabHiding`, `SpaceHeader`, `LiveFolders` and `littlearc` setups; in the one test that counts
   the tab listeners after `module.stop()` in `BookmarkFolders.test.ts`, stop the state first. Done
   when `make check` is green.
-- [ ] **T2. Open-link rows follow the shown workspace** (TDD; parallel with T1 and T3). In
+- [x] **T2. Open-link rows follow the shown workspace** (TDD; parallel with T1 and T3). In
   `tests/shared/links/OpenLinks.test.ts` make the helper pass a shown workspace, add
   `does not show other workspaces' tabs when no tab is active` (AC-6) and a test where an older
   read lands after a newer one; update the constructor calls in `LinkActivator.test.ts`. Then give
   `OpenLinks` the `shownWorkspace` function, filter `#update` by it instead of by the active tab,
   add the refresh generation, and pass the function from `FolderSection` (`this.#workspace`) and
   `FolderPreview` (`context.activeWorkspace.current`). Done when `make check` is green.
-- [ ] **T3. A folder minus saves under the press workspace** (TDD; parallel with T1 and T2). In
+- [x] **T3. A folder minus saves under the press workspace** (TDD; parallel with T1 and T2). In
   `tests/modules/folders/links/FolderClose.test.ts` add
   `saves the folder state in the workspace active at press time` (AC-5) with a real `OpenFolders`
   over a `MemoryStorage` and a `FolderCloser` whose fake `CloserTabs.remove` loads another
@@ -74,7 +74,7 @@ from `origin/main` at that point.
   `active.current` in `FolderDeletion.delete` and `FolderRelocation.move` before their awaits, pass
   `sources.active` in `FolderActionsFactory`, and pass `this.#workspace ?? null` from the section's
   close handler. Done when `make check` is green.
-- [ ] **T4. Docs and version** (lead; after T2 and T3). In
+- [x] **T4. Docs and version** (lead; after T2 and T3). In
   `specs/063-minus-closes-folder-tabs/design.md`, amend the `FolderClose` paragraph so it no longer
   prescribes forgetting the folder on whatever workspace is current after the awaits: the section
   captures the shown workspace at the press and passes it to `apply` and `forget`, refined by 064.

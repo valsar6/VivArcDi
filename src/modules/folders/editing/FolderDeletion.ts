@@ -6,6 +6,7 @@ import type { ToastKind } from '../../../core/dom/Toast.js';
 import type { ClosingLinks } from './ClosingLinks.js';
 import type { FolderLinkTabs } from './FolderLinkTabs.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
+import type { ActiveWorkspace } from '../../../core/workspaces/ActiveWorkspace.js';
 
 export interface FolderDeletionDependencies {
   writer: Pick<BookmarkWriter, 'subTree' | 'move'>;
@@ -13,6 +14,8 @@ export interface FolderDeletionDependencies {
   tabs: Pick<BrowserTabs, 'remove'>;
   linkTabs: Pick<FolderLinkTabs, 'linkIds' | 'tabsOf'>;
   openFolders: Pick<OpenFolders, 'forget'>;
+  /** The workspace whose folder state is saved, captured when the deletion starts. */
+  active: Pick<ActiveWorkspace, 'current'>;
   closing: Pick<ClosingLinks, 'add' | 'clear'>;
   /** Draws the section again from the bookmarks. */
   redraw: () => void;
@@ -41,6 +44,7 @@ export class FolderDeletion {
    */
   public async delete(folderId: string): Promise<void> {
     const { closing, notify } = this.#deps;
+    const workspaceId = this.#deps.active.current;
     let name = folderId;
     let linkIds: string[] = [];
     try {
@@ -50,7 +54,7 @@ export class FolderDeletion {
       const tabIds = await this.#deps.linkTabs.tabsOf(linkIds);
       closing.add(linkIds);
       await this.#moveToTrash(folderId);
-      this.#deps.openFolders.forget(folderId);
+      this.#deps.openFolders.forget(folderId, workspaceId);
       await this.#close(tabIds);
       notify(`Folder "${name}" moved to Trash`);
     } catch (error) {

@@ -23,7 +23,7 @@ written.
 | Close | A `FolderCloser` calls `tabs.remove` for every id and reports success | `modules/folders/links/FolderCloser.ts` |
 | Folder state | `FolderClose` forgets the folder and redraws only after every close succeeded | `modules/folders/links/FolderClose.ts` |
 | Wiring | The view's `onUnload` becomes `onClose`, carrying the folder id of a folder press | `modules/folders/view/FolderSectionView.ts`, `modules/folders/FolderSection.ts` |
-| Folder state | A successful folder press forgets its id in `OpenFolders` and redraws | `modules/folders/FolderSection.ts` |
+| Folder state | A successful folder press forgets its id in `OpenFolders` under the workspace shown when the press started, and redraws (refined by 064) | `modules/folders/FolderSection.ts` |
 | Labels | `Close tab` and `Close tabs` replace `Unload tab` and `Unload tabs` on the two rows | `modules/folders/view/FolderRowElement.ts` |
 | Retired code | `FolderUnloader` is removed; the pinned path keeps `core/tabs/TabUnloader` | `modules/folders/links/FolderUnloader.ts` |
 | Docs | The manual, README and superseded criteria in 009, 061 and 062 name a close, not an unload | `docs/manual/tab-bar.md`, `README.md`, `specs/` |
@@ -79,14 +79,16 @@ argument: a defined id for a folder minus, `undefined` for a link minus. The del
 redraw callback, and wires:
 
 ```ts
-onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId);
+onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId, this.#workspace ?? null);
 ```
 
 `FolderClose.apply` awaits `closer.close(tabIds)`. On success it calls
-`openFolders.forget(folderId)` when the id is defined — the same save-backed removal that folder
-deletion and relocation use — and requests one redraw. On failure it only logs through
-`FolderCloser`; no folder state changes. Virtual folders keep their source's behavior: a later click
-opens them again through the existing `#toggle` path.
+`openFolders.forget(folderId, workspace)` when the id is defined — the same save-backed removal that
+folder deletion and relocation use — and requests one redraw. The section captures `workspace` from
+the workspace shown when the press started, so a change of the active tab during the awaited closes
+cannot file the state under another workspace (refined by [064](../064-stable-workspace-view/spec.md)).
+On failure it only logs through `FolderCloser`; no folder state changes. Virtual folders keep their
+source's behavior: a later click opens them again through the existing `#toggle` path.
 
 The pinned path is untouched: `PinnedMinus` and `PinnedTileMinus` still call `TabUnloader.discard`
 through their own modules.
