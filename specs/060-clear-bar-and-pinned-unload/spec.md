@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-24 |
+| Implemented | 2026-11-24 |
 | Supersedes | Nothing. [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and AC-7 keep their user-visible placement, hover and archive; [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 keep the row minus. This spec fixes where the Clear control sits in the DOM and adds the same minus to a pinned tile. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
