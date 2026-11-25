@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-25 |
 | Supersedes | Nothing yet. It refines the visibility and the badge of [061](../061-pinned-minus-ui/spec.md) FR-1, FR-2, AC-1 to AC-4 and of [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-4 and AC-13, and keeps 061's unload model and labels. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
