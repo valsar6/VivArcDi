@@ -7,7 +7,9 @@ import { BrowserSearch } from '../../../src/core/browser/BrowserSearch.js';
 import type { StoredFormat, StoredRead } from '../../../src/core/browser/StoredFormat.js';
 import type { ChromeApi, RuntimeMessageListener } from '../../../src/core/browser/BrowserTabs.js';
 import { BrowserWindows } from '../../../src/core/browser/BrowserWindows.js';
-import type { WindowDetails } from '../../../src/core/browser/BrowserWindows.js';
+import type { WindowDetails, WindowUpdate } from '../../../src/core/browser/BrowserWindows.js';
+import { SidebarBox } from '../../../src/modules/littlearc/SidebarBox.js';
+import { KeepLabel } from '../../../src/modules/littlearc/KeepLabel.js';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { Logger } from '../../../src/core/support/Logger.js';
 import type { ModuleContext } from '../../../src/core/boot/Module.js';
@@ -27,13 +29,51 @@ const logger = new Logger('test', new SilentSink());
 const screen = { width: 1000, height: 800, left: 0, top: 0 };
 const size = { widthPercent: 50, heightPercent: 50 };
 
+function launcherWith(rect: { left: number; right: number; top: number; bottom: number } | null, reads: WindowDetails[] = []): {
+  launcher: LittleArcLauncher;
+  created: unknown[];
+  updates: Array<{ id: number; properties: WindowUpdate }>;
+  gets: number[];
+} {
+  const created: unknown[] = [];
+  const updates: Array<{ id: number; properties: WindowUpdate }> = [];
+  const gets: number[] = [];
+  let nextRead = 0;
+  const sidebar = rect === null ? null : new SidebarBox(rect.left, rect.right, rect.top, rect.bottom);
+  const launcher = new LittleArcLauncher({
+    windows: {
+      create: async (properties): Promise<WindowDetails> => (created.push(properties), { id: 77 }),
+      get: async (id): Promise<WindowDetails> => (gets.push(id), reads[nextRead++] ?? { id }),
+      update: async (id, properties): Promise<WindowDetails> => (updates.push({ id, properties }), { id }),
+    },
+    registry: { mark: (): void => undefined },
+    screen: (): typeof screen => screen,
+    size,
+    sidebar: (): SidebarBox | null => sidebar,
+    mainWindowId: 1,
+    logger,
+  });
+  return { launcher, created, updates, gets };
+}
+
+function placementOf(properties: unknown): Record<string, unknown> {
+  const { left, top, width, height, type, focused } = properties as Record<string, unknown>;
+  return { left, top, width, height, type, focused };
+}
+
 test('little arc falls back to the default action when the window fails', async () => {
   const marked: number[] = [];
   const failing = new LittleArcLauncher({
-    windows: { create: (): Promise<WindowDetails> => Promise.reject(new Error('no window')) },
+    windows: {
+      create: (): Promise<WindowDetails> => Promise.reject(new Error('no window')),
+      get: async (id): Promise<WindowDetails> => ({ id }),
+      update: async (id): Promise<WindowDetails> => ({ id }),
+    },
     registry: { mark: (id): void => void marked.push(id) },
     screen: (): typeof screen => screen,
     size,
+    sidebar: (): SidebarBox | null => null,
+    mainWindowId: 1,
     logger,
   });
   assert.equal(await failing.adopt(5), false);
@@ -41,15 +81,62 @@ test('little arc falls back to the default action when the window fails', async 
   assert.equal(marked.length, 0);
   const created: unknown[] = [];
   const working = new LittleArcLauncher({
-    windows: { create: async (properties): Promise<WindowDetails> => (created.push(properties), { id: 42 }) },
+    windows: {
+      create: async (properties): Promise<WindowDetails> => (created.push(properties), { id: 42 }),
+      get: async (id): Promise<WindowDetails> => ({ id }),
+      update: async (id): Promise<WindowDetails> => ({ id }),
+    },
     registry: { mark: (id): void => void marked.push(id) },
     screen: (): typeof screen => screen,
     size,
+    sidebar: (): SidebarBox | null => null,
+    mainWindowId: 1,
     logger,
   });
   assert.equal(await working.adopt(5), true);
   assert.deepEqual(created, [{ tabId: 5, type: 'popup', focused: true, width: 500, height: 400, left: 250, top: 200 }]);
   assert.deepEqual(marked, [42]);
+});
+
+test('uses the same placement for every Little Arc opening', async () => {
+  const { launcher, created } = launcherWith({ left: 0, right: 240, top: 0, bottom: 800 });
+  assert.equal(await launcher.openBlank(), true);
+  assert.equal(await launcher.openAddress('https://example.test'), true);
+  assert.notEqual(await launcher.openAddressIn('https://other.test'), null);
+  assert.equal(await launcher.adopt(5), true);
+  assert.equal(created.length, 4);
+  for (const properties of created) {
+    assert.deepEqual(placementOf(properties), { left: 252, top: 200, width: 500, height: 400, type: 'popup', focused: true });
+  }
+});
+
+test('keeps the Little Arc popup bar and the Open in workspace action', async () => {
+  const { launcher, created, updates } = launcherWith({ left: 0, right: 240, top: 0, bottom: 800 });
+  assert.equal(await launcher.openAddress('https://example.test'), true);
+  assert.deepEqual(placementOf(created[0]), { left: 252, top: 200, width: 500, height: 400, type: 'popup', focused: true });
+  assert.equal(KeepLabel.of('Lavoro', 'MacIntel').prefix, 'Open in');
+  assert.deepEqual(updates, []);
+});
+
+test('moves Little Arc clear of the sidebar after creation', async () => {
+  const { launcher, created, updates, gets } = launcherWith({ left: 0, right: 240, top: 0, bottom: 800 }, [
+    { id: 77, left: 0, top: 0, width: 500, height: 400 },
+    { id: 77, left: 252, top: 200, width: 500, height: 400 },
+  ]);
+  assert.equal(await launcher.openBlank(), true);
+  assert.deepEqual(gets, [77, 77]);
+  assert.deepEqual(updates, [{ id: 77, properties: { left: 252, top: 200, width: 500, height: 400 } }]);
+  assert.deepEqual(placementOf(created[0]), { left: 252, top: 200, width: 500, height: 400, type: 'popup', focused: true });
+});
+
+test('leaves the main window focused when Little Arc cannot clear the sidebar', async () => {
+  const overlapping = { id: 77, left: 0, top: 0, width: 500, height: 400 };
+  const { launcher, updates } = launcherWith({ left: 0, right: 240, top: 0, bottom: 800 }, [overlapping, overlapping]);
+  assert.equal(await launcher.openBlank(), true);
+  assert.deepEqual(updates, [
+    { id: 77, properties: { left: 252, top: 200, width: 500, height: 400 } },
+    { id: 1, properties: { focused: true } },
+  ]);
 });
 
 test('external link watcher moves only the tabs the detector accepts', async () => {
@@ -195,6 +282,7 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
   });
   const document = new FakeDocument({ '#webview-container': container, '#browser': new FakeElement('div') });
   const windowCalls: Array<Record<string, unknown>> = [];
+  let lastBounds: Record<string, unknown> = {};
   const tabs = {
     available: true,
     get: async (tabId: number): Promise<chrome.tabs.Tab> => {
@@ -213,8 +301,11 @@ function contextOf(options: Record<string, unknown>, type: string, pages: Page[]
     windows: {
       create: (properties: Record<string, unknown>, callback: (details: unknown) => void): void => {
         windowCalls.push(properties);
+        lastBounds = properties;
         callback({ id: 77 });
       },
+      get: (id: number, callback: (details: unknown) => void): void => callback({ id, ...lastBounds }),
+      update: (id: number, properties: Record<string, unknown>, callback: (details: unknown) => void): void => callback({ id, ...properties }),
       getCurrent: (callback: (info: unknown) => void): void => callback({ id: 1, type }),
       onFocusChanged: focus,
       onRemoved: removed,
@@ -360,7 +451,7 @@ function windowsApi(lastError?: { message: string }): { windows: BrowserWindows;
     (args.at(-1) as (value: unknown) => void)(result);
   };
   const chromeApi = {
-    windows: { create: reply('create', { id: 9 }), getCurrent: reply('getCurrent', { id: 1, type: 'popup' }), getLastFocused: reply('getLastFocused', { id: 2 }), remove: reply('remove', undefined) },
+    windows: { create: reply('create', { id: 9 }), get: reply('get', { id: 9, left: 10, top: 20, width: 300, height: 200 }), update: reply('update', { id: 9, focused: true }), getCurrent: reply('getCurrent', { id: 1, type: 'popup' }), getLastFocused: reply('getLastFocused', { id: 2 }), remove: reply('remove', undefined) },
     runtime: { lastError },
   } as unknown as ChromeApi;
   return { windows: new BrowserWindows(chromeApi), calls };
@@ -369,17 +460,21 @@ function windowsApi(lastError?: { message: string }): { windows: BrowserWindows;
 test('browser windows wrap the callbacks of chrome.windows', async () => {
   const { windows, calls } = windowsApi();
   assert.deepEqual(await windows.create({ tabId: 4, type: 'popup' }), { id: 9 });
+  assert.deepEqual(await windows.get(9), { id: 9, left: 10, top: 20, width: 300, height: 200 });
+  assert.deepEqual(await windows.update(9, { focused: true }), { id: 9, focused: true });
   assert.deepEqual(await windows.current(), { id: 1, type: 'popup' });
   assert.deepEqual(await windows.lastFocused(['normal']), { id: 2 });
   await windows.remove(9);
-  assert.deepEqual(calls, [['create', { tabId: 4, type: 'popup' }], ['getCurrent'], ['getLastFocused', { windowTypes: ['normal'] }], ['remove', 9]]);
+  assert.deepEqual(calls, [['create', { tabId: 4, type: 'popup' }], ['get', 9], ['update', 9, { focused: true }], ['getCurrent'], ['getLastFocused', { windowTypes: ['normal'] }], ['remove', 9]]);
   assert.throws(() => windows.onFocusChanged(() => undefined), /onFocusChanged/);
 });
 
 test('browser windows report errors and a missing API', async () => {
   await assert.rejects(windowsApi({ message: 'boom' }).windows.current(), /boom/);
+  await assert.rejects(windowsApi({ message: 'boom' }).windows.get(9), /boom/);
   assert.equal(new BrowserWindows(undefined).available, false);
   await assert.rejects(new BrowserWindows(undefined).current(), /not available/);
+  await assert.rejects(new BrowserWindows(undefined).update(9, { focused: true }), /not available/);
 });
 
 test('browser search runs through chrome.search or gives a fallback address', async () => {

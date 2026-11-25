@@ -1,37 +1,54 @@
-import type { BrowserWindows, WindowDetails } from '../../core/browser/BrowserWindows.js';
+import type { BrowserWindows, WindowDetails, WindowUpdate } from '../../core/browser/BrowserWindows.js';
 import type { Logger } from '../../core/support/Logger.js';
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
+import type { SidebarBox } from './SidebarBox.js';
+import { SidebarPlacement } from './SidebarPlacement.js';
 import { WindowBounds } from './WindowBounds.js';
-import type { ScreenArea, WindowBoundsSettings } from './WindowBounds.js';
+import type { Bounds, ScreenArea, WindowBoundsSettings } from './WindowBounds.js';
 
 const BLANK_PAGE = 'about:blank';
 
 export interface LauncherDependencies {
-  windows: Pick<BrowserWindows, 'create'>;
+  windows: Pick<BrowserWindows, 'create' | 'get' | 'update'>;
   registry: Pick<LittleArcRegistry, 'mark'>;
   screen: () => ScreenArea;
   size: WindowBoundsSettings;
+  sidebar: () => SidebarBox | null;
+  mainWindowId: number;
   logger: Logger;
 }
 
+function boundsOf(details: WindowDetails): Bounds | null {
+  const { left, top, width, height } = details;
+  if (left === undefined || top === undefined || width === undefined || height === undefined) {
+    return null;
+  }
+  return { left, top, width, height };
+}
+
 export class LittleArcLauncher {
-  #windows: Pick<BrowserWindows, 'create'>;
+  #windows: Pick<BrowserWindows, 'create' | 'get' | 'update'>;
   #registry: Pick<LittleArcRegistry, 'mark'>;
   #screen: () => ScreenArea;
   #size: WindowBoundsSettings;
+  #sidebar: () => SidebarBox | null;
+  #mainWindowId: number;
   #logger: Logger;
+  #placement = new SidebarPlacement();
+  #warned = new Set<string>();
 
   /**
-   * Opens Little Arc windows: a small popup window, centred on the screen.
+   * Opens Little Arc windows: a small popup window beside the sidebar when there is room.
    *
-   * @param dependencies The windows API, the registry of Little Arc windows, the screen, the share
-   * of the screen the window takes and a logger.
+   * @param dependencies The windows API, registry, screen, size, sidebar, main window and logger.
    */
-  constructor({ windows, registry, screen, size, logger }: LauncherDependencies) {
+  constructor({ windows, registry, screen, size, sidebar, mainWindowId, logger }: LauncherDependencies) {
     this.#windows = windows;
     this.#registry = registry;
     this.#screen = screen;
     this.#size = size;
+    this.#sidebar = sidebar;
+    this.#mainWindowId = mainWindowId;
     this.#logger = logger;
   }
 
@@ -83,15 +100,58 @@ export class LittleArcLauncher {
   }
 
   async #open(source: { url: string } | { tabId: number }): Promise<WindowDetails | null> {
+    const sidebar = this.#sidebar();
+    const placement = sidebar === null ? null : this.#placement.beside(sidebar, this.#screen(), this.#size);
+    const bounds = placement?.bounds ?? WindowBounds.centred(this.#screen(), this.#size);
     try {
-      const details = await this.#windows.create({ ...source, type: 'popup', focused: true, ...WindowBounds.centred(this.#screen(), this.#size) });
+      const details = await this.#windows.create({ ...source, type: 'popup', focused: true, ...bounds });
       if (details.id !== undefined) {
         this.#registry.mark(details.id);
+        this.#warnAboutPlacement(sidebar, placement);
+        await this.#keepClear(details.id, bounds, sidebar);
       }
       return details;
     } catch (error) {
       this.#logger.error('could not open a Little Arc window, leaving the link to Vivaldi', error);
       return null;
     }
+  }
+
+  #warnAboutPlacement(sidebar: SidebarBox | null, placement: { shrunk: boolean } | null): void {
+    if (sidebar === null) {
+      this.#warnOnce('could not read the sidebar: centring the Little Arc window');
+    } else if (placement === null) {
+      this.#warnOnce('no room beside the sidebar: centring the Little Arc window');
+    } else if (placement.shrunk) {
+      this.#warnOnce('the sidebar leaves no room: the Little Arc window was shrunk');
+    }
+  }
+
+  async #keepClear(popupId: number, bounds: Bounds, sidebar: SidebarBox | null): Promise<void> {
+    if (sidebar === null) {
+      return;
+    }
+    try {
+      const actual = boundsOf(await this.#windows.get(popupId));
+      if (actual === null || !this.#placement.overlaps(sidebar, actual)) {
+        return;
+      }
+      await this.#windows.update(popupId, bounds);
+      const after = boundsOf(await this.#windows.get(popupId));
+      if (after !== null && this.#placement.overlaps(sidebar, after)) {
+        await this.#windows.update(this.#mainWindowId, { focused: true } satisfies WindowUpdate);
+        this.#warnOnce('the Little Arc window still covers the sidebar: the main window stays in front');
+      }
+    } catch (error) {
+      this.#logger.warn('could not check the Little Arc window position', error);
+    }
+  }
+
+  #warnOnce(message: string): void {
+    if (this.#warned.has(message)) {
+      return;
+    }
+    this.#warned.add(message);
+    this.#logger.warn(message);
   }
 }
