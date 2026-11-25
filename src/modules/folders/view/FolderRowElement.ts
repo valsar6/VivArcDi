@@ -9,8 +9,8 @@ export const LIVE_FOLDER_ATTRIBUTE = 'data-vivarcdi-live-folder';
 export const LIVE_WARNING_ATTRIBUTE = 'data-vivarcdi-live-warning';
 export const ICON_CLASS = 'vivarcdi-folders-icon';
 
-const LINK_LABEL = 'Unload tab';
-const FOLDER_LABEL = 'Unload tabs';
+const LINK_LABEL = 'Close tab';
+const FOLDER_LABEL = 'Close tabs';
 const SUBTITLE_ATTRIBUTE = 'data-vivarcdi-link-subtitle';
 const OPEN_TAB_INDENT = 1;
 
@@ -21,8 +21,8 @@ export class FolderRowElement {
   /**
    * Builds the element of a row with plain DOM calls. A folder row has its icon (the pull-request
    * icon for a live folder), its name or the field that edits it, the warning mark of a live
-   * folder whose refresh failed, and an unload minus when it owns open link rows. A link row has
-   * its icon, its title with the subtitle under it when it has one, and the unload minus when its
+   * folder whose refresh failed, and a close minus when it owns open link rows. A link row has
+   * its icon, its title with the subtitle under it when it has one, and the close minus when its
    * tab is open.
    *
    * @param document The browser window document.

@@ -7,7 +7,8 @@ import { LinkId } from '../../shared/links/LinkId.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
 import { SpaceCollapse } from '../../shared/spaces/SpaceCollapse.js';
 import { TabBarAnchor } from '../../core/dom/TabBarAnchor.js';
-import { FolderUnloader } from './links/FolderUnloader.js';
+import { FolderCloser } from './links/FolderCloser.js';
+import { FolderClose } from './links/FolderClose.js';
 import { VirtualFolders } from '../../shared/links/VirtualFolders.js';
 import { WorkspaceNames } from '../../core/workspaces/WorkspaceNames.js';
 import { ClosingLinks } from './editing/ClosingLinks.js';
@@ -48,6 +49,7 @@ export class FolderSection {
   #view: FolderSectionView;
   #hiddenTabs: HiddenTabs;
   #hiddenMarker: HiddenTabMarker;
+  #close: FolderClose;
   #collapse: SpaceCollapse;
   #labels: LinkLabels;
   #virtual: VirtualFolders;
@@ -92,13 +94,13 @@ export class FolderSection {
     this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
-    const unloader = new FolderUnloader(tabs, logger);
+    this.#close = new FolderClose(new FolderCloser(tabs, logger), this.#openFolders, () => this.#redraw.request());
     this.#view = new FolderSectionView(
       document,
       {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => (LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? undefined : void activator.activate(link)),
-        onUnload: (tabIds): void => unloader.unload(tabIds),
+        onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId),
         onRename: (id, name): void => void this.#editing.rename(id, name),
         onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },

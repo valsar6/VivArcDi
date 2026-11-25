@@ -105,6 +105,9 @@ export class FolderTabs {
 
   public async remove(tabId: number): Promise<void> {
     this.calls.push(['remove', tabId]);
+    if (this.failing.has('remove')) {
+      throw new Error('remove failed');
+    }
     this.close(tabId);
   }
 

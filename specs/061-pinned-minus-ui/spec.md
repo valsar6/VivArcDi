@@ -7,7 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-24 |
 | Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. It replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus for the unload; the other close routes of 009/FR-15 stay. |
-| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. |
+| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-6, AC-11 and AC-12: the folder and link row minuses close tabs instead of unloading them. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -158,12 +158,11 @@ with the Favorites grid on and off.
 - **FR-5.** The minus of a pinned row and of a pinned tile SHALL keep the accessible name
   `Unload tab`; it SHALL NOT use Arc's `Close and Keep Pinned` wording or its shortcut, because the
   click unloads and does not close.
-- **FR-6.** The row of a Favorites link SHALL show the same minus on hover or while its tab is the
-  current one, and a press SHALL unload its tab, never close it and never remove the bookmark. The
-  row of a Favorites folder SHALL show the same minus on hover while it has an open link tab, and a
-  press SHALL unload the tabs of the link rows below it, never close them and never remove the
-  folder or a bookmark. The link row's minus SHALL be labelled `Unload tab` and the folder row's
-  `Unload tabs`.
+- **FR-6.** Refined by 063/FR-1 and FR-2. The row of a Favorites link shows the same minus on hover;
+  a press closes its tab, never removes the bookmark and returns the row to its bookmark depth. The
+  row of a Favorites folder shows the same minus on hover while it has an open link tab; a press
+  closes the tabs of the link rows below it and closes the folder, never removing the folder or a
+  bookmark. The link row's minus is labelled `Close tab` and the folder row's `Close tabs`.
 - **FR-7.** A tile of the bookmark grid SHALL keep no minus, no back arrow and no reset control
   (059/FR-17, AC-28; 060/FR-7).
 - **FR-8.** The behavior SHALL hold on Vivaldi 8.1, 8.2 and 8.3, in the tab strip and in the pinned
@@ -202,8 +201,8 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-8 | WHEN a press starts on the minus of a pinned row, THE module SHALL NOT start a drag of the row. | auto: `does not start a drag from the pinned row minus` |
 | AC-9 | WHEN a press starts on the minus of a pinned tile, THE module SHALL NOT start a drag of the tile and SHALL NOT open it. | auto: `does not drag or open a pinned tile from its minus` |
 | AC-10 | WHILE the pointer rests on the row of a Favorites link, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if the link is active (062/AC-3). | auto: `shows the link row minus only while the row is hovered` |
-| AC-11 | WHEN the minus of a Favorites link row is clicked, THE module SHALL unload its tab and SHALL NOT close it or remove the bookmark. | auto: `unloads a link tab from its minus` |
-| AC-12 | WHILE the pointer rests on the row of a Favorites folder with an open link tab, THE minus SHALL be visible, and WHEN it is clicked, THE module SHALL unload the tabs of the link rows below it and SHALL NOT remove the folder or its bookmarks. | auto: `unloads the link tabs of a folder from its minus` |
+| AC-11 | WHEN the minus of a Favorites link row is pressed, THE module SHALL close its tab, return its row to the bookmark depth and keep the bookmark (063/AC-1). | auto: `closes a link tab from its minus` |
+| AC-12 | WHEN the minus of a Favorites folder row is pressed, THE module SHALL close the tabs of its open link rows and close the folder, keeping the folder and its bookmarks (063/AC-2). | auto: `closes the open link tabs of a folder from its minus and closes the folder` |
 | AC-13 | THE minus SHALL NOT appear on a tile of the bookmark grid. | auto: `keeps the minus off a Favorite tile` |
 | AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 21×21 CSS px at the right end of the tile. | live: `the pinned minus is a badge on the tile of a pinned tab` |
 | AC-15 | WHEN Tore compares VivArcDi with his recording of 2026-11-24 and the screenshots of 2026-11-25, the minus of a pinned row and of a pinned tile SHALL look and sit as in the recording, SHALL appear on hover only with its badge on button hover, and a press SHALL unload without closing, dragging or opening (062/AC-9). | manual |
