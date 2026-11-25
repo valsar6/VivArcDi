@@ -79,7 +79,8 @@ class FolderSection {
     this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
-    this.#close = new FolderClose(new FolderCloser(tabs, logger), this.#openFolders, () => this.#redraw.request());
+    const closer = new FolderCloser(tabs, logger);
+    this.#close = new FolderClose(closer, this.#openFolders, () => this.#redraw.request(), this.#active);
     this.#view = new FolderSectionView(
       document,
       {
