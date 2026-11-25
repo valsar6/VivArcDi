@@ -11,6 +11,7 @@ class PinnedMinus {
   #buttons = /* @__PURE__ */ new Map();
   #unwatch = null;
   #onClick = (event) => this.#handle(event);
+  #onPointerDown = (event) => this.#swallow(event);
   #onMouseDown = (event) => this.#swallow(event);
   /**
    * The minus at the right end of every pinned row: Vivaldi 8.3 draws no close button there, so
@@ -29,6 +30,7 @@ class PinnedMinus {
   start() {
     const { document, selectors } = this.#deps;
     document.addEventListener("click", this.#onClick, true);
+    document.addEventListener("pointerdown", this.#onPointerDown, true);
     document.addEventListener("mousedown", this.#onMouseDown, true);
     const browser = document.querySelector(selectors.get("browser"));
     browser?.setAttribute(PINNED_UNLOAD_ATTRIBUTE, "");
@@ -54,6 +56,7 @@ class PinnedMinus {
    */
   stop() {
     this.#deps.document.removeEventListener("click", this.#onClick, true);
+    this.#deps.document.removeEventListener("pointerdown", this.#onPointerDown, true);
     this.#deps.document.removeEventListener("mousedown", this.#onMouseDown, true);
     this.#unwatch?.();
     this.#unwatch = null;

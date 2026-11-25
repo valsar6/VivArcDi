@@ -6,6 +6,7 @@ import { HiddenTabs } from "../../shared/tabs/HiddenTabs.js";
 import { LinkId } from "../../shared/links/LinkId.js";
 import { SpaceCollapse } from "../../shared/spaces/SpaceCollapse.js";
 import { TabBarAnchor } from "../../core/dom/TabBarAnchor.js";
+import { FolderUnloader } from "./links/FolderUnloader.js";
 import { VirtualFolders } from "../../shared/links/VirtualFolders.js";
 import { WorkspaceNames } from "../../core/workspaces/WorkspaceNames.js";
 import { ClosingLinks } from "./editing/ClosingLinks.js";
@@ -44,11 +45,9 @@ class FolderSection {
   #workspace;
   #stops = [];
   /**
-   * The section in the tab bar and everything it needs: the tree of the bookmarks, the tabs that
-   * stand for the links, the folders that are open, and the clicks. The tabs of the links are
-   * hidden from Vivaldi's tab list, since their rows stand for them. The folders that a source
-   * fills, such as the live folders, are drawn after the bookmarks with the same rows; the
-   * section opens them, renames them and reports their clicks through `VirtualFolders`.
+   * The section in the tab bar: the bookmark tree, the tabs of the links, the open folders and the
+   * clicks. The tabs are hidden from Vivaldi's list, since their rows stand for them. Live folders
+   * are drawn with the same rows and reported through `VirtualFolders`.
    *
    * @param context What the module may use.
    * @param settings The root folders and how many levels are shown.
@@ -79,12 +78,13 @@ class FolderSection {
     this.#labels = LinkLabels.of(context.storage, logger);
     this.#hiddenMarker = new HiddenTabMarker(document, selectors, this.#hiddenTabs);
     const activator = new LinkActivator(tabs, this.#openLinks, logger);
+    const unloader = new FolderUnloader(tabs, logger);
     this.#view = new FolderSectionView(
       document,
       {
         onFolder: (id) => this.#toggle(id),
         onLink: (link) => LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? void 0 : void activator.activate(link),
-        onClose: (tabId) => void activator.close(tabId),
+        onUnload: (tabIds) => unloader.unload(tabIds),
         onRename: (id, name) => void this.#editing.rename(id, name),
         onMenu: (id, x, y) => this.#virtual.openMenu(id, x, y)
       }
