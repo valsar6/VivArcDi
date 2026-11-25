@@ -92,7 +92,7 @@ from `origin/main` at that point.
   `keeps the workspace of a folder minus when Vivaldi activates another workspace`. Then add
   `hold`/`release` to `ActiveWorkspace` and call them around `FolderClose.apply`, releasing after
   the task that follows the last close. Done when `make check` is green.
-- [ ] **T5. Tore's manual check** (last; after T6). On macOS and Debian, on Vivaldi 8.1, 8.2 and
+- [x] **T5. Tore's manual check** (last; after T6). On macOS and Debian, on Vivaldi 8.1, 8.2 and
   8.3, with the Favorites grid on and off: select a dedicated workspace, expand a folder, click a
   link inside it, then press the folder's minus. Confirm the tab and the folder close while the
   header, the Favorites and the folder rows stay in that workspace: the view must not move to the
@@ -101,4 +101,5 @@ from `origin/main` at that point.
   `vivaldi://inspect/#apps`: the header and rows keep the selected workspace, the pinned tiles stay,
   and no `Tabs` row or label appears mid-gesture. Confirm a normal tab outside any workspace still
   selects the `Tabs` area (043/FR-4), and check the console for one warning at most about an
-  unlisted workspace. Record the result in the checklist built from AC-7.
+  unlisted workspace. Record the result in the checklist built from AC-7. Tore confirmed the
+  reported four-step case on 2026-11-25 with 0.72.2 and closed issue #283.
