@@ -19,6 +19,7 @@ export class ActiveWorkspace {
   #listed: (workspaceId: string) => boolean;
   #current: string | null = null;
   #generation = 0;
+  #holds = 0;
   #listeners = new Set<WorkspaceListener>();
   #unsubscribe: Array<() => void> = [];
   #warnedUnlisted = false;
@@ -88,9 +89,29 @@ export class ActiveWorkspace {
   }
 
   /**
-   * Reads the workspace of the active tab and reports a change.
+   * Stops following the tabs while a gesture closes them, so the activation Vivaldi performs on
+   * its own after a removal does not move the shown workspace. Reads that land from now on are
+   * dropped until the matching `release`.
+   */
+  public hold(): void {
+    this.#holds += 1;
+    this.#generation += 1;
+  }
+
+  /**
+   * Follows the tabs again after a `hold`, so a later activation changes the workspace as usual.
+   */
+  public release(): void {
+    this.#holds = Math.max(0, this.#holds - 1);
+  }
+
+  /**
+   * Reads the workspace of the active tab and reports a change. Does nothing while held.
    */
   public async refresh(): Promise<void> {
+    if (this.#holds > 0) {
+      return;
+    }
     const generation = ++this.#generation;
     const workspace = await this.#read();
     if (generation === this.#generation && workspace !== undefined && workspace !== this.#current) {

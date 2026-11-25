@@ -118,6 +118,35 @@ test('keeps the last workspace when the active tab is removed', async () => {
   active.stop();
 });
 
+test('keeps the shown workspace during a hold and follows the next activation after it', async () => {
+  const { tabs, seen, active } = setup();
+  await active.start();
+  active.hold();
+  switchTo(tabs, 3);
+  await settle();
+  assert.deepEqual(seen, [], 'an activation during the hold is consumed');
+  assert.equal(active.current, '7');
+
+  active.release();
+  switchTo(tabs, 2);
+  await settle();
+  assert.deepEqual(seen, ['8'], 'a later activation is honoured');
+  assert.equal(active.current, '8');
+  active.stop();
+});
+
+test('drops a read that lands after a hold starts', async () => {
+  const { tabs, seen, active } = setup();
+  await active.start();
+  switchTo(tabs, 2);
+  active.hold();
+  await settle();
+  assert.deepEqual(seen, []);
+  assert.equal(active.current, '7');
+  active.release();
+  active.stop();
+});
+
 test('keeps the last workspace when the tab names a workspace Vivaldi does not list', async () => {
   const warnings: unknown[][] = [];
   const { tabs, seen, active } = setup({ listed: (id): boolean => id === '7' || id === '8', logger: warningLogger(warnings) });
