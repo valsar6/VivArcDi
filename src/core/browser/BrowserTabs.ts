@@ -51,6 +51,8 @@ export interface ChromeApi extends BookmarksHost, StorageHost {
   windows?:
     | {
         create: (...args: unknown[]) => void;
+        get?: ((...args: unknown[]) => void) | undefined;
+        update?: ((...args: unknown[]) => void) | undefined;
         getAll?: ((...args: unknown[]) => void) | undefined;
         getCurrent?: ((...args: unknown[]) => void) | undefined;
         getLastFocused?: ((...args: unknown[]) => void) | undefined;

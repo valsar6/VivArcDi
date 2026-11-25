@@ -4,6 +4,18 @@ export interface WindowDetails {
   id?: number | undefined;
   type?: string | undefined;
   incognito?: boolean | undefined;
+  left?: number | undefined;
+  top?: number | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+}
+
+export interface WindowUpdate {
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+  focused?: boolean;
 }
 
 export interface NewWindow {
@@ -48,6 +60,23 @@ export class BrowserWindows {
    */
   public create(properties: NewWindow): Promise<WindowDetails> {
     return this.#call('create', properties);
+  }
+
+  /**
+   * @param windowId Window id.
+   * @returns The window's details, including its bounds when Vivaldi reports them.
+   */
+  public get(windowId: number): Promise<WindowDetails> {
+    return this.#call('get', windowId);
+  }
+
+  /**
+   * @param windowId Window id.
+   * @param properties The bounds or focus to change.
+   * @returns The updated window.
+   */
+  public update(windowId: number, properties: WindowUpdate): Promise<WindowDetails> {
+    return this.#call('update', windowId, properties);
   }
 
   /**
@@ -117,7 +146,7 @@ export class BrowserWindows {
     return () => event.removeListener(listener);
   }
 
-  #call<T>(method: 'create' | 'getAll' | 'getCurrent' | 'getLastFocused' | 'remove', ...args: unknown[]): Promise<T> {
+  #call<T>(method: 'create' | 'get' | 'update' | 'getAll' | 'getCurrent' | 'getLastFocused' | 'remove', ...args: unknown[]): Promise<T> {
     const windows = this.#windows;
     const call = windows?.[method];
     if (windows === null || call === undefined) {

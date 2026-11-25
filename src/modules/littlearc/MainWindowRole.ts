@@ -16,6 +16,7 @@ import { isDestinationQuestion, parseAdoptMessage, parsePageLinkMessage } from '
 import type { LittleArcRegistry } from './LittleArcRegistry.js';
 import type { LittleArcOptions } from './LittleArcOptions.js';
 import { screenOf } from './ScreenAreas.js';
+import { sidebarOf } from './SidebarBox.js';
 import { assembleCommandBar } from './commandbar/CommandBarAssembly.js';
 import type { CommandBarMount } from './commandbar/CommandBarMount.js';
 import { WorkspaceAdopter } from './WorkspaceAdopter.js';
@@ -54,6 +55,8 @@ export class MainWindowRole {
       registry,
       screen: (): ReturnType<typeof screenOf> => screenOf(context.document),
       size: settings,
+      sidebar: (): ReturnType<typeof sidebarOf> => sidebarOf(context),
+      mainWindowId: windowId,
       logger: context.logger,
     });
     this.#indicator = new LittleArcIndicator({ ...context, logger: context.logger.child('LittleArcIndicator') });
