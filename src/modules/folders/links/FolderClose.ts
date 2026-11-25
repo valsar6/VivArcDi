@@ -2,6 +2,8 @@ import type { ActiveWorkspace } from '../../../core/workspaces/ActiveWorkspace.j
 import type { FolderCloser } from './FolderCloser.js';
 import type { OpenFolders } from '../tree/OpenFolders.js';
 
+const RELEASE_DELAY_MS = 0;
+
 export class FolderClose {
   #closer: FolderCloser;
   #openFolders: OpenFolders;
@@ -10,8 +12,8 @@ export class FolderClose {
 
   /**
    * Closes the tabs a row minus stands for, then closes the folder and redraws on success. The
-   * shown workspace is held while the tabs close, so the activation Vivaldi performs on its own
-   * after a removal does not move it.
+   * shown workspace is held while the tabs close and for the task that follows, so the activation
+   * Vivaldi performs on its own after a removal does not move it.
    *
    * @param closer The tab closer.
    * @param openFolders The folders whose state is saved.
@@ -46,6 +48,7 @@ export class FolderClose {
       }
       this.#redraw();
     } finally {
+      await new Promise<void>((resolve) => setTimeout(resolve, RELEASE_DELAY_MS));
       this.#active.release();
     }
   }

@@ -16,7 +16,7 @@ stays in Tore's hands.
 
 ```
 T1 ─┐
-T2 ─┼──> T4 (lead: docs and version) ──> T5 (Tore: manual)
+T2 ─┼──> T4 (lead: docs and version) ──> T6 (hold through a close) ──> T5 (Tore: manual)
 T3 ─┘
 ```
 
@@ -34,6 +34,7 @@ from `origin/main` at that point.
 | T2 | `src/shared/links/OpenLinks.ts`, `src/modules/folderpreview/FolderPreview.ts`, `src/modules/folders/FolderSection.ts` (the `OpenLinks` call), `tests/shared/links/OpenLinks.test.ts`, `tests/shared/links/LinkActivator.test.ts` |
 | T3 | `src/modules/folders/links/FolderClose.ts`, `src/modules/folders/tree/OpenFolders.ts`, `src/modules/folders/editing/FolderDeletion.ts`, `src/modules/folders/editing/FolderRelocation.ts`, `src/modules/folders/editing/FolderActionsFactory.ts`, `src/modules/folders/FolderSection.ts` (the close handler), `tests/modules/folders/links/FolderClose.test.ts`, `tests/modules/folders/tree/OpenFolders.test.ts`, `tests/modules/folders/editing/FolderDeletion.test.ts`, `tests/modules/folders/editing/FolderRelocation.test.ts` |
 | T4 | `specs/063-minus-closes-folder-tabs/design.md`, `package.json`, `package-lock.json`, `installer/vivarcdi/__init__.py` |
+| T6 | `src/core/workspaces/ActiveWorkspace.ts`, `src/modules/folders/links/FolderClose.ts`, `src/modules/folders/FolderSection.ts`, `tests/core/workspaces/ActiveWorkspace.test.ts`, `tests/modules/folders/BookmarkFolders.test.ts`, `tests/modules/folders/links/FolderClose.test.ts`, `tests/modules/folders/links/FolderCloser.test.ts`, this design |
 | T5 | Nothing in the repository; the checklist comes from AC-7 |
 
 ## Tasks
@@ -80,13 +81,24 @@ from `origin/main` at that point.
   captures the shown workspace at the press and passes it to `apply` and `forget`, refined by 064.
   In the three version files, make the patch bump read from `origin/main` right before editing. Done
   when `make check` is green.
-- [ ] **T5. Tore's manual check** (last). On macOS and Debian, on Vivaldi 8.1, 8.2 and 8.3, with
-  the Favorites grid on and off: select a workspace with a folder of several open links, open
-  `vivaldi://inspect/#apps` so it sits in Vivaldi's own inspection workspace or is loading, and
-  press the folder's minus. Confirm the header keeps the workspace name, the Favorites and folder
-  rows stay with no `Tabs` row or label, the folder's link rows keep their tabs, the pinned tiles
-  stay, and the folder and its tabs then close. Switch workspace away and back and confirm the
-  folder stays closed. Confirm that closing an active tab does not move the header to `Tabs` before
-  Vivaldi selects the next tab, and that a normal tab outside any workspace still selects the
-  `Tabs` area (043/FR-4). Check the console for one warning at most about an unlisted workspace.
-  Record the result in the checklist built from AC-7.
+- [x] **T6. Keep the shown workspace through a folder minus close** (TDD; after T4). In
+  `tests/core/workspaces/ActiveWorkspace.test.ts` add
+  `keeps the shown workspace during a hold and follows the next activation after it` and
+  `drops a read that lands after a hold starts`. In
+  `tests/modules/folders/links/FolderClose.test.ts` add
+  `holds the shown workspace while the tabs close and releases it after` and
+  `releases the shown workspace when a tab cannot be closed`. In
+  `tests/modules/folders/BookmarkFolders.test.ts` add
+  `keeps the workspace of a folder minus when Vivaldi activates another workspace`. Then add
+  `hold`/`release` to `ActiveWorkspace` and call them around `FolderClose.apply`, releasing after
+  the task that follows the last close. Done when `make check` is green.
+- [ ] **T5. Tore's manual check** (last; after T6). On macOS and Debian, on Vivaldi 8.1, 8.2 and
+  8.3, with the Favorites grid on and off: select a dedicated workspace, expand a folder, click a
+  link inside it, then press the folder's minus. Confirm the tab and the folder close while the
+  header, the Favorites and the folder rows stay in that workspace: the view must not move to the
+  `Tabs` area when Vivaldi activates another tab after the removal. Switch workspace away and back
+  and confirm the folder stays closed. Also replay the 2026-11-25 12:30 recording with
+  `vivaldi://inspect/#apps`: the header and rows keep the selected workspace, the pinned tiles stay,
+  and no `Tabs` row or label appears mid-gesture. Confirm a normal tab outside any workspace still
+  selects the `Tabs` area (043/FR-4), and check the console for one warning at most about an
+  unlisted workspace. Record the result in the checklist built from AC-7.

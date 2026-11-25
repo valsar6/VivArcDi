@@ -225,6 +225,13 @@ onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId, th
 `FolderClose.apply(tabIds, folderId, workspace)` passes `workspace` to `openFolders.forget`. A
 failed close still leaves the folder state alone, as 063 decided.
 
+Closing the active tab makes Vivaldi activate another tab on its own. That activation must not
+move the shown workspace: `ActiveWorkspace` has a `hold()`/`release()` pair whose counter makes
+`refresh()` a no-op while held, and whose `hold()` invalidates a read already in flight.
+`FolderClose.apply` calls `hold()` before the first `tabs.remove`, and `release()` in `finally`
+after the task that follows the last close, so the automatic activation is consumed without
+changing `#current`. A later activation caused by the user still refreshes the state.
+
 `OpenFolders` saves under the key of the given workspace, whichever one is loaded now:
 
 ```ts
@@ -286,8 +293,10 @@ What each one does:
 
 Extra tests, not tied to a criterion: `tests/core/tabs/InspectionTarget.test.ts` for the helper,
 `keeps the last workspace when the tab names a workspace Vivaldi does not list` for NFR-3, a
-cross-workspace case in `tests/modules/folders/tree/OpenFolders.test.ts`, and a refresh that
-lands after a newer one in `OpenLinks.test.ts`.
+cross-workspace case in `tests/modules/folders/tree/OpenFolders.test.ts`, a refresh that lands
+after a newer one in `OpenLinks.test.ts`, and the hold path in `ActiveWorkspace.test.ts` and
+`FolderClose.test.ts`, including the integration case where Vivaldi activates a workspace-0 tab
+during a folder minus close.
 
 The module tests follow the real state rather than a stub, so `start` in the module starts it:
 `tests/modules/folders/BookmarkFolders.test.ts`, `tests/modules/folders/LinkTabHiding.test.ts`,
