@@ -203,15 +203,14 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-11 | WHEN the minus of a Favorites link row is clicked, THE module SHALL unload its tab and SHALL NOT close it or remove the bookmark. | auto: `unloads a link tab from its minus` |
 | AC-12 | WHILE the pointer rests on the row of a Favorites folder with an open link tab, THE minus SHALL be visible, and WHEN it is clicked, THE module SHALL unload the tabs of the link rows below it and SHALL NOT remove the folder or its bookmarks. | auto: `unloads the link tabs of a folder from its minus` |
 | AC-13 | THE minus SHALL NOT appear on a tile of the bookmark grid. | auto: `keeps the minus off a Favorite tile` |
-| AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 21×21 CSS px at the right end of the tile. | manual; becomes live: `the pinned minus is a badge on the tile of a pinned tab` with the scenario the implementation adds |
+| AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 21×21 CSS px at the right end of the tile. | live: `the pinned minus is a badge on the tile of a pinned tab` |
 | AC-15 | WHEN Tore compares VivArcDi with his recording of 2026-11-24, the minus of a pinned row and of a pinned tile SHALL look and sit as in the recording, SHALL appear on hover and on the current row or tile, and a press SHALL unload without closing, dragging or opening. | manual |
 | AC-16 | WHEN Tore compares the row of a Favorites folder and of a Favorites link with the recording, THE minus SHALL look and sit as on a pinned row, and a press SHALL unload the tabs it stands for without closing them or removing the bookmark or the folder. | manual |
 
-AC-14 is checked by hand in this Draft. When the implementation adds its scenario, named
-"the pinned minus is a badge on the tile of a pinned tab", it becomes a live check on the lab
-Vivaldi of [046](../046-live-verification/spec.md): it opens a pinned tab with the default Favorites
-grid and reads the box, the radius and the place of the minus on its tile; the hover and the press
-stay the manual checks of AC-15 and AC-16.
+AC-14 is checked by the live scenario on the lab Vivaldi of
+[046](../046-live-verification/spec.md): it opens a pinned tab with the default Favorites grid and
+reads the box, the radius and the place of the minus on its tile; the hover and the press stay the
+manual checks of AC-15 and AC-16.
 
 ## Out of scope
 

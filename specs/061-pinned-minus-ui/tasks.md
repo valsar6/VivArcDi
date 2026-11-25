@@ -60,7 +60,7 @@ after T1. T5 runs last on the code; the live scenario needs T1 and T2.
   collect the descendant tab ids from `#links` and `data-vivarcdi-depth`. In `FolderSection`, wire
   `onUnload` to `TabUnloader`. Apply the mixin in `folders.scss`. Keep `onClose` for the other close
   routes. Done when `make check` is green.
-- [ ] **T4. The live scenario** (after T1 and T2). Add the scenario named
+- [x] **T4. The live scenario** (after T1 and T2). Add the scenario named
   `the pinned minus is a badge on the tile of a pinned tab`, read the tile minus's box, radius and
   position, and change AC-14's check in the spec from `manual; becomes live:` to
   `live: the pinned minus is a badge on the tile of a pinned tab`. Run `npm run live -- --only 061`
