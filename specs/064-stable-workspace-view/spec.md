@@ -128,7 +128,7 @@ for ordinary and live folders.
 - **NFR-2.** The change adds no module, no option in `config.json` and no runtime dependency; the
   existing listeners SHALL still be removed by `stop()`.
 - **NFR-3.** IF the active tab names a workspace that Vivaldi does not list, THEN the last known
-  workspace SHALL stay and the problem SHALL be logged once, as 010/NFR-3.
+  workspace SHALL stay and VivArcDi SHALL log one console warning per session naming that id.
 - **NFR-4.** No new storage container: the folder close state keeps the key of `OpenFolders`, and
   the `Tabs` area of 043/FR-4 stays reserved for tabs outside any workspace.
 - **NFR-5.** Works on macOS and Debian; texts in English.

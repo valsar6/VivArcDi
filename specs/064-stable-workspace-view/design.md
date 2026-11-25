@@ -174,8 +174,11 @@ active tab is an inspection page (AC-1, FR-3) or there is no active tab (FR-6):
 
 ```ts
 constructor(tabs: OpenLinksTabs, onChange: () => void, logger: Logger,
-  shownWorkspace: () => string | null, timing: FrameTiming = {});
+  settings: OpenLinksSettings = {});
 ```
+
+`OpenLinksSettings` carries `shownWorkspace: () => string | null` and the optional `timing` of the
+frame task, as other collaborators do; keeping them in one object respects the `max-params` rule.
 
 ```ts
 #update(tabs: chrome.tabs.Tab[]): void {
@@ -205,9 +208,9 @@ async refresh(): Promise<void> {
 ```
 
 `stop` increments the generation as well, so a read that lands after the stop changes nothing. The
-call sites pass the function: `FolderSection.ts:88` passes `(): string | null => this.#workspace ??
-null` and `FolderPreview.ts:29` passes `(): string | null => context.activeWorkspace.current`. The
-tests pass a constant or a variable.
+call sites pass the function in the settings: `FolderSection.ts:88` passes `shownWorkspace: ():
+string | null => this.#workspace ?? null` and `FolderPreview.ts:29` passes `shownWorkspace: ():
+string | null => context.activeWorkspace.current`. The tests pass a constant or a variable.
 
 ### The folder minus
 
