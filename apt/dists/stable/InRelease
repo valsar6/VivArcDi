@@ -5,17 +5,17 @@ Origin: VivArcDi
 Label: VivArcDi
 Suite: stable
 Codename: stable
-Date: Wed, 25 Nov 2026 08:32:08 GMT
+Date: Wed, 25 Nov 2026 09:31:54 GMT
 Architectures: all
 Components: main
 Description: VivArcDi apt repository
 SHA256:
- e52baf247c45a86f9e4e4ac4714ead6e9c43faeec09bdab97031d209b86c15a1             2172 main/binary-all/Packages
- 5fdd056381ea9e30fbc7290bc840814f24fab78471f574950a52b7491716deaa              738 main/binary-all/Packages.gz
+ 066acb8af74b7db92bb050a7c22f0a325758c0b78d3f2792cc27e696affcca64             2172 main/binary-all/Packages
+ e9bb73cbdf7f22bac0aeba55cb6db707628c5cbae62167fae5a1d21e4848b720              739 main/binary-all/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYIAB0WIQQU8mSYo3NNkPdkp71L62i+x7QcjwUCawadZgAKCRBL62i+x7Qc
-j0e0AP9yt2M8Ja3GhbXXwiZQw6zW5QRTccoNxiQBJvwHo0I3/QEAhg5877yxsz9u
-v079/gP4tuKgyqcTpcB+Qc21CF5aYwU=
-=Pi4+
+iHUEARYIAB0WIQQU8mSYo3NNkPdkp71L62i+x7QcjwUCawarOAAKCRBL62i+x7Qc
+j/RZAQDcMrA8vuPz9Y2yqgCElhcIZVCwSBRbOcRIShpUVhfGXQEA9JLnuiwb4yjn
+2w6uliYMk46QFufUzvpW5In2E09QKw8=
+=Ngig
 -----END PGP SIGNATURE-----
