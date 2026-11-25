@@ -4,6 +4,7 @@ import type { ModuleContext } from '../../../src/core/boot/Module.js';
 import type { BrowserBookmarks } from '../../../src/core/browser/bookmarks/BrowserBookmarks.js';
 import { ReopenPinned } from '../../../src/modules/reopen/ReopenPinned.js';
 import { LAST_OPENED_STORAGE_KEY } from '../../../src/shared/links/LastOpenedStore.js';
+import type { FakeTab } from '../favorites/fakes.js';
 import { bookmarkTree, folder, link, recordingChrome } from '../folders/fakes.js';
 import { MemoryStorage, ReopenTabs, settle, silentLogger } from './fakes.js';
 import { silentNotices } from '../../loader/fakes.js';
@@ -11,7 +12,11 @@ import { silentNotices } from '../../loader/fakes.js';
 const NIX = 'https://nixos.org/manual';
 const TREE = bookmarkTree([folder('10', 'Hobbies', [link('11', 'Nix manual', NIX)])]);
 
-async function start(tabs: ReopenTabs, bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks): Promise<MemoryStorage> {
+async function start(
+  tabs: ReopenTabs,
+  bookmarks: BrowserBookmarks = recordingChrome(TREE).bookmarks,
+  folders: Record<string, unknown> = { enabled: true, root: 'Importati da Firefox/Bookmarks Bar' },
+): Promise<MemoryStorage> {
   const storage = new MemoryStorage();
   const context = {
     document: {},
@@ -20,7 +25,7 @@ async function start(tabs: ReopenTabs, bookmarks: BrowserBookmarks = recordingCh
     options: {},
     tabs,
     bookmarks,
-    modules: { 'bookmark-folders': { enabled: true, root: 'Importati da Firefox/Bookmarks Bar' } },
+    modules: { 'bookmark-folders': folders },
     notices: silentNotices(),
   } as unknown as ModuleContext;
   new ReopenPinned().start(context);
@@ -58,6 +63,27 @@ test('records the last opened date of tabs that match a bookmark', async () => {
     { id: 6, windowId: 1, pinned: false, url: 'https://example.com/other' },
   ]);
   const storage = await start(tabs);
+  tabs.activateByUser(6);
+  await settle();
+  assert.equal(storage.getItem(LAST_OPENED_STORAGE_KEY), null);
+  tabs.activateByUser(5);
+  await settle();
+  const saved = JSON.parse(storage.getItem(LAST_OPENED_STORAGE_KEY) ?? '{}') as Record<string, number>;
+  assert.deepEqual(Object.keys(saved), ['nixos.org/manual']);
+});
+
+test('records the last opened date of a linked tab when the folder root is empty', async () => {
+  const tabs = new ReopenTabs([
+    {
+      id: 5,
+      windowId: 1,
+      pinned: false,
+      url: NIX,
+      vivExtData: JSON.stringify({ vivarcdi: { bookmarkId: '11' } }),
+    } as FakeTab,
+    { id: 6, windowId: 1, pinned: false, url: 'https://example.com/other' },
+  ]);
+  const storage = await start(tabs, recordingChrome(TREE).bookmarks, { enabled: true, root: '' });
   tabs.activateByUser(6);
   await settle();
   assert.equal(storage.getItem(LAST_OPENED_STORAGE_KEY), null);
