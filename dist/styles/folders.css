@@ -140,7 +140,6 @@
   border: 0;
   appearance: none;
   border-radius: 5px;
-  background-color: color-mix(in srgb, var(--colorFg, #fff) 14%, transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity 160ms ease;
@@ -155,22 +154,16 @@
   content: "";
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.500 7.250h11v1.500h-11z'/%3E%3C/svg%3E") center/contain no-repeat;
 }
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-minus:hover {
+  background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-minus:hover::before {
+  background-color: color-mix(in srgb, currentcolor 85%, var(--colorHighlightBg, currentcolor));
+}
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-link-open]:hover [data-vivarcdi-link-minus],
-#browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-link-active] [data-vivarcdi-link-minus],
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-folder-unload]:hover [data-vivarcdi-folder-minus] {
   opacity: 1;
   pointer-events: auto;
-}
-#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]:hover::after {
-  display: none;
-}
-#browser[data-vivarcdi-active] [data-vivarcdi-folders] [data-vivarcdi-link-open]::after {
-  flex: none;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--colorHighlightBg, currentcolor);
-  content: "";
 }
 
 @keyframes vivarcdi-folders-in {

@@ -8,6 +8,7 @@ const ICON_CLASS = "vivarcdi-folders-icon";
 const LINK_LABEL = "Unload tab";
 const FOLDER_LABEL = "Unload tabs";
 const SUBTITLE_ATTRIBUTE = "data-vivarcdi-link-subtitle";
+const OPEN_TAB_INDENT = 1;
 class FolderRowElement {
   #document;
   #editor;
@@ -35,7 +36,8 @@ class FolderRowElement {
     element.setAttribute("role", row.kind === "folder" ? "treeitem" : "link");
     element.setAttribute("title", row.kind === "link" && row.subtitle !== void 0 ? `${row.title}
 ${row.subtitle}` : row.title);
-    element.style.setProperty("--vivarcdi-depth", String(row.depth));
+    const depth = row.kind === "link" && row.tab !== void 0 ? row.depth + OPEN_TAB_INDENT : row.depth;
+    element.style.setProperty("--vivarcdi-depth", String(depth));
     element.setAttribute("data-vivarcdi-depth", String(row.depth));
     if (row.kind === "folder") {
       this.#fillFolder(element, row, hasOpenLinks);
