@@ -57,12 +57,13 @@ the minus itself, the rounded-square badge of 061 is drawn behind the dash, with
 and the dash's color changing to their hover values. Both colors still come from the theme, and the
 change is short and quiet as in 061.
 
-**Open links.** The dot of 009/FR-4 is removed: no element, pseudo-element or mark beside an open
-link's icon or title indicates that its tab is open. An open link still stays visible below its
-folder while that folder is closed, and its row is indented one step further than a link row whose
-tab is closed at the same depth, so that the indentation is the sign of the open tab. Folder rows
-keep their own indentation, and an unloaded link keeps the indentation because its tab is still
-open. The link's title, icon, active look and unload minus stay as they are in 009 and 061.
+**Open tabs.** The dot of 009/FR-4 is removed: no element, pseudo-element or mark beside a row's
+icon or title indicates that its tab is open. Every row that stands for an open tab is indented one
+step further than a row of the same depth whose tab is closed, whether or not Vivaldi displays the
+tab itself in its tab list. An open link still stays visible below its folder while that folder is
+closed. Folder rows keep their own indentation, and an unloaded link keeps the indentation because
+its tab is still open. The link's title, icon, active look and unload minus stay as they are in 009
+and 061.
 
 **Press.** A press on the minus still unloads the tab, never closes it, never drags the row or tile,
 never opens the tile and never removes a bookmark or a folder. The accessible names `Unload tab`
@@ -87,7 +88,7 @@ group, with the Favorites grid on and off, in the light and dark themes.
 |---|---|---|
 | Pinned row and tile minus | Visible only while the row or tile is hovered; badge only while the button is hovered | `pinned.scss`, `favorites.scss`, `_minus.scss` |
 | Folder and link row minus | Visible only while its row is hovered; badge only while the button is hovered | `folders.scss`, `_minus.scss` |
-| Open link | No dot; the row is indented one step further than a closed link at the same depth | `folders.scss`, `FolderRows.ts`, `FolderRowElement.ts` |
+| Open tab row | No dot; every row of an open tab, including a tab Vivaldi does not display in its tab list, is indented one step further than a closed link at the same depth | `folders.scss`, `FolderRows.ts`, `FolderRowElement.ts` |
 | Press | Unchanged: unload, never close | 061 |
 
 ## Requirements
@@ -104,10 +105,11 @@ group, with the Favorites grid on and off, in the light and dark themes.
   061/FR-3 to FR-6 and FR-9.
 - **FR-4.** An open link row SHALL NOT show a dot or another mark of its open state beside its icon
   or title, and an open link SHALL stay visible below its closed folder.
-- **FR-5.** WHILE a link's tab is open, THE link row SHALL be indented one `$folders-indent` step
-  further than a link row whose tab is closed at the same bookmark depth; folder rows SHALL keep
-  their depth. The indentation SHALL apply to links listed below a closed folder and to links of a
-  collapsed space.
+- **FR-5.** WHILE a row stands for an open tab, including a tab that Vivaldi does not display in its
+  tab list or that is unloaded, THE row SHALL be indented one `$folders-indent` step further than a
+  row whose tab is closed at the same bookmark depth; folder rows SHALL keep their depth. No row
+  SHALL show a dot for its open tab. The indentation SHALL apply to links listed below a closed
+  folder and to links of a collapsed space.
 - **FR-6.** The behavior SHALL hold on Vivaldi 8.1, 8.2 and 8.3, in the tab strip and in the pinned
   group, with the Favorites grid on and off.
 
@@ -135,7 +137,7 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-5 | WHILE the pointer rests on the minus of a pinned row or tile, THE badge and its hover colors SHALL be visible, and WHILE the pointer rests on the row elsewhere, THE minus SHALL be only a dash. | auto: `shows the pinned minus badge only while the button is hovered` |
 | AC-6 | WHILE the pointer rests on the minus of a Favorites folder or link row, THE badge and its hover colors SHALL be visible, and WHILE the pointer rests on the row elsewhere, THE minus SHALL be only a dash. | auto: `shows the folder and link minus badges only while the buttons are hovered` |
 | AC-7 | THE section SHALL draw no dot or other open-state mark on a link row with an open tab. | auto: `removes the dot from an open link row` |
-| AC-8 | WHILE a link's tab is open, THE link row SHALL be indented one step further than a link row whose tab is closed at the same depth, including below a closed folder and in a collapsed space. | auto: `indents an open link row one step further than a closed link row` |
+| AC-8 | WHILE a row stands for an open tab, including a tab Vivaldi does not display in its tab list, THE row SHALL be indented one step further than a row whose tab is closed at the same depth, including below a closed folder and in a collapsed space. | auto: `indents every row of an open tab one step further than a closed link row` |
 | AC-9 | WHEN Tore compares VivArcDi with his screenshots of 2026-11-25, THE minus SHALL appear only on row hover, its badge only on button hover, and open links SHALL be indented without a dot, while a press on the minus SHALL still unload without closing. | manual |
 
 AC-1 to AC-8 are checked by reading the rendered rules and the row markup; the look of the badge
@@ -152,14 +154,13 @@ and its colors stay with the manual check of AC-9.
 
 ## Open questions
 
-- [ ] **Q-1. How much an open link is indented.** Option A, proposed here: an open link row is one
-  `$folders-indent` step further right than a closed link row at the same depth, so that the indent
-  itself says the tab is open. Option B: remove the dot and keep every link row at its current
-  bookmark depth. Tore to choose from the screenshots of 2026-11-25.
-- [ ] **Q-2. Which surfaces follow the hover-only rule.** Option A, proposed here: all four minus
-  surfaces of 061, pinned row and tile as well as folder and link rows, so that one control keeps
-  one behavior. Option B: only the Favorites folder and link rows of the screenshots, keeping the
-  current-tab visibility of a pinned row or tile. Tore to choose.
+- [x] **Q-1. How much an open tab is indented.** Tore chose option A with an addition on
+  2026-11-25: every row that stands for an open tab is one `$folders-indent` step further right than
+  a closed row at the same depth, even when Vivaldi does not display the tab itself in its tab list;
+  the dot is removed in every case. Option B, keeping every link at its current depth, is rejected.
+- [x] **Q-2. Which surfaces follow the hover-only rule.** Tore chose option A on 2026-11-25: pinned
+  rows and tiles, Favorites folder rows and Favorites link rows all show the minus only on hover.
+  Option B, keeping the current-tab visibility of a pinned row or tile, is rejected.
 
 ## References
 
