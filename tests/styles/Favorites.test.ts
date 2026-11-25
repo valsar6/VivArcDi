@@ -22,7 +22,7 @@ test('draws the pinned tile minus as the same badge', () => {
   assert.match(base, /width: 21px;/);
   assert.match(base, /height: 21px;/);
   assert.match(base, /border-radius: 5px;/);
-  assert.match(base, /background-color: color-mix\(/);
+  assert.equal(/background-color:/.test(base), false);
   assert.match(base, /opacity: 0;/);
   assert.match(base, /pointer-events: none/);
   assert.equal(/mask:/.test(base), false);
@@ -31,10 +31,10 @@ test('draws the pinned tile minus as the same badge', () => {
   assert.match(dash, /mask: url\("data:image\/svg\+xml/);
 });
 
-test('shows the pinned tile minus on hover and on the current tile', () => {
+test('shows the pinned tile minus only while the tile is hovered', () => {
   const css = compiled();
   assert.match(css, /\[data-vivarcdi-tile\]:hover \[data-vivarcdi-tile-minus\][^{]*\{[^}]*opacity: 1/);
-  assert.match(css, /\[data-vivarcdi-tile\]\[data-vivarcdi-current\] \[data-vivarcdi-tile-minus\][^{]*\{[^}]*opacity: 1/);
+  assert.equal(/\[data-vivarcdi-tile\]\[data-vivarcdi-current\] \[data-vivarcdi-tile-minus\]/.test(css), false);
   assert.match(css, /\[data-vivarcdi-tile\]:hover \[data-vivarcdi-tile-minus\][^{]*\{[^}]*pointer-events: auto/);
 });
 

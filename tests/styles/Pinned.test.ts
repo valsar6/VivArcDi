@@ -7,9 +7,13 @@ import * as sass from 'sass';
 const STYLES = fileURLToPath(new URL('../../src/styles/', import.meta.url));
 const read = (name: string): string => readFileSync(`${STYLES}${name}`, 'utf8');
 const compiled = (): string => sass.compile(`${STYLES}pinned.scss`).css;
+const compiledTiles = (): string => sass.compile(`${STYLES}favorites.scss`).css;
 
 const ROW = '#browser\\[data-vivarcdi-active\\]\\[data-vivarcdi-pinned-unload\\] \\.tab-position\\.is-pinned';
 const MINUS = '\\[data-vivarcdi-pinned-minus\\]';
+const TILE_SOURCE = '\\[data-vivarcdi-tiles\\]\\[data-vivarcdi-tile-source=pinned\\]';
+const TILE_MINUS = '\\[data-vivarcdi-tile-minus\\]';
+const ruleBody = (css: string, selector: RegExp): string => selector.exec(css)?.[1] ?? '';
 
 test('draws the pinned row minus as a badge like Arc', () => {
   const tokens = read('_tokens.scss');
@@ -22,7 +26,7 @@ test('draws the pinned row minus as a badge like Arc', () => {
   assert.match(base, /width: 21px;/);
   assert.match(base, /height: 21px;/);
   assert.match(base, /border-radius: 5px;/);
-  assert.match(base, /background-color: color-mix\(/);
+  assert.equal(/background-color:/.test(base), false);
   assert.match(base, /opacity: 0;/);
   assert.match(base, /pointer-events: none/);
   assert.equal(/mask:/.test(base), false);
@@ -33,8 +37,21 @@ test('draws the pinned row minus as a badge like Arc', () => {
   assert.equal(css.includes('data-vivarcdi-tile'), false);
 });
 
-test('shows the pinned row minus on hover and on the current row', () => {
+test('shows the pinned row minus only while the row is hovered', () => {
   const css = compiled();
   assert.match(css, /\.tab-position\.is-pinned:hover \[data-vivarcdi-pinned-minus\][^{]*\{[^}]*opacity: 1/);
-  assert.match(css, /\.tab-position\.is-pinned:has\(\.tab\.active\) \[data-vivarcdi-pinned-minus\]/);
+  assert.equal(css.includes(':has('), false);
+});
+
+test('shows the pinned minus badge only while the button is hovered', () => {
+  const css = compiled();
+  const hover = ruleBody(css, new RegExp(`${ROW} ${MINUS}:hover \\{([^}]*)\\}`));
+  assert.match(hover, /background-color: color-mix\(/);
+  const dash = ruleBody(css, new RegExp(`${ROW} ${MINUS}:hover::before \\{([^}]*)\\}`));
+  assert.match(dash, /background-color: color-mix\(/);
+  const tiles = compiledTiles();
+  const tileHover = ruleBody(tiles, new RegExp(`${TILE_SOURCE}[^{]*${TILE_MINUS}:hover \\{([^}]*)\\}`));
+  assert.match(tileHover, /background-color: color-mix\(/);
+  const tileDash = ruleBody(tiles, new RegExp(`${TILE_SOURCE}[^{]*${TILE_MINUS}:hover::before \\{([^}]*)\\}`));
+  assert.match(tileDash, /background-color: color-mix\(/);
 });

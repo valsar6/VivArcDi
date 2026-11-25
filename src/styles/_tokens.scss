@@ -38,7 +38,6 @@ $folders-transition: 200ms;
 $folders-indent: 14px;
 $folders-padding: 6px;
 $folders-icon-size: 16px;
-$folders-dot-size: 6px;
 $folders-min-height: 120px;
 $column-scroll: '[data-vivarcdi-column-scroll]';
 $frame-basis: 100000px;
@@ -306,7 +305,8 @@ $close-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' 
 $minus-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.500 7.250h11v1.500h-11z'/%3E%3C/svg%3E");
 $minus-badge-size: 21px;
 $minus-badge-radius: 5px;
-$minus-badge-tint: 14%;
+$minus-badge-hover-tint: 26%;
+$minus-dash-hover-mix: 85%;
 $minus-offset: 6px;
 $minus-size: 16px;
 $alert-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7.250 2.500h1.500v6.500h-1.500zM7.250 10.500h1.500V12h-1.500z'/%3E%3C/svg%3E");

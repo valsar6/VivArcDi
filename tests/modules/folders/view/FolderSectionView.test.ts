@@ -46,15 +46,28 @@ const pressMinus = (node: DomNode, type: string): void =>
     stopImmediatePropagation: (): void => undefined,
   } as unknown as Event);
 
-test('shows the link row minus on hover and on the current link', async () => {
+test('shows the link row minus only while the row is hovered', async () => {
   const { view } = await setup(new FolderTabs());
   view.render([linkRow(OPEN)]);
   const button = minusOf(rowOf(view));
   assert.ok(button);
   assert.equal(button.getAttribute('aria-label'), 'Unload tab');
-  assert.ok(rowOf(view).hasAttribute('data-vivarcdi-link-active'));
   view.render([linkRow(undefined)]);
   assert.equal(minusOf(rowOf(view)), undefined);
+});
+
+test('indents every row of an open tab one step further than a closed link row', async () => {
+  const { view } = await setup(new FolderTabs());
+  const open = { ...linkRow(OPEN), id: '21' };
+  const closed = { ...linkRow(undefined), id: '22' };
+  const belowFolder = { ...linkRow(OPEN), id: '23', depth: 1 };
+  view.render([open, closed, belowFolder]);
+  const rows = (view.element as unknown as DomNode).children;
+  assert.equal(rows[0]?.properties.get('--vivarcdi-depth'), '1');
+  assert.equal(rows[1]?.properties.get('--vivarcdi-depth'), '0');
+  assert.equal(rows[2]?.properties.get('--vivarcdi-depth'), '2');
+  assert.equal(rows[0]?.getAttribute('data-vivarcdi-depth'), '0');
+  assert.equal(rows[2]?.getAttribute('data-vivarcdi-depth'), '1');
 });
 
 test('unloads a link tab from its minus', async () => {

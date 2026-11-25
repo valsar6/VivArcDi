@@ -17,14 +17,31 @@ test('draws the folder and link minus as the same badge', () => {
   const badge = /\[data-vivarcdi-folders\][^{]*\.vivarcdi-folders-minus \{([^}]*)\}/.exec(css())?.[1] ?? '';
   assert.match(badge, /width: 21px;/);
   assert.match(badge, /border-radius: 5px;/);
-  assert.match(badge, /background-color: color-mix\(/);
+  assert.equal(/background-color:/.test(badge), false);
   assert.equal(/\[data-vivarcdi-link-close\]/.test(css()), false);
   assert.equal(css().includes('\\00d7'), false);
 });
 
-test('shows the folder and link minus on hover or on the current link', () => {
+test('shows the link row minus only while the row is hovered', () => {
   const cssText = css();
   assert.match(cssText, /\[data-vivarcdi-link-open\]:hover \[data-vivarcdi-link-minus\][^{]*\{[^}]*opacity: 1/);
-  assert.match(cssText, /\[data-vivarcdi-link-active\] \[data-vivarcdi-link-minus\]/);
-  assert.match(cssText, /\[data-vivarcdi-folder-unload\]:hover \[data-vivarcdi-folder-minus\]/);
+  assert.equal(/\[data-vivarcdi-link-active\] \[data-vivarcdi-link-minus\]/.test(cssText), false);
+});
+
+test('shows the folder row minus only while the row is hovered', () => {
+  assert.match(css(), /\[data-vivarcdi-folder-unload\]:hover \[data-vivarcdi-folder-minus\][^{]*\{[^}]*opacity: 1/);
+});
+
+test('shows the folder and link minus badges only while the buttons are hovered', () => {
+  const cssText = css();
+  const badge = /\[data-vivarcdi-folders\][^{]*\.vivarcdi-folders-minus:hover \{([^}]*)\}/.exec(cssText)?.[1] ?? '';
+  assert.match(badge, /background-color: color-mix\(/);
+  const dash = /\[data-vivarcdi-folders\][^{]*\.vivarcdi-folders-minus:hover::before \{([^}]*)\}/.exec(cssText)?.[1] ?? '';
+  assert.match(dash, /background-color: color-mix\(/);
+});
+
+test('removes the dot from an open link row', () => {
+  const tokens = readFileSync(`${STYLES}_tokens.scss`, 'utf8');
+  assert.equal(/::after/.test(css()), false);
+  assert.equal(tokens.includes('$folders-dot-size'), false);
 });
