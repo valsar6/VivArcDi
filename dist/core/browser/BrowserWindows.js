@@ -26,6 +26,21 @@ class BrowserWindows {
     return this.#call("create", properties);
   }
   /**
+   * @param windowId Window id.
+   * @returns The window's details, including its bounds when Vivaldi reports them.
+   */
+  get(windowId) {
+    return this.#call("get", windowId);
+  }
+  /**
+   * @param windowId Window id.
+   * @param properties The bounds or focus to change.
+   * @returns The updated window.
+   */
+  update(windowId, properties) {
+    return this.#call("update", windowId, properties);
+  }
+  /**
    * @returns The window this document belongs to.
    */
   current() {

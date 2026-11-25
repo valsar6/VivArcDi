@@ -13,6 +13,7 @@ import { LittleArcIndicator } from "./LittleArcIndicator.js";
 import { LittleArcLauncher } from "./LittleArcLauncher.js";
 import { isDestinationQuestion, parseAdoptMessage, parsePageLinkMessage } from "./LittleArcMessage.js";
 import { screenOf } from "./ScreenAreas.js";
+import { sidebarOf } from "./SidebarBox.js";
 import { assembleCommandBar } from "./commandbar/CommandBarAssembly.js";
 import { WorkspaceAdopter } from "./WorkspaceAdopter.js";
 const LINK_SCRIPT_PATH = "page/little-arc-links.js";
@@ -46,6 +47,8 @@ class MainWindowRole {
       registry,
       screen: () => screenOf(context.document),
       size: settings,
+      sidebar: () => sidebarOf(context),
+      mainWindowId: windowId,
       logger: context.logger
     });
     this.#indicator = new LittleArcIndicator({ ...context, logger: context.logger.child("LittleArcIndicator") });

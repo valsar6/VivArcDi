@@ -422,6 +422,9 @@ no workspace switcher, and nothing above the page but one slim bar in the colors
 - The page sits in a thin frame of the same color with rounded corners. The colors are the ones the
   main window uses for the sidebar (the `sidebar-look` palette, `arclight` by default), light or dark
   as Vivaldi is. Drag an empty part of the bar to move the window.
+- The window opens beside the vertical tab bar, so the sidebar stays visible and clickable. If
+  Vivaldi puts it over the sidebar anyway, VivArcDi moves it once; if the overlap remains, the main
+  window stays in front and the sidebar stays reachable while the Little Arc page keeps its bar.
 
 What it does:
 
