@@ -50,7 +50,25 @@ test('forgets a folder and saves, so a restored folder comes back closed', () =>
   folders.useWorkspace(null);
   folders.toggle('10');
   folders.toggle('11');
-  folders.forget('10');
+  folders.forget('10', null);
   assert.equal(folders.has('10'), false);
   assert.equal(storage.getItem(OPEN_FOLDERS_STORAGE_KEY), '["11"]');
+});
+
+test('forgets a folder under the key it names while another workspace is loaded', () => {
+  const storage = new MemoryStorage();
+  const folders = new OpenFolders(storage, silentLogger());
+  folders.useWorkspace('7');
+  folders.toggle('10');
+  folders.toggle('11');
+  folders.useWorkspace('8');
+  folders.toggle('10');
+
+  folders.forget('10', '7');
+
+  assert.equal(storage.getItem(`${OPEN_FOLDERS_STORAGE_KEY}.7`), '["11"]');
+  assert.equal(storage.getItem(`${OPEN_FOLDERS_STORAGE_KEY}.8`), '["10"]');
+  assert.equal(folders.has('10'), true);
+  folders.useWorkspace('7');
+  assert.deepEqual(['10', '11'].map((id) => folders.has(id)), [false, true]);
 });

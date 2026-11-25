@@ -22,13 +22,14 @@ export class FolderClose {
   /**
    * @param tabIds The tabs to close.
    * @param folderId The pressed folder, or undefined for a link row.
+   * @param workspace The workspace shown when the press started.
    */
-  public async apply(tabIds: number[], folderId: string | undefined): Promise<void> {
+  public async apply(tabIds: number[], folderId: string | undefined, workspace: string | null): Promise<void> {
     if (!(await this.#closer.close(tabIds))) {
       return;
     }
     if (folderId !== undefined) {
-      this.#openFolders.forget(folderId);
+      this.#openFolders.forget(folderId, workspace);
     }
     this.#redraw();
   }

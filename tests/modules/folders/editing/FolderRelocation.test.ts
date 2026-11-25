@@ -49,7 +49,7 @@ function setup(active: string | null = '7', entries = workspaces, rootOption = '
   const closing = new ClosingLinks();
   const seen: string[] = [];
   const open = new OpenFolders(new MemoryStorage(), silentLogger());
-  open.useWorkspace(null);
+  open.useWorkspace('7');
   open.toggle('10');
   const writer = chrome.writer;
   const relocation = new FolderRelocation({

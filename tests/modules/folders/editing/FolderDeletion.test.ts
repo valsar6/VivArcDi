@@ -41,7 +41,7 @@ function setup(withTrash = true): {
   const closing = new ClosingLinks();
   const seen: string[] = [];
   const open = new OpenFolders(new MemoryStorage(), silentLogger());
-  open.useWorkspace(null);
+  open.useWorkspace('7');
   open.toggle('10');
   const writer = chrome.writer;
   const deletion = new FolderDeletion({
@@ -55,6 +55,7 @@ function setup(withTrash = true): {
       },
     },
     openFolders: open,
+    active: { current: '7' },
     closing,
     redraw: (): void => void (redraws += 1),
     notify: (text, kind): void => void toasts.push([text, kind]),

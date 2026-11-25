@@ -100,7 +100,7 @@ export class FolderSection {
       {
         onFolder: (id): void => this.#toggle(id),
         onLink: (link): void => (LinkId.isVirtual(link.id) && this.#virtual.activate(link.id) ? undefined : void activator.activate(link)),
-        onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId),
+        onClose: (tabIds, folderId): void => void this.#close.apply(tabIds, folderId, this.#workspace ?? null),
         onRename: (id, name): void => void this.#editing.rename(id, name),
         onMenu: (id, x, y): void => this.#virtual.openMenu(id, x, y),
       },
