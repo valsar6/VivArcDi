@@ -137,6 +137,12 @@ export class MinusDocument extends ListeningDocument {
   public browser = new MinusNode(['[data-browser]']);
   public rows: MinusNode[] = [];
 
+  public addGroupRow(tabId: number): MinusNode {
+    const row = this.addRow(tabId);
+    new MinusNode(['group'], [row]);
+    return row;
+  }
+
   public addRow(tabId: number): MinusNode {
     const favicon = new MinusNode(['favicon']);
     const header = new MinusNode([], [favicon]);

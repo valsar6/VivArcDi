@@ -59,6 +59,15 @@ test('keeps marking the strip when the catalog has no pinned group', () => {
   assert.deepEqual(rows.map((row) => row.hasAttribute(PINNED_LAST_ATTRIBUTE)), [false, true, false]);
 });
 
+test('marks the separator after the last pinned row inside the tab strip', () => {
+  const rows = [tabSlot(1, { pinned: true }), tabSlot(2, { pinned: true }), tabSlot(3)];
+  const marker = new TabBarMarker(selectors);
+  marker.apply(root([new FakeNode(['strip'], rows)]), { linked: new Set() });
+  assert.deepEqual(rows.map((row) => row.hasAttribute(PINNED_LAST_ATTRIBUTE)), [false, true, false]);
+  marker.clear();
+  assert.ok(rows.every((row) => !row.hasAttribute(PINNED_LAST_ATTRIBUTE)));
+});
+
 test('does not warn when the strip is missing but a group exists', () => {
   const warnings: string[] = [];
   const rows = [tabSlot(1, { pinned: true })];
