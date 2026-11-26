@@ -56,9 +56,12 @@ every page bundle that imports a message file only for its constants (NFR-3).
 ### Guards and the cast (Q-5)
 
 A predicate `candidate is T` needs `T` assignable to `Record<string, unknown>`. An `interface` is
-not (it has no index signature); a `type` alias is. So `CopyMessage`, `PinnedMessage`,
-`ArchiveMessage` and `CallMessage` change from `interface` to `type` with the same fields and
-comments; callers do not notice. `PeekMessage` is already a type alias. No cast is needed. If
+not (it has no index signature). The lint rule `@typescript-eslint/consistent-type-definitions`
+forbids turning them into `type` aliases, so `CopyMessage`, `PinnedMessage`, `ArchiveMessage`,
+`CallMessage` and peek's `Envelope` stay interfaces and extend `Record<string, unknown>`, which adds
+the index signature; callers do not notice. `parsePageMessage` constrains
+`T extends Record<string, unknown>` and checks a shallow copy (`{ ...parsed }`) of the parsed object,
+so the guard result is the same and no cast is needed. If
 TypeScript still refuses a case, the implementer stops and reports it: a cast inside
 `parsePageMessage` is the last resort of Q-5, and only the lead allows it.
 
@@ -213,7 +216,7 @@ work runs on `refactor/068-shared-page-messages-and-timers` with **no version ch
 | File | Role |
 |---|---|
 | `src/shared/messages/PageMessage.ts` | `parsePageMessage`, `hasEnvelope` |
-| `src/modules/{copyurl/CopyMessage,pinned/PinnedMessage,peek/PeekMessage,today/ArchiveMessage,callpip/CallMessage}.ts` | Guards; interfaces to type aliases |
+| `src/modules/{copyurl/CopyMessage,pinned/PinnedMessage,peek/PeekMessage,today/ArchiveMessage,callpip/CallMessage}.ts` | Guards; interfaces extend `Record<string, unknown>` |
 | `src/core/support/Timers.ts` | `Timers`, `systemTimers` |
 | The eleven users in the timers table | Use `Timers` |
 | `tests/shared/messages/PageMessage.test.ts`, `tests/core/support/Timers.test.ts` | New helper tests |
@@ -225,7 +228,7 @@ work runs on `refactor/068-shared-page-messages-and-timers` with **no version ch
 
 | Risk | Answer |
 |---|---|
-| The guard does not compile for an interface | The four interfaces become type aliases first; a cast needs the lead |
+| The guard does not compile for an interface | The interfaces extend `Record<string, unknown>`; a cast needs the lead |
 | A page bundle grows | The byte comparison of NFR-3 on `dist/page/*.js` before and after |
 | `mock.timers` stops controlling `systemTimers` | The arrows call the global at call time; `TileHoverName.test.ts` proves it |
 | A removed type name stays in a test | `make check` typechecks `tests/` |

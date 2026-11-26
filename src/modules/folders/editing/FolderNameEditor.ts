@@ -1,5 +1,5 @@
 import type { Row } from '../view/FolderRows.js';
-import type { ViewTimers } from '../view/FolderSectionView.js';
+import type { Timers } from '../../../core/support/Timers.js';
 
 export const EDIT_ATTRIBUTE = 'data-vivarcdi-edit';
 
@@ -14,7 +14,7 @@ interface Editing {
 
 export class FolderNameEditor {
   #document: Document;
-  #timers: ViewTimers;
+  #timers: Timers;
   #onFinish: (folderId: string, name: string | null) => void;
   #editing: Editing | null = null;
   #input: HTMLInputElement | null = null;
@@ -29,7 +29,7 @@ export class FolderNameEditor {
    * @param timers Timers, replaceable in tests.
    * @param onFinish Called when the edit ends, with the new name, or null when the name is kept (Escape, empty or unchanged text).
    */
-  constructor(document: Document, timers: ViewTimers, onFinish: (folderId: string, name: string | null) => void) {
+  constructor(document: Document, timers: Timers, onFinish: (folderId: string, name: string | null) => void) {
     this.#document = document;
     this.#timers = timers;
     this.#onFinish = onFinish;

@@ -1,8 +1,5 @@
-export interface HoverTimers {
-  set: (run: () => void, delayMs: number) => unknown;
-  clear: (handle: unknown) => void;
-}
-
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
 export interface HoverHandlers {
   /** Called when the pointer has rested on a closed folder row. */
   onOpen: (folderId: string, row: HTMLElement) => void;
@@ -14,16 +11,11 @@ const FOLDER_ROW = '[data-vivarcdi-folder-id]';
 const PANEL = '[data-vivarcdi-preview]';
 const OPEN_MARK = 'data-vivarcdi-open';
 
-const defaultTimers: HoverTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
-
 export class FolderHover {
   #document: Document;
   #delayMs: number;
   #handlers: HoverHandlers;
-  #timers: HoverTimers;
+  #timers: Timers;
   #pending: unknown = null;
   #current: string | null = null;
   #listener = (event: Event): void => this.#moved(event as MouseEvent);
@@ -38,7 +30,7 @@ export class FolderHover {
    * @param handlers What to do on rest and on leave.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(document: Document, delayMs: number, handlers: HoverHandlers, timers: HoverTimers = defaultTimers) {
+  constructor(document: Document, delayMs: number, handlers: HoverHandlers, timers: Timers = systemTimers) {
     this.#document = document;
     this.#delayMs = delayMs;
     this.#handlers = handlers;

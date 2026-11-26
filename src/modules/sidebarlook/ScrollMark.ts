@@ -1,20 +1,12 @@
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
 export const SCROLLING_ATTRIBUTE = 'data-vivarcdi-scrolling';
 export const SCROLL_MARK_MS = 800;
-
-export interface ScrollTimers {
-  set(run: () => void, delayMs: number): unknown;
-  clear(handle: unknown): void;
-}
-
-const SYSTEM_TIMERS: ScrollTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
 
 export class ScrollMark {
   #document: Document;
   #tabBarSelector: string;
-  #timers: ScrollTimers;
+  #timers: Timers;
   #marked = new Map<Element, unknown>();
   #onScroll = (event: Event): void => this.#handle(event.target);
 
@@ -26,7 +18,7 @@ export class ScrollMark {
    * @param tabBarSelector Selector of Vivaldi's tab bar.
    * @param timers Delayed calls, replaceable in tests.
    */
-  constructor(document: Document, tabBarSelector: string, timers: ScrollTimers = SYSTEM_TIMERS) {
+  constructor(document: Document, tabBarSelector: string, timers: Timers = systemTimers) {
     this.#document = document;
     this.#tabBarSelector = tabBarSelector;
     this.#timers = timers;

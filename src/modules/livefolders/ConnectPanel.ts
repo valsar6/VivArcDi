@@ -1,4 +1,6 @@
-import type { ToastKind, ToastTimers } from '../../core/dom/Toast.js';
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
+import type { ToastKind } from '../../core/dom/Toast.js';
 import type { ConnectFlow, ConnectState } from './ConnectFlow.js';
 import type { TextCopier } from '../../shared/clipboard/TextCopier.js';
 
@@ -25,7 +27,7 @@ export interface ConnectPanelDependencies {
   closeAfterMs: number;
   /** Shows a short confirmation to the user, such as the shared toast. */
   notify: (text: string, kind?: ToastKind) => void;
-  timers?: ToastTimers;
+  timers?: Timers;
 }
 
 export const TITLE = 'Connect GitHub';
@@ -37,14 +39,9 @@ export const RETRY_LABEL = 'Try again';
 export const COPIED_MESSAGE = 'Code copied, paste it on GitHub';
 export const CANCELLED_MESSAGE = 'GitHub connection cancelled';
 
-const defaultTimers: ToastTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
-
 export class ConnectPanel {
   #deps: ConnectPanelDependencies;
-  #timers: ToastTimers;
+  #timers: Timers;
   #element: HTMLElement | null = null;
   #closing: unknown = null;
   #onKey = (event: Event): void => this.#key(event as KeyboardEvent);
@@ -61,7 +58,7 @@ export class ConnectPanel {
    */
   constructor(dependencies: ConnectPanelDependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
 
   /**

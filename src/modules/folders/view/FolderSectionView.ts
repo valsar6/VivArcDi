@@ -1,3 +1,5 @@
+import type { Timers } from '../../../core/support/Timers.js';
+import { systemTimers } from '../../../core/support/Timers.js';
 import { LinkId } from '../../../shared/links/LinkId.js';
 import { notifyRowsDrawn } from '../../../shared/links/InPlaceEditor.js';
 import { EDIT_ATTRIBUTE, FolderNameEditor } from '../editing/FolderNameEditor.js';
@@ -15,11 +17,6 @@ export interface SectionHandlers {
   onMenu: (virtualId: string, x: number, y: number) => void;
 }
 
-export interface ViewTimers {
-  set: (run: () => void, delayMs: number) => unknown;
-  clear: (handle: unknown) => void;
-}
-
 export interface LinkTarget {
   id: string;
   url: string;
@@ -31,17 +28,12 @@ const ROW_ATTRIBUTES = ['data-vivarcdi-folder-id', 'data-vivarcdi-link-id'] as c
 const CLICK_DELAY_MS = 250;
 const LEAVE_MS = 220;
 
-const defaultTimers: ViewTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
-
 export class FolderSectionView {
   #document: Document;
   #handlers: SectionHandlers;
   #element: HTMLElement;
   #links = new Map<string, { target: LinkTarget; tabId: number | undefined }>();
-  #timers: ViewTimers;
+  #timers: Timers;
   #editor: FolderNameEditor;
   #elements: FolderRowElement;
   #rows: Row[] = [];
@@ -62,7 +54,7 @@ export class FolderSectionView {
    * @param handlers What a click on a folder row, on a link row and on the minuses does, what a new name does, and what a right click on a live folder or one of its rows does.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(document: Document, handlers: SectionHandlers, timers: ViewTimers = defaultTimers) {
+  constructor(document: Document, handlers: SectionHandlers, timers: Timers = systemTimers) {
     this.#document = document;
     this.#handlers = handlers;
     this.#timers = timers;

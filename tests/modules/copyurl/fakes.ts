@@ -1,5 +1,5 @@
 import type { ClipboardWriter } from '../../../src/shared/clipboard/TextCopier.js';
-import type { ToastTimers } from '../../../src/core/dom/Toast.js';
+import type { Timers } from '../../../src/core/support/Timers.js';
 import { FakeElement } from '../peek/fakes.js';
 
 export class FakeField extends FakeElement {
@@ -63,7 +63,7 @@ export class CopyDocument {
   }
 }
 
-export class ManualTimers implements ToastTimers {
+export class ManualTimers implements Timers {
   public pending = new Map<number, { run: () => void; delayMs: number }>();
   #next = 1;
 

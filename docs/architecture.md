@@ -123,7 +123,7 @@ every module, and only `src/loader.ts` imports it.
 | Folder | Holds | May import |
 |---|---|---|
 | `src/core/` | The boot, the services that `ModuleContext` injects, and generic helpers that name no feature | `src/core/` |
-| `src/shared/` | Feature building blocks that two or more modules use, grouped by topic: `clipboard/`, `dragdrop/`, `links/`, `newtab/`, `spaces/`, `tabs/` | `src/core/`, `src/shared/` |
+| `src/shared/` | Feature building blocks that two or more modules use, grouped by topic: `clipboard/`, `dragdrop/`, `links/`, `messages/`, `newtab/`, `spaces/`, `tabs/` | `src/core/`, `src/shared/` |
 | `src/modules/<name>/` | One module | `src/core/`, `src/shared/`, its own folder |
 
 A file moves to `src/shared/` when a second module needs it, and back into its module when only one
@@ -141,7 +141,7 @@ the real tree. Tests are not bound by the rule: an integration test may drive tw
 | `tabs/` | The data Vivaldi keeps on a tab, the tab strip's slots, and the key of a tab's address |
 | `workspaces/` | Which workspace is active, its name, and its tabs |
 | `dom/` | Finding and keeping elements in Vivaldi's window, menus, toasts and keys |
-| `support/` | The logger, and running work once per frame or one at a time |
+| `support/` | The logger, the shared `Timers`, and running work once per frame or one at a time |
 
 A large module splits its folder by responsibility. `folders/` keeps the module
 (`BookmarkFolders.ts`) and the composition root of a section (`FolderSection.ts`) at its top level:

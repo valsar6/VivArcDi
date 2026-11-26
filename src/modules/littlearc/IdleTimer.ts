@@ -1,20 +1,12 @@
-export interface Scheduler {
-  set(callback: () => void, delayMs: number): unknown;
-  clear(handle: unknown): void;
-}
-
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
 const HOUR_MS = 3_600_000;
 const MAX_DELAY_MS = 2_147_483_647;
-
-const timerScheduler: Scheduler = {
-  set: (callback, delayMs) => setTimeout(callback, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
 
 export class IdleTimer {
   #delayMs: number;
   #onIdle: () => void;
-  #scheduler: Scheduler;
+  #scheduler: Timers;
   #handle: unknown = null;
 
   /**
@@ -24,7 +16,7 @@ export class IdleTimer {
    * @param onIdle Called once the time has passed.
    * @param scheduler Starts and cancels timeouts, replaceable in tests.
    */
-  constructor(hours: number, onIdle: () => void, scheduler: Scheduler = timerScheduler) {
+  constructor(hours: number, onIdle: () => void, scheduler: Timers = systemTimers) {
     this.#delayMs = Number.isFinite(hours) && hours > 0 ? Math.min(hours * HOUR_MS, MAX_DELAY_MS) : 0;
     this.#onIdle = onIdle;
     this.#scheduler = scheduler;

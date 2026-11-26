@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SCROLLING_ATTRIBUTE, SCROLL_MARK_MS, ScrollMark } from '../../../src/modules/sidebarlook/ScrollMark.js';
-import type { ScrollTimers } from '../../../src/modules/sidebarlook/ScrollMark.js';
+import type { Timers } from '../../../src/core/support/Timers.js';
 import { asDocument, DomDocument, DomNode } from '../../core/dom.js';
 
-class ManualTimers implements ScrollTimers {
+class ManualTimers implements Timers {
   public pending = new Map<number, { run: () => void; delayMs: number }>();
   #next = 1;
 
