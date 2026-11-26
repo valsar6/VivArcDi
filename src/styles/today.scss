@@ -142,7 +142,7 @@ $clear-height: $separator-gap * 2 + 1px;
 #{$root} #{$clear-row} {
   position: absolute;
   top: 0;
-  inset-inline: 0;
+  inset-inline: $folders-padding;
   z-index: 1;
   height: 0;
   transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));

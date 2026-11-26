@@ -58,6 +58,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
   }
 
   #{$rows} {
+    align-items: center;
     box-sizing: border-box;
     height: $row-height !important;
     margin-bottom: $row-gap !important;
@@ -81,7 +82,15 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     background: transparent !important;
   }
 
+  #{$rows} .tab-header {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
   #{$rows} .title {
+    align-self: center;
+    line-height: normal;
     color: var(--vivarcdi-ink) !important;
     display: block !important;
     font-size: $row-font-size;
@@ -197,10 +206,6 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     border-radius: $row-radius;
     color: var(--vivarcdi-muted);
     font-size: $header-font-size;
-  }
-
-  #{$pinned-last} {
-    border-bottom: $line-width solid var(--vivarcdi-line);
   }
 
   #{$new-tab-row} {

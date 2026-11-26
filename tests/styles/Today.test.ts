@@ -18,3 +18,14 @@ test('draws the Clear bar on the separator above the Today tabs', () => {
   const button = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
   assert.doesNotMatch(button, /border-top/);
 });
+
+test('insets the Clear line like the rows', () => {
+  const css = compiled();
+  const row = /\[data-vivarcdi-clear-row\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(row, /inset-inline: 6px;/);
+  const line = /\[data-vivarcdi-clear-row\]::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(line, /inset-inline: 0;/);
+  const button = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(button, /inset-inline: 0;/);
+  assert.match(button, /justify-content: flex-end;/);
+});

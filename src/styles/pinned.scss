@@ -4,7 +4,25 @@
 #{$root} #{$pinned-last} {
   margin-bottom: $separator-gap;
   padding-bottom: $separator-gap;
-  border-bottom: 1px solid color-mix(in srgb, var(--colorFg, #fff) #{$separator-tint}, transparent);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: $folders-padding;
+    bottom: 0;
+    height: 0;
+    border-top: 1px solid var(--vivarcdi-line, color-mix(in srgb, var(--colorFg, #fff) #{$separator-tint}, transparent));
+    pointer-events: none;
+  }
+}
+
+#{$root}[data-vivarcdi-no-today] #{$pinned-last} {
+  margin-bottom: 0;
+  padding-bottom: 0;
+
+  &::after {
+    display: none;
+  }
 }
 
 #{$root}#{$pinned-unload} .tab-position.is-pinned .tab-header .close {
