@@ -10,6 +10,7 @@ import type { Logger } from '../support/Logger.js';
 import type { VersionedStorage } from '../browser/StoredFormat.js';
 import type { ActiveWorkspace } from '../workspaces/ActiveWorkspace.js';
 import type { NoticeBoard } from '../dom/Notices.js';
+import type { ShapeBoard } from './ShapeGuards.js';
 import type { PayloadSource } from './ResourceLoader.js';
 import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import type { BuildInfo, ModuleOptions } from './types.js';
@@ -50,6 +51,8 @@ export interface ModuleContext<O extends object = RawOptions> {
   storage: VersionedStorage;
   /** Tells the user something through the window's one shared toast. */
   notices: NoticeBoard;
+  /** Reports a change of Vivaldi's interface that the module depends on (spec 070). */
+  shape: ShapeBoard;
   /** Loads files that ship with VivArcDi. */
   payload: PayloadSource;
   /** Versions written by the installer. */

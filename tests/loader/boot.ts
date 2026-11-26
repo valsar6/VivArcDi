@@ -8,6 +8,7 @@ import type { OptionValues } from '../../src/core/boot/options/OptionSchema.js';
 import { ModuleRegistry } from '../../src/core/boot/ModuleRegistry.js';
 import type { ModuleOptions } from '../../src/core/boot/types.js';
 import { VivArcDi } from '../../src/core/boot/VivArcDi.js';
+import { registerReactProbe } from '../../src/shared/spaces/ReactProbe.js';
 import { ActivationMarker } from '../../src/modules/ActivationMarker.js';
 import type { SaveOutcome, SavingStorage, StorageMode } from '../../src/core/browser/SavingStorage.js';
 import { FakeDocument, FakeElement, FakeLoader, SilentSink } from './fakes.js';
@@ -128,7 +129,7 @@ export function createApp({
   const { browser, document } = documentOf(hasBrowser);
   const sink = new SilentSink();
   const loader = new FakeLoader(payloadFiles(vivaldiVersion, modules, missing));
-  const registry = new ModuleRegistry().register(marker).register(Broken).register(AlsoBroken).register(Hidden).register(Private).register(Configured).register(Follower).register(Asker);
+  const registry = new ModuleRegistry().register(marker).register(Broken).register(AlsoBroken).register(Hidden).register(Private).register(Configured).register(Follower).register(Asker).register(ReactUser).register(ProbeRecorder);
   const app = new VivArcDi({
     loader,
     registry,
@@ -160,3 +161,31 @@ export const summaryOf = (sink: SilentSink): { level: string; text: string } | u
   const line = linesOf(sink, '[test:boot]').find(([, , text]) => String(text).startsWith('self-check:'));
   return line === undefined ? undefined : { level: String(line[0]), text: line.slice(2).join(' ') };
 };
+
+export class ReactUser extends Module {
+  public static override id = 'react-user';
+
+  public override start(context: ModuleContext): void {
+    registerReactProbe(context);
+  }
+}
+
+export const events: string[] = [];
+
+export class ProbeRecorder extends Module {
+  public static override id = 'probe-recorder';
+
+  public override start(context: ModuleContext): void {
+    events.push('start');
+    const probe = {
+      name: 'recorded',
+      expects: 'nothing',
+      holds: (): boolean => {
+        events.push('probe');
+        return true;
+      },
+    };
+    context.shape.add(probe);
+    context.shape.add(probe);
+  }
+}

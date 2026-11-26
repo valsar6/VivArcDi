@@ -1,5 +1,6 @@
 import { Module } from '../../core/boot/Module.js';
 import type { ModuleContext } from '../../core/boot/Module.js';
+import { registerReactProbe } from '../../shared/spaces/ReactProbe.js';
 import { BOOKMARK_FOLDERS_OPTIONS } from './BookmarkFoldersOptions.js';
 import type { BookmarkFoldersOptions } from './BookmarkFoldersOptions.js';
 import { FolderSection } from './FolderSection.js';
@@ -27,6 +28,7 @@ export class BookmarkFolders extends Module<BookmarkFoldersOptions> {
       logger.warn('chrome.bookmarks or chrome.tabs is missing: the bookmark folders are off');
       return;
     }
+    registerReactProbe(context);
     this.#section = new FolderSection(context, {
       roots: new WorkspaceRoots(options),
       maxDepth: options.maxDepth,

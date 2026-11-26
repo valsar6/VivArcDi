@@ -14,6 +14,8 @@ import { DisabledRenamer, WorkspaceRenamer } from '../../../src/modules/workspac
 import { CountingSink, FakeNames } from '../../modules/workspacesync/fakes.js';
 import { FakeReactInternals, FakeVivaldiMenu, catalog, fakeView } from './popup.js';
 
+const QUIET_BOARD = { report: (): undefined => undefined };
+
 const instantPoll = (): Poll => {
   let now = 0;
   return new Poll({ now: () => now, sleep: async (delayMs) => void (now += delayMs) });
@@ -126,14 +128,14 @@ test('finds the workspace id and the candidate hooks in the fiber tree', () => {
   const item = { memoizedProps: { isRenaming: false, id: 7 }, return: list };
   const inner = { memoizedProps: {}, return: item };
   const row = { __reactFiber$abc: inner } as unknown as Element;
-  const found = new ReactInternals().renameHooks(row);
+  const found = new ReactInternals(QUIET_BOARD).renameHooks(row);
   assert.equal(found?.workspaceId, 7);
   found?.starters.forEach((start) => start(7));
   assert.deepEqual(calls, ['a', 'c']);
 });
 
 test('returns null for a row without the expected fibers', () => {
-  const internals = new ReactInternals();
+  const internals = new ReactInternals(QUIET_BOARD);
   assert.equal(internals.renameHooks({} as Element), null);
   assert.equal(internals.renameHooks({ __reactFiber$x: { memoizedProps: {}, return: null } } as unknown as Element), null);
   assert.equal(internals.renameHooks({ __reactFiber$x: { memoizedProps: { isRenaming: true, id: 'x' }, return: { memoizedProps: { workspaces: 1, hidePopup: 1 } } } } as unknown as Element), null);

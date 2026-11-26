@@ -39,7 +39,7 @@ export class LinkRelocationFactory {
     const parent = (): Element => document.querySelector(selectors.get('browser')) ?? document.body;
     const gestures = new ElementGestures(view);
     const poll = new Poll();
-    const menu = new WorkspaceMenu(document, selectors, { gestures, poll, editor: new ReactEditorOpener(document, selectors, poll, new ReactInternals()) });
+    const menu = new WorkspaceMenu(document, selectors, { gestures, poll, editor: new ReactEditorOpener(document, selectors, poll, new ReactInternals(context.shape)) });
     const parts: MenuParts = { menu, quiet: new QuietMoment(document), names: sources.names, poll, logger };
     return new LinkRelocation({
       writer: bookmarkWriter,
