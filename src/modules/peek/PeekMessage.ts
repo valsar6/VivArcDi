@@ -1,3 +1,4 @@
+import { hasEnvelope, parsePageMessage } from '../../shared/messages/PageMessage.js';
 import type { Disposition } from './LinkClassifier.js';
 
 export const PEEK_MESSAGE_TYPE = 'vivarcdi-peek';
@@ -5,7 +6,7 @@ export const CONSOLE_PREFIX = 'vivarcdi-peek:';
 
 export type PeekCommand = 'close' | 'expand';
 
-interface Envelope {
+interface Envelope extends Record<string, unknown> {
   type: typeof PEEK_MESSAGE_TYPE;
   /** Secret given to injected scripts, so pages cannot forge messages. */
   token: string;
@@ -17,6 +18,9 @@ export type PeekMessage = Envelope &
 const DISPOSITIONS = new Set<unknown>(['new-window', 'new-tab', 'same-tab']);
 const COMMANDS = new Set<unknown>(['close', 'expand']);
 
+const isPeekMessage = (candidate: Record<string, unknown>): candidate is PeekMessage =>
+  hasEnvelope(candidate, PEEK_MESSAGE_TYPE) && (isOpen(candidate) || isCommand(candidate));
+
 /**
  * Reads a message sent by a script that VivArcDi injected into a page.
  *
@@ -24,26 +28,7 @@ const COMMANDS = new Set<unknown>(['close', 'expand']);
  * @returns The message, or null when the value is not a valid Peek message.
  */
 export function parsePeekMessage(value: unknown): PeekMessage | null {
-  const candidate = typeof value === 'string' ? fromConsole(value) : value;
-  if (typeof candidate !== 'object' || candidate === null) {
-    return null;
-  }
-  const message = candidate as Record<string, unknown>;
-  if (message['type'] !== PEEK_MESSAGE_TYPE || typeof message['token'] !== 'string') {
-    return null;
-  }
-  return isOpen(message) || isCommand(message) ? (message as unknown as PeekMessage) : null;
-}
-
-function fromConsole(line: string): unknown {
-  if (!line.startsWith(CONSOLE_PREFIX)) {
-    return null;
-  }
-  try {
-    return JSON.parse(line.slice(CONSOLE_PREFIX.length));
-  } catch {
-    return null;
-  }
+  return parsePageMessage(value, CONSOLE_PREFIX, isPeekMessage);
 }
 
 function isOpen(message: Record<string, unknown>): boolean {
