@@ -7,6 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-26 (PR #298); amendment approved 2026-11-26 (PR #303) |
 | Implemented | 2026-11-26 |
+| Superseded in part by | [069](../069-clear-like-arc/spec.md): FR-8 to FR-10 and AC-9 to AC-11 (Clear at rest), and the 6 px line inset of FR-4, FR-5, AC-5 and AC-6. FR-1 to FR-3, FR-6 and AC-1 to AC-4 and AC-7 stay. |
 | Amends | [060](../060-clear-bar-and-pinned-unload/spec.md) FR-1: the Clear control keeps a non-zero box only while the workspace has a Today tab. It also refines the divider with Clear of [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and [028](../028-arc-sidebar-look/spec.md) FR-5, and the title of the row of 028. FR-8 supersedes the hover-only Clear of 004/FR-5 and 060/AC-12. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
