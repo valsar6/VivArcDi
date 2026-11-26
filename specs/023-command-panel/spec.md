@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Draft |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | 2026-11-08 |
+| Approved | – (2026-11-08, reopened 2026-11-26 by 069) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -21,7 +21,7 @@ Arc's Command Bar (Cmd+T) is a search box and an action list in one. Typing `pin
 
 ## Expected behavior
 
-A shortcut (default Cmd/Ctrl+Shift+K) opens a centered panel like Arc's. The field takes text; the list below shows, in this order: actions that match (Pin tab, Unpin tab, Favorite, Pin to folder, Archive tab, Copy URL, Copy as Markdown link), open tabs that match with "Switch to Tab", bookmarks and history that match. Arrow keys choose, Enter runs, Esc closes. A site name from the user's `search-sites` map followed by Tab searches that site: `youtube` Tab `lofi` opens the YouTube results. Quick Commands stays on Cmd/Ctrl+T.
+A shortcut (to be chosen again, see the open questions) opens a centered panel like Arc's. The field takes text; the list below shows, in this order: actions that match (Pin tab, Unpin tab, Favorite, Pin to folder, Archive tab, Copy URL, Copy as Markdown link), open tabs that match with "Switch to Tab", bookmarks and history that match. Arrow keys choose, Enter runs, Esc closes. A site name from the user's `search-sites` map followed by Tab searches that site: `youtube` Tab `lofi` opens the YouTube results. Quick Commands stays on Cmd/Ctrl+T.
 
 ## Requirements
 
@@ -50,7 +50,7 @@ A shortcut (default Cmd/Ctrl+Shift+K) opens a centered panel like Arc's. The fie
 
 ## Open questions
 
-- [x] Which default shortcut? Cmd/Ctrl+Shift+K (Tore, 2026-11-08).
+- [ ] Which default shortcut? Cmd/Ctrl+Shift+K (Tore, 2026-11-08); reopened (Tore, 2026-11-26): Cmd/Ctrl+Shift+K now runs Clear ([069](../069-clear-like-arc/spec.md)), the panel needs another key.
 - [x] Include history and bookmarks in the first version, or only actions and tabs? Actions, tabs, bookmarks and history, as in the expected behavior (Tore approved the spec as written, 2026-11-08).
 
 ## References

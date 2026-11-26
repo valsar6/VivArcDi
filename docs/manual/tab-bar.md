@@ -199,8 +199,9 @@ new tab closes.
 ## The Arc look
 
 The **sidebar look** module gives the tab bar Arc's style: rows without a background at rest, a light
-pill for the active tab, Favorites tiles on a light veil, a thin line above the Today tabs, inset like the rows and
-hidden while there is no Today tab ([spec 067](../../specs/067-clear-line-and-titles/spec.md)), Today
+pill for the active tab, Favorites tiles on a light veil, a thin line above the Today tabs, aligned with the row icons, with **Clear** fading in while the
+pointer is in the tab bar, and hidden while there is no Today tab ([spec 067](../../specs/067-clear-line-and-titles/spec.md),
+[spec 069](../../specs/069-clear-like-arc/spec.md)), Today
 titles centered in their row, a scroll bar that shows only while scrolling, and the workspace color behind the tab bar. Choose the colors with the
 `palette` option. This work is in progress ([spec 028](../../specs/028-arc-sidebar-look/spec.md)), and
 the [Arc Light theme](roadmap.md#arc-light-theme) will extend it to the rest of Vivaldi.

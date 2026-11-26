@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-26 (PR #307) |
+| Implemented | 2026-11-26 |
 | Supersedes | [067](../067-clear-line-and-titles/spec.md) FR-8 to FR-10 and AC-9 to AC-11 (Clear shown at rest), and the 6 px line inset of 067 FR-4, FR-5, AC-5 and AC-6. 067 FR-1 to FR-3 (nothing shows with no Today tab) and FR-6 (centered titles) stay. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -68,7 +69,10 @@ as 067 FR-1 already does.
   label does (`navigator.platform`, `KeepLabel.isMac`).
 - **FR-4.** THE line SHALL start at the left edge of the row icons and, at rest, end at the right
   edge of the rows' trailing icons; Clear's right edge SHALL sit at that same end.
-- **FR-5.** THE line SHALL sit midway between the last row above it and `+ New Tab`.
+- **FR-5.** THE line SHALL sit midway between the last row above it and `+ New Tab`. WHILE the
+  Favorites grid is off and the tab strip holds Vivaldi's own pinned group (where `+ New Tab` sits
+  above the pinned rows), THE line SHALL sit midway between the bottom of the pinned group and the
+  first Today tab (Q-4).
 - **FR-6.** Showing and hiding Clear SHALL fade, with the sidebar's usual transition, and the line's
   end SHALL move with it.
 - **FR-8.** WHEN the user presses Cmd/Ctrl+Shift+K, in the interface or with the focus in a page,
@@ -101,6 +105,8 @@ as 067 FR-1 already does.
 | AC-6 | WHEN Tore compares VivArcDi on Vivaldi 8.3 with the recording, THE line, its place, the fade of Clear, its colors and the tooltip SHALL look and behave as in Arc, with the grid on and off, light and dark. | manual |
 | AC-7 | WHEN the user presses Cmd/Ctrl+Shift+K, THE Today tabs of the workspace SHALL be archived as a click on Clear does. | auto: `clears the Today tabs on the Clear shortcut` |
 | AC-8 | WHILE there is no Today tab, THE Clear shortcut SHALL archive nothing. | auto: `does nothing on the Clear shortcut without Today tabs` |
+| AC-9 | WHILE the Favorites grid is off and the tab strip holds a pinned group, THE line SHALL sit midway between the pinned group and the first Today tab. | auto: `puts the Clear line below a native pinned group when the Favorites grid is off` |
+| AC-10 | WHEN the user presses Cmd+Shift+K in a lab Vivaldi with two Today tabs, THE inactive Today tab SHALL be archived and the active and pinned tabs SHALL stay open. | live: `the Clear shortcut archives the Today tabs` |
 
 AC-6 becomes a live check with a scenario that measures the line's ends and center against the rows,
 once the implementation adds it.
@@ -125,6 +131,13 @@ once the implementation adds it.
 - [x] **Q-3. Exact numbers.** Proposal: the design takes the icon edges from the existing row tokens
   (row inset plus row padding) rather than fixed pixels, and the lab probe checks the 10 px gap and
   the midway place within 1 px. Answered (Tore, 2026-11-26): perfect, tokens and a probe within 1 px.
+  The lab probe on Vivaldi 8.3 found the line 0 px off midway in the four layouts (grid on and off,
+  with and without a pinned tab); the line starts 12 px from the bar edge and sits 19 px from each
+  row center, because Vivaldi's rows are 36 px with a 2 px gap, where Arc's are taller.
+- [x] **Q-4. The line with the grid off and a pinned tab.** Found by the T2 probe: Vivaldi then puts
+  `+ New Tab` above its own pinned group, and one offset put the line inside the group. Answered
+  (Tore, 2026-11-26): the line sits midway between the pinned group and the first Today tab (FR-5,
+  AC-9). Moving `+ New Tab` below the pinned rows as in Arc is out of scope.
 
 ## References
 

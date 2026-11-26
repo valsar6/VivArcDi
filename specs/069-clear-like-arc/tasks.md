@@ -33,7 +33,7 @@ T2 ──┼──> T3 (scenario) ──> T4 (lead: docs and version) ──> T5
 
 ## Tasks
 
-- [ ] **T1. The tooltip and the shortcut** (TDD; parallel with T2). Add the tests first:
+- [x] **T1. The tooltip and the shortcut** (TDD; parallel with T2). Add the tests first:
   `titles the Clear control like Arc` (AC-4, with platforms `MacIntel`, `Linux x86_64` and none),
   `clears the Today tabs on the Clear shortcut` (AC-7) and
   `does nothing on the Clear shortcut without Today tabs` (AC-8), the last two in the module test
@@ -43,7 +43,7 @@ T2 ──┼──> T3 (scenario) ──> T4 (lead: docs and version) ──> T5
   `clear` action of `ArchiveMessage` and of the page script, and the wiring in `TodayArchive`, as in
   the design. Before coding, read `ArchiveSweeper.#clearNow` and confirm a press with no Today tab
   writes nothing; if it does, report it instead of adding a guard. Done when `make check` is green.
-- [ ] **T2. Styles, tokens and the probe** (TDD; parallel with T1). Remove the 067 tests
+- [x] **T2. Styles, tokens and the probe** (TDD; parallel with T1). Remove the 067 tests
   `insets the Clear line like the rows`, `shows the Clear label at rest`,
   `ends the Clear line before its label` and `strengthens the Clear label on hover`; add the new
   `hides the Clear label outside the sidebar`, `shows the muted Clear label while the pointer is in the
@@ -54,11 +54,11 @@ T2 ──┼──> T3 (scenario) ──> T4 (lead: docs and version) ──> T5
   `$clear-line-offset` from its numbers, and write the styles of the design. Put the probe numbers in
   the pull request. If a number is outside 1 px of the spec's table, report it. Done when
   `make check` is green.
-- [ ] **T3. The live scenario** (after T1 and T2; alone). Add
+- [x] **T3. The live scenario** (after T1 and T2; alone). Add
   `the-clear-shortcut-archives-the-today-tabs.live.ts` as in the design, with the same cleanup style
   as `the-clear-bar-keeps-a-box-above-today.live.ts`. Run it with `npm run live -- --only 069` on a
   lab Vivaldi if Tore agrees; otherwise leave it to CI of the lab. Done when `make check` is green.
-- [ ] **T4. Docs and version** (lead; after T1 to T3). Add the shortcut to the Arc shortcuts list of
+- [x] **T4. Docs and version** (lead; after T1 to T3). Add the shortcut to the Arc shortcuts list of
   014 (`Cmd/Ctrl+Shift+K runs Clear, see 069`), update `docs/manual/tab-bar.md` (Clear shows while the
   pointer is in the sidebar, the tooltip, the shortcut) and `README.md`, mark the superseded rows in
   the criteria table of 067 (AC-5, AC-9 to AC-11, and the 6 px in AC-6), set 069 to `Implemented`
