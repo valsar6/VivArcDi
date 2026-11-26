@@ -2,7 +2,7 @@ import type { Driver } from '../../../scripts/live/Driver.js';
 import type { Scenario } from '../../../scripts/live/scenarios/ScenarioCatalog.js';
 
 const TOLERANCE = 2;
-const EXPECTED_SIZE = 21;
+const EXPECTED_SIZE = 24;
 const EXPECTED_RADIUS = 5;
 const TILE_SOURCE = '[data-vivarcdi-tile-source="pinned"]';
 const TILE = '[data-vivarcdi-tile]';

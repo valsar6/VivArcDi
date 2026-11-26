@@ -6,6 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-08; revision 2026-11-08 (default palette `arclight` of 029) |
+| Refined by | [066 Arc close control and title space](../066-arc-close-control/spec.md) FR-3 and AC-3: the close button is Arc's `×` with its badge on button hover, and a row's title uses its space at rest. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

@@ -7,7 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-24 |
 | Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. It replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus for the unload; the other close routes of 009/FR-15 stay. |
-| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-6, AC-11 and AC-12: the folder and link row minuses close tabs instead of unloading them. |
+| Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-6, AC-11 and AC-12: the folder and link row minuses close tabs instead of unloading them. [066 Arc close control and title space](../066-arc-close-control/spec.md) FR-1 to FR-4 and AC-1 to AC-5: the badge is 24×24 with a 14×2 dash, and the title uses the control's space at rest. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -130,7 +130,7 @@ with the Favorites grid on and off.
 
 | Case | What happens after | Where |
 |---|---|---|
-| Pinned row minus | A badge of about 21×21 px with a 5 px radius and a centered 11×2 px dash, in the theme's colors, at the right end | `PinnedMinus.ts`, `pinned.scss`, `_tokens.scss` |
+| Pinned row minus | A badge of about 24×24 px with a 5 px radius and a centered 14×2 px dash, in the theme's colors, at the right end | `PinnedMinus.ts`, `pinned.scss`, `_tokens.scss` |
 | Pinned tile minus | The same badge on the pinned tile | `PinnedTileMinus.ts`, `favorites.scss`, `_tokens.scss` |
 | Visibility | Unchanged: hover or current row or tile, hidden otherwise | `pinned.scss`, `favorites.scss` |
 | Label | `Unload tab`, unchanged | `PinnedMinus.ts`, `PinnedTileMinus.ts` |
@@ -145,8 +145,8 @@ with the Favorites grid on and off.
 ### Functional
 
 - **FR-1.** The minus of a pinned row and of a pinned tile SHALL be a VivArcDi control of one look:
-  a rounded-square badge of about 21×21 CSS px with a radius of about 5 px and a centered dash of
-  about 11×2 px, at the right end and vertically centered, in the theme's colors so that it stays
+  a rounded-square badge of about 24×24 CSS px with a radius of about 5 px and a centered dash of
+  about 14×2 px, at the right end and vertically centered, in the theme's colors so that it stays
   legible in light and dark themes.
 - **FR-2.** The minus SHALL be visible while its row or tile is hovered, and hidden otherwise,
   even if its tab is the current one (062/FR-1). The badge and its colors SHALL appear only while
@@ -191,7 +191,7 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | THE minus of a pinned row SHALL be a rounded-square badge of about 21×21 CSS px with a radius of about 5 px and a centered dash of about 11×2 px, in the theme's colors, at the right end of the row. | auto: `draws the pinned row minus as a badge like Arc` |
+| AC-1 | THE minus of a pinned row SHALL be a rounded-square badge of about 24×24 CSS px with a radius of about 5 px and a centered dash of about 14×2 px, in the theme's colors, at the right end of the row. | auto: `draws the pinned row minus as a badge like Arc` |
 | AC-2 | THE minus of a pinned tile SHALL be the same badge as the row's, at the right end of the tile. | auto: `draws the pinned tile minus as the same badge` |
 | AC-3 | WHILE a pinned row is hovered, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if its tab is current (062/AC-1). | auto: `shows the pinned row minus only while the row is hovered` |
 | AC-4 | WHILE a pinned tile is hovered, THE minus SHALL be visible, and WHEN the pointer leaves it, THE minus SHALL be hidden even if its tab is current (062/AC-2). | auto: `shows the pinned tile minus only while the tile is hovered` |
@@ -204,7 +204,7 @@ Written in [EARS](../README.md#acceptance-criteria). Test names and live scenari
 | AC-11 | WHEN the minus of a Favorites link row is pressed, THE module SHALL close its tab, return its row to the bookmark depth and keep the bookmark (063/AC-1). | auto: `closes a link tab from its minus` |
 | AC-12 | WHEN the minus of a Favorites folder row is pressed, THE module SHALL close the tabs of its open link rows and close the folder, keeping the folder and its bookmarks (063/AC-2). | auto: `closes the open link tabs of a folder from its minus and closes the folder` |
 | AC-13 | THE minus SHALL NOT appear on a tile of the bookmark grid. | auto: `keeps the minus off a Favorite tile` |
-| AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 21×21 CSS px at the right end of the tile. | live: `the pinned minus is a badge on the tile of a pinned tab` |
+| AC-14 | WHILE the Favorites grid is on, THE minus of a pinned tile SHALL be a badge of about 24×24 CSS px at the right end of the tile. | live: `the pinned minus is a badge on the tile of a pinned tab` |
 | AC-15 | WHEN Tore compares VivArcDi with his recording of 2026-11-24 and the screenshots of 2026-11-25, the minus of a pinned row and of a pinned tile SHALL look and sit as in the recording, SHALL appear on hover only with its badge on button hover, and a press SHALL unload without closing, dragging or opening (062/AC-9). | manual |
 | AC-16 | WHEN Tore compares the row of a Favorites folder and of a Favorites link with the recording, THE minus SHALL look and sit as on a pinned row, and a press SHALL unload the tabs it stands for without closing them or removing the bookmark or the folder. | manual |
 

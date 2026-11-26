@@ -15,12 +15,12 @@ test('draws the pinned tile minus as the same badge', () => {
   const tokens = read('_tokens.scss');
   const css = compiled();
   assert.match(tokens, /\$tile-minus: '\[data-vivarcdi-tile-minus\]'/);
-  assert.match(tokens, /\$minus-badge-size: 21px/);
+  assert.match(tokens, /\$minus-badge-size: 24px/);
   assert.match(tokens, /\$minus-badge-radius: 5px/);
   assert.match(tokens, /\$minus-size: 16px/);
   const base = new RegExp(`${SOURCE}[^{]*${MINUS}[^{]*\\{([^}]*)\\}`).exec(css)?.[1] ?? '';
-  assert.match(base, /width: 21px;/);
-  assert.match(base, /height: 21px;/);
+  assert.match(base, /width: 24px;/);
+  assert.match(base, /height: 24px;/);
   assert.match(base, /border-radius: 5px;/);
   assert.equal(/background-color:/.test(base), false);
   assert.match(base, /opacity: 0;/);

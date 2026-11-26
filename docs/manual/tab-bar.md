@@ -204,4 +204,9 @@ that shows only while scrolling, and the workspace color behind the tab bar. Cho
 `palette` option. This work is in progress ([spec 028](../../specs/028-arc-sidebar-look/spec.md)), and
 the [Arc Light theme](roadmap.md#arc-light-theme) will extend it to the rest of Vivaldi.
 
+Hovering a row shows Arc's `×` on the close button of an open tab: a dark glyph on row hover, with a
+light rounded badge when you point at the button itself. The pinned row's minus uses the same badge.
+A title reaches the row's end while its control is hidden and gives up the control's space when the
+row is hovered, as in Arc.
+
 ![Mockup: hover on rows, then the palettes powder, lagoon and arclight](images/mockups/sidebar-look.gif)

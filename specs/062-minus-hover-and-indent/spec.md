@@ -7,7 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-25 |
 | Supersedes | Nothing yet. It refines the visibility and the badge of [061](../061-pinned-minus-ui/spec.md) FR-1, FR-2, AC-1 to AC-4 and of [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-4 and AC-13, and keeps 061's unload model and labels. |
-| Refined by | [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-1 to FR-3: the folder and link row minuses close tabs instead of unloading them. |
+| Refined by | [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-1 to FR-3: the folder and link row minuses close tabs instead of unloading them. [066 Arc close control and title space](../066-arc-close-control/spec.md) FR-2 to FR-5 and AC-3 to AC-5: the badge is 24×24 and the title gives up the control's space only while the row is hovered. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
