@@ -41,6 +41,7 @@
   background-color: color-mix(in srgb, var(--vivarcdi-ink) 35%, transparent);
 }
 #browser[data-vivarcdi-look] #tabs-container .tab-strip > :not([data-vivarcdi-favorite]) .tab-wrapper {
+  align-items: center;
   box-sizing: border-box;
   height: 36px !important;
   margin-bottom: 2px !important;
@@ -60,7 +61,14 @@
   height: 36px !important;
   background: transparent !important;
 }
+#browser[data-vivarcdi-look] #tabs-container .tab-strip > :not([data-vivarcdi-favorite]) .tab-wrapper .tab-header {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
 #browser[data-vivarcdi-look] #tabs-container .tab-strip > :not([data-vivarcdi-favorite]) .tab-wrapper .title {
+  align-self: center;
+  line-height: normal;
   color: var(--vivarcdi-ink) !important;
   display: block !important;
   font-size: 14px;
@@ -157,9 +165,6 @@
   border-radius: 8px;
   color: var(--vivarcdi-muted);
   font-size: 13px;
-}
-#browser[data-vivarcdi-look] [data-vivarcdi-pinned-last] {
-  border-bottom: 1px solid var(--vivarcdi-line);
 }
 #browser[data-vivarcdi-look] [data-vivarcdi-new-tab-row] {
   display: flex;

@@ -1,7 +1,23 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-pinned-last] {
   margin-bottom: 6px;
   padding-bottom: 6px;
-  border-bottom: 1px solid color-mix(in srgb, var(--colorFg, #fff) 18%, transparent);
+}
+#browser[data-vivarcdi-active] [data-vivarcdi-pinned-last]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 6px;
+  bottom: 0;
+  height: 0;
+  border-top: 1px solid var(--vivarcdi-line, color-mix(in srgb, var(--colorFg, #fff) 18%, transparent));
+  pointer-events: none;
+}
+
+#browser[data-vivarcdi-active][data-vivarcdi-no-today] [data-vivarcdi-pinned-last] {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#browser[data-vivarcdi-active][data-vivarcdi-no-today] [data-vivarcdi-pinned-last]::after {
+  display: none;
 }
 
 #browser[data-vivarcdi-active][data-vivarcdi-pinned-unload] .tab-position.is-pinned .tab-header .close {

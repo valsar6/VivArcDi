@@ -115,7 +115,7 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] {
   position: absolute;
   top: 0;
-  inset-inline: 0;
+  inset-inline: 6px;
   z-index: 1;
   height: 0;
   transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));

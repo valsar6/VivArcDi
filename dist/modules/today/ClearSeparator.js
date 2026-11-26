@@ -2,7 +2,7 @@ import { watchSubtree } from "../../core/dom/KeptElement.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
 import { TabSlot } from "../../core/tabs/TabSlot.js";
 import { HIDDEN_ATTRIBUTE } from "../../shared/tabs/HiddenAttribute.js";
-import { OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from "../../shared/tabs/TabBarMarks.js";
+import { NO_TODAY_ATTRIBUTE, OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from "../../shared/tabs/TabBarMarks.js";
 const CLEAR_ATTRIBUTE = "data-vivarcdi-clear";
 const CLEAR_ROW_ATTRIBUTE = "data-vivarcdi-clear-row";
 const CLEAR_LINE_ATTRIBUTE = "data-vivarcdi-clear-line";
@@ -54,6 +54,7 @@ class ClearSeparator {
     this.#unwatch = null;
     this.#task.cancel();
     this.#row.remove();
+    this.#mark(false);
   }
   /**
    * Puts the row above the first Today tab, aligned with its offset and shift, and updates the line.
@@ -62,14 +63,17 @@ class ClearSeparator {
     const strip = this.#element("tabStrip");
     if (strip === null) {
       this.#row.remove();
+      this.#mark(false);
       this.#warnMissing();
       return;
     }
     const slot = this.#firstTodaySlot(strip);
     if (slot === null) {
       this.#row.remove();
+      this.#mark(true);
       return;
     }
+    this.#mark(false);
     this.#place(strip, slot);
     this.#line();
   }
@@ -95,7 +99,7 @@ class ClearSeparator {
     return null;
   }
   static #isToday(slot, wrapper, pinned) {
-    return TabSlot.idOf(slot, wrapper) !== null && !slot.matches(pinned) && slot.querySelector(pinned) === null;
+    return TabSlot.idOf(slot, wrapper) !== null && !slot.hasAttribute(HIDDEN_ATTRIBUTE) && !slot.matches(pinned) && slot.querySelector(pinned) === null;
   }
   #place(strip, slot) {
     const placed = slot.style.getPropertyValue(OFFSET_PROPERTY) === "" ? slot.firstElementChild ?? slot : slot;
@@ -108,6 +112,12 @@ class ClearSeparator {
     this.#write(SHIFT_PROPERTY, `${Number.parseFloat(slot.style.getPropertyValue(SHIFT_PROPERTY)) || 0}px`);
     if (this.#row.parentElement !== strip || this.#row.nextElementSibling !== slot) {
       strip.insertBefore(this.#row, slot);
+    }
+  }
+  #mark(empty) {
+    const browser = this.#element("browser");
+    if (browser !== null && browser.hasAttribute(NO_TODAY_ATTRIBUTE) !== empty) {
+      browser.toggleAttribute(NO_TODAY_ATTRIBUTE, empty);
     }
   }
   #line() {
