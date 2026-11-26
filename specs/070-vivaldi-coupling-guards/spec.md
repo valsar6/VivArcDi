@@ -2,9 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
+| Approved | 2026-11-26 (PR #308) |
 | Amends | [039 Boot self-check](../039-boot-self-check/spec.md) (one more kind of warning) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -110,7 +111,8 @@ nothing. The summary line counts the warning with the undefined selectors.
 
 - **FR-1.** `src/styles/_vivaldi.scss` defines one SCSS variable per Vivaldi DOM name that a
   stylesheet uses, each with a stable name that follows the catalog name (`$tab-position` for the
-  class of `pinnedTab`, and so on).
+  class of `pinnedTab`, and so on). A token that already exists (`$strip`, `$tab-bar`,
+  `$narrow-tab-bar`) keeps its name and moves to the partial.
 - **FR-2.** No stylesheet in `src/styles/` other than `_vivaldi.scss` writes a Vivaldi class or id as
   a literal. The names that are VivArcDi's own (`data-vivarcdi-*`, classes VivArcDi adds) stay where
   they are.
@@ -119,17 +121,18 @@ nothing. The summary line counts the warning with the undefined selectors.
   when a mirrored catalog name is missing in a catalog.
 - **FR-4.** A test fails when a Vivaldi class or id appears as a literal in a stylesheet other than
   `_vivaldi.scss` (the list of names comes from the variables themselves).
-- **FR-5.** `ReactInternals` or a sibling exposes a probe that returns whether the interface is
+- **FR-5.** `ReactInternals` or a sibling in `src/shared/spaces/` exposes a probe that returns whether the interface is
   built with React: an element under `#browser` carries a key that starts with `__reactFiber`. It
   never throws.
 - **FR-6.** `src/core/boot/` offers a registration point for such checks, typed in core with no
   import from `shared/` or `modules/`. Shared code registers the React probe at the window start,
-  through a service of `ModuleContext` or a `WindowServices` member (design decides).
+  through the `shape` service of `ModuleContext`, from the start of the two modules that use
+  `ReactInternals`.
 - **FR-7.** `BootReport` logs one `warn` line for a probe that fails, once per start, and counts it
   in the problem count that sets the summary level. It logs nothing for a probe that passes.
 - **FR-8.** WHEN `renameHooks` returns `null` at the first use in a window, THE code SHALL log the
   same kind of warning once per window session (the deep shape is only known then), through the
-  same registration point. The design may drop this FR if Q-4 is answered "boot only".
+  same registration point. Q-4 is answered "both", so the FR stays.
 
 ### Non-functional
 
@@ -160,13 +163,16 @@ nothing. The summary line counts the warning with the undefined selectors.
 | AC-8 | WHEN a registered probe fails, THE report SHALL log one warning that names what is missing, and the summary SHALL count it | auto: `BootReport warns once for a failed probe and counts it` |
 | AC-9 | WHEN every registered probe passes, THE report SHALL log nothing extra | auto: `BootReport logs nothing for a passing probe` |
 | AC-10 | WHEN `renameHooks` returns `null` at the first use in a window, THE code SHALL log one warning, and no more until the window reloads | auto: `a missing React shape at first use warns once` |
-| AC-11 | THE start SHALL register the React probe and run it once, after the modules start | auto: `boot runs the registered probes once after the modules` |
+| AC-11 | THE start SHALL run the registered probes once, after the modules start | auto: `boot runs the registered probes once after the modules` |
 | AC-12 | IF core imports shared or a module, or shared imports a module, THEN THE tests SHALL report it | auto: `core imports only core`, `shared imports only core and shared` (existing) |
-| AC-13 | THE three users of `ReactInternals` SHALL behave as before | auto: the existing tests of `ReactInternals`, `EditorOpener`, `WorkspaceSync` and `LinkRelocationFactory`, names unchanged |
+| AC-13 | THE three users of `ReactInternals` SHALL behave as before | auto: the existing tests of `ReactInternals` and `ReactEditorOpener` in `tests/shared/spaces/WorkspaceMenu.test.ts` and of the `workspacesync` and `folders` modules, names unchanged |
+| AC-14 | IF the interface carries no React fiber when the start ends, THEN THE boot report SHALL warn and the summary SHALL be a warning | auto: `boot warns when Vivaldi's React shape is missing` |
+| AC-15 | WHEN the interface carries a React fiber, THE boot report SHALL log no shape warning and the summary SHALL stay `info` | auto: `boot stays silent when Vivaldi's React shape is present` |
+| AC-16 | WHEN a module builds `ReactInternals`, THE module SHALL register the React probe in its `start` | auto: `every module that builds ReactInternals registers the React probe` |
 
 There is no `manual` criterion: the change is internal to the build and the console, and `make check`
-runs every check, including the build. A `live:` scenario is for the design to add if Tore wants it
-(Q-6).
+runs every check, including the build. There is no `live:` scenario (Q-6): AC-14 and AC-15 boot the
+whole start in a node test with a fake document, once without and once with the React shape.
 
 ## Out of scope
 
@@ -181,39 +187,46 @@ runs every check, including the build. A `live:` scenario is for the design to a
 
 ## Open questions
 
-- [ ] **Q-1. One spec or two?** A and B share only the cause (silent breakage on a Vivaldi update)
+- [x] **Q-1. One spec or two?** A and B share only the cause (silent breakage on a Vivaldi update)
   and the home (boot self-check, `make check`). They touch different files and could land as two
   pull requests. Recommendation: one spec, two tasks that run in parallel, as in
   [068](../068-shared-page-messages-and-timers/spec.md), because both are small and the audit
   asked for them together. Split them if Tore prefers separate reviews.
-- [ ] **Q-2. Hand-written variables or a partial generated from the JSON at build time?** A generated
+  Answered (Tore, 2026-11-26): one spec, two tasks in parallel.
+- [x] **Q-2. Hand-written variables or a partial generated from the JSON at build time?** A generated
   `_vivaldi.scss` (from `8.1.json`) cannot drift, but it ties Sass to one catalog while several can
   exist, hides the names from a plain read of the styles and adds a step to `scripts/build.mjs`.
   Recommendation: hand-written variables plus the test of FR-3, because the test gives the same
   guarantee for all catalogs and the styles stay readable. Revisit if more than two catalogs ship.
-- [ ] **Q-3. Names the catalog does not have.** `.title`, `.close`, `.tab-audio`, `.stack-counter`,
+  Answered (Tore, 2026-11-26): hand-written variables, protected by the tests of FR-3 and FR-4.
+- [x] **Q-3. Names the catalog does not have.** `.title`, `.close`, `.tab-audio`, `.stack-counter`,
   `.svg-tab-selection`, `.page-progress-indicator`, `#panels`, `#panels-container` and `#switch`
   are in styles only. Recommendation: add them to the catalog only when a TypeScript reader needs
   them; otherwise keep them in `_vivaldi.scss` marked "style only" in the test, so they are in one
   place and a grep finds them, without growing the catalog and the undefined-selector check.
-- [ ] **Q-4. Where and when does the React check report?** Options: (a) boot only, the cheap probe
+  Answered (Tore, 2026-11-26): keep the style-only names in the partial, marked in the test; the catalog does not grow.
+- [x] **Q-4. Where and when does the React check report?** Options: (a) boot only, the cheap probe
   of FR-5; (b) first use only, from `ReactEditorOpener` when `renameHooks` returns `null`;
   (c) both. Recommendation: (c). The boot probe tells that React is gone (the case that breaks all
   three users at once); the first-use warning tells that the deep shape changed, which only exists
   while the popup is open. Both go through the registration point of FR-6, so core has no import of
   shared code: core owns an interface (a probe with a name and a `check()`), the window services
   hold the list, `VivArcDi` runs it and `BootReport` prints.
-- [ ] **Q-5. What does the boot probe look at?** The fiber key under `#browser` is cheap but may
+  Answered (Tore, 2026-11-26): as proposed (c): boot probe and first-use warning, both through the registration point.
+- [x] **Q-5. What does the boot probe look at?** The fiber key under `#browser` is cheap but may
   pass while the workspace rows have changed. Recommendation: accept this, since the first-use
   warning of Q-4 covers the deep shape. A deeper boot probe would need to open the popup, which a
   self-check that only reports must not do.
-- [ ] **Q-6. Is a `live:` scenario worth it?** `npm run live` (spec 046) could remove the
+  Answered (Tore, 2026-11-26): correct as proposed: the probe looks for the `__reactFiber` key; the deep shape is the first-use warning.
+- [x] **Q-6. Is a `live:` scenario worth it?** `npm run live` (spec 046) could remove the
   `__reactFiber` keys and read the console for the warning. Recommendation: no for this spec; the
   `auto:` tests with a fake document are enough and a lab run adds cost for one console line.
-- [ ] **Q-7. Mapping of partial names to catalog names.** Variables for a whole selector equal the
+  Answered (Tore, 2026-11-26): changed: no `live:` scenario and no lab run, but an automated boot scenario in a node test with a fake DOM, one without and one with the React shape (AC-14, AC-15).
+- [x] **Q-7. Mapping of partial names to catalog names.** Variables for a whole selector equal the
   catalog value; variables for one class are a part of it. Recommendation: the test holds a table
   `variable -> catalog name -> "equals" or "contained in"`, so each rule is visible and a new
   variable without a row fails AC-1.
+  Answered (Tore, 2026-11-26): the mapping lives in the tests.
 
 ## References
 
