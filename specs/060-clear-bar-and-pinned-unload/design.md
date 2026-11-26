@@ -309,7 +309,7 @@ Behavior that no criterion names, and its tests:
 
 | Behavior | Test | File |
 |---|---|---|
-| The row draws its line only when no pinned row shows it | `draws its line only when no pinned row shows it` | `tests/modules/today/ClearSeparator.test.ts` |
+| The row draws its line only when no pinned row shows it (renamed by [067](../067-clear-line-and-titles/spec.md): the line is always drawn) | `draws its line whether or not a pinned row shows it` | `tests/modules/today/ClearSeparator.test.ts` |
 | A missing strip leaves the bar as Vivaldi draws it, with one warning | `warns once when the tab strip is missing` | `tests/modules/today/ClearSeparator.test.ts` |
 | The row does not stop 050's gap corrections | `ignores the row that is not a slot` | `tests/shared/tabs/StripGapCloser.test.ts` |
 | The minus is hidden until hover or current | `draws the tile minus only on hover and on the current tile` | `tests/styles/Favorites.test.ts` |

@@ -64,8 +64,6 @@ test('hides the pinned-last border while there is no Today tab', () => {
   const empty = ruleBody(css, new RegExp(`#browser\\[data-vivarcdi-active\\]\\[data-vivarcdi-no-today\\] \\[data-vivarcdi-pinned-last\\] \\{([^}]*)\\}`));
   assert.match(empty, /margin-bottom: 0;/);
   assert.match(empty, /padding-bottom: 0;/);
-  const after = ruleBody(css, new RegExp(`\\[data-vivarcdi-no-today\\] \\[data-vivarcdi-pinned-last\\]::after \\{([^}]*)\\}`));
-  assert.match(after, /display: none;/);
   assert.equal(/border-bottom/.test(css), false);
   assert.equal(/border-bottom/.test(compiledLook()), false);
 });
@@ -74,9 +72,7 @@ test('insets the pinned-last border like the rows', () => {
   const css = compiled();
   const base = ruleBody(css, new RegExp(`${LAST} \\{([^}]*)\\}`));
   assert.equal(/border-bottom/.test(base), false);
-  const line = ruleBody(css, new RegExp(`${LAST}::after \\{([^}]*)\\}`));
-  assert.match(line, /inset-inline: 6px;/);
-  assert.match(line, /border-top: 1px solid var\(--vivarcdi-line, color-mix\(/);
-  assert.match(line, /bottom: 0;/);
-  assert.match(line, /pointer-events: none;/);
+  assert.equal(/pinned-last\\]::after/.test(css), false);
+  const today = read('today.scss');
+  assert.match(today, /inset-inline: \$folders-padding;/);
 });

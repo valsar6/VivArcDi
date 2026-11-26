@@ -8,6 +8,7 @@ $archive-width: 340px;
 $archive-max-height: 70vh;
 $archive-row-height: 44px;
 $clear-height: $separator-gap * 2 + 1px;
+$clear-label-gap: 8px;
 
 #{$root} :is(#{$archive}, #{$archive-footer}, #{$clear}) {
   -webkit-app-region: no-drag;
@@ -144,15 +145,15 @@ $clear-height: $separator-gap * 2 + 1px;
   top: 0;
   inset-inline: $folders-padding;
   z-index: 1;
+  display: flex;
+  align-items: center;
   height: 0;
   transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));
   pointer-events: none;
 
   &::before {
     content: '';
-    position: absolute;
-    inset-inline: 0;
-    top: 0;
+    flex: 1 1 auto;
     height: 0;
     border-top: 1px solid var(--vivarcdi-line);
     opacity: 0;
@@ -164,24 +165,24 @@ $clear-height: $separator-gap * 2 + 1px;
 }
 
 #{$root} #{$clear-row} #{$clear} {
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
+  position: static;
   display: flex;
+  flex: none;
   align-items: center;
-  justify-content: flex-end;
   box-sizing: border-box;
   height: $clear-height;
-  padding: 0 $gap;
+  margin-inline-start: $clear-label-gap;
+  padding: 0;
   border: 0;
   background: transparent;
-  color: var(--colorFg, inherit);
+  color: var(--vivarcdi-muted, color-mix(in srgb, var(--colorFg, #fff) #{$muted-ink}, transparent));
   font: inherit;
   font-size: 11px;
-  opacity: 0;
+  font-weight: 600;
+  opacity: 1;
   pointer-events: auto;
   cursor: pointer;
-  transition: opacity var(--vivarcdi-transition);
+  transition: color var(--vivarcdi-transition);
 
   &::before {
     content: "↓";
@@ -190,7 +191,7 @@ $clear-height: $separator-gap * 2 + 1px;
 
   &:hover,
   &:focus-visible {
-    opacity: 0.8;
+    color: var(--vivarcdi-ink, var(--colorFg, inherit));
   }
 }
 
