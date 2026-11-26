@@ -2,6 +2,7 @@ import type { BrowserTabs } from '../../core/browser/BrowserTabs.js';
 import type { NoticeBoard } from '../../core/dom/Notices.js';
 import type { Logger } from '../../core/support/Logger.js';
 import { TabData } from '../../core/tabs/TabData.js';
+import type { WorkspaceTabs } from '../../core/workspaces/WorkspaceTabs.js';
 import { ActivityClock } from './ActivityClock.js';
 import type { ActivityStamps } from './ActivityStamps.js';
 import type { ArchiveEntry, ArchiveStore } from './ArchiveStore.js';
@@ -26,6 +27,8 @@ export interface SweeperDependencies {
   /** Where the user is told that tabs stay open. */
   notices: Pick<NoticeBoard, 'once'>;
   logger: Logger;
+  /** Opens the blank tab that keeps the window and workspace alive when Clear closes every tab. */
+  blank: Pick<WorkspaceTabs, 'open'>;
 }
 
 const SWEEP_INTERVAL_MS = 60_000;
@@ -86,8 +89,8 @@ export class ArchiveSweeper {
   }
 
   /**
-   * Archives now, whatever their age, the Today tabs of the active tab's workspace. The active
-   * tab is never among them.
+   * Archives now, whatever their age, the Today tabs of the active tab's workspace, the active
+   * tab included. When no tab of the workspace would stay open, a blank tab is opened first.
    *
    * @returns Settles once the tabs are archived.
    */
@@ -121,7 +124,9 @@ export class ArchiveSweeper {
       return;
     }
     const workspace = TabData.of(active);
-    await this.#archive(windowTabs.filter((tab) => TodayTabPolicy.isArchivable(tab) && TabData.of(tab) === workspace));
+    const closing = windowTabs.filter((tab) => TodayTabPolicy.isClearable(tab) && TabData.of(tab) === workspace);
+    const stays = windowTabs.some((tab) => TabData.of(tab) === workspace && !closing.includes(tab));
+    await this.#archive(closing, stays ? undefined : (): Promise<unknown> => this.#deps.blank.open(null, workspace));
   }
 
   async #windowTabs(): Promise<IdentifiedTab[]> {
@@ -129,7 +134,7 @@ export class ArchiveSweeper {
     return windowTabs.filter((tab): tab is IdentifiedTab => tab.id !== undefined);
   }
 
-  async #archive(tabs: IdentifiedTab[]): Promise<void> {
+  async #archive(tabs: IdentifiedTab[], beforeClose?: () => Promise<unknown>): Promise<void> {
     if (tabs.length === 0) {
       return;
     }
@@ -138,6 +143,12 @@ export class ArchiveSweeper {
     if (outcome !== 'saved') {
       this.#deps.logger.warn(`could not save to the archive (${outcome}): the tabs stay open`);
       this.#deps.notices.once(KEPT_KEY, KEPT_TEXT, 'error');
+      return;
+    }
+    try {
+      await beforeClose?.();
+    } catch (error) {
+      this.#deps.logger.warn('could not open a blank tab: the Today tabs stay open', error);
       return;
     }
     for (const tab of tabs) {

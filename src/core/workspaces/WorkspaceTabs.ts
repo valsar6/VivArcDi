@@ -28,13 +28,13 @@ export class WorkspaceTabs {
    * its `vivExtData` in one write that reads the tab again. When they cannot be written, the tab stays where Vivaldi
    * put it.
    *
-   * @param url The address to open.
+   * @param url The address to open, or null for Vivaldi's own new tab.
    * @param workspace The workspace id, or null to leave the tab where Vivaldi puts it.
    * @param own Values to store under VivArcDi's own key, such as the bookmark the tab stands for.
    * @returns The new tab.
    */
-  public async open(url: string, workspace: string | null, own: OwnTabChanges = {}): Promise<chrome.tabs.Tab> {
-    const created = await this.#tabs.create({ url, active: true });
+  public async open(url: string | null, workspace: string | null, own: OwnTabChanges = {}): Promise<chrome.tabs.Tab> {
+    const created = await this.#tabs.create(url === null ? { active: true } : { url, active: true });
     await this.#store(created, workspace, own);
     return created;
   }
