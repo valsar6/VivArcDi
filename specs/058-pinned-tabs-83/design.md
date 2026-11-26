@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-26, PR #297) |
 | Spec | [spec.md](spec.md) |
 
 Tore approved the spec on 2026-11-26 (PR #297): no `8.3.json` while 8.1 and 8.3 are compatible
