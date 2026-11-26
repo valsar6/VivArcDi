@@ -9,6 +9,7 @@ const STYLES = fileURLToPath(new URL('../../src/styles/', import.meta.url));
 const read = (name: string): string => readFileSync(`${STYLES}${name}`, 'utf8');
 const shortHex = (color: string): string => color.replace(/^#(\w)\1(\w)\2(\w)\3$/, '#$1$2$3');
 const compiled = (): string => sass.compile(`${STYLES}sidebar-look.scss`).css;
+const ruleBody = (css: string, selector: RegExp): string => selector.exec(css)?.[1] ?? '';
 
 const TOKENS: Array<[string, string]> = [
   ['$row-height', '36px'],
@@ -85,4 +86,57 @@ test('the space name and the rows below keep the row spacing', () => {
 test('the bars revealed by Automatically hide UI keep the space color over the page', () => {
   const css = compiled();
   assert.match(css, /#browser\[data-vivarcdi-look\]\.auto-hide \.auto-hide-wrapper\s*\{\s*background-color: var\(--vivarcdi-space\) !important;/);
+});
+
+test('draws the open tab close as an Arc X', () => {
+  const tokens = read('_tokens.scss');
+  const css = compiled();
+  assert.match(tokens, /\$close-glyph: url\("data:image\/svg\+xml[^"]*viewBox='0 0 12 12'/);
+  assert.match(tokens, /\$close-glyph-size: 12px;/);
+  const base = ruleBody(css, /\.tab-wrapper \.close \{([^}]*)\}/);
+  assert.match(base, /position: relative !important/);
+  assert.match(base, /order: 0;/);
+  assert.match(base, /flex: none/);
+  assert.match(base, /width: 0;/);
+  assert.match(base, /height: 24px;/);
+  assert.match(base, /overflow: hidden/);
+  assert.match(base, /opacity: 0;/);
+  assert.match(base, /pointer-events: none/);
+  const glyph = ruleBody(css, /\.tab-wrapper \.close::before \{([^}]*)\}/);
+  assert.match(glyph, /width: 12px;/);
+  assert.match(glyph, /height: 12px;/);
+  assert.match(glyph, /mask: url\("data:image\/svg\+xml/);
+  const hover = ruleBody(css, /\.tab-wrapper:hover \.close \{([^}]*)\}/);
+  assert.match(hover, /width: 24px;/);
+  assert.match(hover, /margin-inline-end: 6px;/);
+  assert.match(hover, /opacity: 1;/);
+  assert.match(hover, /pointer-events: auto/);
+});
+
+test('shows the Arc close badge only on button hover', () => {
+  const css = compiled();
+  const base = ruleBody(css, /\.tab-wrapper \.close \{([^}]*)\}/);
+  assert.equal(/background-color:/.test(base), false);
+  assert.match(base, /border-radius: 5px;/);
+  const rowHover = ruleBody(css, /\.tab-wrapper:hover \.close \{([^}]*)\}/);
+  assert.equal(/background-color:/.test(rowHover), false);
+  const badge = ruleBody(css, /\.tab-wrapper \.close:hover \{([^}]*)\}/);
+  assert.match(badge, /background-color: color-mix\(/);
+  const glyph = ruleBody(css, /\.tab-wrapper \.close:hover::before \{([^}]*)\}/);
+  assert.match(glyph, /background-color: color-mix\(/);
+});
+
+test('gives the title the hidden close space at rest', () => {
+  const css = compiled();
+  assert.match(css, /\.tab-wrapper:hover \.favicon \{[^}]*display: block !important/);
+  const base = ruleBody(css, /\.tab-wrapper \.title \{([^}]*)\}/);
+  assert.match(base, /display: block !important;/);
+  assert.match(base, /min-width: 0;/);
+  assert.match(base, /overflow: hidden;/);
+  assert.match(base, /text-overflow: ellipsis;/);
+  assert.match(base, /white-space: nowrap;/);
+  assert.match(base, /padding-inline-end: 0;/);
+  assert.equal(/\.tab-wrapper:hover \.title \{/.test(css), false);
+  const pinned = ruleBody(css, /\.tab-position\.is-pinned:hover \.title \{([^}]*)\}/);
+  assert.match(pinned, /padding-inline-end: 30px;/);
 });

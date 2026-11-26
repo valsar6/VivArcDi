@@ -10,12 +10,12 @@ const css = (): string => sass.compile(`${STYLES}folders.scss`).css;
 test('draws the folder and link minus as the same badge', () => {
   const tokens = readFileSync(`${STYLES}_tokens.scss`, 'utf8');
   const source = readFileSync(`${STYLES}folders.scss`, 'utf8');
-  assert.match(tokens, /\$minus-badge-size: 21px/);
+  assert.match(tokens, /\$minus-badge-size: 24px/);
   assert.match(tokens, /\$minus-badge-radius: 5px/);
   assert.ok(source.includes('@use \'minus\''));
   assert.ok(source.includes('@include minus-badge'));
   const badge = /\[data-vivarcdi-folders\][^{]*\.vivarcdi-folders-minus \{([^}]*)\}/.exec(css())?.[1] ?? '';
-  assert.match(badge, /width: 21px;/);
+  assert.match(badge, /width: 24px;/);
   assert.match(badge, /border-radius: 5px;/);
   assert.equal(/background-color:/.test(badge), false);
   assert.equal(/\[data-vivarcdi-link-close\]/.test(css()), false);

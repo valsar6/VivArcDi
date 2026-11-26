@@ -166,6 +166,18 @@
   }
 }
 
+#{$look} #{$folders} {
+  .vivarcdi-folders-title {
+    padding-inline-end: 0;
+    transition: padding-inline-end $transition;
+  }
+
+  > [data-vivarcdi-folder-unload]:hover .vivarcdi-folders-title,
+  > [data-vivarcdi-link-open]:hover .vivarcdi-folders-title {
+    padding-inline-end: $minus-badge-size + $minus-offset;
+  }
+}
+
 @keyframes vivarcdi-folders-in {
   from {
     height: 0;

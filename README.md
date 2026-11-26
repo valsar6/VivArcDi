@@ -739,6 +739,11 @@ tab, tiles on a light veil, a thin line above `+ New Tab`, a thin scroll bar tha
 scrolling, and the space color as the background of the tab bar. The `+ New Tab` row opens a blank tab.
 Vivaldi's own `+` button in the tab bar is hidden.
 
+Hovering a row shows Arc's `×` on its close button, with a light badge when you point at the button
+itself. A title uses the space of a hidden close or minus control and gives it back to the visible
+control on hover, so a long title truncates only while the control is shown. The `sidebar look` option
+turns all of this off.
+
 | Option | Default | Meaning |
 |---|---|---|
 | `enabled` | `true` | Set to `false` and Vivaldi looks as it does without the module |
