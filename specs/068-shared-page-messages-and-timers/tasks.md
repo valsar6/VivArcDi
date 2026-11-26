@@ -29,7 +29,7 @@ T2 ──┘
 
 ## Tasks
 
-- [ ] **T1. The page-message reader** (TDD; parallel with T2). Add
+- [x] **T1. The page-message reader** (TDD; parallel with T2). Add
   `tests/shared/messages/PageMessage.test.ts` with `parsePageMessage returns a valid runtime message`,
   `parsePageMessage returns a valid console line`, `parsePageMessage rejects a wrong prefix`,
   `parsePageMessage rejects broken JSON` and `parsePageMessage rejects a wrong shape` (AC-1 to AC-5),
@@ -40,7 +40,7 @@ T2 ──┘
   names, constants, JSDoc and results: the existing tests of the five messages pass unchanged (AC-6).
   Build on the base commit and after the change and compare `wc -c dist/page/*.js` (NFR-3); the lists
   must be identical. Do not touch `LittleArcMessage.ts`. Done when `make check` is green.
-- [ ] **T2. The shared timers** (TDD; parallel with T1). Add `tests/core/support/Timers.test.ts` with
+- [x] **T2. The shared timers** (TDD; parallel with T1). Add `tests/core/support/Timers.test.ts` with
   `systemTimers set runs the function after the delay` and `systemTimers clear cancels a pending timer`
   (AC-7, AC-8), and `tests/structure/OneTimers.test.ts` with `only Timers defines the system timers`
   (AC-9). Then add `Timers.ts` with `Timers` and `systemTimers`, and move the eleven users of the
@@ -49,7 +49,7 @@ T2 ──┘
   interfaces and nine default objects with no alias. Keep every constructor parameter and dependency
   field name. In the three test files that import a removed type, change the import only. The tests
   of all these classes pass with their names unchanged (AC-11). Done when `make check` is green.
-- [ ] **T3. Docs, bundle check and spec status** (lead; after T1 and T2). Merge both branches, run
+- [x] **T3. Docs, bundle check and spec status** (lead; after T1 and T2). Merge both branches, run
   `npm run build` and compare `dist/page/*.js` sizes with the base commit. In
   `docs/architecture.md` add `messages/` to the shared folders and the timers to the `support/` row
   (NFR-5). Set the spec Status and the README row to `Implemented` and tick T1 to T3. Make no
