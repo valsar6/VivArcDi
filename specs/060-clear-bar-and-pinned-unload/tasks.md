@@ -65,7 +65,8 @@ A task edits only its files.
   first, in `tests/modules/today/ClearSeparator.test.ts`:
   `keeps the Clear control out of the hidden pinned group` (AC-3),
   `puts the Clear control above the Today tabs and takes its clicks` (AC-4),
-  `draws its line only when no pinned row shows it`, and
+  `draws its line only when no pinned row shows it` (renamed by 067 to
+  `draws its line whether or not a pinned row shows it`), and
   `warns once when the tab strip is missing`; in `tests/shared/tabs/StripGapCloser.test.ts`:
   `ignores the row that is not a slot`; in `tests/styles/Today.test.ts`, rewrite the existing test as
   `draws the Clear bar on the separator above the Today tabs` (AC-5). Then add `ClearSeparator` with

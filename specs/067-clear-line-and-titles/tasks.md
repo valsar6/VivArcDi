@@ -91,13 +91,13 @@ T6 ──┴──> T7 (lead: docs and version) ──> T8 (Tore: manual)
 | T7 | `specs/` (notes in the 060 design and tasks, 067 status), `docs/manual/tab-bar.md`, `README.md`, version files |
 | T8 | Nothing in the repository |
 
-- [ ] **T5. Always-on line mark** (TDD; parallel with T6). Change the bodies of
+- [x] **T5. Always-on line mark** (TDD; parallel with T6). Change the bodies of
   `shows the Clear line when a Today tab opens` and of `draws its line only when no pinned row shows
   it`, renamed `draws its line whether or not a pinned row shows it`, so they fail. Then remove
   `#line()` and set `data-vivarcdi-clear-line` in `sync` next to `#mark(false)`, guarded by
   `hasAttribute`; drop the `PINNED_LAST_ATTRIBUTE` import if unused. Keep `firstTodaySlot`, `#place`
   and the empty state. Done when `make check` is green.
-- [ ] **T6. Styles and probe** (TDD; parallel with T5). Add `shows the Clear label at rest` (AC-9),
+- [x] **T6. Styles and probe** (TDD; parallel with T5). Add `shows the Clear label at rest` (AC-9),
   `ends the Clear line before its label` (AC-10) and `strengthens the Clear label on hover` (AC-11)
   to `tests/styles/Today.test.ts`; update the bodies of `draws the Clear bar on the separator above
   the Today tabs`, `insets the Clear line like the rows`, `insets the pinned-last border like the
@@ -109,7 +109,7 @@ T6 ──┴──> T7 (lead: docs and version) ──> T8 (Tore: manual)
   band above Today exists with no pinned tab. Run the scenario `the Clear bar keeps a box above
   Today with the Favorites grid on` and do not edit it. Done when `make check` is green and the
   probe is within 1 px.
-- [ ] **T7. Docs and version** (lead; after T5 and T6). Update `docs/manual/tab-bar.md` and
+- [x] **T7. Docs and version** (lead; after T5 and T6). Update `docs/manual/tab-bar.md` and
   `README.md` to say Clear shows at rest; note in the 060 design and tasks that
   `draws its line only when no pinned row shows it` was renamed by 067; read the version on
   `origin/main` and bump the patch in the three version files. Done when `make check` is green.
