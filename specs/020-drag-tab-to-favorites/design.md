@@ -99,10 +99,10 @@ order everywhere, Vivaldi Sync included (030).
 | `src/modules/favorites/TabToFavorite.ts` | Wires a `TabPointerDrag` and the HTML5 path to `GridDropZone` and `FavoriteDrop` | Mediator |
 | `src/modules/favorites/TileDrag.ts` | Follows the press, move and release on a tile; dims it; swallows the click after a drag; reports the place of the release | Observer |
 | `src/modules/favorites/FavoriteReorder.ts` | Moves a Favorite bookmark before another or to the end of the folder; skips a move to its own place | Command |
-| `src/core/bookmarks/BookmarkWriter.ts` | Gains `move(id, destination)` | |
+| `src/core/browser/bookmarks/BookmarkWriter.ts` | Gains `move(id, destination)` | |
 | `src/modules/favorites/FavoriteRemoval.ts` | Turns a released tile into a link through `LinkDropZone` or into a Today tab, closes the Favorite's tabs of the other workspaces, then removes the bookmark | Command |
-| `src/core/LinkDropZone.ts` | Shared, per window: the folders section registers its targets; the Favorites ask for them | Mediator, like `FolderCommands` |
-| `src/modules/folders/WorkspaceFavorites.ts` | Gains `addLink(page, place)` for a link without a tab | |
+| `src/shared/dragdrop/LinkDropZone.ts` | Shared, per window: the folders section registers its targets; the Favorites ask for them | Mediator, like `FolderCommands` |
+| `src/modules/folders/favoritelinks/WorkspaceFavorites.ts` | Gains `addLink(page, place)` for a link without a tab | |
 | `src/modules/folders/BookmarkFolders.ts` | Registers its `DropTargets` and `WorkspaceFavorites` in `LinkDropZone` | |
 | `src/modules/favorites/FavoritesGrid.ts` | Starts and stops `TabToFavorite` and `TileDrag` with the bookmark Favorites | |
 | `src/styles/favorites.scss`, `_tokens.scss` | Gap tile, dimmed dragged tile, mark of the drop below the separator; sizes as tokens | |

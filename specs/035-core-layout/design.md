@@ -128,7 +128,7 @@ directly or through shared files. `VivArcDi.ts` counts as used because `src/load
 - `docs/architecture.md`: the core folders, the three layers and their import rules, and the core
   paths it cites, such as `src/core/boot/Module.ts`.
 - The paths of the files above in earlier specs stay as they are, since they record history. Spec
-  033's design names `src/core/bookmarks/BookmarkTrash.ts` and `BookmarkCopier.ts`; code that step 2
+  033's design names `src/modules/folders/editing/BookmarkTrash.ts` and `BookmarkCopier.ts`; code that step 2
   of 033 adds follows the new paths when this branch takes main.
 
 ## Vivaldi interface

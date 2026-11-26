@@ -136,7 +136,7 @@ Test shapes:
   the keys it had.
 - AC-6 to AC-13: the tab of the other window carries `windowId: 2`; the assertion is on the calls
   of the writer or of the saved addresses fake, never on a log line.
-- `BrowserTabs.ownWindowId` gets its own tests in `tests/core/browser/BrowserTabs.test.ts`
+- `BrowserTabs.ownWindowId` gets its own tests in `tests/loader/BrowserTabs.test.ts`
   (`reads the window id once`, `resolves null when the window id cannot be read`), named by the
   implementer from those texts; they cover no AC.
 

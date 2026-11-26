@@ -128,10 +128,10 @@ Rename is the double click of 012, routed to `VirtualFolders.onRename`.
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/VirtualFolders.ts` | Extra entries per workspace and their handlers, shared per window | Observer, Registry |
-| `src/core/SpaceMenuItems.ts` | Items other modules add to the space menu | Registry |
-| `src/core/LinkId.ts` | `isVirtual(id)` | |
-| `src/core/ContextMenu.ts` | Check items and submenus | Composite |
+| `src/shared/links/VirtualFolders.ts` | Extra entries per workspace and their handlers, shared per window | Observer, Registry |
+| `src/shared/spaces/SpaceMenuItems.ts` | Items other modules add to the space menu | Registry |
+| `src/shared/links/LinkId.ts` | `isVirtual(id)` | |
+| `src/core/dom/ContextMenu.ts` | Check items and submenus | Composite |
 | `src/modules/livefolders/LiveFolders.ts` | Module | Module |
 | `.../LiveFolderStore.ts` | Stored folders, filters and rows | Repository |
 | `.../PullRequestFilters.ts` | Filters and queries | |

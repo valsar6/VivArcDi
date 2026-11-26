@@ -172,5 +172,5 @@ read from the module's fakes.
   handling of an API failure (NFR-3).
 - Code: `src/modules/folders/view/FolderSectionView.ts`, `src/modules/folders/view/FolderMinus.ts`,
   `src/modules/folders/view/FolderRowElement.ts`, `src/modules/folders/FolderSection.ts`,
-  `src/core/browser/TabUnloader.ts`.
+  `src/core/tabs/TabUnloader.ts`.
 - Recording by Tore, `~/Desktop/Registrazione schermo 2026-11-25 alle 10.30.43.mov`, 2026-11-25.

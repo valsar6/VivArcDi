@@ -45,12 +45,12 @@ Rejected alternatives:
 | `src/modules/peek/SiteComparator.ts` | Registrable domain of a URL; same-site test (FR-3) | |
 | `src/modules/peek/LinkClassifier.ts` | Turns a click (button, modifiers, link and page URLs, pinned flag) and the triggers into `peek` or `default` (FR-2) | Strategy, one rule per trigger |
 | `src/page/peek-links.ts` | Page script: capture-phase click listener, uses `LinkClassifier`, cancels and messages; removes itself on request | |
-| `src/modules/peek/PageScriptInjector.ts` | Finds tab webviews, injects the page script with the tab's policy on every `loadcommit`, removes it on stop | Observer |
+| `src/core/browser/PageScriptInjector.ts` | Finds tab webviews, injects the page script with the tab's policy on every `loadcommit`, removes it on stop | Observer |
 | `src/modules/peek/PeekPanel.ts` | Builds and removes the backdrop, panel, webview and buttons; emits `expand`, `split`, `close` | |
 | `src/modules/peek/PeekController.ts` | One Peek at a time: open, replace, close, expand, split; falls back when the panel fails (FR-4 to FR-7, NFR-2) | State |
 | `src/modules/peek/PeekKeys.ts` | Esc, Cmd/Ctrl+W and Cmd/Ctrl+O while a Peek is open | |
-| `src/modules/peek/TabTiler.ts` | Tiles two tabs through `vivExtData` | Adapter |
-| `src/core/BrowserTabs.ts` | Gains `create`, `update` and `onActivated` | |
+| `src/shared/tabs/TabTiler.ts` | Tiles two tabs through `vivExtData` | Adapter |
+| `src/core/browser/BrowserTabs.ts` | Gains `create`, `update` and `onActivated` | |
 | `src/styles/peek.scss` | Backdrop, panel, buttons, open animation | |
 | `scripts/build.mjs` | Bundles `src/page/*.ts` into one self-contained file each | |
 

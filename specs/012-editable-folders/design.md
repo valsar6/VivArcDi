@@ -63,15 +63,15 @@ second press (could remove a bookmark Tore made himself).
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/bookmarks/BookmarkWriter.ts` | The only writer of bookmarks: `create`, `update`, `remove`, `ensurePath` | Adapter |
-| `src/core/Toast.ts` | Moved from `src/modules/copyurl` | - |
-| `src/modules/folders/CreatedLinks.ts` | Ids of the bookmarks VivArcDi created, to decide what a second press removes | Repository |
-| `src/modules/folders/WorkspaceRoots.ts` | Order of FR-4 and `workspacesBase` | Value object |
-| `src/modules/folders/WorkspaceFavorites.ts` | `add`, `addFolder`, `take`: bookmark, link and tab together | Facade |
-| `src/modules/folders/FavoriteShortcut.ts` | Cmd/Ctrl+D | - |
-| `src/core/TabPointerDrag.ts` | Pointer drag of a tab row, reports the release point | Observer |
-| `src/modules/folders/DropTargets.ts` | Maps a point to `folder(id)`, `between(index)` or `header` | - |
-| `src/modules/folders/FolderSectionView.ts` | Edit mode of a row, delayed toggle, drop highlight | - |
+| `src/core/browser/bookmarks/BookmarkWriter.ts` | The only writer of bookmarks: `create`, `update`, `remove`, `ensurePath` | Adapter |
+| `src/core/dom/Toast.ts` | Moved from `src/modules/copyurl` | - |
+| `src/modules/folders/favoritelinks/CreatedLinks.ts` | Ids of the bookmarks VivArcDi created, to decide what a second press removes | Repository |
+| `src/modules/folders/tree/WorkspaceRoots.ts` | Order of FR-4 and `workspacesBase` | Value object |
+| `src/modules/folders/favoritelinks/WorkspaceFavorites.ts` | `add`, `addFolder`, `take`: bookmark, link and tab together | Facade |
+| `src/modules/folders/favoritelinks/FavoriteShortcut.ts` | Cmd/Ctrl+D | - |
+| `src/shared/dragdrop/TabPointerDrag.ts` | Pointer drag of a tab row, reports the release point | Observer |
+| `src/modules/folders/dragdrop/DropTargets.ts` | Maps a point to `folder(id)`, `between(index)` or `header` | - |
+| `src/modules/folders/view/FolderSectionView.ts` | Edit mode of a row, delayed toggle, drop highlight | - |
 | `src/modules/spaceheader/SpaceHeaderView.ts` | `+` button | - |
 | `installer/vivarcdi/shortcuts.json` and tests | `COMMAND_PIN_TAB` empty | - |
 
@@ -181,18 +181,18 @@ The rows are VivArcDi's own elements, so their drag follows the mouse as `TileDr
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/TabDragRelease.ts` | Mouse and HTML5 ways of a tab drag over one place; one release per press | Mediator |
-| `src/core/TabEntries.ts` | The `vivaldi/x-tab-entries` type and its check | - |
-| `src/core/RowDrag.ts` | Mouse drag of VivArcDi's own rows or tiles, dimming and click swallowing | Observer |
-| `src/core/TodayList.ts` | Moved from the Favorites | Adapter |
-| `src/core/FavoriteDropZone.ts` | Shared per window: the Favorites register the grid, the folders ask | Mediator |
-| `src/modules/folders/LinkRemoval.ts` | Places the page of a released link, then takes the link out | Command |
-| `src/core/TabRowMove.ts` | Moves a tab to the index of the row under the pointer, shared by `FavoriteRemoval` and `LinkRemoval` | - |
+| `src/shared/dragdrop/TabDragRelease.ts` | Mouse and HTML5 ways of a tab drag over one place; one release per press | Mediator |
+| `src/shared/dragdrop/TabEntries.ts` | The `vivaldi/x-tab-entries` type and its check | - |
+| `src/shared/dragdrop/RowDrag.ts` | Mouse drag of VivArcDi's own rows or tiles, dimming and click swallowing | Observer |
+| `src/shared/tabs/TodayList.ts` | Moved from the Favorites | Adapter |
+| `src/shared/dragdrop/FavoriteDropZone.ts` | Shared per window: the Favorites register the grid, the folders ask | Mediator |
+| `src/modules/folders/favoritelinks/LinkRemoval.ts` | Places the page of a released link, then takes the link out | Command |
+| `src/shared/dragdrop/TabRowMove.ts` | Moves a tab to the index of the row under the pointer, shared by `FavoriteRemoval` and `LinkRemoval` | - |
 | `src/modules/favorites/GridFavoriteTargets.ts` | The grid's places registered in `FavoriteDropZone` | Adapter |
-| `src/modules/folders/FolderDragDrop.ts` | Wires `TabDragRelease`, `RowDrag` and `LinkRemoval` | - |
+| `src/modules/folders/dragdrop/FolderDragDrop.ts` | Wires `TabDragRelease`, `RowDrag` and `LinkRemoval` | - |
 | `src/modules/favorites/TabToFavorite.ts`, `GridDropZone.ts` | Use `TabDragRelease`; HTML5 code removed | - |
 | `src/modules/favorites/FavoriteDrop.ts` | `addPage`; registered in `FavoriteDropZone` by `GridDragging` | - |
-| `src/modules/folders/WorkspaceFavorites.ts` | `take` by bookmark id; copies recorded in `CreatedLinks` | - |
+| `src/modules/folders/favoritelinks/WorkspaceFavorites.ts` | `take` by bookmark id; copies recorded in `CreatedLinks` | - |
 | `src/styles/folders.scss` | Dimmed dragged row; the drop mark below the separator is the one of 020 | - |
 
 ### Risks of the revision

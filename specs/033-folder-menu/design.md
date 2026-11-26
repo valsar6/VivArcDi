@@ -125,9 +125,9 @@ Paths follow the `folders` layout of [034](../034-module-boundaries/design.md#fo
 
 | File | Change |
 |---|---|
-| `src/core/ContextMenu.ts` | Separator item. |
-| `src/core/bookmarks/BookmarkNode.ts` | Optional `trash` flag. |
-| `src/core/bookmarks/BookmarkTrash.ts` | New: finds and caches the Trash id. |
+| `src/core/dom/ContextMenu.ts` | Separator item. |
+| `src/core/browser/bookmarks/BookmarkNode.ts` | Optional `trash` flag. |
+| `src/modules/folders/editing/BookmarkTrash.ts` | New: finds and caches the Trash id. |
 | `src/modules/folders/editing/FolderMenu.ts` | New: opens the menu on folder rows. |
 | `src/modules/folders/editing/FolderMenuItems.ts` | New: the items, by step and group. |
 | `src/modules/folders/editing/FolderDeletion.ts` | New: tabs, move to Trash, close, toast. |

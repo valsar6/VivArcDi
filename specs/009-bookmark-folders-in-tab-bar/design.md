@@ -93,26 +93,26 @@ Rejected alternatives:
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/bookmarks/BrowserBookmarks.ts` | Promise-based `chrome.bookmarks`: `getTree` and the four change events; no write method is exposed (shared with 003) | Adapter |
-| `src/core/bookmarks/BookmarkFolderFinder.ts` | Finds a folder by a path of exact titles, first match (shared with 003) | |
-| `src/core/bookmarks/BookmarkNode.ts` | Bookmark type for both modules (shared with 003) | |
-| `src/core/bookmarks/LinkKeyIndex.ts` | Address keys of the links under a root, rebuilt on events; one instance per root path | Flyweight, Observer |
-| `src/core/TabBarAnchor.ts` | Host above the tab list: `add(element, order)` (created by 003 or by the first of the two modules) | |
-| `src/core/TabData.ts` | Workspace id of a tab and writing it to a new tab (shared with 003) | Adapter |
-| `src/core/AddressKey.ts` | Moved from `reopen/` (as 003 does), shared by 007, 003 and 009 | Value object |
-| `src/modules/folders/FolderTree.ts` | Pure: bookmark nodes to the tree of folders and links, with the rules of FR-6 (AC-1, AC-2) | |
-| `src/modules/folders/FolderTreeSource.ts` | Finds the root, rebuilds the tree on bookmark events once per frame (AC-3) | Observer |
-| `src/modules/folders/OpenFolders.ts` | Ids of open folders, saved and restored (AC-7) | Repository |
-| `src/modules/folders/OpenLinks.ts` | Which link has which open tab, from tab events (AC-5, AC-6) | Observer |
-| `src/modules/folders/LinkActivator.ts` | Click on a link: activate, reload, or create (AC-4, AC-5) | Command |
-| `src/modules/folders/FolderRows.ts` | Pure: which rows to show, with the open links of a closed folder below it (AC-6) | |
-| `src/modules/folders/FolderSectionView.ts` | Rows, indentation, dots, open links below closed folders, one delegated listener | |
+| `src/core/browser/bookmarks/BrowserBookmarks.ts` | Promise-based `chrome.bookmarks`: `getTree` and the four change events; no write method is exposed (shared with 003) | Adapter |
+| `src/core/browser/bookmarks/BookmarkFolderFinder.ts` | Finds a folder by a path of exact titles, first match (shared with 003) | |
+| `src/core/browser/bookmarks/BookmarkNode.ts` | Bookmark type for both modules (shared with 003) | |
+| `src/modules/reopen/LinkKeyIndex.ts` | Address keys of the links under a root, rebuilt on events; one instance per root path | Flyweight, Observer |
+| `src/core/dom/TabBarAnchor.ts` | Host above the tab list: `add(element, order)` (created by 003 or by the first of the two modules) | |
+| `src/core/tabs/TabData.ts` | Workspace id of a tab and writing it to a new tab (shared with 003) | Adapter |
+| `src/core/tabs/AddressKey.ts` | Moved from `reopen/` (as 003 does), shared by 007, 003 and 009 | Value object |
+| `src/shared/links/FolderTree.ts` | Pure: bookmark nodes to the tree of folders and links, with the rules of FR-6 (AC-1, AC-2) | |
+| `src/modules/folders/tree/FolderTreeSource.ts` | Finds the root, rebuilds the tree on bookmark events once per frame (AC-3) | Observer |
+| `src/modules/folders/tree/OpenFolders.ts` | Ids of open folders, saved and restored (AC-7) | Repository |
+| `src/shared/links/OpenLinks.ts` | Which link has which open tab, from tab events (AC-5, AC-6) | Observer |
+| `src/shared/links/LinkActivator.ts` | Click on a link: activate, reload, or create (AC-4, AC-5) | Command |
+| `src/modules/folders/view/FolderRows.ts` | Pure: which rows to show, with the open links of a closed folder below it (AC-6) | |
+| `src/modules/folders/view/FolderSectionView.ts` | Rows, indentation, dots, open links below closed folders, one delegated listener | |
 | `src/modules/folders/BookmarkFolders.ts` | Module: options, wiring, clean stop | Facade |
-| `src/core/HiddenTabs.ts` | Ids of tabs hidden from the list, by owner; the union is what is hidden | Observer |
-| `src/core/HiddenTabMarker.ts` | Marks the slots of hidden tabs with `data-vivarcdi-hidden`, after every redraw of the strip (AC-19) | |
-| `src/core/TabDataWriter.ts` | Serialized, fresh-read writes of `vivExtData` per tab, shared by the modules of a window (AC-27) | Command queue |
-| `src/core/KeptTab.ts` | Whether a tab is pinned, a Favorite or the tab of a link (AC-24, AC-26) | |
-| `src/modules/folders/LinkTabAdopter.ts` | Links tabs open at start and new tabs on their first navigation to a link's address (AC-22) | Observer |
+| `src/shared/tabs/HiddenTabs.ts` | Ids of tabs hidden from the list, by owner; the union is what is hidden | Observer |
+| `src/shared/tabs/HiddenTabMarker.ts` | Marks the slots of hidden tabs with `data-vivarcdi-hidden`, after every redraw of the strip (AC-19) | |
+| `src/core/tabs/TabDataWriter.ts` | Serialized, fresh-read writes of `vivExtData` per tab, shared by the modules of a window (AC-27) | Command queue |
+| `src/shared/tabs/KeptTab.ts` | Whether a tab is pinned, a Favorite or the tab of a link (AC-24, AC-26) | |
+| `src/modules/folders/links/LinkTabAdopter.ts` | Links tabs open at start and new tabs on their first navigation to a link's address (AC-22) | Observer |
 | `src/styles/hidden-tabs.scss` | The rule that hides a marked slot, shared by 003 and 009 | |
 | `src/modules/reopen/TabTargets.ts` | Tries the finders of 007 in order | Chain of responsibility |
 | `src/modules/reopen/LinkedTabFinder.ts` | Tab whose address key is in the `LinkKeyIndex` (AC-9) | Strategy |
@@ -121,7 +121,7 @@ Rejected alternatives:
 **One writer for `vivExtData`.** Several modules write the same tab at once: the new tab of a link
 gets its workspace and bookmark id while the Today archive stamps it. Each did read, change and write
 with a copy that could be stale, so the last write erased the keys of the other and the tab came back
-in the list (AC-27). `src/core/TabDataWriter.ts` is shared by every module of a window through
+in the list (AC-27). `src/core/tabs/TabDataWriter.ts` is shared by every module of a window through
 `TabDataWriter.of(tabs)`, queues the writes of each tab, and when its turn comes reads the tab again,
 builds the text with `TabData.withOwn` or `TabData.with`, and updates it. A failed write rejects to its
 caller and does not block the next one. `WorkspaceTabs`, `TabLinks`, `LinkedTabs`, `SavedAddresses`,

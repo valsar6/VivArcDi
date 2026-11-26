@@ -20,7 +20,7 @@ reuses the picker.
 
 | Fact | Where |
 |---|---|
-| No code keeps a custom name or icon for a link: the only "custom name" of a saved row is its bookmark title, which Vivaldi's panel edits and Vivaldi Sync carries. `LinkExtras.copy` is a no-op waiting for this spec | `src/modules/folders/editing/LinkExtras.ts` 1-14; `SyncStore.ts` 76-90 |
+| No code keeps a custom name or icon for a link: the only "custom name" of a saved row is its bookmark title, which Vivaldi's panel edits and Vivaldi Sync carries. `LinkExtras.copy` is a no-op waiting for this spec | `src/shared/linkmenu/LinkExtras.ts` 1-14; `SyncStore.ts` 76-90 |
 | The menu of a saved row is `LinkMenuItems`; group 2 is only `Edit Pinned Page`; the slots come from `SavedTabActions.create` | `src/modules/folders/editing/LinkMenuItems.ts` 3-12, 39-48; `SavedTabActions.ts` 45-52 |
 | The menu of a tile is `TileMenu`: `Untile tab`, `Pin tab`, then the web panel item; 057 (not implemented) puts the link groups before them | `src/modules/favorites/TileMenu.ts` 60-79; `specs/057-tile-menu/design.md` |
 | A link row gets its title in `FolderRows.#link` (the title of the open tab when it navigated elsewhere, else the bookmark title) and its icon in `FolderRowElement.#fillLink` through `LinkIcon.create` (an `img`) | `src/modules/folders/view/FolderRows.ts` 85-89; `FolderRowElement.ts` 58-67; `src/shared/links/LinkIcon.ts` 17-24 |

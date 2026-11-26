@@ -42,12 +42,12 @@ A task edits only its files. A file in two columns is shared: the owner is named
 | Task | Owns |
 |---|---|
 | T2 | `src/core/dom/ContextMenu.ts`, `Toast.ts`, `PromptDialog.ts`; `src/styles/_tokens.scss`, `toast.scss`, `dialog.scss`; `src/config.json` (styles list); `tests/core/dom/` |
-| T3 | `src/shared/links/LinkMenuItems.ts`, `LinkedTab.ts`; `src/shared/tabs/CommandLabels.ts`; `RowMenu.ts`, `FolderDragDrop.ts`, `FolderEditing.ts` (the structure: `#linkActions` and five empty slot methods); their tests |
-| T4 | `src/shared/links/LinkClipboard.ts`, `LinkTexts.ts`, `LinkDuplication.ts`, `LinkExtras.ts`, `BookmarkCopier.ts` (moved from the folders module); `FolderDuplication.ts` and `FolderEditing.ts` import line; the slots `#copyLink`, `#duplicate` |
-| T5 | `src/core/browser/bookmarks/BookmarkWriter.ts`; `src/shared/links/PinnedAddress.ts`; the slot `#editPinnedPage` |
-| T6 | `src/shared/tabs/TabTiler.ts` (moved from peek); `src/modules/peek/Peek.ts` import; `src/shared/links/SplitView.ts`; selector names for F-1 and F-2; the slot `#openInSplitView` |
+| T3 | `src/modules/folders/editing/LinkMenuItems.ts`, `LinkedTab.ts`; `src/shared/tabs/CommandLabels.ts`; `RowMenu.ts`, `FolderDragDrop.ts`, `FolderEditing.ts` (the structure: `#linkActions` and five empty slot methods); their tests |
+| T4 | `src/shared/linkmenu/LinkClipboard.ts`, `LinkTexts.ts`, `LinkDuplication.ts`, `LinkExtras.ts`, `BookmarkCopier.ts` (moved from the folders module); `FolderDuplication.ts` and `FolderEditing.ts` import line; the slots `#copyLink`, `#duplicate` |
+| T5 | `src/core/browser/bookmarks/BookmarkWriter.ts`; `src/shared/linkmenu/PinnedAddress.ts`; the slot `#editPinnedPage` |
+| T6 | `src/shared/tabs/TabTiler.ts` (moved from peek); `src/modules/peek/Peek.ts` import; `src/shared/linkmenu/SplitView.ts`; selector names for F-1 and F-2; the slot `#openInSplitView` |
 | T7a | `src/shared/spaces/` (moved drivers); `src/modules/workspacesync/` imports; `tests/shared/spaces/`, `tests/modules/workspacesync/` |
-| T7b | `src/shared/links/LinkRelocation.ts`, `WorkspaceSwitcher.ts`; selector names for F-5; the slot `#moveTo` |
+| T7b | `src/modules/folders/editing/LinkRelocation.ts`, `WorkspaceSwitcher.ts`; selector names for F-5; the slot `#moveTo` |
 | T8 | `tests/live/scenarios/` (two files); `specs/056-saved-tab-menu/spec.md` rows AC-10 and AC-11 |
 | T9 to T11 | The lead: `package.json`, `installer/vivarcdi/__init__.py`, README, `docs/`; the checklist |
 

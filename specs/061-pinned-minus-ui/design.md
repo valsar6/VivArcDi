@@ -114,7 +114,7 @@ then the spec keeps its `manual; becomes live:` note and the Draft convention of
 | `src/modules/folders/FolderSection.ts` | Wire `onUnload` to `TabUnloader` |
 | `tests/styles/Pinned.test.ts`, `tests/styles/Favorites.test.ts`, `tests/styles/Folders.test.ts` | AC-1 to AC-4 and AC-13 |
 | `tests/modules/pinned/PinnedTabs.test.ts`, `tests/modules/favorites/PinnedFavorites.test.ts` | AC-5 to AC-9 |
-| `tests/modules/folders/FolderRowElement.test.ts`, `tests/modules/folders/FolderSectionView.test.ts`, `tests/modules/folders/FolderSection.test.ts` | AC-10 to AC-12 |
+| `tests/modules/folders/FolderRowElement.test.ts`, `tests/modules/folders/view/FolderSectionView.test.ts`, `tests/modules/folders/FolderSection.test.ts` | AC-10 to AC-12 |
 | `tests/live/scenarios/` | AC-14's scenario |
 
 ## Risks
