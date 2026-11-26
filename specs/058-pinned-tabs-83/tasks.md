@@ -50,7 +50,7 @@ T3 ──┘
   last row of `pinnedGroup`, click its minus, wait for `discarded`, activate it and wait for its
   pinned page, and remove every tab in `finally`. Do not run `npm run live`. Done when `make check`
   is green.
-- [ ] **T4. Live run, spec and version** (lead; after T1 to T3). With Tore's agreement, run
+- [x] **T4. Live run, spec and version** (lead; after T1 to T3). With Tore's agreement, run
   `npm run live` on the lab Vivaldi 8.3; record the scenario result and that the selector check
   reports no failed selector. Change AC-5 of the spec to
   `live: the separator and the minus work on the pinned group`, tick T1 to T4, and name the branch
