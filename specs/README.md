@@ -76,6 +76,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [066 Arc close control and title space](066-arc-close-control/spec.md) | 3 | Implemented |
 | [067 Clear line, its inset and centered titles](067-clear-line-and-titles/spec.md) | 3 | Implemented |
 | [068 Shared page-message parser and timers](068-shared-page-messages-and-timers/spec.md) | 3 | Implemented |
+| [070 Guards for the two couplings to Vivaldi's interface](070-vivaldi-coupling-guards/spec.md) | 3 | Draft |
 
 
 
