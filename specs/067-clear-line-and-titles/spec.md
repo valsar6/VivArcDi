@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-26 (PR #298); reopened 2026-11-26 for FR-8 to FR-10, AC-9 to AC-11 and Q-4 to Q-6 |
+| Approved | 2026-11-26 (PR #298); amendment approved 2026-11-26 (PR #303) |
 | Amends | [060](../060-clear-bar-and-pinned-unload/spec.md) FR-1: the Clear control keeps a non-zero box only while the workspace has a Today tab. It also refines the divider with Clear of [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and [028](../028-arc-sidebar-look/spec.md) FR-5, and the title of the row of 028. FR-8 supersedes the hover-only Clear of 004/FR-5 and 060/AC-12. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -135,18 +135,18 @@ proposed as future `live:` checks on a lab Vivaldi; until then AC-8 covers them.
 - [x] **Q-3. Does the inset apply to the line when pinned rows show it.** Proposal: yes, one inset
   of 6 px for both lines (FR-5). Answered (Tore, 2026-11-26): the proposal.
 
-- [ ] **Q-4. The gap and the label's look.** Tore asked for the exact look of Arc's line (screenshot of
+- [x] **Q-4. The gap and the label's look.** Tore asked for the exact look of Arc's line (screenshot of
   2026-11-26 16:36). Proposal: the line ends 8 px before the arrow; the label is 11 px, weight 600,
   in the sidebar's muted text color at rest and the full text color on hover; the arrow and the word
-  keep 4 px between them. The design measures Arc's screenshot and the lab, and adjusts within 1 px.
-- [ ] **Q-5. One line or two.** With the Favorites grid off the visible line is today the pinned-last
+  keep 4 px between them. The design measures Arc's screenshot and the lab, and adjusts within 1 px. Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-5. One line or two.** With the Favorites grid off the visible line is today the pinned-last
   border (FR-5), and the Clear row draws no line of its own, so the line could not stop before the
   label. Proposal: while a Today tab is visible, the Clear row always draws the only separator line
   (FR-9) and the pinned-last line is not drawn; with no Today tab both stay hidden (FR-1). FR-5 and
   AC-6 then apply to that single line. In Arc the line sits between the folders and Today whether or
-  not pinned tabs exist.
-- [ ] **Q-6. Hover state.** Proposal: keep a hover state (FR-10, AC-11) so the label still reads as a
-  button; if Arc shows none, drop AC-11 and FR-10's last clause.
+  not pinned tabs exist. Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-6. Hover state.** Proposal: keep a hover state (FR-10, AC-11) so the label still reads as a
+  button; if Arc shows none, drop AC-11 and FR-10's last clause. Answered (Tore, 2026-11-26): the proposal.
 
 ## References
 

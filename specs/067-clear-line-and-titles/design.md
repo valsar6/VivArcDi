@@ -5,7 +5,9 @@
 | Status | Approved (2026-11-26) |
 | Spec | [spec.md](spec.md) |
 
-Tore approved the spec on 2026-11-26 (PR #298) and accepted every proposal of Q-1 to Q-3. This
+Tore approved the spec on 2026-11-26 (PR #298) and accepted every proposal of Q-1 to Q-3; he approved
+the amendment (FR-8 to FR-10, PR #303) the same day and accepted every proposal of Q-4 to Q-6, which
+the last section designs. This
 document says **how**; the spec says **what**. It keeps the Clear action of
 [004](../004-today-tabs-and-keyboard/spec.md) and [060](../060-clear-bar-and-pinned-unload/spec.md)
 and the separator rules of [050](../050-tab-strip-gap/spec.md), and changes only when the line and
@@ -216,6 +218,155 @@ does. Module tests use the fakes of `tests/modules/today/ClearSeparator.test.ts`
 
 The geometry (within 1 px) cannot be proved from CSS text. The implementer records the probe numbers
 in the pull request, and AC-8 covers them until a `live:` check exists.
+
+## Amendment (FR-8 to FR-10)
+
+Tore compared the result with Arc again: the "↓ Clear" label must show at rest, and the line must stop
+before it instead of running under it. The amendment is mostly CSS in `today.scss`, plus one change in
+`ClearSeparator` for Q-5. The Clear action, the box rules of 060 and the empty state (FR-1) do not
+change.
+
+### Today
+
+| Part | Now | Where |
+|---|---|---|
+| Label | Button `opacity: 0`, `0.8` on hover and focus | `src/styles/today.scss:164-190` |
+| Line | `::before` of the row, `inset-inline: 0`, runs under the label | `today.scss:150-162` |
+| Line mark | `#line()` sets `data-vivarcdi-clear-line` only when no visible pinned-last mark exists | `src/modules/today/ClearSeparator.ts:144-150` |
+| Pinned-last line | Inset `::after` (T2) shows whenever pinned rows are visible | `src/styles/pinned.scss:5-17` |
+
+### Layout: the row becomes a flex line
+
+The simplest robust CSS needs no measured width: the row is a flex container of height 0, the line is
+a flex item that takes the free width, and the button is the item after it.
+
+```scss
+$clear-label-gap: 8px;
+
+#{$root} #{$clear-row} {
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: '';
+    flex: 1 1 auto;
+    height: 0;
+    border-top: $line-width solid var(--vivarcdi-line);
+    opacity: 0;
+  }
+}
+
+#{$root} #{$clear-row} #{$clear} {
+  position: static;
+  flex: none;
+  margin-inline-start: $clear-label-gap;
+  padding: 0;
+  color: var(--vivarcdi-muted, color-mix(in srgb, var(--colorFg, #fff) #{$muted-ink}, transparent));
+  font-weight: 600;
+  opacity: 1;
+  transition: color var(--vivarcdi-transition);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--vivarcdi-ink, var(--colorFg, inherit));
+  }
+}
+```
+
+- The row keeps `position: absolute`, `height: 0`, `top: 0`, `inset-inline: $folders-padding`, its
+  transform and `pointer-events: none`; only `display` and `align-items` are added, so 060's box
+  rules hold. `align-items: center` in a container of height 0 centers each item on the row's top
+  edge: the line (height 0, its border is the 1 px) sits on that edge and the 13 px button
+  (`$clear-height`, kept) overflows 6.5 px on each side, so the line crosses the label's vertical
+  middle (FR-9, AC-10).
+- The line ends where the button starts, less the `8px` margin: it stops before the arrow with the
+  gap of Q-4. The button's right edge is the right inset of the rows: the old `padding: 0 $gap`,
+  `inset-inline`, `top` and `justify-content` leave the button, so the word ends where the rows end.
+- The label shows at rest by color, not by opacity (`opacity: 1`; the `0.8` hover rule goes).
+  `--vivarcdi-muted` is defined by `sidebar-look` (`sidebar-look.scss:13`, the ink at `$muted-ink`,
+  60%); the fallback applies the same `color-mix` to `--colorFg` when the look is off, as
+  `pinned.scss` does for the line. Hover and focus use `--vivarcdi-ink` (`sidebar-look.scss:10`).
+  Font size stays 11 px, weight becomes 600; the arrow keeps `margin-inline-end: 4px`.
+- A Clear row exists only while a Today tab shows (FR-1), so the label shows whenever the row does
+  (FR-8).
+
+### One line (Q-5)
+
+`#line()` is removed. `sync` sets `data-vivarcdi-clear-line` on the row once the slot is found, next
+to `#mark(false)`, guarded by `hasAttribute`, so the Clear row always draws the line while a Today tab
+shows. The pinned-last `::after` rule of `pinned.scss` is deleted with its empty-state twin (the
+`display: none` rule): the pinned-last margin and padding, and their `[data-vivarcdi-no-today]`
+reset, stay because they reserve the band above Today. FR-5 and AC-6 now apply to the single line of
+the Clear row; AC-5 and AC-6 both check its 6 px inset. The `PINNED_LAST_ATTRIBUTE` import of
+`ClearSeparator` goes if nothing else uses it.
+
+Risk: with no visible pinned tab, 050/FR-4 hides the separator slot, so the 13 px band that the
+pinned-last margin and padding reserve above the first Today slot may not exist, and the line (at
+`offset - CLEAR_HEIGHT`) would land on the last folder row. The probe decides. If the band is
+missing, the implementer reports it: reserving it changes 050's rule and needs Tore.
+
+### 050 and 060 stay coherent
+
+- 050/FR-4 keeps hiding the separator slot. The line is no longer that slot's border, so 050's AC-5
+  and AC-6 (`hides the separator while no pinned tab is visible`, `shows the separator when a pinned
+  tab is visible`) do not change.
+- The 060 scenario `the Clear bar keeps a box above Today with the Favorites grid on` has Today tabs
+  and asserts a non-zero box, a position above the first Today slot and the press at the middle of
+  the button. The button is now centered on the row's top edge instead of hanging below it: its
+  bottom is 6.5 px below the row top and the first Today slot is 13 px below it, so the assertion
+  holds. **The body does not change.** T6 runs it after the style change.
+
+### Probe (lab Vivaldi 8.3, with Tore's agreement)
+
+One `npm run live -- --probe <file>` run with a Today tab, with the Favorites grid on and off and with
+and without a pinned tab. It prints, in px:
+
+- the rects of the row and of the button; the line spans `row.left` to `button.left - 8`;
+- the computed color of the label at rest and after a pointer move onto it, against `--vivarcdi-muted`
+  and `--vivarcdi-ink`;
+- `button.top + button.height / 2 - row.top`: within 1 px of 0 (line on the label's middle);
+- `row.left - firstRow.left` and `firstRow.right - button.right`: 6 px inset on both sides, 1 px
+  tolerance, and the gap between the line end and the arrow, 8 px within 1 px;
+- the vertical distances from the line to the last folder row and to the first Today row, compared
+  with the proportions of Arc's screenshot of 2026-11-26 16:36 (scaled by the 36 px row): within 1 px.
+
+The numbers go in the pull request; AC-8 covers them until a `live:` scenario exists.
+
+### Tests
+
+Style tests compile `today.scss`, as the others in `tests/styles/Today.test.ts`.
+
+| AC | Test name (verbatim) | File | What it asserts |
+|---|---|---|---|
+| AC-9 | `shows the Clear label at rest` | `tests/styles/Today.test.ts` | The button rule has no `opacity: 0`, has `opacity: 1`, a `color` starting with `var(--vivarcdi-muted`, `font-weight: 600` and `font-size: 11px` |
+| AC-10 | `ends the Clear line before its label` | `tests/styles/Today.test.ts` | The row has `display: flex` and `align-items: center`; its `::before` has `flex: 1 1 auto`, `height: 0` and the 1 px top border; the button has `position: static`, `flex: none`, `margin-inline-start: 8px` and no `inset-inline` |
+| AC-11 | `strengthens the Clear label on hover` | `tests/styles/Today.test.ts` | The `:hover` and `:focus-visible` rule sets `color: var(--vivarcdi-ink` and does not lower `opacity` |
+
+Existing tests whose body changes (names stay, except the last row):
+
+| Test | File | New body |
+|---|---|---|
+| `draws the Clear bar on the separator above the Today tabs` (060/AC-5) | `tests/styles/Today.test.ts` | Keeps the row, `translateY`, line and `height: 13px` assertions; the `::before` `content: "↓"` stays |
+| `insets the Clear line like the rows` (067/AC-5) | `tests/styles/Today.test.ts` | Row `inset-inline: 6px`; the `::before` and the button have no inset of their own and are flex items of the row |
+| `insets the pinned-last border like the rows` (067/AC-6) | `tests/styles/Pinned.test.ts` | The pinned-last mark has no `::after` and no `border-bottom`; the single line carries the 6 px inset (read from `today.scss`) |
+| `hides the pinned-last border while there is no Today tab` (067/AC-2) | `tests/styles/Pinned.test.ts` | Keeps `margin-bottom: 0` and `padding-bottom: 0` under `[data-vivarcdi-no-today]`; the `::after` assertion goes with the rule |
+| `shows the Clear line when a Today tab opens` (067/AC-3) | `tests/modules/today/ClearSeparator.test.ts` | The line mark is set whether or not a pinned-last mark exists |
+| `draws its line only when no pinned row shows it` (060) | `tests/modules/today/ClearSeparator.test.ts` | Its name states the old rule, so it is renamed `draws its line whether or not a pinned row shows it`; the row has the line mark with a visible, hidden or missing pinned-last mark |
+
+The renamed test is cited in the design and tasks of 060 (Implemented); T7 adds a note there instead
+of rewriting them. 050's tests do not change.
+
+### Files
+
+| File | Change |
+|---|---|
+| `src/modules/today/ClearSeparator.ts` | Remove `#line()`; set the line mark in `sync` |
+| `src/styles/today.scss` | Flex row, flex line, static muted label, hover color |
+| `src/styles/pinned.scss` | Remove the pinned-last `::after` and its empty-state twin |
+| `tests/modules/today/ClearSeparator.test.ts`, `tests/styles/Today.test.ts`, `tests/styles/Pinned.test.ts` | As in the tables |
+| `docs/manual/tab-bar.md`, `README.md` | Clear shows at rest, not on hover |
+
+Version: a patch bump on branch `fix/067-clear-always-shown`, read from `origin/main` right before T7.
 
 ## Risks
 

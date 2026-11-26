@@ -74,7 +74,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [064 Stable workspace view](064-stable-workspace-view/spec.md) | 3 | Implemented |
 | [065 Little Arc under the sidebar](065-little-arc-under-sidebar/spec.md) | 5 | Implemented |
 | [066 Arc close control and title space](066-arc-close-control/spec.md) | 3 | Implemented |
-| [067 Clear line, its inset and centered titles](067-clear-line-and-titles/spec.md) | 3 | Draft |
+| [067 Clear line, its inset and centered titles](067-clear-line-and-titles/spec.md) | 3 | Approved |
 
 
 
