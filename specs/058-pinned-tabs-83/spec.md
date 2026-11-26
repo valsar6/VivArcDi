@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-26 (PR #297) |
 | Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): AC-1 and the away-arrow parts of AC-4 to AC-6 are superseded; the pinned-group layout and the separator stay. [060](../060-clear-bar-and-pinned-unload/spec.md) (2026-11-24): the pinned rows with the grid on are tiles up to `maxTiles`. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -94,12 +94,13 @@ selector check on 8.3 reports no failed selector.
 | AC-2 | WHEN the pinned rows sit in a group beside the tab strip, THE module SHALL mark the last pinned row shown with the separator. | auto: `marks the separator after the last pinned row of a group beside the tab strip` |
 | AC-3 | THE selector catalog in use on Vivaldi 8.3 SHALL define every selector the 8.1 catalog defines. | auto: `defines on Vivaldi 8.3 every selector of the 8.1 catalog` |
 | AC-4 | WHEN the minus of a pinned row inside a group beside the tab strip is clicked, THE module SHALL unload the tab and SHALL NOT close it. | auto: `unloads a pinned tab from its minus in a group beside the tab strip` |
-| AC-5 | WHEN Tore pins a tab on Vivaldi 8.3, browses away and clicks the minus of its row, THE row SHALL keep its favicon, the separator SHALL sit below the last pinned row, and the tab SHALL unload and reload its pinned page when opened. | manual |
-| AC-6 | WHEN Tore turns the Favorites grid off on Vivaldi 8.3 and repeats AC-5, THE row, the separator and the minus SHALL work as with the grid on. | manual |
-| AC-7 | WHEN Tore runs the AC-5 flow on Vivaldi 8.1, or 8.2 if 8.1 is no longer installed, THE separator and the minus SHALL work as before. | manual |
+| AC-5 | WHEN a pinned row shows in Vivaldi 8.3's pinned group and its tab browsed away, THE last pinned row SHALL carry the separator, a click on its minus SHALL unload the tab, and opening it SHALL load its pinned page. | manual |
+| AC-6 | WHEN Tore pins a tab on Vivaldi 8.3, browses away and unloads it from its minus, with the Favorites grid on and then off, THE row SHALL keep its favicon, the separator SHALL sit below the last pinned row and the dimmed row SHALL look as on a pinned row of 059. | manual |
+| AC-7 | WHILE the pinned rows sit inside the tab strip, as on Vivaldi 8.1 and 8.2, THE module SHALL mark the separator after the last pinned row as before. | auto: `marks the separator after the last pinned row inside the tab strip` |
 
-AC-5 becomes a live check when the implementation adds its scenario. A Draft spec names none:
-`every live check has a scenario` would look for a scenario that does not exist yet.
+AC-5 becomes `live: the separator and the minus work on the pinned group` in the same commit that adds
+its scenario: naming it earlier would fail `every live check has a scenario`. No Vivaldi 8.1 or 8.2
+is available to Tore (Q-3), so AC-7 and the existing strip tests stand in for a manual run there.
 
 ## Out of scope
 
@@ -113,18 +114,15 @@ AC-5 becomes a live check when the implementation adds its scenario. A Draft spe
 
 ## Open questions
 
-- [ ] **Q-1. A catalog for 8.3 or the 8.1 catalog as stand-in.** Every selector of the 8.1 catalog
-  resolved in the lab on 8.3, and `pinnedGroup` is already in it. Recommendation: no `8.3.json`; the
-  AC-3 test loads the catalog `SelectorCatalog` picks for `8.3.4191.47` and compares its names with
-  8.1, and the boot keeps its stand-in line. Add `src/selectors/8.3.json` only if the design's probe
-  finds a selector that differs on 8.3, so that no copy of 8.1 has to be kept in step.
-- [ ] **Q-2. A live scenario for AC-5.** The lab runs the installed Vivaldi 8.3, and the separator
-  and the unload can be read from the DOM and from `chrome.tabs`. Recommendation: yes; once the spec
-  is Approved, AC-5 turns into `live: the separator and the minus work on the pinned group` and only
-  the look stays in Tore's checklist.
-- [ ] **Q-3. Which Vivaldi build Tore still has.** Recommendation: run AC-7 on 8.1 if it is still
-  installed, otherwise on 8.2; the change must leave both untouched. If neither is available, say so
-  and rely on the 8.3 live run and the automated tests.
+All answered by Tore on 2026-11-26 (PR #297).
+
+- [x] **Q-1. A catalog for 8.3 or the 8.1 catalog as stand-in.** No `8.3.json` while 8.1 and 8.3
+  are compatible: the AC-3 test and the 046 selector check on 8.3 prove it. A catalog file for 8.3 is
+  added only when a selector differs.
+- [x] **Q-2. A live scenario for AC-5.** Yes: the separator, the unload and the reload are read from
+  the DOM and `chrome.tabs` on the lab Vivaldi 8.3; only the look stays manual (AC-6).
+- [x] **Q-3. Which Vivaldi build Tore still has.** Neither 8.1 nor 8.2. The 8.1 and 8.2 layout is
+  covered by the automated tests (AC-7 and the existing strip tests) and the 8.3 layout by the lab.
 
 ## References
 
