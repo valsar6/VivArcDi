@@ -31,7 +31,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [020 Drag a tab into the Favorites](020-drag-tab-to-favorites/spec.md) | 1 | Implemented |
 | [021 Auto-hide tab bar](021-auto-hide-tab-bar/spec.md) | 3 | Approved |
 | [022 Split from a dragged tab](022-split-from-drag/spec.md) | 2 | Draft |
-| [023 Command panel with tab actions](023-command-panel/spec.md) | 5 | Approved |
+| [023 Command panel with tab actions](023-command-panel/spec.md) | 5 | Draft |
 | [024 Site boosts and zap](024-site-boosts-and-zap/spec.md) | 5 | Approved |
 | [025 Annotated screenshots](025-annotated-screenshots/spec.md) | 5 | Approved |
 | [026 Live folders](026-live-folders/spec.md) | 3 | Implemented |
@@ -76,7 +76,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [066 Arc close control and title space](066-arc-close-control/spec.md) | 3 | Implemented |
 | [067 Clear line, its inset and centered titles](067-clear-line-and-titles/spec.md) | 3 | Implemented |
 | [068 Shared page-message parser and timers](068-shared-page-messages-and-timers/spec.md) | 3 | Implemented |
-| [069 Clear like Arc](069-clear-like-arc/spec.md) | 3 | Approved |
+| [069 Clear like Arc](069-clear-like-arc/spec.md) | 3 | Implemented |
 | [070 Guards for the two couplings to Vivaldi's interface](070-vivaldi-coupling-guards/spec.md) | 3 | Approved |
 
 

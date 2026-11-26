@@ -44,6 +44,7 @@ these settings:
 | Panel | loses Cmd+P (Ctrl+P), keeps its other shortcuts |
 | Next Workspace (`COMMAND_WORKSPACE_SWITCH_FORWARD_ORDER`) | Cmd+Opt+`]` (Ctrl+Alt+`]` on Debian) |
 | Previous Workspace (`COMMAND_WORKSPACE_SWITCH_BACK_ORDER`) | Cmd+Opt+`[` (Ctrl+Alt+`[` on Debian) |
+| Clear key | Cmd+Shift+K (Ctrl+Shift+K on Debian) runs Clear, see [069](../069-clear-like-arc/spec.md); no Vivaldi command holds it by default (checked on 8.3) |
 | Little Arc key | Cmd+Opt+N (Ctrl+Alt+N on Debian) belongs to [Little Arc](../005-little-arc/spec.md); the command that holds it, in Vivaldi the Notes panel, loses it and keeps its other shortcuts |
 
 Change request of 2026-11-08, from Tore's check of Little Arc: Cmd+Opt+N opened Vivaldi's own Notes

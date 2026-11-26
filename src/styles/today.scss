@@ -8,7 +8,7 @@ $archive-width: 340px;
 $archive-max-height: 70vh;
 $archive-row-height: 44px;
 $clear-height: $separator-gap * 2 + 1px;
-$clear-label-gap: 8px;
+$clear-max-width: 60px;
 
 #{$root} :is(#{$archive}, #{$archive-footer}, #{$clear}) {
   -webkit-app-region: no-drag;
@@ -143,12 +143,12 @@ $clear-label-gap: 8px;
 #{$root} #{$clear-row} {
   position: absolute;
   top: 0;
-  inset-inline: $folders-padding;
+  inset-inline: $clear-line-start $clear-line-end;
   z-index: 1;
   display: flex;
   align-items: center;
   height: 0;
-  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));
+  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px) + #{$clear-line-offset}));
   pointer-events: none;
 
   &::before {
@@ -164,6 +164,10 @@ $clear-label-gap: 8px;
   }
 }
 
+#{$root} #{$tab-bar}:has(#{$pinned-group} #{$pinned-tab}):not(:has(#{$tiles})) #{$clear-row} {
+  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px) + #{$clear-line-offset-pinned}));
+}
+
 #{$root} #{$clear-row} #{$clear} {
   position: static;
   display: flex;
@@ -171,7 +175,9 @@ $clear-label-gap: 8px;
   align-items: center;
   box-sizing: border-box;
   height: $clear-height;
-  margin-inline-start: $clear-label-gap;
+  max-width: 0;
+  margin-inline-start: 0;
+  overflow: hidden;
   padding: 0;
   border: 0;
   background: transparent;
@@ -179,10 +185,15 @@ $clear-label-gap: 8px;
   font: inherit;
   font-size: 11px;
   font-weight: 600;
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color var(--vivarcdi-transition);
+  transition:
+    max-width var(--vivarcdi-transition),
+    margin-inline-start var(--vivarcdi-transition),
+    opacity var(--vivarcdi-transition),
+    color var(--vivarcdi-transition);
 
   &::before {
     content: "↓";
@@ -193,6 +204,13 @@ $clear-label-gap: 8px;
   &:focus-visible {
     color: var(--vivarcdi-ink, var(--colorFg, inherit));
   }
+}
+
+#{$root} :is(#{$tab-bar}:hover, #{$clear-row}:focus-within) #{$clear} {
+  max-width: $clear-max-width;
+  margin-inline-start: $clear-gap;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #{$root} #{$archive-footer} {

@@ -25,6 +25,7 @@ async function openTabs(driver: Driver): Promise<number[]> {
   await driver.waitForElement(PINNED_TILE);
   await driver.waitFor(`(() => {
     const clear = document.querySelector(${JSON.stringify(CLEAR)});
+    clear?.focus();
     const box = clear === null ? null : clear.getBoundingClientRect();
     return box !== null && box.width > 0 && box.height > 0;
   })()`);

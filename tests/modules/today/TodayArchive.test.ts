@@ -125,3 +125,46 @@ test('Cmd/Ctrl+Shift+A toggles the panel and stop removes everything', async () 
     globalThis.MutationObserver = original;
   }
 });
+
+async function pressClear(tabs: TodayTabs, storage: MemoryStorage, modifier: 'metaKey' | 'ctrlKey'): Promise<void> {
+  const original = globalThis.MutationObserver;
+  globalThis.MutationObserver = class {
+    public observe(): void {}
+    public disconnect(): void {}
+  } as unknown as typeof MutationObserver;
+  try {
+    const dom = new TodayDocument();
+    const elements = new Map<string, DomNode>([
+      ['#browser', dom.parent],
+      ['#bar', dom.list],
+      ['#tabs-container', dom.list],
+    ]);
+    dom.querySelector = ((selector: string): DomNode | null => elements.get(selector) ?? null) as typeof dom.querySelector;
+    const module = new TodayArchive({ now: (): number => NOW, repeat: new ManualTimer().repeat, frames: immediateFrames });
+    await module.start(context(tabs, storage, dom));
+    const keydown = event('keydown', { key: 'K', [modifier]: true, shiftKey: true }) as unknown as Event;
+    dom.listeners.get('keydown')?.forEach((listener) => listener(keydown));
+    await settle();
+    module.stop();
+  } finally {
+    globalThis.MutationObserver = original;
+  }
+}
+
+test('clears the Today tabs on the Clear shortcut', async () => {
+  for (const modifier of ['metaKey', 'ctrlKey'] as const) {
+    const tabs = new TodayTabs(TABS());
+    const storage = new MemoryStorage();
+    await pressClear(tabs, storage, modifier);
+    assert.deepEqual(tabs.removedIds(), [2]);
+    assert.match(storage.getItem(ARCHIVE_STORAGE_KEY) ?? '', /Left before the restart/);
+  }
+});
+
+test('does nothing on the Clear shortcut without Today tabs', async () => {
+  const tabs = new TodayTabs([{ id: 1, active: true, url: 'https://active.example/' }, { id: 2, pinned: true, url: 'https://pinned.example/' }]);
+  const storage = new MemoryStorage();
+  await pressClear(tabs, storage, 'metaKey');
+  assert.deepEqual(tabs.removedIds(), []);
+  assert.equal(storage.getItem(ARCHIVE_STORAGE_KEY), null);
+});

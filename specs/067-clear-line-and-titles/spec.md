@@ -107,12 +107,12 @@ becomes `live:` with its scenario when the implementation adds one.
 | AC-2 | WHILE the workspace has no visible Today tab, THE native pinned-last border and its gap SHALL NOT be drawn. | auto: `hides the pinned-last border while there is no Today tab` |
 | AC-3 | WHEN a Today tab becomes visible, THE Clear row and the line SHALL appear again. | auto: `shows the Clear line when a Today tab opens` |
 | AC-4 | WHERE the only Today slots are hidden by a folder or linked, THE module SHALL treat the workspace as having no Today tab. | auto: `ignores hidden and linked tabs for the Clear line` |
-| AC-5 | THE Clear row, its line and its button SHALL use an inline inset of 6 px, with Clear at the right end. | auto: `insets the Clear line like the rows` |
-| AC-6 | WHILE pinned rows are visible, THE pinned-last border SHALL use the same 6 px inset. | auto: `insets the pinned-last border like the rows` |
+| AC-5 | THE Clear row, its line and its button SHALL use an inline inset of 6 px, with Clear at the right end. | auto: `insets the Clear line like the rows` (superseded by 069) |
+| AC-6 | WHILE pinned rows are visible, THE pinned-last border SHALL use the same inset as the Clear line (6 px superseded by 069). | auto: `insets the pinned-last border like the rows` |
 | AC-7 | THE title of a Today tab SHALL be vertically centered in its row. | auto: `centers the Today title in its row` |
-| AC-9 | WHILE a Today tab is visible, THE Clear label SHALL be shown at rest, without hover. | auto: `shows the Clear label at rest` |
-| AC-10 | THE separator line SHALL end before the Clear label and SHALL be vertically centered on it. | auto: `ends the Clear line before its label` |
-| AC-11 | WHEN the pointer rests on Clear or it has keyboard focus, THE label SHALL show with stronger contrast than at rest. | auto: `strengthens the Clear label on hover` |
+| AC-9 | WHILE a Today tab is visible, THE Clear label SHALL be shown at rest, without hover. | auto: `shows the Clear label at rest` (superseded by 069) |
+| AC-10 | THE separator line SHALL end before the Clear label and SHALL be vertically centered on it. | auto: `ends the Clear line before its label` (superseded by 069) |
+| AC-11 | WHEN the pointer rests on Clear or it has keyboard focus, THE label SHALL show with stronger contrast than at rest. | auto: `strengthens the Clear label on hover` (superseded by 069) |
 | AC-8 | WHEN Tore compares VivArcDi on Vivaldi 8.3 with Arc, THE empty-Today sidebar, the line with its Clear and the Today titles SHALL look and sit as in Arc. | manual |
 
 AC-1 to AC-7 read the module's marks and the stylesheet rules. The measures (line inset equal to the

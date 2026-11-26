@@ -167,6 +167,7 @@ interface Setup {
 }
 
 interface SetupOptions {
+  platform?: string;
   withStrip?: boolean;
   pinnedLast?: StripChild | null;
   shift?: string;
@@ -190,7 +191,7 @@ function todaySlot(id: number, offset: number, options: { shift?: string; pinned
   return slot;
 }
 
-function setUp({ withStrip = true, pinnedLast = null, shift = '4px' }: SetupOptions = {}): Setup {
+function setUp({ withStrip = true, pinnedLast = null, shift = '4px', platform }: SetupOptions = {}): Setup {
   const document = new FakeDocument();
   const browser = new StripChild('div');
   document.elements.set('#browser', browser);
@@ -207,6 +208,7 @@ function setUp({ withStrip = true, pinnedLast = null, shift = '4px' }: SetupOpti
     document: document as unknown as Document,
     selectors: SELECTORS,
     onClear: (): void => void cleared.push(1),
+    ...(platform === undefined ? {} : { platform }),
     logger,
     watch: watcher.watch,
     timing: immediateFrames,
@@ -369,4 +371,21 @@ test('warns once when the tab strip is missing', () => {
   setup.separator.stop();
   assert.equal(setup.watcher.count, 0);
   assert.equal(setup.document.count(), 0);
+});
+
+test('titles the Clear control like Arc', async () => {
+  const expected: Array<[string | undefined, string]> = [
+    ['MacIntel', 'Clear Today tabs ⇧⌘K'],
+    ['Linux x86_64', 'Clear Today tabs Ctrl+Shift+K'],
+    [undefined, 'Clear Today tabs Ctrl+Shift+K'],
+  ];
+  for (const [platform, title] of expected) {
+    const setup = setUp(platform === undefined ? {} : { platform });
+    setup.separator.start();
+    await settle();
+    const clear = rowOf(setup.strip)?.children[0];
+    assert.ok(clear);
+    assert.equal(clear.values.get('title'), title);
+    setup.separator.stop();
+  }
 });
