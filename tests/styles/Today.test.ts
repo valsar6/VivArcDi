@@ -23,9 +23,44 @@ test('insets the Clear line like the rows', () => {
   const css = compiled();
   const row = /\[data-vivarcdi-clear-row\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
   assert.match(row, /inset-inline: 6px;/);
+  assert.match(row, /display: flex;/);
   const line = /\[data-vivarcdi-clear-row\]::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
-  assert.match(line, /inset-inline: 0;/);
+  assert.doesNotMatch(line, /inset-inline/);
+  assert.doesNotMatch(line, /position: absolute/);
   const button = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
-  assert.match(button, /inset-inline: 0;/);
-  assert.match(button, /justify-content: flex-end;/);
+  assert.doesNotMatch(button, /inset-inline/);
+  assert.doesNotMatch(button, /justify-content/);
+});
+
+test('shows the Clear label at rest', () => {
+  const css = compiled();
+  const button = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.doesNotMatch(button, /opacity: 0;/);
+  assert.match(button, /opacity: 1;/);
+  assert.match(button, /color: var\(--vivarcdi-muted/);
+  assert.match(button, /font-weight: 600;/);
+  assert.match(button, /font-size: 11px;/);
+});
+
+test('ends the Clear line before its label', () => {
+  const css = compiled();
+  const row = /\[data-vivarcdi-clear-row\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(row, /display: flex;/);
+  assert.match(row, /align-items: center;/);
+  const line = /\[data-vivarcdi-clear-row\]::before \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(line, /flex: 1 1 auto;/);
+  assert.match(line, /height: 0;/);
+  assert.match(line, /border-top: 1px solid var\(--vivarcdi-line\);/);
+  const button = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\] \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(button, /position: static;/);
+  assert.match(button, /flex: none;/);
+  assert.match(button, /margin-inline-start: 8px;/);
+  assert.doesNotMatch(button, /inset-inline/);
+});
+
+test('strengthens the Clear label on hover', () => {
+  const css = compiled();
+  const hover = /\[data-vivarcdi-clear-row\] \[data-vivarcdi-clear\]:hover, [^{]*:focus-visible \{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(hover, /color: var\(--vivarcdi-ink/);
+  assert.doesNotMatch(hover, /opacity/);
 });
