@@ -169,6 +169,15 @@ test('clear opens a blank tab when no tab is left to show', async () => {
   assert.deepEqual(tabs.extData(100), { workspaceId: 7 });
 });
 
+test('clear opens the blank tab in the window of the active tab and shows it after the closing', async () => {
+  const { tabs, sweeper } = setup([{ ...ACTIVE, windowId: 1 }]);
+  await sweeper.clear();
+  assert.deepEqual(creates(tabs), [['create', { windowId: 1, active: true }]]);
+  const lastRemove = tabs.calls.map(([name]) => name).lastIndexOf('remove');
+  const activation = tabs.calls.findIndex(([name, id, properties]) => name === 'update' && id === 100 && (properties as { active?: boolean }).active === true);
+  assert.ok(activation > lastRemove);
+});
+
 test('clear opens no blank tab while a kept tab stays open', async () => {
   const kept: Record<string, FolderTab> = {
     pinned: { id: 4, pinned: true, url: 'https://pinned.example/', vivExtData: JSON.stringify({ workspaceId: 7 }) },

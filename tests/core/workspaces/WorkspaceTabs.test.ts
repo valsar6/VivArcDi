@@ -40,6 +40,12 @@ test('opens a tab with no address when the address is null', async () => {
   ]);
 });
 
+test('opens the tab in the given window', async () => {
+  const tabs = new FolderTabs();
+  await new WorkspaceTabs(tabs, silentLogger()).open(null, null, {}, 3);
+  assert.deepEqual(tabs.actions(), [['create', { windowId: 3, active: true }]]);
+});
+
 test('keeps the new tab when the workspace cannot be written', async () => {
   const tabs = new FolderTabs();
   tabs.failing.add('update');

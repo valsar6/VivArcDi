@@ -87,6 +87,7 @@ Rules:
   when the last Today tab closes, and it is never in `closing` (it did not exist when `closing` was
   computed), so it is not archived (FR-3).
 - With a tab left, nothing runs: Vivaldi chooses the tab to show (Q-1, FR-4).
+- The blank tab opens in the window of the active tab (`create({ windowId, active: true })`, as the New Tab rows do) and, after the last removal, is activated again, so Vivaldi cannot fall back to a tab of another workspace (found by Tore's manual check on 2026-11-26).
 - A removal that fails leaves the blank tab open and logs as today (`ArchiveSweeper.ts` line 144).
 - `clear()` and `sweep()` still share the queue, so a sweep cannot run between the save and the
   removals.

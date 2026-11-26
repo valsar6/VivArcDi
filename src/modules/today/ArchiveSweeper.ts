@@ -8,7 +8,7 @@ import type { ActivityStamps } from './ActivityStamps.js';
 import type { ArchiveEntry, ArchiveStore } from './ArchiveStore.js';
 import { TodayTabPolicy } from './TodayTabPolicy.js';
 
-export type SweepTabs = Pick<BrowserTabs, 'query' | 'remove'>;
+export type SweepTabs = Pick<BrowserTabs, 'query' | 'remove' | 'update'>;
 
 type IdentifiedTab = chrome.tabs.Tab & { id: number };
 
@@ -126,7 +126,7 @@ export class ArchiveSweeper {
     const workspace = TabData.of(active);
     const closing = windowTabs.filter((tab) => TodayTabPolicy.isClearable(tab) && TabData.of(tab) === workspace);
     const stays = windowTabs.some((tab) => TabData.of(tab) === workspace && !closing.includes(tab));
-    await this.#archive(closing, stays ? undefined : (): Promise<unknown> => this.#deps.blank.open(null, workspace));
+    await this.#archive(closing, stays ? undefined : (): Promise<chrome.tabs.Tab> => this.#deps.blank.open(null, workspace, {}, active.windowId));
   }
 
   async #windowTabs(): Promise<IdentifiedTab[]> {
@@ -134,7 +134,7 @@ export class ArchiveSweeper {
     return windowTabs.filter((tab): tab is IdentifiedTab => tab.id !== undefined);
   }
 
-  async #archive(tabs: IdentifiedTab[], beforeClose?: () => Promise<unknown>): Promise<void> {
+  async #archive(tabs: IdentifiedTab[], beforeClose?: () => Promise<chrome.tabs.Tab>): Promise<void> {
     if (tabs.length === 0) {
       return;
     }
@@ -145,14 +145,18 @@ export class ArchiveSweeper {
       this.#deps.notices.once(KEPT_KEY, KEPT_TEXT, 'error');
       return;
     }
+    let blank: chrome.tabs.Tab | undefined;
     try {
-      await beforeClose?.();
+      blank = await beforeClose?.();
     } catch (error) {
       this.#deps.logger.warn('could not open a blank tab: the Today tabs stay open', error);
       return;
     }
     for (const tab of tabs) {
       await this.#deps.tabs.remove(tab.id).catch((error: unknown) => this.#deps.logger.warn(`could not close tab ${tab.id}`, error));
+    }
+    if (blank?.id !== undefined) {
+      await this.#deps.tabs.update(blank.id, { active: true }).catch((error: unknown) => this.#deps.logger.warn('could not show the blank tab', error));
     }
   }
 

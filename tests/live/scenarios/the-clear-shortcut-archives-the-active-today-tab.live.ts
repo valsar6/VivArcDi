@@ -14,7 +14,7 @@ async function openTabs(driver: Driver): Promise<{ ids: number[]; before: number
     await chrome.tabs.update(two.id, { active: true });
     for (let attempt = 0; attempt < 50; attempt += 1) {
       const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (active !== undefined && active.id === two.id) break;
+      if (active !== undefined && active.id === two.id && active.url) break;
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     return [pinned.id, one.id, two.id];

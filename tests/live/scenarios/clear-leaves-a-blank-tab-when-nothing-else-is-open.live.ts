@@ -12,11 +12,14 @@ const scenario: Scenario = {
       await chrome.tabs.update(two.id, { active: true });
       for (let attempt = 0; attempt < 50; attempt += 1) {
         const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (active !== undefined && active.id === two.id) break;
+        if (active !== undefined && active.id === two.id && active.url) break;
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
       const others = (await chrome.tabs.query({ currentWindow: true })).filter((tab) => tab.id !== one.id && tab.id !== two.id);
       await chrome.tabs.remove(others.map((tab) => tab.id));
+      for (let attempt = 0; attempt < 50 && (await chrome.tabs.query({ currentWindow: true })).length !== 2; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
       return [one.id, two.id];
     })()`);
     await driver.waitForElement(CLEAR);

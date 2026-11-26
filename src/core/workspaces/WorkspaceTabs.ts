@@ -31,10 +31,12 @@ export class WorkspaceTabs {
    * @param url The address to open, or null for Vivaldi's own new tab.
    * @param workspace The workspace id, or null to leave the tab where Vivaldi puts it.
    * @param own Values to store under VivArcDi's own key, such as the bookmark the tab stands for.
+   * @param windowId The window that receives the tab; omitted, the current one.
    * @returns The new tab.
    */
-  public async open(url: string | null, workspace: string | null, own: OwnTabChanges = {}): Promise<chrome.tabs.Tab> {
-    const created = await this.#tabs.create(url === null ? { active: true } : { url, active: true });
+  public async open(url: string | null, workspace: string | null, own: OwnTabChanges = {}, windowId?: number): Promise<chrome.tabs.Tab> {
+    const where = windowId === undefined ? {} : { windowId };
+    const created = await this.#tabs.create(url === null ? { ...where, active: true } : { url, ...where, active: true });
     await this.#store(created, workspace, own);
     return created;
   }
