@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | Tooling |
 | Owner | Tore |
 | Approved | Tore, 2026-11-18 |
+| Implemented | 2026-11-18 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

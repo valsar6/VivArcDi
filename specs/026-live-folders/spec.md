@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | First version 2026-11-08, never implemented; revision approved by Tore on 2026-11-12 (PR #148 merged with the proposed answers), implemented in 0.49.0 (PR #150); second revision (connect GitHub from the browser) approved by Tore on 2026-11-12 (PR #151 merged with the proposed answers) |
+| Implemented | 2026-11-12 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

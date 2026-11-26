@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 5 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-20 (shortcut version, the proposed answers to Q-1 to Q-4; Q-1 with the rule that if Cmd/Ctrl+Shift+P clashes the default becomes Cmd/Ctrl+Option+P); Tore, 2026-11-20 (opening on a tab switch, FR-9 to FR-12, after the probes of the same day) |
+| Implemented | 2026-11-20 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 

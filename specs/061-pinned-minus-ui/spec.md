@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-24 |
+| Implemented | 2026-11-25 |
 | Supersedes | Nothing yet. It refines the look and the press of [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 and of [060](../060-clear-bar-and-pinned-unload/spec.md) FR-4, and keeps 059/FR-17 and AC-28. It replaces the close button of an open link row in [009](../009-bookmark-folders-in-tab-bar/spec.md) FR-12 with the minus for the unload; the other close routes of 009/FR-15 stay. |
 | Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-1, FR-2, AC-1, AC-3, AC-4 and AC-10: the minus is shown on row or tile hover only, and its badge on button hover only. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-6, AC-11 and AC-12: the folder and link row minuses close tabs instead of unloading them. [066 Arc close control and title space](../066-arc-close-control/spec.md) FR-1 to FR-4 and AC-1 to AC-5: the badge is 24×24 with a 14×2 dash, and the title uses the control's space at rest. |
 

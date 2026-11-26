@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 2 |
 | Owner | Tore |
 | Approved | 2026-10-25 |
+| Implemented | 2026-10-25 |
 
 ## Summary
 

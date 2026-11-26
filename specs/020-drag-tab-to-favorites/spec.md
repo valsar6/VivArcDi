@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 1 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-09 (PR #119) |
+| Implemented | 2026-11-12 |
 | Revision | Approved, 2026-11-12 (PR #154): reordering tiles by drag (US-3, FR-8, FR-9, AC-9 to AC-12) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).

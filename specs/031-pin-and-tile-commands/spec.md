@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | Tore, 2026-11-11 (merge of PR #128) |
+| Implemented | 2026-11-11 |
 | Revision | Approved, Tore 2026-11-11 ("vai" on the mock, PR #139): drop area for the first tile (FR-8, FR-9, AC-13 to AC-16) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
