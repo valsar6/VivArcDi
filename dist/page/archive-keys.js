@@ -28,6 +28,13 @@ var VivArcDiArchiveKeys = (() => {
   // src/core/dom/ShortcutKeys.ts
   var ShortcutKeys = class {
     /**
+     * @param platform The value of `navigator.platform`.
+     * @returns Whether it is macOS.
+     */
+    static isMac(platform) {
+      return platform.toLowerCase().startsWith("mac");
+    }
+    /**
      * Tells whether a key press is Cmd/Ctrl+Shift and a letter, with no other modifier. Like the
      * other shortcuts of VivArcDi, Cmd and Ctrl are both accepted on every platform.
      *
@@ -129,10 +136,11 @@ var VivArcDiArchiveKeys = (() => {
   function install(token) {
     INSTALL.replace(
       new PageListener("keydown", (event) => {
-        if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, "a")) {
+        const action = ShortcutKeys.isCommandShift(event, "a") ? "open" : ShortcutKeys.isCommandShift(event, "k") ? "clear" : null;
+        if (!event.defaultPrevented && action !== null) {
           event.preventDefault();
           event.stopImmediatePropagation();
-          sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action: "open" }, ARCHIVE_CONSOLE_PREFIX);
+          sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action }, ARCHIVE_CONSOLE_PREFIX);
         }
       })
     );

@@ -688,8 +688,9 @@ well. The active tab and a tab playing audio are never archived.
 The archive opens from the button at the bottom of the tab bar or with Cmd/Ctrl+Shift+A: a search
 field, then the closed tabs grouped by day with favicon, title, host and time. Up and Down move the
 highlight, Enter or a click reopens the tab in its workspace and removes it from the archive, Esc
-closes the panel. **Clear**, at the right end of the line above the Today tabs,
-archives every Today tab of the workspace except the active one; the panel has the same action.
+closes the panel. **Clear**, at the right end of the line above the Today tabs, fades in while the
+pointer is in the tab bar and archives every Today tab of the workspace except the active one;
+Cmd/Ctrl+Shift+K and the panel do the same.
 With no Today tab the line and **Clear** are not shown, as in Arc, and `+ New Tab` sits right under
 the folders.
 

@@ -1,5 +1,12 @@
 class ShortcutKeys {
   /**
+   * @param platform The value of `navigator.platform`.
+   * @returns Whether it is macOS.
+   */
+  static isMac(platform) {
+    return platform.toLowerCase().startsWith("mac");
+  }
+  /**
    * Tells whether a key press is Cmd/Ctrl+Shift and a letter, with no other modifier. Like the
    * other shortcuts of VivArcDi, Cmd and Ctrl are both accepted on every platform.
    *

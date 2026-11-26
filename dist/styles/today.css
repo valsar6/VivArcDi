@@ -115,12 +115,12 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] {
   position: absolute;
   top: 0;
-  inset-inline: 6px;
+  inset-inline: 6px 12px;
   z-index: 1;
   display: flex;
   align-items: center;
   height: 0;
-  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px)));
+  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px) + -26px));
   pointer-events: none;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row]::before {
@@ -134,6 +134,10 @@
   opacity: 1;
 }
 
+#browser[data-vivarcdi-active] #tabs-tabbar-container:is(.left, .right):has(.pinned-group .tab-position.is-pinned):not(:has([data-vivarcdi-tiles])) [data-vivarcdi-clear-row] {
+  transform: translateY(calc(var(--PositionY) - var(--vivarcdi-gap-shift, 0px) + 4px));
+}
+
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] [data-vivarcdi-clear] {
   position: static;
   display: flex;
@@ -141,7 +145,9 @@
   align-items: center;
   box-sizing: border-box;
   height: 13px;
-  margin-inline-start: 8px;
+  max-width: 0;
+  margin-inline-start: 0;
+  overflow: hidden;
   padding: 0;
   border: 0;
   background: transparent;
@@ -149,10 +155,11 @@
   font: inherit;
   font-size: 11px;
   font-weight: 600;
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color var(--vivarcdi-transition);
+  transition: max-width var(--vivarcdi-transition), margin-inline-start var(--vivarcdi-transition), opacity var(--vivarcdi-transition), color var(--vivarcdi-transition);
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] [data-vivarcdi-clear]::before {
   content: "↓";
@@ -160,6 +167,13 @@
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] [data-vivarcdi-clear]:hover, #browser[data-vivarcdi-active] [data-vivarcdi-clear-row] [data-vivarcdi-clear]:focus-visible {
   color: var(--vivarcdi-ink, var(--colorFg, inherit));
+}
+
+#browser[data-vivarcdi-active] :is(#tabs-tabbar-container:is(.left, .right):hover, [data-vivarcdi-clear-row]:focus-within) [data-vivarcdi-clear] {
+  max-width: 60px;
+  margin-inline-start: 10px;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #browser[data-vivarcdi-active] [data-vivarcdi-archive-footer] {

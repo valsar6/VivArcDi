@@ -45,7 +45,7 @@ entry with its own name and icon.
 
 Proposed, [spec 023](../../specs/023-command-panel/spec.md).
 
-A panel like Arc's Command Bar, opened with Cmd/Ctrl+Shift+K. Type an action such as "pin" and run it
+A panel like Arc's Command Bar, opened with a shortcut still to choose. Type an action such as "pin" and run it
 on the current tab (Pin, Unpin, Favorite, Pin to folder, Archive, Copy URL, Copy as Markdown link),
 switch to an open tab by part of its title, or type a site name and a query to search that site.
 

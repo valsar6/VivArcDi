@@ -1,3 +1,4 @@
+import { ShortcutKeys } from "../../core/dom/ShortcutKeys.js";
 import { watchSubtree } from "../../core/dom/KeptElement.js";
 import { FrameTask } from "../../core/support/FrameTask.js";
 import { TabSlot } from "../../core/tabs/TabSlot.js";
@@ -31,7 +32,7 @@ class ClearSeparator {
     this.#row = dependencies.document.createElement("div");
     this.#row.setAttribute(CLEAR_ROW_ATTRIBUTE, "");
     this.#row.setAttribute(OWN_ROW_ATTRIBUTE, "");
-    this.#row.append(ClearSeparator.#button(dependencies.document));
+    this.#row.append(this.#button(dependencies.document));
     this.#task = new FrameTask(() => this.sync(), dependencies.timing);
   }
   /**
@@ -78,11 +79,11 @@ class ClearSeparator {
       this.#row.setAttribute(CLEAR_LINE_ATTRIBUTE, "");
     }
   }
-  static #button(document) {
+  #button(document) {
     const button = document.createElement("button");
     button.setAttribute("type", "button");
     button.setAttribute(CLEAR_ATTRIBUTE, "");
-    button.setAttribute("title", "Archive the Today tabs of this workspace");
+    button.setAttribute("title", `Clear Today tabs ${ShortcutKeys.isMac(this.#deps.platform ?? "") ? "\u21E7\u2318K" : "Ctrl+Shift+K"}`);
     button.textContent = "Clear";
     return button;
   }
