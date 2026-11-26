@@ -79,7 +79,7 @@ export class ModuleStarter {
    * @returns How the module ended: started, failed, or off by invalid options.
    */
   public async start(entry: EnabledModule, start: StartServices): Promise<ModuleOutcome> {
-    const { settings, selectors, build, storage, notices, activeWorkspace } = start;
+    const { settings, selectors, build, storage, notices, shape, activeWorkspace } = start;
     const options = settings.optionsOf(entry.id);
     const logger = this.#logger.child(entry.id);
     if (options === null) {
@@ -96,6 +96,7 @@ export class ModuleStarter {
         modules: settings.all,
         storage,
         notices,
+        shape,
         activeWorkspace,
       });
       return 'started';

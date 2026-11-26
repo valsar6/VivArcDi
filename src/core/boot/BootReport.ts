@@ -1,5 +1,6 @@
 import type { Logger } from '../support/Logger.js';
 import type { Notices } from '../dom/Notices.js';
+import type { ShapeFinding } from './ShapeGuards.js';
 import type { BuildInfo } from './types.js';
 
 /** The step of the start that was reached last. */
@@ -49,6 +50,7 @@ export class BootReport {
   #started: string[] = [];
   #failed: string[] = [];
   #invalid: string[] = [];
+  #shape: readonly ShapeFinding[] = [];
 
   /**
    * Collects what one start reached and reports it at the end. It holds no DOM, timer or storage.
@@ -109,13 +111,23 @@ export class BootReport {
   }
 
   /**
-   * Logs one warning per undefined selector, then the summary line. Call it once per start.
+   * @param findings The probes of Vivaldi's interface that failed.
+   */
+  public useShape(findings: readonly ShapeFinding[]): void {
+    this.#shape = findings;
+  }
+
+  /**
+   * Logs one warning per undefined selector and per failed probe, then the summary line. Call it once per start.
    *
    * @param outcome How the start ended.
    */
   public summarize(outcome: BootOutcome): void {
     for (const name of this.#catalog?.undefinedNames ?? []) {
       this.#logger.warn(`selector "${name}" is not defined in catalog ${this.#catalog?.version}`);
+    }
+    for (const { expects } of this.#shape) {
+      this.#logger.warn(`Vivaldi UI shape: ${expects}`);
     }
     this.#logger[this.#level(outcome)](this.#line(outcome));
   }
@@ -149,7 +161,7 @@ export class BootReport {
     if (outcome === 'failed' || (outcome === 'active' && this.#severe)) {
       return 'error';
     }
-    const problems = this.#failed.length + this.#invalid.length + this.#undefinedCount;
+    const problems = this.#failed.length + this.#invalid.length + this.#undefinedCount + this.#shape.length;
     return outcome === 'inactive' || problems > 0 ? 'warn' : 'info';
   }
 
@@ -161,8 +173,12 @@ export class BootReport {
       `self-check: ${result}, ${this.#started.length} of ${this.#tried} modules started, ` +
       `${this.#failed.length} failed${ids} (${this.#versions()}); ` +
       `off: ${config} in config, ${window} for this window, ${this.#invalid.length} by options; ` +
-      `undefined selectors: ${this.#undefinedCount}`
+      `undefined selectors: ${this.#undefinedCount}${this.#shapeWarnings()}`
     );
+  }
+
+  #shapeWarnings(): string {
+    return this.#shape.length > 0 ? `; shape warnings: ${this.#shape.length}` : '';
   }
 
   #versions(): string {

@@ -164,3 +164,28 @@ test('boot notice needs two failures and the activation mark', () => {
   assert.deepEqual(attempt(severe, 'failed').shown, []);
   assert.deepEqual(attempt(severe, 'active', false).shown, []);
 });
+
+test('BootReport warns once for a failed probe and counts it', () => {
+  const { sink, report } = setup();
+  report.useBuild(BUILD);
+  report.useCatalog(catalogOf('8.1'));
+  report.record('a', 'started');
+  report.useShape([{ name: 'react-fiber', expects: 'a fiber' }]);
+  report.summarize('active');
+  assert.equal(sink.lines.length, 2);
+  assert.deepEqual([sink.lines[0]?.[0], sink.lines[0]?.slice(2).join(' ')], ['warn', 'Vivaldi UI shape: a fiber']);
+  assert.equal(sink.lines[1]?.[0], 'warn');
+  assert.match(String(sink.lines[1]?.[2]), /; shape warnings: 1$/);
+});
+
+test('BootReport logs nothing for a passing probe', () => {
+  const { sink, report } = setup();
+  report.useBuild(BUILD);
+  report.useCatalog(catalogOf('8.1'));
+  report.record('a', 'started');
+  report.useShape([]);
+  report.summarize('active');
+  assert.equal(sink.lines.length, 1);
+  assert.equal(sink.lines[0]?.[0], 'info');
+  assert.doesNotMatch(String(sink.lines[0]?.[2]), /shape warnings/);
+});

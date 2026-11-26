@@ -1,3 +1,5 @@
+import type { ShapeBoard } from '../../core/boot/ShapeGuards.js';
+
 export interface RenameHooks {
   /** The Vivaldi id of the workspace of the row. */
   workspaceId: number;
@@ -18,8 +20,19 @@ interface Hook {
 }
 
 const FIBER_KEY = '__reactFiber';
+const RENAME_KEY = 'react-rename';
+const RENAME_EXPECTS = 'a workspace row has no React rename state: renaming a space may not work';
 
 export class ReactInternals {
+  #shape: Pick<ShapeBoard, 'report'>;
+
+  /**
+   * @param shape The board that is told, once, when a row has no rename state.
+   */
+  constructor(shape: Pick<ShapeBoard, 'report'>) {
+    this.#shape = shape;
+  }
+
   /**
    * The only class that reaches into React's internals, which Vivaldi's interface is built with. A
    * workspace row does not offer a way to start renaming from a script, so the state that does is
@@ -30,10 +43,26 @@ export class ReactInternals {
    * @returns The workspace id and the candidate setters, or null when the structure is not there.
    */
   public renameHooks(row: Element): RenameHooks | null {
+    const hooks = ReactInternals.#attempt(row);
+    if (hooks === null) {
+      this.#miss();
+    }
+    return hooks;
+  }
+
+  static #attempt(row: Element): RenameHooks | null {
     try {
       return ReactInternals.#find(row);
     } catch {
       return null;
+    }
+  }
+
+  #miss(): void {
+    try {
+      this.#shape.report(RENAME_KEY, RENAME_EXPECTS);
+    } catch {
+      return;
     }
   }
 

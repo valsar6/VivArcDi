@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-26 (PR #308) |
+| Implemented | 2026-11-26 |
 | Amends | [039 Boot self-check](../039-boot-self-check/spec.md) (one more kind of warning) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).

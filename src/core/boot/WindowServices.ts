@@ -5,6 +5,7 @@ import type { SelectorCatalog } from '../dom/SelectorCatalog.js';
 import { Toast } from '../dom/Toast.js';
 import type { Logger } from '../support/Logger.js';
 import type { ActiveWorkspace } from '../workspaces/ActiveWorkspace.js';
+import { ShapeGuards } from './ShapeGuards.js';
 import { GuardedStorage } from './GuardedStorage.js';
 import { NoticedStorage } from './NoticedStorage.js';
 import type { ModuleSettings } from './ModuleSettings.js';
@@ -16,6 +17,7 @@ export interface StartServices {
   build: BuildInfo;
   storage: VersionedStorage;
   notices: Notices;
+  shape: ShapeGuards;
   activeWorkspace: ActiveWorkspace;
 }
 
@@ -29,13 +31,13 @@ export class WindowServices {
    * @param selectors Selectors for the running Vivaldi.
    * @param storage The storage that does the work.
    * @param logger The window logger; the storage logs under its own child.
-   * @returns The notices and the storage given to modules.
+   * @returns The notices, the storage and the shape probes given to modules.
    */
-  public static open(document: Document, selectors: SelectorCatalog, storage: SavingStorage, logger: Logger): Pick<StartServices, 'storage' | 'notices'> {
+  public static open(document: Document, selectors: SelectorCatalog, storage: SavingStorage, logger: Logger): Pick<StartServices, 'storage' | 'notices' | 'shape'> {
     const parent = document.querySelector(selectors.get('browser')) ?? document.body;
     const notices = new Notices(new Toast({ document, parent, durationMs: NOTICE_MS }));
     const noticed = new NoticedStorage(storage, notices);
     noticed.announce();
-    return { storage: new GuardedStorage(noticed, notices, logger.child('storage')), notices };
+    return { storage: new GuardedStorage(noticed, notices, logger.child('storage')), notices, shape: new ShapeGuards(logger.child('shape')) };
   }
 }

@@ -43,6 +43,7 @@ const contextOf = (setup: ReturnType<typeof world>, options: Partial<WorkspaceSy
     storage: new MemoryStorage(),
     modules: { 'bookmark-folders': { ...BOOKMARK_FOLDERS_OPTIONS.defaults }, 'favorites-grid': { ...FAVORITES_GRID_OPTIONS.defaults } },
     notices: silentNotices(),
+    shape: { add: () => undefined, report: () => undefined },
   } as unknown as ModuleContext<WorkspaceSyncOptions>;
   return { context, sink };
 };

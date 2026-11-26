@@ -62,6 +62,7 @@ function running(tabs: RacingFolderTabs): Running {
     prefs: new BrowserPrefs(undefined),
     storage: new MemoryStorage(),
     notices: silentNotices(),
+    shape: { add: () => undefined, report: () => undefined },
     activeWorkspace: new ActiveWorkspace(tabs, silentLogger()),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   const module = new BookmarkFolders();

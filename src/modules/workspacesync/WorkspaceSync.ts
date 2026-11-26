@@ -18,6 +18,7 @@ import { PinnedApplier } from './PinnedApplier.js';
 import { Poll } from '../../shared/spaces/Poll.js';
 import { QuietMoment } from '../../shared/spaces/QuietMoment.js';
 import { ReactInternals } from '../../shared/spaces/ReactInternals.js';
+import { registerReactProbe } from '../../shared/spaces/ReactProbe.js';
 import { SpaceBase } from './SpaceBase.js';
 import { SpaceIds } from './SpaceIds.js';
 import { SpaceList } from './SpaceList.js';
@@ -64,6 +65,7 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
       logger.warn('tabs, windows, bookmarks or preferences are missing: pinned tabs are not synced');
       return;
     }
+    registerReactProbe(context);
     const names = new WorkspaceNames(prefs, () => this.#trigger?.request(), logger);
     this.#names = names;
     await names.start();
@@ -148,14 +150,14 @@ export class WorkspaceSync extends Module<WorkspaceSyncOptions> {
     });
   }
 
-  #menuParts({ document, selectors, logger }: ModuleContext<WorkspaceSyncOptions>, names: WorkspaceNames): MenuParts {
+  #menuParts({ document, selectors, logger, shape }: ModuleContext<WorkspaceSyncOptions>, names: WorkspaceNames): MenuParts {
     const view = document.defaultView;
     if (view === null) {
       throw new Error('the document has no window');
     }
     const gestures = new ElementGestures(view);
     const poll = new Poll();
-    const menu = new WorkspaceMenu(document, selectors, { gestures, poll, editor: new ReactEditorOpener(document, selectors, poll, new ReactInternals()) });
+    const menu = new WorkspaceMenu(document, selectors, { gestures, poll, editor: new ReactEditorOpener(document, selectors, poll, new ReactInternals(shape)) });
     return { menu, quiet: new QuietMoment(document), names, poll, logger };
   }
 

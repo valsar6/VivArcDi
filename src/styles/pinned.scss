@@ -11,15 +11,15 @@
   padding-bottom: 0;
 }
 
-#{$root}#{$pinned-unload} .tab-position.is-pinned .tab-header .close {
+#{$root}#{$pinned-unload} #{$tab-position}#{$is-pinned} #{$tab-header} #{$close} {
   display: none !important;
 }
 
-#{$root}#{$pinned-unload} .tab-position.is-pinned #{$pinned-minus} {
+#{$root}#{$pinned-unload} #{$tab-position}#{$is-pinned} #{$pinned-minus} {
   @include minus-badge;
 }
 
-#{$root}#{$pinned-unload} .tab-position.is-pinned:hover #{$pinned-minus} {
+#{$root}#{$pinned-unload} #{$tab-position}#{$is-pinned}:hover #{$pinned-minus} {
   opacity: 1;
   pointer-events: auto;
 }

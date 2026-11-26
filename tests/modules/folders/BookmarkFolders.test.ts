@@ -53,6 +53,7 @@ function setup(
     prefs,
     storage: new MemoryStorage(),
     notices: silentNotices(),
+    shape: { add: () => undefined, report: () => undefined },
     activeWorkspace: new ActiveWorkspace(tabs, silentLogger()),
   } as unknown as ModuleContext<BookmarkFoldersOptions>;
   return { dom, module: new BookmarkFolders(), context };

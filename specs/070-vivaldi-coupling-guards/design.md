@@ -303,6 +303,8 @@ The probe looks at the browser element and its direct children, not at every des
 cost stays at one lookup and a handful of key scans. **To verify in a lab Vivaldi** before
 `Implemented` (not an acceptance criterion): that `#browser` or a child carries the key. If neither
 does, the child level in the probe moves down to the first element that does.
+Verified on 2026-11-26 in a lab Vivaldi 8.3.4191.47: `#browser` carries a `__reactFiber$…` key, and so
+do its `header`, `main` and `footer` children; the boot logged no shape warning.
 
 `ReactInternals` constructor takes the board that reports the first-use miss:
 

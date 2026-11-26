@@ -213,10 +213,8 @@ export class VivArcDi {
       }
     }
 
-    this.#logger.info(
-      `${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`,
-      `(selectors ${selectors.version}, modules: ${this.startedModules.join(', ') || 'none'})`,
-    );
+    report.useShape(services.shape.run());
+    this.#logger.info(`${build.vivarcdiVersion} active on Vivaldi ${build.vivaldiVersion}`, `(selectors ${selectors.version}, modules: ${this.startedModules.join(', ') || 'none'})`);
     return 'active';
   }
 
