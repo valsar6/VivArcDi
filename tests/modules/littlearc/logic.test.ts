@@ -6,7 +6,7 @@ import { DestinationPicker } from '../../../src/modules/littlearc/DestinationPic
 import { ExternalLinkDetector } from '../../../src/modules/littlearc/ExternalLinkDetector.js';
 import { FocusHistory } from '../../../src/modules/littlearc/FocusHistory.js';
 import { IdleTimer } from '../../../src/modules/littlearc/IdleTimer.js';
-import type { Scheduler } from '../../../src/modules/littlearc/IdleTimer.js';
+import type { Timers } from '../../../src/core/support/Timers.js';
 import { commandFor } from '../../../src/modules/littlearc/LittleArcKeyMap.js';
 import { adoptMessage, parseAdoptMessage } from '../../../src/modules/littlearc/LittleArcMessage.js';
 import { LittleArcRegistry } from '../../../src/modules/littlearc/LittleArcRegistry.js';
@@ -64,7 +64,7 @@ test('focus history keeps only the last two events', () => {
   assert.equal(reversed.broughtForwardNear(5, 100), false);
 });
 
-class FakeScheduler implements Scheduler {
+class FakeScheduler implements Timers {
   public scheduled: Array<{ callback: () => void; delayMs: number }> = [];
   public cleared = 0;
 

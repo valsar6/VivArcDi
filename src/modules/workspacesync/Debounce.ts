@@ -1,17 +1,9 @@
-export interface DebounceTimers {
-  set: (run: () => void, delayMs: number) => unknown;
-  clear: (handle: unknown) => void;
-}
-
-const defaultTimers: DebounceTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
-
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
 export class Debounce {
   #run: () => void;
   #delayMs: number;
-  #timers: DebounceTimers;
+  #timers: Timers;
   #pending: unknown = null;
 
   /**
@@ -21,7 +13,7 @@ export class Debounce {
    * @param delayMs How long to wait after the last request, in milliseconds.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(run: () => void, delayMs: number, timers: DebounceTimers = defaultTimers) {
+  constructor(run: () => void, delayMs: number, timers: Timers = systemTimers) {
     this.#run = run;
     this.#delayMs = delayMs;
     this.#timers = timers;

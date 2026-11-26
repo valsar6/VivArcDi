@@ -1,3 +1,4 @@
+import { systemTimers } from '../../core/support/Timers.js';
 import { LabelIcon } from '../../shared/icons/LabelIcon.js';
 import type { Favorite } from './FavoritesFolder.js';
 import type { TileState } from './FavoriteStates.js';
@@ -58,10 +59,7 @@ export class FavoritesView {
     const hover = new TileHoverName({
       document,
       parent,
-      timers: {
-        set: (run: () => void, ms: number): unknown => setTimeout(run, ms),
-        clear: (handle: unknown): void => clearTimeout(handle as ReturnType<typeof setTimeout>),
-      },
+      timers: systemTimers,
     });
     this.#stopHover = hover.attach(this.#root, (tile) => tile.getAttribute(TILE_LABEL_ATTRIBUTE) ?? '');
   }

@@ -1,3 +1,4 @@
+import type { Timers } from '../../core/support/Timers.js';
 import { TILE_ATTRIBUTE } from './FavoritesView.js';
 
 export const HOVER_NAME_MS = 3000;
@@ -6,17 +7,12 @@ export const NAME_ATTRIBUTE = 'data-vivarcdi-tile-name';
 const EDGE_PX = 8;
 const CANCELLING_EVENTS = ['mousedown', 'contextmenu', 'dragstart', 'wheel'];
 
-export interface HoverTimers {
-  set(run: () => void, ms: number): unknown;
-  clear(handle: unknown): void;
-}
-
 export interface TileHoverNameDependencies {
   /** The document of Vivaldi's browser window. */
   document: Document;
   /** The element the name is added to, read when the name is shown. */
   parent: () => Element;
-  timers: HoverTimers;
+  timers: Timers;
 }
 
 export class TileHoverName {

@@ -1,3 +1,5 @@
+import type { Timers } from '../../core/support/Timers.js';
+import { systemTimers } from '../../core/support/Timers.js';
 import type { GithubResponse } from './GithubPullRequests.js';
 
 export interface DeviceCode {
@@ -18,16 +20,11 @@ export type DeviceFailureReason = 'expired' | 'denied' | 'unreachable' | 'cancel
 /** The part of `fetch` that GitHub's sign-in endpoints need; replaceable in tests, so that no test reaches the network. */
 export type DeviceFetch = (url: string, init: { method: 'POST'; headers: Record<string, string>; body: string }) => Promise<GithubResponse>;
 
-export interface DeviceTimers {
-  set: (run: () => void, delayMs: number) => unknown;
-  clear: (handle: unknown) => void;
-}
-
 export interface DeviceFlowDependencies {
   /** The client id of the VivArcDi OAuth App; it is public. */
   clientId: string;
   send: DeviceFetch;
-  timers?: DeviceTimers;
+  timers?: Timers;
 }
 
 export const CODE_URL = 'https://github.com/login/device/code';
@@ -37,11 +34,6 @@ export const SCOPE = 'repo';
 const GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
 const SLOW_DOWN_SECONDS = 5;
 const MS_PER_SECOND = 1000;
-
-const defaultTimers: DeviceTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
 
 export class DeviceFlowFailure extends Error {
   /** Why the flow ended without a token. */
@@ -73,7 +65,7 @@ interface Poll {
 
 export class GithubDeviceFlow {
   #deps: DeviceFlowDependencies;
-  #timers: DeviceTimers;
+  #timers: Timers;
   #handle: unknown = null;
   #run = 0;
   #abort: ((failure: DeviceFlowFailure) => void) | null = null;
@@ -88,7 +80,7 @@ export class GithubDeviceFlow {
    */
   constructor(dependencies: DeviceFlowDependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
 
   /**

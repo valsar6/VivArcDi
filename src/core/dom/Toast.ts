@@ -1,14 +1,11 @@
+import type { Timers } from '../support/Timers.js';
+import { systemTimers } from '../support/Timers.js';
 export const TOAST_ATTRIBUTE = 'data-vivarcdi-toast';
 export const VISIBLE_ATTRIBUTE = 'data-vivarcdi-visible';
 export const ACTIONABLE_ATTRIBUTE = 'data-vivarcdi-actionable';
 export const KIND_ATTRIBUTE = 'data-vivarcdi-toast-kind';
 
 export type ToastKind = 'ok' | 'neutral' | 'error';
-
-export interface ToastTimers {
-  set: (run: () => void, delayMs: number) => unknown;
-  clear: (handle: unknown) => void;
-}
 
 export interface ToastDependencies {
   /** The document of Vivaldi's browser window. */
@@ -18,17 +15,12 @@ export interface ToastDependencies {
   /** How long the toast stays, in milliseconds. */
   durationMs: number;
   /** Timers, replaceable in tests. */
-  timers?: ToastTimers;
+  timers?: Timers;
 }
-
-const defaultTimers: ToastTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-};
 
 export class Toast {
   #deps: ToastDependencies;
-  #timers: ToastTimers;
+  #timers: Timers;
   #element: HTMLElement | null = null;
   #pending: unknown = null;
   #onClick: (() => void) | null = null;
@@ -42,7 +34,7 @@ export class Toast {
    */
   constructor(dependencies: ToastDependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
 
   /**
