@@ -31,6 +31,15 @@ test('leaves a tab without a workspace where Vivaldi puts it', async () => {
   assert.deepEqual(tabs.actions(), [['create', { url: URL, active: true }]]);
 });
 
+test('opens a tab with no address when the address is null', async () => {
+  const tabs = new FolderTabs();
+  await new WorkspaceTabs(tabs, silentLogger()).open(null, '7');
+  assert.deepEqual(tabs.actions(), [
+    ['create', { active: true }],
+    ['update', 100, { vivExtData: JSON.stringify({ workspaceId: 7 }) }],
+  ]);
+});
+
 test('keeps the new tab when the workspace cannot be written', async () => {
   const tabs = new FolderTabs();
   tabs.failing.add('update');

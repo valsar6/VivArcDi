@@ -156,13 +156,14 @@ test('clears the Today tabs on the Clear shortcut', async () => {
     const tabs = new TodayTabs(TABS());
     const storage = new MemoryStorage();
     await pressClear(tabs, storage, modifier);
-    assert.deepEqual(tabs.removedIds(), [2]);
+    assert.deepEqual(tabs.removedIds(), [1, 2]);
+    assert.equal(tabs.calls.filter(([name]) => name === 'create').length, 1);
     assert.match(storage.getItem(ARCHIVE_STORAGE_KEY) ?? '', /Left before the restart/);
   }
 });
 
 test('does nothing on the Clear shortcut without Today tabs', async () => {
-  const tabs = new TodayTabs([{ id: 1, active: true, url: 'https://active.example/' }, { id: 2, pinned: true, url: 'https://pinned.example/' }]);
+  const tabs = new TodayTabs([{ id: 1, active: true, pinned: true, url: 'https://active.example/' }, { id: 2, pinned: true, url: 'https://pinned.example/' }]);
   const storage = new MemoryStorage();
   await pressClear(tabs, storage, 'metaKey');
   assert.deepEqual(tabs.removedIds(), []);
