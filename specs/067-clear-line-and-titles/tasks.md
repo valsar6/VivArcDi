@@ -32,7 +32,7 @@ T2 ──┼──> T3 (lead: docs and version) ──> T4 (Tore: manual)
 
 ## Tasks
 
-- [ ] **T1. The empty-state mark** (TDD; parallel with T2). In
+- [x] **T1. The empty-state mark** (TDD; parallel with T2). In
   `tests/modules/today/ClearSeparator.test.ts` add `hides the Clear line while there is no Today tab`
   (AC-1), `shows the Clear line when a Today tab opens` (AC-3) and
   `ignores hidden and linked tabs for the Clear line` (AC-4), with the assertions of the design.
@@ -41,7 +41,7 @@ T2 ──┼──> T3 (lead: docs and version) ──> T4 (Tore: manual)
   scope. Then add `NO_TODAY_ATTRIBUTE` to `TabBarMarks.ts` and `#mark` to `ClearSeparator` with the
   three call sites of the design (no slot, slot found, strip missing) and `stop()`. Keep
   `firstTodaySlot`, `#place` and `#line` as they are. Done when `make check` is green.
-- [ ] **T2. Inset and centered titles** (TDD; parallel with T1). First confirm the design's
+- [x] **T2. Inset and centered titles** (TDD; parallel with T1). First confirm the design's
   assumptions with one DOM probe (`npm run live -- --probe`, with Tore's agreement) on a lab
   Vivaldi 8.3, no Today tab and one pinned tab: which element draws the line that stays, whether
   the pinned-last slot is already positioned, and the rects of a Today title and its row. Report the
@@ -56,7 +56,7 @@ T2 ──┼──> T3 (lead: docs and version) ──> T4 (Tore: manual)
   favicon or the New Tab row. Do not edit the live scenario of 060: its body stays valid. Done
   when `make check` is green and the probe shows the title center within 1 px of the row center
   and the line inset equal to the row inset.
-- [ ] **T3. Docs and version** (lead; after T1 and T2). Mark 060/FR-1, 004/FR-5 and 028/FR-5 as
+- [x] **T3. Docs and version** (lead; after T1 and T2). Mark 060/FR-1, 004/FR-5 and 028/FR-5 as
   amended or refined by 067, set the 067 design Status to Approved, and update
   `docs/manual/tab-bar.md` and `README.md` where they describe the separator line or Clear so
   they say that nothing shows while there is no Today tab. Read the version on `origin/main` and make

@@ -140,3 +140,15 @@ test('gives the title the hidden close space at rest', () => {
   const pinned = ruleBody(css, /\.tab-position\.is-pinned:hover \.title \{([^}]*)\}/);
   assert.match(pinned, /padding-inline-end: 30px;/);
 });
+
+test('centers the Today title in its row', () => {
+  const css = compiled();
+  const wrapper = ruleBody(css, /\.tab-strip > :not\(\[data-vivarcdi-favorite\]\) \.tab-wrapper \{([^}]*)\}/);
+  assert.match(wrapper, /align-items: center;/);
+  const header = ruleBody(css, /\.tab-wrapper \.tab-header \{([^}]*)\}/);
+  assert.match(header, /display: flex;/);
+  assert.match(header, /align-items: center;/);
+  assert.match(header, /height: 100%;/);
+  const title = ruleBody(css, /\.tab-wrapper \.title \{([^}]*)\}/);
+  assert.match(title, /align-self: center;/);
+});

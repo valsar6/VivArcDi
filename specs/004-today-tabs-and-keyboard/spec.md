@@ -6,6 +6,7 @@
 | Phase | 4 |
 | Owner | Tore |
 | Approved | 2026-10-28 |
+| Refined by | [067 Clear line and Today titles](../067-clear-line-and-titles/spec.md) (2026-11-26): FR-5's divider and Clear show only while a Today tab exists, inset like the rows. |
 
 ## Summary
 

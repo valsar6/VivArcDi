@@ -8,6 +8,7 @@ const STYLES = fileURLToPath(new URL('../../src/styles/', import.meta.url));
 const read = (name: string): string => readFileSync(`${STYLES}${name}`, 'utf8');
 const compiled = (): string => sass.compile(`${STYLES}pinned.scss`).css;
 const compiledTiles = (): string => sass.compile(`${STYLES}favorites.scss`).css;
+const compiledLook = (): string => sass.compile(`${STYLES}sidebar-look.scss`).css;
 
 const ROW = '#browser\\[data-vivarcdi-active\\]\\[data-vivarcdi-pinned-unload\\] \\.tab-position\\.is-pinned';
 const MINUS = '\\[data-vivarcdi-pinned-minus\\]';
@@ -54,4 +55,28 @@ test('shows the pinned minus badge only while the button is hovered', () => {
   assert.match(tileHover, /background-color: color-mix\(/);
   const tileDash = ruleBody(tiles, new RegExp(`${TILE_SOURCE}[^{]*${TILE_MINUS}:hover::before \\{([^}]*)\\}`));
   assert.match(tileDash, /background-color: color-mix\(/);
+});
+
+const LAST = '#browser\\[data-vivarcdi-active\\] \\[data-vivarcdi-pinned-last\\]';
+
+test('hides the pinned-last border while there is no Today tab', () => {
+  const css = compiled();
+  const empty = ruleBody(css, new RegExp(`#browser\\[data-vivarcdi-active\\]\\[data-vivarcdi-no-today\\] \\[data-vivarcdi-pinned-last\\] \\{([^}]*)\\}`));
+  assert.match(empty, /margin-bottom: 0;/);
+  assert.match(empty, /padding-bottom: 0;/);
+  const after = ruleBody(css, new RegExp(`\\[data-vivarcdi-no-today\\] \\[data-vivarcdi-pinned-last\\]::after \\{([^}]*)\\}`));
+  assert.match(after, /display: none;/);
+  assert.equal(/border-bottom/.test(css), false);
+  assert.equal(/border-bottom/.test(compiledLook()), false);
+});
+
+test('insets the pinned-last border like the rows', () => {
+  const css = compiled();
+  const base = ruleBody(css, new RegExp(`${LAST} \\{([^}]*)\\}`));
+  assert.equal(/border-bottom/.test(base), false);
+  const line = ruleBody(css, new RegExp(`${LAST}::after \\{([^}]*)\\}`));
+  assert.match(line, /inset-inline: 6px;/);
+  assert.match(line, /border-top: 1px solid var\(--vivarcdi-line, color-mix\(/);
+  assert.match(line, /bottom: 0;/);
+  assert.match(line, /pointer-events: none;/);
 });
