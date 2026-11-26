@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-26, PR #302) |
 | Phase | 3 |
 | Owner | Tore |
 
@@ -168,28 +168,33 @@ build. AC-9 and AC-10 read the files under `src/` with a pattern, in `tests/stru
 
 ## Open questions
 
-- [ ] **Q-1. Where does the reader live?** Options: `src/shared/messages/PageMessage.ts` (five
+- [x] **Q-1. Where does the reader live?** Options: `src/shared/messages/PageMessage.ts` (five
   module users, the two-user rule of 034) or `src/core/support/`. Recommendation: `shared/messages/`.
   The reader knows the shape of VivArcDi's page messages (`type`, `token`), so it is a feature
   building block; `core/support/` is for helpers that know no feature, like `Timers`.
-- [ ] **Q-2. Which near-duplicates join?** `IdleTimer`'s `Scheduler` has the same two methods under
+  Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-2. Which near-duplicates join?** `IdleTimer`'s `Scheduler` has the same two methods under
   other parameter names, and `LittleArcMessage.ts` has `pageLinkFromConsole`, a console reader
   inside a file with four other message kinds, with its own `Number.isInteger` check on `tabId`
   and no `as unknown as`. Recommendation: include `IdleTimer` (identical shape; its test only
   changes an import). Leave `LittleArcMessage` out, but let it call the console-line reader if the
   design exports it, so the only `JSON.parse(line.slice(prefix))` is in `PageMessage.ts`. If that
   changes a case of its tests, it stays out and AC-10 excludes it by name.
-- [ ] **Q-3. One pull request or two?** The two halves touch different files. Recommendation: two
+  Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-3. One pull request or two?** The two halves touch different files. Recommendation: two
   tasks in one branch and one pull request, run in parallel: the diff is mechanical and small, and
   the structure tests of FR-7 are easier to review together.
-- [ ] **Q-4. Keep the old type names?** The tests import `ScrollTimers`, `ToastTimers` and
+  Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-4. Keep the old type names?** The tests import `ScrollTimers`, `ToastTimers` and
   `Scheduler`. Recommendation: remove the names and change those test imports to `Timers`
   (NFR-1 allows it), so no alias outlives the refactor.
-- [ ] **Q-5. Type guard without a cast.** A guard `candidate is T` over `Record<string, unknown>`
+  Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-5. Type guard without a cast.** A guard `candidate is T` over `Record<string, unknown>`
   compiles for a type alias but may not for an `interface` such as `CopyMessage`. Recommendation:
   the design tries the guard first and, if TypeScript refuses, changes the `interface`s to `type`
   aliases (no change for callers), before it accepts a cast inside the reader. A cast inside the
   one helper is allowed only if both fail.
+  Answered (Tore, 2026-11-26): the proposal.
 
 ## References
 
