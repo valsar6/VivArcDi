@@ -6,7 +6,7 @@ import type { FrameTiming } from '../../core/support/FrameTask.js';
 import type { Logger } from '../../core/support/Logger.js';
 import { TabSlot } from '../../core/tabs/TabSlot.js';
 import { HIDDEN_ATTRIBUTE } from '../../shared/tabs/HiddenAttribute.js';
-import { OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from '../../shared/tabs/TabBarMarks.js';
+import { NO_TODAY_ATTRIBUTE, OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from '../../shared/tabs/TabBarMarks.js';
 
 export const CLEAR_ATTRIBUTE = 'data-vivarcdi-clear';
 export const CLEAR_ROW_ATTRIBUTE = 'data-vivarcdi-clear-row';
@@ -79,6 +79,7 @@ export class ClearSeparator {
     this.#unwatch = null;
     this.#task.cancel();
     this.#row.remove();
+    this.#mark(false);
   }
 
   /**
@@ -88,14 +89,17 @@ export class ClearSeparator {
     const strip = this.#element('tabStrip');
     if (strip === null) {
       this.#row.remove();
+      this.#mark(false);
       this.#warnMissing();
       return;
     }
     const slot = this.#firstTodaySlot(strip);
     if (slot === null) {
       this.#row.remove();
+      this.#mark(true);
       return;
     }
+    this.#mark(false);
     this.#place(strip, slot);
     this.#line();
   }
@@ -124,7 +128,7 @@ export class ClearSeparator {
   }
 
   static #isToday(slot: HTMLElement, wrapper: string, pinned: string): boolean {
-    return TabSlot.idOf(slot, wrapper) !== null && !slot.matches(pinned) && slot.querySelector(pinned) === null;
+    return TabSlot.idOf(slot, wrapper) !== null && !slot.hasAttribute(HIDDEN_ATTRIBUTE) && !slot.matches(pinned) && slot.querySelector(pinned) === null;
   }
 
   #place(strip: HTMLElement, slot: HTMLElement): void {
@@ -138,6 +142,13 @@ export class ClearSeparator {
     this.#write(SHIFT_PROPERTY, `${Number.parseFloat(slot.style.getPropertyValue(SHIFT_PROPERTY)) || 0}px`);
     if (this.#row.parentElement !== strip || this.#row.nextElementSibling !== slot) {
       strip.insertBefore(this.#row, slot);
+    }
+  }
+
+  #mark(empty: boolean): void {
+    const browser = this.#element('browser');
+    if (browser !== null && browser.hasAttribute(NO_TODAY_ATTRIBUTE) !== empty) {
+      browser.toggleAttribute(NO_TODAY_ATTRIBUTE, empty);
     }
   }
 

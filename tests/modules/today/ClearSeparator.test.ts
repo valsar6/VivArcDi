@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { SelectorCatalog } from '../../../src/core/dom/SelectorCatalog.js';
 import { CLEAR_ATTRIBUTE, CLEAR_LINE_ATTRIBUTE, CLEAR_ROW_ATTRIBUTE, ClearSeparator } from '../../../src/modules/today/ClearSeparator.js';
 import { HIDDEN_ATTRIBUTE } from '../../../src/shared/tabs/HiddenAttribute.js';
-import { OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from '../../../src/shared/tabs/TabBarMarks.js';
+import { NO_TODAY_ATTRIBUTE, OWN_ROW_ATTRIBUTE, PINNED_LAST_ATTRIBUTE } from '../../../src/shared/tabs/TabBarMarks.js';
 import { immediateFrames } from '../folders/fakes.js';
 import { event } from '../pinned/fakes.js';
 
@@ -295,6 +295,67 @@ test('draws its line only when no pinned row shows it', async () => {
   setup.watcher.change();
   await settle();
   assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), true);
+  setup.separator.stop();
+});
+
+test('hides the Clear line while there is no Today tab', async () => {
+  const setup = setUp();
+  const browser = setup.document.elements.get('#browser') as StripChild;
+  setup.slot.remove();
+  setup.separator.start();
+  await settle();
+  assert.equal(rowOf(setup.strip), null);
+  assert.equal(setup.strip.children.some((child) => child.hasAttribute(CLEAR_LINE_ATTRIBUTE)), false);
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), true);
+  setup.separator.stop();
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), false);
+});
+
+test('shows the Clear line when a Today tab opens', async () => {
+  const setup = setUp();
+  const browser = setup.document.elements.get('#browser') as StripChild;
+  setup.slot.remove();
+  setup.separator.start();
+  await settle();
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), true);
+  setup.strip.append(setup.slot);
+  setup.watcher.change();
+  await settle();
+  const row = rowOf(setup.strip);
+  assert.ok(row);
+  assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), true);
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), false);
+  setup.slot.remove();
+  setup.watcher.change();
+  await settle();
+  assert.equal(rowOf(setup.strip), null);
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), true);
+  setup.separator.stop();
+});
+
+test('ignores hidden and linked tabs for the Clear line', async () => {
+  const setup = setUp();
+  const browser = setup.document.elements.get('#browser') as StripChild;
+  setup.slot.remove();
+  const linked = todaySlot(8, 80, { pinned: true });
+  const group = new StripChild('span');
+  group.classes.add('pinned-group');
+  group.append(todaySlot(9, 120, { pinned: true }));
+  const hidden = todaySlot(10, 160);
+  hidden.setAttribute(HIDDEN_ATTRIBUTE, '');
+  setup.strip.append(linked, group, hidden);
+  setup.separator.start();
+  await settle();
+  assert.equal(rowOf(setup.strip), null);
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), true);
+  const visible = todaySlot(11, 200);
+  setup.strip.append(visible);
+  setup.watcher.change();
+  await settle();
+  const row = rowOf(setup.strip);
+  assert.ok(row);
+  assert.equal(row.nextElementSibling, visible);
+  assert.equal(browser.hasAttribute(NO_TODAY_ATTRIBUTE), false);
   setup.separator.stop();
 });
 
