@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-26, PR #294 |
 | Refines | Nothing yet. It refines the open-tab close button of [028](../028-arc-sidebar-look/spec.md) FR-3 and AC-3, the minus size of [061](../061-pinned-minus-ui/spec.md) FR-1, FR-2, AC-1 and AC-2, and the badge of [062](../062-minus-hover-and-indent/spec.md) FR-2, AC-5 and AC-6. It changes the title width of rows that carry a close or minus control. Every press behavior stays as it is. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
