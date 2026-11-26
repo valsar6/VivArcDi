@@ -5,28 +5,36 @@ import { parseArchiveMessage } from './ArchiveMessage.js';
 
 const KEYS_PATH = 'page/archive-keys.js';
 const KEYS_GLOBAL = 'VivArcDiArchiveKeys';
-const LETTER = 'a';
+const OPEN_LETTER = 'a';
+const CLEAR_LETTER = 'k';
 
 export type ArchiveKeysContext = Pick<ModuleContext, 'document' | 'selectors' | 'runtime' | 'payload' | 'logger'>;
 
+export interface ArchiveActions {
+  /** Opens or closes the archive panel. */
+  open: () => void;
+  /** Archives the Today tabs of the workspace. */
+  clear: () => void;
+}
+
 export class ArchiveKeys {
   #context: ArchiveKeysContext;
-  #onPress: () => void;
+  #actions: ArchiveActions;
   #token = crypto.randomUUID();
   #injector: PageScriptInjector | null = null;
   #unsubscribe: Array<() => void> = [];
   #onKey = (event: Event): void => this.#handleKey(event as KeyboardEvent);
 
   /**
-   * Catches Cmd/Ctrl+Shift+A in the interface, in the capture phase, and in every tab's page
+   * Catches Cmd/Ctrl+Shift+A and Cmd/Ctrl+Shift+K in the interface, in the capture phase, and in every tab's page
    * through an injected script that forwards it with a token.
    *
    * @param context The context of the today-archive module.
-   * @param onPress What the shortcut does.
+   * @param actions What each shortcut does.
    */
-  constructor(context: ArchiveKeysContext, onPress: () => void) {
+  constructor(context: ArchiveKeysContext, actions: ArchiveActions) {
     this.#context = context;
-    this.#onPress = onPress;
+    this.#actions = actions;
   }
 
   /**
@@ -38,7 +46,7 @@ export class ArchiveKeys {
     try {
       await this.#startPageScript();
     } catch (error) {
-      this.#context.logger.warn('Cmd/Ctrl+Shift+A works only while the interface has the focus', error);
+      this.#context.logger.warn('Cmd/Ctrl+Shift+A and Cmd/Ctrl+Shift+K work only while the interface has the focus', error);
     }
   }
 
@@ -74,16 +82,21 @@ export class ArchiveKeys {
   }
 
   #handleKey(event: KeyboardEvent): void {
-    if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, LETTER)) {
+    if (event.defaultPrevented) {
+      return;
+    }
+    const action = ShortcutKeys.isCommandShift(event, OPEN_LETTER) ? this.#actions.open : ShortcutKeys.isCommandShift(event, CLEAR_LETTER) ? this.#actions.clear : null;
+    if (action !== null) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      this.#onPress();
+      action();
     }
   }
 
   #receive(value: unknown): void {
-    if (parseArchiveMessage(value)?.token === this.#token) {
-      this.#onPress();
+    const message = parseArchiveMessage(value);
+    if (message?.token === this.#token) {
+      this.#actions[message.action]();
     }
   }
 }

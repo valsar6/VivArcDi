@@ -1,4 +1,5 @@
 import type { SelectorCatalog } from '../../core/dom/SelectorCatalog.js';
+import { ShortcutKeys } from '../../core/dom/ShortcutKeys.js';
 import { watchSubtree } from '../../core/dom/KeptElement.js';
 import type { SubtreeWatcher } from '../../core/dom/KeptElement.js';
 import { FrameTask } from '../../core/support/FrameTask.js';
@@ -27,6 +28,8 @@ export interface ClearSeparatorDependencies {
   selectors: SelectorCatalog;
   /** What a click on Clear does. */
   onClear: () => void;
+  /** `navigator.platform`, to name the shortcut in the tooltip; empty means not macOS. */
+  platform?: string;
   /** Reports a tab strip that does not match the selectors. */
   logger?: Pick<Logger, 'warn'>;
   /** Watches the tab bar for redraws, replaceable in tests. */
@@ -54,7 +57,7 @@ export class ClearSeparator {
     this.#row = dependencies.document.createElement('div');
     this.#row.setAttribute(CLEAR_ROW_ATTRIBUTE, '');
     this.#row.setAttribute(OWN_ROW_ATTRIBUTE, '');
-    this.#row.append(ClearSeparator.#button(dependencies.document));
+    this.#row.append(this.#button(dependencies.document));
     this.#task = new FrameTask(() => this.sync(), dependencies.timing);
   }
 
@@ -105,11 +108,11 @@ export class ClearSeparator {
     }
   }
 
-  static #button(document: Document): HTMLButtonElement {
+  #button(document: Document): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute('type', 'button');
     button.setAttribute(CLEAR_ATTRIBUTE, '');
-    button.setAttribute('title', 'Archive the Today tabs of this workspace');
+    button.setAttribute('title', `Clear Today tabs ${ShortcutKeys.isMac(this.#deps.platform ?? '') ? '⇧⌘K' : 'Ctrl+Shift+K'}`);
     button.textContent = 'Clear';
     return button;
   }

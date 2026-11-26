@@ -153,3 +153,18 @@ test('peek keys use the newest token', async () => {
   assert.equal(sent.length, 1);
   assert.equal((sent[0] as { token: string }).token, 'new');
 });
+
+test('archive keys send open for Cmd/Ctrl+Shift+A and clear for Cmd/Ctrl+Shift+K', async () => {
+  const script = await load('archive-keys');
+  script.install('t' as never);
+  const press = (key: string, modifiers: Record<string, boolean>): void =>
+    live[0]?.listener({ key, metaKey: false, ctrlKey: false, shiftKey: true, altKey: false, defaultPrevented: false, preventDefault: (): void => undefined, stopImmediatePropagation: (): void => undefined, ...modifiers });
+  press('A', { metaKey: true });
+  press('K', { ctrlKey: true });
+  press('j', { metaKey: true });
+  assert.deepEqual(
+    sent.map((message) => (message as { action: string }).action),
+    ['open', 'clear'],
+  );
+  script.uninstall();
+});

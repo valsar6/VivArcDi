@@ -9,11 +9,11 @@ export interface ArchiveMessage extends Record<string, unknown> {
   /** Secret that proves the message comes from the injected script. */
   token: string;
   /** What the user asked. */
-  action: 'open';
+  action: 'open' | 'clear';
 }
 
 const isArchiveMessage = (candidate: Record<string, unknown>): candidate is ArchiveMessage =>
-  hasEnvelope(candidate, ARCHIVE_MESSAGE_TYPE) && candidate['action'] === 'open';
+  hasEnvelope(candidate, ARCHIVE_MESSAGE_TYPE) && (candidate['action'] === 'open' || candidate['action'] === 'clear');
 
 /**
  * Reads a message of the `archive-keys` page script, sent through `chrome.runtime` or the console.

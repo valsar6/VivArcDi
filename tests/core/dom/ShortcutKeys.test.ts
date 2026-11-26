@@ -23,3 +23,10 @@ test('ignores the letter without Shift, with Alt or without Cmd and Ctrl', () =>
   assert.equal(ShortcutKeys.isCommandShift(press('c', { shiftKey: true }), 'c'), false);
   assert.equal(ShortcutKeys.isCommandShift(press('x', { metaKey: true, shiftKey: true }), 'c'), false);
 });
+
+test('recognizes macOS platforms and nothing else', () => {
+  assert.equal(ShortcutKeys.isMac('MacIntel'), true);
+  assert.equal(ShortcutKeys.isMac('Linux x86_64'), false);
+  assert.equal(ShortcutKeys.isMac('Win32'), false);
+  assert.equal(ShortcutKeys.isMac(''), false);
+});

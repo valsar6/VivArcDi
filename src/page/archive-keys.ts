@@ -6,18 +6,19 @@ import { PageInstall, PageListener } from './lib/PageInstall.js';
 const INSTALL = new PageInstall('vivarcdi.archive.keys');
 
 /**
- * Forwards Cmd/Ctrl+Shift+A from a tab's page to Vivaldi's interface, which opens the archive
- * panel. Replaces a previous installation.
+ * Forwards Cmd/Ctrl+Shift+A and Cmd/Ctrl+Shift+K from a tab's page to Vivaldi's interface, which
+ * opens the archive panel or clears the Today tabs. Replaces a previous installation.
  *
  * @param token Secret that proves a message comes from this script.
  */
 export function install(token: string): void {
   INSTALL.replace(
     new PageListener('keydown', (event) => {
-      if (!event.defaultPrevented && ShortcutKeys.isCommandShift(event, 'a')) {
+      const action = ShortcutKeys.isCommandShift(event, 'a') ? 'open' : ShortcutKeys.isCommandShift(event, 'k') ? 'clear' : null;
+      if (!event.defaultPrevented && action !== null) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action: 'open' }, ARCHIVE_CONSOLE_PREFIX);
+        sendToInterface({ type: ARCHIVE_MESSAGE_TYPE, token, action }, ARCHIVE_CONSOLE_PREFIX);
       }
     }),
   );

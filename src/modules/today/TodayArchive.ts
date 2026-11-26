@@ -110,12 +110,13 @@ export class TodayArchive extends Module<TodayArchiveOptions> {
     this.#stops.push(() => panel.close());
     const toggle = (): void => this.#toggle(context);
     const frames = this.#clock.frames === undefined ? {} : { timing: this.#clock.frames };
-    const clear = new ClearSeparator({ document, selectors, onClear: (): void => void this.#clear(), logger, ...frames });
-    this.#startPart(clear);
+    const onClear = (): void => void this.#clear();
+    const platform = document.defaultView?.navigator.platform ?? '';
+    this.#startPart(new ClearSeparator({ document, selectors, onClear, platform, logger, ...frames }));
     if (selectors.has('tabsContainer')) {
       this.#startPart(new ArchiveButton(document, selectors.get('tabsContainer'), toggle, { root: browser, ...frames }));
     }
-    const keys = new ArchiveKeys(context, toggle);
+    const keys = new ArchiveKeys(context, { open: toggle, clear: onClear });
     this.#stops.push(() => keys.stop());
     await keys.start();
   }

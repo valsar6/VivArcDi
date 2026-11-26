@@ -39,6 +39,7 @@ test('reads archive messages from the runtime and the console', () => {
   const message = { type: 'vivarcdi-archive', token: 't', action: 'open' };
   assert.deepEqual(parseArchiveMessage(message), message);
   assert.deepEqual(parseArchiveMessage(`${ARCHIVE_CONSOLE_PREFIX}${JSON.stringify(message)}`), message);
+  assert.deepEqual(parseArchiveMessage({ ...message, action: 'clear' }), { ...message, action: 'clear' });
   assert.equal(parseArchiveMessage({ ...message, action: 'close' }), null);
   assert.equal(parseArchiveMessage(`${ARCHIVE_CONSOLE_PREFIX}{`), null);
   assert.equal(parseArchiveMessage('vivarcdi-pinned:{}'), null);
