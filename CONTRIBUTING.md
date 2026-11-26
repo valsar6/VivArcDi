@@ -80,6 +80,7 @@ the installer deploys. Users never need Node.
 | `npm run typecheck` | `tsc --noEmit` with `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` |
 | `npm test` | Node's test runner through `tsx` |
 | `npm run build` | Build `dist/` |
+| `npm run install` | Build `dist/`, then run `python3 installer install`, falling back to `python`; skipped during `npm install` and `npm ci` |
 | `make test-py` | Installer tests (Python 3.9+, standard library only) |
 | `make check` | Lint, typecheck, all tests and build in one go |
 | `npm run live` | Build, then run the boot check, the selector check and the live scenarios on a lab copy of Vivaldi; `--only <name or spec>`, `--probe <file>`, `--channel snapshot`, `--vivaldi <root>`, `--vivaldi-version <v>`, `--no-sandbox` |

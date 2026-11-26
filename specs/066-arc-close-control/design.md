@@ -115,7 +115,9 @@ the title to give up the same space as padding.
 - Open tab rows: the close button goes from zero width to 24 px plus a 6 px end margin, so the flex
   title loses 30 px on its own. Vivaldi hides the favicon when the close appears; the style keeps
   the favicon visible on hover, otherwise the row would give back 18 px and the ellipsis would sit
-  too far from the button. No padding is added here.
+  too far from the button. No padding is added here. The title is forced to `display: block` because
+  Vivaldi's flex title does not render `text-overflow: ellipsis`; the close button is forced to
+  `order: 0` because Vivaldi otherwise moves it to the start of the header on hover.
 - Pinned rows: Vivaldi's close is `display: none` and the VivArcDi minus is absolutely positioned,
   so `.title` gets `padding-inline-end: $minus-badge-size + $minus-offset` under
   `.tab-position.is-pinned:hover`.

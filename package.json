@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "install": "node scripts/install-payload.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && stylelint \"src/**/*.scss\"",
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",

@@ -95,6 +95,7 @@ test('draws the open tab close as an Arc X', () => {
   assert.match(tokens, /\$close-glyph-size: 12px;/);
   const base = ruleBody(css, /\.tab-wrapper \.close \{([^}]*)\}/);
   assert.match(base, /position: relative !important/);
+  assert.match(base, /order: 0;/);
   assert.match(base, /flex: none/);
   assert.match(base, /width: 0;/);
   assert.match(base, /height: 24px;/);
@@ -129,6 +130,7 @@ test('gives the title the hidden close space at rest', () => {
   const css = compiled();
   assert.match(css, /\.tab-wrapper:hover \.favicon \{[^}]*display: block !important/);
   const base = ruleBody(css, /\.tab-wrapper \.title \{([^}]*)\}/);
+  assert.match(base, /display: block !important;/);
   assert.match(base, /min-width: 0;/);
   assert.match(base, /overflow: hidden;/);
   assert.match(base, /text-overflow: ellipsis;/);

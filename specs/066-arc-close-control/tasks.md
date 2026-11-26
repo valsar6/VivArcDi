@@ -45,9 +45,10 @@ are done.
   verbatim names `draws the open tab close as an Arc X` (AC-1) and
   `shows the Arc close badge only on button hover` (AC-2). Assert the close button is zero-width at
   rest with no badge, becomes a 24×24 badge with a 5 px radius on row hover, draws a 10×10 masked
-  `×`, and gets its badge surface and hover color only on button hover. Then add `$close-glyph` and
-  `$close-glyph-size` to `_tokens.scss` and replace the two opacity rules in `sidebar-look.scss`
-  with the base and state rules of `design.md`. Keep all selectors under `#browser[data-vivarcdi-look]`.
+  `×`, and gets its badge surface and hover color only on button hover. Assert the close button
+  keeps `order: 0` so it stays at the row's end. Then add `$close-glyph` and `$close-glyph-size` to
+  `_tokens.scss` and replace the two opacity rules in `sidebar-look.scss` with the base and state
+  rules of `design.md`. Keep all selectors under `#browser[data-vivarcdi-look]`.
   Done when `make check` is green.
 - [x] **T3. Title space** (TDD; after T2). In `tests/styles/SidebarLook.test.ts`, add
   `gives the title the hidden close space at rest` (AC-4) and, in `tests/styles/Minus.test.ts`,
