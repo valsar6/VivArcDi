@@ -2,10 +2,10 @@ Origin: VivArcDi
 Label: VivArcDi
 Suite: stable
 Codename: stable
-Date: Thu, 26 Nov 2026 13:57:02 GMT
+Date: Thu, 26 Nov 2026 15:28:23 GMT
 Architectures: all
 Components: main
 Description: VivArcDi apt repository
 SHA256:
- 81c8909fec78ce0d8156f4a27195701925fcd5902c06688137b4cfe1d1203cd2             2172 main/binary-all/Packages
- 7d44f1509a11cd97bbdb8c9871c3d9bc11794780f6db70192a302cf0b7dfcf1b              739 main/binary-all/Packages.gz
+ 5d60586a0fc73202c38c1d67ad739ca6fddbe6972eee5213cb08e04125955384             2172 main/binary-all/Packages
+ 10ee3825cd83ad36f027af00cbf7dda32717da3c7fa176a396547e16da23cb84              736 main/binary-all/Packages.gz
