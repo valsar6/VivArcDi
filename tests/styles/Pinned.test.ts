@@ -74,5 +74,5 @@ test('insets the pinned-last border like the rows', () => {
   assert.equal(/border-bottom/.test(base), false);
   assert.equal(/pinned-last\\]::after/.test(css), false);
   const today = read('today.scss');
-  assert.match(today, /inset-inline: \$folders-padding;/);
+  assert.match(today, /inset-inline: \$clear-line-start \$clear-line-end;/);
 });
