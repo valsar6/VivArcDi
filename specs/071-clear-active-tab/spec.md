@@ -105,24 +105,28 @@ Today tab of the workspace except the active one` (060 AC-1) is replaced by AC-1
 
 ## Open questions
 
-- [ ] **Q-1. What is active after Clear when kept tabs exist.** With a pinned tab, a Favorite or a
+- [x] **Q-1. What is active after Clear when kept tabs exist.** With a pinned tab, a Favorite or a
   tiled tab left, Vivaldi activates a neighbor when the active tab is removed. Recommendation:
   leave Vivaldi's native choice; no code runs, and it is the least surprising on both platforms. The
   alternative is to activate the first kept tab of the workspace ourselves.
-- [ ] **Q-2. Who opens the blank tab.** When the last tab closes, Vivaldi closes the window (or
+  Answered (Tore, 2026-11-26): recommendation accepted.
+- [x] **Q-2. Who opens the blank tab.** When the last tab closes, Vivaldi closes the window (or
   switches workspace), so leaving it to Vivaldi does not work. Recommendation: VivArcDi opens it with
   `WorkspaceTabs.open` (an empty new tab, assigned to the workspace) before closing the Today tabs,
   only when no tab of the workspace will remain (FR-3). The blank tab is created before the first
   removal and stays if a removal fails.
-- [ ] **Q-3. Tabs of other windows and workspaces.** Clear works on the current window and the
+  Answered (Tore, 2026-11-26): recommendation accepted.
+- [x] **Q-3. Tabs of other windows and workspaces.** Clear works on the current window and the
   workspace of the active tab (`ArchiveSweeper.ts` lines 119-124) and keeps working so. Recommendation:
   unchanged; tabs of other workspaces of the window stay and do not count as "a tab left to show", so
   Clear still opens the blank tab in the current workspace.
-- [ ] **Q-4. Audio.** Both the sweep and Clear skip a tab playing audio today (`TodayTabPolicy.ts`
+  Answered (Tore, 2026-11-26): recommendation accepted.
+- [x] **Q-4. Audio.** Both the sweep and Clear skip a tab playing audio today (`TodayTabPolicy.ts`
   line 16). Recommendation: Clear keeps skipping it: archiving closes the tab and the sound stops,
   which the user did not ask for; Arc archives from the list and would also stop it, so this is a
   deliberate difference. An active tab playing audio therefore stays after Clear. The alternative is
   that Clear archives audible tabs, as an explicit user action.
+  Answered (Tore, 2026-11-26): recommendation accepted.
 
 ## References
 
