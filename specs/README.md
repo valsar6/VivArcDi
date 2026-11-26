@@ -76,6 +76,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [066 Arc close control and title space](066-arc-close-control/spec.md) | 3 | Implemented |
 | [067 Clear line, its inset and centered titles](067-clear-line-and-titles/spec.md) | 3 | Implemented |
 | [068 Shared page-message parser and timers](068-shared-page-messages-and-timers/spec.md) | 3 | Implemented |
+| [069 Clear like Arc](069-clear-like-arc/spec.md) | 3 | Approved |
 
 
 
