@@ -134,8 +134,8 @@
   top: 50%;
   translate: 0 -50%;
   box-sizing: border-box;
-  width: 21px;
-  height: 21px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   appearance: none;
@@ -152,7 +152,7 @@
   margin: auto;
   background-color: currentcolor;
   content: "";
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.500 7.250h11v1.500h-11z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 7h14v2H1z'/%3E%3C/svg%3E") center/contain no-repeat;
 }
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] .vivarcdi-folders-minus:hover {
   background-color: color-mix(in srgb, var(--colorFg, #fff) 26%, transparent);
@@ -164,6 +164,15 @@
 #browser[data-vivarcdi-active] [data-vivarcdi-folders] > [data-vivarcdi-folder-unload]:hover [data-vivarcdi-folder-minus] {
   opacity: 1;
   pointer-events: auto;
+}
+
+#browser[data-vivarcdi-look] [data-vivarcdi-folders] .vivarcdi-folders-title {
+  padding-inline-end: 0;
+  transition: padding-inline-end 160ms ease;
+}
+#browser[data-vivarcdi-look] [data-vivarcdi-folders] > [data-vivarcdi-folder-unload]:hover .vivarcdi-folders-title,
+#browser[data-vivarcdi-look] [data-vivarcdi-folders] > [data-vivarcdi-link-open]:hover .vivarcdi-folders-title {
+  padding-inline-end: 30px;
 }
 
 @keyframes vivarcdi-folders-in {
