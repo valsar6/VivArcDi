@@ -154,6 +154,45 @@ test('unloads a pinned tab from its minus', async () => {
   assert.equal(watchers.size, 0);
 });
 
+test('unloads a pinned tab from its minus in a group beside the tab strip', async () => {
+  const document = new MinusDocument();
+  const pinned = document.addGroupRow(5);
+  const tabs = new LinkingTabs([
+    { id: 5, url: 'https://docs.example/a' },
+    { id: 6, active: true, url: 'https://news.example/' },
+  ]);
+  const watchers = new Set<() => void>();
+  const minus = new PinnedMinus({
+    document: document as unknown as Document,
+    selectors: minusSelectors,
+    tabs,
+    logger: silentLogger,
+    watch: (_target, onChange): (() => void) => {
+      watchers.add(onChange);
+      return () => watchers.delete(onChange);
+    },
+    timing: immediateFrames,
+  });
+  minus.start();
+  await settle();
+  assert.ok(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE));
+  const button = pinned.querySelector(`[${PINNED_MINUS_ATTRIBUTE}]`);
+  assert.ok(button instanceof MinusNode);
+  const down = document.dispatch(event('mousedown', { target: button }));
+  const pointerDown = document.dispatch(event('pointerdown', { target: button }));
+  const click = document.dispatch(event('click', { target: button }));
+  await settle();
+  assert.ok(down.defaultPrevented && down.stopped);
+  assert.ok(pointerDown.defaultPrevented && pointerDown.stopped);
+  assert.ok(click.defaultPrevented && click.stopped);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'discard'), [['discard', 5]]);
+  assert.deepEqual(tabs.calls.filter(([name]) => name === 'remove'), []);
+  minus.stop();
+  assert.equal(document.browser.hasAttribute(PINNED_UNLOAD_ATTRIBUTE), false);
+  assert.equal(button.parentElement, null);
+  assert.equal(watchers.size, 0);
+});
+
 test('keeps the pinned minus unloading', async () => {
   const document = new MinusDocument();
   const pinned = document.addRow(5);

@@ -1,7 +1,8 @@
+import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SelectorCatalog } from '../../src/core/dom/SelectorCatalog.js';
-import { FakeLoader } from './fakes.js';
+import { DiskLoader, FakeLoader } from './fakes.js';
 
 test('bestMatch picks the exact major.minor', () => {
   assert.equal(SelectorCatalog.bestMatch(['8.0', '8.1', '8.2'], '8.1.3740.12'), '8.1');
@@ -52,4 +53,17 @@ test('standsInFor tells an older catalog from a matching one', () => {
   assert.equal(catalog.standsInFor('unknown'), true);
   assert.equal(catalog.standsInFor('8.1.3740.12'), false);
   assert.equal(new SelectorCatalog({}, null).standsInFor('8.3.1.1'), false);
+});
+
+test('defines on Vivaldi 8.3 every selector of the 8.1 catalog', async () => {
+  const version = '8.3.4191.47';
+  const loader = new DiskLoader('src');
+  const catalog = await SelectorCatalog.load(loader, version);
+  const names = Object.keys(JSON.parse(await readFile('src/selectors/8.1.json', 'utf8')) as Record<string, string>);
+  assert.deepEqual(
+    names.filter((name) => !catalog.has(name)),
+    [],
+  );
+  const index = await loader.json<{ versions: string[] }>('selectors/index.json');
+  assert.equal(catalog.standsInFor(version), !index.versions.includes('8.3'));
 });
