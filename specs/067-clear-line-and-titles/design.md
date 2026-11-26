@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-26) |
 | Spec | [spec.md](spec.md) |
 
 Tore approved the spec on 2026-11-26 (PR #298) and accepted every proposal of Q-1 to Q-3. This

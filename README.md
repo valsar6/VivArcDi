@@ -690,6 +690,8 @@ field, then the closed tabs grouped by day with favicon, title, host and time. U
 highlight, Enter or a click reopens the tab in its workspace and removes it from the archive, Esc
 closes the panel. Resting the pointer on the line above the Today tabs shows **Clear**, which
 archives every Today tab of the workspace except the active one; the panel has the same action.
+With no Today tab the line and **Clear** are not shown, as in Arc, and `+ New Tab` sits right under
+the folders.
 
 The archive stays on your machine, in Vivaldi's extension storage.
 
