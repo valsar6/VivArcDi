@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-26 |
+| Implemented | 2026-11-26 |
 | Supersedes | [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and AC-7 (Clear keeps the active tab); [060](../060-clear-bar-and-pinned-unload/spec.md) FR-2, AC-1 and the sentence "except the active one" in its "What Clear does" paragraph; [069](../069-clear-like-arc/spec.md) AC-10 (the live scenario that expects the active tab to stay open) and the words "Today tabs" of FR-8 and AC-7 where they exclude the active tab. 004 FR-2 and AC-2 stay for the automatic sweep: it never archives the active tab of any window nor a tab playing audio. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).

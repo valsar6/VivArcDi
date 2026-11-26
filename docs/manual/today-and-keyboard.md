@@ -10,10 +10,11 @@ a stack.
 
 - A Today tab that has not been active for 12 hours is closed and kept in the archive. The hours
   Vivaldi was closed count too.
-- The active tab and a tab that plays audio are never archived.
+- The automatic archive never takes the active tab or a tab that plays audio.
 - **Clear**, at the right end of the line above the Today tabs, archives every Today tab of the
-  workspace except the active one. As in Arc it fades in while the pointer is in the tab bar, and
-  Cmd/Ctrl+Shift+K does the same; with no Today tab the key does nothing.
+  workspace, the active one included, except a tab that plays audio. When no other tab of the
+  workspace is left, a blank tab opens so the window stays. As in Arc it fades in while the pointer
+  is in the tab bar, and Cmd/Ctrl+Shift+K does the same; with no Today tab the key does nothing.
 
 Open the archive with the button at the bottom of the tab bar or Cmd/Ctrl+Shift+A. It lists the closed
 tabs by day, with a search field. Up and Down move, Enter or a click reopens the tab in its workspace,

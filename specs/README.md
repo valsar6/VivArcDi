@@ -78,7 +78,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [068 Shared page-message parser and timers](068-shared-page-messages-and-timers/spec.md) | 3 | Implemented |
 | [069 Clear like Arc](069-clear-like-arc/spec.md) | 3 | Implemented |
 | [070 Guards for the two couplings to Vivaldi's interface](070-vivaldi-coupling-guards/spec.md) | 3 | Approved |
-| [071 Clear archives the active tab too](071-clear-active-tab/spec.md) | 3 | Approved |
+| [071 Clear archives the active tab too](071-clear-active-tab/spec.md) | 3 | Implemented |
 
 
 
