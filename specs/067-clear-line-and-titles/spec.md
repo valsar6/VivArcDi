@@ -5,8 +5,8 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-26 (PR #298) |
-| Amends | [060](../060-clear-bar-and-pinned-unload/spec.md) FR-1: the Clear control keeps a non-zero box only while the workspace has a Today tab. It also refines the divider with Clear of [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and [028](../028-arc-sidebar-look/spec.md) FR-5, and the title of the row of 028. |
+| Approved | 2026-11-26 (PR #298); amendment approved 2026-11-26 (PR #303) |
+| Amends | [060](../060-clear-bar-and-pinned-unload/spec.md) FR-1: the Clear control keeps a non-zero box only while the workspace has a Today tab. It also refines the divider with Clear of [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and [028](../028-arc-sidebar-look/spec.md) FR-5, and the title of the row of 028. FR-8 supersedes the hover-only Clear of 004/FR-5 and 060/AC-12. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -75,6 +75,14 @@ vertical center of the title box is within 1 px of the center of the row.
   rows, `$folders-padding` (6 px), with Clear at the right end of the line.
 - **FR-5.** The pinned-last border drawn while pinned rows are visible SHALL use the same inset.
 - **FR-6.** The title of a Today tab SHALL be vertically centered in its row, within 1 px.
+- **FR-8.** WHILE a Today tab is visible, THE Clear label (`↓ Clear`) SHALL show at rest, without
+  hover, as in Arc. This supersedes the hover-only Clear of 004/FR-5 and 060/AC-12; the action of
+  Clear does not change.
+- **FR-9.** THE separator line SHALL run from the left inset of the rows to just before the Clear
+  label, end with a gap before the arrow, and sit on the label's vertical center, as in Arc.
+- **FR-10.** THE line and the label SHALL use Arc's look: a 1 px line in the sidebar line color, and
+  a muted, semi-bold label of the sidebar's small text size, with stronger contrast on hover and
+  focus.
 - **FR-7.** The behavior SHALL hold on Vivaldi 8.1, 8.2 and 8.3, with the Favorites grid on and off,
   and in the light and dark themes.
 
@@ -100,6 +108,9 @@ becomes `live:` with its scenario when the implementation adds one.
 | AC-5 | THE Clear row, its line and its button SHALL use an inline inset of 6 px, with Clear at the right end. | auto: `insets the Clear line like the rows` |
 | AC-6 | WHILE pinned rows are visible, THE pinned-last border SHALL use the same 6 px inset. | auto: `insets the pinned-last border like the rows` |
 | AC-7 | THE title of a Today tab SHALL be vertically centered in its row. | auto: `centers the Today title in its row` |
+| AC-9 | WHILE a Today tab is visible, THE Clear label SHALL be shown at rest, without hover. | auto: `shows the Clear label at rest` |
+| AC-10 | THE separator line SHALL end before the Clear label and SHALL be vertically centered on it. | auto: `ends the Clear line before its label` |
+| AC-11 | WHEN the pointer rests on Clear or it has keyboard focus, THE label SHALL show with stronger contrast than at rest. | auto: `strengthens the Clear label on hover` |
 | AC-8 | WHEN Tore compares VivArcDi on Vivaldi 8.3 with Arc, THE empty-Today sidebar, the line with its Clear and the Today titles SHALL look and sit as in Arc. | manual |
 
 AC-1 to AC-7 read the module's marks and the stylesheet rules. The measures (line inset equal to the
@@ -123,6 +134,19 @@ proposed as future `live:` checks on a lab Vivaldi; until then AC-8 covers them.
   `ClearSeparator` already does; hidden-by-folder and linked tabs do not (FR-3). Answered (Tore, 2026-11-26): the proposal.
 - [x] **Q-3. Does the inset apply to the line when pinned rows show it.** Proposal: yes, one inset
   of 6 px for both lines (FR-5). Answered (Tore, 2026-11-26): the proposal.
+
+- [x] **Q-4. The gap and the label's look.** Tore asked for the exact look of Arc's line (screenshot of
+  2026-11-26 16:36). Proposal: the line ends 8 px before the arrow; the label is 11 px, weight 600,
+  in the sidebar's muted text color at rest and the full text color on hover; the arrow and the word
+  keep 4 px between them. The design measures Arc's screenshot and the lab, and adjusts within 1 px. Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-5. One line or two.** With the Favorites grid off the visible line is today the pinned-last
+  border (FR-5), and the Clear row draws no line of its own, so the line could not stop before the
+  label. Proposal: while a Today tab is visible, the Clear row always draws the only separator line
+  (FR-9) and the pinned-last line is not drawn; with no Today tab both stay hidden (FR-1). FR-5 and
+  AC-6 then apply to that single line. In Arc the line sits between the folders and Today whether or
+  not pinned tabs exist. Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-6. Hover state.** Proposal: keep a hover state (FR-10, AC-11) so the label still reads as a
+  button; if Arc shows none, drop AC-11 and FR-10's last clause. Answered (Tore, 2026-11-26): the proposal.
 
 ## References
 

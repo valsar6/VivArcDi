@@ -69,4 +69,53 @@ T2 ──┼──> T3 (lead: docs and version) ──> T4 (Tore: manual)
   tab; open a Today tab and confirm the line and Clear return, the line starting and ending where
   the rows do and Clear at its right end; check that the pinned-last line, when pinned rows are
   visible, has the same inset; confirm every Today title is centered in its row. Compare with Arc
-  and record the result in the checklist built from AC-8 (in Italian).
+  and record the result in the checklist built from AC-8 (in Italian). T8 absorbs the check of the
+  line and Clear once the amendment ships; do T4 and T8 in one session, after T7.
+
+## Amendment tasks (FR-8 to FR-10)
+
+Branch `fix/067-clear-always-shown`, with a patch version change read from `origin/main` right before
+T7. T5 and T6 own disjoint files and run in parallel, each in its own worktree from the same base
+commit; T7 and T8 run alone after them. TDD as above. The lab probe needs Tore's agreement (he agreed
+to lab use for probes).
+
+```
+T5 ──┐
+T6 ──┴──> T7 (lead: docs and version) ──> T8 (Tore: manual)
+```
+
+| Task | Owns |
+|---|---|
+| T5 | `src/modules/today/ClearSeparator.ts`, `tests/modules/today/ClearSeparator.test.ts` |
+| T6 | `src/styles/today.scss`, `src/styles/pinned.scss`, `tests/styles/Today.test.ts`, `tests/styles/Pinned.test.ts`, the probe file |
+| T7 | `specs/` (notes in the 060 design and tasks, 067 status), `docs/manual/tab-bar.md`, `README.md`, version files |
+| T8 | Nothing in the repository |
+
+- [ ] **T5. Always-on line mark** (TDD; parallel with T6). Change the bodies of
+  `shows the Clear line when a Today tab opens` and of `draws its line only when no pinned row shows
+  it`, renamed `draws its line whether or not a pinned row shows it`, so they fail. Then remove
+  `#line()` and set `data-vivarcdi-clear-line` in `sync` next to `#mark(false)`, guarded by
+  `hasAttribute`; drop the `PINNED_LAST_ATTRIBUTE` import if unused. Keep `firstTodaySlot`, `#place`
+  and the empty state. Done when `make check` is green.
+- [ ] **T6. Styles and probe** (TDD; parallel with T5). Add `shows the Clear label at rest` (AC-9),
+  `ends the Clear line before its label` (AC-10) and `strengthens the Clear label on hover` (AC-11)
+  to `tests/styles/Today.test.ts`; update the bodies of `draws the Clear bar on the separator above
+  the Today tabs`, `insets the Clear line like the rows`, `insets the pinned-last border like the
+  rows` and `hides the pinned-last border while there is no Today tab` as the design says. Then
+  change `today.scss` (flex row, flex line, static muted label, hover color) and `pinned.scss`
+  (remove the pinned-last `::after` and its empty-state twin). Write the probe and run it on a lab
+  Vivaldi 8.3 (`npm run live -- --probe <file>`), with and without pinned tabs and the Favorites
+  grid on and off. Report the numbers against the limits of the design and say whether the 13 px
+  band above Today exists with no pinned tab. Run the scenario `the Clear bar keeps a box above
+  Today with the Favorites grid on` and do not edit it. Done when `make check` is green and the
+  probe is within 1 px.
+- [ ] **T7. Docs and version** (lead; after T5 and T6). Update `docs/manual/tab-bar.md` and
+  `README.md` to say Clear shows at rest; note in the 060 design and tasks that
+  `draws its line only when no pinned row shows it` was renamed by 067; read the version on
+  `origin/main` and bump the patch in the three version files. Done when `make check` is green.
+- [ ] **T8. Tore's manual check** (last). On Vivaldi 8.3, with and without pinned tabs, the
+  Favorites grid on and off, light and dark: with a Today tab, confirm "↓ Clear" shows without hover
+  in a muted color and gets stronger on hover and keyboard focus; confirm the line starts at the
+  left inset, ends with a visible gap before the arrow, sits on the middle of the label, and that
+  only one line shows between the folders (or pinned rows) and Today; confirm a click still
+  archives. Compare with Arc and record the result in the checklist built from AC-8 (in Italian).
