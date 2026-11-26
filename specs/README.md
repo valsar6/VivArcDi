@@ -65,7 +65,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [055 Open a tile as a web panel](055-tile-web-panel/spec.md) | 3 | Implemented |
 | [056 Menu of a saved tab](056-saved-tab-menu/spec.md) | 3 | Implemented |
 | [057 Menu of a Favorites tile](057-tile-menu/spec.md) | 1 | Implemented |
-| [058 Pinned tabs on Vivaldi 8.3](058-pinned-tabs-83/spec.md) | 3 | Draft |
+| [058 Pinned tabs on Vivaldi 8.3](058-pinned-tabs-83/spec.md) | 3 | Approved |
 | [059 Pinned tabs and Favorites like Arc](059-pinned-tabs-arc/spec.md) | 3 | Implemented |
 | [060 Clear bar and pinned tile unload](060-clear-bar-and-pinned-unload/spec.md) | 3 | Implemented |
 | [061 Pinned minus UI](061-pinned-minus-ui/spec.md) | 3 | Approved |
