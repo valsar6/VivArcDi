@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-26, PR #295) |
 | Spec | [spec.md](spec.md) |
 
-Tore approved the spec on 2026-11-26 (PR #294). This document says **how** to implement it. It builds
+Tore approved the spec on 2026-11-26 (PR #294) and the design on the same day (PR #295). This
+document says **how** to implement it. It builds
 on the row look of [028](../028-arc-sidebar-look/design.md) and the shared minus of
 [061](../061-pinned-minus-ui/design.md) and [062](../062-minus-hover-and-indent/design.md).
 
