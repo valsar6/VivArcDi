@@ -2,9 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
+| Approved | 2026-11-26 (PR #298) |
 | Amends | [060](../060-clear-bar-and-pinned-unload/spec.md) FR-1: the Clear control keeps a non-zero box only while the workspace has a Today tab. It also refines the divider with Clear of [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and [028](../028-arc-sidebar-look/spec.md) FR-5, and the title of the row of 028. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -115,13 +116,13 @@ proposed as future `live:` checks on a lab Vivaldi; until then AC-8 covers them.
 
 ## Open questions
 
-- [ ] **Q-1. What is hidden with no Today tab.** Proposal: the native pinned-last border and the Clear
+- [x] **Q-1. What is hidden with no Today tab.** Proposal: the native pinned-last border and the Clear
   line, and also the gap and margin they reserve, so New Tab sits right under the folders as in Arc.
-  The alternative hides only the drawn line and keeps the gap.
-- [ ] **Q-2. What counts as "no Today tab".** Proposal: only visible Today slots count, as
-  `ClearSeparator` already does; hidden-by-folder and linked tabs do not (FR-3).
-- [ ] **Q-3. Does the inset apply to the line when pinned rows show it.** Proposal: yes, one inset
-  of 6 px for both lines (FR-5).
+  The alternative hides only the drawn line and keeps the gap. Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-2. What counts as "no Today tab".** Proposal: only visible Today slots count, as
+  `ClearSeparator` already does; hidden-by-folder and linked tabs do not (FR-3). Answered (Tore, 2026-11-26): the proposal.
+- [x] **Q-3. Does the inset apply to the line when pinned rows show it.** Proposal: yes, one inset
+  of 6 px for both lines (FR-5). Answered (Tore, 2026-11-26): the proposal.
 
 ## References
 
