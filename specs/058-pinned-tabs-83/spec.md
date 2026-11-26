@@ -94,13 +94,11 @@ selector check on 8.3 reports no failed selector.
 | AC-2 | WHEN the pinned rows sit in a group beside the tab strip, THE module SHALL mark the last pinned row shown with the separator. | auto: `marks the separator after the last pinned row of a group beside the tab strip` |
 | AC-3 | THE selector catalog in use on Vivaldi 8.3 SHALL define every selector the 8.1 catalog defines. | auto: `defines on Vivaldi 8.3 every selector of the 8.1 catalog` |
 | AC-4 | WHEN the minus of a pinned row inside a group beside the tab strip is clicked, THE module SHALL unload the tab and SHALL NOT close it. | auto: `unloads a pinned tab from its minus in a group beside the tab strip` |
-| AC-5 | WHEN a pinned row shows in Vivaldi 8.3's pinned group and its tab browsed away, THE last pinned row SHALL carry the separator, a click on its minus SHALL unload the tab, and opening it SHALL load its pinned page. | manual |
+| AC-5 | WHEN a pinned row shows in Vivaldi 8.3's pinned group and its tab browsed away, THE last pinned row SHALL carry the separator, a click on its minus SHALL unload the tab, and opening it SHALL load its pinned page. | live: `the separator and the minus work on the pinned group` |
 | AC-6 | WHEN Tore pins a tab on Vivaldi 8.3, browses away and unloads it from its minus, with the Favorites grid on and then off, THE row SHALL keep its favicon, the separator SHALL sit below the last pinned row and the dimmed row SHALL look as on a pinned row of 059. | manual |
 | AC-7 | WHILE the pinned rows sit inside the tab strip, as on Vivaldi 8.1 and 8.2, THE module SHALL mark the separator after the last pinned row as before. | auto: `marks the separator after the last pinned row inside the tab strip` |
 
-AC-5 becomes `live: the separator and the minus work on the pinned group` in the same commit that adds
-its scenario: naming it earlier would fail `every live check has a scenario`. No Vivaldi 8.1 or 8.2
-is available to Tore (Q-3), so AC-7 and the existing strip tests stand in for a manual run there.
+No Vivaldi 8.1 or 8.2 is available to Tore (Q-3), so AC-7 and the existing strip tests stand in for a manual run there.
 
 ## Out of scope
 

@@ -30,13 +30,13 @@ T3 ──┘
 
 ## Tasks
 
-- [ ] **T1. The 8.1 catalog serves 8.3** (AC-3). Add `DiskLoader` to `tests/loader/fakes.ts`,
+- [x] **T1. The 8.1 catalog serves 8.3** (AC-3). Add `DiskLoader` to `tests/loader/fakes.ts`,
   reading payload files from `src/` with `node:fs/promises`. Add
   `defines on Vivaldi 8.3 every selector of the 8.1 catalog` to
   `tests/loader/SelectorCatalog.test.ts`: load the catalog for `8.3.4191.47`, assert no key of
   `src/selectors/8.1.json` is missing, and assert `standsInFor('8.3.4191.47')` while the index lists
   no `8.3`. Done when `make check` is green.
-- [ ] **T2. The pinned rows in both layouts** (AC-4, AC-7). In `tests/modules/pinned/fakes.ts` let
+- [x] **T2. The pinned rows in both layouts** (AC-4, AC-7). In `tests/modules/pinned/fakes.ts` let
   `MinusDocument` put a row inside a `group` node. Add
   `unloads a pinned tab from its minus in a group beside the tab strip` to `PinnedTabs.test.ts` with
   the assertions of `unloads a pinned tab from its minus`, and
@@ -44,7 +44,7 @@ T3 ──┘
   `favorites/fakes.ts` catalog, two pinned rows, one normal tab and no group. If a test fails, fix
   `src/modules/pinned/` and report it, so T4 picks the `fix/` branch. Done when `make check` is
   green.
-- [ ] **T3. The live scenario** (AC-5). Add the scenario of the design with `name`
+- [x] **T3. The live scenario** (AC-5). Add the scenario of the design with `name`
   `the separator and the minus work on the pinned group` and `spec` `058`: read `maxTiles` from
   `src/config.json`, pin `maxTiles + 1` tabs, browse the last one away, assert the separator on the
   last row of `pinnedGroup`, click its minus, wait for `discarded`, activate it and wait for its

@@ -46,14 +46,17 @@ const scenario: Scenario = {
       await driver.waitForElement(rows);
       const id = ids[count - 1] as number;
       await driver.evaluate(`chrome.tabs.update(${id}, { url: ${JSON.stringify(AWAY)} })`);
-      const seen = await driver.evaluate<Seen>(`(() => {
+      const lastMarked = `(() => {
         const all = [...document.querySelectorAll(${JSON.stringify(rows)})];
-        return { rows: all.length, lastMarked: all.at(-1)?.matches(${JSON.stringify(LAST)}) ?? false };
-      })()`);
-      if (!seen.lastMarked) {
+        return { rows: all.length, lastMarked: all.at(-1)?.closest(${JSON.stringify(LAST)}) != null };
+      })()`;
+      try {
+        await driver.waitFor(`${lastMarked}.lastMarked`);
+      } catch {
+        const seen = await driver.evaluate<Seen>(lastMarked);
         throw new Error(`the last of ${seen.rows} pinned rows has no separator mark`);
       }
-      await driver.click(`${rows}${LAST} ${MINUS}`);
+      await driver.click(`${driver.selector('pinnedGroup')} ${LAST} ${MINUS}`);
       await driver.waitFor(`chrome.tabs.get(${id}).then((tab) => tab.discarded)`);
       await driver.evaluate(`chrome.tabs.update(${id}, { active: true })`);
       const page = JSON.stringify(`about:blank#058-${count - 1}`);
