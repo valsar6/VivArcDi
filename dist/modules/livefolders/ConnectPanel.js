@@ -1,3 +1,4 @@
+import { systemTimers } from "../../core/support/Timers.js";
 const PANEL_ATTRIBUTE = "data-vivarcdi-connect-panel";
 const CODE_ATTRIBUTE = "data-vivarcdi-connect-code";
 const PRIMARY_ATTRIBUTE = "data-vivarcdi-connect-primary";
@@ -15,10 +16,6 @@ const CANCEL_LABEL = "Cancel";
 const RETRY_LABEL = "Try again";
 const COPIED_MESSAGE = "Code copied, paste it on GitHub";
 const CANCELLED_MESSAGE = "GitHub connection cancelled";
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
 class ConnectPanel {
   #deps;
   #timers;
@@ -37,7 +34,7 @@ class ConnectPanel {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
   /**
    * Opens the panel at a point, closing the one that is open, and starts connecting.

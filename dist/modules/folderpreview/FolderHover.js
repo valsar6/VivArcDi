@@ -1,10 +1,7 @@
+import { systemTimers } from "../../core/support/Timers.js";
 const FOLDER_ROW = "[data-vivarcdi-folder-id]";
 const PANEL = "[data-vivarcdi-preview]";
 const OPEN_MARK = "data-vivarcdi-open";
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
 class FolderHover {
   #document;
   #delayMs;
@@ -23,7 +20,7 @@ class FolderHover {
    * @param handlers What to do on rest and on leave.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(document, delayMs, handlers, timers = defaultTimers) {
+  constructor(document, delayMs, handlers, timers = systemTimers) {
     this.#document = document;
     this.#delayMs = delayMs;
     this.#handlers = handlers;

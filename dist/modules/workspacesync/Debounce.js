@@ -1,7 +1,4 @@
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
+import { systemTimers } from "../../core/support/Timers.js";
 class Debounce {
   #run;
   #delayMs;
@@ -14,7 +11,7 @@ class Debounce {
    * @param delayMs How long to wait after the last request, in milliseconds.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(run, delayMs, timers = defaultTimers) {
+  constructor(run, delayMs, timers = systemTimers) {
     this.#run = run;
     this.#delayMs = delayMs;
     this.#timers = timers;

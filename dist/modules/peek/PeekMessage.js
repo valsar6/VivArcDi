@@ -1,27 +1,11 @@
+import { hasEnvelope, parsePageMessage } from "../../shared/messages/PageMessage.js";
 const PEEK_MESSAGE_TYPE = "vivarcdi-peek";
 const CONSOLE_PREFIX = "vivarcdi-peek:";
 const DISPOSITIONS = /* @__PURE__ */ new Set(["new-window", "new-tab", "same-tab"]);
 const COMMANDS = /* @__PURE__ */ new Set(["close", "expand"]);
+const isPeekMessage = (candidate) => hasEnvelope(candidate, PEEK_MESSAGE_TYPE) && (isOpen(candidate) || isCommand(candidate));
 function parsePeekMessage(value) {
-  const candidate = typeof value === "string" ? fromConsole(value) : value;
-  if (typeof candidate !== "object" || candidate === null) {
-    return null;
-  }
-  const message = candidate;
-  if (message["type"] !== PEEK_MESSAGE_TYPE || typeof message["token"] !== "string") {
-    return null;
-  }
-  return isOpen(message) || isCommand(message) ? message : null;
-}
-function fromConsole(line) {
-  if (!line.startsWith(CONSOLE_PREFIX)) {
-    return null;
-  }
-  try {
-    return JSON.parse(line.slice(CONSOLE_PREFIX.length));
-  } catch {
-    return null;
-  }
+  return parsePageMessage(value, CONSOLE_PREFIX, isPeekMessage);
 }
 function isOpen(message) {
   return message["action"] === "open" && typeof message["url"] === "string" && typeof message["tabId"] === "number" && DISPOSITIONS.has(message["disposition"]);

@@ -1,3 +1,4 @@
+import { systemTimers } from "../../../core/support/Timers.js";
 import { LinkId } from "../../../shared/links/LinkId.js";
 import { notifyRowsDrawn } from "../../../shared/links/InPlaceEditor.js";
 import { EDIT_ATTRIBUTE, FolderNameEditor } from "../editing/FolderNameEditor.js";
@@ -9,10 +10,6 @@ const LETTER_CLASS = `${ICON_CLASS} vivarcdi-folders-letter`;
 const ROW_ATTRIBUTES = ["data-vivarcdi-folder-id", "data-vivarcdi-link-id"];
 const CLICK_DELAY_MS = 250;
 const LEAVE_MS = 220;
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
 class FolderSectionView {
   #document;
   #handlers;
@@ -38,7 +35,7 @@ class FolderSectionView {
    * @param handlers What a click on a folder row, on a link row and on the minuses does, what a new name does, and what a right click on a live folder or one of its rows does.
    * @param timers Timers, replaceable in tests.
    */
-  constructor(document, handlers, timers = defaultTimers) {
+  constructor(document, handlers, timers = systemTimers) {
     this.#document = document;
     this.#handlers = handlers;
     this.#timers = timers;

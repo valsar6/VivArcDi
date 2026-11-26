@@ -1,11 +1,8 @@
+import { systemTimers } from "../support/Timers.js";
 const TOAST_ATTRIBUTE = "data-vivarcdi-toast";
 const VISIBLE_ATTRIBUTE = "data-vivarcdi-visible";
 const ACTIONABLE_ATTRIBUTE = "data-vivarcdi-actionable";
 const KIND_ATTRIBUTE = "data-vivarcdi-toast-kind";
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
 class Toast {
   #deps;
   #timers;
@@ -21,7 +18,7 @@ class Toast {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
   /**
    * Shows a message for the toast's duration.

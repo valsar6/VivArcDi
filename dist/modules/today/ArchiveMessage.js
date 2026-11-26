@@ -1,23 +1,9 @@
+import { hasEnvelope, parsePageMessage } from "../../shared/messages/PageMessage.js";
 const ARCHIVE_MESSAGE_TYPE = "vivarcdi-archive";
 const ARCHIVE_CONSOLE_PREFIX = "vivarcdi-archive:";
+const isArchiveMessage = (candidate) => hasEnvelope(candidate, ARCHIVE_MESSAGE_TYPE) && candidate["action"] === "open";
 function parseArchiveMessage(value) {
-  const candidate = typeof value === "string" ? fromConsole(value) : value;
-  if (typeof candidate !== "object" || candidate === null) {
-    return null;
-  }
-  const message = candidate;
-  const valid = message["type"] === ARCHIVE_MESSAGE_TYPE && typeof message["token"] === "string" && message["action"] === "open";
-  return valid ? message : null;
-}
-function fromConsole(line) {
-  if (!line.startsWith(ARCHIVE_CONSOLE_PREFIX)) {
-    return null;
-  }
-  try {
-    return JSON.parse(line.slice(ARCHIVE_CONSOLE_PREFIX.length));
-  } catch {
-    return null;
-  }
+  return parsePageMessage(value, ARCHIVE_CONSOLE_PREFIX, isArchiveMessage);
 }
 export {
   ARCHIVE_CONSOLE_PREFIX,

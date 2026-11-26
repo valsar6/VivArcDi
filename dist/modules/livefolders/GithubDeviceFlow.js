@@ -1,13 +1,10 @@
+import { systemTimers } from "../../core/support/Timers.js";
 const CODE_URL = "https://github.com/login/device/code";
 const TOKEN_URL = "https://github.com/login/oauth/access_token";
 const SCOPE = "repo";
 const GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code";
 const SLOW_DOWN_SECONDS = 5;
 const MS_PER_SECOND = 1e3;
-const defaultTimers = {
-  set: (run, delayMs) => setTimeout(run, delayMs),
-  clear: (handle) => clearTimeout(handle)
-};
 class DeviceFlowFailure extends Error {
   /** Why the flow ended without a token. */
   reason;
@@ -38,7 +35,7 @@ class GithubDeviceFlow {
    */
   constructor(dependencies) {
     this.#deps = dependencies;
-    this.#timers = dependencies.timers ?? defaultTimers;
+    this.#timers = dependencies.timers ?? systemTimers;
   }
   /**
    * Asks GitHub for a sign-in code, with access to read pull requests of private repositories.
