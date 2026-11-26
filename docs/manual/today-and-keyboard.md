@@ -11,7 +11,8 @@ a stack.
 - A Today tab that has not been active for 12 hours is closed and kept in the archive. The hours
   Vivaldi was closed count too.
 - The active tab and a tab that plays audio are never archived.
-- **Clear**, shown when you rest the pointer on the line above the Today tabs, archives every Today tab
+- **Clear**, at the right end of the line above the Today tabs and always shown while there is a
+  Today tab, archives every Today tab
   of the workspace except the active one.
 
 Open the archive with the button at the bottom of the tab bar or Cmd/Ctrl+Shift+A. It lists the closed
