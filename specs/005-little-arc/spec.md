@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 5 |
 | Owner | Tore |
 | Approved | 2026-11-08 |
+| Implemented | 2026-11-09 |
 | Change request | 2026-11-09, the look of the window (section Look, FR-11 to FR-17, AC-15 to AC-24): Approved 2026-11-09 |
 | Change request | 2026-11-10, the opening with a command bar (section Opening: the command bar, FR-18 to FR-33, AC-25 to AC-43): Approved 2026-11-11 |
 | Change request | 2026-11-11, the bar as Arc draws it: no dimming and no blur, recent sites for an empty field, outside clicks swallowed, searches through the fallback address (sections Opening: the command bar and Probe results, FR-19, FR-21, FR-23, FR-25, FR-27, AC-26, AC-31, AC-38, AC-44, AC-45): Approved 2026-11-11 |

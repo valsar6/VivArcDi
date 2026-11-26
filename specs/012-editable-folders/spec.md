@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-28; revisions approved 2026-11-01 (FR-10, FR-11 and AC-19 to AC-22 moved to 018), 2026-11-08 (FR-15 and AC-29 to AC-31 removed), 2026-11-11 (FR-14, FR-16, FR-17, AC-32 to AC-40; PR #125), 2026-11-11 (FR-18, AC-41, AC-42; Tore's decision card on old links) |
+| Implemented | 2026-11-11 |
 
 ## Summary
 

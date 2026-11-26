@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-27 |
+| Implemented | 2026-10-27 |
 | Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): FR-5, AC-9, AC-10 and AC-16 are superseded; pinned tabs and Favorites keep their page without an away arrow. |
 
 ## Summary

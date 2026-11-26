@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-11-26 (PR #297) |
+| Implemented | 2026-11-26 |
 | Amended by | [059](../059-pinned-tabs-arc/spec.md) (2026-11-23): AC-1 and the away-arrow parts of AC-4 to AC-6 are superseded; the pinned-group layout and the separator stay. [060](../060-clear-bar-and-pinned-unload/spec.md) (2026-11-24): the pinned rows with the grid on are tiles up to `maxTiles`. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).

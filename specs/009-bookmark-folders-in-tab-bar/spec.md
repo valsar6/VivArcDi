@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
 | Approved | 2026-10-27; revision approved 2026-10-28; revision of 2026-11-12 (FR-18, FR-19, AC-29 to AC-32) approved 2026-11-12 (PR #146 merged by Tore) |
+| Implemented | 2026-11-25 |
 | Refined by | [062 Minus on hover and open-link indent](../062-minus-hover-and-indent/spec.md) FR-4, FR-5 and AC-13: an open link is marked by indentation, without a dot. [063 Minus closes folder link tabs](../063-minus-closes-folder-tabs/spec.md) FR-12 and FR-15: the row minuses close tabs. |
 
 ## Summary

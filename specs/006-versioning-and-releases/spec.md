@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | Tooling |
 | Owner | Tore |
 | Approved | 2026-10-25, rules given by Tore; approved together with the implementation by merging its pull request |
+| Implemented | 2026-10-25 |
 
 ## Summary
 
