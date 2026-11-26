@@ -1,8 +1,8 @@
 @use 'tokens' as *;
 
-$rows: '#{$strip} > :not(#{$tile}) .tab-wrapper';
-$row-tabs: '#{$strip} > :not(#{$tile}) .tab';
-$tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
+$rows: '#{$strip} > :not(#{$tile}) #{$tab-wrapper}';
+$row-tabs: '#{$strip} > :not(#{$tile}) #{$tab}';
+$tile-wrappers: '#{$strip} > #{$tile} #{$tab-wrapper}';
 
 #{$look} {
   --vivarcdi-space: var(--vivarcdi-space-theme, #{$arclight-space});
@@ -14,7 +14,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
   --vivarcdi-line: color-mix(in srgb, var(--vivarcdi-ink) #{$separator-tint}, transparent);
 
   #{$tab-bar},
-  #{$tab-bar} #tabs-container {
+  #{$tab-bar} #{$tabs-container} {
     background-color: var(--vivarcdi-space) !important;
   }
 
@@ -22,27 +22,27 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     background: var(--vivarcdi-gradient) !important;
 
     #{$tab-bar},
-    #{$tab-bar} #tabs-container,
-    #panels-container,
-    #panels,
-    #switch {
+    #{$tab-bar} #{$tabs-container},
+    #{$panels-container},
+    #{$panels},
+    #{$switch} {
       background-color: transparent !important;
     }
   }
 
-  &.auto-hide .auto-hide-wrapper {
+  &#{$auto-hide} #{$auto-hide-wrapper} {
     background-color: var(--vivarcdi-space) !important;
   }
 
-  #{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
+  #{$tab-bar} :is(#{$new-tab-button}, #{$button-toolbar}#{$toolbar-spacer-flexible}) {
     display: none !important;
   }
 
-  #{$tab-bar} .tabbar-nested-buttons:not(:has(.button-toolbar:not(.toolbar-spacer, .toolbar-spacer-flexible))) {
+  #{$tab-bar} #{$tabbar-nested-buttons}:not(:has(#{$button-toolbar}:not(#{$toolbar-spacer}, #{$toolbar-spacer-flexible}))) {
     display: none !important;
   }
 
-  #{$tab-bar} #tabs-container {
+  #{$tab-bar} #{$tabs-container} {
     ::-webkit-scrollbar {
       width: $scrollbar-width;
     }
@@ -71,7 +71,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
       background-color: var(--vivarcdi-hover) !important;
     }
 
-    &:has(.tab.active) {
+    &:has(#{$tab}#{$active}) {
       background-color: var(--vivarcdi-pill) !important;
       box-shadow: $pill-shadow;
     }
@@ -82,13 +82,13 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     background: transparent !important;
   }
 
-  #{$rows} .tab-header {
+  #{$rows} #{$tab-header} {
     display: flex;
     align-items: center;
     height: 100%;
   }
 
-  #{$rows} .title {
+  #{$rows} #{$title} {
     align-self: center;
     line-height: normal;
     color: var(--vivarcdi-ink) !important;
@@ -103,15 +103,15 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     transition: padding-inline-end $transition;
   }
 
-  #{$strip} > :not(#{$tile}) .tab-position.is-pinned:hover .title {
+  #{$strip} > :not(#{$tile}) #{$tab-position}#{$is-pinned}:hover #{$title} {
     padding-inline-end: $minus-badge-size + $minus-offset;
   }
 
-  #{$rows}:hover .favicon {
+  #{$rows}:hover #{$favicon} {
     display: block !important;
   }
 
-  #{$rows} .close {
+  #{$rows} #{$close} {
     position: relative !important;
     box-sizing: border-box;
     flex: none;
@@ -149,14 +149,14 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     }
   }
 
-  #{$rows}:hover .close {
+  #{$rows}:hover #{$close} {
     width: $minus-badge-size;
     margin-inline-end: $minus-offset;
     opacity: 1;
     pointer-events: auto;
   }
 
-  #{$rows} .close:hover {
+  #{$rows} #{$close}:hover {
     background-color: color-mix(in srgb, var(--colorFg, #fff) $minus-badge-hover-tint, transparent);
 
     &::before {
@@ -177,7 +177,7 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     --vivarcdi-tile-bg-active: var(--vivarcdi-pill);
   }
 
-  #{$tile-wrappers}:has(.tab.active),
+  #{$tile-wrappers}:has(#{$tab}#{$active}),
   #{$own-tile}#{$tile-current} {
     background-color: var(--vivarcdi-pill) !important;
     box-shadow: $pill-shadow;

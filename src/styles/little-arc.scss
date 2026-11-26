@@ -23,7 +23,7 @@ $indicator-tile-offset: 4px;
   transform: translateY(-50%);
 }
 
-#browser:not(#{$little-arc}) #{$indicator} {
+#{$browser}:not(#{$little-arc}) #{$indicator} {
   position: relative;
 
   &:not(#{$own-tile})::after {
@@ -31,7 +31,7 @@ $indicator-tile-offset: 4px;
   }
 }
 
-#browser:not(#{$little-arc}) #{$own-tile}#{$indicator} > .tab-position .tab-wrapper::after {
+#{$browser}:not(#{$little-arc}) #{$own-tile}#{$indicator} > #{$tab-position} #{$tab-wrapper}::after {
   @include indicator-icon;
 
   top: $indicator-tile-offset;
@@ -39,7 +39,7 @@ $indicator-tile-offset: 4px;
   transform: none;
 }
 
-#browser#{$little-arc} {
+#{$browser}#{$little-arc} {
   --little-arc-space: var(--vivarcdi-space, #{$arclight-space});
   --little-arc-pill: var(--vivarcdi-pill, #{$arclight-pill});
   --little-arc-ink: var(--vivarcdi-ink, #{$arclight-ink});
@@ -193,7 +193,7 @@ $indicator-tile-offset: 4px;
   }
 }
 
-#browser #{$command-bar-class}-catcher {
+#{$browser} #{$command-bar-class}-catcher {
   --command-bar-card: #{$command-bar-card};
   --command-bar-text: var(--vivarcdi-ink, #{$command-bar-text});
   --command-bar-placeholder: #{$command-bar-placeholder};

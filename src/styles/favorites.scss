@@ -18,15 +18,15 @@
   height: auto !important;
 }
 
-#{$root} #{$grid} > :has(> .tab-position) {
+#{$root} #{$grid} > :has(> #{$tab-position}) {
   display: contents !important;
 }
 
-#{$root} #{$grid} > :not(:has(> .tab-position)) {
+#{$root} #{$grid} > :not(:has(> #{$tab-position})) {
   grid-column: 1 / -1;
 }
 
-#{$root} #{$grid} > * > .tab-position {
+#{$root} #{$grid} > * > #{$tab-position} {
   grid-column: 1 / -1;
   position: relative !important;
   inset: auto !important;
@@ -35,19 +35,19 @@
   transform: none !important;
 }
 
-#{$root} #{$grid} > #{$tile} > .tab-position {
+#{$root} #{$grid} > #{$tile} > #{$tab-position} {
   grid-column: auto;
 }
 
 #{$root} #{$grid} > #{$tile} + :not(#{$tile}),
-#{$root} #{$grid} > #{$tile} + :not(#{$tile}) > .tab-position {
+#{$root} #{$grid} > #{$tile} + :not(#{$tile}) > #{$tab-position} {
   margin-top: var(--vivarcdi-favorites-gap, #{$gap});
 }
 
 #{$root} #{$tile} {
-  .tab-position,
-  .tab-wrapper,
-  .tab {
+  #{$tab-position},
+  #{$tab-wrapper},
+  #{$tab} {
     width: 100% !important;
     min-width: 0 !important;
     height: var(--vivarcdi-favorites-tile-height, #{$tile-height}) !important;
@@ -55,7 +55,7 @@
     margin: 0 !important;
   }
 
-  .tab-wrapper {
+  #{$tab-wrapper} {
     position: relative !important;
     border-radius: var(--vivarcdi-radius);
     background-color: var(--vivarcdi-tile-bg) !important;
@@ -66,19 +66,19 @@
       background-color: var(--vivarcdi-tile-bg-hover) !important;
     }
 
-    &:has(.tab.active) {
+    &:has(#{$tab}#{$active}) {
       background-color: var(--vivarcdi-tile-bg-active) !important;
       box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
     }
   }
 
-  .tab,
-  .tab-header {
+  #{$tab},
+  #{$tab-header} {
     position: static !important;
     background: transparent !important;
   }
 
-  .favicon {
+  #{$favicon} {
     position: absolute !important;
     inset: 0 !important;
     width: $favicon-size !important;
@@ -90,16 +90,16 @@
       filter var(--vivarcdi-transition);
   }
 
-  .favicon img {
+  #{$favicon} img {
     width: 100% !important;
     height: 100% !important;
   }
 
-  :is(.title, .close, .stack-counter, .svg-tab-selection, .page-progress-indicator) {
+  :is(#{$title}, #{$close}, #{$stack-counter}, #{$svg-tab-selection}, #{$page-progress-indicator}) {
     display: none !important;
   }
 
-  .button-badge {
+  #{$button-badge} {
     position: absolute !important;
     top: $badge-offset !important;
     right: $badge-offset !important;
@@ -109,7 +109,7 @@
     transform-origin: top right;
   }
 
-  .tab-audio {
+  #{$tab-audio} {
     position: absolute !important;
     top: auto !important;
     right: $audio-offset !important;
@@ -118,7 +118,7 @@
   }
 }
 
-#{$root} #{$unloaded} .favicon {
+#{$root} #{$unloaded} #{$favicon} {
   opacity: $unloaded-opacity;
   filter: saturate($unloaded-saturation);
 }

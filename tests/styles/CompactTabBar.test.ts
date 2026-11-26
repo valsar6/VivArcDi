@@ -11,7 +11,6 @@ const selectors = (): string[] => [...compiled().matchAll(/^([^\s@}][^{]*)\{/gm)
 const NARROW = '#browser[data-vivarcdi-active]:has(#tabs-tabbar-container.narrow)';
 
 const TOKENS: Array<[string, string]> = [
-  ['$narrow-tab-bar', "'#tabs-tabbar-container.narrow'"],
   ['$chevron-size', '10px'],
   ['$chevron-gap', '2px'],
 ];
@@ -52,6 +51,8 @@ test('compact tab bar uses tokens', () => {
     assert.ok(tokens.includes(`${name}: ${value};`), `${name} is defined as ${value}`);
     assert.ok(source.includes(name), `${name} is used`);
   }
+  assert.ok(read('_vivaldi.scss').includes("$narrow-tab-bar: '#tabs-tabbar-container.narrow';"), '$narrow-tab-bar is defined');
+  assert.ok(source.includes('$narrow-tab-bar'), '$narrow-tab-bar is used');
   assert.ok(tokens.includes('$archive-icon-size: 18px;'), '$archive-icon-size is defined as 18px');
   assert.ok(read('today.scss').includes('$archive-icon-size'), '$archive-icon-size is used');
   const users: Array<[string, string]> = [['$chevron-glyph', source], ['$archive-glyph', read('today.scss')]];
