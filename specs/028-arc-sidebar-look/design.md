@@ -55,7 +55,7 @@ Rejected:
 | `src/modules/sidebarlook/SidebarLook.ts` | Module: sets `data-vivarcdi-look`, the default palette variables and the scroll mark; adds the New Tab row | Template method (`Module`) |
 | `src/modules/sidebarlook/ScrollMark.ts` | Sets `data-vivarcdi-scrolling` on the tab list while it scrolls and 800 ms after (FR-7) | Observer |
 | `src/modules/sidebarlook/Palettes.ts` | The six palettes as data (name, space, pill, ink), the default, and `contrast()` for AC-11; 019 reads it for its presets (FR-11) | Value object |
-| `src/core/NewTabRow.ts` | Moved from `incognito`; shared by 013 and 028 | – |
+| `src/shared/newtab/NewTabRow.ts` | Moved from `incognito`; shared by 013 and 028 | – |
 | `src/modules/favorites/PinnedFavorites.ts` | Own tiles for the pinned tabs no Favorite is linked to, under the Favorites or alone when the folder is missing or empty; click activates the tab | Adapter, same interface as `BookmarkFavorites` |
 | `src/modules/favorites/FavoritesGrid.ts` | Chooses the source: bookmark folder with links, otherwise pinned tabs | Strategy |
 | `src/styles/sidebar-look.scss` | All rules of the look, under `$look` | – |

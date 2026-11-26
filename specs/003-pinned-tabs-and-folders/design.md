@@ -63,14 +63,14 @@ Rejected alternatives:
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/bookmarks/BrowserBookmarks.ts` | Promise-based `chrome.bookmarks`: `getTree`, change events (shared with 009) | Adapter |
-| `src/core/bookmarks/BookmarkFolderFinder.ts` | Finds a folder by a path of exact titles, first match (shared with 009) | |
-| `src/core/bookmarks/BookmarkNode.ts` | Bookmark type used by both modules | |
-| `src/core/TabBarAnchor.ts` | Host above the tab list shared with 009: created once, re-created if removed, `add(element, order)` | |
-| `src/core/TabData.ts` | Reads and writes `vivExtData`: workspace id and VivArcDi's key, other keys untouched | Adapter |
-| `src/core/AddressKey.ts` | Moved from `reopen/`, shared by 007, 003 and 009 | Value object |
-| `src/core/TabUnloader.ts` | Moved from `favorites/TileUnloader.ts` | |
-| `src/core/PageScriptInjector.ts` | Moved from `peek/` and made generic: a script per tab, chosen by a function | |
+| `src/core/browser/bookmarks/BrowserBookmarks.ts` | Promise-based `chrome.bookmarks`: `getTree`, change events (shared with 009) | Adapter |
+| `src/core/browser/bookmarks/BookmarkFolderFinder.ts` | Finds a folder by a path of exact titles, first match (shared with 009) | |
+| `src/core/browser/bookmarks/BookmarkNode.ts` | Bookmark type used by both modules | |
+| `src/core/dom/TabBarAnchor.ts` | Host above the tab list shared with 009: created once, re-created if removed, `add(element, order)` | |
+| `src/core/tabs/TabData.ts` | Reads and writes `vivExtData`: workspace id and VivArcDi's key, other keys untouched | Adapter |
+| `src/core/tabs/AddressKey.ts` | Moved from `reopen/`, shared by 007, 003 and 009 | Value object |
+| `src/core/tabs/TabUnloader.ts` | Moved from `favorites/TileUnloader.ts` | |
+| `src/core/browser/PageScriptInjector.ts` | Moved from `peek/` and made generic: a script per tab, chosen by a function | |
 | `src/modules/favorites/FavoritesFolder.ts` | Web links of the folder, in order, rebuilt on bookmark events (AC-1, AC-2) | Observer |
 | `src/modules/favorites/LinkedTabs.ts` | Linked tab of each Favorite in the current window and workspace, from tab events (AC-5, AC-13) | Repository |
 | `src/modules/favorites/FavoriteOpener.ts` | Tile click: activate, reload, or open and link a pinned tab; reset when active and away (AC-3, AC-4, AC-10) | |

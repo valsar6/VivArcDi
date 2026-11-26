@@ -34,7 +34,7 @@ element added to the tab bar (NFR-3).
    are skipped on load and logged once.
 5. **Restore (FR-4, AC-6).** `ArchiveRestorer` creates the tab with the entry's address, writes the
    entry's workspace into its `vivExtData` and activates it, then removes the entry. Creating a tab in a
-   workspace is the step 009's `LinkActivator` already does; it moves to `src/core/WorkspaceTabs.ts`
+   workspace is the step 009's `LinkActivator` already does; it moves to `src/core/workspaces/WorkspaceTabs.ts`
    with a `workspace` argument, and `LinkActivator` calls it.
 6. **Panel (FR-4, AC-9, AC-10).** `ArchivePanelView` is a popover drawn over the tab bar, styled like
    the folder panel of 008: a search field with focus, then groups by day ("Today", "Yesterday", then
@@ -80,9 +80,9 @@ Rejected alternatives:
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/WorkspaceTabs.ts` | Create a tab in a given workspace; moved out of 009's `LinkActivator` | |
-| `src/core/TabData.ts` | Own key gains `lastActive` (number) | Adapter |
-| `src/core/ShortcutKeys.ts` | Pure: is a key event Cmd/Ctrl+Shift+letter for this platform | |
+| `src/core/workspaces/WorkspaceTabs.ts` | Create a tab in a given workspace; moved out of 009's `LinkActivator` | |
+| `src/core/tabs/TabData.ts` | Own key gains `lastActive` (number) | Adapter |
+| `src/core/dom/ShortcutKeys.ts` | Pure: is a key event Cmd/Ctrl+Shift+letter for this platform | |
 | `src/modules/today/ActivityStamps.ts` | Stamps tabs on deactivation, creation and start (AC-3) | Observer |
 | `src/modules/today/ActivityClock.ts` | Pure: last active time from stamp and `lastAccessed` (AC-4) | |
 | `src/modules/today/TodayTabPolicy.ts` | Pure: which tabs may be archived (AC-2) | Specification |
@@ -95,7 +95,7 @@ Rejected alternatives:
 | `src/modules/today/ArchiveButton.ts` | Footer button at the bottom of the tab bar | |
 | `src/modules/today/TodayArchive.ts` | Module: options, wiring, clean stop | Facade |
 | `src/modules/copyurl/UrlCopier.ts` | Clipboard write with fallback | Strategy |
-| `src/modules/copyurl/Toast.ts` | One toast at a time, two seconds | |
+| `src/core/dom/Toast.ts` | One toast at a time, two seconds | |
 | `src/modules/copyurl/CopyUrl.ts` | Module: shortcut, injector, clean stop | Facade |
 | `src/page/archive-keys.ts`, `src/page/copy-keys.ts` | Forward the shortcut from the page | |
 | `src/styles/today.scss`, `src/styles/toast.scss` | Panel, buttons, toast, theme colors, no-drag | |

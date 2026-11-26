@@ -10,7 +10,7 @@
   `src/core/`, the injector generic; `TabData` for `vivExtData`, used by `Workspace` and `TabTiler`.
   Existing tests pass unchanged.
 - [x] **T2.** `src/core/bookmarks/`: `BrowserBookmarks`, `BookmarkFolderFinder`, `BookmarkNode`,
-  and `src/core/TabBarAnchor.ts` (shared with 009; whichever lands first creates them).
+  and `src/core/dom/TabBarAnchor.ts` (shared with 009; whichever lands first creates them).
 - [x] **T3.** `FavoritesFolder`. AC-1, AC-2.
 - [x] **T4.** `LinkedTabs` and `FavoriteOpener`, unlink on removed bookmark. AC-3, AC-4, AC-13.
 - [x] **T5.** `FavoritesView`, glow, dimming, middle click, fallback to `FavoriteTagger` without the

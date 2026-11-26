@@ -105,15 +105,15 @@ by the same code as every other.
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/DragPill.ts` | The pill that follows the pointer, shared per window | Singleton per scope |
-| `src/core/ContextMenu.ts` | VivArcDi's own menu: items, position, closing | - |
-| `src/core/TabMenuItems.ts` | Adds items to Vivaldi's menu of a tab and runs them | Decorator over `vivaldi.contextMenu.show` |
-| `src/core/TabDragRelease.ts`, `RowDrag.ts` | Feed the pill; mark Vivaldi's dragged slot | - |
-| `src/core/TodayList.ts`, `LinkDropZone.ts`, `FavoriteDropZone.ts` | `first()` and `end()` places | - |
-| `src/modules/folders/LinkRemoval.ts`, `src/modules/favorites/FavoriteRemoval.ts` | `placeAt` and `moveTo` | Command |
-| `src/modules/folders/RowMenu.ts` | Menu of a link row: Remove pin, Tile tab | - |
+| `src/shared/dragdrop/DragPill.ts` | The pill that follows the pointer, shared per window | Singleton per scope |
+| `src/core/dom/ContextMenu.ts` | VivArcDi's own menu: items, position, closing | - |
+| `src/modules/folders/favoritelinks/TabMenuItems.ts` | Adds items to Vivaldi's menu of a tab and runs them | Decorator over `vivaldi.contextMenu.show` |
+| `src/shared/dragdrop/TabDragRelease.ts`, `RowDrag.ts` | Feed the pill; mark Vivaldi's dragged slot | - |
+| `src/shared/tabs/TodayList.ts`, `LinkDropZone.ts`, `FavoriteDropZone.ts` | `first()` and `end()` places | - |
+| `src/modules/folders/favoritelinks/LinkRemoval.ts`, `src/modules/favorites/FavoriteRemoval.ts` | `placeAt` and `moveTo` | Command |
+| `src/modules/folders/editing/RowMenu.ts` | Menu of a link row: Remove pin, Tile tab | - |
 | `src/modules/favorites/TileMenu.ts` | Menu of a tile: Untile tab, Pin tab | - |
-| `src/modules/folders/TabCommands.ts` | Pin tab and Tile tab of a tab of today, registered in `TabMenuItems` | Command |
+| `src/modules/folders/favoritelinks/TabCommands.ts` | Pin tab and Tile tab of a tab of today, registered in `TabMenuItems` | Command |
 | `src/styles/_tokens.scss`, `base.scss` | Pill and menu look; faded Vivaldi slot | - |
 | `src/modules/favorites/FirstTileArea.ts` | The drop area above the space header while there are no tiles | - |
 | `src/modules/favorites/FavoritesGrid.ts`, `GridDropZone.ts` | Place the area; treat it as the end of the grid | - |

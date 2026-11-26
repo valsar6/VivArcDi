@@ -78,9 +78,9 @@ have no bookmark on the first computer, and address keys already match tabs in 0
 | `src/modules/workspacesync/SyncPass.ts` | One merge pass over every workspace | Template method |
 | `src/modules/workspacesync/SyncNames.ts` | Store folder name of a workspace, `Tabs` outside any | |
 | `src/modules/workspacesync/Debounce.ts` | The 500 ms trigger delay | |
-| `src/core/bookmarks/BookmarkWriter.ts` | Gains `describe(id, description)` | |
-| `src/core/WorkspaceTabs.ts` | Gains `openPinned`, which writes the own page with the workspace in one write | |
-| `src/core/BrowserWindows.ts`, `BrowserTabs.ts`, `WorkspaceNames.ts` | Gain `normalIds`, `onMoved`, `idOf` | |
+| `src/core/browser/bookmarks/BookmarkWriter.ts` | Gains `describe(id, description)` | |
+| `src/core/workspaces/WorkspaceTabs.ts` | Gains `openPinned`, which writes the own page with the workspace in one write | |
+| `src/core/browser/BrowserWindows.ts`, `BrowserTabs.ts`, `WorkspaceNames.ts` | Gain `normalIds`, `onMoved`, `idOf` | |
 
 `PinnedMerge` has no browser dependency, so AC-1 to AC-8 are mostly tested on it with plain lists;
 `PinnedApplier` and `SyncStore` are tested with the fake tabs and bookmarks the other modules use.
@@ -153,8 +153,8 @@ Approved with the spec revision. It replaces step 6 (missing workspaces).
 | `src/modules/workspacesync/SpaceList.ts` | Reads and writes `VivArcDi Sync/Spaces` | Repository |
 | `src/modules/workspacesync/SpaceIds.ts` | Link from Vivaldi ids to sync ids | Repository |
 | `src/modules/workspacesync/SpaceMerge.ts` | Three-way merge of the workspace list, renames, kept deletions | Strategy |
-| `src/modules/workspacesync/WorkspaceCreator.ts` | Creates a workspace through Vivaldi's menu | Command |
-| `src/modules/workspacesync/QuietMoment.ts` | Tells when the window is focused and idle | |
+| `src/shared/spaces/WorkspaceCreator.ts` | Creates a workspace through Vivaldi's menu | Command |
+| `src/shared/spaces/QuietMoment.ts` | Tells when the window is focused and idle | |
 
 ## Risks
 

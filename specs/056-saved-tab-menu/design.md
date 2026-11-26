@@ -22,11 +22,11 @@ It is written for the tiles too: [057](../057-tile-menu/spec.md) reuses the clas
 | `ContextMenu` has command, submenu (`items`) and separator items; a command can be `checked`; no `disabled` | `src/core/dom/ContextMenu.ts` 4-22, `#commandRow` 108-120 |
 | `Toast.show(text, kind)` has no click; the element is `pointer-events: none` | `src/core/dom/Toast.ts` 51-58, `src/styles/toast.scss` 32 |
 | `BookmarkWriter.update(id, title)` changes the title only; `BookmarkChanges` has `title` and `description` | `src/core/browser/bookmarks/BookmarkWriter.ts` 14-18, 80-82 |
-| `BookmarkCopier` copies `title` and `url` only; it lives in the folders module | `src/modules/folders/editing/BookmarkCopier.ts` 27-47, 74-76 |
+| `BookmarkCopier` copies `title` and `url` only; it lives in the folders module | `src/shared/linkmenu/BookmarkCopier.ts` 27-47, 74-76 |
 | `FolderRelocation` moves a folder to the end of the root of a workspace and writes `workspaceId` into each open tab afterwards; the toast is `Moved "<name>" to <workspace>` | `src/modules/folders/editing/FolderRelocation.ts` 63-92, 101-109 |
 | The open tab of a link is found as `TabData.ownOf(tab).bookmarkId === linkId`, in the current window, same workspace as the active tab, most recent first | `src/modules/folders/favoritelinks/LinkRemoval.ts` 158-163 |
-| `TabTiler.tile(ids)` writes a shared `tiling` (`{ id, index, layout: 'row', type: 'selection' }`) into each tab's `vivExtData`; used by Peek only | `src/modules/peek/TabTiler.ts` 25-35 |
-| `WorkspaceCreator.create(name)` drives Vivaldi's New Space form (open menu, `startCreate`, `writeName`, `save`, wait until listed) | `src/modules/workspacesync/WorkspaceCreator.ts` 20-30, `WorkspaceMenu.ts` |
+| `TabTiler.tile(ids)` writes a shared `tiling` (`{ id, index, layout: 'row', type: 'selection' }`) into each tab's `vivExtData`; used by Peek only | `src/shared/tabs/TabTiler.ts` 25-35 |
+| `WorkspaceCreator.create(name)` drives Vivaldi's New Space form (open menu, `startCreate`, `writeName`, `save`, wait until listed) | `src/shared/spaces/WorkspaceCreator.ts` 20-30, `WorkspaceMenu.ts` |
 | `NewTabOpener.open()` creates a blank tab and focuses the address field | `src/shared/newtab/NewTabOpener.ts` 28-33 |
 | `TextCopier.for(document, clipboard).write(text)` copies with a fallback; the toast texts are `Copied` and `Copy failed` | `src/shared/clipboard/TextCopier.ts` 105-113, `src/modules/copyurl/CopyUrl.ts` 11-12 |
 | Rename and Change icon (027) are **not implemented**: no code stores a name or icon on a bookmark | `specs/027-rename-pinned-tabs/` Approved, no `src` match |
@@ -156,7 +156,7 @@ when it resolves (one `chrome.tabs.query`, under a frame). `RowMenu` takes `item
 **`LinkClipboard.copy(linkId)`** in `src/shared/links/`: reads the bookmark (`writer.get`), copies its
 `url` with `TextCopier.write`, then `notify('Copied')`; a refused copy or a missing url logs and
 `notify('Copy failed', 'error')` (NFR-1). The texts are the constants `COPIED_TEXT` and `FAILED_TEXT` of
-`copy-url`, repeated in `src/shared/links/LinkTexts.ts` because a module cannot import another. The
+`copy-url`, repeated in `src/shared/linkmenu/LinkTexts.ts` because a module cannot import another. The
 module `copy-url` and `LiveRowMenu` keep their own.
 
 ## Duplicate (FR-3)
@@ -253,16 +253,16 @@ in `src/shared/links/`:
 |---|---|---|
 | `src/core/dom/ContextMenu.ts`, `src/styles/_tokens.scss` | `disabled` item | T2 |
 | `src/core/dom/Toast.ts`, `src/styles/toast.scss` | Click action on a toast | T2 |
-| `src/core/dom/PromptDialog.ts`, `src/styles/dialog.scss`, `src/config.json` | The small dialog | T2 |
-| `src/shared/links/LinkMenuItems.ts`, `src/shared/tabs/CommandLabels.ts` | Menu groups, labels | T3 |
-| `src/shared/links/LinkedTab.ts` | Open tab of a bookmark | T3 |
+| `src/shared/linkmenu/PromptDialog.ts`, `src/styles/dialog.scss`, `src/config.json` | The small dialog | T2 |
+| `src/modules/folders/editing/LinkMenuItems.ts`, `src/shared/tabs/CommandLabels.ts` | Menu groups, labels | T3 |
+| `src/shared/linkmenu/LinkedTab.ts` | Open tab of a bookmark | T3 |
 | `src/modules/folders/editing/RowMenu.ts`, `FolderDragDrop.ts`, `FolderEditing.ts` | Menu rewired, five empty slots | T3 |
-| `src/shared/links/LinkClipboard.ts`, `LinkTexts.ts` | Copy Link | T4 |
-| `src/shared/links/BookmarkCopier.ts` (moved), `LinkDuplication.ts`, `LinkExtras.ts` | Duplicate | T4 |
-| `src/core/browser/bookmarks/BookmarkWriter.ts`, `src/shared/links/PinnedAddress.ts` | Edit Pinned Page | T5 |
-| `src/shared/tabs/TabTiler.ts` (moved), `src/shared/links/SplitView.ts` | Open in Split View | T6 |
+| `src/shared/linkmenu/LinkClipboard.ts`, `LinkTexts.ts` | Copy Link | T4 |
+| `src/shared/linkmenu/BookmarkCopier.ts` (moved), `LinkDuplication.ts`, `LinkExtras.ts` | Duplicate | T4 |
+| `src/core/browser/bookmarks/BookmarkWriter.ts`, `src/shared/linkmenu/PinnedAddress.ts` | Edit Pinned Page | T5 |
+| `src/shared/tabs/TabTiler.ts` (moved), `src/shared/linkmenu/SplitView.ts` | Open in Split View | T6 |
 | `src/shared/spaces/` (moved drivers), `src/modules/workspacesync/` imports | Extraction | T7a |
-| `src/shared/links/LinkRelocation.ts`, `WorkspaceSwitcher.ts` | Move to, New Space, toast | T7b |
+| `src/modules/folders/editing/LinkRelocation.ts`, `WorkspaceSwitcher.ts` | Move to, New Space, toast | T7b |
 | `src/selectors/8.1.json`, `tests/live/selector-states.json` | Names found by F-1, F-2 and F-5, if any | T6, T7b |
 | `tests/live/scenarios/opens-a-saved-tab-in-split-view.live.ts`, `...-with-a-new-tab.live.ts` | AC-10, AC-11 | T8 |
 
@@ -284,15 +284,15 @@ Names are the `auto:` texts, verbatim.
 
 | AC | Test name | File |
 |---|---|---|
-| AC-1 | `copies the saved link of a row` | `tests/shared/links/LinkClipboard.test.ts` |
-| AC-2 | `duplicates a saved tab right below it` | `tests/shared/links/LinkDuplication.test.ts` |
-| AC-3 | `moves a saved tab to another workspace` | `tests/shared/links/LinkRelocation.test.ts` |
-| AC-4 | `checks the current workspace in move to of a saved tab` | `tests/shared/links/LinkRelocation.test.ts` |
-| AC-5 | `switches to the workspace from the move toast` | `tests/shared/links/LinkRelocation.test.ts` |
-| AC-6 | `moves a saved tab to a new space` | `tests/shared/links/LinkRelocation.test.ts` |
-| AC-7 | `edits the pinned url of a saved tab` | `tests/shared/links/PinnedAddress.test.ts` |
-| AC-8 | `replaces the pinned url with the current one` | `tests/shared/links/PinnedAddress.test.ts` |
-| AC-9 | `disables replace pinned url when equal` | `tests/shared/links/PinnedAddress.test.ts` |
+| AC-1 | `copies the saved link of a row` | `tests/shared/linkmenu/LinkClipboard.test.ts` |
+| AC-2 | `duplicates a saved tab right below it` | `tests/shared/linkmenu/LinkDuplication.test.ts` |
+| AC-3 | `moves a saved tab to another workspace` | `tests/modules/folders/editing/LinkRelocation.test.ts` |
+| AC-4 | `checks the current workspace in move to of a saved tab` | `tests/modules/folders/editing/LinkRelocation.test.ts` |
+| AC-5 | `switches to the workspace from the move toast` | `tests/modules/folders/editing/LinkRelocation.test.ts` |
+| AC-6 | `moves a saved tab to a new space` | `tests/modules/folders/editing/LinkRelocation.test.ts` |
+| AC-7 | `edits the pinned url of a saved tab` | `tests/shared/linkmenu/PinnedAddress.test.ts` |
+| AC-8 | `replaces the pinned url with the current one` | `tests/shared/linkmenu/PinnedAddress.test.ts` |
+| AC-9 | `disables replace pinned url when equal` | `tests/shared/linkmenu/PinnedAddress.test.ts` |
 | AC-10 | `live: opens a saved tab in split view` (from `manual`, T8) | `tests/live/scenarios/` |
 | AC-11 | `live: opens a saved tab in split view with a new tab` (from `manual`, T8) | `tests/live/scenarios/` |
 | AC-12 to AC-14 | `manual`, the checklist of T10 | - |

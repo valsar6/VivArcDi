@@ -20,7 +20,7 @@ The pasted DOM of the tab bar had no `[data-vivarcdi-anchor]` element, while
 ## Cause
 
 Every section above the tab list lives in one host, `[data-vivarcdi-anchor]`, kept by
-`TabBarAnchor` (`src/core/TabBarAnchor.ts`) right before the element that holds `.tab-strip`.
+`TabBarAnchor` (`src/core/dom/TabBarAnchor.ts`) right before the element that holds `.tab-strip`.
 
 `TabBarAnchor` watched only the children of the tab list's parent, with a `MutationObserver`
 attached once. That covered Vivaldi removing the host from the same container, which the probes of 009

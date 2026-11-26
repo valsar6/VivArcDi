@@ -58,9 +58,9 @@ Rejected alternatives:
 | `src/modules/littlearc/KeepLabel.ts` | "Open in" text from the workspace name and the platform | |
 | `src/modules/littlearc/IdleTimer.ts` | Closes the window after `idleCloseHours` of no interaction | |
 | `src/modules/littlearc/WorkspaceAdopter.ts` | In the main window: receives the move request, picks the destination, moves the tab | Command |
-| `src/core/BrowserWindows.ts` | Promise wrapper for `chrome.windows`: `create` with `tabId` and `type`, `getLastFocused`, `onFocusChanged`, `getCurrent`, `remove`, `update` | Adapter |
-| `src/core/WindowKeys.ts` | Key interception shared with Peek | |
-| `src/core/ShortcutKeys.ts` | `isCommandOption(event, code)`: Cmd+Opt or Ctrl+Alt plus a physical key | |
+| `src/core/browser/BrowserWindows.ts` | Promise wrapper for `chrome.windows`: `create` with `tabId` and `type`, `getLastFocused`, `onFocusChanged`, `getCurrent`, `remove`, `update` | Adapter |
+| `src/core/dom/WindowKeys.ts` | Key interception shared with Peek | |
+| `src/core/dom/ShortcutKeys.ts` | `isCommandOption(event, code)`: Cmd+Opt or Ctrl+Alt plus a physical key | |
 | `src/styles/little-arc.scss` | The bar, the page frame, the hidden Vivaldi header of the popup | |
 | `src/config.json` | `little-arc` options | |
 
@@ -174,9 +174,9 @@ The bar lives in the normal window's `window.html`, next to Peek's overlay. It i
 | `.../SuggestionSource.ts` | Interface: `suggest(text, limit): Promise<Suggestion[]>`; `''` asks for the empty-field list | Strategy |
 | `.../TabSuggestions.ts` | Reads `chrome.tabs.query({})` through `BrowserTabs`, leaves out Little Arc windows' tabs (registry) | Adapter |
 | `.../BookmarkSuggestions.ts` | Reads `chrome.bookmarks` through `BrowserBookmarks` (`chrome.bookmarks.search`, proven by T23) | Adapter |
-| `.../HistorySuggestions.ts` | `chrome.history.search({ text, maxResults })` through a new `src/core/BrowserHistory.ts`; with empty text it returns the most recent pages, newest first | Adapter |
+| `.../HistorySuggestions.ts` | `chrome.history.search({ text, maxResults })` through a new `src/core/browser/BrowserHistory.ts`; with empty text it returns the most recent pages, newest first | Adapter |
 | `.../SuggestionRanker.ts` | Pure: merges the sources' lists, drops non-web addresses, removes duplicates by normalized address, scores matches, sorts, cuts to the limit; for the empty field it takes the history list newest first, drops non-web addresses, deduplicates and cuts to five (FR-26, FR-27, AC-28 to AC-31) | Strategy |
-| `.../AddressKey.ts` use | Reuses `src/core/AddressKey.ts` for the normalized address if it fits; otherwise a small `normalizedAddress` function next to the ranker (DRY: one of the two) | |
+| `.../AddressKey.ts` use | Reuses `src/core/tabs/AddressKey.ts` for the normalized address if it fits; otherwise a small `normalizedAddress` function next to the ranker (DRY: one of the two) | |
 | `.../MiddleEllipsis.ts` | Pure: `of(host, maxChars)` keeps the start and the end of a long host with `…` between (`membersh…platform.com`); a short host is returned as it is. The view calls it with the number of characters that fit | |
 | `.../SelectionCursor.ts` | Pure: index, `up()`, `down()`, `reset()`, wraps around (AC-32) | State |
 | `.../SuggestionList.ts` | Collects the sources (failures skipped and logged once), calls the ranker, builds the rows: the typed text row first, then suggestions | Facade |

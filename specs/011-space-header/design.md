@@ -49,14 +49,14 @@ layout engine, and it couples the folders' markup to another module's mark); let
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/ActiveWorkspace.ts` | Moved from `src/modules/folders`, unchanged | Observer |
-| `src/core/WorkspaceNames.ts` | Adds `iconOf(id)` from the `icon` field | - |
-| `src/core/SpaceCollapse.ts` | Shared collapsed state of the window, with listeners | Observer, shared instance per scope |
+| `src/core/workspaces/ActiveWorkspace.ts` | Moved from `src/modules/folders`, unchanged | Observer |
+| `src/core/workspaces/WorkspaceNames.ts` | Adds `iconOf(id)` from the `icon` field | - |
+| `src/shared/spaces/SpaceCollapse.ts` | Shared collapsed state of the window, with listeners | Observer, shared instance per scope |
 | `src/modules/spaceheader/SpaceHeader.ts` | The module: options, start and stop, wiring | Mediator |
 | `src/modules/spaceheader/CollapsedSpaces.ts` | Reads and saves the state of each workspace | Repository |
 | `src/modules/spaceheader/CollapsedPinned.ts` | Hides unloaded, inactive pinned tabs of the active workspace while collapsed | Observer |
 | `src/modules/spaceheader/SpaceHeaderView.ts` | Draws the row, reports clicks | - |
-| `src/modules/folders/FolderRows.ts` | `build` takes `collapsed` | - |
+| `src/modules/folders/view/FolderRows.ts` | `build` takes `collapsed` | - |
 | `src/modules/folders/FolderSection.ts` | Follows `SpaceCollapse`, redraws | - |
 | `src/styles/space-header.scss` | Row style from the folder rows of 009 and Vivaldi's theme colors, arrow rotation | - |
 

@@ -60,17 +60,17 @@ private data); sending the `+` to a URL such as `vivaldi://newtab` (not Quick Co
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/BrowserRuntime.ts` | `isPrivateWindow()` | Facade |
-| `src/core/Module.ts` | Static `privateWindows` policy | - |
-| `src/core/ModuleRegistry.ts` | `createEnabled` filters by window kind | - |
-| `src/core/VivArcDi.ts` | Detects the window once and passes it to the registry | - |
-| `src/core/KeptElement.ts` | Moved from `src/modules/today`, unchanged | - |
+| `src/core/browser/BrowserRuntime.ts` | `isPrivateWindow()` | Facade |
+| `src/core/boot/Module.ts` | Static `privateWindows` policy | - |
+| `src/core/boot/ModuleRegistry.ts` | `createEnabled` filters by window kind | - |
+| `src/core/boot/VivArcDi.ts` | Detects the window once and passes it to the registry | - |
+| `src/core/dom/KeptElement.ts` | Moved from `src/modules/today`, unchanged | - |
 | `src/modules/incognito/Incognito.ts` | The module: mark, rows, bottom bar, wiring | Mediator |
 | `src/modules/incognito/IncognitoHeader.ts` | Title and `Clear` | - |
-| `src/modules/incognito/NewTabRow.ts` | The `New Tab` row | - |
+| `src/shared/newtab/NewTabRow.ts` | The `New Tab` row | - |
 | `src/modules/incognito/BottomBar.ts` | Footer with `BarButton`s | Composite |
 | `src/modules/incognito/PrivateTabs.ts` | `clear()` of the window's tabs | - |
-| `src/modules/incognito/AddressField.ts` | Finds, focuses and selects the address field | - |
+| `src/shared/newtab/AddressField.ts` | Finds, focuses and selects the address field | - |
 | `src/modules/incognito/DownloadsButton.ts` | Clicks Vivaldi's Downloads button | - |
 | `src/modules/incognito/CommandLauncher.ts` | `newTab()` and `openLibrary()` for the three buttons | Facade |
 | `src/styles/incognito.scss` | Rows, bottom bar, hidden Vivaldi buttons, all under the mark | - |

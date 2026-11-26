@@ -55,7 +55,7 @@ Rejected:
 | `src/styles/compact-tab-bar.scss` | The compact rules of the table above, all under `#{$root}:has(#{$narrow-tab-bar})` |
 | `src/styles/today.scss` | The archive footer button is a flex row whose `::before` draws `$archive-glyph` at `$archive-icon-size` before the label, at any width (FR-8) |
 | `src/config.json` | Adds `styles/compact-tab-bar.css` to `styles`, last |
-| `src/core/NewTabRow.ts` | Sets `title="New Tab"` on the row, which has no tooltip today, so the bare `+` explains itself (FR-5) |
+| `src/shared/newtab/NewTabRow.ts` | Sets `title="New Tab"` on the row, which has no tooltip today, so the bare `+` explains itself (FR-5) |
 | `tests/styles/CompactTabBar.test.ts` | AC-1, AC-2, AC-4, AC-5 on the compiled CSS |
 
 The only TypeScript change is the tooltip of `NewTabRow`.

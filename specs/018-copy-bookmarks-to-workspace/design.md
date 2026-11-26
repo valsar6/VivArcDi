@@ -67,13 +67,13 @@ dragged rows from the panel's DOM (the ids are already in the drag data).
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/modules/folders/PanelBookmarkDrop.ts` | HTML5 drag from the Bookmarks panel over the section: mark, accept, hand over | Observer |
-| `src/modules/folders/PanelDragData.ts` | Ids out of `vivaldi/x-bookmarks` | - |
-| `src/modules/folders/DropPlace.ts` | Target to `{ parentId, index }`, shared by `TabDrops` and the panel drop | - |
-| `src/core/bookmarks/BookmarkCopier.ts` | Recursive copy, self-nesting check, rollback | Command |
-| `src/core/bookmarks/BookmarkWriter.ts` | Adds `subTree`, `get`, `removeTree` | Adapter |
-| `src/modules/folders/WorkspaceFavorites.ts` | Adds `copy(ids, place)` | Facade |
-| `src/modules/folders/FolderDragDrop.ts` | Starts the panel drop next to the tab drag | - |
+| `src/modules/folders/dragdrop/PanelBookmarkDrop.ts` | HTML5 drag from the Bookmarks panel over the section: mark, accept, hand over | Observer |
+| `src/modules/folders/dragdrop/PanelDragData.ts` | Ids out of `vivaldi/x-bookmarks` | - |
+| `src/modules/folders/dragdrop/DropPlace.ts` | Target to `{ parentId, index }`, shared by `TabDrops` and the panel drop | - |
+| `src/shared/linkmenu/BookmarkCopier.ts` | Recursive copy, self-nesting check, rollback | Command |
+| `src/core/browser/bookmarks/BookmarkWriter.ts` | Adds `subTree`, `get`, `removeTree` | Adapter |
+| `src/modules/folders/favoritelinks/WorkspaceFavorites.ts` | Adds `copy(ids, place)` | Facade |
+| `src/modules/folders/dragdrop/FolderDragDrop.ts` | Starts the panel drop next to the tab drag | - |
 
 All of them take their dependencies in the constructor and are tested with fakes.
 

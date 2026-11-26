@@ -38,12 +38,12 @@ Rejected: storing the folder in `chrome.storage` from a context menu (Tore chose
 
 | Class or file | Responsibility | Pattern |
 |---|---|---|
-| `src/core/BrowserPrefs.ts` | Read-only access to Vivaldi's preferences (`get`, `onChange`), `available` flag; the only place that touches `vivaldi.prefs` | Adapter |
-| `src/core/WorkspaceNames.ts` | Id to name of the workspaces from `vivaldi.workspaces.list`; follows changes | Observer |
-| `src/modules/folders/WorkspaceRoots.ts` | Parses the options `root` and `workspaces`, answers the root path for a workspace name, logs invalid entries once | Value object |
-| `src/modules/folders/FolderTreeSource.ts` | New `useRoot(path)`: switches the root and rebuilds; the missing-root warning is once per path | - |
-| `src/modules/folders/OpenFolders.ts` | New `useWorkspace(id)`: the open ids are kept under `vivarcdi.openFolders` for the area outside workspaces (existing key, so nothing is lost) and `vivarcdi.openFolders.<id>` for a workspace | - |
-| `src/modules/folders/ActiveWorkspace.ts` | Follows the active tab of the window and reports the workspace id when it changes | Observer |
+| `src/core/browser/BrowserPrefs.ts` | Read-only access to Vivaldi's preferences (`get`, `onChange`), `available` flag; the only place that touches `vivaldi.prefs` | Adapter |
+| `src/core/workspaces/WorkspaceNames.ts` | Id to name of the workspaces from `vivaldi.workspaces.list`; follows changes | Observer |
+| `src/modules/folders/tree/WorkspaceRoots.ts` | Parses the options `root` and `workspaces`, answers the root path for a workspace name, logs invalid entries once | Value object |
+| `src/modules/folders/tree/FolderTreeSource.ts` | New `useRoot(path)`: switches the root and rebuilds; the missing-root warning is once per path | - |
+| `src/modules/folders/tree/OpenFolders.ts` | New `useWorkspace(id)`: the open ids are kept under `vivarcdi.openFolders` for the area outside workspaces (existing key, so nothing is lost) and `vivarcdi.openFolders.<id>` for a workspace | - |
+| `src/core/workspaces/ActiveWorkspace.ts` | Follows the active tab of the window and reports the workspace id when it changes | Observer |
 | `src/modules/folders/FolderSection.ts` | Wires the above; hides the element while the root is empty | Mediator (existing) |
 | `src/modules/folders/BookmarkFolders.ts` | Builds `WorkspaceRoots` from the options | - |
 
