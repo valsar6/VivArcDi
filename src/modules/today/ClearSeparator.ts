@@ -44,9 +44,8 @@ export class ClearSeparator {
   #onEvent = (event: Event): void => this.#handle(event);
 
   /**
-   * The row VivArcDi owns above the Today tabs: it holds the Clear control and draws the separator
-   * when no pinned row shows it. It lives in the tab strip but outside every pinned row and group,
-   * so the rules that hide pinned rows cannot collapse it.
+   * The row VivArcDi owns above the Today tabs: it holds the Clear control and draws the separator line.
+   * It lives in the tab strip but outside every pinned row and group, so the rules that hide pinned rows cannot collapse it.
    *
    * @param dependencies Everything it collaborates with.
    */
@@ -83,7 +82,7 @@ export class ClearSeparator {
   }
 
   /**
-   * Puts the row above the first Today tab, aligned with its offset and shift, and updates the line.
+   * Puts the row above the first Today tab, aligned with its offset and shift, and marks it to draw its line.
    */
   public sync(): void {
     const strip = this.#element('tabStrip');
@@ -101,7 +100,9 @@ export class ClearSeparator {
     }
     this.#mark(false);
     this.#place(strip, slot);
-    this.#line();
+    if (!this.#row.hasAttribute(CLEAR_LINE_ATTRIBUTE)) {
+      this.#row.setAttribute(CLEAR_LINE_ATTRIBUTE, '');
+    }
   }
 
   static #button(document: Document): HTMLButtonElement {
@@ -149,14 +150,6 @@ export class ClearSeparator {
     const browser = this.#element('browser');
     if (browser !== null && browser.hasAttribute(NO_TODAY_ATTRIBUTE) !== empty) {
       browser.toggleAttribute(NO_TODAY_ATTRIBUTE, empty);
-    }
-  }
-
-  #line(): void {
-    const marked = this.#deps.document.querySelector(`[${PINNED_LAST_ATTRIBUTE}]`);
-    const visible = marked !== null && !marked.hasAttribute(HIDDEN_ATTRIBUTE);
-    if (this.#row.hasAttribute(CLEAR_LINE_ATTRIBUTE) === visible) {
-      this.#row.toggleAttribute(CLEAR_LINE_ATTRIBUTE, !visible);
     }
   }
 

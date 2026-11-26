@@ -274,7 +274,7 @@ test('puts the Clear control above the Today tabs and takes its clicks', async (
   assert.equal(setup.document.count(), 0);
 });
 
-test('draws its line only when no pinned row shows it', async () => {
+test('draws its line whether or not a pinned row shows it', async () => {
   const marked = todaySlot(3, 0, { pinned: true });
   marked.setAttribute(PINNED_LAST_ATTRIBUTE, '');
   const setup = setUp({ pinnedLast: marked });
@@ -282,7 +282,7 @@ test('draws its line only when no pinned row shows it', async () => {
   await settle();
   const row = rowOf(setup.strip);
   assert.ok(row);
-  assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), false);
+  assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), true);
   marked.setAttribute(HIDDEN_ATTRIBUTE, '');
   setup.watcher.change();
   await settle();
@@ -290,7 +290,7 @@ test('draws its line only when no pinned row shows it', async () => {
   marked.removeAttribute(HIDDEN_ATTRIBUTE);
   setup.watcher.change();
   await settle();
-  assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), false);
+  assert.equal(row.hasAttribute(CLEAR_LINE_ATTRIBUTE), true);
   setup.document.elements.set(`[${PINNED_LAST_ATTRIBUTE}]`, null);
   setup.watcher.change();
   await settle();
