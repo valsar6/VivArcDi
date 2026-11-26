@@ -29,7 +29,7 @@ T2 ──┘
 
 ## Tasks
 
-- [ ] **T1. The Vivaldi names of the styles** (TDD; parallel with T2). Add
+- [x] **T1. The Vivaldi names of the styles** (TDD; parallel with T2). Add
   `tests/styles/VivaldiNames.test.ts` with `_vivaldi.scss defines every Vivaldi name the styles use`,
   `every mirrored variable equals its catalog selector in every catalog`,
   `a mirrored name missing in a catalog fails` and `no stylesheet writes a Vivaldi name as a literal`
@@ -41,7 +41,7 @@ T2 ──┘
   (whitespace aside): the selectors must be identical (NFR-1). The existing tests under
   `tests/styles/` pass with their names unchanged; `CompactTabBar.test.ts` reads `_vivaldi.scss`
   for the `$narrow-tab-bar` row. Done when `make check` is green.
-- [ ] **T2. The probe service, the React probe and the boot scenario** (TDD; parallel with T1). Add
+- [x] **T2. The probe service, the React probe and the boot scenario** (TDD; parallel with T1). Add
   the tests with the verbatim names: `React probe passes when the interface carries a fiber`,
   `React probe fails without a fiber and never throws` and `a missing React shape at first use warns once`
   (`tests/shared/spaces/ReactProbe.test.ts`); `BootReport warns once for a failed probe and counts it`
@@ -59,7 +59,7 @@ T2 ──┘
   `ReactInternals` constructor calls of the existing tests as the design describes, changing no test
   name (AC-13). Done when `make check` is green, including the structure tests and the
   `module-boundaries` lint rule (AC-12).
-- [ ] **T3. Docs and spec status** (lead; after T1 and T2). Merge both branches. In
+- [x] **T3. Docs and spec status** (lead; after T1 and T2). Merge both branches. In
   `docs/architecture.md` say where the Vivaldi names live and how the self-check reports React
   (NFR-6). Do a lab check if Tore agrees: in `npm run live`, that `#browser` or one of its children
   carries a `__reactFiber` key (the design's open point). Set the spec Status and the README row to

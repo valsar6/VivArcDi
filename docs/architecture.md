@@ -165,6 +165,21 @@ The catalog picks the newest file that is not newer than the running Vivaldi. Wh
 newer, VivArcDi stays inactive instead of guessing. Supporting a new Vivaldi version usually means
 adding one selector file.
 
+Stylesheets cannot read the catalog, so the Vivaldi names they use live in one partial,
+`src/styles/_vivaldi.scss`, forwarded by `_tokens.scss`. `tests/styles/VivaldiNames.test.ts` holds
+the mapping from each variable to its catalog selector and fails when a catalog drops or changes a
+mirrored name, or when a stylesheet writes a Vivaldi name as a literal
+([spec 070](../specs/070-vivaldi-coupling-guards/spec.md)).
+
+### Shape probes
+
+Some modules rely on Vivaldi internals that no selector describes, such as the React fiber behind the
+workspace and folder editors. They register a probe on `context.shape` (`ShapeGuards` in
+`src/core/boot/`), and after the modules start the boot runs every probe once. A failed probe adds one
+`Vivaldi UI shape: <expects>` warning to the boot report and counts in its summary; a missing hook
+found later, at first use, warns once the same way. The React probe lives in
+`src/shared/spaces/ReactProbe.ts`.
+
 ## Live verification
 
 `npm run live` ([spec 046](../specs/046-live-verification/spec.md)) checks the payload on a real
