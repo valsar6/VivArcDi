@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { GuardedStorage } from '../../src/core/boot/GuardedStorage.js';
 import type { PayloadSource } from '../../src/core/boot/ResourceLoader.js';
 import type { SavingStorage } from '../../src/core/browser/SavingStorage.js';
@@ -25,6 +27,26 @@ export class FakeLoader implements PayloadSource {
 
   public async text(path: string): Promise<string> {
     return String(await this.json<unknown>(path));
+  }
+}
+
+export class DiskLoader implements PayloadSource {
+  #root: string;
+
+  constructor(root: string) {
+    this.#root = root;
+  }
+
+  public url(path: string): string {
+    return `chrome-extension://vivaldi/vivarcdi/${path}`;
+  }
+
+  public async json<T>(path: string): Promise<T> {
+    return JSON.parse(await this.text(path)) as T;
+  }
+
+  public async text(path: string): Promise<string> {
+    return readFile(join(this.#root, path), 'utf8');
   }
 }
 
