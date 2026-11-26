@@ -190,7 +190,22 @@ test('clear opens no blank tab while a kept tab stays open', async () => {
     await sweeper.clear();
     assert.deepEqual(tabs.removedIds(), [1, 2]);
     assert.deepEqual(creates(tabs), []);
+    const activation = tabs.calls.findIndex(([name, id, properties]) => name === 'update' && id === 4 && (properties as { active?: boolean }).active === true);
+    const firstRemove = tabs.calls.findIndex(([name]) => name === 'remove');
+    assert.ok(activation >= 0 && activation < firstRemove);
   }
+});
+
+test('clear shows the nearest kept tab of the workspace, never one of another workspace', async () => {
+  const { tabs, sweeper } = setup([
+    { id: 5, url: 'https://elsewhere.example/', vivExtData: stamped(NOW, { workspaceId: 8 }) },
+    { id: 4, pinned: true, url: 'https://pinned.example/', vivExtData: JSON.stringify({ workspaceId: 7 }) },
+    ACTIVE,
+    { id: 6, url: 'https://elsewhere-too.example/', vivExtData: stamped(NOW, { workspaceId: 8 }) },
+  ]);
+  await sweeper.clear();
+  const activated = tabs.calls.filter(([name, , properties]) => name === 'update' && (properties as { active?: boolean }).active === true).map(([, id]) => id);
+  assert.deepEqual(activated, [4]);
 });
 
 test('the sweep still never archives the active tab', async () => {

@@ -125,8 +125,20 @@ export class ArchiveSweeper {
     }
     const workspace = TabData.of(active);
     const closing = windowTabs.filter((tab) => TodayTabPolicy.isClearable(tab) && TabData.of(tab) === workspace);
-    const stays = windowTabs.some((tab) => TabData.of(tab) === workspace && !closing.includes(tab));
-    await this.#archive(closing, stays ? undefined : (): Promise<chrome.tabs.Tab> => this.#deps.blank.open(null, workspace, {}, active.windowId));
+    const staying = windowTabs.filter((tab) => TabData.of(tab) === workspace && !closing.includes(tab));
+    const nearest = ArchiveSweeper.#nearestTo(active, staying, windowTabs);
+    await this.#archive(closing, nearest === undefined ? (): Promise<chrome.tabs.Tab | undefined> => this.#deps.blank.open(null, workspace, {}, active.windowId) : (): Promise<undefined> => this.#show(nearest));
+  }
+
+  async #show(tab: IdentifiedTab): Promise<undefined> {
+    await this.#deps.tabs.update(tab.id, { active: true });
+    return undefined;
+  }
+
+  static #nearestTo(active: chrome.tabs.Tab, candidates: IdentifiedTab[], windowTabs: chrome.tabs.Tab[]): IdentifiedTab | undefined {
+    const position = windowTabs.indexOf(active);
+    const distance = (tab: IdentifiedTab): number => Math.abs(windowTabs.indexOf(tab) - position);
+    return candidates.reduce<IdentifiedTab | undefined>((best, tab) => (best === undefined || distance(tab) < distance(best) ? tab : best), undefined);
   }
 
   async #windowTabs(): Promise<IdentifiedTab[]> {
@@ -134,7 +146,7 @@ export class ArchiveSweeper {
     return windowTabs.filter((tab): tab is IdentifiedTab => tab.id !== undefined);
   }
 
-  async #archive(tabs: IdentifiedTab[], beforeClose?: () => Promise<chrome.tabs.Tab>): Promise<void> {
+  async #archive(tabs: IdentifiedTab[], beforeClose?: () => Promise<chrome.tabs.Tab | undefined>): Promise<void> {
     if (tabs.length === 0) {
       return;
     }
@@ -149,7 +161,7 @@ export class ArchiveSweeper {
     try {
       blank = await beforeClose?.();
     } catch (error) {
-      this.#deps.logger.warn('could not open a blank tab: the Today tabs stay open', error);
+      this.#deps.logger.warn('could not show another tab or open a blank one: the Today tabs stay open', error);
       return;
     }
     for (const tab of tabs) {

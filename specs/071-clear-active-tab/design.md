@@ -86,7 +86,7 @@ Rules:
 - The blank tab is created after the archive is saved and before the first removal, so it exists
   when the last Today tab closes, and it is never in `closing` (it did not exist when `closing` was
   computed), so it is not archived (FR-3).
-- With a tab left, nothing runs: Vivaldi chooses the tab to show (Q-1, FR-4).
+- With a tab left, `ArchiveSweeper` activates the kept tab of the workspace nearest to the active one (by position in the window) before the first removal (Q-1, FR-4): left to itself, Vivaldi showed a tab of another workspace.
 - The blank tab opens in the window of the active tab (`create({ windowId, active: true })`, as the New Tab rows do) and, after the last removal, is activated again, so Vivaldi cannot fall back to a tab of another workspace (found by Tore's manual check on 2026-11-26).
 - A removal that fails leaves the blank tab open and logs as today (`ArchiveSweeper.ts` line 144).
 - `clear()` and `sweep()` still share the queue, so a sweep cannot run between the save and the
@@ -99,7 +99,7 @@ Rules:
 |---|---|---|---|
 | AC-1 | `clear archives the active Today tab too` | `tests/modules/today/ArchiveSweeper.test.ts` | Replaces `clear archives every Today tab of the workspace except the active one`. Tabs: `ACTIVE` (workspace 7), tab 2 (7), tab 3 (workspace 8), pinned tab 4 (7). Expect `removedIds()` `[1, 2]`, the two entries, and no `create` call |
 | AC-2 | `clear opens a blank tab when no tab is left to show` | same | `ACTIVE` (7), tab 2 (7), tab 3 (8, stays but does not count). Expect one `create` call, issued before the first `remove` in `tabs.calls`, and the new tab carries `workspaceId` 7 in its `vivExtData` |
-| AC-3 | `clear opens no blank tab while a kept tab stays open` | same | One run each with a pinned tab, a Favorite, a stacked tab and a `vivaldi://settings` tab of workspace 7 left; expect no `create` call |
+| AC-3 | `clear opens no blank tab while a kept tab stays open` | same | One run each with a pinned tab, a Favorite, a stacked tab and a `vivaldi://settings` tab of workspace 7 left; expect no `create` call and an activation of that tab before the first `remove`; the second test puts tabs of workspace 8 on both sides and expects the pinned tab of workspace 7 to be the only one activated |
 | AC-4 | `the sweep still never archives the active tab` | same | `ACTIVE` stamped older than the limit plus a stale tab 2; `sweep()` removes `[2]` only |
 | AC-5 | `clear still keeps protected tabs` | same | Protected set of `never archives protected tabs` (audible active tab, pinned, Favorite, stacked, other window, non-page) plus a tab of workspace 8; `clear()` removes nothing, saves nothing, opens no blank tab |
 | AC-6 | `clear keeps the active tab and opens no blank tab when the archive cannot be saved` | same | `outcomeSetup` with `failed` and `memory`; `clear()` leaves `[ACTIVE, OLD]` open, no `remove`, no `create` |

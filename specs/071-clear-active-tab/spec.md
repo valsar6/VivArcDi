@@ -39,7 +39,7 @@ Clear alike. After this spec Clear archives it too; the sweep does not.
 |---|---|---|
 | Clear, active tab is a Today tab | Stays open (`TodayTabPolicy.ts` line 16, `ArchiveSweeper.ts` line 124) | Archived with the others |
 | Clear, nothing else stays in the workspace | Not possible: the active tab always stays | A blank new tab opens in the workspace, active, before the Today tabs close |
-| Clear, pinned tabs, Favorites, stacks or tiles exist | Active tab stays | Vivaldi picks the tab to show (Q-1) |
+| Clear, pinned tabs, Favorites, stacks or tiles exist | Active tab stays | VivArcDi shows the kept tab of the workspace nearest to the closed one (Q-1) |
 | Sweep, every minute | Never archives the active tab of the window | Same |
 | Tab playing audio, Clear or sweep | Kept (`TodayTabPolicy.ts` line 16) | Same (Q-4) |
 | Pinned, Favorite, bookmark-link, stacked tabs, non-page URLs | Kept by both | Same |
@@ -66,7 +66,7 @@ never cause.
   tab in that workspace, active, before it closes the Today tabs, so that the window does not close
   and the user stays in the workspace. THE blank tab SHALL not be a Today tab to archive afterwards.
 - **FR-4.** WHEN Clear leaves a pinned tab, a Favorite or a tab in a stack or tile in the workspace,
-  THE module SHALL open no blank tab and leave the choice of the tab to show to Vivaldi (Q-1).
+  THE module SHALL open no blank tab and activate the kept tab of the workspace nearest to the active tab, before it closes the Today tabs, because Vivaldi may otherwise show a tab of another workspace (Q-1).
 - **FR-5.** WHEN the archive cannot be saved, THE module SHALL keep every tab open, the active one
   included, and open no blank tab (as 004 today).
 - **FR-6.** Pinned, Favorite, bookmark-link, stacked and tiled tabs, tabs playing audio and tabs of
@@ -85,7 +85,7 @@ never cause.
 |---|---|---|
 | AC-1 | WHEN Clear runs, THE module SHALL archive the active Today tab with the other Today tabs of the workspace. | auto: `clear archives the active Today tab too` |
 | AC-2 | WHEN Clear leaves the workspace with no open tab, THE module SHALL open a blank tab in that workspace before closing the Today tabs. | auto: `clear opens a blank tab when no tab is left to show` |
-| AC-3 | WHEN a pinned tab, a Favorite or a stacked tab stays open after Clear, THE module SHALL open no blank tab. | auto: `clear opens no blank tab while a kept tab stays open` |
+| AC-3 | WHEN a pinned tab, a Favorite or a stacked tab stays open after Clear, THE module SHALL open no blank tab and activate the nearest kept tab of the same workspace before closing. | auto: `clear opens no blank tab while a kept tab stays open`, `clear shows the nearest kept tab of the workspace, never one of another workspace` |
 | AC-4 | THE sweep SHALL never archive the active tab of the window. | auto: `the sweep still never archives the active tab` |
 | AC-5 | WHEN Clear runs, THE module SHALL keep pinned, Favorite, bookmark-link, stacked and audible tabs and tabs of other workspaces. | auto: `clear still keeps protected tabs` |
 | AC-6 | WHEN the archive cannot be saved, THE module SHALL keep all tabs open and open no blank tab. | auto: `clear keeps the active tab and opens no blank tab when the archive cannot be saved` |
@@ -102,7 +102,6 @@ Today tab of the workspace except the active one` (060 AC-1) is replaced by AC-1
 - The automatic sweep: no change (FR-2).
 - The look of Clear, its line and its tooltip: 067, 069.
 - Archiving tabs of other workspaces or other windows on Clear.
-- Moving the user to a chosen tab when kept tabs exist (Q-1 recommends Vivaldi's own choice).
 
 ## Open questions
 
@@ -110,7 +109,9 @@ Today tab of the workspace except the active one` (060 AC-1) is replaced by AC-1
   tiled tab left, Vivaldi activates a neighbor when the active tab is removed. Recommendation:
   leave Vivaldi's native choice; no code runs, and it is the least surprising on both platforms. The
   alternative is to activate the first kept tab of the workspace ourselves.
-  Answered (Tore, 2026-11-26): recommendation accepted.
+  Answered (Tore, 2026-11-26): recommendation accepted. Revised 2026-11-27: the manual test showed
+  that Vivaldi then activates a tab of another workspace, so VivArcDi activates the nearest kept tab
+  of the workspace (the alternative above).
 - [x] **Q-2. Who opens the blank tab.** When the last tab closes, Vivaldi closes the window (or
   switches workspace), so leaving it to Vivaldi does not work. Recommendation: VivArcDi opens it with
   `WorkspaceTabs.open` (an empty new tab, assigned to the workspace) before closing the Today tabs,
