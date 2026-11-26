@@ -32,9 +32,12 @@ test('draws the minus badge at twenty-four pixels', () => {
 
 test('gives the title the hidden minus space at rest', () => {
   const rows = compiled('sidebar-look.scss');
-  const rowHover = /\.tab-wrapper:hover \.title \{([^}]*)\}/.exec(rows)?.[1] ?? '';
-  assert.match(rowHover, /padding-inline-end: 30px;/);
-  const folders = compiled('folders.scss');
+  assert.equal(/\.tab-wrapper:hover \.title \{/.test(rows), false);
+  assert.match(rows, /\.tab-position\.is-pinned:hover \.title[^{]*\{[^}]*padding-inline-end: 30px;/);
+  const foldersText = compiled('folders.scss');
+  assert.equal(foldersText.includes('#browser[data-vivarcdi-look] #browser[data-vivarcdi-active]'), false);
+  assert.match(foldersText, /#browser\[data-vivarcdi-look\] \[data-vivarcdi-folders\][^{]*\[data-vivarcdi-link-open\]:hover \.vivarcdi-folders-title/);
+  const folders = foldersText;
   assert.match(folders, /\[data-vivarcdi-folders\][^{]*\[data-vivarcdi-folder-unload\]:hover \.vivarcdi-folders-title[^{]*\{[^}]*padding-inline-end: 30px;/);
   assert.match(folders, /\[data-vivarcdi-folders\][^{]*\[data-vivarcdi-link-open\]:hover \.vivarcdi-folders-title[^{]*\{[^}]*padding-inline-end: 30px;/);
 });

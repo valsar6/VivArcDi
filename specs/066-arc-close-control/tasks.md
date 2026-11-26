@@ -52,9 +52,10 @@ are done.
 - [x] **T3. Title space** (TDD; after T2). In `tests/styles/SidebarLook.test.ts`, add
   `gives the title the hidden close space at rest` (AC-4) and, in `tests/styles/Minus.test.ts`,
   `gives the title the hidden minus space at rest` (AC-5) and `keeps the close and minus gestures`
-  (AC-6). Assert that `.title` and `.vivarcdi-folders-title` have no end padding at rest, get
-  `padding-inline-end: 30px` on the row states that reveal their control, and that no rule disables
-  the close or minus button on hover. Then add the padding rules to `sidebar-look.scss` and
+  (AC-6). Assert that `.title` and `.vivarcdi-folders-title` have no end padding at rest, that the
+  favicon stays visible on hover, that pinned and Favorites titles get `padding-inline-end: 30px`
+  when their minus appears, and that no rule disables the close or minus button on hover. Then add
+  the pinned and Favorites padding rules and the favicon rule to `sidebar-look.scss` and
   `folders.scss`, leaving the tile layout and every press handler alone.
   Done when `make check` is green.
 - [x] **T4. Docs and version** (lead; after T3). Add the `Refined by 066` rows to 028, 061 and 062,

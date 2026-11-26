@@ -108,12 +108,17 @@ The existing style tests keep their names from 061's and 062's criteria but asse
 
 The title is a flex child with `min-width: 0` and an ellipsis. While a control is hidden it must be
 able to grow to the row's end; while the row is hovered the visible control takes 30 px
-(`$minus-badge-size + $minus-offset`) from it. The control itself stays absolutely positioned in
-the cases where VivArcDi draws it, so it sits over the padding the title gives up.
+(`$minus-badge-size + $minus-offset`) from it. How it loses that space depends on where the control
+lives: a control in the flex row takes it by its width, while an absolutely positioned minus needs
+the title to give up the same space as padding.
 
-- Open tab rows and pinned rows: `#{$rows} .title` gets `padding-inline-end: 0` at rest and
-  `padding-inline-end: $minus-badge-size + $minus-offset` under `#{$rows}:hover`. In a pinned row
-  Vivaldi's close is `display: none`, so the padding reserves space for the VivArcDi minus.
+- Open tab rows: the close button goes from zero width to 24 px plus a 6 px end margin, so the flex
+  title loses 30 px on its own. Vivaldi hides the favicon when the close appears; the style keeps
+  the favicon visible on hover, otherwise the row would give back 18 px and the ellipsis would sit
+  too far from the button. No padding is added here.
+- Pinned rows: Vivaldi's close is `display: none` and the VivArcDi minus is absolutely positioned,
+  so `.title` gets `padding-inline-end: $minus-badge-size + $minus-offset` under
+  `.tab-position.is-pinned:hover`.
 - Favorites folder and link rows: `.vivarcdi-folders-title` gets the same padding under
   `[data-vivarcdi-folder-unload]:hover` and `[data-vivarcdi-link-open]:hover`, the same row states
   that reveal their minuses (062).

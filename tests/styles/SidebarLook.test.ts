@@ -127,12 +127,14 @@ test('shows the Arc close badge only on button hover', () => {
 
 test('gives the title the hidden close space at rest', () => {
   const css = compiled();
+  assert.match(css, /\.tab-wrapper:hover \.favicon \{[^}]*display: block !important/);
   const base = ruleBody(css, /\.tab-wrapper \.title \{([^}]*)\}/);
   assert.match(base, /min-width: 0;/);
   assert.match(base, /overflow: hidden;/);
   assert.match(base, /text-overflow: ellipsis;/);
   assert.match(base, /white-space: nowrap;/);
   assert.match(base, /padding-inline-end: 0;/);
-  const hover = ruleBody(css, /\.tab-wrapper:hover \.title \{([^}]*)\}/);
-  assert.match(hover, /padding-inline-end: 30px;/);
+  assert.equal(/\.tab-wrapper:hover \.title \{/.test(css), false);
+  const pinned = ruleBody(css, /\.tab-position\.is-pinned:hover \.title \{([^}]*)\}/);
+  assert.match(pinned, /padding-inline-end: 30px;/);
 });

@@ -93,8 +93,12 @@ $tile-wrappers: '#{$strip} > #{$tile} .tab-wrapper';
     transition: padding-inline-end $transition;
   }
 
-  #{$rows}:hover .title {
+  #{$strip} > :not(#{$tile}) .tab-position.is-pinned:hover .title {
     padding-inline-end: $minus-badge-size + $minus-offset;
+  }
+
+  #{$rows}:hover .favicon {
+    display: block !important;
   }
 
   #{$rows} .close {
