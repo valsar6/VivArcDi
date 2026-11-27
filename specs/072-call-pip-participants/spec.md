@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 5 |
 | Owner | Tore |
-| Approved | – |
+| Approved | Tore, 2026-11-27 (the answers to Q-1 to Q-5, the buttons of the window as the way to page and to control the call, the arrows as a fallback) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -28,6 +28,8 @@ screen, when there is one, and the tiles of every participant, yours included.
   camera off, so that I can tell at a glance whether my camera is on.
 - **US-5.** As a user in a large call, I want to scroll through the participants with the left and
   right arrows when they do not all fit.
+- **US-6.** As a user, I want to mute and unmute the microphone, turn the camera on and off and leave
+  the call from the floating window, so that I never have to go back to the call tab for it.
 
 ## Expected behavior
 
@@ -41,8 +43,9 @@ takes most of the window and the cameras sit beside it in a column or a grid, as
 Without a presentation, the cameras are laid out in a grid. Your own tile is
 there like the others. A participant whose camera is off shows their avatar, the same picture the
 call page shows, so a tile without a face tells you the camera is off, yours included. When the call
-has more tiles than `maxTiles`, the window shows a page of them and the left and right arrows move
-to the previous and the next page. The picture updates while the window is open: a participant who
+has more tiles than `maxTiles`, the window shows a page of them and its previous and next buttons
+move between the pages; where the browser passes the left and right arrow keys of the window to the
+page, they do the same. The picture updates while the window is open: a participant who
 joins or leaves, a presentation that starts or stops, and a camera that turns on or off change the
 layout without closing the window.
 
@@ -51,8 +54,9 @@ limit, the closing on return to the call tab or at the end of the call, the site
 This spec replaces what the window shows, not when it opens.
 
 The window stays the browser's own Picture in Picture, so it floats above other windows and can be
-moved and resized. The call itself, its audio and its page are untouched; the window is a picture of
-the videos and has no controls of the call.
+moved and resized. The window carries the buttons of the call: microphone, camera and leave the call,
+each showing the current state and acting on the call, as the buttons of the call page do. The call
+itself, its audio and its page are otherwise untouched.
 
 ## Requirements
 
@@ -71,9 +75,18 @@ the videos and has no controls of the call.
   video as 054 does, and log one warning.
 - **FR-7.** WHERE the call has more tiles than `maxTiles` (default 9), the window SHALL show the shared
   screen first, then the tiles in the order of the page, `maxTiles` at a time, and the right and left
-  arrows SHALL show the next and the previous page.
-- **FR-9.** WHILE the shared screen is present it SHALL stay on every page, the arrows scrolling only
+  buttons of the window SHALL show the next and the previous page, and the right and left arrow keys
+  SHALL do the same wherever the browser passes them to the page.
+- **FR-9.** WHILE the shared screen is present it SHALL stay on every page, the paging moving only
   the participants.
+- **FR-10.** WHILE the window is open, it SHALL offer the actions microphone, camera and leave the
+  call, as the browser's video-call controls (Media Session actions `togglemicrophone`, `togglecamera`
+  and `hangup`), and each SHALL activate the corresponding control of the call page.
+- **FR-11.** The microphone and camera buttons SHALL show the state of the call page and follow it when
+  it changes, also when the change is made in the page.
+- **FR-12.** The buttons for the three call actions SHALL have priority over the paging buttons: if the
+  browser cannot show both sets, the window SHALL keep the three call actions and page with the
+  arrow keys only.
 - **FR-8.** The module SHALL keep the triggers, the closing rules, the sites and the shortcut of 054
   unchanged (054 FR-2 to FR-12).
 
@@ -104,8 +117,14 @@ the videos and has no controls of the call.
 | AC-5 | WHEN a participant joins, leaves or starts or stops presenting while the window is open THE picture SHALL change and the window SHALL stay open | auto: `updates the picture while the window is open` |
 | AC-6 | IF the picture cannot be built THEN THE page script SHALL float the largest live video and send one `call-warning` | auto: `falls back to the largest video when the picture fails` |
 | AC-7 | WHERE the call has more tiles than `maxTiles` THE picture SHALL hold the shared screen first and then the tiles in page order, up to `maxTiles` | auto: `limits the picture to the configured number of tiles` |
-| AC-7b | WHEN the right or left arrow is pressed AND there are more tiles than fit THE picture SHALL show the next or the previous page, with the shared screen on every page | auto: `scrolls the tiles with the arrows` |
-| AC-7c | WHEN the arrow is pressed on the first or last page THE picture SHALL stay as it is | auto: `stops the arrows at the first and last page` |
+| AC-7b | WHEN the next or previous action is invoked AND there are more tiles than fit THE picture SHALL show the next or the previous page, with the shared screen on every page | auto: `pages the tiles with the previous and next actions` |
+| AC-7c | WHEN the right or left arrow key reaches the page AND there are more tiles than fit THE picture SHALL page as the actions do | auto: `pages the tiles with the arrow keys` |
+| AC-7d | WHEN the first or last page is shown THE paging SHALL NOT go past it | auto: `stops the paging at the first and last page` |
+| AC-15 | WHEN the window opens THE page script SHALL register the microphone, camera and hang up actions | auto: `registers the call actions` |
+| AC-16 | WHEN the microphone, camera or hang up action is invoked THE page script SHALL activate the matching control of the call page | auto: `drives the call controls from the window` |
+| AC-17 | WHEN the microphone or the camera changes state in the call page THE page script SHALL report the new state to the window | auto: `reports the microphone and camera state` |
+| AC-18 | IF the control of the call page is not found THEN THE page script SHALL do nothing for that action and send one `call-warning` | auto: `warns when a call control is not found` |
+| AC-19 | WHEN I use the buttons of the window THE microphone, the camera and the call SHALL change as when I use the page | manual |
 | AC-8 | WHEN the call tab is hidden THE picture SHALL refresh at least once per second | auto: `keeps refreshing the picture while the page is hidden` |
 | AC-9 | THE triggers, closing rules and shortcut of 054 SHALL behave as before | auto: the tests of 054 AC-1 to AC-5 and AC-15 to AC-20, unchanged |
 | AC-10 | WHEN I use the shortcut in a Meet call where someone presents THE window SHALL show the slides and the faces of the participants, and keep them moving after I switch tab | manual |
@@ -116,8 +135,8 @@ the videos and has no controls of the call.
 
 ## Out of scope
 
-- Controls of the call in the window (mute, camera, hang up, chat), and the names of the participants:
-  the window is a picture (NFR-2).
+- Other controls of the call in the window (chat, raise hand, reactions, share screen) and the names of
+  the participants (NFR-2).
 - Audio: the call keeps playing in its own tab.
 - Calls in native apps and sites other than the four of 054.
 - Choosing which participants appear, beyond the order of the page and `maxTiles`.
@@ -138,17 +157,15 @@ the videos and has no controls of the call.
   the rest (FR-7).
 - [x] **Q-5.** Calls without a presentation. Decided by Tore: same behavior, the window always shows
   the call (FR-3).
-- [ ] **Q-6.** The avatar picture. The call page shows it as an `<img>` from the Google avatar host,
-  loaded with credentials. A canvas that draws a cross-origin image without CORS approval is tainted
-  and `captureStream()` then fails. Proposed: draw the image the page already loaded; if a probe in a
-  real call shows the canvas tainted, draw a neutral silhouette on a flat color instead, which still
-  tells camera on from off. Which one ships depends on the probe.
-- [ ] **Q-7.** How the arrows reach the page. The PiP window of a `<video>` belongs to the browser and
-  forwards no key to the page. Proposed: register the Media Session actions `previoustrack` and
-  `nexttrack`, which Chromium shows as buttons in the window, and check in a real Vivaldi whether the
-  left and right arrow keys of the window trigger them (or `seekbackward` and `seekforward`). Plain
-  arrows are never taken from the call page, where Meet uses them. Tore, is the buttons-in-the-window
-  fallback acceptable if the keys cannot be reached?
+- [x] **Q-6.** The avatar picture. Decided: draw the image the page already loaded; if a probe in a
+  real call shows the canvas tainted, draw a neutral silhouette on a flat color, which still tells
+  camera on from off. The probe is a task of the design.
+- [x] **Q-7.** How to page. Decided by Tore: the previous and next actions of the browser's window
+  (Media Session `previoustrack` and `nexttrack`), with the arrow keys as a fallback where the browser
+  passes them. Plain arrows are never taken from the call page, where Meet uses them.
+- [x] **Q-8.** Microphone, camera and leave the call from the window. Decided by Tore: they are
+  required, as actions of the window (FR-10 to FR-12). If Chromium cannot show them together with the
+  paging buttons, the three call actions win and the arrows page (FR-12).
 
 ## References
 
