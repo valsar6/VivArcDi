@@ -99,7 +99,8 @@ export class CallPip extends Module<CallPipOptions> {
       token: this.#token,
       tabId,
       letter: context.options.shortcutLetter,
-      inCallSelector: found.inCallSelector,
+      maxTiles: context.options.maxTiles,
+      selectors: found.selectors,
     };
     return `${script}\n${SCRIPT_GLOBAL}.install(${JSON.stringify(policy)});`;
   }

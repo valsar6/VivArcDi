@@ -35,6 +35,10 @@ const selectors = new SelectorCatalog(
     webviewContainer: '#webview-container',
     tabWebview: '#webview-container webview[tab_id]',
     callMeetInCall: 'button[jsname="CQylAd"]',
+    callMeetTile: '[data-participant-id]',
+    callMeetTileAvatar: 'img.avatar',
+    callMeetMicrophone: 'button.mic',
+    callMeetCamera: 'button.cam',
   },
   'test',
 );
@@ -95,7 +99,9 @@ test('injects the call script on the supported sites only', async () => {
   assert.match(code, /^CALL\nVivArcDiCallPip\.install\(/);
   assert.match(code, /"tabId":1/);
   assert.match(code, /"letter":"p"/);
-  assert.match(code, /"inCallSelector":"button\[jsname=\\"CQylAd\\"\]"/);
+  assert.match(code, /"maxTiles":9/);
+  assert.match(code, /"inCall":"button\[jsname=\\"CQylAd\\"\]"/);
+  assert.match(code, /"tile":"\[data-participant-id\]","avatar":"img\.avatar","microphone":"button\.mic","camera":"button\.cam"/);
   assert.deepEqual(webviews.slice(1).map((webview) => webview.executed.at(-1)), [
     'globalThis.VivArcDiCallPip?.uninstall();',
     'globalThis.VivArcDiCallPip?.uninstall();',
@@ -113,6 +119,12 @@ test('skips a disabled site', async () => {
 test('uses the configured shortcut letter in the page script', async () => {
   const { module, webviews } = await started([MEET], { shortcutLetter: 'k' });
   assert.match(webviews[0]?.executed[0] ?? '', /"letter":"k"/);
+  module.stop();
+});
+
+test('passes the configured page size to the page script', async () => {
+  const { module, webviews } = await started([MEET], { maxTiles: 4 });
+  assert.match(webviews[0]?.executed[0] ?? '', /"maxTiles":4/);
   module.stop();
 });
 
@@ -188,9 +200,9 @@ test('reads call messages and refuses anything else', () => {
   assert.equal(parseCallMessage(null), null);
 });
 
-test('call settings default to Meet and the tab switch on, and the letter p', () => {
+test('call settings default to Meet and the tab switch on, the letter p and nine tiles', () => {
   const check = (raw: Record<string, unknown>): CallPipOptions | null => CALL_PIP_OPTIONS.check(raw, { warn: (): void => undefined });
-  assert.deepEqual(check({}), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p' });
-  assert.deepEqual(check({ meet: false, openOnTabSwitch: false, shortcutLetter: 'k' }), { meet: false, openOnTabSwitch: false, shortcutLetter: 'k' });
-  assert.deepEqual(check({ shortcutLetter: '  ' }), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p' });
+  assert.deepEqual(check({}), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p', maxTiles: 9 });
+  assert.deepEqual(check({ meet: false, openOnTabSwitch: false, shortcutLetter: 'k', maxTiles: 4 }), { meet: false, openOnTabSwitch: false, shortcutLetter: 'k', maxTiles: 4 });
+  assert.deepEqual(check({ shortcutLetter: '  ', maxTiles: 1 }), { meet: true, openOnTabSwitch: true, shortcutLetter: 'p', maxTiles: 9 });
 });

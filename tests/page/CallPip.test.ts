@@ -2,9 +2,11 @@ import { afterEach, beforeEach, mock, test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { CallPagePolicy } from '../../src/modules/callpip/CallMessage.js';
 import { CallVideo } from '../../src/page/lib/CallVideo.js';
+import type { CallPageServices } from '../../src/page/lib/CallPipHook.js';
+import { FakePictureEnvironment, cameras } from './pictureFakes.js';
 
 interface PageScript {
-  install(policy: CallPagePolicy): void;
+  install(policy: CallPagePolicy, services?: CallPageServices): void;
   uninstall(): void;
   open(): void;
   close(): void;
@@ -30,6 +32,7 @@ interface Pressed {
 }
 
 const IN_CALL = '.in-call';
+const TILE = '.tile';
 const POLL_MS = 1000;
 
 class FakeVideo {
@@ -73,8 +76,13 @@ class FakeDocument {
     return selector === IN_CALL && this.inCallView ? {} : null;
   }
 
-  public querySelectorAll(): FakeVideo[] {
-    return this.videos;
+  public tiles: unknown[] = [];
+
+  public querySelectorAll(selector: string): unknown[] {
+    if (selector === TILE) {
+      return this.tiles;
+    }
+    return selector === 'video' ? this.videos : [];
   }
 
   public addEventListener(type: string, listener: () => void): void {
@@ -102,7 +110,13 @@ let page = new FakeDocument();
 let saved: Array<[string, PropertyDescriptor | undefined]> = [];
 let activation = false;
 
-const policy = (letter = 'p'): CallPagePolicy => ({ token: 'tok', tabId: 7, letter, inCallSelector: IN_CALL });
+const policy = (letter = 'p'): CallPagePolicy => ({
+  token: 'tok',
+  tabId: 7,
+  letter,
+  maxTiles: 9,
+  selectors: { inCall: IN_CALL, tile: TILE, avatar: '.avatar', microphone: '.mic', camera: '.cam' },
+});
 
 function load(): Promise<PageScript> {
   return import('../../src/page/call-pip.js');
@@ -332,4 +346,45 @@ test('keeps the call PiP open when the script is installed again', async () => {
   assert.equal(live.filter((entry) => entry.type === 'keydown').length, 1);
   press({});
   assert.equal(page.exits, 1);
+});
+
+function fakeTile(): unknown {
+  return {
+    querySelectorAll: (selector: string): unknown[] => (selector === 'video' ? [{ videoWidth: 640, videoHeight: 360, paused: false, ended: false, srcObject: { getVideoTracks: (): Array<{ readyState: string }> => [{ readyState: 'live' }] } }] : []),
+    getBoundingClientRect: (): { width: number; height: number } => ({ width: 146, height: 182 }),
+  };
+}
+
+test('pages the tiles with the arrow keys', async () => {
+  const environment = new FakePictureEnvironment();
+  environment.onEnter = (): void => {
+    page.pictureInPictureElement = environment.videos[0] as unknown as FakeVideo;
+  };
+  const handlers = new Map<string, (() => void) | null>();
+  const services: CallPageServices = {
+    environment,
+    mediaSession: { setActionHandler: (action, handler): void => void handlers.set(action, handler) },
+    observe: () => () => undefined,
+  };
+  page.tiles = cameras(12).map(fakeTile);
+  page.videos = [new FakeVideo(page, 640, 360)];
+  (await load()).install(policy(), services);
+  const arrow = (key: string, fields: Partial<Pressed> = {}): Pressed => press({ key, metaKey: false, shiftKey: false, ...fields });
+  const before = arrow('ArrowRight');
+  assert.equal(before.prevented, false);
+  press({});
+  await settle();
+  assert.equal(page.pictureInPictureElement, environment.videos[0]);
+  assert.ok(handlers.get('nexttrack'));
+  const moved = arrow('ArrowRight');
+  assert.ok(moved.prevented && moved.stopped);
+  const modified = arrow('ArrowLeft', { shiftKey: true });
+  assert.equal(modified.prevented, false);
+  const other = arrow('ArrowDown');
+  assert.equal(other.prevented, false);
+  press({});
+  assert.equal(page.exits, 1);
+  environment.videos[0]?.leave();
+  assert.equal(arrow('ArrowLeft').prevented, false);
+  assert.equal(handlers.get('nexttrack'), null);
 });

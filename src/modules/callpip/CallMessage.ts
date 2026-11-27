@@ -3,7 +3,20 @@ import { hasEnvelope, parsePageMessage } from '../../shared/messages/PageMessage
 export const CALL_MESSAGE_TYPE = 'vivarcdi-call-pip';
 export const CALL_CONSOLE_PREFIX = 'vivarcdi-call-pip:';
 
-export type CallWarning = 'unsupported-page' | 'request-failed';
+export type CallWarning = 'unsupported-page' | 'request-failed' | 'composition-failed' | 'control-not-found';
+
+export interface CallSelectors {
+  /** Matches only while the page shows a call in progress: the leave button. */
+  inCall: string;
+  /** Matches the tile of each participant, the user's own included. */
+  tile: string;
+  /** Matches the avatar picture inside a tile. */
+  avatar: string;
+  /** Matches the microphone button of the call bar. */
+  microphone: string;
+  /** Matches the camera button of the call bar. */
+  camera: string;
+}
 
 export interface CallPagePolicy {
   /** Secret that proves a message comes from this script. */
@@ -12,8 +25,10 @@ export interface CallPagePolicy {
   tabId: number;
   /** The letter of the Cmd/Ctrl+Shift shortcut. */
   letter: string;
-  /** Selector that matches only while the page shows a call in progress. */
-  inCallSelector: string;
+  /** How many tiles one page of the picture holds. */
+  maxTiles: number;
+  /** The selectors of the call page. */
+  selectors: CallSelectors;
 }
 
 export interface CallMessage extends Record<string, unknown> {
@@ -27,7 +42,7 @@ export interface CallMessage extends Record<string, unknown> {
   reason: CallWarning;
 }
 
-const REASONS: readonly unknown[] = ['unsupported-page', 'request-failed'];
+const REASONS: readonly unknown[] = ['unsupported-page', 'request-failed', 'composition-failed', 'control-not-found'];
 
 const isCallMessage = (candidate: Record<string, unknown>): candidate is CallMessage =>
   hasEnvelope(candidate, CALL_MESSAGE_TYPE) && typeof candidate['tabId'] === 'number' && REASONS.includes(candidate['reason']);

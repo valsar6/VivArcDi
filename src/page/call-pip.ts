@@ -1,10 +1,17 @@
 import { CALL_CONSOLE_PREFIX, CALL_MESSAGE_TYPE } from '../modules/callpip/CallMessage.js';
 import type { CallPagePolicy, CallWarning } from '../modules/callpip/CallMessage.js';
+import { BrowserPictureEnvironment, observeMuted } from './lib/BrowserPicture.js';
 import { CallPipHook } from './lib/CallPipHook.js';
+import type { CallPageServices } from './lib/CallPipHook.js';
 import { sendToInterface } from './lib/PageChannel.js';
 import { PageInstall } from './lib/PageInstall.js';
 
 const INSTALL = new PageInstall('vivarcdi.call.pip');
+
+function pageServices(): CallPageServices {
+  const session = (globalThis.navigator as { mediaSession?: CallPageServices['mediaSession'] } | undefined)?.mediaSession ?? null;
+  return { environment: new BrowserPictureEnvironment(document), mediaSession: session, observe: observeMuted };
+}
 let installed: CallPipHook | null = null;
 
 /**
@@ -13,9 +20,10 @@ let installed: CallPipHook | null = null;
  * previous installation without closing its window. A page that cannot do Picture in Picture is left
  * as it is.
  *
- * @param policy The token, the tab, the letter and the selector of the in-call view.
+ * @param policy The token, the tab, the letter, the page size and the selectors of the call page.
+ * @param services What the picture and the buttons of the window use; the page's own by default.
  */
-export function install(policy: CallPagePolicy): void {
+export function install(policy: CallPagePolicy, services?: CallPageServices): void {
   const warn = (reason: CallWarning): void =>
     sendToInterface({ type: CALL_MESSAGE_TYPE, token: policy.token, tabId: policy.tabId, reason }, CALL_CONSOLE_PREFIX);
   if (document.pictureInPictureEnabled !== true) {
@@ -24,7 +32,7 @@ export function install(policy: CallPagePolicy): void {
     warn('unsupported-page');
     return;
   }
-  installed = new CallPipHook(policy, document, warn);
+  installed = new CallPipHook(policy, document, warn, services ?? pageServices());
   INSTALL.replace(installed);
 }
 
