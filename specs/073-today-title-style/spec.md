@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | – |
+| Approved | 2026-11-27 (PR #314) |
 | Amends | [028](../028-arc-sidebar-look/spec.md): the title of the row of a Today tab (font size, weight and color). |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -70,8 +70,8 @@ pinned or tile titles are not touched.
 
 ## Open questions
 
-- [ ] Should the Today title take the regular weight of a link (400) or keep a slightly heavier one
-  for the active tab? This draft uses the regular weight for all.
+- [x] Weight of the Today title: Tore decided on 2026-11-27 that all Today titles, the active one
+  included, take the regular weight (400) of a link row.
 
 - [x] Cause of the misalignment, probed on a lab Vivaldi (2026-11-27): the Today `.title` is a
   30 px tall block (`height: 30px`, `line-height: normal`, `padding-inline-start: 4px`) next to an
