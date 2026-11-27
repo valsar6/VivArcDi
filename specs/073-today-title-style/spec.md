@@ -1,12 +1,13 @@
-# 073 Today titles styled like the folder rows
+# 073 Today titles aligned like the folder rows
 
 | | |
 |---|---|
-| Status | Approved |
+| Status | Implemented |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | 2026-11-27 (PR #314) |
-| Amends | [028](../028-arc-sidebar-look/spec.md): the title of the row of a Today tab (font size, weight and color). |
+| Approved | 2026-11-27 (PR #314); amendment approved 2026-11-27 |
+| Implemented | 2026-11-27 |
+| Amends | [028](../028-arc-sidebar-look/spec.md): the title of the row of a Today tab (its position next to the icon). |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -17,14 +18,20 @@ folder in the Favorites area under the pinned tiles. This spec makes the two loo
 visual change only: no behavior, markup or selector changes. Tore also showed on 2026-11-27 that a
 Today title is not aligned like a link title: it sits about 4 px above the center of its icon and
 about 3 px closer to the icon (screenshot compared "Amazon Luna" in a folder with "Rame Membership"
-in Today). So the spec covers the alignment of the title next to its icon too.
+in Today).
 
 What the code does today:
 
-- A folder or link row (`span.vivarcdi-folders-title`, `src/styles/folders.scss`) is 13 px, in the
-  regular weight and in the color of the sidebar text (`--colorFg`); folders alone are bold (600).
-- A Today row title (`span.title` of `div.tab-header`, `src/styles/sidebar-look.scss`) is
-  `$row-font-size` (14 px), `$row-font-weight` (500) and `--vivarcdi-ink`.
+- In the Arc look, `sidebar-look.scss` gives the Favorites list and the Today titles the same font
+  size (`$row-font-size`, 14 px), weight (`$row-font-weight`, 500) and color (`--vivarcdi-ink`). The
+  13 px, regular weight and `--colorFg` of `folders.scss` are the base style, which the Arc look
+  overrides. The first draft of this spec took the base style for the look; the probe of
+  2026-11-27 showed that it is not, so font size, weight and color already match and are only
+  guarded.
+- A Today row title (`span.title` of `div.tab-header`) is a block with `height: 30px`,
+  `line-height: normal`, `padding-inline-start: 4px`, next to a favicon of 18 px (16 px image and
+  1 px padding): the text sits at the top of the tall box and starts 4 px from the icon, where a
+  link row has `$gap` (8 px).
 
 ## User stories
 
@@ -33,10 +40,10 @@ What the code does today:
 
 ## Expected behavior
 
-The title of a Today tab uses the same font size, weight and color as the title of a link row of the
-Favorites area. Ellipsis on overflow, centering, the room kept for the minus badge on hover and the
-height of the row stay as 028, 062 and 067 define them. Folder titles keep their bold weight and
-pinned or tile titles are not touched.
+The title of a Today tab has the same font size, weight and color as the title of a link row of the
+Favorites area, is centered vertically on its icon, and starts as far from the icon as a link title
+does. Ellipsis on overflow, the room kept for the minus badge on hover and the height of the row stay
+as 028, 062 and 067 define them. Folder titles, pinned and tile titles are not touched.
 
 ## Requirements
 
@@ -48,11 +55,6 @@ pinned or tile titles are not touched.
   distance from the icon as the title of a link row of the Favorites area.
 - **FR-3.** THE change SHALL NOT alter the markup, the height or the behavior of any row.
 
-### Non-functional
-
-- **NFR-1.** The values come from one set of tokens shared by both title styles (DRY), not from two
-  copies of the same numbers.
-
 ## Acceptance criteria
 
 | ID | Criterion | Check |
@@ -60,7 +62,6 @@ pinned or tile titles are not touched.
 | AC-1 | THE title of a Today row SHALL have the same computed font size, font weight and color as the title of a link row of the Favorites area. | live: `today title matches link title` |
 | AC-2 | THE vertical center of a Today title SHALL be within 1 px of the center of its icon, and the distance from icon to title SHALL equal that of a link row. | live: `today title aligns with its icon` |
 | AC-5 | THE title of a Today row SHALL stay ellipsized on overflow and keep the hover room of the minus badge. | live: `today title keeps layout` |
-| AC-3 | THE two title styles SHALL read their font size, weight and color from the same tokens. | auto: `title style tokens are shared` |
 | AC-4 | THE Today list SHALL look like the link rows of the Favorites area in the title. | manual |
 
 ## Out of scope
@@ -70,8 +71,10 @@ pinned or tile titles are not touched.
 
 ## Open questions
 
-- [x] Weight of the Today title: Tore decided on 2026-11-27 that all Today titles, the active one
-  included, take the regular weight (400) of a link row.
+- [x] Weight of the Today title: Tore decided on 2026-11-27 on the regular weight of a link row for
+  all Today titles, the active one included. The probe then showed that in the Arc look the link
+  weight is already the one of the Today title (500), so nothing changes: Tore approved the
+  amendment on 2026-11-27 that drops the shared tokens and keeps the guard of AC-1.
 
 - [x] Cause of the misalignment, probed on a lab Vivaldi (2026-11-27): the Today `.title` is a
   30 px tall block (`height: 30px`, `line-height: normal`, `padding-inline-start: 4px`) next to an
