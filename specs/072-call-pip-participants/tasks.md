@@ -10,7 +10,9 @@ Ordered, small and independently reviewable. Each task names the acceptance crit
 and is done when its check passes. Tests keep the names of the `auto:` checks.
 
 - [ ] **T1.** Probes in a real Meet call, by Tore, with a presentation, some cameras off and the tab
-  switched: the six questions at the end of `design.md`. Records the answers there and replaces the
+  switched: the six questions at the end of `design.md`. The lab run of 2026-11-27 answered the hidden-tab
+  refresh, the taint and the Media Session registration (see `design.md`); still open: the buttons and keys
+  of the window, Meet's selectors, Meet's hidden-tab decoding. Records the answers there and replaces the
   initial selectors and the choices they decide (avatar form, ticker, paging keys). Done when each
   question has an answer in `design.md`.
 - [ ] **T2.** `CallSelectors` and the policy: `CallSites.ts` carries the five selector keys, the four
@@ -27,7 +29,7 @@ and is done when its check passes. Tests keep the names of the `auto:` checks.
   `limits the picture to the configured number of tiles`,
   `pages the tiles with the previous and next actions` and
   `stops the paging at the first and last page` pass.
-- [ ] **T5.** `Ticker.ts` with `WorkerTicker` and `TimerTicker`, `AvatarSource.ts`, `PipPicture.ts`.
+- [ ] **T5.** `Ticker.ts` (a 66 ms interval), `AvatarSource.ts` with `CredentialedAvatar` and `SilhouetteAvatar`, `PipPicture.ts`.
   Satisfies AC-5, AC-8. Done when `updates the picture while the window is open` and
   `keeps refreshing the picture while the page is hidden` pass.
 - [ ] **T6.** `PipSource.ts` and `OpenPipCommand` taking a source, the fallback to the largest video.
