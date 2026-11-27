@@ -237,6 +237,8 @@ test('closes the call PiP when the call ends', async () => {
   press({});
   page.inCallView = false;
   mock.timers.tick(POLL_MS);
+  assert.equal(page.exits, 0);
+  mock.timers.tick(POLL_MS * 2);
   assert.equal(page.exits, 1);
 });
 

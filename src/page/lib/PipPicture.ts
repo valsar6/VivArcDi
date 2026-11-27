@@ -39,8 +39,8 @@ export interface PictureEnvironment {
   createImage(): AvatarImage;
 }
 
-function drawCovering(context: CanvasRenderingContext2D, video: HTMLVideoElement, rect: Rect): void {
-  const scale = Math.max(rect.width / video.videoWidth, rect.height / video.videoHeight);
+function drawContained(context: CanvasRenderingContext2D, video: HTMLVideoElement, rect: Rect): void {
+  const scale = Math.min(rect.width / video.videoWidth, rect.height / video.videoHeight);
   const width = video.videoWidth * scale;
   const height = video.videoHeight * scale;
   context.save();
@@ -153,7 +153,7 @@ export class PipPicture {
     context.fillStyle = TILE_BACKGROUND;
     context.fillRect(inner.x, inner.y, inner.width, inner.height);
     if (this.#shows(tile)) {
-      drawCovering(context, tile.video as HTMLVideoElement, inner);
+      drawContained(context, tile.video as HTMLVideoElement, inner);
     } else {
       drawAvatar(context, this.#avatars.picture(tile.avatar), inner);
     }
