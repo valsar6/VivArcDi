@@ -108,7 +108,7 @@ export class CallPipHook implements PageHook {
   };
 
   #onVisibility = (): void => {
-    if (!this.#document.hidden) {
+    if (!this.#document.hidden && !this.#controls.actedRecently()) {
       this.closeWindow();
     }
   };

@@ -148,7 +148,8 @@ four sites share one module and one list in `config.json`.
   the worse choice.
 - [x] **Q-2.** What is "a call in progress" on each site? Decided: a live video track in a playing
   `<video>` plus a per-site selector for the in-call view, verified in a real call (T1 of the
-  design).
+  design). Amended by [072](../072-call-pip-participants/spec.md): with the whole call composed, the
+  in-call view alone is enough, so the window opens in a call where nobody has a camera on.
 - [x] **Q-3.** Should the page script also register the `enterpictureinpicture` media session action,
   so that a future Vivaldi opens PiP on tab switch by itself? Decided: no, nothing to prove it works
   and it would hide the day Vivaldi does it on its own.

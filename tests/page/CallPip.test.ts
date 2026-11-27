@@ -246,11 +246,8 @@ test('ignores the shortcut without a call', async () => {
   const video = await inCall();
   page.inCallView = false;
   const lobby = press({});
-  page.inCallView = true;
-  video.paused = true;
-  const paused = press({});
   assert.equal(video.requested, 0);
-  assert.ok([lobby, paused].every((key) => !key.prevented && !key.stopped));
+  assert.ok(!lobby.prevented && !lobby.stopped);
 });
 
 test('floats the largest live video', () => {
@@ -389,4 +386,40 @@ test('pages the tiles with the arrow keys', async () => {
   environment.videos[0]?.leave();
   assert.equal(arrow('ArrowLeft').prevented, false);
   assert.equal(handlers.get('nexttrack'), null);
+});
+
+test('opens the window in a call where nobody shows a video', async () => {
+  const environment = new FakePictureEnvironment();
+  environment.onEnter = (): void => {
+    page.pictureInPictureElement = environment.videos[0] as unknown as FakeVideo;
+  };
+  page.tiles = cameras(3).map(fakeTile);
+  page.videos = [];
+  (await load()).install(policy(), { environment, mediaSession: null, observe: () => (): void => undefined });
+  const key = press({});
+  await settle();
+  assert.ok(key.prevented && key.stopped);
+  assert.equal(page.pictureInPictureElement, environment.videos[0]);
+});
+
+test('keeps the window open when its own buttons bring the tab forward', async () => {
+  const environment = new FakePictureEnvironment();
+  environment.onEnter = (): void => {
+    page.pictureInPictureElement = environment.videos[0] as unknown as FakeVideo;
+  };
+  const handlers = new Map<string, (() => void) | null>();
+  const services: CallPageServices = {
+    environment,
+    mediaSession: { setActionHandler: (action, handler): void => void handlers.set(action, handler) },
+    observe: () => () => undefined,
+  };
+  page.tiles = cameras(3).map(fakeTile);
+  page.videos = [new FakeVideo(page, 640, 360)];
+  (await load()).install(policy(), services);
+  press({});
+  await settle();
+  handlers.get('togglecamera')?.();
+  page.hidden = false;
+  page.fire('visibilitychange');
+  assert.equal(page.exits, 0);
 });

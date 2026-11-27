@@ -30,6 +30,7 @@ export interface CallControlsParts {
 
 const SELECTOR_OF: Record<CallControlName, keyof ControlSelectors> = { microphone: 'microphone', camera: 'camera', leave: 'inCall' };
 const MUTED_ATTRIBUTE = 'data-is-muted';
+const ACTION_GRACE_MS = 3000;
 
 export class CallControls implements PictureObserver {
   #root: ParentNode;
@@ -40,6 +41,7 @@ export class CallControls implements PictureObserver {
   #pager: TilePager | null = null;
   #registered: string[] = [];
   #watching: Array<() => void> = [];
+  #lastAction = Number.NEGATIVE_INFINITY;
 
   /**
    * The buttons of the floating window: microphone, camera and leave the call act on the matching
@@ -78,6 +80,14 @@ export class CallControls implements PictureObserver {
   }
 
   /**
+   * @returns Whether a button of the window acted on the call a moment ago. The browser can bring the
+   * call tab forward while it runs the action, which is not the user going back to the tab.
+   */
+  public actedRecently(): boolean {
+    return Date.now() - this.#lastAction < ACTION_GRACE_MS;
+  }
+
+  /**
    * Moves the pages of the picture with an arrow key.
    *
    * @param key `ArrowLeft` or `ArrowRight`.
@@ -96,6 +106,7 @@ export class CallControls implements PictureObserver {
   }
 
   #click(name: CallControlName): void {
+    this.#lastAction = Date.now();
     const control = this.#root.querySelector<HTMLElement>(this.#selectors[SELECTOR_OF[name]]);
     if (control === null) {
       this.#warn('control-not-found');

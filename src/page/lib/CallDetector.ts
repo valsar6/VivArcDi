@@ -1,5 +1,3 @@
-import { CallVideo } from './CallVideo.js';
-
 const POLL_MS = 1000;
 const LEAVE_CHECKS = 3;
 
@@ -12,8 +10,7 @@ export class CallDetector {
   #absent = 0;
 
   /**
-   * Follows whether a page shows a call in progress: the site's in-call view is there and a video
-   * plays a live track.
+   * Follows whether a page shows a call in progress: the site's in-call view is there.
    *
    * @param root The document of the page.
    * @param selector Selector that matches only while the page shows a call.
@@ -29,7 +26,7 @@ export class CallDetector {
    * @returns Whether a call is in progress now.
    */
   public inCall(): boolean {
-    return this.#root.querySelector(this.#selector) !== null && CallVideo.pick(this.#root) !== null;
+    return this.#root.querySelector(this.#selector) !== null;
   }
 
   /**
