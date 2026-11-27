@@ -73,10 +73,11 @@ pinned or tile titles are not touched.
 - [ ] Should the Today title take the regular weight of a link (400) or keep a slightly heavier one
   for the active tab? This draft uses the regular weight for all.
 
-- [ ] The cause is not verified yet. `display: block !important` on the title (`sidebar-look.scss`)
-  is a suspect but a flex item is blockified anyway, so Vivaldi's own margin, padding or line-height
-  on `.title` and `.favicon` is likelier. A probe of the computed styles on a lab Vivaldi (needs
-  Tore's agreement to run `npm run live`) settles it before the design.
+- [x] Cause of the misalignment, probed on a lab Vivaldi (2026-11-27): the Today `.title` is a
+  30 px tall block (`height: 30px`, `line-height: normal`, `padding-inline-start: 4px`) next to an
+  18 px favicon. The box is centered, but the text sits at the top of the box, so it looks higher
+  than the icon, and the gap from icon to text is 4 px, where a link row uses `$gap` (8 px). The
+  `display: block` is not the cause, the height of the box and the 4 px padding are.
 
 ## References
 
