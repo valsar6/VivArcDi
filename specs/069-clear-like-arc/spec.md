@@ -7,6 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-26 (PR #307) |
 | Implemented | 2026-11-26 |
+| Amended by | [071 Clear archives the active tab too](../071-clear-active-tab/spec.md) (2026-11-26): AC-10 (the live scenario `the Clear shortcut archives the Today tabs` expects the active tab to stay open) is replaced, and "Today tabs" in FR-8 and AC-7 include the active tab. |
 | Supersedes | [067](../067-clear-line-and-titles/spec.md) FR-8 to FR-10 and AC-9 to AC-11 (Clear shown at rest), and the 6 px line inset of 067 FR-4, FR-5, AC-5 and AC-6. 067 FR-1 to FR-3 (nothing shows with no Today tab) and FR-6 (centered titles) stay. |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).

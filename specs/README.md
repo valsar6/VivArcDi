@@ -79,7 +79,9 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [069 Clear like Arc](069-clear-like-arc/spec.md) | 3 | Implemented |
 | [070 Guards for the two couplings to Vivaldi's interface](070-vivaldi-coupling-guards/spec.md) | 3 | Approved |
 | [071 Clear archives the active tab too](071-clear-active-tab/spec.md) | 3 | Draft |
+| [072 Call Picture in Picture with the participants](072-call-pip-participants/spec.md) | 5 | Draft |
 | [073 Today titles styled like the folder rows](073-today-title-style/spec.md) | 3 | Approved |
+
 
 
 
