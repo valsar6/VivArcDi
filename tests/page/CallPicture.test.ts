@@ -75,6 +75,14 @@ test('gives the shared screen the larger area', () => {
   placed.filter((entry) => entry !== primary).forEach((entry) => assert.ok(areaOf(primary) > areaOf(entry)));
 });
 
+test('recognises a shared screen in a small call', () => {
+  const screen = { video: video(3000, 1872), avatar: null, area: 710 * 443 };
+  const pager = new TilePager(9, () => [screen, avatarTile('a', 364 * 443), avatarTile('b', 364 * 443)]);
+  assert.equal(pager.current().primary, screen);
+  const equal = new TilePager(9, () => [cameraTile(100000), cameraTile(100000), cameraTile(120000)]);
+  assert.equal(equal.current().primary, null);
+});
+
 test('lays the cameras out in a grid without a presentation', () => {
   const pager = new TilePager(9, () => cameras(4));
   const page = pager.current();

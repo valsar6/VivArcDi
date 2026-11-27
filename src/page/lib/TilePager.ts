@@ -1,6 +1,6 @@
 import type { CallTile } from './CallTiles.js';
 
-const PRIMARY_RATIO = 2;
+const PRIMARY_RATIO = 1.5;
 
 export interface TilePage {
   /** The tile the page shows largest, such as a shared screen, or null when none stands out. */

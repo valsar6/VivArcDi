@@ -26,7 +26,7 @@ Four small pieces, each with one reason to change:
 - **`TileLayout`** (Strategy) turns a list of tiles and a canvas size into rectangles:
   `SpotlightLayout` gives the primary tile about 70 % of the width and stacks the others in a column
   or grid beside it; `GridLayout` is the rows and columns that fit the count best. The **primary tile**
-  is the tile whose video has at least twice the area of the next one: a shared screen, and also a
+  is the tile whose video has at least one and a half times the area of the next one: a shared screen, and also a
   pinned or spotlighted participant, which deserves the same place. With no such tile the layout is a
   grid (FR-2, FR-3, Q-5). This needs no marker of "presentation", which Meet gives only in a
   language-dependent label.
@@ -215,10 +215,23 @@ avatar-only tiles) and the probe of T1 driven over the debugging port with a use
 Meet's own policy has no `worker-src`, so it falls back to `script-src`, which is a nonce with
 `strict-dynamic`.
 
-Still open, and only a real call or a person can answer them: which buttons the window shows and whether
-its arrow keys reach the page (the lab cannot see an operating system window), the attributes of the
-microphone and camera buttons of Meet, whether Meet decodes tiles of a hidden tab, and whether Meet
-registers Media Session actions of its own.
+### Real call probe (Meet, Vivaldi 8.3, 2026-11-27)
+
+Run by Tore in a real call with a shared screen and two participants with the camera off.
+
+| Question | Result |
+|---|---|
+| Tiles | `[data-participant-id]` finds one tile per participant and one for the shared screen; the shared screen has a `<video>` of 3000 x 1872, the camera-off tiles have no `<video>` at all and two avatar `<img>` (50 x 50 with `crossorigin=use-credentials`, 320 x 320 without) |
+| Primary tile | The shared screen (710 x 443) is only 1.95 times the area of the others (364 x 443): the threshold of 2 would have missed it, so it is now 1.5 |
+| Microphone button | `jsname="hw0c9"` while muted, not `BOHaEe`; the selector lists both names; the camera button is `psRWwc` and the leave button `CQylAd`, as expected |
+| Muted state | `data-is-muted="true"` while the microphone and the camera are off, as the code reads it |
+| Hidden tab, PiP window open | Timer of 66 ms: 15 per second; `requestAnimationFrame`: about 119 per second; the shared-screen video kept advancing; the picture was drawn 15 times per second |
+| Avatar | No load error for the credentialed copy of the avatars, so the host accepted it; the first-frame taint check ran before the load and does not prove it |
+| Media Session | `togglemicrophone`, `togglecamera`, `hangup`, `previoustrack` and `nexttrack` registered without error |
+
+Still open: which buttons the window shows and whether its arrow keys reach the page, whether the
+microphone button keeps `hw0c9` when the microphone is on, whether Meet decodes the camera tiles of a
+hidden tab (this call had none), and whether Meet registers Media Session actions of its own.
 
 ## Probes (T1, real Meet call, by Tore)
 

@@ -11,8 +11,9 @@ and is done when its check passes. Tests keep the names of the `auto:` checks.
 
 - [ ] **T1.** Probes in a real Meet call, by Tore, with a presentation, some cameras off and the tab
   switched: the six questions at the end of `design.md`. The lab run of 2026-11-27 answered the hidden-tab
-  refresh, the taint and the Media Session registration (see `design.md`); still open: the buttons and keys
-  of the window, Meet's selectors, Meet's hidden-tab decoding. Records the answers there and replaces the
+  refresh, the taint and the Media Session registration (see `design.md`); the real Meet call of the same day answered the selectors, the
+  hidden-tab refresh and the Media Session registration; still open: the buttons and keys of the window,
+  the microphone jsname when unmuted, Meet's decoding of hidden camera tiles. Records the answers there and replaces the
   initial selectors and the choices they decide (avatar form, ticker, paging keys). Done when each
   question has an answer in `design.md`.
 - [x] **T2.** `CallSelectors` and the policy: `CallSites.ts` carries the five selector keys, the four

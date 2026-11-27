@@ -29,7 +29,7 @@
   "callMeetInCall": "button[jsname=\"CQylAd\"]",
   "callMeetTile": "[data-participant-id]",
   "callMeetTileAvatar": "img[src*=\"googleusercontent.com\"]",
-  "callMeetMicrophone": "button[data-is-muted][jsname=\"BOHaEe\"]",
+  "callMeetMicrophone": "button[data-is-muted][jsname=\"hw0c9\"], button[data-is-muted][jsname=\"BOHaEe\"]",
   "callMeetCamera": "button[data-is-muted][jsname=\"psRWwc\"]",
   "panelAddButton": "#panels button[data-name=\"PanelWeb\"]",
   "panelAddressField": ".CustomizePanelPopup input.address",
