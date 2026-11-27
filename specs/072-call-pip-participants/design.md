@@ -34,7 +34,7 @@ Four small pieces, each with one reason to change:
   primary tile and up to `maxTiles - 1` others; without a primary tile it holds `maxTiles`. `next()` and
   `previous()` stop at the ends (AC-7d). It is rebuilt from `CallTiles` at each frame, so a participant
   who leaves cannot leave an empty page (FR-5, FR-9).
-- **`PipPicture`** owns the canvas, the hidden `<video>`, the `Ticker` and the layout: `open()` builds
+- **`PipPicture`** owns the canvas, the hidden `<video>`, the 66 ms interval and the layout: `open()` builds
   them, draws a first frame synchronously, starts the stream and returns the video to float; `dispose()`
   stops the ticker and the tracks and removes the video. A `leavepictureinpicture` event on the video
   disposes it too, so a window closed with its own X leaves nothing behind.
@@ -79,7 +79,7 @@ worker ticker, or to `MediaStreamTrackProcessor`, as a new decision.
 ```text
 page (call-pip.ts)
 CallPipHook ─ shortcut / tab switch ─▶ OpenPipCommand(source, allowed)
-                                          ├─ ComposedPipSource ─▶ PipPicture(CallTiles, TileLayout, TilePager, Ticker)
+                                          ├─ ComposedPipSource ─▶ PipPicture(CallTiles, TileLayout, TilePager)
                                           └─ LargestVideoSource (fallback, 054)
             ─ on open ─▶ CallControls (Media Session actions, state observer) + arrow keys
             ─ on close / leavepictureinpicture ─▶ PipPicture.dispose, CallControls.release
@@ -189,7 +189,7 @@ them with what a real call shows; none may depend on the language of the page.
 | Chromium shows the video-call actions (microphone, camera, hang up) and the track buttons only in part | FR-12: the three call actions win; paging falls back to the arrows; T1 records what the window shows |
 | The window turns the arrow keys into nothing the page sees | T1 probes the keys and `seekbackward`/`seekforward`; with neither, the buttons are the only way and the spec says so in the manual check |
 | A hidden tab freezes the picture | The lab shows no throttling while the window is open; T1 confirms it in a real call, together with Meet's own decoding of hidden tiles |
-| The avatar taints the canvas | Never draw the page's image: `CredentialedAvatar` or `SilhouetteAvatar` |
+| The avatar taints the canvas | Never draw the page's image: `CredentialedAvatars`, or the silhouette |
 | Meet registers its own Media Session actions and ours replace them | Ours run the same clicks; on close they are removed, and T1 checks whether Meet's are lost, in which case they stay registered until `uninstall` |
 | The primary-tile rule (twice the next area) picks a pinned participant | Acceptable by design: the page shows it large as well |
 | Selectors of Meet change | Selectors are data; a mismatch means the fallback window of 054 and one warning, never a broken page (NFR-1) |
