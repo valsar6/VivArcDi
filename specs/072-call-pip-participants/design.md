@@ -92,12 +92,12 @@ throws `SecurityError: Canvas is not origin-clean` (seen in the lab). The avatar
 at full size has no `crossorigin` attribute, so drawing it would taint the canvas. The Google avatar host
 answers with `access-control-allow-origin: https://meet.google.com` and
 `access-control-allow-credentials: true` (curl, 2026-11-27, on the default avatar), so the same picture
-loaded with `crossOrigin = 'use-credentials'` is clean. `AvatarSource` (Strategy) therefore never draws the
+loaded with `crossOrigin = 'use-credentials'` is clean. `CredentialedAvatars` therefore never draws the
 page's own image:
 
-- `CredentialedAvatar` loads its own copy of the largest avatar of the tile with
+- `CredentialedAvatars` loads its own copy of the largest avatar of the tile with
   `crossOrigin = 'use-credentials'`, caches it by address and draws it once loaded;
-- `SilhouetteAvatar` draws a neutral shape on a flat color, while the copy loads and whenever it fails.
+- the silhouette, a neutral shape on a flat color, is drawn while the copy loads and whenever it fails.
 
 Both tell camera on from off, which is what US-4 asks. No pixel check is needed, since an image that is
 not CORS-approved is never drawn.
@@ -109,10 +109,10 @@ not CORS-approved is never drawn.
 | `src/page/lib/CallTiles.ts` | Reads the tiles of the page, in order, each as video or avatar | – |
 | `src/page/lib/TileLayout.ts` | `TileLayout`, `SpotlightLayout`, `GridLayout`: tiles and size to rectangles | Strategy |
 | `src/page/lib/TilePager.ts` | The page of tiles, `next`, `previous`, the primary tile on every page | – |
-| `src/page/lib/Ticker.ts` | Starts and stops the 66 ms interval that draws the picture | – |
-| `src/page/lib/AvatarSource.ts` | `CredentialedAvatar`, `SilhouetteAvatar` | Strategy |
-| `src/page/lib/PipPicture.ts` | Canvas, hidden video, ticker, layout; `open`, `dispose` | Facade |
-| `src/page/lib/PipSource.ts` | `PipSource`, `ComposedPipSource`, `LargestVideoSource` | Strategy |
+| `src/page/lib/CredentialedAvatars.ts` | Loads each avatar again with credentials; the silhouette is drawn while it loads or when it fails | – |
+| `src/page/lib/PipPicture.ts` | Canvas, hidden video, the 66 ms interval, layout; `open`, `dispose` | Facade |
+| `src/page/lib/BrowserPicture.ts` | The canvas, video and images of the real page, and the `MutationObserver` of the muted attribute | Adapter |
+| `src/page/lib/PipSource.ts` | `PipSource`, `ComposedPipSource`, `LargestVideoSource`, `PictureObserver` | Strategy, Observer |
 | `src/page/lib/CallControls.ts` | Media Session actions, button state observer, `ClickCallControl` | Command |
 | `src/page/lib/PipCommand.ts` | `OpenPipCommand` takes a `PipSource` | Command |
 | `src/page/lib/CallPipHook.ts` | Builds the source and the controls, listens for the two arrows while the window is open | Invoker |
