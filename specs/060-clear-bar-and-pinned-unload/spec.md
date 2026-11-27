@@ -7,6 +7,7 @@
 | Owner | Tore |
 | Approved | 2026-11-24 |
 | Implemented | 2026-11-24 |
+| Amended by | [071 Clear archives the active tab too](../071-clear-active-tab/spec.md) (2026-11-26): FR-2, AC-1 and "except the active one" in "What Clear does": Clear archives the active Today tab too, and opens a blank tab when nothing else is left. |
 | Amended by | [067 Clear line and Today titles](../067-clear-line-and-titles/spec.md) (2026-11-26): FR-1 holds only while a Today tab is shown; with no Today tab the Clear row and its line are removed. 067/FR-8 supersedes the hover-only Clear of AC-12: the label shows at rest. |
 | Supersedes | Nothing. [004](../004-today-tabs-and-keyboard/spec.md) FR-5 and AC-7 keep their user-visible placement, hover and archive; [059](../059-pinned-tabs-arc/spec.md) FR-5 and AC-15 keep the row minus. This spec fixes where the Clear control sits in the DOM and adds the same minus to a pinned tile. |
 
