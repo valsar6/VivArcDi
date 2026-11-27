@@ -2,7 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
+| Approved | Tore, 2026-11-27 |
 | Spec | [spec.md](spec.md) |
 
 Written after the spec was `Approved`. It says **how**; the spec says **what**. It builds on the page
