@@ -1,24 +1,18 @@
-# 073 Today titles styled like the folder rows: design
+# 073 Today titles aligned like the folder rows: design
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Implemented |
 | Spec | [spec.md](spec.md) |
 
 Written only after the spec is `Approved`. It says **how**; the spec says **what**.
 
 ## Approach
 
-Styles only, in two stylesheets and one token file. No TypeScript changes.
+Styles only, in `sidebar-look.scss` and one token. No TypeScript changes.
 
-**Shared tokens (FR-1, NFR-1, AC-3).** `src/styles/_tokens.scss` gets `$list-title-size: 13px` and
-`$list-title-weight: 400`. `folders.scss` replaces its literal `font-size: 13px` on the list with
-`$list-title-size` and sets `font-weight: $list-title-weight` on the link titles (folder titles keep
-their 600). `sidebar-look.scss` replaces `$row-font-size` and `$row-font-weight` in its `.title` rule
-with the same two tokens. `$row-font-size` and `$row-font-weight` stay for the other users
-(`base.scss`, `live-folders.scss`, `icon-picker.scss`). The title color becomes the one of the link
-rows, `var(--colorFg, inherit)`, in place of `--vivarcdi-ink`. The live scenario compares the two
-computed colors, so a theme where they differ is caught.
+**Font and color (FR-1, AC-1).** No change. In the Arc look `sidebar-look.scss` already gives link
+and Today titles the same size, weight and color; `today title matches link title` guards it.
 
 **Alignment (FR-2, AC-2).** Probe on a lab Vivaldi, 2026-11-27: `.title` is a block with
 `height: 30px`, `line-height: normal`, `padding-inline-start: 4px` and `margin: 0 3px 0 0`, beside a
@@ -26,8 +20,8 @@ computed colors, so a theme where they differ is caught.
 starts 4 px from the icon. The `.title` rule of `sidebar-look.scss` becomes:
 
 - `height: auto`, so `align-self: center` centers the text itself and not a 30 px box;
-- `padding-inline-start: 0` and `margin-inline-start: $gap - 1px`, so the space from the 16 px image
-  to the text is `$gap` (8 px), as in a link row (the 1 px is the favicon padding);
+- `padding-left: 0` (Vivaldi pads the left, and stylelint forbids two logical longhands that could be a shorthand while a test expects `padding-inline-end: 0`) and `margin-inline-start: $gap - $favicon-padding`, so the space from the 16 px image
+  to the text is `$gap` (8 px), as in a link row (`$favicon-padding`, 1 px, is the favicon padding);
 - everything else of the rule stays: ellipsis, `min-width: 0`, the `padding-inline-end` transition
   and the hover room of the minus badge (FR-3, AC-5).
 
@@ -41,21 +35,19 @@ selector already does; AC-5 and the tile rule (`display: none` on `.title`) stay
 
 | File | Change |
 |---|---|
-| `src/styles/_tokens.scss` | `$list-title-size`, `$list-title-weight` |
-| `src/styles/folders.scss` | Uses the two tokens |
-| `src/styles/sidebar-look.scss` | `.title` uses the tokens, the link color, `height: auto` and the new inline start |
-| `tests/styles/SidebarLook.test.ts` | `title style tokens are shared` |
-| `tests/live/scenarios/` | Three scenarios named as the `live:` checks |
-| `package.json`, `installer/vivarcdi/__init__.py` | Patch version, read from `main` before the PR |
+| `src/styles/_tokens.scss` | `$favicon-padding` |
+| `src/styles/sidebar-look.scss` | `.title`: `height: auto`, `padding-left: 0`, the inline start margin |
+| `tests/live/scenarios/` | Three scenarios named as the `live:` checks, and their helper `titles.ts` |
+| `package.json`, `installer/vivarcdi/__init__.py` | Patch version |
 
 ## Tests
 
 | Criterion | Test | Where | What it asserts |
 |---|---|---|---|
-| AC-3 | `title style tokens are shared` | `tests/styles/SidebarLook.test.ts` | Both stylesheets use `$list-title-size` and `$list-title-weight`; the compiled 13 px and 400 appear in the Today `.title` rule and in the folder list; no literal `13px` remains in `folders.scss` |
 | AC-1 | `today title matches link title` | `tests/live/scenarios/` | A Today title and a link title have equal computed font size, weight and color |
-| AC-2 | `today title aligns with its icon` | `tests/live/scenarios/` | Title center within 1 px of the icon center; distance from the image to the text equals that of a link row |
-| AC-5 | `today title keeps layout` | `tests/live/scenarios/` | Overflow gets an ellipsis; the hover padding of the minus badge is still applied |
+| AC-2 | `today title aligns with its icon` | `tests/live/scenarios/` | Text center within 1 px of the icon center; distance from the image to the text equals that of a link row |
+| AC-5 | `today title keeps layout` | `tests/live/scenarios/` | Overflow gets an ellipsis; the hover transition of the minus badge is still applied |
 | AC-4 | manual | | Look at the Today list next to the Favorites area |
 
-The live scenarios are written first and fail on the current code, so each one proves the fix.
+The alignment scenario failed on the code before the change (6.75 px off the center, 4 px from the
+icon) and passes after it.
