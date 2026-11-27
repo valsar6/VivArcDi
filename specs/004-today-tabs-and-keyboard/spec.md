@@ -6,6 +6,7 @@
 | Phase | 4 |
 | Owner | Tore |
 | Approved | 2026-10-28 |
+| Amended by | [071 Clear archives the active tab too](../071-clear-active-tab/spec.md) (2026-11-26): FR-5 and AC-7 (Clear keeps the active tab) no longer hold: Clear archives the active Today tab too. FR-2 and AC-2 stay for the automatic sweep. |
 | Refined by | [067 Clear line and Today titles](../067-clear-line-and-titles/spec.md) (2026-11-26): FR-5's divider and Clear show only while a Today tab exists, inset like the rows. 067/FR-8 supersedes the hover-only Clear of FR-5: the label shows at rest. |
 
 ## Summary
