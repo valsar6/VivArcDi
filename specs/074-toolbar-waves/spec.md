@@ -141,8 +141,10 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
 - **FR-1.** The module reads both lists through `vivaldi.prefs.get` at start and on every change
   announced by `onChanged`.
 - **FR-2.** `BrowserPrefs` gains a `set(key, value)` that calls `vivaldi.prefs.set({path, value})`, the
-  only signature Vivaldi accepts, and returns once the call is made (it has no callback); it never
-  throws, and it stays the only place that touches `vivaldi.prefs`.
+  only signature Vivaldi accepts, and returns once the call is made (the call is synchronous and has
+  no callback); it throws only to report that the preferences or their `set` are unavailable, and
+  it stays the only place that touches `vivaldi.prefs`. `WaveController.choose` catches that error and
+  fails with the readable message of AC-24, so `choose` itself never throws.
 - **FR-3.** Choosing a wave writes its two lists of the table in [After](#after), `before` first.
 - **FR-4.** When no wave is chosen, or Still water is, and a preset wave is chosen, the module stores
   the current lists as the backup first. It never overwrites a backup while Ripple, Swell or Breaking
@@ -182,7 +184,7 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 
 | ID | Criterion | Check |
 |---|---|---|
-| AC-1 | THE preference service SHALL write a value through `vivaldi.prefs.set` and resolve when it is done | auto: `writes a preference and resolves` |
+| AC-1 | THE preference service SHALL write a value through `vivaldi.prefs.set({path, value})`, a synchronous call with no callback | auto: `writes a preference through the api` |
 | AC-2 | WHEN the module starts, THE module SHALL read both lists and show the wave they equal, or none | auto: `shows the wave the lists already equal` |
 | AC-3 | WHEN the user chooses a wave, THE module SHALL write that wave's two lists | auto: `writes the lists of the chosen wave` |
 | AC-4 | WHEN the user chooses a wave while none is chosen, THE module SHALL store the current lists first | auto: `stores the user's lists before the first write` |

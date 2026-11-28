@@ -39,7 +39,8 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `draws the four wave icons with currentColor`, `serves the waves with a JSON-safe preview`,
   `each wave gives the lists of its table`, `builds the four waves in order`.
 - [ ] **T4. Preference writer.** `BrowserPrefs.set` and `canSet`, `PrefsApi.set`, the class JSDoc.
-  Green: `writes a preference and resolves`. Existing tests keep their names.
+  `tests/core/prefs.ts` `FakePrefsApi.set(key, value)` is adapted to `set({ path, value })` so that
+  `canSet` stays honest. Green: `writes a preference through the api`. Existing tests keep their names.
 - [ ] **T5. Marker and store.** `WaveMarker.ts`, `WaveStore.ts` with its versioned format. Green:
   `marks the body with the chosen wave`.
 - [ ] **T6. Controller and module.** `WaveController.ts`, `ToolbarWaves.ts`, options, the published
@@ -53,7 +54,8 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `asks before replacing custom lists`, `does not start without writable toolbar lists`,
   `stays out of private windows`, `exposes the four waves and a service to choose one`,
   `reports a failed choice with a readable message`, `chooses a wave it has no special case for`. Blocks 075.
-- [ ] **T7. Sidebar look.** The guards in `src/styles/sidebar-look.scss`. Green:
+- [ ] **T7. Sidebar look.** The guards in `src/styles/sidebar-look.scss`: `:not(body[data-vivarcdi-wave] *)` at the end of the two
+  rules, inside the look block, so every selector still starts with `#browser[data-vivarcdi-look]`. Green:
   `lets an active wave keep the new-tab button, spacers and nested row`; the existing style tests
   keep their names.
 - [ ] **T7b. Tore looks.** Tore checks the CSS himself in this prototype phase: with a wave chosen

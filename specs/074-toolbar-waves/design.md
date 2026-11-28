@@ -38,7 +38,7 @@ only while `body` has no `data-vivarcdi-wave` (FR-12).
                  │   │   └────▶ WaveStore ──▶ ModuleContext.storage (vivarcdi.toolbar-waves)
                  │   └────────▶ WaveMarker ──▶ body[data-vivarcdi-wave]
                  └────────────▶ BrowserPrefs.get / set / onChange (two toolbar lists)
-sidebar-look.scss ◀── body:not([data-vivarcdi-wave]) hides NewTab and spacers
+sidebar-look.scss ◀── :not(body[data-vivarcdi-wave] *) guard on the NewTab and spacer rules
 ```
 
 ### Rejected alternatives
@@ -85,8 +85,9 @@ export class BrowserPrefs {
 }
 ```
 
-- `set` throws only when the preferences are not available or have no `set`; the module checks
-  `canSet` first (FR-9). The JSDoc of the class stops saying "no method that writes".
+- `set` is synchronous, like Vivaldi's call, and throws only when the preferences are not available
+  or have no `set`; the module checks `canSet` first (FR-9), and `WaveController.choose` catches the
+  error and fails with a readable message (AC-24), so `choose` never throws. The JSDoc of the class stops saying "no method that writes".
 - `onChange(key, listener)` already exists and is used for both lists.
 
 ### Waves (`src/modules/toolbarwaves/`)
@@ -293,17 +294,24 @@ button whose `data-name` is `TabsTrash`.
 
 ### Sidebar look (`src/styles/sidebar-look.scss`, changed)
 
-The two rules at lines 37-43 gain a guard:
+The look mark `[data-vivarcdi-look]` is on `#browser`, which sits inside `body`, so a selector that
+starts with `body` cannot match under it, and the test `sidebar look rules all sit under the look
+mark` needs every selector to start with `#browser[data-vivarcdi-look]`. The two rules at lines 37-43
+stay inside the `#{$look}` block and gain the guard at the end of their last compound:
 
 ```scss
-body:not([data-vivarcdi-wave]) #{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible) {
+#{$tab-bar} :is(.button-toolbar.newtab, .button-toolbar.toolbar-spacer-flexible):not(body[data-vivarcdi-wave] *) {
   display: none !important;
 }
 
-body:not([data-vivarcdi-wave]) #{$tab-bar} .tabbar-nested-buttons:not(:has(.button-toolbar:not(.toolbar-spacer, .toolbar-spacer-flexible))) {
+#{$tab-bar} .tabbar-nested-buttons:not(:has(.button-toolbar:not(.toolbar-spacer, .toolbar-spacer-flexible))):not(body[data-vivarcdi-wave] *) {
   display: none !important;
 }
 ```
+
+`:not(body[data-vivarcdi-wave] *)` uses a complex selector inside `:not`, which Chromium supports (and
+Vivaldi runs Chromium); the compiled selector keeps its `#browser[data-vivarcdi-look]` start and the
+marker stays on `body`.
 
 - With no wave chosen the look is as today (Q-9). With a wave chosen, Swell and Breaking wave show
   both the "+ New Tab" row of 028 and the `NewTab` button.
@@ -311,11 +319,25 @@ body:not([data-vivarcdi-wave]) #{$tab-bar} .tabbar-nested-buttons:not(:has(.butt
   Breaking wave; the guard keeps it visible while a wave is chosen.
 - 028 gets a "Refined by" line and a note under FR-6 (task T8).
 
+## Names the tests rely on
+
+The T2 tests import these; T3 to T6 keep them:
+
+- `ToolbarWavesOptions.ts` exports `TOOLBAR_WAVES_OPTIONS` and the type `ToolbarWavesOptions`.
+- `WaveIcons.ts` exports `WAVE_ICONS: Record<WaveId, string>`.
+- `new WaveMarker(document)`, `new WaveStore(storage)`; the four strategies are built with no
+  constructor arguments.
+- `WaveStrategy.ts` exports `PreviewRow`, `PreviewShape`, `WaveContext`, `ToolbarLists`, `WaveId`.
+- `WaveDataMapper.ts` exports `WaveData`; `WaveController.ts` exports `WaveChoice`.
+- The published service has `waves` (a `WaveData[]`), `current`, `needsConfirmation`,
+  `choose(id, { confirmed })` and `onChange`.
+- The message of a choice that needs a confirmation contains the word "confirmation".
+
 ## Tests
 
 | AC | Test | File |
 |---|---|---|
-| AC-1 | `writes a preference and resolves` | `tests/core/browser/BrowserPrefs.test.ts` |
+| AC-1 | `writes a preference through the api` | `tests/core/browser/BrowserPrefs.test.ts` |
 | AC-2 | `shows the wave the lists already equal` | `tests/modules/toolbarwaves/WaveController.test.ts` |
 | AC-3 | `writes the lists of the chosen wave` | same |
 | AC-4 | `stores the user's lists before the first write` | same |
