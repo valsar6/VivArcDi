@@ -15,7 +15,7 @@ Order and parallel work: T1 runs alone and first. T2 follows T1. T3 and T4 are i
 other and can run in parallel from the commit that has T2, each in its own `vivarcdi-implementer`
 worktree from the same base commit. T5 needs T2, T3 and T4 and runs alone. T6 is Tore's. T7, T8 and
 T9 are independent and can run in parallel after T5. T8 is blocked by spec 074 (its wave service and
-preview data). T10 is owned by the lead and comes last.
+preview data). T11 to T14 (the workspace icon option, added later) follow the same rules: T11 first and alone, T12 and T13 in parallel, T14 after both; T13 does not wait for 074. T10 is owned by the lead and closes the work after T14.
 
 - [ ] **T1. Live scenarios first.** Write `tests/live/scenarios/opens-the-vivarcdi-settings-page.live.ts`
   (name `opens the VivArcDi Settings page`, AC-1) and
@@ -79,3 +79,27 @@ preview data). T10 is owned by the lead and comes last.
   `npm run release -- check --base origin/main --branch features/settings-page` and `make check`.
   When Tore reports AC-18 and AC-21 green, and the 046 follow-up has made AC-1 and AC-9 pass, the
   spec becomes `Implemented`.
+- [ ] **T11. Live scenario for the workspace icon, first (AC-28).** Write
+  `tests/live/scenarios/the-workspace-button-shows-only-its-icon.live.ts` (name
+  `the workspace button shows only its icon`, `spec: '075'`), real code as described in the design;
+  add the selectors `workspaceButton`, `workspaceButtonName`, `workspaceButtonIcon` to
+  `src/selectors/` if missing. Red first: `every live check has a scenario` fails on the new
+  `live:` text until the file exists, then the scenario is run with `npm run live` (ask Tore
+  first) and fails if Vivaldi does not update the button at once. Done when `LiveChecks.test.ts` is green
+  and the scenario passes on the lab; it needs no page file and no 074. Runs alone, before T12 to T14.
+- [ ] **T12. Window preferences bridge (AC-24, AC-26).** Red first in
+  `tests/modules/settingspage/WindowPrefsBridge.test.ts`: `allows only listed window preferences`,
+  `writes no window preference in a private window`, with a fake `BrowserPrefs`. Then
+  `WindowPrefsBridge.ts` and `WINDOW_PREF_KEYS`, and one shared listener for it and `WavesBridge`.
+  Needs T5 (the opener module) and 074 T4 (`BrowserPrefs.set`). Parallel with T13.
+- [ ] **T13. The checkbox (AC-22, AC-23, AC-25, AC-27).** Red first in
+  `tests/settings/WorkspaceIconOption.test.ts`: `shows the workspace icon option from the current preference`,
+  `writes show_name from the workspace icon checkbox`,
+  `leaves the waves alone when the workspace icon changes`,
+  `disables the workspace icon option when preferences cannot be set`, with a fake
+  `WindowPrefsClient`. Then `WindowPrefsClient.ts` and `sections/WorkspaceIconOption.ts`. Needs
+  T3 and T5 (widgets); independent of T8, so it does not wait for 074's waves. Parallel with T12.
+- [ ] **T14. Wire the option into the Tab bar section.** `main.ts` draws `WorkspaceIconOption` in the Tab
+  bar section above the wave cards (or alone when 074's service is absent). No new test name:
+  covered by T13; checked by eye in T6 (Tore looks) and by AC-21 in T10. Docs: `docs/architecture.md`
+  and the manual get one line for the option and the allow-list (T9 owner).
