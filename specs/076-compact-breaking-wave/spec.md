@@ -5,7 +5,7 @@
 | Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | Tore, 2026-11-28 (in chat) |
+| Approved | Tore, 2026-11-28 (in chat); amended 2026-11-28 (sizes, measures, anchoring) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -46,6 +46,26 @@ first form ("the compact form does not include the archive footer"): the footer 
 the row. The workspace button shows only its icon, hidden by style in the compact row whatever the option
 `vivaldi.workspaces.button.show_name` says ([075](../075-settings-page/spec.md) owns that option).
 
+### Amendment of 2026-11-28 (Tore, after the first measures against Arc)
+
+Tore approved these decisions, which refine the sizes, the thresholds and the anchoring below; where
+they differ from the first wording, they win:
+
+- The buttons are 28 px (never below 24 px) with a glyph of about 13 px, in place of 32 px. Arc's
+  reference, at about 1.75 px per pt: sidebar about 215 px, side margin about 7 px, bottom bar 24 to 28 px
+  high, archive and plus about 7 px from the edges, workspace icon centered.
+- The row wraps into a column below 116 px (3 x 28 + 2 x 8 gap + 2 x 8 padding), token `$compact-wrap-width`.
+- The toolbar starts at most 8 px above the first button (AC-6); the workspace popup stays inside the
+  window, within 16 px of the button and centered on it (AC-8).
+- The full-width Archive footer is removed by [077](../077-archive-icon/spec.md) (icon only); the row uses
+  that icon.
+- Measured: the Archive footer and `.toolbar-tabbar-after` are siblings inside `#tabs-container`
+  (`position: relative`), not of `#tabs-tabbar-container`; attempt (a) anchors on `#tabs-container`, and
+  CSS anchor positioning is supported. The after-toolbar is 540 px tall and the footer overlaps it by a
+  few px.
+- The workspace label is `span.button-title` inside `button[data-name="WorkspaceButton"]` (catalog key
+  `workspaceButtonName`); `NewTab` has no label.
+
 ## User stories
 
 - **US-1.** As a user who chose the Breaking wave to look like Arc, I want the bottom of the tab bar to be
@@ -76,7 +96,7 @@ While the Breaking wave is the chosen wave, the bottom bar of the tab strip is o
 |---|---|---|
 | Archive icon | `WorkspaceButton` icon | `NewTab` icon |
 
-- Each is a square icon button of the size of Vivaldi's small toolbar buttons. The workspace button shows
+- Each is a square icon button of 28 px (never below 24 px), with a glyph of about 13 px. The workspace button shows
   the icon of the current workspace and no name; `NewTab` shows only a `+`; the Archive button keeps the icon of 077.
 - The buttons are the real buttons restyled, not copies: Vivaldi's `WorkspaceButton` and `NewTab` and
   VivArcDi's own Archive footer keep their click, the popup of the workspace button, the tooltips, the
@@ -101,14 +121,16 @@ the row reacts when the window or the bar is resized.
 - **FR-1.** The compact form applies only while `body` matches `body[data-vivarcdi-wave="breaking-wave"]`, the attribute that
   `toolbar-waves` sets (074 FR-13, Q-2), and only in the tab bar after-toolbar.
 - **FR-2.** In the compact form the Archive button, `WorkspaceButton` and `NewTab` sit on one row, in that order,
-  left, center and right, at every width that fits them; below the threshold of Q-6 they stack in a column, none smaller than 24 px.
+  left, center and right, at every width that fits them; below 116 px (`$compact-wrap-width`, Q-6) they stack in a column, none smaller than 24 px.
 - **FR-3.** The compact form never changes the two lists, never calls `vivaldi.prefs.set` and never moves
   Vivaldi's buttons to another parent. It moves VivArcDi's own Archive footer into the row only if style
   alone cannot reach the result (Q-1, Q-8).
 - **FR-4.** The three buttons keep Vivaldi's behavior: `NewTab` opens a tab, `WorkspaceButton` opens its
   popup anchored to the button, the Archive button opens the archive panel.
 - **FR-5.** Tooltips and accessible names are those of the real buttons; each icon button is reachable
-  and operable with the keyboard, in the order of the row, with a visible focus ring (Q-3).
+  and operable with the keyboard, in the order of the row, with a visible focus ring (Q-3). Known limit of attempt (a): the footer follows the toolbar in the DOM, so
+  the visual order is Archive, workspace, new tab but the DOM and tab order is workspace, new tab, Archive;
+  this limit is recorded and is the trigger for attempt (b) (Q-8).
 - **FR-6.** When the attribute is removed or changed to another wave, the lists change, or the module stops, the compact form is off at
   once and Vivaldi's layout is back (Q-4).
 - **FR-7.** The compact form works in the light and dark themes, and with the compact tab bar of
@@ -124,6 +146,9 @@ the row reacts when the window or the bar is resized.
   [077](../077-archive-icon/spec.md); outside the compact form the footer stays where it is today. The
   compact form never shows two Archive buttons.
 - **FR-12.** The style applies only when the Archive footer, `WorkspaceButton` and `NewTab` are all present.
+- **FR-13.** The tokens are `$compact-bar-gap` (8 px), `$compact-wrap-width` (116 px), `$compact-bar-button-size`
+  (28 px), `$compact-bar-button-min` (24 px), `$workspace-button` (`.tabbar-workspace-button`) and
+  `$new-tab-button` (`.button-toolbar.newtab`).
 
 ### Non-functional
 
@@ -146,18 +171,21 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-3 | THE stylesheet SHALL define the attribute selector, the button size and the row gap as tokens | auto: `compact breaking wave uses tokens` |
 | AC-4 | THE compact form SHALL NOT call `vivaldi.prefs.set` nor change the two lists | auto: `compact breaking wave never writes preferences` |
 | AC-5 | WHEN a lab Vivaldi receives the Breaking wave lists with the attribute set, THE archive, the workspace and the new-tab buttons SHALL share one row, in that order, left to right | live: `the compact breaking wave puts three buttons on one row` |
-| AC-6 | WHILE the compact form is on, THE three buttons SHALL be square and at most 36 px high, and the row SHALL start no higher than the first button's top | live: `the compact breaking wave row has the height of an icon button` |
+| AC-6 | WHILE the compact form is on, THE three buttons SHALL be square, 28 px (at least 24 px, at most 36 px) high, and the toolbar SHALL start no more than 8 px above the first button | live: `the compact breaking wave row has the height of an icon button` |
 | AC-7 | WHEN the compact form is on and a script clicks `NewTab`, THE browser SHALL open a new tab | live: `the compact new-tab button opens a tab` |
-| AC-8 | WHEN the compact form is on and a script clicks the workspace button, THE workspace popup SHALL open anchored inside the window and under the button's row | live: `the compact workspace button opens its popup in place` |
+| AC-8 | WHEN the compact form is on and a script clicks the workspace button, THE workspace popup SHALL open inside the window, within 16 px of the button and centered on it (the popup opens above the bar, since a bottom bar cannot open below) | live: `the compact workspace button opens its popup in place` |
 | AC-9 | WHEN the compact form is on and a script clicks the Archive button, THE archive panel SHALL open | live: `the compact archive button opens the archive panel` |
 | AC-10 | WHILE the compact form is on, THE three buttons SHALL keep the tooltip and the accessible name they have without it | live: `the compact buttons keep their labels` |
-| AC-11 | WHEN the tab bar is resized between its narrowest and widest widths, THE three buttons SHALL stay inside the bar, on one row where they fit and in a column below the threshold | live: `the compact breaking wave row survives a resize` |
+| AC-11 | WHEN the tab bar is resized between its narrowest and widest widths, THE three buttons SHALL stay inside the bar, on one row where they fit and in a column below 116 px | live: `the compact breaking wave row survives a resize` |
 | AC-12 | WHEN the lists are replaced by Still water or by a manual edit, THE bottom bar SHALL return to Vivaldi's rows and THE Archive footer to the end of the tab list, without a reload | live: `the compact form switches off with the breaking wave` |
 | AC-13 | WHILE the compact tab bar of 032 is on, THE three buttons SHALL stack in a column inside the narrow bar, each at least 24 px | live: `the compact breaking wave stacks in the narrow tab bar` |
 | AC-14 | WHEN Tore looks at the bottom bar in the light and dark themes on macOS and Debian, THE row SHALL look like Arc's bottom bar: the archive icon at the left, one small workspace icon in the middle, the plus at the right | manual |
 | AC-15 | WHILE the compact form is on, THE workspace button SHALL show only its icon, with no visible label | live: `the compact workspace button shows only its icon` |
 | AC-16 | WHILE the compact form is on and `vivaldi.workspaces.button.show_name` is on, THE workspace button SHALL still show only its icon | live: `the compact row hides the workspace name whatever the option says` |
 | AC-17 | THE compact rules SHALL apply only when the Archive footer, `WorkspaceButton` and `NewTab` are all present | auto: `compact breaking wave needs the archive, workspace and new-tab buttons` |
+
+AC-16 note: in the lab, `show_name` false leaves the label visible in Vivaldi, so the false case does not
+discriminate between the style and Vivaldi; the true case is the proof, and the false case is recorded.
 
 AC-14 is the only `manual` criterion; tab order and focus (FR-5) are read from the DOM in AC-10 and
 are not asked of Tore. Not proven yet: that style can put the Archive footer on the row, the vertical
@@ -222,7 +250,7 @@ If scenarios 1 and 2 show that style cannot do it, the design is amended for the
   (AC-13), where the three icons stack in a column (Q-6). The "+ New Tab" row of 028 stays,
   so the tab bar has two new-tab entries, as 074 Q-9 decided.
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
-- [x] **Q-6. Narrow widths.** At 42 px three 28 px icons do not fit one row. Recommended: below a width
+- [x] **Q-6. Narrow widths.** At 42 px three 28 px icons do not fit one row (the threshold is 116 px, `$compact-wrap-width`). Recommended: below a width
   that fits them, the row wraps to a column of three icons rather than shrinking them below 24 px;
   AC-11 and AC-13 read accordingly and the verification plan records the break point.
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
@@ -231,18 +259,23 @@ If scenarios 1 and 2 show that style cannot do it, the design is amended for the
   after 074 is implemented, because the live scenarios need the Breaking wave lists.
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 
-- [ ] **Q-8. Where does the Archive footer live in the row?** The footer is a VivArcDi element, the last
+- [x] **Q-8. Where does the Archive footer live in the row?** The footer is a VivArcDi element, the last
   child of `#tabs-container` (a scrolling, sticky column); the other two buttons are children of Vivaldi's
   `.toolbar-tabbar-after`. Recommended: attempt (a), style only: the toolbar keeps a left slot and the
   footer is positioned over it from their common parent; attempt (b), a helper that keeps the footer as
   the first child of the after-toolbar with `KeptElement`, only if (a) fails the live scenarios.
-- [ ] **Q-9. Vertical position and height of the row.** The row is the after-toolbar's; the footer must sit
+  Answered (Tore, 2026-11-28): attempt (a), anchored on `#tabs-container`, the real common parent (measured);
+  the DOM order limit of FR-5 triggers (b).
+- [x] **Q-9. Vertical position and height of the row.** The row is the after-toolbar's; the footer must sit
   on its middle line, not on the bottom of the column. Recommended: anchor the footer to the toolbar
   (CSS anchor positioning if Vivaldi's Chromium has it, else a measured offset) and let scenario AC-6
   read the result; a fixed pixel offset is rejected.
-- [ ] **Q-10. Order of the specs.** Recommended: 076 ships after 074 (marker, preset without `TabsTrash`)
+  Answered (Tore, 2026-11-28): CSS anchor positioning is supported; the toolbar is 540 px tall and the footer
+  overlaps it by a few px; AC-6 allows the toolbar to start 8 px above the first button.
+- [x] **Q-10. Order of the specs.** Recommended: 076 ships after 074 (marker, preset without `TabsTrash`)
   and 077 (the icon-only Archive); until both are in `main`, the scenarios may set the attribute, the lists
   and the footer by hand.
+  Answered (Tore, 2026-11-28): the recommendation; 077 removes the full-width footer.
 
 ## References
 
