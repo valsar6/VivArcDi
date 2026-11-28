@@ -23,7 +23,7 @@ entries are examples.
 
 The page is the home of four sections:
 
-- **Tab bar**: the four wave layouts of [074](../074-toolbar-waves/spec.md), as four cards, in this order,
+- **Tab bar**: a checkbox "Show only the icon of the workspace" (Italian: "Mostra solo l'icona dello spazio di lavoro"), and the four wave layouts of [074](../074-toolbar-waves/spec.md), as four cards, in this order,
   from no effect to the most customized interface: Still water (Specchio d'acqua), Ripple
   (Increspatura), Swell (Flutto), Breaking wave (Cavallone). The four icons are approved by Tore.
 - **Themes**: the VivArcDi themes of [028](../028-arc-sidebar-look/spec.md),
@@ -77,6 +77,7 @@ Option B needs two proofs, listed in Q-1.
 |---|---|---|
 | A user turns a module off | Edits `enabled` in the deployed `config.json`; the next reinstall can overwrite it | `src/config.json`, `src/core/boot/VivArcDi.ts` (reads `config.json` at boot) |
 | A user changes the theme | Runs `theme apply` in a terminal; the installer writes Vivaldi's preferences | `installer/vivarcdi/theme.py`, specs 029 and 051 |
+| The workspace switcher shows the icon and the name | Vivaldi has a native preference for icon only, `vivaldi.workspaces.button.show_name` (boolean, default `true`; `false` shows the icon only, no CSS needed), but VivArcDi has no control for it | none |
 | A user picks a tab bar layout | Not possible: no setting exists (074 adds the service `globalThis[Symbol.for('vivarcdi.waves')]` with `{waves, current, needsConfirmation, choose, onChange}`, and marks `body` with `data-vivarcdi-wave`) | none yet |
 | A user asks "why is it half working" | Reads the console summary line `VivArcDi:boot` | spec 039 |
 | The payload reads preferences | Only reads, and follows changes; has no method that writes | `src/core/browser/BrowserPrefs.ts` |
@@ -91,6 +92,19 @@ layout of Vivaldi's settings. Section headings are uppercase with a rule below; 
 description. Choices that exclude each other are **cards** (a preview, the name below, a check mark on
 the chosen one); independent choices are **checkboxes** with a gray explanation. Colors, type and
 spacing follow Vivaldi's own, in the light and in the dark theme ([Q-5](#open-questions)).
+
+**The workspace icon option.** The Tab bar section also holds one checkbox in Vivaldi's own style (a
+label and a gray explanation line, like Vivaldi's "Force dark theme"): **Show only the icon of the
+workspace** (Italian: Mostra solo l'icona dello spazio di lavoro), explained as "The workspace button
+shows its icon without the name." It is **independent of the waves** of 074 and of
+[076](../076-compact-breaking-wave/spec.md): no wave sets it and none reads it. Checked writes
+`vivaldi.workspaces.button.show_name` as `false`; unchecked writes `true`; opening the page reads the
+current value. Vivaldi applies it at once; that is expected, and unproven for this preference (the
+spike showed it for the toolbar lists), so a `live:` scenario proves it. The page reaches the
+preference through the same `chrome.runtime` channel as the waves, generalised to **window
+preferences** with an allow-list of the keys the page may read and write; today it holds only this
+key. In a private window the box shows the value and is disabled. When the preference or `set` is
+unavailable, the box is disabled with its reason.
 
 **Sections as a registry.** The page knows no section by name. Each section is an object that gives an
 id, a title, a description and a way to draw itself and to read and write its choice. The four sections
@@ -137,6 +151,16 @@ before the code that makes it pass.
   schema falls back to the default with a warning, as in 036.
 - **FR-9.** In a private window no choice is written.
 - **FR-10.** When the page cannot be reached, the rest of VivArcDi is unaffected (see After).
+- **FR-11.** The **Tab bar** section holds the checkbox **Show only the icon of the workspace**, with a
+  gray explanation, independent of the wave cards; it reads `vivaldi.workspaces.button.show_name`
+  when the page opens and shows it checked when the value is `false`.
+- **FR-12.** Checking the box writes `show_name` as `false`; unchecking it writes `true`. Neither
+  writes anything else, and the waves of 074 are untouched.
+- **FR-13.** The page reads and writes window preferences only through the message bridge, which
+  accepts a key only if it is on an allow-list; the list holds `vivaldi.workspaces.button.show_name`
+  and nothing else.
+- **FR-14.** In a private window the box shows the value and is disabled, and the bridge refuses the
+  write. When the preference or its `set` is unavailable, the box is disabled and says why.
 
 ### Non-functional
 
@@ -180,6 +204,13 @@ red tests exist first.
 | AC-19 | THE build SHALL put the settings page file in `dist/`, and the installer SHALL copy it into the install's `vivarcdi/` folder | auto: `builds and installs the settings page file` |
 | AC-20 | THE wave card previews SHALL follow the measured structure of 074: full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible spacers, with `before` drawn above the page area and `after` below it | auto: `draws the previews with the measured structure` |
 | AC-21 | WHEN Tore uses the entry point on his install, THE opened page SHALL have `vivaldi.prefs` and read and write a choice | manual |
+| AC-22 | WHEN the page opens, THE Tab bar section SHALL show the checkbox "Show only the icon of the workspace" with its gray explanation, checked when `show_name` is `false` | auto: `shows the workspace icon option from the current preference` |
+| AC-23 | WHEN the user checks the box, THE page SHALL write `show_name` as `false`, and WHEN the user unchecks it, as `true` | auto: `writes show_name from the workspace icon checkbox` |
+| AC-24 | THE bridge SHALL read and write only the window preferences on its allow-list, and SHALL refuse any other key | auto: `allows only listed window preferences` |
+| AC-25 | WHEN the workspace icon option changes, THE page SHALL NOT read, write or change the wave choice | auto: `leaves the waves alone when the workspace icon changes` |
+| AC-26 | WHILE the window is private, THE bridge SHALL refuse a preference write and THE box SHALL be disabled | auto: `writes no window preference in a private window` |
+| AC-27 | IF the preference or its `set` is unavailable, THEN THE box SHALL be disabled with its reason | auto: `disables the workspace icon option when preferences cannot be set` |
+| AC-28 | WHEN `show_name` is `false`, THE workspace button SHALL show its icon and not its name, and WHEN restored to `true` the name SHALL return | live: `the workspace button shows only its icon` |
 
 AC-18 is the manual step for the look: whether a page "looks like Vivaldi's" cannot be asserted by a
 test; the variables and structure are covered by AC-5 to AC-7. AC-21 is the second manual step and
@@ -192,6 +223,8 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
   grouping of features, the format of the report. Each gets its own spec or a revision of this one.
 - New themes, and any change to `theme apply` or the installer's theme flow.
 - The wave layouts themselves and their stylesheet ([074](../074-toolbar-waves/spec.md)).
+- Any other window preference on the page; the allow-list grows only by a revision of this spec.
+- CSS for the icon-only workspace button: Vivaldi's own preference does it.
 - Changing an option of a module other than `enabled` (a later spec, per module).
 - Syncing the choices between devices, import and export of settings.
 - Translations of the page (English only, like the rest of the interface).
@@ -256,6 +289,10 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
   browser and cannot be read from its resources or `vivaldi.prefs`. Tore accepts it only if free: the
   manual checklist has a step to search the combination in Vivaldi Settings > Keyboard and, if it is
   taken, to choose another and update the default.
+- [x] **Q-8. Where the icon-only option is stored.** Answered (Tore, 2026-11-28, in chat; scope
+  change): in Vivaldi's own preference `vivaldi.workspaces.button.show_name`, not in VivArcDi's
+  storage, so Vivaldi's own settings and the page always agree; nothing of ours to migrate or back up.
+  AC-28 is the only live check of it and does not need the page file, so it can run in the lab today.
 
 ## References
 

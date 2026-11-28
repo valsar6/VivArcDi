@@ -79,6 +79,8 @@ window.html: SettingsOverrides ◀── chrome.storage.onChanged / boot read �
 | `SettingsChoices.ts` | `read(): Promise<StoredChoices>`, `set(patch): Promise<SaveOutcome>` over `vivarcdi.settings` with a `StoredFormat`; `set` resolves `memory` without writing when `priv` is true | Repository |
 | `widgets/CardGroup.ts` | `render(host, cards: Card[], chosen: string, onChoose)`; one `button` per card with the preview, the name and a check mark on the chosen one only | Widget |
 | `widgets/CheckboxRow.ts` | A `label` with an `input[type=checkbox]` and a gray `small` explanation | Widget |
+| `WindowPrefsClient.ts` | Page side: `get(key)`, `set(key, value)` over `chrome.runtime` messages, an error name from the bridge becomes a typed error | Proxy |
+| `sections/WorkspaceIconOption.ts` | The checkbox of the Tab bar section: `CheckboxRow` with the label, the gray explanation and the reason when disabled; checked means `show_name` is `false`; disabled when private, or the client reports `unavailable` | Section part |
 | `sections/WavesSection.ts` | The four cards, in the order Still water, Ripple, Swell, Breaking wave, from `WavesClient` | Section |
 | `WavesClient.ts` | Page side of the bridge: `waves()`, `current()`, `needsConfirmation()`, `choose(id, { confirmed })`, `onChange(listener)` over `chrome.runtime` messages | Proxy |
 | `sections/ThemesSection.ts` | The five themes of 051 as cards; marks `vivaldi.themes.current` | Section |
@@ -100,6 +102,18 @@ as promises and an `onChange`. `WavesSection` uses only the client's shape, so t
 client. A `choose` that 074 refuses (`needsConfirmation` without `confirmed`) comes back as an error
 that the section shows as a confirmation step. When the service is not published (074's FR-9, the
 module off), the bridge answers `unavailable` and the section is not drawn.
+
+**Window preferences.** The page needs one more thing from the window: Vivaldi's preferences, which
+only the window's side reliably holds (`BrowserPrefs.set({path, value})` exists since 074 T4). The
+same envelope serves it: `{ vivarcdi: 'window-prefs', call: 'get' | 'set', key, value? }`.
+`WindowPrefsBridge` (`src/modules/settingspage/`, next to `WavesBridge`) answers it through
+`BrowserPrefs`, after three checks in this order: the key is on `WINDOW_PREF_KEYS` (today
+`['vivaldi.workspaces.button.show_name']`), the window is not private for a `set`, and `prefs.available`
+and `canSet` hold; each failure answers `{ error: 'refused' | 'private' | 'unavailable' }` and logs one
+`warn`. `WindowPrefsClient` (`src/settings/`) gives `get(key)` and `set(key, value)` back as
+promises. `WavesBridge` and `WindowPrefsBridge` register on one listener that routes by `vivarcdi`, so
+the window has one `onMessage` handler. The option never calls the waves service and the waves
+never read the preference (AC-25).
 
 **What 075 requires of 074.** One thing the 074 design lacks: `Wave` also carries
 `preview: PreviewShape`, as 074's FR-10 and spec already say ("id, English name, Italian name, icon,
@@ -135,6 +149,7 @@ does not register the section.
 | `SettingsPage.ts` | `Module`, `id = 'settings-page'`, `privateWindows = 'allowed'` (it stores nothing, the page enforces AC-15). `start` attaches a `WindowKeys` for the shortcut; `stop` detaches |
 | `SettingsOpener.ts` | `open(): Promise<void>`: `tabs.create({ url: \`${origin}/vivarcdi/settings.html\` })`; if `tabs.available` is false or `create` rejects, one `warn` and the notice `VivArcDi Settings cannot be opened` (AC-16) |
 | `WavesBridge.ts` | Window side of the bridge: reads `globalThis[Symbol.for('vivarcdi.waves')]` per call, answers messages, posts changes, answers `unavailable` without the service | Adapter |
+| `WindowPrefsBridge.ts` | Window side of the window-preferences channel: allow-list `WINDOW_PREF_KEYS`, private-window and availability checks, `get` and `set` over `BrowserPrefs` | Adapter with a guard |
 | `SettingsOverrides.ts` | At boot reads `vivarcdi.settings` and returns `config.modules` with each `enabled` replaced by the stored boolean; ignored with a warning when the value is unreadable (036, 037) |
 
 Option `shortcut` of `settings-page` in `src/config.json`, a string with the default `Mod+Alt+,`, and the user changes it by editing the option (schema of 036; an invalid value falls back to the default with a warning). The combination is free in VivArcDi (Cmd+Opt+[ and ], Cmd+Opt+N, Cmd+Shift+K, Cmd+T); that it is free in Vivaldi is **to confirm**: Vivaldi's shortcut table cannot be read from its resources or `vivaldi.prefs`, so the manual checklist asks Tore to search it in Vivaldi Settings > Keyboard. `ModuleSettings.check` runs after the overrides, so a
@@ -172,6 +187,7 @@ they fit. Tore checks the result by eye in this prototype phase (task T6).
 - **074 is a dependency** of the Waves section and of AC-9, and `Wave.preview` is a requirement on it. 075 ships the shell and three sections
   first.
 - **The shortcut** may clash with a Vivaldi shortcut; `WindowKeys` takes it before Vivaldi, so a clash would silently hide Vivaldi's command. Tore confirms it is free (T10) or the default changes.
+- **The icon preference** is a native Vivaldi pref (`vivaldi.workspaces.button.show_name`, found in Vivaldi 8.3's `prefs_definitions.json`). That a write updates the button at once is expected, not proven; AC-28 proves it, and it runs in the lab today because it needs no page file. The key may be renamed by a Vivaldi update: the checkbox then reads `undefined`, shows unchecked and disabled with the reason.
 - **The bridge**: `chrome.runtime.sendMessage` from a tab to a window must reach the window's `onMessage`; unproven, covered by AC-21 together with `vivaldi.prefs`. If it fails, the Waves section is absent and the page says so.
 
 ## Tests
@@ -202,6 +218,19 @@ name and `spec: '075'` of its criterion. Each is written and seen red before the
 | AC-19 | auto: `builds and installs the settings page file` | `tests/release/BuildAssets.test.ts` and `tests/installer/test_payload.py` |
 | AC-20 | auto: `draws the previews with the measured structure` | `tests/settings/WavesSection.test.ts` |
 | AC-21 | manual: the page opens with `vivaldi.prefs` | checklist T10 |
+| AC-22 | auto: `shows the workspace icon option from the current preference` | `tests/settings/WorkspaceIconOption.test.ts` |
+| AC-23 | auto: `writes show_name from the workspace icon checkbox` | `tests/settings/WorkspaceIconOption.test.ts` |
+| AC-24 | auto: `allows only listed window preferences` | `tests/modules/settingspage/WindowPrefsBridge.test.ts` |
+| AC-25 | auto: `leaves the waves alone when the workspace icon changes` | `tests/settings/WorkspaceIconOption.test.ts` |
+| AC-26 | auto: `writes no window preference in a private window` | `tests/modules/settingspage/WindowPrefsBridge.test.ts` |
+| AC-27 | auto: `disables the workspace icon option when preferences cannot be set` | `tests/settings/WorkspaceIconOption.test.ts` |
+| AC-28 | live: `the workspace button shows only its icon` | `tests/live/scenarios/the-workspace-button-shows-only-its-icon.live.ts` |
+
+The scenario of AC-28 sets the preference with the window's `vivaldi.prefs`, the same call the bridge
+makes (it needs no page file), reads the button through selectors `workspaceButton`,
+`workspaceButtonName` and `workspaceButtonIcon` (added to the selector catalog if missing), asserts
+that the name is gone and the icon stays, and restores `true` in a `finally`. The bridge and the
+checkbox logic are covered by the `auto:` tests above.
 
 AC-17 is checked on `SettingsChoices.set` returning `failed` and on the section keeping the previous
 card checked.
