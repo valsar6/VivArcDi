@@ -125,14 +125,14 @@ sticky is kept by `favorites and footer stay fixed while the column scrolls`, wh
 |---|---|
 | [032](../032-compact-tab-bar/spec.md) | FR-4 (centered icon in the narrow bar) and FR-8 (icon before the label) are replaced by FR-1 here; AC-12 (`archive footer shows the archive icon beside its label`) is replaced by AC-6 here; AC-5 (`compact tab bar uses tokens`) no longer lists `$archive-glyph`; AC-9 and AC-11 (archive part) stay true in meaning. See Q-2 |
 | [053](../053-single-scroll/spec.md) | None: the footer stays sticky |
-| [076](../076-compact-breaking-wave/spec.md) | None to its criteria; see Q-3 |
+| [076](../076-compact-breaking-wave/spec.md) | 076 builds the compact bottom row of the Breaking wave and moves the archive element into it, under the Breaking wave marker: archive icon at the left, one small workspace icon in the middle, the new-tab plus at the right (Q-3). 077 defines only the icon-only button and must not break that move: the footer element keeps `data-vivarcdi-archive-footer`, the button keeps its own size token (`$archive-button-size`), and no rule or script assumes the footer is a full-width block or a child of `#tabs-container`. Where 076 places it, 076 owns the layout |
 | [004](../004-today-tabs-and-keyboard/spec.md) | None: FR-4 and AC-10 hold |
 
 ## Out of scope
 
 - A choice among several icons, or a setting to show the label again.
-- A setting for where the button sits, and moving it to another row, such as the left of the Breaking
-  wave bar of [076](../076-compact-breaking-wave/spec.md).
+- A setting for where the button sits. Its place in the compact row of the Breaking wave is built by
+  [076](../076-compact-breaking-wave/spec.md), not here.
 - A change to the archive panel, its entries, the shortcut or the `today` options.
 - A new tooltip drawn by VivArcDi, or a different tooltip delay: the tooltip is Vivaldi's.
 - A count or badge on the icon.
@@ -150,11 +150,10 @@ sticky is kept by `favorites and footer stay fixed while the column scrolls`, wh
   footer block of `compact-tab-bar.scss`, the `$archive-glyph` token and the test `archive footer shows
   the archive icon beside its label`, whose job AC-6 and AC-7 take over. The edit of 032 is done with the
   implementation, in the docs task owned by the lead.
-- [ ] **Q-3. 076's compact row.** 076 puts the trash, workspace and new-tab icons on one row and does
-  not include VivArcDi's archive footer; Arc has the archive at the left of that row. Recommended: leave
-  them apart. The archive icon stays its own footer, below the tab list and above the toolbar row, and
-  076 is not changed. If Tore wants one row later, that is a new spec, because it moves a VivArcDi element
-  into Vivaldi's toolbar.
+- [x] **Q-3. 076's compact row.** Resolved (Tore, 2026-11-28): the archive icon joins the compact bottom
+  row of the Breaking wave, as in Arc's bottom bar (archive icon at the left, one small workspace icon in
+  the middle, the new-tab plus at the right). 076 builds that row and places the element; 077 keeps the
+  icon-only button, which must not depend on being a full-width footer (see the table above).
 - [ ] **Q-4. Tooltip.** The `title` is shown by Vivaldi after its own hover delay. Recommended: keep it as
   it is; VivArcDi does not draw a tooltip of its own.
 - [x] **Q-5. Alignment of the icon in the footer.** Resolved: aligned left at every width, as in Arc
