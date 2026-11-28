@@ -178,7 +178,7 @@ red tests exist first.
 | AC-17 | WHEN a save fails, THE page SHALL show the notice of 041 and keep the old choice drawn as chosen | auto: `shows the save notice and keeps the old choice` |
 | AC-18 | WHEN Tore opens the page in light and in dark on macOS and Debian, THE page SHALL look like a section of Vivaldi's settings | manual |
 | AC-19 | THE build SHALL put the settings page file in `dist/`, and the installer SHALL copy it into the install's `vivarcdi/` folder | auto: `builds and installs the settings page file` |
-| AC-20 | THE wave card previews SHALL follow the measured structure of 074: full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible spacers | auto: `draws the previews with the measured structure` |
+| AC-20 | THE wave card previews SHALL follow the measured structure of 074: full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible spacers, with `before` drawn above the page area and `after` below it | auto: `draws the previews with the measured structure` |
 | AC-21 | WHEN Tore uses the entry point on his install, THE opened page SHALL have `vivaldi.prefs` and read and write a choice | manual |
 
 AC-18 is the manual step for the look: whether a page "looks like Vivaldi's" cannot be asserted by a
@@ -245,8 +245,8 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
   Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: own SCSS over Vivaldi's CSS variables.
 
 - [x] **Q-6. Who owns the wave card previews.** 075 draws cards; 074 knows what a wave looks like.
-  *Recommendation:* 074 supplies one preview per layout in its wave data (`Wave.preview`, a structure
-  of rows, groups and spacers; requirement of 075 on 074, see the design) and owns the data; the previews follow the measured structure (full-width rows
+  *Recommendation:* 074 supplies one preview per layout in its wave data (`Wave.preview`, `{before, after}`:
+  rows above and below the tab strip, of rows, groups and spacers; requirement of 075 on 074, see the design) and owns the data; the previews follow the measured structure (full-width rows
   for Workspace and NewTab, a horizontal group for small buttons, flexible spacers; AC-20). 075 only
   places them in cards, in the order of the Summary, so a layout and its preview change together.
   Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: 074 owns the previews and the data, 075 places them.

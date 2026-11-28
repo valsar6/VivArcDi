@@ -62,7 +62,7 @@ preview data). T10 is owned by the lead and comes last.
   in the boot (not in private windows). Parallel with T8 and T9.
 - [ ] **T8. Waves section (AC-8, AC-20). Blocked by spec 074.** Red first in
   `tests/settings/WavesSection.test.ts`: `shows the four wave layouts as cards in order` and
-  `draws the previews with the measured structure`, with a fake `WavesClient`. Then
+  `draws the previews with the measured structure` (a fake `WavesClient` gives `preview: { before, after }`; the test checks that the `before` rows are drawn above the page-area block and the `after` rows below it), Then
   `sections/WavesSection.ts`, `PreviewDrawing.ts`, `WavesClient.ts` and, in the window,
   `WavesBridge.ts` over `globalThis[Symbol.for('vivarcdi.waves')]` (tests of the bridge with a fake
   service in `tests/modules/settingspage/WavesBridge.test.ts`, named after the behavior they prove);

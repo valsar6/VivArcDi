@@ -103,11 +103,15 @@ module off), the bridge answers `unavailable` and the section is not drawn.
 
 **What 075 requires of 074.** One thing the 074 design lacks: `Wave` also carries
 `preview: PreviewShape`, as 074's FR-10 and spec already say ("id, English name, Italian name, icon,
-preview"). The shape measured from Vivaldi's tab bar, JSON-safe so it crosses the bridge:
+preview"). The shape measured from Vivaldi's tab bar, JSON-safe so it crosses the bridge. 074's design
+still shows `{ rows }` at the time of writing; 075 uses `{ before, after }`, as agreed with Tore, and
+this is a dependency: when 074's design lands with the same shape, nothing here changes, otherwise
+this section is the one to update:
 
 ```ts
 export interface PreviewShape {
-  readonly rows: readonly PreviewRow[];
+  readonly before: readonly PreviewRow[];
+  readonly after: readonly PreviewRow[];
 }
 
 export interface PreviewRow {
@@ -118,7 +122,9 @@ export interface PreviewRow {
 ```
 
 Full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible
-spacers. `PreviewDrawing` walks it (AC-20). Both `icon` and `preview` must survive `JSON`; `choose`
+spacers. `before` holds the rows above the tab strip and `after` the rows below it. `PreviewDrawing`
+draws `before`, then a block that stands for the page area, then `after`, so the card shows where each
+button sits relative to the tabs (AC-20). Both `icon` and `preview` must survive `JSON`; `choose`
 errors must have a readable `message`. Until 074 ships, a fake client serves the tests and `main.ts`
 does not register the section.
 
