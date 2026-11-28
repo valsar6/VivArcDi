@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
 | Decision | Tore, 2026-11-28 (from testing on his own Vivaldi) |
+| Approved | Tore, 2026-11-28 |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -144,18 +145,21 @@ sticky is kept by `favorites and footer stay fixed while the column scrolls`, wh
   with rounded bottom corners, a short horizontal handle slot in the middle, and a small four-point
   sparkle above the right corner of the lid, as in Arc's archive. The exact path goes in the design.
   Resolved: the drawing with the sparkle (Tore, 2026-11-28); now FR-7 and AC-13.
-- [ ] **Q-2. What happens to 032's narrow-bar rules.** 032 is `Implemented`. Recommended: do not mark 032
+- [x] **Q-2. What happens to 032's narrow-bar rules.** 032 is `Implemented`. Recommended: do not mark 032
   `Superseded` as a whole, since its space header and New Tab rows are unchanged. Add an `Amended by` row
   to 032's header, as 004 has for 071, naming FR-4, FR-8 and AC-12 as replaced by 077, and delete the
   footer block of `compact-tab-bar.scss`, the `$archive-glyph` token and the test `archive footer shows
   the archive icon beside its label`, whose job AC-6 and AC-7 take over. The edit of 032 is done with the
   implementation, in the docs task owned by the lead.
+  Resolved: yes, as recommended (Tore, 2026-11-28); 032 gets a revision note, loses its footer block and
+  the `$archive-glyph` token, and its test is replaced by the 077 equivalents.
 - [x] **Q-3. 076's compact row.** Resolved (Tore, 2026-11-28): the archive icon joins the compact bottom
   row of the Breaking wave, as in Arc's bottom bar (archive icon at the left, one small workspace icon in
   the middle, the new-tab plus at the right). 076 builds that row and places the element; 077 keeps the
   icon-only button, which must not depend on being a full-width footer (see the table above).
-- [ ] **Q-4. Tooltip.** The `title` is shown by Vivaldi after its own hover delay. Recommended: keep it as
+- [x] **Q-4. Tooltip.** The `title` is shown by Vivaldi after its own hover delay. Recommended: keep it as
   it is; VivArcDi does not draw a tooltip of its own.
+  Resolved: yes, unchanged: `Archive (Cmd/Ctrl+Shift+A)` (Tore, 2026-11-28).
 - [x] **Q-5. Alignment of the icon in the footer.** Resolved: aligned left at every width, as in Arc
   (Tore, 2026-11-28); now FR-8 and AC-12.
 
