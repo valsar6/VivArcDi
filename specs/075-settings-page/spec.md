@@ -6,7 +6,7 @@
 | Phase | 3 |
 | Owner | Tore |
 | Approved | |
-| Related | [074 Toolbar waves](../074-toolbar-waves/spec.md) (a sibling Draft: it defines the tab bar section) |
+| Related | [074 Toolbar waves](../074-toolbar-waves/spec.md) (a sibling Draft: it defines the tab bar section); [076 Compact Breaking wave](../076-compact-breaking-wave/spec.md) (a separate Draft) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -23,8 +23,9 @@ entries are examples.
 
 The page is the home of four sections:
 
-- **Tab bar**: the four wave layouts of [074](../074-toolbar-waves/spec.md), as four cards: Ripple
-  (Increspatura), Swell (Flutto), Breaking wave (Cavallone), Still water (Specchio d'acqua).
+- **Tab bar**: the four wave layouts of [074](../074-toolbar-waves/spec.md), as four cards, in this order,
+  from no effect to the most customized interface: Still water (Specchio d'acqua), Ripple
+  (Increspatura), Swell (Flutto), Breaking wave (Cavallone). The four icons are approved by Tore.
 - **Themes**: the VivArcDi themes of [028](../028-arc-sidebar-look/spec.md),
   [029](../029-arc-light-theme/spec.md) and [051](../051-more-themes/spec.md).
 - **Features**: every module of `config.json`, switchable ([036](../036-module-options/spec.md)).
@@ -34,13 +35,28 @@ The page is the home of four sections:
 This spec defines the shell of the page and what every section must satisfy. It does not define the
 content of any section beyond the tab bar section, which 074 owns.
 
-**Not proven yet.** Vivaldi 8.3.4191.47 opens its settings as a tab at
-`chrome-extension://<id>/components/settings/settings.html` (found in `resources/vivaldi/bundle.js`;
-the file is not on disk, it is served virtually) and at `vivaldi:settings`. VivArcDi's payload is
-injected only in `window.html` (`vivarcdi/loader.js`), so it is **not known** whether the payload can
-add a section to Vivaldi's settings tab, nor whether a page of ours, installed under `vivarcdi/` and
-opened in a tab, can reach the extension APIs it needs. A spike is running; [Q-1](#open-questions)
-holds both options and waits for its result. Everything below that depends on the answer is marked.
+**Spike results (lab Vivaldi 8.3.4191.47, 2026-11-28).**
+
+- Vivaldi's settings tab is `chrome://settings/` (element `<settings-ui>`, with a shadow root);
+  `vivaldi://settings` opens it too. The form `chrome-extension://<id>/components/settings/settings.html`
+  does not exist in the lab.
+- Inside that tab `vivaldi.prefs` does not exist (only `vivaldi.themePrivate`).
+  `chrome.scripting.executeScript` is refused ("Extension manifest must request permission to access
+  this host") and `chrome.tabs.executeScript` does not exist. `webview.executeScript` worked only when
+  the tab was opened as `chrome://settings/`, never with `vivaldi://settings` (3 of 3, cause unknown).
+- Pages shipped in Vivaldi's resources (welcome, private-intro, mail, devtools) open as normal tabs with
+  `chrome.tabs.create({url: 'chrome-extension://<id>/<path>'})` and have `chrome`, `chrome.tabs`,
+  `chrome.storage`, `vivaldi` and `vivaldi.prefs`.
+- A new file under `vivarcdi/` is **not proven**: the lab copy has no `vivarcdi` folder (its payload is
+  served from 127.0.0.1 and injected through CDP), and adding a file to the lab copy breaks its code
+  signature.
+- Read in the code: `scripts/build.mjs` (`StaticAssets`, line 167) copies only `.json` files from
+  `src/` to `dist/`, so a `.html` file is not built today; `PayloadDeployer.deploy`
+  (`installer/vivarcdi/payload.py`) copies the whole `dist/` folder with `copytree`, so any file the
+  build puts there is installed.
+
+Adding a section to Vivaldi's settings tab (option A of [Q-1](#open-questions)) is therefore fragile.
+Option B needs two proofs, listed in Q-1.
 
 ## User stories
 
@@ -107,7 +123,7 @@ before the code that makes it pass.
   settings, in light and dark.
 - **FR-3.** Sections are objects in a registry; the page draws whatever the registry holds, in
   registration order, and a module can add one.
-- **FR-4.** The **Tab bar** section shows the four layouts of 074 as cards with a preview and a name;
+- **FR-4.** The **Tab bar** section shows the four layouts of 074 as cards with a preview and a name, in the order Still water, Ripple, Swell, Breaking wave;
   who owns the previews is [Q-6](#open-questions); the choice and its effect are 074's.
 - **FR-5.** The **Themes** section shows the VivArcDi themes of 051 as cards and marks the current one;
   it adds no new theme.
@@ -148,7 +164,7 @@ red tests exist first.
 | AC-5 | THE page SHALL draw a card choice with a preview, a name and a check mark on the chosen card only | auto: `marks only the chosen card` |
 | AC-6 | THE page SHALL draw a checkbox choice with its gray explanation | auto: `draws a checkbox with its explanation` |
 | AC-7 | WHILE Vivaldi uses the dark theme, THE page SHALL use Vivaldi's dark colors, and the light ones otherwise | auto: `takes its colors from Vivaldi's variables` |
-| AC-8 | THE Tab bar section SHALL show four cards named Ripple, Swell, Breaking wave and Still water | auto: `shows the four wave layouts as cards` |
+| AC-8 | THE Tab bar section SHALL show four cards named, in this order, Still water, Ripple, Swell and Breaking wave | auto: `shows the four wave layouts as cards in order` |
 | AC-9 | WHEN the user chooses a card of the Tab bar section, THE window SHALL store the choice and apply 074's layout without a restart | live: `applies a wave layout from the settings page` |
 | AC-10 | THE Themes section SHALL mark the current VivArcDi theme and list the five themes of 051 | auto: `marks the current theme among the five` |
 | AC-11 | WHEN the user switches a module in the Features section, THE page SHALL write its `enabled` option, and SHALL leave every other option as it was | auto: `writes only the enabled option of a module` |
@@ -159,9 +175,14 @@ red tests exist first.
 | AC-16 | IF the page cannot be reached, THEN THE window SHALL start as today, log one warning and show no blank tab | auto: `starts normally when the settings page is missing` |
 | AC-17 | WHEN a save fails, THE page SHALL show the notice of 041 and keep the old choice drawn as chosen | auto: `shows the save notice and keeps the old choice` |
 | AC-18 | WHEN Tore opens the page in light and in dark on macOS and Debian, THE page SHALL look like a section of Vivaldi's settings | manual |
+| AC-19 | THE build SHALL put the settings page file in `dist/`, and the installer SHALL copy it into the install's `vivarcdi/` folder | auto: `builds and installs the settings page file` |
+| AC-20 | THE wave card previews SHALL follow the measured structure of 074: full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible spacers | auto: `draws the previews with the measured structure` |
+| AC-21 | WHEN Tore uses the entry point on his install, THE opened page SHALL have `vivaldi.prefs` and read and write a choice | manual |
 
-AC-18 is the only manual step: whether a page "looks like Vivaldi's" cannot be asserted by a test; the
-variables and structure are covered by AC-5 to AC-7.
+AC-18 is the manual step for the look: whether a page "looks like Vivaldi's" cannot be asserted by a
+test; the variables and structure are covered by AC-5 to AC-7. AC-21 is the second manual step and
+answers a different behavior, the reach of the page: the lab copy cannot hold a new file under
+`vivarcdi/` (see Q-1), so it is proven on Tore's install until the harness change below lands.
 
 ## Out of scope
 
@@ -175,19 +196,21 @@ variables and structure are covered by AC-5 to AC-7.
 
 ## Open questions
 
-- [ ] **Q-1. How the page is reached.** The spike decides; do not choose without its result.
-  - **A. A section inside Vivaldi's own settings tab.** The page lives where users expect it, in
-    Vivaldi's chrome and navigation. Needs the payload to run in that tab, which loads from
-    `chrome-extension://<id>/components/settings/settings.html` and not from `window.html`, so it
-    needs either a patch of that file (which is virtual, not on disk) or a second injection point.
-    Fragile across Vivaldi versions and the least proven.
-  - **B. A VivArcDi page under the resources `vivarcdi/` folder, opened in a tab.** The installer
-    already deploys that folder ([016](../016-plug-and-play-installer/spec.md)); the page is ours and
-    stable. Needs a URL a tab can open and the extension APIs for the choices (preferences, storage),
-    which a plain page may not get.
-  - *Recommendation:* B if the spike shows the page can reach `chrome.storage` and `vivaldi.prefs`
-    (or can talk to the window payload); A only if B cannot and A is proven. Both are written so
-    the shell (FR-1 to FR-3) is the same, and only the host differs.
+- [ ] **Q-1. How the page is reached.** Evidence in [Spike results](#summary).
+  - **A. A section inside Vivaldi's own settings tab (`chrome://settings/`).** The page lives where
+    users expect it. Fragile: no `vivaldi.prefs` there, `chrome.scripting.executeScript` refused,
+    `webview.executeScript` worked only for the `chrome://settings/` form and never for
+    `vivaldi://settings`, cause unknown.
+  - **B. A VivArcDi page under the resources `vivarcdi/` folder, opened as a tab** with
+    `chrome.tabs.create({url: 'chrome-extension://<id>/vivarcdi/<page>.html'})`. Vivaldi's own shipped
+    pages open this way and have `chrome.storage` and `vivaldi.prefs`. The page is ours and stable.
+  - *Recommendation:* B, with two proofs before Approved. **Proof 1**, the file is built and
+    installed: today the build copies only `.json` and the installer copies all of `dist/`, so the
+    build needs to also copy the page; proven by AC-19. **Proof 2**, the page opens with
+    `vivaldi.prefs`: proven on Tore's install by AC-21 (manual), because the lab cannot hold the file.
+    Dependency, not written here: a change to [046](../046-live-verification/spec.md) that serves
+    `vivarcdi/*.html` in the lab through CDP `Fetch` interception, so Proof 2 can later become a
+    `live:` check. A stays as the fallback only if B fails Proof 2.
 - [ ] **Q-2. Where it opens from.** A button in the sidebar, a menu entry, a command (Quick Commands),
   or a link in the boot notice.
   *Recommendation:* a command plus a link in the boot notice of 039 for a broken start, and a
@@ -211,12 +234,15 @@ variables and structure are covered by AC-5 to AC-7.
   measured from "Layout presets" and "Page appearance"; no copy of Vivaldi's stylesheet.
 - [ ] **Q-6. Who owns the wave card previews.** 075 draws cards; 074 knows what a wave looks like.
   *Recommendation:* 074 supplies one preview per layout (an inline SVG that shares its tokens with
-  the real stylesheet), 075 only places them in cards, so a layout and its preview change together.
+  the real stylesheet) and owns the data; the previews follow the measured structure (full-width rows
+  for Workspace and NewTab, a horizontal group for small buttons, flexible spacers; AC-20). 075 only
+  places them in cards, in the order of the Summary, so a layout and its preview change together.
 
 ## References
 
 - Mockup: <https://claude.ai/artifact/1GZq7xVP3D6H8MKnRmXyuG>, section "Pagina Impostazioni VivArcDi".
 - [074 Toolbar waves](../074-toolbar-waves/spec.md): the tab bar section (a sibling Draft, on its own branch).
+- [076 Compact Breaking wave](../076-compact-breaking-wave/spec.md): a separate Draft, related only.
 - [036 Module options](../036-module-options/spec.md), [037 Versioned storage](../037-versioned-storage/spec.md),
   [038 Page scripts](../038-page-scripts/spec.md), [039 Boot self-check](../039-boot-self-check/spec.md),
   [041 Write outcome](../041-write-outcome/spec.md), [046 Live verification](../046-live-verification/spec.md).
