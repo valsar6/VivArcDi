@@ -71,7 +71,7 @@ recorded here after the first scenario run.
 | `src/styles/_tokens.scss` | `$breaking-wave` (`body[data-vivarcdi-wave="breaking-wave"]`), `$after-toolbar`, `$nested-buttons`, `$trash-button`, `$workspace-button`, `$new-tab-button`, `$compact-bar-button-size`, `$compact-bar-button-min`, `$compact-wrap-width` |
 | `src/styles/compact-breaking-wave.scss` | All compact rules of the attempt that passes |
 | `src/config.json` | Adds `styles/compact-breaking-wave.css` to `styles`, last |
-| `src/selectors/8.1.json` | Adds `afterToolbar`, `nestedButtons` and `trashButton`; the catalog already has `workspaceButton`, `workspaceMenuButton` and `newTabButton` |
+| `src/selectors/8.1.json` | Adds only `trashButton`; `toolbarAfter` and `nestedButtons` come from [074](../074-toolbar-waves/design.md) (selectors section), `workspaceButton`, `workspaceMenuButton` and `newTabButton` are already there |
 | `tests/styles/CompactBreakingWave.test.ts` | AC-1 to AC-3 on the compiled CSS |
 | `tests/modules/toolbarwaves/` or the nearest suite | AC-4, the one test that watches for a write |
 | `tests/live/scenarios/*.live.ts` | One file per `live:` criterion, nine in all |
@@ -79,8 +79,8 @@ recorded here after the first scenario run.
 The stylesheet cannot read the catalog, so the selectors live twice: in `8.1.json` for scripts and the
 live scenarios, in `_tokens.scss` for the styles, as sidebar-look does today. The scenarios read the
 selectors through the catalog, so a rename shows as one red scenario. The selector of the trash button
-(likely `button[data-name="TabsTrash"]`, as `workspaceMenuButton`) is not yet in the catalog and is read from
-the lab Vivaldi in task T1 before it is written down.
+(likely `button[data-name="TabsTrash"]`, as `workspaceMenuButton`) is in neither the catalog nor the 074 design; it is read from
+the lab Vivaldi in task T1 and added there.
 
 The attempt 3 helper, if ever written, is `src/modules/toolbarwaves/BreakingWaveRow.ts` or a `src/shared/`
 class, with its own design amendment.
@@ -99,13 +99,17 @@ class, with its own design amendment.
 | `the compact workspace button opens its popup in place` | Lab: click, `.WorkspacePopup` is inside the window and below the row |
 | `the compact trash button opens its list` | Lab: click, the closed tabs list is in the DOM |
 | `the compact buttons keep their labels` | Lab: title and `aria-label` of each button are equal with and without the attribute |
-| `the compact breaking wave row survives a resize` | Lab: the bar at its narrowest and widest width; the three stay inside the bar |
+| `the compact breaking wave row survives a resize` | Lab: the bar at its narrowest and widest width; the three stay inside the bar, in a row where they fit and in a column below the threshold |
 | `the compact form switches off with the breaking wave` | Lab: the attribute set to `still-water`, then the rows are Vivaldi's again with no reload |
-| `the compact breaking wave fits the narrow tab bar` | Lab: with the 032 narrow bar the three stay inside the bar |
+| `the compact breaking wave stacks in the narrow tab bar` | Lab: with the 032 narrow bar the three are stacked in a column, inside the bar, each at least 24 px |
 
 Live scenarios follow `tests/live/scenarios/` (`name`, `spec: '076'`, `run`) and are written first, red.
 
 ## Risks
+
+- **Selectors from 074.** `toolbarAfter` and `nestedButtons` exist only after 074 T6 adds them to
+  `src/selectors/8.1.json`; 076 reads them through the `SelectorCatalog` and adds nothing of its own
+  except `trashButton`.
 
 - **074 not in main.** The scenarios need the Breaking wave lists and `data-vivarcdi-wave` from
   [074](../074-toolbar-waves/spec.md) FR-13. Every task is blocked by it; until then a scenario may set
@@ -114,7 +118,6 @@ Live scenarios follow `tests/live/scenarios/` (`name`, `spec: '076'`, `run`) and
 - **Popup anchors.** Vivaldi anchors the workspace popup to the button's rectangle; a shrunk or
   re-parented button may place it wrongly (AC-8).
 - **Resize.** The spike measured one width; wrap and break point are unmeasured (AC-11, AC-13).
-- **Narrow bar.** At 42 px three icons of 24 px or more do not fit one row, so AC-13 as written
-  ("share one row") cannot pass under the wrap of Q-6. It needs one line of amendment by Tore before the
-  scenario is judged.
+- **Narrow bar.** At 42 px three icons of 24 px or more do not fit one row; AC-13 asks for the column of Q-6
+  there, and the break point is recorded after the first run.
 - **Vivaldi renames a toolbar class.** The look falls back to Vivaldi's own layout, never broken.

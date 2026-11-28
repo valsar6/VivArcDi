@@ -85,7 +85,7 @@ and how the row reacts when the window or the bar is resized.
 - **FR-1.** The compact form applies only while `body` matches `body[data-vivarcdi-wave="breaking-wave"]`, the attribute that
   `toolbar-waves` sets (074 FR-13, Q-2), and only in the tab bar after-toolbar.
 - **FR-2.** In the compact form `TabsTrash`, `WorkspaceButton` and `NewTab` sit on one row, in that order,
-  left, center and right, at every width the bar can take.
+  left, center and right, at every width that fits them; below the threshold of Q-6 they stack in a column, none smaller than 24 px.
 - **FR-3.** The compact form never changes the two lists, never calls `vivaldi.prefs.set` and never moves
   Vivaldi's buttons to another parent unless style alone cannot reach the result (Q-1).
 - **FR-4.** The three buttons keep Vivaldi's behavior: `NewTab` opens a tab, `WorkspaceButton` opens its
@@ -127,9 +127,9 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-8 | WHEN the compact form is on and a script clicks the workspace button, THE workspace popup SHALL open anchored inside the window and under the button's row | live: `the compact workspace button opens its popup in place` |
 | AC-9 | WHEN the compact form is on and a script clicks the trash button, THE list of closed tabs SHALL open | live: `the compact trash button opens its list` |
 | AC-10 | WHILE the compact form is on, THE three buttons SHALL keep the tooltip and the accessible name they have without it | live: `the compact buttons keep their labels` |
-| AC-11 | WHEN the tab bar is resized between its narrowest and widest widths, THE three buttons SHALL stay on one row inside the bar | live: `the compact breaking wave row survives a resize` |
+| AC-11 | WHEN the tab bar is resized between its narrowest and widest widths, THE three buttons SHALL stay inside the bar, on one row where they fit and in a column below the threshold | live: `the compact breaking wave row survives a resize` |
 | AC-12 | WHEN the lists are replaced by Still water or by a manual edit, THE bottom bar SHALL return to Vivaldi's rows without a reload | live: `the compact form switches off with the breaking wave` |
-| AC-13 | WHILE the compact tab bar of 032 is on, THE three buttons SHALL still share one row inside the narrow bar | live: `the compact breaking wave fits the narrow tab bar` |
+| AC-13 | WHILE the compact tab bar of 032 is on, THE three buttons SHALL stack in a column inside the narrow bar, each at least 24 px | live: `the compact breaking wave stacks in the narrow tab bar` |
 | AC-14 | WHEN Tore looks at the bottom bar in the light and dark themes on macOS and Debian, THE row SHALL look like Arc's bottom bar: three clear icons, balanced left, center and right | manual |
 
 AC-14 is the only `manual` criterion; tab order and focus (FR-5) are read from the DOM in AC-10 and
@@ -184,12 +184,12 @@ If scenario 1 shows that style cannot do it, the spec returns to Q-1 before any 
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 - [x] **Q-5. Interplay with 032 and 028.** Recommended: 032's narrow bar keeps its rules for the rows of
   VivArcDi and does not touch the toolbar buttons; the compact Breaking wave must fit the narrow width
-  (AC-13), where the three icons share the 42 px with a smaller size. The "+ New Tab" row of 028 stays,
+  (AC-13), where the three icons stack in a column (Q-6). The "+ New Tab" row of 028 stays,
   so the tab bar has two new-tab entries, as 074 Q-9 decided.
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 - [x] **Q-6. Narrow widths.** At 42 px three 28 px icons do not fit one row. Recommended: below a width
   that fits them, the row wraps to a column of three icons rather than shrinking them below 24 px;
-  AC-13 then reads "inside the bar" and the verification plan records the break point.
+  AC-11 and AC-13 read accordingly and the verification plan records the break point.
   Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 - [x] **Q-7. Order and dependency on 074.** Recommended: 076 is written now as a Draft, linked to 074,
   but its design and tasks wait until 074 is Approved and `data-vivarcdi-wave` is in its design; implementation starts
