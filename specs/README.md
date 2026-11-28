@@ -84,6 +84,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [074 Toolbar waves](074-toolbar-waves/spec.md) | 3 | Approved |
 | [075 VivArcDi Settings](075-settings-page/spec.md) | 3 | Approved |
 | [076 Compact Breaking wave](076-compact-breaking-wave/spec.md) | 3 | Approved |
+| [078 Address field actions](078-url-pill-actions/spec.md) | 3 | Draft |
 
 ## Layout
 
