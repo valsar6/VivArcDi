@@ -54,7 +54,8 @@ SVG like the wave icons of [074](../074-toolbar-waves/spec.md) (Q-1).
 | Footer markup | Same `div[data-vivarcdi-archive-footer]` and one `button[type=button]` holding one inline `svg` and no text node. The button has `aria-label="Archive"` and `title="Archive (Cmd/Ctrl+Shift+A)"`; the `svg` has `aria-hidden="true"` and `focusable="false"` |
 | Icon | Inline SVG, 16 x 16 `viewBox`, stroke only, `fill="none"`, `stroke="currentColor"`: an archive box (lid, body, handle slot) with a small four-point sparkle above its right corner, like Arc's |
 | Size | The button is a square of `$archive-button-size` (28 px, a token); the icon inside is `$archive-icon-size` (18 px). The footer is as high as the button plus the padding of the footer, and no wider than the button |
-| Narrow bar | No rule of its own: the same icon button at every width, so 032's narrow-bar rules for the footer go (Q-2) |
+| Alignment | The button sits at the start (left) edge of the footer at every width, as in Arc, with the same side padding as the rows above; the narrow bar does not center it |
+| Narrow bar | No rule of its own: the same icon button, left aligned, at every width, so 032's narrow-bar rules for the footer go (Q-2) |
 | Colors | The icon follows the tab bar text color through `currentColor`, at opacity 0.7 and 1 on hover and on focus, in the light and dark themes |
 | Click, shortcut, tooltip | Unchanged: the same action, Cmd/Ctrl+Shift+A, and the same tooltip text on macOS and Debian |
 | Scrolling column | Unchanged: the footer stays sticky at the bottom |
@@ -76,7 +77,11 @@ The tooltip is Vivaldi's: its delay and look are the browser's own (Q-4).
   tokens in `_tokens.scss`, and the footer SHALL no longer stretch the button to the full width of the bar.
 - **FR-6.** The stylesheet SHALL no longer draw the icon with a `::before` mask nor hide a label with
   `font-size: 0`; `$archive-glyph` SHALL be removed from `_tokens.scss` if nothing else uses it.
-- **FR-7.** The button SHALL show a visible focus ring and the hover state of the other icon buttons of
+- **FR-7.** The icon SHALL be the approved drawing: an archive box (lid, body, handle slot) with a small
+  four-point sparkle above the right corner of the lid, stroke 1.3 px with round joins and caps on the
+  16 x 16 grid (Q-1).
+- **FR-8.** The button SHALL be aligned to the start (left) edge of the footer at every width of the tab bar (Q-5).
+- **FR-9.** The button SHALL show a visible focus ring and the hover state of the other icon buttons of
   the tab bar, in the light and dark themes.
 
 ### Non-functional
@@ -104,11 +109,13 @@ criterion has a named check, and the check is written and run red before any cod
 | AC-6 | THE stylesheet SHALL draw no `::before` mask, no label hiding by `font-size: 0` and no full-width button for the archive footer, at any width | auto: `archive footer has no label rules` |
 | AC-7 | WHILE the tab bar is narrow, THE archive footer SHALL have no rule of its own in the compact tab bar stylesheet | auto: `compact tab bar leaves the archive footer alone` |
 | AC-8 | THE button SHALL define hover and focus states with theme variables and no fixed color | auto: `archive icon button follows the theme` |
-| AC-9 | WHEN a lab Vivaldi runs with the payload, THE archive footer SHALL be at most 36 px wide and 36 px high at the full and at the narrow width of the tab bar | live: `the archive footer is only an icon` |
+| AC-12 | THE stylesheet SHALL align the archive button to the start of the footer, with no centering rule at any width | auto: `archive icon button is aligned to the start` |
+| AC-13 | THE icon SHALL have a 1.3 stroke width with round joins and caps, and its drawing SHALL be the archive box with the sparkle | auto: `archive icon draws the box with the sparkle` |
+| AC-9 | WHEN a lab Vivaldi runs with the payload, THE archive footer SHALL be at most 36 px wide and 36 px high at the full and at the narrow width of the tab bar, and its left edge SHALL be at the same distance from the bar's left edge in both | live: `the archive footer is only an icon` |
 | AC-10 | WHEN a script clicks the archive icon in a lab Vivaldi, THE archive panel SHALL open | live: `the archive icon opens the archive panel` |
-| AC-11 | WHEN Tore looks at the icon in the light and dark themes on macOS and Debian, THE icon SHALL be legible, recognizable as an archive and in the colors of the tab bar | manual |
+| AC-11 | WHEN Tore looks at the icon in the light and dark themes on macOS and Debian, THE icon SHALL be legible and in the colors of the tab bar | manual |
 
-AC-11 is the only `manual` criterion. The accessible name, the tooltip text and the absence of text are
+AC-11 is the only `manual` criterion and checks legibility only; the drawing and the alignment are settled by FR-7, FR-8, AC-12 and AC-13. The accessible name, the tooltip text and the absence of text are
 read from the DOM (AC-1, AC-2) and are not asked of Tore. The check for 032 and 053 that the footer stays
 sticky is kept by `favorites and footer stay fixed while the column scrolls`, which must still pass.
 
@@ -132,12 +139,11 @@ sticky is kept by `favorites and footer stay fixed while the column scrolls`, wh
 
 ## Open questions
 
-- [ ] **Q-1. The drawing.** Proposed: a stroke icon on a 16 x 16 grid, 1.3 px stroke, round joins and
+- [x] **Q-1. The drawing.** Proposed: a stroke icon on a 16 x 16 grid, 1.3 px stroke, round joins and
   caps, like the wave icons of 074 and the 032 glyph: a wide lid (rounded rectangle), a body below it
   with rounded bottom corners, a short horizontal handle slot in the middle, and a small four-point
   sparkle above the right corner of the lid, as in Arc's archive. The exact path goes in the design.
-  Recommended: approve this drawing. Tore, please approve or ask for another (a plain box without the
-  sparkle is the alternative; the existing 032 glyph, a box with two sheets, is the third).
+  Resolved: the drawing with the sparkle (Tore, 2026-11-28); now FR-7 and AC-13.
 - [ ] **Q-2. What happens to 032's narrow-bar rules.** 032 is `Implemented`. Recommended: do not mark 032
   `Superseded` as a whole, since its space header and New Tab rows are unchanged. Add an `Amended by` row
   to 032's header, as 004 has for 071, naming FR-4, FR-8 and AC-12 as replaced by 077, and delete the
@@ -151,10 +157,8 @@ sticky is kept by `favorites and footer stay fixed while the column scrolls`, wh
   into Vivaldi's toolbar.
 - [ ] **Q-4. Tooltip.** The `title` is shown by Vivaldi after its own hover delay. Recommended: keep it as
   it is; VivArcDi does not draw a tooltip of its own.
-- [ ] **Q-5. Alignment of the icon in the footer.** Recommended: at the start edge of the bar (left),
-  as in Arc, with the same side padding as the rows above; in the narrow bar it is centered by the same
-  rule because the bar is as wide as the button plus padding. Tore, please say if you prefer it centered
-  at every width.
+- [x] **Q-5. Alignment of the icon in the footer.** Resolved: aligned left at every width, as in Arc
+  (Tore, 2026-11-28); now FR-8 and AC-12.
 
 ## References
 
