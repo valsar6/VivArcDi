@@ -207,7 +207,17 @@ export class ListComposer {
   controller then writes nothing and rejects with the readable message `the address field would be
   lost` (FR-15, AC-30). With presets this cannot happen, because `compose` keeps it; it guards Still
   water and a backup taken before the address field moved into the lists.
-- The backup is the full current lists (FR-4); the previews of 075 stay layout-only.
+- **Navigation buttons.** `ToolbarButtons.ts` exports `NAVIGATION_BUTTONS`: `Back`, `Forward`, `Reload`,
+  the ids of Vivaldi's `navigation` toolbar (`prefs_definitions`). They stay "other" buttons that the
+  composer inserts, and are not in `LAYOUT_BUTTONS`: then `layoutOf` and `matches` ignore them without
+  a special case, FR-14 and FR-16 hold unchanged, and a wave is still recognized after they are added
+  (AC-31). `compose` gains one step: when `current` holds `AddressField`, each of `NAVIGATION_BUTTONS`
+  in neither list is inserted in order directly before `AddressField` in the list that holds it
+  (FR-17); a button the user already has stays in place, so nothing is duplicated (AC-34). Without
+  `AddressField` it adds nothing (FR-18, AC-35). Still water is never composed, so it adds nothing.
+- The backup is the full current lists, taken before composing, so it never holds the added buttons
+  (FR-4); the previews of 075 stay layout-only and show none of these buttons, and the compact
+  Breaking wave of 076 is not affected.
 
 ### Store (`WaveStore.ts`)
 
@@ -382,6 +392,9 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-14 | `lets an active wave keep the new-tab button, spacers and nested row` | `tests/styles/sidebar-look-waves.test.ts` |
 | AC-22 | `marks the body with the chosen wave` | `tests/modules/toolbarwaves/WaveMarker.test.ts` |
 | AC-23 | `serves the waves with a JSON-safe preview` | `tests/modules/toolbarwaves/WaveDataMapper.test.ts` |
+| AC-33 | `adds back forward and reload before the address field` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
+| AC-34 | `does not duplicate the navigation buttons` | same |
+| AC-35 | `adds nothing when the address bar is not in the tab bar` | same (the Still water case in `WaveController.test.ts`) |
 | AC-25 | `each wave gives the lists of its table` | `tests/modules/toolbarwaves/WaveStrategies.test.ts` (one case per `StillWaterWave`, `RippleWave`, `SwellWave`, `BreakingWave`) |
 | AC-26 | `builds the four waves in order` | `tests/modules/toolbarwaves/WaveFactory.test.ts` |
 | AC-28 | `keeps the buttons the wave does not manage` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
@@ -398,12 +411,18 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-17 | `the breaking wave puts every button below the strip` (same) | same |
 | AC-18 | `a written toolbar list shows without a reload` (raw `vivaldi.prefs.set`) | same |
 | AC-32 | `a wave keeps the address field of the tab bar` (first writes lists with `AddressField` and `Extensions`, chooses each wave through the service, checks the field is visible and listed, then Still water) | same |
+| AC-36 | `a wave shows back forward and reload above the address field` (lists with `AddressField`; checks the written lists and records whether and where Vivaldi draws the three buttons) | same |
 | AC-19 | `still water restores the toolbar` | same |
 
 AC-20 and AC-21 are manual. Fakes: a `FakePrefs` with `get`, `set` and `onChanged` that records
 writes and fires changes, in `tests/modules/toolbarwaves/fakes.ts`.
 
 ## Risks
+
+- **Back, Forward and Reload in the tab bar are unproven.** Vivaldi's `navigation` toolbar is the
+  native home of these ids; that its tab bar toolbars draw them, and how they sit beside
+  `AddressField` in a vertical toolbar, is not measured. AC-36 proves it on the lab; if Vivaldi draws
+  nothing, FR-17 changes by a new spec.
 
 - **Restart persistence is not proven** (AC-21). If the lists do not survive a restart, the spec
   returns to Q-5.

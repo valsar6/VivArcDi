@@ -96,3 +96,20 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
 - [ ] **T15. Run and recheck.** With Tore's agreement, `npm run live -- 074`: the six scenarios pass;
   then Tore tries a wave on his real profile and the address bar must stay. The lab does not show how
   Vivaldi lays out `AddressField` beside a wave's group; the scenario records it for the design.
+- [ ] **T16. Navigation scenario (red).** `tests/live/scenarios/a-wave-shows-back-forward-and-reload-above-the-address-field.live.ts`,
+  `spec: '074'`, named `a wave shows back forward and reload above the address field`: write lists with
+  `AddressField`, choose each preset wave through the service, assert the written lists carry `Back`,
+  `Forward`, `Reload` directly before `AddressField`, and record whether and where Vivaldi draws them.
+  Red until T18. Runs in parallel with T17.
+- [ ] **T17. Navigation tests (red).** Cases in `ListComposer.test.ts`
+  (`adds back forward and reload before the address field`, `does not duplicate the navigation buttons`,
+  `adds nothing when the address bar is not in the tab bar`) and the Still water case in
+  `WaveController.test.ts`, named exactly as the `auto:` checks of AC-33 to AC-35. Runs in parallel
+  with T16.
+- [ ] **T18. Composer inserts them.** `NAVIGATION_BUTTONS` in `ToolbarButtons.ts` and the insert step
+  of `ListComposer.compose`; they stay outside `LAYOUT_BUTTONS`. Green: the three tests of T17. Needs
+  T13 and T17.
+- [ ] **T19. Run and recheck.** With Tore's agreement, `npm run live -- 074`: the seven scenarios run;
+  the AC-36 result (drawn or not, and where) goes into the design before anything else is built on it;
+  then Tore checks a wave on his real profile: address bar, Back, Forward and Reload present. Needs T14
+  and T18.

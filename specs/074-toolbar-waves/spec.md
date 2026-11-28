@@ -108,6 +108,15 @@ after the wave's own buttons of that list. The first version wrote fixed lists a
 made the address bar disappear in every wave. The table above gives the layout part; the written lists
 are that part plus the user's other buttons. The previews of 075 show only the layout buttons.
 
+**Back, Forward and Reload.** When the address bar lives in the tab bar (`AddressField` is in one of the
+user's lists, as on Tore's Vivaldi 8.3 where `vivaldi.address_bar.visible` is false), Vivaldi's native
+`navigation` toolbar is hidden and nothing shows the three navigation buttons. Arc keeps them in one row
+above the address pill. The three waves therefore add `Back`, `Forward` and `Reload` as a group directly
+before `AddressField`, in the list that holds it, unless the user's lists already have them. Without
+`AddressField` in the tab bar lists (Vivaldi's default) nothing is added, because the native toolbar
+shows them and they would appear twice. Still water never adds them. Whether and how Vivaldi draws
+these buttons inside the tab bar toolbars is not proven; the live scenario of AC-36 proves it.
+
 **Service and data.** This module draws no control. It exposes the four waves as data (id, English
 name, Italian name, icon, preview) and a service with three calls: read the current wave, choose a
 wave, and tell when the current wave changes. The cards, their preview, the check mark on the chosen
@@ -184,6 +193,12 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
 - **FR-16.** The backup of FR-4 stores the user's full lists, and Still water restores them exactly.
   Recognizing the current wave (FR-7, FR-8, AC-2) compares only the layout buttons of each list, so
   lists with other buttons still count as that wave.
+- **FR-17.** For Ripple, Swell and Breaking wave, when `AddressField` is in the user's lists, each of
+  `Back`, `Forward`, `Reload` that is in neither list is inserted, in that order, directly before
+  `AddressField` in the list that holds it. Any of them already in the user's lists stays where the
+  user put it and is not duplicated.
+- **FR-18.** When `AddressField` is in neither of the user's lists, the three buttons are not added.
+  Still water writes the backup unchanged and never adds them.
 - **FR-13.** While a wave is chosen, `body` carries `data-vivarcdi-wave` with the wave's id
   (`still-water`, `ripple`, `swell`, `breaking-wave`); with no wave chosen the attribute is absent.
   Spec [076](../076-compact-breaking-wave/spec.md) and the sidebar look read it.
@@ -235,6 +250,10 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-30 | IF the pair to write would lack `AddressField` that the user's lists have, THEN `choose` SHALL write nothing and fail with a readable message | auto: `refuses a pair without the address field` |
 | AC-31 | WHEN the lists hold a wave's layout buttons plus other buttons, THE module SHALL recognize that wave | auto: `recognizes a wave among core buttons` |
 | AC-32 | WHEN the user's lists hold `AddressField` and `Extensions` and each wave is chosen through the service, THE address field SHALL stay visible and in the lists, and Still water SHALL restore the lists | live: `a wave keeps the address field of the tab bar` |
+| AC-33 | WHEN a preset wave is chosen and `AddressField` is in the user's lists, THE written list holding it SHALL have `Back`, `Forward` and `Reload` directly before it | auto: `adds back forward and reload before the address field` |
+| AC-34 | WHEN the user's lists already hold any of `Back`, `Forward` or `Reload`, THE written lists SHALL NOT duplicate them and SHALL keep them where the user put them | auto: `does not duplicate the navigation buttons` |
+| AC-35 | WHEN `AddressField` is in neither of the user's lists, or Still water is chosen, THE module SHALL add none of the three buttons | auto: `adds nothing when the address bar is not in the tab bar` |
+| AC-36 | WHEN the user's lists hold `AddressField` and each preset wave is chosen through the service, THE lab tab bar SHALL list `Back`, `Forward` and `Reload` before `AddressField` and the scenario SHALL record whether Vivaldi draws them and where | live: `a wave shows back forward and reload above the address field` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
 design of the icons is approved, so AC-20 is about legibility on macOS and Debian only. AC-21 is a
@@ -266,7 +285,9 @@ To prove first, as red tests:
 8. With lists that hold `AddressField` and `Extensions` before and `UpdateButton` after, each wave
    keeps them, in the toolbar where they were (AC-28, AC-29, AC-32). Not measured yet: how Vivaldi lays
    out `AddressField` next to a wave's group in a vertical toolbar; the scenario records it.
-9. A restart keeps the lists and the chosen wave (AC-21, manual).
+9. With `AddressField` in the lists, Vivaldi draws `Back`, `Forward` and `Reload` inside the tab bar
+   toolbars, and how (AC-33, AC-36). Not proven; a spike is running, and the result goes in the design.
+10. A restart keeps the lists and the chosen wave (AC-21, manual).
 
 ## Out of scope
 
