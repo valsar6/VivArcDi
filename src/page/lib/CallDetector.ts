@@ -1,6 +1,5 @@
-import { CallVideo } from './CallVideo.js';
-
 const POLL_MS = 1000;
+const LEAVE_CHECKS = 3;
 
 export class CallDetector {
   #root: ParentNode;
@@ -8,10 +7,10 @@ export class CallDetector {
   #onChange: (inCall: boolean) => void;
   #timer: ReturnType<typeof setInterval> | null = null;
   #active = false;
+  #absent = 0;
 
   /**
-   * Follows whether a page shows a call in progress: the site's in-call view is there and a video
-   * plays a live track.
+   * Follows whether a page shows a call in progress: the site's in-call view is there.
    *
    * @param root The document of the page.
    * @param selector Selector that matches only while the page shows a call.
@@ -27,7 +26,7 @@ export class CallDetector {
    * @returns Whether a call is in progress now.
    */
   public inCall(): boolean {
-    return this.#root.querySelector(this.#selector) !== null && CallVideo.pick(this.#root) !== null;
+    return this.#root.querySelector(this.#selector) !== null;
   }
 
   /**
@@ -49,11 +48,13 @@ export class CallDetector {
   }
 
   /**
-   * Compares the page with the last state and reports a change.
+   * Compares the page with the last state and reports a change. A call is reported as left only after
+   * several checks in a row find it absent, because the page redraws its tiles when a camera is turned on.
    */
   public check(): void {
     const now = this.inCall();
-    if (now !== this.#active) {
+    this.#absent = now ? 0 : this.#absent + 1;
+    if (now !== this.#active && (now || this.#absent >= LEAVE_CHECKS)) {
       this.#active = now;
       this.#onChange(now);
     }

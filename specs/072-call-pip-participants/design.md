@@ -26,7 +26,7 @@ Four small pieces, each with one reason to change:
 - **`TileLayout`** (Strategy) turns a list of tiles and a canvas size into rectangles:
   `SpotlightLayout` gives the primary tile about 70 % of the width and stacks the others in a column
   or grid beside it; `GridLayout` is the rows and columns that fit the count best. The **primary tile**
-  is the tile whose video has at least twice the area of the next one: a shared screen, and also a
+  is the tile whose video has at least one and a half times the area of the next one: a shared screen, and also a
   pinned or spotlighted participant, which deserves the same place. With no such tile the layout is a
   grid (FR-2, FR-3, Q-5). This needs no marker of "presentation", which Meet gives only in a
   language-dependent label.
@@ -34,7 +34,7 @@ Four small pieces, each with one reason to change:
   primary tile and up to `maxTiles - 1` others; without a primary tile it holds `maxTiles`. `next()` and
   `previous()` stop at the ends (AC-7d). It is rebuilt from `CallTiles` at each frame, so a participant
   who leaves cannot leave an empty page (FR-5, FR-9).
-- **`PipPicture`** owns the canvas, the hidden `<video>`, the `Ticker` and the layout: `open()` builds
+- **`PipPicture`** owns the canvas, the hidden `<video>`, the 66 ms interval and the layout: `open()` builds
   them, draws a first frame synchronously, starts the stream and returns the video to float; `dispose()`
   stops the ticker and the tracks and removes the video. A `leavepictureinpicture` event on the video
   disposes it too, so a window closed with its own X leaves nothing behind.
@@ -68,23 +68,18 @@ window is open and pages. Nothing is listened for when the window is closed, so 
 (Q-7). If the probe of T1 shows the window turns the arrows into `seekbackward` and `seekforward`,
 those two actions are mapped to paging too.
 
-**The picture keeps moving in a hidden tab (NFR-4).** The page of a call is hidden while the window
-is open, and Chromium clamps its timers to one per second and stops `requestAnimationFrame`. `Ticker`
-(Strategy) hides the choice:
-
-- `WorkerTicker` runs a tiny worker, built from a `Blob`, that posts a message every 66 ms; timers of
-  a worker are not clamped. It needs the site's content security policy to allow `blob:` workers.
-- `TimerTicker` uses `setInterval` at 1000 ms, the floor of NFR-4, and is the fallback when the worker
-  cannot start.
-
-Meet may also stop decoding the tiles it does not show. If T1 shows frozen sources in a hidden tab, the
-design escalates to `MediaStreamTrackProcessor` in a worker, which reads the tracks, not the elements;
-that is a new spec if it is needed.
+**The picture keeps moving in a hidden tab (NFR-4).** A plain `setInterval` of 66 ms (about 15
+pictures per second) draws the canvas. The page of a call is hidden while the window is open, and
+Chromium clamps the timers of a hidden page to one per second and stops `requestAnimationFrame`; but the
+lab probe of 2026-11-27 shows that a page with a floating PiP window is not throttled at all, so the
+interval keeps its rate (see the results below). A worker would add a `Blob` and a Trusted Types policy
+for nothing and is dropped. If a real Meet call shows the picture freezing, the design escalates to a
+worker ticker, or to `MediaStreamTrackProcessor`, as a new decision.
 
 ```text
 page (call-pip.ts)
 CallPipHook ─ shortcut / tab switch ─▶ OpenPipCommand(source, allowed)
-                                          ├─ ComposedPipSource ─▶ PipPicture(CallTiles, TileLayout, TilePager, Ticker)
+                                          ├─ ComposedPipSource ─▶ PipPicture(CallTiles, TileLayout, TilePager)
                                           └─ LargestVideoSource (fallback, 054)
             ─ on open ─▶ CallControls (Media Session actions, state observer) + arrow keys
             ─ on close / leavepictureinpicture ─▶ PipPicture.dispose, CallControls.release
@@ -92,13 +87,20 @@ CallPipHook ─ shortcut / tab switch ─▶ OpenPipCommand(source, allowed)
 
 ### Avatar and the canvas (Q-6)
 
-The avatar is an `<img>` from the Google avatar host that the page loaded with `crossorigin=use-credentials`.
-Drawing it on the canvas taints the canvas unless the host answers with CORS headers for the page's
-origin; a tainted canvas makes `captureStream()` produce nothing. `AvatarSource` (Strategy) therefore
-has two forms: `PageImageAvatar` draws the loaded image, and `SilhouetteAvatar` draws a neutral shape on
-a flat color. `PipPicture` starts with the image, checks once by reading one pixel of the canvas whether
-it is tainted (a `SecurityError`), and keeps the silhouette for the rest of the call if it is. Both tell
-camera on from off, which is what US-4 asks. T1 decides which one a real call needs.
+A canvas that has drawn an image without CORS approval is tainted for good, and `captureStream()` on it
+throws `SecurityError: Canvas is not origin-clean` (seen in the lab). The avatar `<img>` that Meet shows
+at full size has no `crossorigin` attribute, so drawing it would taint the canvas. The Google avatar host
+answers with `access-control-allow-origin: https://meet.google.com` and
+`access-control-allow-credentials: true` (curl, 2026-11-27, on the default avatar), so the same picture
+loaded with `crossOrigin = 'use-credentials'` is clean. `CredentialedAvatars` therefore never draws the
+page's own image:
+
+- `CredentialedAvatars` loads its own copy of the largest avatar of the tile with
+  `crossOrigin = 'use-credentials'`, caches it by address and draws it once loaded;
+- the silhouette, a neutral shape on a flat color, is drawn while the copy loads and whenever it fails.
+
+Both tell camera on from off, which is what US-4 asks. No pixel check is needed, since an image that is
+not CORS-approved is never drawn.
 
 ## Components
 
@@ -107,10 +109,10 @@ camera on from off, which is what US-4 asks. T1 decides which one a real call ne
 | `src/page/lib/CallTiles.ts` | Reads the tiles of the page, in order, each as video or avatar | – |
 | `src/page/lib/TileLayout.ts` | `TileLayout`, `SpotlightLayout`, `GridLayout`: tiles and size to rectangles | Strategy |
 | `src/page/lib/TilePager.ts` | The page of tiles, `next`, `previous`, the primary tile on every page | – |
-| `src/page/lib/Ticker.ts` | `Ticker`, `WorkerTicker`, `TimerTicker` | Strategy |
-| `src/page/lib/AvatarSource.ts` | `PageImageAvatar`, `SilhouetteAvatar` | Strategy |
-| `src/page/lib/PipPicture.ts` | Canvas, hidden video, ticker, layout; `open`, `dispose` | Facade |
-| `src/page/lib/PipSource.ts` | `PipSource`, `ComposedPipSource`, `LargestVideoSource` | Strategy |
+| `src/page/lib/CredentialedAvatars.ts` | Loads each avatar again with credentials; the silhouette is drawn while it loads or when it fails | – |
+| `src/page/lib/PipPicture.ts` | Canvas, hidden video, the 66 ms interval, layout; `open`, `dispose` | Facade |
+| `src/page/lib/BrowserPicture.ts` | The canvas, video and images of the real page, and the `MutationObserver` of the muted attribute | Adapter |
+| `src/page/lib/PipSource.ts` | `PipSource`, `ComposedPipSource`, `LargestVideoSource`, `PictureObserver` | Strategy, Observer |
 | `src/page/lib/CallControls.ts` | Media Session actions, button state observer, `ClickCallControl` | Command |
 | `src/page/lib/PipCommand.ts` | `OpenPipCommand` takes a `PipSource` | Command |
 | `src/page/lib/CallPipHook.ts` | Builds the source and the controls, listens for the two arrows while the window is open | Invoker |
@@ -186,12 +188,50 @@ them with what a real call shows; none may depend on the language of the page.
 |---|---|
 | Chromium shows the video-call actions (microphone, camera, hang up) and the track buttons only in part | FR-12: the three call actions win; paging falls back to the arrows; T1 records what the window shows |
 | The window turns the arrow keys into nothing the page sees | T1 probes the keys and `seekbackward`/`seekforward`; with neither, the buttons are the only way and the spec says so in the manual check |
-| A hidden tab freezes the picture | `WorkerTicker`, then `TimerTicker` at 1 s; T1 measures both and the decoding of Meet's hidden tiles |
-| The page's content security policy blocks the `blob:` worker | `TimerTicker` fallback, never an error (NFR-1) |
-| The avatar image taints the canvas | `SilhouetteAvatar`, decided by a one-pixel check at the first frame |
+| A hidden tab freezes the picture | The lab shows no throttling while the window is open; T1 confirms it in a real call, together with Meet's own decoding of hidden tiles |
+| The avatar taints the canvas | Never draw the page's image: `CredentialedAvatars`, or the silhouette |
 | Meet registers its own Media Session actions and ours replace them | Ours run the same clicks; on close they are removed, and T1 checks whether Meet's are lost, in which case they stay registered until `uninstall` |
 | The primary-tile rule (twice the next area) picks a pinned participant | Acceptable by design: the page shows it large as well |
 | Selectors of Meet change | Selectors are data; a mismatch means the fallback window of 054 and one warning, never a broken page (NFR-1) |
+
+## Lab probe results (Vivaldi 8.3.4191.47, Chromium 156, 2026-11-27)
+
+Run by the agent with Tore's approval, on a lab copy of Vivaldi with a throwaway profile, on a page served
+from `127.0.0.1` with the content security policy of Meet (`require-trusted-types-for 'script'`, a nonce,
+`strict-dynamic`, no `worker-src`), ten tiles (a shared screen drawn on a canvas, seven fake cameras, two
+avatar-only tiles) and the probe of T1 driven over the debugging port with a user gesture.
+
+| Question | Result |
+|---|---|
+| Is the composed canvas floatable? | Yes: `captureStream()` on the canvas, played in a hidden `<video>`, opens a PiP window of 336 x 189 for the 1280 x 720 canvas |
+| Hidden tab, no PiP window | Timer of 66 ms: 1 per second. `requestAnimationFrame`: 0. A worker's timer: 15 per second |
+| Hidden tab, PiP window open | Timer: 15 per second. `requestAnimationFrame`: about 120 per second. The picture was drawn 15.2 times per second with a plain interval or with a worker: no throttling |
+| Do the source videos keep advancing while the tab is hidden? | Yes, 8 of 8 live videos (fake streams; Meet's own behavior is still open) |
+| Taint | A cross-origin image without CORS made `captureStream()` throw; with the silhouette instead the canvas stayed clean |
+| Blob worker under Meet's policy | Works with a Trusted Types policy (`createScriptURL`); without one `new Worker` would be refused; not needed after all |
+| Media Session | `togglemicrophone`, `togglecamera`, `hangup`, `previoustrack`, `nexttrack`, `seekbackward`, `seekforward` register without error; `setMicrophoneActive` and `setCameraActive` exist |
+| Google avatar host | `access-control-allow-origin: https://meet.google.com` and `access-control-allow-credentials: true` |
+
+Meet's own policy has no `worker-src`, so it falls back to `script-src`, which is a nonce with
+`strict-dynamic`.
+
+### Real call probe (Meet, Vivaldi 8.3, 2026-11-27)
+
+Run by Tore in a real call with a shared screen and two participants with the camera off.
+
+| Question | Result |
+|---|---|
+| Tiles | `[data-participant-id]` finds one tile per participant and one for the shared screen; the shared screen has a `<video>` of 3000 x 1872, the camera-off tiles have no `<video>` at all and two avatar `<img>` (50 x 50 with `crossorigin=use-credentials`, 320 x 320 without) |
+| Primary tile | The shared screen (710 x 443) is only 1.95 times the area of the others (364 x 443): the threshold of 2 would have missed it, so it is now 1.5 |
+| Microphone button | `jsname="hw0c9"` while muted, not `BOHaEe`; the selector lists both names; the camera button is `psRWwc` and the leave button `CQylAd`, as expected |
+| Muted state | `data-is-muted="true"` while the microphone and the camera are off, as the code reads it |
+| Hidden tab, PiP window open | Timer of 66 ms: 15 per second; `requestAnimationFrame`: about 119 per second; the shared-screen video kept advancing; the picture was drawn 15 times per second |
+| Avatar | No load error for the credentialed copy of the avatars, so the host accepted it; the first-frame taint check ran before the load and does not prove it |
+| Media Session | `togglemicrophone`, `togglecamera`, `hangup`, `previoustrack` and `nexttrack` registered without error |
+
+Still open: which buttons the window shows and whether its arrow keys reach the page, whether the
+microphone button keeps `hw0c9` when the microphone is on, whether Meet decodes the camera tiles of a
+hidden tab (this call had none), and whether Meet registers Media Session actions of its own.
 
 ## Probes (T1, real Meet call, by Tore)
 
@@ -203,7 +243,7 @@ DevTools console of the call page, as T1 of 054 was. It answers:
 2. The attributes of the microphone, camera and leave buttons that do not depend on the language.
 3. Whether the canvas is tainted after drawing the avatar.
 4. With the window open and the tab hidden: do the source videos keep advancing frames (`currentTime`),
-   and does a canvas drawn by `WorkerTicker` and by `TimerTicker` keep changing.
+   and does the canvas keep changing (answered in the lab, to confirm in Meet).
 5. Which buttons the window shows for the three call actions with and without `previoustrack` and
    `nexttrack`, and which events the window's arrow keys produce.
 6. Whether Meet registers its own Media Session actions.

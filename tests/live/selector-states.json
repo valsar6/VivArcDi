@@ -16,6 +16,18 @@
   "callMeetInCall": {
     "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
   },
+  "callMeetTile": {
+    "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
+  },
+  "callMeetTileAvatar": {
+    "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
+  },
+  "callMeetMicrophone": {
+    "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
+  },
+  "callMeetCamera": {
+    "notChecked": "a selector of Meet's page, not of Vivaldi's interface"
+  },
   "panelAddressField": "web-panel-form",
   "panelAddSubmit": "web-panel-form"
 }

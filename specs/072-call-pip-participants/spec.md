@@ -125,6 +125,8 @@ itself, its audio and its page are otherwise untouched.
 | AC-17 | WHEN the microphone or the camera changes state in the call page THE page script SHALL report the new state to the window | auto: `reports the microphone and camera state` |
 | AC-18 | IF the control of the call page is not found THEN THE page script SHALL do nothing for that action and send one `call-warning` | auto: `warns when a call control is not found` |
 | AC-19 | WHEN I use the buttons of the window THE microphone, the camera and the call SHALL change as when I use the page | manual |
+| AC-20 | WHEN the shortcut is pressed in a call where nobody shows a video THE page script SHALL open the window with the avatars | auto: `opens the window in a call where nobody shows a video` |
+| AC-21 | WHEN a button of the window acts on the call and the call tab becomes visible a moment later THE page script SHALL keep the window open | auto: `keeps the window open when its own buttons bring the tab forward` |
 | AC-8 | WHEN the call tab is hidden THE picture SHALL refresh at least once per second | auto: `keeps refreshing the picture while the page is hidden` |
 | AC-9 | THE triggers, closing rules and shortcut of 054 SHALL behave as before | auto: the tests of 054 AC-1 to AC-5 and AC-15 to AC-20, unchanged |
 | AC-10 | WHEN I use the shortcut in a Meet call where someone presents THE window SHALL show the slides and the faces of the participants, and keep them moving after I switch tab | manual |

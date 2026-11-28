@@ -1,5 +1,5 @@
 interface VideoStream {
-  getVideoTracks?: () => Array<{ readyState: string }>;
+  getVideoTracks?: () => Array<{ readyState: string; muted?: boolean }>;
 }
 
 function hasLiveTrack(video: HTMLVideoElement): boolean {
@@ -13,6 +13,16 @@ function areaOf(video: HTMLVideoElement): number {
   }
   const { width, height } = video.getBoundingClientRect();
   return width * height;
+}
+
+/**
+ * @param video A video of a call page.
+ * @returns Whether it is playing a live video track that is delivering frames.
+ */
+export function isLiveVideo(video: HTMLVideoElement): boolean {
+  const stream = video.srcObject as unknown as VideoStream | null;
+  const tracks = stream?.getVideoTracks?.() ?? [];
+  return !video.paused && !video.ended && tracks.some((track) => track.readyState === 'live' && track.muted !== true);
 }
 
 export class CallVideo {
