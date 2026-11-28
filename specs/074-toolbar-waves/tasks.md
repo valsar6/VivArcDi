@@ -31,8 +31,8 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `tests/modules/toolbarwaves/`, with `fakes.ts`, named exactly as the `auto:` checks of AC-1 to
   AC-14 and AC-22 to AC-24. They fail to compile or run until the code exists. Done: each test names a
   criterion and the file list matches the design.
-- [ ] **T3. Catalog and icons.** `ToolbarButtons.ts`, `WaveCatalog.ts` (with `PreviewShape`, `WaveData` and the four previews
-  of the design), `WaveIcons.ts`. Green: `draws the four wave icons with currentColor`,
+- [ ] **T3. Catalog and icons.** `ToolbarButtons.ts`, `WaveCatalog.ts` (with `PreviewShape` as `{ before, after }`, `WaveData` and the four
+  previews of the design), `WaveIcons.ts`. Green: `draws the four wave icons with currentColor`,
   `serves the waves with a JSON-safe preview`, and `shows the wave the lists already equal` for
   the matching part.
 - [ ] **T4. Preference writer.** `BrowserPrefs.set` and `canSet`, `PrefsApi.set`, the class JSDoc.

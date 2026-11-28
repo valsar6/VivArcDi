@@ -102,7 +102,8 @@ export interface PreviewRow {
 }
 
 export interface PreviewShape {
-  readonly rows: readonly PreviewRow[];
+  readonly before: readonly PreviewRow[];
+  readonly after: readonly PreviewRow[];
 }
 
 export interface Wave {
@@ -132,17 +133,18 @@ export class WaveCatalog {
 - `WaveData` is what the service serves: plain JSON, with no function and no DOM node, because the
   page of 075 receives it in `chrome.runtime` messages (AC-23). `all()` returns `Wave`; the service
   maps it to `WaveData`.
-- `preview.rows` follow the measured structure: `row` with `full` width for `WorkspaceButton` and
+- `preview.before` and `preview.after` are the rows above and below the tab strip
+  (`tabbar_before` and `tabbar_after`), each in the order of its toolbar, and follow the measured structure: `row` with `full` width for `WorkspaceButton` and
   `NewTab`, `group` with `fit` width for the small buttons that Vivaldi groups, `spacer` for a
-  flexible spacer alone (vertical); `items` counts the buttons of a group. Rows list the top toolbar,
-  then the bottom one; the tab strip is not a row (see Risks). The four previews:
+  flexible spacer alone (vertical); `items` counts the buttons of a group. The tab strip is
+  not drawn by the data; the page puts it between the two lists. The four previews:
 
-| Wave | Rows |
-|---|---|
-| Still water | `row full 1`, `row full 1`, `group fit 2` (Vivaldi's defaults, not the user's lists) |
-| Ripple | `row full 1`, `group fit 3` |
-| Swell | `row full 1`, `group fit 2`, `group fit 3`, `row full 1` |
-| Breaking wave | `group fit 1`, `group fit 3`, `row full 1`, `spacer full 1`, `row full 1` |
+| Wave | `before` | `after` |
+|---|---|---|
+| Still water | `row full 1` | `row full 1`, `group fit 2` (Vivaldi's defaults, not the user's lists) |
+| Ripple | `row full 1`, `group fit 3` | none |
+| Swell | `row full 1`, `group fit 2` | `group fit 3`, `row full 1` |
+| Breaking wave | `group fit 1` | `group fit 3`, `row full 1`, `spacer full 1`, `row full 1` |
 
 - Icons are in `WaveIcons.ts`: four SVG strings, `viewBox="0 0 16 16"`, `fill="none"`,
   `stroke="currentColor"`, no other color. Each is `[the approved drawing]` of the spec.
@@ -314,10 +316,6 @@ writes and fires changes, in `tests/modules/toolbarwaves/fakes.ts`.
   private window still shows the wave chosen in a normal one.
 - **A Vivaldi without these preferences or without `set`.** The module logs one warning and does not
   start (Q-4); the 075 page finds no service and omits the section.
-- **The tab strip in the preview.** The shape agreed with 075 is a flat list of rows, without a mark
-  for the tab strip. The page can place it after the rows of the top toolbar only if it knows how many
-  they are; if 075 needs the split, a `before` count is added to `PreviewShape` by agreement between
-  the two specs.
 - **Looks.** The compact Breaking wave of [076](../076-compact-breaking-wave/spec.md) reads
   `data-vivarcdi-wave`; its rules must not assume the order of the buttons beyond the lists above.
 - **The 028 row and the button** both show with Swell and Breaking wave (Q-9); Tore judges the look.

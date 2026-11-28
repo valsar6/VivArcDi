@@ -204,7 +204,7 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-20 | WHEN Tore looks at the four icons in the light and dark themes on macOS and Debian, THE icons SHALL be legible and told apart | manual |
 | AC-21 | WHEN Tore restarts Vivaldi on his own profile after choosing a wave, THE tab bar SHALL keep the lists of that wave and THE page SHALL show the same wave | manual |
 | AC-22 | WHILE a wave is chosen, THE body SHALL carry `data-vivarcdi-wave` with its id, and WHILE none is chosen THE attribute SHALL be absent | auto: `marks the body with the chosen wave` |
-| AC-23 | THE wave data SHALL carry `id`, `name`, `italianName`, `icon` and a `preview` of rows that follows the measured structure, and SHALL survive `JSON.stringify` and `JSON.parse` unchanged | auto: `serves the waves with a JSON-safe preview` |
+| AC-23 | THE wave data SHALL carry `id`, `name`, `italianName`, `icon` and a `preview` with the rows above (`before`) and below (`after`) the tab strip, which follows the measured structure, and SHALL survive `JSON.stringify` and `JSON.parse` unchanged | auto: `serves the waves with a JSON-safe preview` |
 | AC-24 | IF choosing a wave fails, THEN THE service SHALL reject with an error whose `message` is readable text | auto: `reports a failed choice with a readable message` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
