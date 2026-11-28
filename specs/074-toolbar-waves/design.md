@@ -95,13 +95,26 @@ export interface ToolbarLists {
   readonly after: readonly string[];
 }
 
+export interface PreviewRow {
+  readonly kind: 'row' | 'group' | 'spacer';
+  readonly width: 'full' | 'fit';
+  readonly items: number;
+}
+
+export interface PreviewShape {
+  readonly rows: readonly PreviewRow[];
+}
+
 export interface Wave {
   readonly id: WaveId;
   readonly name: string;
   readonly italianName: string;
   readonly icon: string;
+  readonly preview: PreviewShape;
   readonly lists: ToolbarLists | null;
 }
+
+export type WaveData = Omit<Wave, 'lists'>;
 
 export class WaveCatalog {
   public static readonly defaults: ToolbarLists;
@@ -116,6 +129,21 @@ export class WaveCatalog {
   `["NewTab", "FlexibleSpacer", "TabButton"]`.
 - `match` compares both lists in order and returns the preset's id, or null (Still water is never
   matched by lists; it is a stored choice).
+- `WaveData` is what the service serves: plain JSON, with no function and no DOM node, because the
+  page of 075 receives it in `chrome.runtime` messages (AC-23). `all()` returns `Wave`; the service
+  maps it to `WaveData`.
+- `preview.rows` follow the measured structure: `row` with `full` width for `WorkspaceButton` and
+  `NewTab`, `group` with `fit` width for the small buttons that Vivaldi groups, `spacer` for a
+  flexible spacer alone (vertical); `items` counts the buttons of a group. Rows list the top toolbar,
+  then the bottom one; the tab strip is not a row (see Risks). The four previews:
+
+| Wave | Rows |
+|---|---|
+| Still water | `row full 1`, `row full 1`, `group fit 2` (Vivaldi's defaults, not the user's lists) |
+| Ripple | `row full 1`, `group fit 3` |
+| Swell | `row full 1`, `group fit 2`, `group fit 3`, `row full 1` |
+| Breaking wave | `group fit 1`, `group fit 3`, `row full 1`, `spacer full 1`, `row full 1` |
+
 - Icons are in `WaveIcons.ts`: four SVG strings, `viewBox="0 0 16 16"`, `fill="none"`,
   `stroke="currentColor"`, no other color. Each is `[the approved drawing]` of the spec.
 
@@ -193,6 +221,8 @@ export class ToolbarWaves extends Module<ToolbarWavesOptions> {
 - `start` checks `prefs.canSet` and that both lists read as arrays; if not it logs one warning
   `the toolbar waves are off: Vivaldi has no writable toolbar lists` and returns (FR-9, AC-10),
   leaving the service unpublished so that the 075 page hides the section.
+- `choose` rejects with an `Error` whose `message` is readable (`needs a confirmation`, `the toolbar
+  lists could not be written`), never a bare object (AC-24).
 - `start` publishes the controller and the catalog as `globalThis[Symbol.for('vivarcdi.waves')]`,
   an object `{ waves, current, needsConfirmation, choose, onChange }`; `stop` removes it and the
   marker. This is the contract for [075](../075-settings-page/spec.md); the key is also what the
@@ -202,9 +232,23 @@ export class ToolbarWaves extends Module<ToolbarWavesOptions> {
 
 ### Selectors (`src/selectors/8.1.json`)
 
-Three keys, read through `context.selectors`: `toolbarBefore` (`.toolbar-tabbar-before`),
-`toolbarAfter` (`.toolbar-tabbar-after`), `nestedButtons` (`.tabbar-nested-buttons`). The live
-scenarios read them from the DOM; `selector-states.json` gets the states the selector check needs.
+Four keys, read through `context.selectors`: `toolbarBefore` (`.toolbar-tabbar-before`),
+`toolbarAfter` (`.toolbar-tabbar-after`), `nestedButtons` (`.tabbar-nested-buttons`) and
+`trashButton`, the button of Schede chiuse (`TabsTrash`), which [076](../076-compact-breaking-wave/spec.md)
+needs. The spikes found every toolbar button through `[data-name]` (the attribute holds the button id,
+for example `TabsTrash`), under the two toolbar classes. That gives `trashButton` as
+`:is(.toolbar-tabbar-before, .toolbar-tabbar-after) [data-name="TabsTrash"]`; the spike data does not
+say whether the attribute sits on the button itself or on a wrapper, so T6 reads it on the lab and
+a selector-states entry proves it (below). It is not guessed beyond that.
+
+**Selector states.** `tests/live/selector-states.json` needs no entry for `toolbarBefore`,
+`toolbarAfter` and `nestedButtons`: Vivaldi's default lists put `WorkspaceButton`, `NewTab`,
+`FlexibleSpacer` and `TabButton` there, so the three resolve in the default state. `trashButton`
+needs an entry: `TabsTrash` is in no default list. T6 adds a state `toolbar-trash` in
+`scripts/live/checks/SelectorStates.ts` (`enter` writes the Ripple lists with `vivaldi.prefs.set` and
+waits for the element, `leave` writes Vivaldi's defaults) and the entry
+`"trashButton": "toolbar-trash"`. Its assertion is that the selector resolves to exactly one visible
+button whose `data-name` is `TabsTrash`.
 
 ### Sidebar look (`src/styles/sidebar-look.scss`, changed)
 
@@ -245,6 +289,8 @@ body:not([data-vivarcdi-wave]) #{$tab-bar} .tabbar-nested-buttons:not(:has(.butt
 | AC-13 | `draws the four wave icons with currentColor` | `tests/modules/toolbarwaves/WaveIcons.test.ts` |
 | AC-14 | `lets an active wave keep the new-tab button, spacers and nested row` | `tests/styles/sidebar-look-waves.test.ts` |
 | AC-22 | `marks the body with the chosen wave` | `tests/modules/toolbarwaves/WaveMarker.test.ts` |
+| AC-23 | `serves the waves with a JSON-safe preview` | `tests/modules/toolbarwaves/WaveCatalog.test.ts` |
+| AC-24 | `reports a failed choice with a readable message` | `tests/modules/toolbarwaves/WaveController.test.ts` |
 
 | AC | Scenario | File |
 |---|---|---|
@@ -268,6 +314,10 @@ writes and fires changes, in `tests/modules/toolbarwaves/fakes.ts`.
   private window still shows the wave chosen in a normal one.
 - **A Vivaldi without these preferences or without `set`.** The module logs one warning and does not
   start (Q-4); the 075 page finds no service and omits the section.
+- **The tab strip in the preview.** The shape agreed with 075 is a flat list of rows, without a mark
+  for the tab strip. The page can place it after the rows of the top toolbar only if it knows how many
+  they are; if 075 needs the split, a `before` count is added to `PreviewShape` by agreement between
+  the two specs.
 - **Looks.** The compact Breaking wave of [076](../076-compact-breaking-wave/spec.md) reads
   `data-vivarcdi-wave`; its rules must not assume the order of the buttons beyond the lists above.
 - **The 028 row and the button** both show with Swell and Breaking wave (Q-9); Tore judges the look.

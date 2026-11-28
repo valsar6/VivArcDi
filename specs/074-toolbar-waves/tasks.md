@@ -29,23 +29,27 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `every live check has a scenario` because the spec lists live checks that have no scenario.
 - [ ] **T2. Unit tests (red).** Write the tests of the Tests table in `tests/core/browser/` and
   `tests/modules/toolbarwaves/`, with `fakes.ts`, named exactly as the `auto:` checks of AC-1 to
-  AC-14 and AC-22. They fail to compile or run until the code exists. Done: each test names a
+  AC-14 and AC-22 to AC-24. They fail to compile or run until the code exists. Done: each test names a
   criterion and the file list matches the design.
-- [ ] **T3. Catalog and icons.** `ToolbarButtons.ts`, `WaveCatalog.ts`, `WaveIcons.ts`. Green:
-  `draws the four wave icons with currentColor`, and `shows the wave the lists already equal` for
+- [ ] **T3. Catalog and icons.** `ToolbarButtons.ts`, `WaveCatalog.ts` (with `PreviewShape`, `WaveData` and the four previews
+  of the design), `WaveIcons.ts`. Green: `draws the four wave icons with currentColor`,
+  `serves the waves with a JSON-safe preview`, and `shows the wave the lists already equal` for
   the matching part.
 - [ ] **T4. Preference writer.** `BrowserPrefs.set` and `canSet`, `PrefsApi.set`, the class JSDoc.
   Green: `writes a preference and resolves`. Existing tests keep their names.
 - [ ] **T5. Marker and store.** `WaveMarker.ts`, `WaveStore.ts` with its versioned format. Green:
   `marks the body with the chosen wave`.
 - [ ] **T6. Controller and module.** `WaveController.ts`, `ToolbarWaves.ts`, options, the published
-  service, `src/modules/index.ts`, `src/config.json`, the three selectors in
-  `src/selectors/8.1.json`. Green: `shows the wave the lists already equal`,
+  service, `src/modules/index.ts`, `src/config.json`, the four selectors
+  (`toolbarBefore`, `toolbarAfter`, `nestedButtons`, `trashButton`) in `src/selectors/8.1.json`,
+  the `toolbar-trash` state in `scripts/live/checks/SelectorStates.ts` and the entry
+  `trashButton` in `tests/live/selector-states.json`; the lab proves the `trashButton` selector. Green: `shows the wave the lists already equal`,
   `writes the lists of the chosen wave`, `stores the user's lists before the first write`,
   `keeps the first backup when waves change`, `still water writes the stored lists`,
   `still water writes the defaults without a backup`, `drops the choice after a manual edit`,
   `asks before replacing custom lists`, `does not start without writable toolbar lists`,
-  `stays out of private windows`, `exposes the four waves and a service to choose one`. Blocks 075.
+  `stays out of private windows`, `exposes the four waves and a service to choose one`,
+  `reports a failed choice with a readable message`. Blocks 075.
 - [ ] **T7. Sidebar look.** The guards in `src/styles/sidebar-look.scss`. Green:
   `lets an active wave keep the new-tab button, spacers and nested row`; the existing style tests
   keep their names.
