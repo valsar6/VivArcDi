@@ -7,11 +7,15 @@
 
 ## Approach
 
-Five small pieces in a new module, `toolbar-waves`, and one change of style.
+Six small pieces in a new module, `toolbar-waves`, and one change of style.
 
-**A catalog of the four waves.** `WaveCatalog` (`src/modules/toolbarwaves/WaveCatalog.ts`) is the one
-table of ids, names, icons and lists (NFR-1). The button ids are constants of `ToolbarButtons`
-beside it. Nothing else names a button.
+**One strategy per wave, built by a factory.** A wave is a Strategy: the abstract `WaveStrategy`
+(`src/modules/toolbarwaves/WaveStrategy.ts`) holds what every wave has (id, names, icon, preview) and
+the one thing that differs, the lists it writes. `StillWaterWave`, `RippleWave`, `SwellWave` and
+`BreakingWave` implement it. `WaveFactory` builds them and returns them in the order Still water,
+Ripple, Swell, Breaking wave. Adding a wave is one class and one line in the factory; `WaveController`
+never switches on an id (Open/Closed). The button ids are constants of `ToolbarButtons` beside them
+(NFR-1); nothing else names a button.
 
 **A preference writer.** `BrowserPrefs` gains `set(key, value)`, which calls
 `prefs.set({ path: key, value })`, the only signature Vivaldi accepts, and returns at once (FR-2).
@@ -30,7 +34,7 @@ key, through `StoredFormat` like the other stores (037, NFR-2).
 only while `body` has no `data-vivarcdi-wave` (FR-12).
 
 ```text
-075 page ──▶ WaveController ──▶ WaveCatalog (lists, names, icons)
+075 page ──▶ WaveController ──▶ WaveFactory ──▶ WaveStrategy x4 (lists, names, icons)
                  │   │   └────▶ WaveStore ──▶ ModuleContext.storage (vivarcdi.toolbar-waves)
                  │   └────────▶ WaveMarker ──▶ body[data-vivarcdi-wave]
                  └────────────▶ BrowserPrefs.get / set / onChange (two toolbar lists)
@@ -85,7 +89,7 @@ export class BrowserPrefs {
   `canSet` first (FR-9). The JSDoc of the class stops saying "no method that writes".
 - `onChange(key, listener)` already exists and is used for both lists.
 
-### Catalog (`src/modules/toolbarwaves/`)
+### Waves (`src/modules/toolbarwaves/`)
 
 ```ts
 export type WaveId = 'still-water' | 'ripple' | 'swell' | 'breaking-wave';
@@ -95,6 +99,59 @@ export interface ToolbarLists {
   readonly after: readonly string[];
 }
 
+export interface WaveContext {
+  readonly backup: ToolbarLists | null;
+  readonly defaults: ToolbarLists;
+}
+
+export abstract class WaveStrategy {
+  public abstract readonly id: WaveId;
+  public abstract readonly name: string;
+  public abstract readonly italianName: string;
+  public abstract readonly icon: string;
+  public abstract readonly preview: PreviewShape;
+  public abstract lists(context: WaveContext): ToolbarLists;
+  public abstract get replacesUserLists(): boolean;
+  public matches(lists: ToolbarLists): boolean;
+}
+
+export class WaveFactory {
+  constructor(defaults: ToolbarLists);
+  public all(): readonly WaveStrategy[];
+  public byId(id: WaveId): WaveStrategy;
+  public matching(lists: ToolbarLists): WaveStrategy | null;
+  public get context(): Pick<WaveContext, 'defaults'>;
+}
+
+export interface WaveData {
+  readonly id: WaveId;
+  readonly name: string;
+  readonly italianName: string;
+  readonly icon: string;
+  readonly preview: PreviewShape;
+}
+
+export class WaveDataMapper {
+  public toData(wave: WaveStrategy): WaveData;
+}
+```
+
+- `lists(context)` of a preset ignores the context and returns its fixed table of the spec;
+  `StillWaterWave.lists` returns `context.backup`, else `context.defaults` (FR-6). `defaults` are
+  `["WorkspaceButton"]` and `["NewTab", "FlexibleSpacer", "TabButton"]`, a constant in
+  `ToolbarButtons.ts` passed to the factory, so there is no static state.
+- `replacesUserLists` is true for the three presets and false for Still water; the controller backs
+  up the user's lists when it goes from a wave that does not replace them to one that does (FR-4).
+- `matches(lists)` compares both lists in order with the wave's own table; Still water never matches
+  (it is a stored choice, not a pair of lists). `WaveFactory.matching` returns the first matching
+  strategy, or null.
+- The factory holds one array of builders, in display order; it is the only registration point.
+- `WaveData` is what the service serves: plain JSON, no function and no DOM node, because the page of
+  075 receives it in `chrome.runtime` messages (AC-23). `WaveDataMapper.toData` is the one mapper from
+  a strategy to `WaveData`; the shape and the service contract are as 075 expects.
+- `PreviewRow` and `PreviewShape` are as follows, and are the ones 075 draws:
+
+```ts
 export interface PreviewRow {
   readonly kind: 'row' | 'group' | 'spacer';
   readonly width: 'full' | 'fit';
@@ -105,39 +162,14 @@ export interface PreviewShape {
   readonly before: readonly PreviewRow[];
   readonly after: readonly PreviewRow[];
 }
-
-export interface Wave {
-  readonly id: WaveId;
-  readonly name: string;
-  readonly italianName: string;
-  readonly icon: string;
-  readonly preview: PreviewShape;
-  readonly lists: ToolbarLists | null;
-}
-
-export type WaveData = Omit<Wave, 'lists'>;
-
-export class WaveCatalog {
-  public static readonly defaults: ToolbarLists;
-  public static all(): readonly Wave[];
-  public static byId(id: WaveId): Wave;
-  public static match(lists: ToolbarLists): WaveId | null;
-}
 ```
 
-- `lists` is null for Still water: its lists are the backup, else `defaults`.
-- The four lists are the table of the spec; `defaults` are `["WorkspaceButton"]` and
-  `["NewTab", "FlexibleSpacer", "TabButton"]`.
-- `match` compares both lists in order and returns the preset's id, or null (Still water is never
-  matched by lists; it is a stored choice).
-- `WaveData` is what the service serves: plain JSON, with no function and no DOM node, because the
-  page of 075 receives it in `chrome.runtime` messages (AC-23). `all()` returns `Wave`; the service
-  maps it to `WaveData`.
 - `preview.before` and `preview.after` are the rows above and below the tab strip
-  (`tabbar_before` and `tabbar_after`), each in the order of its toolbar, and follow the measured structure: `row` with `full` width for `WorkspaceButton` and
-  `NewTab`, `group` with `fit` width for the small buttons that Vivaldi groups, `spacer` for a
-  flexible spacer alone (vertical); `items` counts the buttons of a group. The tab strip is
-  not drawn by the data; the page puts it between the two lists. The four previews:
+  (`tabbar_before` and `tabbar_after`), each in the order of its toolbar, and follow the measured
+  structure: `row` with `full` width for `WorkspaceButton` and `NewTab`, `group` with `fit` width for
+  the small buttons that Vivaldi groups, `spacer` for a flexible spacer alone (vertical); `items`
+  counts the buttons of a group. The tab strip is not drawn by the data; the page puts it between the
+  two lists. The four previews:
 
 | Wave | `before` | `after` |
 |---|---|---|
@@ -147,7 +179,7 @@ export class WaveCatalog {
 | Breaking wave | `group fit 1` | `group fit 3`, `row full 1`, `spacer full 1`, `row full 1` |
 
 - Icons are in `WaveIcons.ts`: four SVG strings, `viewBox="0 0 16 16"`, `fill="none"`,
-  `stroke="currentColor"`, no other color. Each is `[the approved drawing]` of the spec.
+  `stroke="currentColor"`, no other color; each strategy takes its own.
 
 ### Store (`WaveStore.ts`)
 
@@ -176,7 +208,7 @@ export interface WaveChoice {
 }
 
 export class WaveController {
-  constructor(prefs: BrowserPrefs, store: WaveStore, marker: WaveMarker, logger: Logger);
+  constructor(prefs: BrowserPrefs, store: WaveStore, marker: WaveMarker, waves: WaveFactory, logger: Logger);
   public async start(): Promise<void>;
   public stop(): void;
   public current(): WaveId | null;
@@ -187,21 +219,28 @@ export class WaveController {
 ```
 
 - `start` reads both lists and the stored state, sets `current` to the stored wave when the lists
-  still agree with it, else to `WaveCatalog.match(lists)`, else null (AC-2); applies the marker;
+  still agree with it, else to `waves.matching(lists)`, else null (AC-2); applies the marker;
   follows both preferences. It writes nothing (NFR-4).
 - A stored wave of a preset whose lists the user has since edited is dropped on start (FR-7).
 - `needsConfirmation` is true when the lists equal no preset and not the defaults (FR-8, AC-9).
   `choose` throws when it is true and `choice.confirmed` is false.
+- The controller works only against `WaveStrategy`; no line of it names a wave id.
 - `choose(id)`:
-  1. When the current wave is null or Still water and `id` is a preset, store the current lists as
-     the backup (FR-4); never overwrite a backup while a preset wave is chosen (AC-5).
-  2. Resolve the lists: the preset's, or for Still water the backup, else `defaults` (FR-6).
+  1. Take the strategy from the factory. When the current wave is null or does not replace the user's
+     lists, and the chosen one does, store the current lists as the backup (FR-4); never overwrite a
+     backup while a wave that replaces them is chosen (AC-5).
+  2. Ask the strategy for its lists with the context `{ backup, defaults }` (FR-6).
   3. Write `before`, then `after`, through `BrowserPrefs.set`.
   4. Save `{ wave: id, backup }`, set the marker, tell the listeners.
 - Following: on a change of either list, compare the pair with the chosen preset. Still water is
   never compared. When it no longer equals the preset, save `{ wave: null, backup }`, remove the
   marker and tell the listeners; never write (FR-7). A change that the controller wrote itself is
   ignored by comparing it with the pair it just wrote.
+- **A raw write never adopts a wave.** Only `choose` sets the wave and the marker. A list written
+  by anything else (`vivaldi.prefs.set` from a script, Vivaldi's editor, a sync) can only drop a
+  chosen preset (FR-7); it never makes one current, so the 028 look stays as it is and the live
+  scenarios of AC-15 to AC-17 choose through the service. `start` is the one place that reads a wave
+  from the lists (AC-2).
 - A write whose `onChanged` echo arrives with the expected pair keeps the current wave.
 
 ### Marker (`WaveMarker.ts`)
@@ -225,7 +264,7 @@ export class ToolbarWaves extends Module<ToolbarWavesOptions> {
   leaving the service unpublished so that the 075 page hides the section.
 - `choose` rejects with an `Error` whose `message` is readable (`needs a confirmation`, `the toolbar
   lists could not be written`), never a bare object (AC-24).
-- `start` publishes the controller and the catalog as `globalThis[Symbol.for('vivarcdi.waves')]`,
+- `start` publishes the controller and the waves as `globalThis[Symbol.for('vivarcdi.waves')]`,
   an object `{ waves, current, needsConfirmation, choose, onChange }`; `stop` removes it and the
   marker. This is the contract for [075](../075-settings-page/spec.md); the key is also what the
   live scenarios use.
@@ -291,15 +330,18 @@ body:not([data-vivarcdi-wave]) #{$tab-bar} .tabbar-nested-buttons:not(:has(.butt
 | AC-13 | `draws the four wave icons with currentColor` | `tests/modules/toolbarwaves/WaveIcons.test.ts` |
 | AC-14 | `lets an active wave keep the new-tab button, spacers and nested row` | `tests/styles/sidebar-look-waves.test.ts` |
 | AC-22 | `marks the body with the chosen wave` | `tests/modules/toolbarwaves/WaveMarker.test.ts` |
-| AC-23 | `serves the waves with a JSON-safe preview` | `tests/modules/toolbarwaves/WaveCatalog.test.ts` |
+| AC-23 | `serves the waves with a JSON-safe preview` | `tests/modules/toolbarwaves/WaveDataMapper.test.ts` |
+| AC-25 | `each wave gives the lists of its table` | `tests/modules/toolbarwaves/WaveStrategies.test.ts` (one case per `StillWaterWave`, `RippleWave`, `SwellWave`, `BreakingWave`) |
+| AC-26 | `builds the four waves in order` | `tests/modules/toolbarwaves/WaveFactory.test.ts` |
+| AC-27 | `chooses a wave it has no special case for` | `tests/modules/toolbarwaves/WaveController.test.ts` (with a fake strategy) |
 | AC-24 | `reports a failed choice with a readable message` | `tests/modules/toolbarwaves/WaveController.test.ts` |
 
 | AC | Scenario | File |
 |---|---|---|
-| AC-15 | `the ripple wave puts the buttons above the strip` | `tests/live/scenarios/` |
-| AC-16 | `the swell wave splits the buttons around the strip` | same |
-| AC-17 | `the breaking wave puts every button below the strip` | same |
-| AC-18 | `a written toolbar list shows without a reload` | same |
+| AC-15 | `the ripple wave puts the buttons above the strip` (chooses through the service) | `tests/live/scenarios/` |
+| AC-16 | `the swell wave splits the buttons around the strip` (same) | same |
+| AC-17 | `the breaking wave puts every button below the strip` (same) | same |
+| AC-18 | `a written toolbar list shows without a reload` (raw `vivaldi.prefs.set`) | same |
 | AC-19 | `still water restores the toolbar` | same |
 
 AC-20 and AC-21 are manual. Fakes: a `FakePrefs` with `get`, `set` and `onChanged` that records

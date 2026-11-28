@@ -21,7 +21,8 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `the swell wave splits the buttons around the strip`,
   `the breaking wave puts every button below the strip`,
   `a written toolbar list shows without a reload`, `still water restores the toolbar`. AC-15 to
-  AC-17 write the lists with `vivaldi.prefs.set` and check the visible buttons and rows against the
+  AC-17 choose the wave through `globalThis[Symbol.for('vivarcdi.waves')].choose(id)` (only `choose` sets
+  the marker; a raw write never adopts a wave) and check the marker and the visible buttons and rows against the
   group (the structure of Measured), AC-18 checks the DOM, `onChanged` and `[]` on read-back, AC-19
   chooses Still water through `globalThis[Symbol.for('vivarcdi.waves')]`. They may fail on
   `npm run live` until the code exists; that is the red state, and they are run only with Tore's
@@ -29,12 +30,14 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `every live check has a scenario` because the spec lists live checks that have no scenario.
 - [ ] **T2. Unit tests (red).** Write the tests of the Tests table in `tests/core/browser/` and
   `tests/modules/toolbarwaves/`, with `fakes.ts`, named exactly as the `auto:` checks of AC-1 to
-  AC-14 and AC-22 to AC-24. They fail to compile or run until the code exists. Done: each test names a
+  AC-14 and AC-22 to AC-27 (including the strategies, the factory and the fake strategy). They fail to compile or run until the code exists. Done: each test names a
   criterion and the file list matches the design.
-- [ ] **T3. Catalog and icons.** `ToolbarButtons.ts`, `WaveCatalog.ts` (with `PreviewShape` as `{ before, after }`, `WaveData` and the four
-  previews of the design), `WaveIcons.ts`. Green: `draws the four wave icons with currentColor`,
-  `serves the waves with a JSON-safe preview`, and `shows the wave the lists already equal` for
-  the matching part.
+- [ ] **T3. Waves and icons.** `ToolbarButtons.ts` (ids and Vivaldi's defaults), `WaveStrategy.ts`
+  (with `ToolbarLists`, `WaveContext`, `PreviewShape` as `{ before, after }`), `StillWaterWave.ts`,
+  `RippleWave.ts`, `SwellWave.ts`, `BreakingWave.ts`, `WaveFactory.ts`, `WaveDataMapper.ts` (`WaveData`)
+  and `WaveIcons.ts`, with the four previews of the design. Green:
+  `draws the four wave icons with currentColor`, `serves the waves with a JSON-safe preview`,
+  `each wave gives the lists of its table`, `builds the four waves in order`.
 - [ ] **T4. Preference writer.** `BrowserPrefs.set` and `canSet`, `PrefsApi.set`, the class JSDoc.
   Green: `writes a preference and resolves`. Existing tests keep their names.
 - [ ] **T5. Marker and store.** `WaveMarker.ts`, `WaveStore.ts` with its versioned format. Green:
@@ -49,7 +52,7 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   `still water writes the defaults without a backup`, `drops the choice after a manual edit`,
   `asks before replacing custom lists`, `does not start without writable toolbar lists`,
   `stays out of private windows`, `exposes the four waves and a service to choose one`,
-  `reports a failed choice with a readable message`. Blocks 075.
+  `reports a failed choice with a readable message`, `chooses a wave it has no special case for`. Blocks 075.
 - [ ] **T7. Sidebar look.** The guards in `src/styles/sidebar-look.scss`. Green:
   `lets an active wave keep the new-tab button, spacers and nested row`; the existing style tests
   keep their names.

@@ -196,9 +196,9 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-12 | THE module SHALL expose the four waves as data, with English and Italian names, and a service to read, choose and follow the current wave | auto: `exposes the four waves and a service to choose one` |
 | AC-13 | THE four icons SHALL be inline SVG colored by `currentColor` | auto: `draws the four wave icons with currentColor` |
 | AC-14 | WHILE a wave is active, THE sidebar look SHALL NOT hide `NewTab`, flexible spacers or the nested buttons row in the tab bar | auto: `lets an active wave keep the new-tab button, spacers and nested row` |
-| AC-15 | WHEN a lab Vivaldi receives the Ripple lists, THE tab bar SHALL show `WorkspaceButton` as a full-width row and `TabsTrash` and `TabButton` in one `.tabbar-nested-buttons` group in `.toolbar-tabbar-before`, and no visible button in `.toolbar-tabbar-after` | live: `the ripple wave puts the buttons above the strip` |
-| AC-16 | WHEN a lab Vivaldi receives the Swell lists, THE tab bar SHALL show `WorkspaceButton` as a row and `SyncedTabs` in a group in `.toolbar-tabbar-before`, and `TabsTrash` in a group followed by `NewTab` as a full-width row in `.toolbar-tabbar-after` | live: `the swell wave splits the buttons around the strip` |
-| AC-17 | WHEN a lab Vivaldi receives the Breaking wave lists, THE tab bar SHALL show no visible button in `.toolbar-tabbar-before`, and in `.toolbar-tabbar-after` `TabsTrash` in a group, then `WorkspaceButton` and `NewTab` as full-width rows, in that order | live: `the breaking wave puts every button below the strip` |
+| AC-15 | WHEN the user chooses the Ripple wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show `WorkspaceButton` as a full-width row and `TabsTrash` and `TabButton` in one `.tabbar-nested-buttons` group in `.toolbar-tabbar-before`, and no visible button in `.toolbar-tabbar-after` | live: `the ripple wave puts the buttons above the strip` |
+| AC-16 | WHEN the user chooses the Swell wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show `WorkspaceButton` as a row and `SyncedTabs` in a group in `.toolbar-tabbar-before`, and `TabsTrash` in a group followed by `NewTab` as a full-width row in `.toolbar-tabbar-after` | live: `the swell wave splits the buttons around the strip` |
+| AC-17 | WHEN the user chooses the Breaking wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show no visible button in `.toolbar-tabbar-before`, and in `.toolbar-tabbar-after` `TabsTrash` in a group, then `WorkspaceButton` and `NewTab` as full-width rows, in that order | live: `the breaking wave puts every button below the strip` |
 | AC-18 | WHEN the lists are written in a lab Vivaldi, THE interface SHALL update without a reload, `onChanged` SHALL fire once per list, and the preference SHALL hold the written lists, an empty one as `[]`, when read again | live: `a written toolbar list shows without a reload` |
 | AC-19 | WHEN Still water runs after a wave, THE lab tab bar SHALL show the lists as before the first wave, or Vivaldi's default values without a backup | live: `still water restores the toolbar` |
 | AC-20 | WHEN Tore looks at the four icons in the light and dark themes on macOS and Debian, THE icons SHALL be legible and told apart | manual |
@@ -206,6 +206,9 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-22 | WHILE a wave is chosen, THE body SHALL carry `data-vivarcdi-wave` with its id, and WHILE none is chosen THE attribute SHALL be absent | auto: `marks the body with the chosen wave` |
 | AC-23 | THE wave data SHALL carry `id`, `name`, `italianName`, `icon` and a `preview` with the rows above (`before`) and below (`after`) the tab strip, which follows the measured structure, and SHALL survive `JSON.stringify` and `JSON.parse` unchanged | auto: `serves the waves with a JSON-safe preview` |
 | AC-24 | IF choosing a wave fails, THEN THE service SHALL reject with an error whose `message` is readable text | auto: `reports a failed choice with a readable message` |
+| AC-25 | THE four wave strategies SHALL each give the lists of their row in the table of After, Still water the backup else Vivaldi's defaults | auto: `each wave gives the lists of its table` |
+| AC-26 | THE wave factory SHALL build the four waves by id and return them in the order Still water, Ripple, Swell, Breaking wave | auto: `builds the four waves in order` |
+| AC-27 | THE controller SHALL choose any wave the factory returns without a case for its id | auto: `chooses a wave it has no special case for` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
 design of the icons is approved, so AC-20 is about legibility on macOS and Debian only. AC-21 is a
@@ -226,7 +229,9 @@ on a lab profile, then turns green with the code. Already measured by a spike (s
 
 To prove first, as red tests:
 
-4. The order of the buttons and the rows against the group in each preset match AC-15 to AC-17.
+4. Choosing each wave through the service writes the lists and the marker, and the order of the buttons
+   and the rows against the group match AC-15 to AC-17. Raw list writes never set the marker, so the
+   scenarios do not use them; AC-18 does, on purpose, because it measures Vivaldi.
 5. `onChanged` fires after a manual edit of the toolbar, so that AC-8 can be built.
 6. With `sidebar-look` on, `NewTab`, the flexible spacers and the nested row are visible while a wave
    is chosen, and still hidden before one is chosen (AC-14).
