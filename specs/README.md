@@ -81,6 +81,7 @@ its approval gates are in [CONTRIBUTING.md](../CONTRIBUTING.md#spec-driven-workf
 | [071 Clear archives the active tab too](071-clear-active-tab/spec.md) | 3 | Implemented |
 | [072 Call Picture in Picture with the participants](072-call-pip-participants/spec.md) | 5 | Draft |
 | [073 Today titles aligned like the folder rows](073-today-title-style/spec.md) | 3 | Implemented |
+| [075 VivArcDi Settings](075-settings-page/spec.md) | 3 | Draft |
 
 ## Layout
 
