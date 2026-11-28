@@ -71,16 +71,15 @@ recorded here after the first scenario run.
 | `src/styles/_tokens.scss` | `$breaking-wave` (`body[data-vivarcdi-wave="breaking-wave"]`), `$after-toolbar`, `$nested-buttons`, `$trash-button`, `$workspace-button`, `$new-tab-button`, `$compact-bar-button-size`, `$compact-bar-button-min`, `$compact-wrap-width` |
 | `src/styles/compact-breaking-wave.scss` | All compact rules of the attempt that passes |
 | `src/config.json` | Adds `styles/compact-breaking-wave.css` to `styles`, last |
-| `src/selectors/8.1.json` | Adds only `trashButton`; `toolbarAfter` and `nestedButtons` come from [074](../074-toolbar-waves/design.md) (selectors section), `workspaceButton`, `workspaceMenuButton` and `newTabButton` are already there |
+| `src/selectors/8.1.json` | No change: `toolbarAfter`, `nestedButtons` and `trashButton` come from [074](../074-toolbar-waves/design.md) (selectors section, 074 T6), `workspaceButton`, `workspaceMenuButton` and `newTabButton` are already there |
 | `tests/styles/CompactBreakingWave.test.ts` | AC-1 to AC-3 on the compiled CSS |
 | `tests/modules/toolbarwaves/` or the nearest suite | AC-4, the one test that watches for a write |
 | `tests/live/scenarios/*.live.ts` | One file per `live:` criterion, nine in all |
 
 The stylesheet cannot read the catalog, so the selectors live twice: in `8.1.json` for scripts and the
 live scenarios, in `_tokens.scss` for the styles, as sidebar-look does today. The scenarios read the
-selectors through the catalog, so a rename shows as one red scenario. The selector of the trash button
-(likely `button[data-name="TabsTrash"]`, as `workspaceMenuButton`) is in neither the catalog nor the 074 design; it is read from
-the lab Vivaldi in task T1 and added there.
+selectors through the catalog, so a rename shows as one red scenario. The trash button selector is
+074's `trashButton` (`:is(.toolbar-tabbar-before, .toolbar-tabbar-after) [data-name="TabsTrash"]`).
 
 The attempt 3 helper, if ever written, is `src/modules/toolbarwaves/BreakingWaveRow.ts` or a `src/shared/`
 class, with its own design amendment.
@@ -107,9 +106,8 @@ Live scenarios follow `tests/live/scenarios/` (`name`, `spec: '076'`, `run`) and
 
 ## Risks
 
-- **Selectors from 074.** `toolbarAfter` and `nestedButtons` exist only after 074 T6 adds them to
-  `src/selectors/8.1.json`; 076 reads them through the `SelectorCatalog` and adds nothing of its own
-  except `trashButton`.
+- **Selectors from 074.** `toolbarAfter`, `nestedButtons` and `trashButton` exist only after 074 T6 adds
+  them to `src/selectors/8.1.json`; 076 reads them through the `SelectorCatalog` and adds none.
 
 - **074 not in main.** The scenarios need the Breaking wave lists and `data-vivarcdi-wave` from
   [074](../074-toolbar-waves/spec.md) FR-13. Every task is blocked by it; until then a scenario may set

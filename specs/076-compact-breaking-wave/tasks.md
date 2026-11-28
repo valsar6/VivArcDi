@@ -23,9 +23,8 @@ All tasks run one after the other; none is parallel, because each judges the pre
   trash button opens its list`, `the compact buttons keep their labels`, `the compact breaking wave
   row survives a resize`, `the compact form switches off with the breaking wave`, `the compact
   breaking wave stacks in the narrow tab bar`. A shared `tests/live/scenarios/compactBar.ts` sets the lists and the
-  attribute and reads the buttons. Read the trash button selector from the lab and add only `trashButton` to
-  `src/selectors/8.1.json`; `toolbarAfter` and `nestedButtons` are 074's (T6) and are read through the
-  `SelectorCatalog`. Done when the live check test passes in CI
+  attribute and reads the buttons. The selectors `toolbarAfter`, `nestedButtons` and `trashButton` are
+  added to `src/selectors/8.1.json` by 074 T6 and are read through the `SelectorCatalog`; 076 adds none. Done when the live check test passes in CI
   and `npm run live -- 076` runs the nine scenarios red (Tore agrees to the run first).
 - [ ] **T2. Unit tests, red.** `tests/styles/CompactBreakingWave.test.ts` with `compact rules apply
   only under the breaking wave attribute`, `without the breaking wave attribute the bottom bar is
