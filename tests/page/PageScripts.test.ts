@@ -30,7 +30,7 @@ const CASES: Case[] = [
   { name: 'pinned-keys', event: 'keydown', argument: KEYED },
   { name: 'copy-keys', event: 'keydown', argument: KEYED },
   { name: 'archive-keys', event: 'keydown', argument: (token) => token },
-  { name: 'call-pip', event: 'keydown', argument: (token) => ({ token, tabId: 1, letter: 'p', inCallSelector: '.in-call' }) },
+  { name: 'call-pip', event: 'keydown', argument: (token) => ({ token, tabId: 1, letter: 'p', maxTiles: 9, selectors: { inCall: '.in-call', tile: '.tile', avatar: '.avatar', microphone: '.mic', camera: '.cam' } }) },
 ];
 
 const KEYS = ['vivarcdi.peek.links', 'vivarcdi.little-arc.links', 'vivarcdi.peek.keys', 'vivarcdi.pinned.keys', 'vivarcdi.copy.keys', 'vivarcdi.archive.keys', 'vivarcdi.call.pip'];

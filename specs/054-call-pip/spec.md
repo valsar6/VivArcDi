@@ -66,7 +66,8 @@ four sites share one module and one list in `config.json`.
   ship Meet first; each other site is added when its in-call selector is confirmed in a real call
   (T1), and the spec is `Implemented` only when all four are in.
 - **FR-2.** WHEN the shortcut is pressed in a tab with a call in progress and no PiP window, the
-  module SHALL open the PiP window with the call video.
+  module SHALL open the PiP window with the call video; since [072](../072-call-pip-participants/spec.md)
+  the window shows the whole call, and the largest video is the fallback.
 - **FR-3.** WHEN the shortcut is pressed while that tab's PiP window is open, the module SHALL close
   it.
 - **FR-4.** WHEN the call tab becomes the active tab again, the module SHALL close the PiP window it
@@ -109,7 +110,7 @@ four sites share one module and one list in `config.json`.
 | AC-3 | WHEN the call tab becomes active again THE module SHALL close the PiP window | auto: `closes the call PiP when the tab is shown again` |
 | AC-4 | WHEN the call ends or the tab closes THE module SHALL close the PiP window | auto: `closes the call PiP when the call ends` |
 | AC-5 | WHEN a supported page has no call in progress THE page script SHALL NOT open PiP and SHALL NOT consume the shortcut | auto: `ignores the shortcut without a call` |
-| AC-6 | WHEN a call shows several videos THE page script SHALL float the largest playing one with a live track | auto: `floats the largest live video` |
+| AC-6 | WHEN a call shows several videos THE page script SHALL float the largest playing one with a live track; since [072](../072-call-pip-participants/spec.md) this is the fallback when the whole call cannot be composed | auto: `floats the largest live video` |
 | AC-7 | WHEN a site is disabled in the options THE module SHALL NOT inject its page script | auto: `skips a disabled site` |
 | AC-8 | THE page script SHALL be injected on the pages of the supported sites only | auto: `injects the call script on the supported sites only` |
 | AC-9 | WHEN the shortcut letter option changes THE page script SHALL answer the new letter only | auto: `uses the configured shortcut letter` |
@@ -147,7 +148,8 @@ four sites share one module and one list in `config.json`.
   the worse choice.
 - [x] **Q-2.** What is "a call in progress" on each site? Decided: a live video track in a playing
   `<video>` plus a per-site selector for the in-call view, verified in a real call (T1 of the
-  design).
+  design). Amended by [072](../072-call-pip-participants/spec.md): with the whole call composed, the
+  in-call view alone is enough, so the window opens in a call where nobody has a camera on.
 - [x] **Q-3.** Should the page script also register the `enterpictureinpicture` media session action,
   so that a future Vivaldi opens PiP on tab switch by itself? Decided: no, nothing to prove it works
   and it would hide the day Vivaldi does it on its own.
