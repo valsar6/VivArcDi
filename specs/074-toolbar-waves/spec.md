@@ -23,11 +23,13 @@ settings page of [075](../075-settings-page/spec.md):
 | Still water | Specchio d'acqua | none: Vivaldi's own lists, the user customizes |
 | Ripple | Increspatura | minimal for tabs: the buttons stay above the strip |
 | Swell | Flutto | a thin top row, the actions below the strip |
-| Breaking wave | Cavallone | nothing above the strip, the buttons below it |
+| Breaking wave | Cavallone | nothing above the strip, a minimal row of buttons below it |
 
 The lists alone do not give Arc's icon bar. Measured on 2026-11-28, with the lists of Breaking wave
 the workspace button and `New Tab` are full-width rows, not three icons in one row. That compact look
-is spec [076](../076-compact-breaking-wave/spec.md), which depends on this one.
+is spec [076](../076-compact-breaking-wave/spec.md), which depends on this one. Breaking wave drops
+`TabsTrash`: in Arc's bottom row the archive icon is VivArcDi's own (spec 077), and 076 builds the single
+row.
 
 A probe of 2026-11-28 (lab profile, Vivaldi 8.3.4191.47) found that the editor writes two list
 preferences, `vivaldi.toolbars.tabbar_before` and `vivaldi.toolbars.tabbar_after`, so a layout is a
@@ -91,7 +93,7 @@ Facts measured on a lab profile (Vivaldi 8.3.4191.47, 2026-11-28), stated as obs
   true there are two sets of the buttons and two address fields, which is why nothing is added when
   `AddressField` is not in the tab bar lists. `vivaldi.address_bar.position` exists, untested.
 - A click on the tab bar's Back and Forward goes back and forth in a tab with history.
-- Not proven: the left alignment of the group (it is centered), widths other than 348 px, and the
+- Not proven: right alignment of the group through a leading `FlexibleSpacer` (without the marker it is centered), widths other than 348 px, and the
   enabled state of Forward right after Back.
 - Not proven: persistence across a restart (the harness deletes the lab profile), see AC-21.
 
@@ -104,7 +106,7 @@ from Vivaldi's bundle: `WorkspaceButton`, `NewTab`, `SyncedTabs`, `TabsTrash`, `
 | Still water | the stored backup, else `WorkspaceButton` | the stored backup, else `NewTab`, `FlexibleSpacer`, `TabButton` |
 | Ripple | `WorkspaceButton`, `FlexibleSpacer`, `TabsTrash`, `TabButton` | empty |
 | Swell | `WorkspaceButton`, `FlexibleSpacer`, `SyncedTabs` | `FlexibleSpacer`, `TabsTrash`, `FlexibleSpacer`, `NewTab` |
-| Breaking wave | `Spacer` | `FlexibleSpacer`, `TabsTrash`, `FlexibleSpacer`, `WorkspaceButton`, `FlexibleSpacer`, `NewTab` |
+| Breaking wave | `Spacer` | `FlexibleSpacer`, `WorkspaceButton`, `FlexibleSpacer`, `NewTab` |
 
 Vivaldi's defaults are `["WorkspaceButton"]` for `tabbar_before` and `["NewTab", "FlexibleSpacer",
 "TabButton"]` for `tabbar_after`.
@@ -118,16 +120,21 @@ other button in the user's lists (`AddressField`, `Extensions`, `UpdateButton`, 
 `Reload`, `PanelToggle`, extension buttons) is kept in the list where it was, in its relative order,
 after the wave's own buttons of that list. The first version wrote fixed lists and, on a real profile,
 made the address bar disappear in every wave. The table above gives the layout part; the written lists
-are that part plus the user's other buttons. The previews of 075 show only the layout buttons.
+are that part plus the user's other buttons, except `Extensions`. Tore decided (2026-11-28) that the
+three waves drop the `Extensions` button (the row of extension icons and the puzzle): it is a personal
+customization, as the Arc sidebar has none. The backup keeps it and Still water restores it, and the
+extensions stay reachable through Vivaldi's menu and `vivaldi://extensions`. The previews of 075 show
+only the layout buttons.
 
 **Back, Forward and Reload.** When the address bar lives in the tab bar (`AddressField` is in one of the
 user's lists, as on Tore's Vivaldi 8.3 where `vivaldi.address_bar.visible` is false), Vivaldi's native
 `navigation` toolbar is hidden and nothing shows the three navigation buttons. Arc keeps them in one row
-above the address pill. The three waves therefore add `Back`, `Forward` and `Reload` as a group directly
-before `AddressField`, in the list that holds it, unless the user's lists already have them. Without
+above the address pill, at the right of the row. The three waves therefore add `Back`, `Forward` and
+`Reload` as a group directly before `AddressField`, preceded by a `FlexibleSpacer` so that the group is
+right-aligned (expected, not proven), in the list that holds it, unless the user's lists already have them. Without
 `AddressField` in the tab bar lists (Vivaldi's default) nothing is added, because the native toolbar
 shows them and they would appear twice. Still water never adds them. Measured: Vivaldi draws them as one centered row of three buttons above the address field row
-(see [Measured](#measured)); their left alignment and other widths are not proven.
+(see [Measured](#measured)); right alignment through a leading `FlexibleSpacer` is expected and not yet measured; other widths are not proven.
 
 **Service and data.** This module draws no control. It exposes the four waves as data (id, English
 name, Italian name, icon, preview) and a service with three calls: read the current wave, choose a
@@ -198,7 +205,7 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
   so that the style can tell; with no wave chosen the hiding stays (Q-6, Q-9).
 - **FR-14.** Choosing Ripple, Swell or Breaking wave writes, for each list, the wave's layout buttons
   followed by the buttons of that list in the user's current lists that are not layout buttons, in
-  their order. Still water writes the backup unchanged (FR-6).
+  their order, except `Extensions`, which is dropped (FR-19). Still water writes the backup unchanged (FR-6).
 - **FR-15.** The address bar is never lost: when `AddressField` is in one of the user's current
   lists, it is in one of the written lists. If the pair to write would lack it, `choose` writes
   nothing and fails with a readable message (AC-24).
@@ -211,7 +218,12 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
   user put it and is not duplicated.
 - **FR-18.** When `AddressField` is in neither of the user's lists, the three buttons are not added.
   Still water writes the backup unchanged and never adds them.
-- **FR-13.** While a wave is chosen, `body` carries `data-vivarcdi-wave` with the wave's id
+- **FR-19.** The three preset waves drop `Extensions` from the lists they write. The backup of FR-4
+  keeps it and Still water restores it.
+- **FR-20.** When the composer creates the navigation group of FR-17, it puts a `FlexibleSpacer`
+  directly before `Back`, so that the horizontal group is right-aligned; it adds none when a
+  `FlexibleSpacer` is already adjacent before the group.
+- **FR-13. While a wave is chosen, `body` carries `data-vivarcdi-wave` with the wave's id
   (`still-water`, `ripple`, `swell`, `breaking-wave`); with no wave chosen the attribute is absent.
   Spec [076](../076-compact-breaking-wave/spec.md) and the sidebar look read it.
 
@@ -246,7 +258,7 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-14 | WHILE a wave is active, THE sidebar look SHALL NOT hide `NewTab`, flexible spacers or the nested buttons row in the tab bar | auto: `lets an active wave keep the new-tab button, spacers and nested row` |
 | AC-15 | WHEN the user chooses the Ripple wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show `WorkspaceButton` as a full-width row and `TabsTrash` and `TabButton` in one `.tabbar-nested-buttons` group in `.toolbar-tabbar-before`, and no visible button in `.toolbar-tabbar-after` | live: `the ripple wave puts the buttons above the strip` |
 | AC-16 | WHEN the user chooses the Swell wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show `WorkspaceButton` as a row and `SyncedTabs` in a group in `.toolbar-tabbar-before`, and `TabsTrash` in a group followed by `NewTab` as a full-width row in `.toolbar-tabbar-after` | live: `the swell wave splits the buttons around the strip` |
-| AC-17 | WHEN the user chooses the Breaking wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show no visible button in `.toolbar-tabbar-before`, and in `.toolbar-tabbar-after` `TabsTrash` in a group, then `WorkspaceButton` and `NewTab` as full-width rows, in that order | live: `the breaking wave puts every button below the strip` |
+| AC-17 | WHEN the user chooses the Breaking wave through the service, THE lists SHALL be written, THE body SHALL carry the marker and THE tab bar SHALL show no visible button in `.toolbar-tabbar-before`, and in `.toolbar-tabbar-after` `WorkspaceButton` and `NewTab` as full-width rows, in that order, and no `TabsTrash` | live: `the breaking wave puts every button below the strip` |
 | AC-18 | WHEN the lists are written in a lab Vivaldi, THE interface SHALL update without a reload, `onChanged` SHALL fire once per list, and the preference SHALL hold the written lists, an empty one as `[]`, when read again | live: `a written toolbar list shows without a reload` |
 | AC-19 | WHEN Still water runs after a wave, THE lab tab bar SHALL show the lists as before the first wave, or Vivaldi's default values without a backup | live: `still water restores the toolbar` |
 | AC-20 | WHEN Tore looks at the four icons in the light and dark themes on macOS and Debian, THE icons SHALL be legible and told apart | manual |
@@ -257,7 +269,7 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-25 | THE four wave strategies SHALL each give the lists of their row in the table of After, Still water the backup else Vivaldi's defaults | auto: `each wave gives the lists of its table` |
 | AC-26 | THE wave factory SHALL build the four waves by id and return them in the order Still water, Ripple, Swell, Breaking wave | auto: `builds the four waves in order` |
 | AC-27 | THE controller SHALL choose any wave the factory returns without a case for its id | auto: `chooses a wave it has no special case for` |
-| AC-28 | WHEN a preset wave is chosen, THE written lists SHALL keep every button that is not a layout button, in the list where it was, in its order, after the wave's own buttons | auto: `keeps the buttons the wave does not manage` |
+| AC-28 | WHEN a preset wave is chosen, THE written lists SHALL keep every button that is not a layout button, except `Extensions`, in the list where it was, in its order, after the wave's own buttons | auto: `keeps the buttons the wave does not manage` |
 | AC-29 | WHEN `AddressField` is in the user's lists, THE written lists SHALL contain it for every wave | auto: `keeps the address field when it is in the user lists` |
 | AC-30 | IF the pair to write would lack `AddressField` that the user's lists have, THEN `choose` SHALL write nothing and fail with a readable message | auto: `refuses a pair without the address field` |
 | AC-31 | WHEN the lists hold a wave's layout buttons plus other buttons, THE module SHALL recognize that wave | auto: `recognizes a wave among core buttons` |
@@ -265,7 +277,10 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-33 | WHEN a preset wave is chosen and `AddressField` is in the user's lists, THE written list holding it SHALL have `Back`, `Forward` and `Reload` directly before it | auto: `adds back forward and reload before the address field` |
 | AC-34 | WHEN the user's lists already hold any of `Back`, `Forward` or `Reload`, THE written lists SHALL NOT duplicate them and SHALL keep them where the user put them | auto: `does not duplicate the navigation buttons` |
 | AC-35 | WHEN `AddressField` is in neither of the user's lists, or Still water is chosen, THE module SHALL add none of the three buttons | auto: `adds nothing when the address bar is not in the tab bar` |
-| AC-36 | WHEN the user's lists hold `AddressField` and each preset wave is chosen through the service, THE lab tab bar SHALL list `Back`, `Forward` and `Reload` before `AddressField`, show them as one `.tabbar-nested-buttons` group above the address field row, and a click on Back and Forward SHALL go back and forth in a tab with history | live: `a wave shows back forward and reload above the address field` |
+| AC-36 | WHEN the user's lists hold `AddressField` and each preset wave is chosen through the service, THE lab tab bar SHALL list `Back`, `Forward` and `Reload` before `AddressField` with a `FlexibleSpacer` before them, show them as one `.tabbar-nested-buttons` group above the address field row, right-aligned in it (expected, not yet measured), and a click on Back and Forward SHALL go back and forth in a tab with history | live: `a wave shows back forward and reload above the address field` |
+| AC-37 | WHEN a preset wave is chosen and the user's lists hold `Extensions`, THE written lists SHALL NOT contain it, and Still water SHALL restore it from the backup | auto: `drops the extensions button` |
+| AC-38 | WHEN the composer creates the navigation group, THE written list SHALL have a `FlexibleSpacer` directly before `Back` | auto: `puts a flexible spacer before the navigation group` |
+| AC-39 | IF a `FlexibleSpacer` is already adjacent before the navigation group, THEN THE composer SHALL NOT add a second one | auto: `does not add a second spacer before the navigation group` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
 design of the icons is approved, so AC-20 is about legibility on macOS and Debian only. AC-21 is a
@@ -298,7 +313,7 @@ To prove first, as red tests:
    keeps them, in the toolbar where they were (AC-28, AC-29, AC-32). Not measured yet: how Vivaldi lays
    out `AddressField` next to a wave's group in a vertical toolbar; the scenario records it.
 9. With `AddressField` in the lists, `Back`, `Forward` and `Reload` form one group above the address row and work (AC-33, AC-36),
-   as measured; the group's left alignment and widths other than 348 px stay unproven.
+   as measured; right alignment through a leading `FlexibleSpacer` is expected and not yet measured (AC-36, AC-38), and widths other than 348 px stay unproven.
 10. A restart keeps the lists and the chosen wave (AC-21, manual).
 
 ## Out of scope

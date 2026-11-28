@@ -113,3 +113,21 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   the AC-36 scenario asserts the measured result (one group above the address row, a click on Back and Forward works);
   then Tore checks a wave on his real profile: address bar, Back, Forward and Reload present. Needs T14
   and T18.
+- [ ] **T20. Extensions, spacer and Cavallone scenarios (red).** Update the two scenarios already
+  written, keeping their names: `the breaking wave puts every button below the strip` (no `TabsTrash`;
+  `WorkspaceButton` and `NewTab` rows, as AC-17 now says) and
+  `a wave shows back forward and reload above the address field` (the written list has a
+  `FlexibleSpacer` before `Back`, and the group sits at the right of its row: red until measured true).
+  `a wave keeps the address field of the tab bar` also asserts `Extensions` is not in the written lists
+  and is back after Still water. Runs in parallel with T21.
+- [ ] **T21. Composer tests (red).** `ListComposer.test.ts`: `drops the extensions button`,
+  `puts a flexible spacer before the navigation group`,
+  `does not add a second spacer before the navigation group`; update `keeps the buttons the wave does not
+  manage` for the `Extensions` exception, and the Breaking wave case of `each wave gives the lists of its
+  table`. Runs in parallel with T20.
+- [ ] **T22. Presets and composer.** From the code of T13 and T18: `DROPPED_BUTTONS` and the removal in
+  `ListComposer.compose`; the leading `FlexibleSpacer` step; `BreakingWave.lists` and preview as in the
+  design (`TabsTrash` out). Green: the tests of T21. Needs T21.
+- [ ] **T23. Run and recheck.** With Tore's agreement, `npm run live -- 074`; the result for right
+  alignment goes into the design, and Tore checks a wave on his own profile (no `Extensions` row, the
+  arrows at the right). Needs T20 and T22.

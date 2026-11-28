@@ -189,7 +189,7 @@ export interface PreviewShape {
 | Still water | `row full 1` | `row full 1`, `group fit 2` (Vivaldi's defaults, not the user's lists) |
 | Ripple | `row full 1`, `group fit 3` | none |
 | Swell | `row full 1`, `group fit 2` | `group fit 3`, `row full 1` |
-| Breaking wave | `group fit 1` | `group fit 3`, `row full 1`, `spacer full 1`, `row full 1` |
+| Breaking wave | `group fit 1` | `spacer full 1`, `row full 1`, `spacer full 1`, `row full 1` |
 
 - Icons are in `WaveIcons.ts`: four SVG strings, `viewBox="0 0 16 16"`, `fill="none"`,
   `stroke="currentColor"`, no other color; each strategy takes its own.
@@ -205,12 +205,20 @@ export class ListComposer {
 }
 ```
 
+- **Changes from the code of T13 and T18 (already merged).** `ListComposer.compose` gains the removal
+  of `DROPPED_BUTTONS` and the leading spacer; `RippleWave`, `SwellWave` and `BreakingWave` keep their
+  classes; only `BreakingWave.lists` changes (its `after` loses `TabsTrash`, and the table of the spec
+  is `["FlexibleSpacer","WorkspaceButton","FlexibleSpacer","NewTab"]`, the minimum that gives the
+  rows 076 turns into one icon row) and its preview. Ripple and Swell keep their lists.
 - A first design wrote the fixed lists of the table. On a real Vivaldi 8.3 the address bar lives in the
   tab bar toolbars, so the lists hold `AddressField`, `Extensions`, `UpdateButton` and others, and a
   fixed list deleted them: the address bar vanished in every wave. The wave must own only the layout.
 - `ToolbarButtons.ts` exports `LAYOUT_BUTTONS`: the nine layout ids of the spec. `compose` returns,
   per list, `layout` followed by the buttons of `current` that are not layout buttons, in order
-  (FR-14). `layoutOf` keeps only the layout buttons of each list.
+  (FR-14), without `Extensions`: `DROPPED_BUTTONS` in `ToolbarButtons.ts` is the set the composer
+  removes from `current` (FR-19), so `compose` ignores it in every list. `layoutOf` keeps only the layout
+  buttons of each list. The user's `Extensions` stays in the backup, which is the full lists, and
+  Still water restores it; extensions stay reachable through Vivaldi's menu and `vivaldi://extensions`.
 - `WaveStrategy.lists(context)` still gives the wave's layout lists; for a wave with
   `replacesUserLists` true the controller passes them through `compose` with the current lists, for
   Still water it writes the backup as it is. `WaveStrategy.matches` compares `layoutOf(lists)` with
@@ -227,7 +235,10 @@ export class ListComposer {
   in neither list is inserted in order directly before `AddressField` in the list that holds it
   (FR-17), in the list that holds `AddressField`, kept as is and not forced into `tabbar_before`; a
   button the user already has stays in place, so nothing is duplicated (AC-34). Without
-  `AddressField` it adds nothing (FR-18, AC-35). Still water is never composed, so it adds nothing.
+  `AddressField` it adds nothing (FR-18, AC-35). When it creates the group it also inserts a
+  `FlexibleSpacer` directly before `Back` (FR-20), unless a `FlexibleSpacer` is already adjacent before
+  the group, so that the horizontal group is right-aligned like in Arc; sidebar-look no longer hides
+  flexible spacers while the marker is on. The alignment is expected and not yet measured. Still water is never composed, so it adds nothing.
 - The backup is the full current lists, taken before composing, so it never holds the added buttons
   (FR-4); the previews of 075 stay layout-only and show none of these buttons, and the compact
   Breaking wave of 076 is not affected.
@@ -408,6 +419,9 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-33 | `adds back forward and reload before the address field` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
 | AC-34 | `does not duplicate the navigation buttons` | same |
 | AC-35 | `adds nothing when the address bar is not in the tab bar` | same (the Still water case in `WaveController.test.ts`) |
+| AC-37 | `drops the extensions button` | `tests/modules/toolbarwaves/ListComposer.test.ts` (and the Still water restore case in `WaveController.test.ts`) |
+| AC-38 | `puts a flexible spacer before the navigation group` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
+| AC-39 | `does not add a second spacer before the navigation group` | same |
 | AC-25 | `each wave gives the lists of its table` | `tests/modules/toolbarwaves/WaveStrategies.test.ts` (one case per `StillWaterWave`, `RippleWave`, `SwellWave`, `BreakingWave`) |
 | AC-26 | `builds the four waves in order` | `tests/modules/toolbarwaves/WaveFactory.test.ts` |
 | AC-28 | `keeps the buttons the wave does not manage` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
@@ -431,6 +445,13 @@ AC-20 and AC-21 are manual. Fakes: a `FakePrefs` with `get`, `set` and `onChange
 writes and fires changes, in `tests/modules/toolbarwaves/fakes.ts`.
 
 ## Risks
+
+- **Right alignment of the navigation group is not measured.** The expectation rests on a spacer
+  inside a nested group growing horizontally (an earlier measure with Ripple before) and on the
+  marker making the flexible spacers visible; the first measure of the group had it centered. AC-36
+  asserts the alignment and may show otherwise.
+- **Dropping `TabsTrash` from Breaking wave** leaves the archive to spec 077; until then the wave
+  has no closed-tabs button, and the `trashButton` selector is still needed by Ripple and Swell.
 
 - **Back, Forward and Reload in the tab bar.** Measured to render as one centered row above the
   address field (see Measured). Unproven: left alignment, widths other than 348 px, and the enabled
