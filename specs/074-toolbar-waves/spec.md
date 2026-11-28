@@ -117,7 +117,7 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
 - **FR-3.** Choosing a wave writes its two lists of the table in [After](#after), `before` first.
 - **FR-4.** Before the first write of a session in which no wave is chosen, the module stores the
   current lists as the backup. It never overwrites a backup while a wave is chosen.
-- **FR-5.** The choice is stored, so that the control shows the same wave after a restart.
+- **FR-5.** The choice is stored, so that the page shows the same wave after a restart.
 - **FR-6.** Choosing **Still water** writes the backup lists and clears the stored wave; when there
   is no backup it writes Vivaldi's defaults.
 - **FR-7.** When either list changes and the pair no longer equals the chosen preset, the module clears
