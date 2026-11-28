@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
-| Approved | |
+| Approved | Tore, 2026-11-28 (in chat) |
 | Related | [074 Toolbar waves](../074-toolbar-waves/spec.md) (a sibling Draft: it defines the tab bar section); [076 Compact Breaking wave](../076-compact-breaking-wave/spec.md) (a separate Draft) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
@@ -196,7 +196,7 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
 
 ## Open questions
 
-- [ ] **Q-1. How the page is reached.** Evidence in [Spike results](#summary).
+- [x] **Q-1. How the page is reached.** Evidence in [Spike results](#summary).
   - **A. A section inside Vivaldi's own settings tab (`chrome://settings/`).** The page lives where
     users expect it. Fragile: no `vivaldi.prefs` there, `chrome.scripting.executeScript` refused,
     `webview.executeScript` worked only for the `chrome://settings/` form and never for
@@ -211,11 +211,15 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
     Dependency, not written here: a change to [046](../046-live-verification/spec.md) that serves
     `vivarcdi/*.html` in the lab through CDP `Fetch` interception, so Proof 2 can later become a
     `live:` check. A stays as the fallback only if B fails Proof 2.
-- [ ] **Q-2. Where it opens from.** A button in the sidebar, a menu entry, a command (Quick Commands),
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: option B, an own page under `vivarcdi/`, with its two proofs (AC-19 auto, AC-21 manual on Tore's install).
+
+- [x] **Q-2. Where it opens from.** A button in the sidebar, a menu entry, a command (Quick Commands),
   or a link in the boot notice.
   *Recommendation:* a command plus a link in the boot notice of 039 for a broken start, and a
   button in the panel bar once the page exists; no tab bar button, which is crowded.
-- [ ] **Q-3. Where choices are stored.** `config.json` is deployed by the installer and fetched
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: a command plus a link in the boot notice, and a panel bar button later.
+
+- [x] **Q-3. Where choices are stored.** `config.json` is deployed by the installer and fetched
   read-only, so the payload cannot write it and a reinstall can overwrite it. `vivaldi.prefs` can set
   Vivaldi's own preferences but is not known to accept new keys. `chrome.storage.local` (037, 041)
   is writable, versioned and reports outcomes.
@@ -224,19 +228,26 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
   preferences, written the way the installer does (read [029](../029-arc-light-theme/spec.md),
   [051](../051-more-themes/spec.md)) if `vivaldi.prefs.set` allows it, else the card shows the
   current theme and the command to change it.
-- [ ] **Q-4. How sections register.** A static list in the page, or a registry the modules add to.
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: `chrome.storage.local` under one versioned key; the theme in Vivaldi's preferences.
+
+- [x] **Q-4. How sections register.** A static list in the page, or a registry the modules add to.
   *Recommendation:* a `SettingsSection` interface and a registry like `ModuleRegistry`
   (`src/modules/index.ts`), with an optional static `settingsSection` on a `Module`; the four
   sections of this spec are the first entries.
-- [ ] **Q-5. How Vivaldi's look is reproduced.** Reuse Vivaldi's own settings CSS (only possible in
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: a `SettingsSection` interface and a registry.
+
+- [x] **Q-5. How Vivaldi's look is reproduced.** Reuse Vivaldi's own settings CSS (only possible in
   option A, and tied to its class names), or own SCSS that reads Vivaldi's CSS variables.
   *Recommendation:* own SCSS in `src/styles/`, using Vivaldi's color variables and the dimensions
   measured from "Layout presets" and "Page appearance"; no copy of Vivaldi's stylesheet.
-- [ ] **Q-6. Who owns the wave card previews.** 075 draws cards; 074 knows what a wave looks like.
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: own SCSS over Vivaldi's CSS variables.
+
+- [x] **Q-6. Who owns the wave card previews.** 075 draws cards; 074 knows what a wave looks like.
   *Recommendation:* 074 supplies one preview per layout (an inline SVG that shares its tokens with
   the real stylesheet) and owns the data; the previews follow the measured structure (full-width rows
   for Workspace and NewTab, a horizontal group for small buttons, flexible spacers; AC-20). 075 only
   places them in cards, in the order of the Summary, so a layout and its preview change together.
+  Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: 074 owns the previews and the data, 075 places them.
 
 ## References
 
