@@ -23,8 +23,8 @@ preview data). T10 is owned by the lead and comes last.
   `applies a wave layout from the settings page`, AC-9), both `spec: '075'`, so that
   `every live check has a scenario` in `tests/live/LiveChecks.test.ts` stops failing. They are real
   code: AC-1 triggers the shortcut, waits for a tab at `/vivarcdi/settings.html`, and fails with a
-  clear message when the page does not load; AC-9 clicks the card in that page and reads the layout
-  attribute in the window (it needs 074's attribute name, taken from 074's design). In the lab they
+  clear message when the page does not load; AC-9 clicks the card in that page and reads
+  `data-vivarcdi-wave` on the window's `body` (074 design) and compares it with the chosen id. In the lab they
   fail for now, because 046 cannot serve the file; that is the expected red. They pass once the
   follow-up spec for 046 (serve `vivarcdi/*.html` through CDP `Fetch`) exists; until then the proof
   is AC-21 by hand. Done when `LiveChecks.test.ts` is green; the scenarios are not run in CI.
@@ -62,16 +62,18 @@ preview data). T10 is owned by the lead and comes last.
   in the boot (not in private windows). Parallel with T8 and T9.
 - [ ] **T8. Waves section (AC-8, AC-20). Blocked by spec 074.** Red first in
   `tests/settings/WavesSection.test.ts`: `shows the four wave layouts as cards in order` and
-  `draws the previews with the measured structure`, with a fake `WaveLayouts`. Then
-  `sections/WavesSection.ts` and `PreviewDrawing.ts`; after 074's service exists, `main.ts`
-  registers it and `SettingsOverrides` carries the wave choice to 074's attribute. Done when AC-9's
-  scenario can run against the real service.
+  `draws the previews with the measured structure`, with a fake `WavesClient`. Then
+  `sections/WavesSection.ts`, `PreviewDrawing.ts`, `WavesClient.ts` and, in the window,
+  `WavesBridge.ts` over `globalThis[Symbol.for('vivarcdi.waves')]` (tests of the bridge with a fake
+  service in `tests/modules/settingspage/WavesBridge.test.ts`, named after the behavior they prove);
+  after 074's service and its `Wave.preview` exist, `main.ts` registers the section. Done when AC-9's
+  scenario can run against the real service. It also needs 074 to add `preview` to `Wave`.
 - [ ] **T9. Docs.** `docs/architecture.md` gains the page, the registry and the storage key; the
   manual in `docs/manual/` a section on the settings page and its shortcut. Parallel with T7 and T8.
 - [ ] **T10. Manual checklist and version (lead).** Italian checklist under
   `~/Desktop/sonde-vivarci/075-settings-page/`, built from the `manual` criteria: AC-18 (apri la
   pagina in tema chiaro e scuro su macOS e Debian e confrontala con le impostazioni di Vivaldi) and
-  AC-21 (usa la scorciatoia, la pagina si apre in una scheda, ha `vivaldi.prefs`, cambia una scelta e
+  Q-7 (apri Impostazioni di Vivaldi > Tastiera, cerca `Cmd/Ctrl+Alt+,`, conferma che non è usata; se lo è, scegli un'altra combinazione e aggiorna il valore predefinito di `shortcut`) e AC-21 (usa la scorciatoia, la pagina si apre in una scheda, ha `vivaldi.prefs`, cambia una scelta e
   la rilegge dopo il riavvio). Then read the versions on `main` right before, bump the minor version
   in `package.json`, `package-lock.json` and `installer/vivarcdi/__init__.py`, and run
   `npm run release -- check --base origin/main --branch features/settings-page` and `make check`.

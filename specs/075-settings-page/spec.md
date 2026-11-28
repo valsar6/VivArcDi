@@ -77,7 +77,7 @@ Option B needs two proofs, listed in Q-1.
 |---|---|---|
 | A user turns a module off | Edits `enabled` in the deployed `config.json`; the next reinstall can overwrite it | `src/config.json`, `src/core/boot/VivArcDi.ts` (reads `config.json` at boot) |
 | A user changes the theme | Runs `theme apply` in a terminal; the installer writes Vivaldi's preferences | `installer/vivarcdi/theme.py`, specs 029 and 051 |
-| A user picks a tab bar layout | Not possible: no setting exists (074 adds one) | none |
+| A user picks a tab bar layout | Not possible: no setting exists (074 adds the service `globalThis[Symbol.for('vivarcdi.waves')]` with `{waves, current, needsConfirmation, choose, onChange}`, and marks `body` with `data-vivarcdi-wave`) | none yet |
 | A user asks "why is it half working" | Reads the console summary line `VivArcDi:boot` | spec 039 |
 | The payload reads preferences | Only reads, and follows changes; has no method that writes | `src/core/browser/BrowserPrefs.ts` |
 | The payload stores its own data | `PersistentStorage` over `chrome.storage.local`, under `vivarcdi.*` keys, versioned and with a write outcome | specs 037 and 041 |
@@ -124,7 +124,9 @@ before the code that makes it pass.
 - **FR-3.** Sections are objects in a registry; the page draws whatever the registry holds, in
   registration order, and a module can add one.
 - **FR-4.** The **Tab bar** section shows the four layouts of 074 as cards with a preview and a name, in the order Still water, Ripple, Swell, Breaking wave;
-  who owns the previews is [Q-6](#open-questions); the choice and its effect are 074's.
+  who owns the previews is [Q-6](#open-questions); the choice and its effect are 074's. The page lives in
+  another document than the window, so it reaches 074's service through a message bridge that 075
+  owns (design, Waves bridge); when 074 does not publish its service, the section is absent.
 - **FR-5.** The **Themes** section shows the VivArcDi themes of 051 as cards and marks the current one;
   it adds no new theme.
 - **FR-6.** The **Features** section lists every module of `config.json` with a checkbox and its
@@ -165,7 +167,7 @@ red tests exist first.
 | AC-6 | THE page SHALL draw a checkbox choice with its gray explanation | auto: `draws a checkbox with its explanation` |
 | AC-7 | WHILE Vivaldi uses the dark theme, THE page SHALL use Vivaldi's dark colors, and the light ones otherwise | auto: `takes its colors from Vivaldi's variables` |
 | AC-8 | THE Tab bar section SHALL show four cards named, in this order, Still water, Ripple, Swell and Breaking wave | auto: `shows the four wave layouts as cards in order` |
-| AC-9 | WHEN the user chooses a card of the Tab bar section, THE window SHALL store the choice and apply 074's layout without a restart | live: `applies a wave layout from the settings page` |
+| AC-9 | WHEN the user chooses a card of the Tab bar section, THE window SHALL store the choice and set `data-vivarcdi-wave` on the window's body to the chosen id, without a restart | live: `applies a wave layout from the settings page` |
 | AC-10 | THE Themes section SHALL mark the current VivArcDi theme and list the five themes of 051 | auto: `marks the current theme among the five` |
 | AC-11 | WHEN the user switches a module in the Features section, THE page SHALL write its `enabled` option, and SHALL leave every other option as it was | auto: `writes only the enabled option of a module` |
 | AC-12 | THE Features section SHALL list every module of the registry with its explanation | auto: `lists every module with a switch` |
@@ -243,16 +245,22 @@ answers a different behavior, the reach of the page: the lab copy cannot hold a 
   Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: own SCSS over Vivaldi's CSS variables.
 
 - [x] **Q-6. Who owns the wave card previews.** 075 draws cards; 074 knows what a wave looks like.
-  *Recommendation:* 074 supplies one preview per layout (an inline SVG that shares its tokens with
-  the real stylesheet) and owns the data; the previews follow the measured structure (full-width rows
+  *Recommendation:* 074 supplies one preview per layout in its wave data (`Wave.preview`, a structure
+  of rows, groups and spacers; requirement of 075 on 074, see the design) and owns the data; the previews follow the measured structure (full-width rows
   for Workspace and NewTab, a horizontal group for small buttons, flexible spacers; AC-20). 075 only
   places them in cards, in the order of the Summary, so a layout and its preview change together.
   Answered (Tore, 2026-11-28): approved with the spec on 2026-11-28, with the recommendation: 074 owns the previews and the data, 075 places them.
+- [ ] **Q-7. The shortcut that opens the page.** Default `Mod+Alt+,`, a `settings-page` option of
+  `src/config.json` that the user can change. Free in VivArcDi (it uses Cmd+Opt+[ and ], Cmd+Opt+N,
+  Cmd+Shift+K, Cmd+T, spec 014); **to confirm in Vivaldi**, whose own shortcut table is inside the
+  browser and cannot be read from its resources or `vivaldi.prefs`. Tore accepts it only if free: the
+  manual checklist has a step to search the combination in Vivaldi Settings > Keyboard and, if it is
+  taken, to choose another and update the default.
 
 ## References
 
 - Mockup: <https://claude.ai/artifact/1GZq7xVP3D6H8MKnRmXyuG>, section "Pagina Impostazioni VivArcDi".
-- [074 Toolbar waves](../074-toolbar-waves/spec.md): the tab bar section (a sibling Draft, on its own branch).
+- [074 Toolbar waves](../074-toolbar-waves/spec.md): the tab bar section; its design fixes the service, the marker `data-vivarcdi-wave` and the wave data.
 - [076 Compact Breaking wave](../076-compact-breaking-wave/spec.md): a separate Draft, related only.
 - [036 Module options](../036-module-options/spec.md), [037 Versioned storage](../037-versioned-storage/spec.md),
   [038 Page scripts](../038-page-scripts/spec.md), [039 Boot self-check](../039-boot-self-check/spec.md),

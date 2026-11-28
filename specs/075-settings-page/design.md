@@ -79,31 +79,48 @@ window.html: SettingsOverrides ◀── chrome.storage.onChanged / boot read �
 | `SettingsChoices.ts` | `read(): Promise<StoredChoices>`, `set(patch): Promise<SaveOutcome>` over `vivarcdi.settings` with a `StoredFormat`; `set` resolves `memory` without writing when `priv` is true | Repository |
 | `widgets/CardGroup.ts` | `render(host, cards: Card[], chosen: string, onChoose)`; one `button` per card with the preview, the name and a check mark on the chosen one only | Widget |
 | `widgets/CheckboxRow.ts` | A `label` with an `input[type=checkbox]` and a gray `small` explanation | Widget |
-| `sections/WavesSection.ts` | The four cards, in the order Still water, Ripple, Swell, Breaking wave, from `WaveLayouts` | Section |
+| `sections/WavesSection.ts` | The four cards, in the order Still water, Ripple, Swell, Breaking wave, from `WavesClient` | Section |
+| `WavesClient.ts` | Page side of the bridge: `waves()`, `current()`, `needsConfirmation()`, `choose(id, { confirmed })`, `onChange(listener)` over `chrome.runtime` messages | Proxy |
 | `sections/ThemesSection.ts` | The five themes of 051 as cards; marks `vivaldi.themes.current` | Section |
 | `sections/FeaturesSection.ts` | One `CheckboxRow` per module of `config.json` | Section |
 | `sections/TroubleshootingSection.ts` | The diagnostic in a `pre`, a **Copy** button, a **Report a problem** link | Section |
 
-`WavesSection` consumes a port, not 074's classes:
+`WavesSection` consumes 074's service, published by the window as
+`globalThis[Symbol.for('vivarcdi.waves')]` with `{ waves, current, needsConfirmation, choose,
+onChange }` (074 design, Module). The wave ids are `still-water`, `ripple`, `swell`, `breaking-wave`,
+in this order; each wave carries `id`, `name`, `italianName`, `icon` and `lists`. The layout marker is
+the attribute `data-vivarcdi-wave` on the window's `body`, which 074 writes and AC-9 reads.
+
+**The page is another document.** The service lives in `window.html`'s globals, which the page
+cannot read. 075 owns a bridge: in the window, `WavesBridge` (`src/modules/settingspage/`) answers
+`chrome.runtime` messages `{ vivarcdi: 'waves', call: 'list' | 'current' | 'needsConfirmation' |
+'choose', ... }` from the service and posts `{ vivarcdi: 'waves-changed', current }` on each
+`onChange`; in the page, `WavesClient` (`src/settings/WavesClient.ts`) gives the same five names back
+as promises and an `onChange`. `WavesSection` uses only the client's shape, so tests give it a fake
+client. A `choose` that 074 refuses (`needsConfirmation` without `confirmed`) comes back as an error
+that the section shows as a confirmation step. When the service is not published (074's FR-9, the
+module off), the bridge answers `unavailable` and the section is not drawn.
+
+**What 075 requires of 074.** One thing the 074 design lacks: `Wave` also carries
+`preview: PreviewShape`, as 074's FR-10 and spec already say ("id, English name, Italian name, icon,
+preview"). The shape measured from Vivaldi's tab bar, JSON-safe so it crosses the bridge:
 
 ```ts
-export interface WaveLayout {
-  readonly id: 'still-water' | 'ripple' | 'swell' | 'breaking-wave';
-  readonly name: string;
-  readonly preview: PreviewShape;
+export interface PreviewShape {
+  readonly rows: readonly PreviewRow[];
 }
 
-export interface WaveLayouts {
-  list(): readonly WaveLayout[];
+export interface PreviewRow {
+  readonly kind: 'row' | 'group' | 'spacer';
+  readonly width: 'full' | 'fit';
+  readonly items: number;
 }
 ```
 
-`PreviewShape` is data owned by 074: rows of `{ kind: 'row' | 'group' | 'spacer', width: 'full' | 'fit',
-items?: number }` measured from Vivaldi's tab bar (full-width rows for Workspace and NewTab, a
-horizontal group for the small buttons, flexible spacers). `WavesSection` draws a preview by walking
-that structure (`PreviewDrawing`, in the same folder), so a change in 074's data changes the card
-(AC-20). Until 074's service exists, a fixed `WaveLayouts` fake serves the tests and the section is
-not registered by `main.ts`.
+Full-width rows for Workspace and NewTab, a horizontal group for the small buttons, flexible
+spacers. `PreviewDrawing` walks it (AC-20). Both `icon` and `preview` must survive `JSON`; `choose`
+errors must have a readable `message`. Until 074 ships, a fake client serves the tests and `main.ts`
+does not register the section.
 
 ### The window (`src/modules/settingspage/`, new)
 
@@ -111,10 +128,10 @@ not registered by `main.ts`.
 |---|---|
 | `SettingsPage.ts` | `Module`, `id = 'settings-page'`, `privateWindows = 'allowed'` (it stores nothing, the page enforces AC-15). `start` attaches a `WindowKeys` for the shortcut; `stop` detaches |
 | `SettingsOpener.ts` | `open(): Promise<void>`: `tabs.create({ url: \`${origin}/vivarcdi/settings.html\` })`; if `tabs.available` is false or `create` rejects, one `warn` and the notice `VivArcDi Settings cannot be opened` (AC-16) |
+| `WavesBridge.ts` | Window side of the bridge: reads `globalThis[Symbol.for('vivarcdi.waves')]` per call, answers messages, posts changes, answers `unavailable` without the service | Adapter |
 | `SettingsOverrides.ts` | At boot reads `vivarcdi.settings` and returns `config.modules` with each `enabled` replaced by the stored boolean; ignored with a warning when the value is unreadable (036, 037) |
 
-Option `shortcut` in `src/config.json`, default `Mod+Alt+,` (to be confirmed by Tore when he looks;
-the schema of 036 holds it as a string choice). `ModuleSettings.check` runs after the overrides, so a
+Option `shortcut` of `settings-page` in `src/config.json`, a string with the default `Mod+Alt+,`, and the user changes it by editing the option (schema of 036; an invalid value falls back to the default with a warning). The combination is free in VivArcDi (Cmd+Opt+[ and ], Cmd+Opt+N, Cmd+Shift+K, Cmd+T); that it is free in Vivaldi is **to confirm**: Vivaldi's shortcut table cannot be read from its resources or `vivaldi.prefs`, so the manual checklist asks Tore to search it in Vivaldi Settings > Keyboard. `ModuleSettings.check` runs after the overrides, so a
 stored switch is checked like a written one. `VivArcDi.start` calls `SettingsOverrides` between
 reading `config.json` and `createEnabled` (`VivArcDi.ts` line 204 to 205); in a private window it
 skips the overrides.
@@ -146,10 +163,10 @@ they fit. Tore checks the result by eye in this prototype phase (task T6).
   after a change to [046](../046-live-verification/spec.md) that serves `vivarcdi/*.html` through
   CDP `Fetch` interception. That change is a follow-up spec, not written here.
 - **Vivaldi versions**: the page uses no Vivaldi class names (NFR-4); only CSS variables, with fallbacks.
-- **074 is a dependency** of the Waves section and of AC-9. 075 ships the shell and three sections
+- **074 is a dependency** of the Waves section and of AC-9, and `Wave.preview` is a requirement on it. 075 ships the shell and three sections
   first.
-- **The shortcut** may clash with a Vivaldi or user shortcut; `WindowKeys` takes it before Vivaldi,
-  so the default is Tore's to confirm.
+- **The shortcut** may clash with a Vivaldi shortcut; `WindowKeys` takes it before Vivaldi, so a clash would silently hide Vivaldi's command. Tore confirms it is free (T10) or the default changes.
+- **The bridge**: `chrome.runtime.sendMessage` from a tab to a window must reach the window's `onMessage`; unproven, covered by AC-21 together with `vivaldi.prefs`. If it fails, the Waves section is absent and the page says so.
 
 ## Tests
 
