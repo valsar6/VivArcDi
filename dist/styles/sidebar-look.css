@@ -73,9 +73,12 @@
   display: block !important;
   font-size: 14px;
   font-weight: 500;
+  height: auto;
+  margin-inline-start: 7px;
   min-width: 0;
   overflow: hidden;
   padding-inline-end: 0;
+  padding-left: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: padding-inline-end 160ms ease;

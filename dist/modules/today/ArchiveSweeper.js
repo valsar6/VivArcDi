@@ -45,8 +45,8 @@ class ArchiveSweeper {
     return this.#enqueue(() => this.#sweepNow());
   }
   /**
-   * Archives now, whatever their age, the Today tabs of the active tab's workspace. The active
-   * tab is never among them.
+   * Archives now, whatever their age, the Today tabs of the active tab's workspace, the active
+   * tab included. When no tab of the workspace would stay open, a blank tab is opened first.
    *
    * @returns Settles once the tabs are archived.
    */
@@ -77,13 +77,25 @@ class ArchiveSweeper {
       return;
     }
     const workspace = TabData.of(active);
-    await this.#archive(windowTabs.filter((tab) => TodayTabPolicy.isArchivable(tab) && TabData.of(tab) === workspace));
+    const closing = windowTabs.filter((tab) => TodayTabPolicy.isClearable(tab) && TabData.of(tab) === workspace);
+    const staying = windowTabs.filter((tab) => TabData.of(tab) === workspace && !closing.includes(tab));
+    const nearest = ArchiveSweeper.#nearestTo(active, staying, windowTabs);
+    await this.#archive(closing, nearest === void 0 ? () => this.#deps.blank.open(null, workspace, {}, active.windowId) : () => this.#show(nearest));
+  }
+  async #show(tab) {
+    await this.#deps.tabs.update(tab.id, { active: true });
+    return void 0;
+  }
+  static #nearestTo(active, candidates, windowTabs) {
+    const position = windowTabs.indexOf(active);
+    const distance = (tab) => Math.abs(windowTabs.indexOf(tab) - position);
+    return candidates.reduce((best, tab) => best === void 0 || distance(tab) < distance(best) ? tab : best, void 0);
   }
   async #windowTabs() {
     const windowTabs = await this.#deps.tabs.query({ currentWindow: true });
     return windowTabs.filter((tab) => tab.id !== void 0);
   }
-  async #archive(tabs) {
+  async #archive(tabs, beforeClose) {
     if (tabs.length === 0) {
       return;
     }
@@ -94,8 +106,18 @@ class ArchiveSweeper {
       this.#deps.notices.once(KEPT_KEY, KEPT_TEXT, "error");
       return;
     }
+    let blank;
+    try {
+      blank = await beforeClose?.();
+    } catch (error) {
+      this.#deps.logger.warn("could not show another tab or open a blank one: the Today tabs stay open", error);
+      return;
+    }
     for (const tab of tabs) {
       await this.#deps.tabs.remove(tab.id).catch((error) => this.#deps.logger.warn(`could not close tab ${tab.id}`, error));
+    }
+    if (blank?.id !== void 0) {
+      await this.#deps.tabs.update(blank.id, { active: true }).catch((error) => this.#deps.logger.warn("could not show the blank tab", error));
     }
   }
   static #entryOf(tab, archivedAt) {

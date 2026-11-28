@@ -20,13 +20,15 @@ class WorkspaceTabs {
    * its `vivExtData` in one write that reads the tab again. When they cannot be written, the tab stays where Vivaldi
    * put it.
    *
-   * @param url The address to open.
+   * @param url The address to open, or null for Vivaldi's own new tab.
    * @param workspace The workspace id, or null to leave the tab where Vivaldi puts it.
    * @param own Values to store under VivArcDi's own key, such as the bookmark the tab stands for.
+   * @param windowId The window that receives the tab; omitted, the current one.
    * @returns The new tab.
    */
-  async open(url, workspace, own = {}) {
-    const created = await this.#tabs.create({ url, active: true });
+  async open(url, workspace, own = {}, windowId) {
+    const where = windowId === void 0 ? {} : { windowId };
+    const created = await this.#tabs.create(url === null ? { ...where, active: true } : { url, ...where, active: true });
     await this.#store(created, workspace, own);
     return created;
   }
