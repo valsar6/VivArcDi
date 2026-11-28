@@ -2,9 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Phase | 3 |
 | Owner | Tore |
+| Approved | Tore, 2026-11-28 (in chat) |
 
 Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/README.md](../README.md).
 
@@ -31,7 +32,7 @@ Mockup: [Toolbar waves](https://claude.ai/artifact/1GZq7xVP3D6H8MKnRmXyuG), sect
 proposta" (no measurements for the compact form).
 
 This spec cannot ship before 074: it needs the Breaking wave and the attribute that 074 puts on `body` (FR-13).
-074 and [075](../075-settings-page/spec.md) are sibling Drafts.
+074 and [075](../075-settings-page/spec.md) are sibling specs, approved together with this one.
 
 ## User stories
 
@@ -162,32 +163,38 @@ If scenario 1 shows that style cannot do it, the spec returns to Q-1 before any 
 
 ## Open questions
 
-- [ ] **Q-1. Style only, or a DOM helper?** The three buttons sit in two different parents (the nested
+- [x] **Q-1. Style only, or a DOM helper?** The three buttons sit in two different parents (the nested
   group and two rows). Recommended: try style only (verification plan, scenario 1); a helper that
   re-parents Vivaldi's buttons risks losing them when Vivaldi rebuilds the toolbar, so it is allowed only
   if style fails, and then it follows `KeptElement` and `TabBarAnchor`.
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 - [x] **Q-2. How does 074 expose the active wave?** Resolved by 074 FR-13 and AC-22: `body` carries
   `data-vivarcdi-wave` with the wave id (`still-water`, `ripple`, `swell`, `breaking-wave`) while a wave
   is chosen, and the attribute is absent while none is. The compact form keys on
   `body[data-vivarcdi-wave="breaking-wave"]`; Still water is a chosen wave too and
   does not match.
-- [ ] **Q-3. Labels.** Recommended: icons only, as in Arc; the name is the tooltip and the accessible
+- [x] **Q-3. Labels.** Recommended: icons only, as in Arc; the name is the tooltip and the accessible
   name Vivaldi already gives; no text is drawn beside the icon, not even on hover.
-- [ ] **Q-4. When the user's own lists replace the wave.** Recommended: the attribute is the only switch, and
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
+- [x] **Q-4. When the user's own lists replace the wave.** Recommended: the attribute is the only switch, and
   074 removes or changes it as soon as the lists no longer match the Breaking wave (074 FR-7), so a manual edit and
   Still water turn the compact form off with no code here. Should the style also check that the three
   buttons exist (`:has`), as a guard against a list that matches in name but lacks one?
   Recommended: yes, the style applies only when all three are present.
-- [ ] **Q-5. Interplay with 032 and 028.** Recommended: 032's narrow bar keeps its rules for the rows of
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
+- [x] **Q-5. Interplay with 032 and 028.** Recommended: 032's narrow bar keeps its rules for the rows of
   VivArcDi and does not touch the toolbar buttons; the compact Breaking wave must fit the narrow width
   (AC-13), where the three icons share the 42 px with a smaller size. The "+ New Tab" row of 028 stays,
   so the tab bar has two new-tab entries, as 074 Q-9 decided.
-- [ ] **Q-6. Narrow widths.** At 42 px three 28 px icons do not fit one row. Recommended: below a width
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
+- [x] **Q-6. Narrow widths.** At 42 px three 28 px icons do not fit one row. Recommended: below a width
   that fits them, the row wraps to a column of three icons rather than shrinking them below 24 px;
   AC-13 then reads "inside the bar" and the verification plan records the break point.
-- [ ] **Q-7. Order and dependency on 074.** Recommended: 076 is written now as a Draft, linked to 074,
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
+- [x] **Q-7. Order and dependency on 074.** Recommended: 076 is written now as a Draft, linked to 074,
   but its design and tasks wait until 074 is Approved and `data-vivarcdi-wave` is in its design; implementation starts
   after 074 is implemented, because the live scenarios need the Breaking wave lists.
+  Resolved: the recommendation, approved with the spec (Tore, 2026-11-28).
 
 ## References
 
@@ -195,6 +202,6 @@ If scenario 1 shows that style cannot do it, the spec returns to Q-1 before any 
 - [Toolbar waves mockups](https://claude.ai/artifact/1GZq7xVP3D6H8MKnRmXyuG), section "Cavallone
   compatto, proposta".
 - [074 Toolbar waves](../074-toolbar-waves/spec.md) and [075 Settings page](../075-settings-page/spec.md):
-  sibling Drafts; 076 depends on 074.
+  sibling specs; 076 depends on 074.
 - [028 Arc sidebar look](../028-arc-sidebar-look/spec.md), [032 Compact tab bar](../032-compact-tab-bar/spec.md),
   [046 Live verification](../046-live-verification/spec.md).
