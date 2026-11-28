@@ -13,7 +13,7 @@ Status is one of `Draft`, `Approved`, `Implemented`, `Superseded`. See [specs/RE
 Vivaldi's own toolbar editor only moves buttons between two lists around the tab strip, and its
 default puts the workspace button on top and `New Tab` below the strip. Arc has a different shape:
 the bottom of the column holds a new-tab button, the space switcher and a trash. This spec offers four
-layouts of those two lists, named after waves (three ready ones and Still water, the way back), from a small control with one icon each:
+layouts of those two lists, named after waves (three ready ones and Still water, the way back), each with its own icon, chosen from the settings page of [075](../075-settings-page/spec.md):
 
 | Name | Italian UI name | Closeness to Arc |
 |---|---|---|
@@ -63,15 +63,22 @@ from Vivaldi's bundle: `WorkspaceButton`, `NewTab`, `SyncedTabs`, `TabsTrash`, `
 | Wave | `tabbar_before` | `tabbar_after` |
 |---|---|---|
 | Still water | the stored backup, else `WorkspaceButton` | the stored backup, else `NewTab`, `FlexibleSpacer`, `TabButton` |
-| Ripple | `WorkspaceButton`, `NewTab`, `FlexibleSpacer`, `TabsTrash`, `TabButton` | empty |
+| Ripple | `WorkspaceButton`, `FlexibleSpacer`, `TabsTrash`, `TabButton` | empty |
 | Swell | `WorkspaceButton`, `FlexibleSpacer`, `SyncedTabs` | `FlexibleSpacer`, `TabsTrash`, `FlexibleSpacer`, `NewTab` |
-| Breaking wave | empty | `FlexibleSpacer`, `TabsTrash`, `FlexibleSpacer`, `WorkspaceButton`, `FlexibleSpacer`, `NewTab` |
+| Breaking wave | `Spacer` | `FlexibleSpacer`, `TabsTrash`, `FlexibleSpacer`, `WorkspaceButton`, `FlexibleSpacer`, `NewTab` |
 
 Vivaldi's defaults are `["WorkspaceButton"]` for `tabbar_before` and `["NewTab", "FlexibleSpacer",
 "TabButton"]` for `tabbar_after`.
 
-**Control.** Four buttons in a group, one per wave (Still water first), each showing its icon and carrying the name as
-tooltip and accessible label. The current wave is pressed. Where the group lives is Q-1.
+`NewTab` is in every preset except Ripple, the minimal one for tabs, which drops the button because
+the "+ New Tab" row of 028 stays. Still water writes the user's lists, which may have no `NewTab`.
+
+**Service and data.** This module draws no control. It exposes the four waves as data (id, English
+name, Italian name, icon, preview) and a service with three calls: read the current wave, choose a
+wave, and tell when the current wave changes. The cards, their preview, the check mark on the chosen
+one and where the page is reached are specified in [075](../075-settings-page/spec.md), which calls this
+service; 074 depends on it only for the page. Without a page, the `config.json` option `wave` gives the
+initial wave.
 
 **Icons.** Four inline SVG icons drawn in the payload, 16 px grid, stroke only, colored with
 `currentColor` so they follow the theme:
@@ -93,11 +100,11 @@ nothing.
 **Interaction with the sidebar look.** `sidebar-look.scss` (lines 37-43) hides `.button-toolbar.newtab`
 and `.button-toolbar.toolbar-spacer-flexible` in the tab bar, and hides a `.tabbar-nested-buttons` row
 that holds no button other than spacers. Both defeat Swell and Breaking wave, whose layouts are made of
-`NewTab` and flexible spacers, and the Ripple row. Decided (Tore, 2026-11-28): while any wave is active,
-including Still water, nothing in the tab bar hides `NewTab` or the flexible spacers, and the nested
-row is not hidden; the other look rules of [028](../028-arc-sidebar-look/spec.md) stay. 028 FR-6 draws
-its own "+ New Tab" row, so with a wave active the tab bar shows two new-tab entries; the design
-decides whether the row or the button is kept (Q-9).
+`NewTab` and flexible spacers. Decided (Tore, 2026-11-28): before any wave is chosen the hiding stays,
+so nothing changes. While a wave is active, including Still water, nothing in the tab bar hides
+`NewTab` or the flexible spacers, and the nested row is not hidden; the other look rules of
+[028](../028-arc-sidebar-look/spec.md) stay. 028 FR-6 draws its own "+ New Tab" row, so with Swell or
+Breaking wave the tab bar shows both the row and the button. 028 needs a revision note.
 
 ## Requirements
 
@@ -119,13 +126,13 @@ decides whether the row or the button is kept (Q-9).
   a confirmation (Q-2).
 - **FR-9.** When `vivaldi.prefs` has no `set`, or a list is missing, the module does not start, and the
   boot logs one warning (Q-4).
-- **FR-10.** The control shows the four icons of [After](#after), each with the wave name as tooltip
-  and accessible label, the chosen one pressed.
+- **FR-10.** The module exposes the four waves as data and a service to read, choose and follow the
+  current wave, for the page of [075](../075-settings-page/spec.md); it builds no visible control.
 - **FR-11.** The module keeps `privateWindows = 'never'`: it stores the backup and the choice, and the
   lists are profile-wide.
 - **FR-12.** While a wave is active, `sidebar-look.scss` does not hide `.button-toolbar.newtab`, the
   flexible spacers or the `.tabbar-nested-buttons` row in the tab bar; the module marks the document
-  so that the style can tell (Q-6, Q-9).
+  so that the style can tell; with no wave chosen the hiding stays (Q-6, Q-9).
 
 ### Non-functional
 
@@ -153,12 +160,12 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-9 | WHEN the lists differ from every preset and from the defaults, THE module SHALL ask for a confirmation before the first write | auto: `asks before replacing custom lists` |
 | AC-10 | IF `vivaldi.prefs.set` or a list is missing, THEN THE module SHALL not start and SHALL log one warning | auto: `does not start without writable toolbar lists` |
 | AC-11 | THE module SHALL NOT start in a private window | auto: `stays out of private windows` |
-| AC-12 | THE control SHALL show four buttons, each with its name as label, the chosen one pressed | auto: `shows four wave buttons with the chosen one pressed` |
+| AC-12 | THE module SHALL expose the four waves as data, with English and Italian names, and a service to read, choose and follow the current wave | auto: `exposes the four waves and a service to choose one` |
 | AC-13 | THE four icons SHALL be inline SVG colored by `currentColor` | auto: `draws the four wave icons with currentColor` |
 | AC-14 | WHILE a wave is active, THE sidebar look SHALL NOT hide `NewTab`, flexible spacers or the nested buttons row in the tab bar | auto: `lets an active wave keep the new-tab button, spacers and nested row` |
-| AC-15 | WHEN a lab Vivaldi receives the Ripple lists, THE tab bar SHALL show `NewTab` and `TabButton` in `.toolbar-tabbar-before` and no `.toolbar-tabbar-after` buttons | live: `the ripple wave puts the buttons above the strip` |
+| AC-15 | WHEN a lab Vivaldi receives the Ripple lists, THE tab bar SHALL show `TabsTrash` and `TabButton` in `.toolbar-tabbar-before` and no `.toolbar-tabbar-after` buttons | live: `the ripple wave puts the buttons above the strip` |
 | AC-16 | WHEN a lab Vivaldi receives the Swell lists, THE tab bar SHALL show `SyncedTabs` above the strip and `TabsTrash` and `NewTab` in `.toolbar-tabbar-after` | live: `the swell wave splits the buttons around the strip` |
-| AC-17 | WHEN a lab Vivaldi receives the Breaking wave lists, THE tab bar SHALL show no buttons in `.toolbar-tabbar-before` and the trash, the workspace button and `NewTab` in order in `.toolbar-tabbar-after` | live: `the breaking wave puts every button below the strip` |
+| AC-17 | WHEN a lab Vivaldi receives the Breaking wave lists, THE tab bar SHALL show only a spacer in `.toolbar-tabbar-before` and the trash, the workspace button and `NewTab` in order in `.toolbar-tabbar-after` | live: `the breaking wave puts every button below the strip` |
 | AC-18 | WHEN the lists are written in a lab Vivaldi, THE interface SHALL update without a reload and the preference SHALL still hold the written lists after reading it again | live: `a written toolbar list shows without a reload` |
 | AC-19 | WHEN Still water runs after a wave, THE lab tab bar SHALL show the lists as before the first wave | live: `still water restores the toolbar` |
 | AC-20 | WHEN Tore looks at the four icons in the light and dark themes on macOS and Debian, THE icons SHALL be told apart and legible | manual |
@@ -167,31 +174,52 @@ AC-18 decides whether the whole feature is possible (Q-5). A restart and a sync 
 proven on the throwaway profile, and they are the one thing Tore checks on his own profile together
 with AC-20.
 
+## Verification plan
+
+Tore wants the work test-first, with spikes. Before any module code, these `live:` scenarios are
+written and run red on a lab profile; each one proves a fact this spec only assumes, and its result
+goes in the design, not here:
+
+1. A list written with `vivaldi.prefs.set` updates `.toolbar-tabbar-before` and
+   `.toolbar-tabbar-after` without a reload (AC-18).
+2. An empty list and a list with a single `Spacer` are accepted and give the expected rows (Q-3
+   resolved on the strength of Tore's choice; the spike checks the result).
+3. The order of buttons and the rows or columns they take in the vertical toolbar match the three
+   presets (AC-15 to AC-17).
+4. `onChanged` fires for both lists after a write and after a manual edit (AC-8).
+5. The written preference still holds the lists when read again, and after a window reload of the lab
+   profile (AC-18).
+6. With `sidebar-look` on, `NewTab`, the flexible spacers and the nested row are visible while a wave
+   is active, and still hidden before one is chosen (AC-14).
+7. Still water writes back the lists stored before the first wave (AC-19).
+
+If scenario 1 or 5 fails, the spec returns to Q-5.
+
 ## Out of scope
 
 - The Downloads panel bar, the address bar toolbar and the translation banner.
 - The Spaces dots switcher.
-- A "VivArcDi Settings" page inside Vivaldi (themes, features, troubleshooting requests): a separate
-  future spec. The footer control of this spec may later move there or be mirrored there.
+- The "VivArcDi Settings" page, its cards and its other sections (themes, features, troubleshooting):
+  [075](../075-settings-page/spec.md).
 - Buttons other than the nine ids above, and user-defined layouts.
 - Moving the user's own buttons into a wave; a wave replaces both lists.
 - Reacting to the sync of the lists from another computer, other than FR-7.
 
 ## Open questions
 
-- [x] **Q-1. Where does the control live?** Answered (Tore, 2026-11-28): a group of icon buttons in the
-  tab bar's footer, plus the `config.json` option for the initial wave. Tore wants a "VivArcDi
-  Settings" page in Vivaldi later (themes, features, troubleshooting requests); that is a separate
-  spec, and this control may move or be mirrored there.
+- [x] **Q-1. Where does the control live?** Answered (Tore, 2026-11-28, revised): not in the tab bar.
+  It lives in a "VivArcDi Settings" page inside Vivaldi, styled like Vivaldi's own settings: cards with
+  a preview, the name below and a check mark on the chosen one. That page is spec
+  [075](../075-settings-page/spec.md); 074 owns the wave logic and the contents of the cards. The
+  `config.json` option for the initial wave stays.
 - [x] **Q-2. A write over the user's lists.** Answered (Tore, 2026-11-28): allowed after one
   confirmation, with the backup of FR-4. The way back is a fourth wave, Still water (Specchio
   d'acqua), which writes the backup and leaves customization to the user; it replaces the separate
   back button.
-- [ ] **Q-3. Empty `tabbar_before` for the Breaking wave.** Recommendation: if the live scenario
-  shows that Vivaldi accepts the empty list and removes the row, keep it empty. If not, keep a single
-  `Spacer` so that the strip still starts at the top.
-- [ ] **Q-4. Vivaldi without these preferences.** Recommendation: the module does not start and logs
-  one warning, like a missing selector (FR-9), and the control never appears.
+- [x] **Q-3. Empty `tabbar_before` for the Breaking wave.** Answered (Tore, 2026-11-28): keep a
+  single `Spacer` ("uno spacer è gradito").
+- [x] **Q-4. Vivaldi without these preferences.** Answered (Tore, 2026-11-28): as recommended; the
+  module does not start and logs one warning (FR-9), and the wave section of the 075 page is absent.
 - [x] **Q-5. Writes that persist without updating the UI.** Answered (Tore, 2026-11-28): as
   recommended. If AC-18 fails, stop and write a new draft that drives Vivaldi's own toolbar editor, as
   055 did for the web panel form.
@@ -206,10 +234,10 @@ with AC-20.
 - [x] **Q-8. Interplay with the compact tab bar.** Answered (Tore, 2026-11-28): as recommended; the
   compact bar of [032](../032-compact-tab-bar/spec.md) keeps its own rules and the live scenarios run
   with it off.
-- [ ] **Q-9. Before any wave is chosen.** Should the 028 hiding of `NewTab` and spacers stay when no
-  wave has been chosen? Recommendation: stay, so nothing changes until the user chooses a wave. The
-  same question covers the double new-tab entry (028's "+ New Tab" row and the button) while a wave is
-  active: recommend keeping 028's row and hiding the button only where a preset would show both.
+- [x] **Q-9. Before any wave is chosen.** Answered (Tore, 2026-11-28): the 028 hiding stays until a
+  wave is chosen. With a wave active, Swell and Breaking wave show both the "+ New Tab" row and the
+  `NewTab` button. `NewTab` is in every preset except Ripple (minimal, the row stays) and may be
+  removed in Still water.
 
 ## References
 
@@ -217,6 +245,8 @@ with AC-20.
 - [Toolbar waves mockups](https://claude.ai/artifact/1GZq7xVP3D6H8MKnRmXyuG).
 - [028 Arc sidebar look](../028-arc-sidebar-look/spec.md), [032 Compact tab bar](../032-compact-tab-bar/spec.md),
   [036 Module options](../036-module-options/spec.md), [037 Versioned storage](../037-versioned-storage/spec.md).
+- [075 Settings page](../075-settings-page/spec.md): the page that shows the wave cards (Draft, in
+  progress).
 - [055 Tile web panel](../055-tile-web-panel/spec.md), question 1: a preference write that did not reach
   the interface.
 - [059 Arc pinned tabs](../059-pinned-tabs-arc/spec.md) and [060 Clear bar](../060-clear-bar-and-pinned-unload/spec.md):
