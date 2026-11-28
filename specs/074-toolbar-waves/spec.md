@@ -81,6 +81,18 @@ Facts measured on a lab profile (Vivaldi 8.3.4191.47, 2026-11-28), stated as obs
   `SyncedTabs`, `TabButton`, `Spacer` and `FlexibleSpacer` are grouped in a horizontal
   `.tabbar-nested-buttons`; a large button breaks the group; a flexible spacer alone is vertical, and
   inside a group it is horizontal.
+- With `AddressField` in the tab bar lists, `Back`, `Forward` and `Reload` placed in
+  `vivaldi.toolbars.tabbar_before` render (30x30, `display: flex`) in one `.tabbar-nested-buttons` row
+  (flex row, centered, 348x37, same y), and `AddressField` stays on its own full-width row (about
+  348x30) just below. The order variants all render: buttons first, a `Spacer` inside the group,
+  buttons after `AddressField` (the row then sits below it), or the buttons in `tabbar_after`.
+- `vivaldi.address_bar.visible` (boolean, default true) controls the native bar. With it false the
+  native `navigation` toolbar is `display: none` and the tab bar's `AddressField` is visible; with it
+  true there are two sets of the buttons and two address fields, which is why nothing is added when
+  `AddressField` is not in the tab bar lists. `vivaldi.address_bar.position` exists, untested.
+- A click on the tab bar's Back and Forward goes back and forth in a tab with history.
+- Not proven: the left alignment of the group (it is centered), widths other than 348 px, and the
+  enabled state of Forward right after Back.
 - Not proven: persistence across a restart (the harness deletes the lab profile), see AC-21.
 
 **Layouts.** A new module, `toolbar-waves`, writes one preset into the two lists. Three waves have fixed lists; the fourth, Still water, writes back the user's own. The button ids come
@@ -114,8 +126,8 @@ user's lists, as on Tore's Vivaldi 8.3 where `vivaldi.address_bar.visible` is fa
 above the address pill. The three waves therefore add `Back`, `Forward` and `Reload` as a group directly
 before `AddressField`, in the list that holds it, unless the user's lists already have them. Without
 `AddressField` in the tab bar lists (Vivaldi's default) nothing is added, because the native toolbar
-shows them and they would appear twice. Still water never adds them. Whether and how Vivaldi draws
-these buttons inside the tab bar toolbars is not proven; the live scenario of AC-36 proves it.
+shows them and they would appear twice. Still water never adds them. Measured: Vivaldi draws them as one centered row of three buttons above the address field row
+(see [Measured](#measured)); their left alignment and other widths are not proven.
 
 **Service and data.** This module draws no control. It exposes the four waves as data (id, English
 name, Italian name, icon, preview) and a service with three calls: read the current wave, choose a
@@ -253,7 +265,7 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-33 | WHEN a preset wave is chosen and `AddressField` is in the user's lists, THE written list holding it SHALL have `Back`, `Forward` and `Reload` directly before it | auto: `adds back forward and reload before the address field` |
 | AC-34 | WHEN the user's lists already hold any of `Back`, `Forward` or `Reload`, THE written lists SHALL NOT duplicate them and SHALL keep them where the user put them | auto: `does not duplicate the navigation buttons` |
 | AC-35 | WHEN `AddressField` is in neither of the user's lists, or Still water is chosen, THE module SHALL add none of the three buttons | auto: `adds nothing when the address bar is not in the tab bar` |
-| AC-36 | WHEN the user's lists hold `AddressField` and each preset wave is chosen through the service, THE lab tab bar SHALL list `Back`, `Forward` and `Reload` before `AddressField` and the scenario SHALL record whether Vivaldi draws them and where | live: `a wave shows back forward and reload above the address field` |
+| AC-36 | WHEN the user's lists hold `AddressField` and each preset wave is chosen through the service, THE lab tab bar SHALL list `Back`, `Forward` and `Reload` before `AddressField`, show them as one `.tabbar-nested-buttons` group above the address field row, and a click on Back and Forward SHALL go back and forth in a tab with history | live: `a wave shows back forward and reload above the address field` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
 design of the icons is approved, so AC-20 is about legibility on macOS and Debian only. AC-21 is a
@@ -285,8 +297,8 @@ To prove first, as red tests:
 8. With lists that hold `AddressField` and `Extensions` before and `UpdateButton` after, each wave
    keeps them, in the toolbar where they were (AC-28, AC-29, AC-32). Not measured yet: how Vivaldi lays
    out `AddressField` next to a wave's group in a vertical toolbar; the scenario records it.
-9. With `AddressField` in the lists, Vivaldi draws `Back`, `Forward` and `Reload` inside the tab bar
-   toolbars, and how (AC-33, AC-36). Not proven; a spike is running, and the result goes in the design.
+9. With `AddressField` in the lists, `Back`, `Forward` and `Reload` form one group above the address row and work (AC-33, AC-36),
+   as measured; the group's left alignment and widths other than 348 px stay unproven.
 10. A restart keeps the lists and the chosen wave (AC-21, manual).
 
 ## Out of scope

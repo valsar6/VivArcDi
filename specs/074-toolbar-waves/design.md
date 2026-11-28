@@ -66,7 +66,19 @@ scenarios keep them true:
   written back.
 - Each toolbar is a flex column; `WorkspaceButton` and `NewTab` are full-width rows; the small
   buttons form a horizontal `.tabbar-nested-buttons` group; a large button breaks the group.
-- Not measured: persistence after a restart (AC-21).
+- With `AddressField` in the tab bar lists, `Back`, `Forward` and `Reload` placed in
+  `vivaldi.toolbars.tabbar_before` render (30x30, `display: flex`) in one `.tabbar-nested-buttons` row
+  (flex row, centered, 348x37, same y), and `AddressField` stays on its own full-width row (about
+  348x30) just below. The order variants all render: buttons first, a `Spacer` inside the group,
+  buttons after `AddressField` (the row then sits below it), or the buttons in `tabbar_after`.
+- `vivaldi.address_bar.visible` (boolean, default true) controls the native bar. With it false the
+  native `navigation` toolbar is `display: none` and the tab bar's `AddressField` is visible; with it
+  true there are two sets of the buttons and two address fields, which is why nothing is added when
+  `AddressField` is not in the tab bar lists. `vivaldi.address_bar.position` exists, untested.
+- A click on the tab bar's Back and Forward goes back and forth in a tab with history.
+- Not proven: the left alignment of the group (it is centered), widths other than 348 px, and the
+  enabled state of Forward right after Back.
+- Not proven: persistence after a restart (AC-21).
 
 ## Components
 
@@ -213,7 +225,8 @@ export class ListComposer {
   a special case, FR-14 and FR-16 hold unchanged, and a wave is still recognized after they are added
   (AC-31). `compose` gains one step: when `current` holds `AddressField`, each of `NAVIGATION_BUTTONS`
   in neither list is inserted in order directly before `AddressField` in the list that holds it
-  (FR-17); a button the user already has stays in place, so nothing is duplicated (AC-34). Without
+  (FR-17), in the list that holds `AddressField`, kept as is and not forced into `tabbar_before`; a
+  button the user already has stays in place, so nothing is duplicated (AC-34). Without
   `AddressField` it adds nothing (FR-18, AC-35). Still water is never composed, so it adds nothing.
 - The backup is the full current lists, taken before composing, so it never holds the added buttons
   (FR-4); the previews of 075 stay layout-only and show none of these buttons, and the compact
@@ -411,7 +424,7 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-17 | `the breaking wave puts every button below the strip` (same) | same |
 | AC-18 | `a written toolbar list shows without a reload` (raw `vivaldi.prefs.set`) | same |
 | AC-32 | `a wave keeps the address field of the tab bar` (first writes lists with `AddressField` and `Extensions`, chooses each wave through the service, checks the field is visible and listed, then Still water) | same |
-| AC-36 | `a wave shows back forward and reload above the address field` (lists with `AddressField`; checks the written lists and records whether and where Vivaldi draws the three buttons) | same |
+| AC-36 | `a wave shows back forward and reload above the address field` (lists with `AddressField`; checks the written lists, one group above the address row, and a click on Back and Forward) | same |
 | AC-19 | `still water restores the toolbar` | same |
 
 AC-20 and AC-21 are manual. Fakes: a `FakePrefs` with `get`, `set` and `onChanged` that records
@@ -419,10 +432,9 @@ writes and fires changes, in `tests/modules/toolbarwaves/fakes.ts`.
 
 ## Risks
 
-- **Back, Forward and Reload in the tab bar are unproven.** Vivaldi's `navigation` toolbar is the
-  native home of these ids; that its tab bar toolbars draw them, and how they sit beside
-  `AddressField` in a vertical toolbar, is not measured. AC-36 proves it on the lab; if Vivaldi draws
-  nothing, FR-17 changes by a new spec.
+- **Back, Forward and Reload in the tab bar.** Measured to render as one centered row above the
+  address field (see Measured). Unproven: left alignment, widths other than 348 px, and the enabled
+  state of Forward right after Back; Tore judges the look.
 
 - **Restart persistence is not proven** (AC-21). If the lists do not survive a restart, the spec
   returns to Q-5.

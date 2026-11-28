@@ -110,6 +110,6 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   of `ListComposer.compose`; they stay outside `LAYOUT_BUTTONS`. Green: the three tests of T17. Needs
   T13 and T17.
 - [ ] **T19. Run and recheck.** With Tore's agreement, `npm run live -- 074`: the seven scenarios run;
-  the AC-36 result (drawn or not, and where) goes into the design before anything else is built on it;
+  the AC-36 scenario asserts the measured result (one group above the address row, a click on Back and Forward works);
   then Tore checks a wave on his real profile: address bar, Back, Forward and Reload present. Needs T14
   and T18.
