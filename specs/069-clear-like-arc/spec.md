@@ -107,7 +107,7 @@ as 067 FR-1 already does.
 | AC-7 | WHEN the user presses Cmd/Ctrl+Shift+K, THE Today tabs of the workspace SHALL be archived as a click on Clear does. | auto: `clears the Today tabs on the Clear shortcut` |
 | AC-8 | WHILE there is no Today tab, THE Clear shortcut SHALL archive nothing. | auto: `does nothing on the Clear shortcut without Today tabs` |
 | AC-9 | WHILE the Favorites grid is off and the tab strip holds a pinned group, THE line SHALL sit midway between the pinned group and the first Today tab. | auto: `puts the Clear line below a native pinned group when the Favorites grid is off` |
-| AC-10 | WHEN the user presses Cmd+Shift+K in a lab Vivaldi with two Today tabs, THE inactive Today tab SHALL be archived and the active and pinned tabs SHALL stay open. | live: `the Clear shortcut archives the Today tabs` |
+| AC-10 | WHEN the user presses Cmd+Shift+K in a lab Vivaldi with two Today tabs, THE inactive Today tab SHALL be archived and the active and pinned tabs SHALL stay open. | live, replaced by 071 AC-7 (the check `the Clear shortcut archives the active Today tab`) |
 
 AC-6 becomes a live check with a scenario that measures the line's ends and center against the rows,
 once the implementation adds it.

@@ -32,19 +32,19 @@ T1 (red tests) ──> T2 (fix) ──> T3 (live) ──> T4 (lead: docs and ver
 
 ## Tasks
 
-- [ ] **T1. Red tests** (alone). Replace `clear archives every Today tab of the workspace except the
+- [x] **T1. Red tests** (alone). Replace `clear archives every Today tab of the workspace except the
   active one` with the six `auto:` tests of AC-1 to AC-6, add the extra tests, and adjust the
   existing tests as listed in the design ("Existing tests the change touches"), including the
   `blank` dependency in `setup` and `outcomeSetup`. They fail for the right reason (the active tab is
   still kept, no blank tab). Done when the new tests fail and the others compile; commit red.
-- [ ] **T2. The fix** (after T1; alone). Split `TodayTabPolicy`, let `WorkspaceTabs.open` take a null
+- [x] **T2. The fix** (after T1; alone). Split `TodayTabPolicy`, let `WorkspaceTabs.open` take a null
   address, add the `blank` dependency and the hook in `ArchiveSweeper`, and wire it in
   `TodayArchive`, as in the design. The sweep keeps `isArchivable`. Done when `make check` is green.
-- [ ] **T3. The live scenarios** (after T2; alone). Rename the scenario with `git mv`, change its name
+- [x] **T3. The live scenarios** (after T2; alone). Rename the scenario with `git mv`, change its name
   to `the Clear shortcut archives the active Today tab` and its `spec` to `'071'`, and add the AC-8
   scenario as in the design. Run `npm run live -- --only 071` if Tore agrees; otherwise leave it to
   the lab run. Report whether Vivaldi gives a pinned tab a `workspaceId`. Done when `make check` is green.
-- [ ] **T4. Docs and version** (lead; after T3). Update the manual and README lines about Clear, set
+- [x] **T4. Docs and version** (lead; after T3). Update the manual and README lines about Clear, set
   071 to `Implemented` in its header and in `specs/README.md`, and bump the patch version on
   `fix/071-clear-active-tab` from the version on `origin/main`. Done when `make check` is green.
 - [ ] **T5. Manual check** (Tore, in Italian, on Vivaldi 8.3), from AC-9:

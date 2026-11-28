@@ -21,3 +21,13 @@ test('the tab of a Favorite is not archivable', () => {
 test('the tab of a bookmark link is not archivable', () => {
   assert.equal(TodayTabPolicy.isArchivable(tabWith({ vivExtData: ownData({ bookmarkId: '11' }) })), false);
 });
+
+test('the active tab is clearable but not archivable', () => {
+  assert.equal(TodayTabPolicy.isClearable(tabWith({ active: true })), true);
+  assert.equal(TodayTabPolicy.isArchivable(tabWith({ active: true })), false);
+});
+
+test('an audible tab is neither clearable nor archivable', () => {
+  assert.equal(TodayTabPolicy.isClearable(tabWith({ audible: true })), false);
+  assert.equal(TodayTabPolicy.isArchivable(tabWith({ audible: true })), false);
+});

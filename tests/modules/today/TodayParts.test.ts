@@ -46,7 +46,7 @@ test('reads archive messages from the runtime and the console', () => {
 });
 
 test('restores an entry in its workspace and removes it from the archive', async () => {
-  const opened: Array<[string, string | null]> = [];
+  const opened: Array<[string | null, string | null]> = [];
   const removed: unknown[] = [];
   const archived = entry('https://a.example/', 'A', NOW, '7');
   const restorer = new ArchiveRestorer(
