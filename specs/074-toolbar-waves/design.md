@@ -182,6 +182,33 @@ export interface PreviewShape {
 - Icons are in `WaveIcons.ts`: four SVG strings, `viewBox="0 0 16 16"`, `fill="none"`,
   `stroke="currentColor"`, no other color; each strategy takes its own.
 
+### Composer (`ListComposer.ts`)
+
+```ts
+export class ListComposer {
+  constructor(layoutButtons: ReadonlySet<string>);
+  public compose(layout: ToolbarLists, current: ToolbarLists): ToolbarLists;
+  public layoutOf(lists: ToolbarLists): ToolbarLists;
+  public lacksAddressField(written: ToolbarLists, current: ToolbarLists): boolean;
+}
+```
+
+- A first design wrote the fixed lists of the table. On a real Vivaldi 8.3 the address bar lives in the
+  tab bar toolbars, so the lists hold `AddressField`, `Extensions`, `UpdateButton` and others, and a
+  fixed list deleted them: the address bar vanished in every wave. The wave must own only the layout.
+- `ToolbarButtons.ts` exports `LAYOUT_BUTTONS`: the nine layout ids of the spec. `compose` returns,
+  per list, `layout` followed by the buttons of `current` that are not layout buttons, in order
+  (FR-14). `layoutOf` keeps only the layout buttons of each list.
+- `WaveStrategy.lists(context)` still gives the wave's layout lists; for a wave with
+  `replacesUserLists` true the controller passes them through `compose` with the current lists, for
+  Still water it writes the backup as it is. `WaveStrategy.matches` compares `layoutOf(lists)` with
+  the wave's table (FR-16, AC-31); `WaveFactory.matching` and `needsConfirmation` use it too.
+- `lacksAddressField` is true when `current` has `AddressField` and `written` has none; the
+  controller then writes nothing and rejects with the readable message `the address field would be
+  lost` (FR-15, AC-30). With presets this cannot happen, because `compose` keeps it; it guards Still
+  water and a backup taken before the address field moved into the lists.
+- The backup is the full current lists (FR-4); the previews of 075 stay layout-only.
+
 ### Store (`WaveStore.ts`)
 
 ```ts
@@ -230,7 +257,9 @@ export class WaveController {
   1. Take the strategy from the factory. When the current wave is null or does not replace the user's
      lists, and the chosen one does, store the current lists as the backup (FR-4); never overwrite a
      backup while a wave that replaces them is chosen (AC-5).
-  2. Ask the strategy for its lists with the context `{ backup, defaults }` (FR-6).
+  2. Ask the strategy for its lists with the context `{ backup, defaults }` (FR-6); when it replaces
+     the user's lists, compose them with the current lists (FR-14); if the pair lacks the address
+     field (FR-15), reject without writing.
   3. Write `before`, then `after`, through `BrowserPrefs.set`.
   4. Save `{ wave: id, backup }`, set the marker, tell the listeners.
 - Following: on a change of either list, compare the pair with the chosen preset. Still water is
@@ -355,6 +384,10 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-23 | `serves the waves with a JSON-safe preview` | `tests/modules/toolbarwaves/WaveDataMapper.test.ts` |
 | AC-25 | `each wave gives the lists of its table` | `tests/modules/toolbarwaves/WaveStrategies.test.ts` (one case per `StillWaterWave`, `RippleWave`, `SwellWave`, `BreakingWave`) |
 | AC-26 | `builds the four waves in order` | `tests/modules/toolbarwaves/WaveFactory.test.ts` |
+| AC-28 | `keeps the buttons the wave does not manage` | `tests/modules/toolbarwaves/ListComposer.test.ts` |
+| AC-29 | `keeps the address field when it is in the user lists` | same |
+| AC-30 | `refuses a pair without the address field` | `tests/modules/toolbarwaves/WaveController.test.ts` |
+| AC-31 | `recognizes a wave among core buttons` | `tests/modules/toolbarwaves/WaveStrategies.test.ts` |
 | AC-27 | `chooses a wave it has no special case for` | `tests/modules/toolbarwaves/WaveController.test.ts` (with a fake strategy) |
 | AC-24 | `reports a failed choice with a readable message` | `tests/modules/toolbarwaves/WaveController.test.ts` |
 
@@ -364,6 +397,7 @@ The T2 tests import these; T3 to T6 keep them:
 | AC-16 | `the swell wave splits the buttons around the strip` (same) | same |
 | AC-17 | `the breaking wave puts every button below the strip` (same) | same |
 | AC-18 | `a written toolbar list shows without a reload` (raw `vivaldi.prefs.set`) | same |
+| AC-32 | `a wave keeps the address field of the tab bar` (first writes lists with `AddressField` and `Extensions`, chooses each wave through the service, checks the field is visible and listed, then Still water) | same |
 | AC-19 | `still water restores the toolbar` | same |
 
 AC-20 and AC-21 are manual. Fakes: a `FakePrefs` with `get`, `set` and `onChanged` that records

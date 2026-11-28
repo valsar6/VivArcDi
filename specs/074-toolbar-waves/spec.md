@@ -59,6 +59,7 @@ Mockups (three waves; Still water was added later): [Toolbar waves](https://clau
 | `vivaldi.prefs` in the payload | Passed to `BrowserPrefs` as `PrefsApi`, which declares `get` and `onChanged` only; Vivaldi's `set` takes one object, `{path, value}` | `src/core/boot/VivArcDi.ts` `#prefsApi` |
 | Sidebar look in the tab bar | Hides `.button-toolbar.newtab`, flexible spacers, and a `.tabbar-nested-buttons` row with nothing else in it | `src/styles/sidebar-look.scss` lines 37-43 |
 | Toolbar lists | Not read or written by any module | none |
+| Other buttons in the lists | On a real Vivaldi 8.3 the address bar sits in the tab bar toolbars (`vivaldi.address_bar.visible` is false) and the lists hold `AddressField`, `Extensions`, `UpdateButton` and more | Vivaldi |
 
 ### After
 
@@ -98,6 +99,14 @@ Vivaldi's defaults are `["WorkspaceButton"]` for `tabbar_before` and `["NewTab",
 
 `NewTab` is in every preset except Ripple, the minimal one for tabs, which drops the button because
 the "+ New Tab" row of 028 stays. Still water writes the user's lists, which may have no `NewTab`.
+
+**Layout buttons and the others.** A wave manages only the layout buttons: `WorkspaceButton`, `NewTab`,
+`SyncedTabs`, `TabsTrash`, `TabButton`, `Spacer`, `FlexibleSpacer`, `PanelWidthSpacer`, `Divider`. Every
+other button in the user's lists (`AddressField`, `Extensions`, `UpdateButton`, `Back`, `Forward`,
+`Reload`, `PanelToggle`, extension buttons) is kept in the list where it was, in its relative order,
+after the wave's own buttons of that list. The first version wrote fixed lists and, on a real profile,
+made the address bar disappear in every wave. The table above gives the layout part; the written lists
+are that part plus the user's other buttons. The previews of 075 show only the layout buttons.
 
 **Service and data.** This module draws no control. It exposes the four waves as data (id, English
 name, Italian name, icon, preview) and a service with three calls: read the current wave, choose a
@@ -145,7 +154,8 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
   no callback); it throws only to report that the preferences or their `set` are unavailable, and
   it stays the only place that touches `vivaldi.prefs`. `WaveController.choose` catches that error and
   fails with the readable message of AC-24, so `choose` itself never throws.
-- **FR-3.** Choosing a wave writes its two lists of the table in [After](#after), `before` first.
+- **FR-3.** Choosing a wave writes its two lists of the table in [After](#after), composed with the
+  user's other buttons by FR-14, `before` first.
 - **FR-4.** When no wave is chosen, or Still water is, and a preset wave is chosen, the module stores
   the current lists as the backup first. It never overwrites a backup while Ripple, Swell or Breaking
   wave is chosen.
@@ -165,6 +175,15 @@ Breaking wave the tab bar shows both the row and the button. 028 needs a revisio
 - **FR-12.** While a wave is active, `sidebar-look.scss` does not hide `.button-toolbar.newtab`, the
   flexible spacers or the `.tabbar-nested-buttons` row in the tab bar; the module marks the document
   so that the style can tell; with no wave chosen the hiding stays (Q-6, Q-9).
+- **FR-14.** Choosing Ripple, Swell or Breaking wave writes, for each list, the wave's layout buttons
+  followed by the buttons of that list in the user's current lists that are not layout buttons, in
+  their order. Still water writes the backup unchanged (FR-6).
+- **FR-15.** The address bar is never lost: when `AddressField` is in one of the user's current
+  lists, it is in one of the written lists. If the pair to write would lack it, `choose` writes
+  nothing and fails with a readable message (AC-24).
+- **FR-16.** The backup of FR-4 stores the user's full lists, and Still water restores them exactly.
+  Recognizing the current wave (FR-7, FR-8, AC-2) compares only the layout buttons of each list, so
+  lists with other buttons still count as that wave.
 - **FR-13.** While a wave is chosen, `body` carries `data-vivarcdi-wave` with the wave's id
   (`still-water`, `ripple`, `swell`, `breaking-wave`); with no wave chosen the attribute is absent.
   Spec [076](../076-compact-breaking-wave/spec.md) and the sidebar look read it.
@@ -211,6 +230,11 @@ Written in [EARS](../README.md#acceptance-criteria). `auto` names a test, `live`
 | AC-25 | THE four wave strategies SHALL each give the lists of their row in the table of After, Still water the backup else Vivaldi's defaults | auto: `each wave gives the lists of its table` |
 | AC-26 | THE wave factory SHALL build the four waves by id and return them in the order Still water, Ripple, Swell, Breaking wave | auto: `builds the four waves in order` |
 | AC-27 | THE controller SHALL choose any wave the factory returns without a case for its id | auto: `chooses a wave it has no special case for` |
+| AC-28 | WHEN a preset wave is chosen, THE written lists SHALL keep every button that is not a layout button, in the list where it was, in its order, after the wave's own buttons | auto: `keeps the buttons the wave does not manage` |
+| AC-29 | WHEN `AddressField` is in the user's lists, THE written lists SHALL contain it for every wave | auto: `keeps the address field when it is in the user lists` |
+| AC-30 | IF the pair to write would lack `AddressField` that the user's lists have, THEN `choose` SHALL write nothing and fail with a readable message | auto: `refuses a pair without the address field` |
+| AC-31 | WHEN the lists hold a wave's layout buttons plus other buttons, THE module SHALL recognize that wave | auto: `recognizes a wave among core buttons` |
+| AC-32 | WHEN the user's lists hold `AddressField` and `Extensions` and each wave is chosen through the service, THE address field SHALL stay visible and in the lists, and Still water SHALL restore the lists | live: `a wave keeps the address field of the tab bar` |
 
 AC-18 was measured to hold (see [Measured](#measured)); it stays as a regression scenario (Q-5). The
 design of the icons is approved, so AC-20 is about legibility on macOS and Debian only. AC-21 is a
@@ -239,7 +263,10 @@ To prove first, as red tests:
    is chosen, and still hidden before one is chosen (AC-14).
 7. Still water writes back the lists stored before the first wave, and the default values without a
    backup (AC-19).
-8. A restart keeps the lists and the chosen wave (AC-21, manual).
+8. With lists that hold `AddressField` and `Extensions` before and `UpdateButton` after, each wave
+   keeps them, in the toolbar where they were (AC-28, AC-29, AC-32). Not measured yet: how Vivaldi lays
+   out `AddressField` next to a wave's group in a vertical toolbar; the scenario records it.
+9. A restart keeps the lists and the chosen wave (AC-21, manual).
 
 ## Out of scope
 
@@ -250,7 +277,8 @@ To prove first, as red tests:
 - The compact form of Breaking wave, Arc's single row of three icons (archive left, workspace center,
   new tab right): [076](../076-compact-breaking-wave/spec.md). The lists of this spec do not draw it.
 - Buttons other than the nine ids above, and user-defined layouts.
-- Moving the user's own buttons into a wave; a wave replaces both lists.
+- Moving the user's other buttons between toolbars, or changing their order; a wave replaces only the
+  layout buttons.
 - Reacting to the sync of the lists from another computer, other than FR-7.
 
 ## Open questions

@@ -74,3 +74,25 @@ alone. The spec 075 page needs T6; spec 076 needs T5 (the marker) and T8.
   chiaro e scuro e verificare che siano leggibili e distinguibili; scegliere ogni onda, riavviare
   Vivaldi sul proprio profilo e controllare che le liste e l'onda scelta siano rimaste. When Tore
   reports it green, the spec becomes `Implemented`.
+- [ ] **T11. Address field scenario (red).** Added after Tore found on his real profile that every
+  wave removed the address bar. `tests/live/scenarios/a-wave-keeps-the-address-field-of-the-tab-bar.live.ts`,
+  `spec: '074'`, named `a wave keeps the address field of the tab bar`: write lists with `AddressField`
+  and `Extensions` before and `UpdateButton` after, choose each wave through the service, assert
+  `AddressField` stays visible and in the lists, then choose Still water and assert the lists are back.
+  Red until T14. Runs in parallel with T12.
+- [ ] **T12. Composition tests (red).** `tests/modules/toolbarwaves/ListComposer.test.ts`
+  (`keeps the buttons the wave does not manage`, `keeps the address field when it is in the user lists`)
+  and cases in `WaveController.test.ts` (`refuses a pair without the address field`) and
+  `WaveStrategies.test.ts` (`recognizes a wave among core buttons`), named exactly as the `auto:`
+  checks of AC-28 to AC-31. Runs in parallel with T11.
+- [ ] **T13. Composer and layout matching.** `LAYOUT_BUTTONS` in `ToolbarButtons.ts`, `ListComposer.ts`,
+  and `WaveStrategy.matches` comparing only the layout buttons. Green: `keeps the buttons the wave does
+  not manage`, `keeps the address field when it is in the user lists`, `recognizes a wave among core
+  buttons`. Needs T12.
+- [ ] **T14. Controller composes.** `WaveController.choose` composes through `ListComposer`, refuses a
+  pair without the address field with the readable message, and `needsConfirmation` compares layout
+  only. Green: `refuses a pair without the address field`, and the earlier controller tests keep their
+  names. Needs T13 and T6. Turns T11 green with T8's run.
+- [ ] **T15. Run and recheck.** With Tore's agreement, `npm run live -- 074`: the six scenarios pass;
+  then Tore tries a wave on his real profile and the address bar must stay. The lab does not show how
+  Vivaldi lays out `AddressField` beside a wave's group; the scenario records it for the design.
